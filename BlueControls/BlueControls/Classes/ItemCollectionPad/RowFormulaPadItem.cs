@@ -159,7 +159,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
                 return true;
 
             case "database":
-                Database = Database.GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
+                Database = Database.Get(value.FromNonCritical(), false, null);
                 return true;
 
             case "rowid": // TODO: alt
@@ -203,8 +203,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
-
-
 
         icp.ResetVariables();
         icp.ReplaceVariables(db, _rowKey);

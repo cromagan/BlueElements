@@ -140,7 +140,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         TableName = MakeValidTableName(tablename);
 
-        if (!IsValidTableName(TableName, false)) {
+        if (!IsValidTableName(TableName)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
         }
 
@@ -228,8 +228,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     #region Properties
 
-    public static string DatabaseId => nameof(Database);
-
     public static List<string> ExecutingScriptAnyDatabase { get; } = [];
 
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
@@ -277,8 +275,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             OnViewChanged();
         }
     }
-
-    public virtual ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
 
     public string CreateDate {
         get => _createDate;
@@ -377,7 +373,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public bool IsDisposed { get; private set; }
 
-    public string KeyName => IsDisposed ? string.Empty : ConnectionData.UniqueId;
+    public string KeyName => IsDisposed ? string.Empty : TableName.ToUpper();
 
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
 
@@ -509,7 +505,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    protected static List<ConnectionInfo> AllavailableTables { get; } = [];
+    private static List<string> _allavailableTables  = [];
 
     protected string? AdditionalFilesPfadtmp { get; set; }
 
@@ -524,9 +520,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     #region Methods
 
-    public static List<ConnectionInfo> AllAvailableTables(string mustBeFreezed) {
+    public static List<string> AllAvailableTables() {
         if (DateTime.UtcNow.Subtract(_lastTableCheck).TotalMinutes < 20) {
-            return AllavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+            return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
 
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
@@ -543,27 +539,28 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             allreadychecked.Add(thisDb);
 
             if (possibletables != null) {
-                foreach (var thistable in possibletables) {
-                    var canadd = true;
+                _allavailableTables.AddRange(possibletables);
+                //foreach (var thistable in possibletables) {
+                ////    var canadd = true;
 
-                    #region prüfen, ob schon voranden, z.b. Database.AllFiles
+                ////    #region prüfen, ob schon vorhanden, z.b. Database.AllFiles
 
-                    foreach (var checkme in AllavailableTables) {
-                        if (string.Equals(checkme.TableName, thistable.TableName, StringComparison.InvariantCultureIgnoreCase)) {
-                            canadd = false;
-                            break;
-                        }
-                    }
+                ////    foreach (var checkme in AllavailableTables) {
+                ////        if (string.Equals(checkme.FileNameWithoutSuffix(), thistable.TableName, StringComparison.InvariantCultureIgnoreCase)) {
+                ////            canadd = false;
+                ////            break;
+                ////        }
+                ////    }
 
-                    #endregion
+                ////    #endregion
 
-                    if (canadd) { AllavailableTables.Add(thistable); }
-                }
+                ////    if (canadd) { AllavailableTables.Add(thistable); }
+                //}
             }
         }
-
+        _allavailableTables = _allavailableTables.SortedDistinctList();
         _lastTableCheck = DateTime.UtcNow;
-        return AllavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+        return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
     public static void CheckSysUndoNow(ICollection<Database> offDatabases, bool mustDoIt) {
@@ -663,114 +660,67 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public static Database? GetByFilename(string filname, bool readOnly, NeedPassword? needPassword, bool checktablename, string mustbefreezed) {
-        var l = new ConnectionInfo(filname, null, mustbefreezed);
-        return GetById(l, readOnly, needPassword, checktablename);
-    }
-
-    public static Database? GetById(ConnectionInfo? ci, bool readOnly, NeedPassword? needPassword, bool checktablename) {
-        if (ci is null) { return null; }
+    public static Database? Get(string fileOrTableName, bool readOnly, NeedPassword? needPassword) {
 
         #region Schauen, ob die Datenbank bereits geladen ist
 
-        foreach (var thisFile in AllFiles) {
-            var d = thisFile.ConnectionData;
+        var folder = new List<string>();
 
-            if (string.Equals(d.UniqueId, ci.UniqueId, StringComparison.OrdinalIgnoreCase)) {
+        if (fileOrTableName.IsFormat(FormatHolder.FilepathAndName)) {
+            folder.AddIfNotExists(fileOrTableName.FilePath());
+            fileOrTableName = fileOrTableName.FileNameWithoutSuffix();
+        }
+
+        foreach (var thisFile in AllFiles) {
+            //if (string.Equals(thisFile.Filename, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
+            //    return thisFile;
+            //}
+
+            if (string.Equals(thisFile.TableName, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
                 return thisFile;
             }
 
-            if (checktablename) {
-                if (string.Equals(d.TableName, ci.TableName, StringComparison.OrdinalIgnoreCase)) {
-                    return thisFile;
-                }
-            }
-
-            if (d.AdditionalData.ToLowerInvariant().EndsWith(".mdb") ||
-                d.AdditionalData.ToLowerInvariant().EndsWith(".bdb") ||
-                d.AdditionalData.ToLowerInvariant().EndsWith(".mbdb") ||
-                d.AdditionalData.ToLowerInvariant().EndsWith(".cbdb")) {
-                if (d.AdditionalData.Equals(ci.AdditionalData, StringComparison.OrdinalIgnoreCase)) {
-                    return thisFile; // Multiuser - nicht multiuser konflikt
-                }
+            if (thisFile.Filename.IsFormat(FormatHolder.FilepathAndName)) {
+                folder.AddIfNotExists(thisFile.Filename.FilePath());
             }
         }
 
         #endregion
 
-        #region Schauen, ob der Provider sie herstellen kann
+        foreach (var thisfolder in folder) {
+            var f = thisfolder + fileOrTableName;
 
-        if (ci.Provider != null) {
-            var db = ci.Provider.GetOtherTable(ci.TableName, readOnly);
-            if (db != null) { return db; }
-        }
-
-        #endregion
-
-        _databaseTypes ??= GetEnumerableOfType<Database>();
-
-        //#region Schauen, ob sie über den Typ definiert werden kann
-
-        //foreach (var thist in _databaseTypes) {
-        //    if (thist.Name.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) {
-        //        var l = new object?[3];
-        //        l[0] = ci;
-        //        l[1] = readOnly;
-        //        l[2] = needPassword;
-        //        var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
-
-        //        if (v is Database db && !db.IsDisposed) { return db; }
-        //    }
-        //}
-
-        //#endregion
-
-        #region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
-
-        if (FileExists(ci.AdditionalData)) {
-            if (ci.AdditionalData.FileSuffix().ToLowerInvariant() is "mdb" or "bdb") {
-                var db = new Database(ci.TableName);
-                db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+            if (FileExists(f + ".cbdb")) {
+                var db = new DatabaseChunk(fileOrTableName);
+                db.LoadFromFile(f + ".cbdb", false, needPassword, string.Empty, readOnly);
                 return db;
             }
-            if (ci.AdditionalData.FileSuffix().ToLowerInvariant() is "mbdb") {
-                var db = new DatabaseMu(ci.TableName);
-                db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+
+            if (FileExists(f + ".mbdb")) {
+                var db = new DatabaseMu(fileOrTableName);
+                db.LoadFromFile(f + ".mbdb", false, needPassword, string.Empty, readOnly);
                 return db;
             }
-            if (ci.AdditionalData.FileSuffix().ToLowerInvariant() is "cbdb") {
-                var db = new DatabaseChunk(ci.TableName);
-                db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+
+            if (FileExists(f + ".bdb")) {
+                var db = new Database(fileOrTableName);
+                db.LoadFromFile(f + ".bdb", false, needPassword, string.Empty, readOnly);
                 return db;
             }
         }
-
-        #endregion
-
-        #region Zu guter Letzte, den Tablenamen nehmen...
-
-        foreach (var thisFile in AllFiles) {
-            var d = thisFile.ConnectionData;
-
-            if (string.Equals(d.TableName, ci.TableName, StringComparison.OrdinalIgnoreCase)) {
-                return thisFile;
-            }
-        }
-
-        #endregion
 
         return null;
     }
 
-    public static bool IsValidTableName(string tablename, bool allowSystemnames) {
+    public static bool IsValidTableName(string tablename) {
         if (string.IsNullOrEmpty(tablename)) { return false; }
 
         var t = tablename.ToUpperInvariant();
 
-        if (!allowSystemnames) {
-            if (t.StartsWith("SYS_")) { return false; }
-            if (t.StartsWith("BAK_")) { return false; }
-        }
+        if (t.StartsWith("SYS_")) { return false; }
+        if (t.StartsWith("BAK_")) { return false; }
+        if (t.StartsWith("_")) { return false; }
+        if (t.EndsWith("_")) { return false; }
 
         if (!t.ContainsOnlyChars(Char_AZ + Char_Numerals + "_")) { return false; }
 
@@ -1117,7 +1067,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToStringInt5()).RemoveChars(Char_DateiSonderZeichen + " _.");
             var ok = true;
 
-            if (IsValidTableName(unique, false)) {
+            if (IsValidTableName(unique)) {
                 foreach (var thisfile in AllFiles) {
                     if (string.Equals(unique, thisfile.TableName)) { ok = false; break; }
                 }
@@ -1214,8 +1164,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    //public static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
-    //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
     public string CheckScriptError() {
         List<string> names = [];
 
@@ -1267,15 +1215,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    public ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
-        if (string.IsNullOrEmpty(Filename)) { return null; }
-
-        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + "." + Filename.FileSuffix();
-
-        if (checkExists && !File.Exists(f)) { return null; }
-
-        return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
-    }
 
     public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable, bool addSysCorrect) {
 
@@ -1764,23 +1703,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return r;
     }
 
-    public Database? GetOtherTable(string tablename, bool readOnly) {
-        if (!IsValidTableName(tablename, false)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Ungültiger Tabellenname: " + tablename);
-            return null;
-        }
 
-        var x = ConnectionDataOfOtherTable(tablename, true);
-        if (x == null) { return null; }
-
-        x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
-
-        return GetById(x, readOnly, null, true);// new DatabaseSQL(_sql, readOnly, tablename);
-    }
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
-            var db = GetByFilename(thisFile, true, null, false, "Import");
+            var db = Get(thisFile, true, null);
             if (db == null) {
                 return thisFile + " konnte nicht geladen werden.";
             }
@@ -2408,7 +2335,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             t += "\r\nColumn-Count: " + Column.Count;
             t += "\r\nRow-Count: " + Row.Count;
             t += "\r\nTable: " + TableName;
-            t += "\r\nID: " + ConnectionData.DatabaseId;
         } catch { }
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
@@ -2649,7 +2575,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (LoadedVersion == DatabaseVersion) {
                         Freeze("Ladefehler der Datenbank");
                         if (!ReadOnly) {
-                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData);
+                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
                         }
                     }
                     return ("Befehl unbekannt.", null, null);
@@ -2797,7 +2723,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (LoadedVersion == DatabaseVersion) {
                     Freeze("Ladefehler der Datenbank");
                     if (!ReadOnly) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
                     }
                 }
 
@@ -2862,24 +2788,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return nu;
     }
 
-    private List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked) {
+    private List<string>? AllAvailableTables(List<Database>? allreadychecked) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
+
+        var path = Filename.FilePath();
+        var fx = Filename.FileSuffix();
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is { IsDisposed: false } db) {
-                    if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
+                    if (string.Equals(db.Filename.FilePath(), path) &&
+                        string.Equals(db.Filename.FileSuffix(), fx) ) { return null; }
                 }
             }
         }
 
-        var nn = Directory.GetFiles(Filename.FilePath(), "*." + Filename.FileSuffix(), SearchOption.TopDirectoryOnly);
-        var gb = new List<ConnectionInfo>();
-        foreach (var thisn in nn) {
-            var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false);
-            if (t != null) { gb.Add(t); }
-        }
-        return gb;
+       return Directory.GetFiles(path, "*." + fx, SearchOption.TopDirectoryOnly).ToList();
+
+
     }
 
     private void Checker_Tick(object state) {

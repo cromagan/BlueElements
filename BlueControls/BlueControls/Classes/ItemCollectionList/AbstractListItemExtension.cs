@@ -46,11 +46,10 @@ public static class AbstractListItemExtension {
     }
 
     public static List<AbstractListItem> AllAvailableTables() {
-        var ld = Database.AllAvailableTables(string.Empty);
+        var ld = Database.AllAvailableTables();
         var ld2 = new List<AbstractListItem>();
         foreach (var thisd in ld) {
-            thisd.Editor = typeof(DatabaseHeadEditor);
-            ld2.Add(ItemOf(thisd));
+            ld2.Add(ItemOf(thisd.FileNameWithoutSuffix(), thisd));
         }
         return ld2;
     }

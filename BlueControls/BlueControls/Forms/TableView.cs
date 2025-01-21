@@ -90,8 +90,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     public static bool SettingsLoadedStatic { get; set; }
     public static List<string> SettingsStatic { get; set; } = [];
 
-    public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
-
     public List<string> Settings { get => SettingsStatic; set => SettingsStatic = value; }
 
     public bool SettingsLoaded { get => SettingsLoadedStatic; set => SettingsLoadedStatic = value; }
@@ -416,13 +414,15 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
     /// HIer wird auch die Standard-Ansicht als Tag Injiziert
     /// </summary>
-    protected void AddTabPage(ConnectionInfo? ci, string settings) {
-        if (ci is null) { return; }
+    protected void AddTabPage(string tablename, string settings) {
+        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+            tablename = tablename.FileNameWithoutSuffix();
+        }
 
         var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
-            Text = ci.TableName.ToTitleCase(),
-            Tag = (List<object>)[ci, settings]
+            Text = tablename.ToTitleCase(),
+            Tag = (List<object>)[tablename, settings]
         };
         tbcDatabaseSelector.Controls.Add(nTabPage);
     }
@@ -471,12 +471,17 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         UpdateScripts(Table.Database);
     }
 
-    protected void ChangeDatabaseInTab(ConnectionInfo? connectionId, TabPage? tabpage, string settings) {
-        if (tabpage == null || connectionId == null) { return; }
-        tabpage.Text = connectionId.TableName.ToTitleCase();
+    protected void ChangeDatabaseInTab(string tablename, TabPage? tabpage, string settings) {
+        if (tabpage == null) { return; }
+
+        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+            tablename = tablename.FileNameWithoutSuffix();
+        }
+
+        tabpage.Text = tablename.ToTitleCase();
 
         var s = (List<object>)tabpage.Tag;
-        s[0] = connectionId;
+        s[0] = tablename;
         s[1] = settings;
         tabpage.Tag = s;
     }
@@ -609,8 +614,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         var s = (List<object>)tabPage.Tag;
 
-        var ci = (ConnectionInfo)s[0];
-        if (ci == null) {
+        if (s[0] is not string tablename) {
             tabPage.Text = "FEHLER";
             UpdateScripts(null);
             DatabaseSet(null, string.Empty);
@@ -621,22 +625,22 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         var maybeok = false;
         foreach (var thisdb in Database.AllFiles) {
-            if (thisdb.TableName.Equals(ci.TableName, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
+            if (thisdb.TableName.Equals(tablename, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
         }
 
         if (!maybeok) {
-            UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + ci.TableName, true);
+            UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + tablename, true);
         }
 
         #endregion
 
-        if (Database.GetById(ci, false, Table.Database_NeedPassword, true) is { IsDisposed: false } db) {
+        if (Database.Get(tablename, false, Table.Database_NeedPassword) is { IsDisposed: false } db) {
             if (btnLetzteDateien.Parent.Parent.Visible) {
                 if (!string.IsNullOrEmpty(db.Filename)) {
                     btnLetzteDateien.AddFileName(db.Filename, db.TableName);
                     LoadTab.FileName = db.Filename;
                 } else {
-                    btnLetzteDateien.AddFileName(db.ConnectionData.UniqueId, db.TableName);
+                    btnLetzteDateien.AddFileName(db.Filename, db.TableName);
                 }
             }
             tabPage.Text = db.TableName.ToTitleCase();
@@ -654,14 +658,14 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
     /// </summary>
     /// <returns></returns>
-    protected bool SwitchTabToDatabase(ConnectionInfo? connectionInfo) {
-        if (connectionInfo is null) { return false; }
-
-        connectionInfo.Editor = typeof(DatabaseHeadEditor);
+    protected bool SwitchTabToDatabase(string tablename) {
+        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+            tablename = tablename.FileNameWithoutSuffix();
+        }
 
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
-            if (thisT is TabPage { Tag: List<object> s } tp && s[0] is ConnectionInfo ci) {
-                if (ci.UniqueId.Equals(connectionInfo.UniqueId, StringComparison.OrdinalIgnoreCase)) {
+            if (thisT is TabPage { Tag: List<object> s } tp && s[0] is string ci) {
+                if (ci.Equals(tablename, StringComparison.OrdinalIgnoreCase)) {
                     tbcDatabaseSelector.SelectedTab = tp; // tbcDatabaseSelector_Selected macht die eigentliche Arbeit
 
                     if (_firstOne) {
@@ -676,10 +680,10 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             }
         }
 
-        var settings = this.GetSettings("View_" + connectionInfo.TableName);
+        var settings = this.GetSettings("View_" + tablename);
 
-        AddTabPage(connectionInfo, settings);
-        return SwitchTabToDatabase(connectionInfo); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
+        AddTabPage(tablename, settings);
+        return SwitchTabToDatabase(tablename); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
     }
 
     /// <summary>
@@ -692,7 +696,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return false;
         }
 
-        return SwitchTabToDatabase(database.ConnectionData);
+        return SwitchTabToDatabase(database.TableName);
     }
 
     protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -845,7 +849,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         MultiUserFile.SaveAll(false);
         Database.ForceSaveAll();
 
-        _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID, string.Empty));
+        _ = SwitchTabToDatabase(e.Item.KeyName);
     }
 
     private void btnMDBImport_Click(object sender, System.EventArgs e) {
@@ -875,7 +879,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         var db = new Database(SaveTab.FileName.FileNameWithoutSuffix());
         db.SaveAsAndChangeTo(SaveTab.FileName);
-        _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID, string.Empty));
+        _ = SwitchTabToDatabase(SaveTab.FileName);
     }
 
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
@@ -907,7 +911,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             }
 
             db.SaveAsAndChangeTo(SaveTab.FileName);
-            _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID, string.Empty));
+            _ = SwitchTabToDatabase(SaveTab.FileName);
         }
     }
 
@@ -1027,7 +1031,10 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
         if (!FileExists(LoadTab.FileName)) { return; }
 
-        _ = SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID, string.Empty));
+        var db = Database.Get(LoadTab.FileName, false, null);
+
+        if (db == null) { return; }
+        _ = SwitchTabToDatabase(db.TableName);
     }
 
     private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {

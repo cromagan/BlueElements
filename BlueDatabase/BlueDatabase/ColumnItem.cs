@@ -1454,7 +1454,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             if (_linkedDatabaseTableName.Contains("|")) {
                 var l = _linkedDatabaseTableName.Split('|');
-                if (IsValidTableName(l[0], false)) { LinkedDatabaseTableName = l[0]; }
+                if (IsValidTableName(l[0])) { LinkedDatabaseTableName = l[0]; }
             }
 
             #endregion
@@ -2406,15 +2406,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             }
         }
 
-        if (_linkedDatabase == null && IsValidTableName(_linkedDatabaseTableName, false)) {
-            //var sr = string.Empty;
-            //if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
-            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseTableName, false);
-        }
-
-        if (_linkedDatabase == null) {
-            var ci = new ConnectionInfo(_linkedDatabaseTableName, null, Database.FreezedReason);
-            _linkedDatabase = GetById(ci, false, null, true);
+        if (_linkedDatabase == null && IsValidTableName(_linkedDatabaseTableName)) {
+            _linkedDatabase = Database.Get(_linkedDatabaseTableName, false, null);
         }
 
         if (_linkedDatabase != null) {

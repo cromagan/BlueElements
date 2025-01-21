@@ -57,7 +57,7 @@ internal class Method_EnsureDatabaseLoaded : Method {
 
         if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
 
-        var db = Database.GetByFilename(filn, false, null, true, string.Empty);
+        var db = Database.Get(filn, false, null);
 
         return new DoItFeedback(db != null);
     }

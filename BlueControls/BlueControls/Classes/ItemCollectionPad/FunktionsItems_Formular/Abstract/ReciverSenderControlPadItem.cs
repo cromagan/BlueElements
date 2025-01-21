@@ -27,7 +27,6 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static BlueDatabase.Database;
 
 #nullable enable
 
@@ -67,7 +66,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
             if (_databaseOutputLoaded) { return _databaseOutput; }
 
-            _databaseOutput = GetById(new ConnectionInfo(_databaseOutputName, null, string.Empty), false, null, true);
+            _databaseOutput = Database.Get(_databaseOutputName, false, null);
 
             _databaseOutputLoaded = true;
 
@@ -189,7 +188,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
                 _databaseOutputLoaded = false;
 
                 if (_databaseOutputName.IsFormat(FormatHolder.FilepathAndName)) {
-                    _databaseOutputName = _databaseOutputName.FilePath() + MakeValidTableName(_databaseOutputName.FileNameWithoutSuffix()) + "." + _databaseOutputName.FileSuffix();
+                    _databaseOutputName = _databaseOutputName.FilePath() + Database.MakeValidTableName(_databaseOutputName.FileNameWithoutSuffix()) + "." + _databaseOutputName.FileSuffix();
                 }
 
                 return true;

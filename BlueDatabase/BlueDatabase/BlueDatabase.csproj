@@ -114,7 +114,6 @@
     <Compile Include="Chunk.cs" />
     <Compile Include="DatabaseChunk.cs" />
     <Compile Include="DatabaseMu.cs" />
-    <Compile Include="ConnetionInfo.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Enums\ButtonArgs.cs" />
     <Compile Include="Enums\ColumnFunction.cs" />

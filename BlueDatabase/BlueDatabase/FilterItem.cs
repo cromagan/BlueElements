@@ -340,7 +340,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
                 return true;
 
             case "database":
-                Database = Database.GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
+                Database = Database.Get(value.FromNonCritical(), false, null);
                 return true;
 
             case "type":

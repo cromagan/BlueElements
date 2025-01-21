@@ -60,10 +60,9 @@ public abstract class Method_Database : Method {
     }
 
     protected Database? DatabaseOf(ScriptProperties scp, string tableName) {
-        if (!IsValidTableName(tableName, false)) { return null; }
+        if (!IsValidTableName(tableName)) { return null; }
 
-        var db = MyDatabase(scp)?.ConnectionDataOfOtherTable(tableName, false);
-        return GetById(db, false, null, true); // Freezed unnötiog, da eh keine Scripte ausgeführt werden.
+       return Database.Get(tableName, false, null); 
     }
 
     #endregion

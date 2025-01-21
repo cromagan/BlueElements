@@ -64,8 +64,6 @@ public class DatabaseChunk : Database {
 
     #region Properties
 
-    public new static string DatabaseId => nameof(DatabaseChunk);
-    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
 
     #endregion
 
@@ -154,33 +152,46 @@ public class DatabaseChunk : Database {
 
             if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
 
+            var important = 0;
+
             if (!chunksAllowed) {
                 // Beim Erstellen des Undo-Speichers die Undos nicht verändern, da auch bei einem nicht
                 // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
                 List<string> works2 = [];
                 foreach (var thisWorkItem in db.Undo) {
-                    if (thisWorkItem != null) {
-                        if (thisWorkItem.LogsUndo(db)) {
+                    if (thisWorkItem != null && thisWorkItem.LogsUndo(db)) {
+                        var doit = false;
+                        if (works2.Count < 5000) { doit = true; }
+                        if (thisWorkItem.Command == DatabaseDataType.EventScript && important < 10) { doit = true; }
+
+                        if (doit) {
                             works2.Add(thisWorkItem.ParseableItems().FinishParseable());
+                            if (thisWorkItem.Command == DatabaseDataType.EventScript) { important++; }
                         }
                     }
                 }
-                if (works2.Count > 5000) { works2.RemoveRange(0, works2.Count - 5000); }
+
                 mainChunk.SaveToByteList(DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
+
             } else {
                 var n = 0;
 
                 foreach (var thisWorkItem in db.Undo) {
-                    if (thisWorkItem != null) {
-                        if (thisWorkItem.LogsUndo(db)) {
-                            n++;
+                    if (thisWorkItem != null && thisWorkItem.LogsUndo(db)) {
+                
 
+                        var doit = false;
+                        if (n < 10000) { doit = true; }
+                        if (thisWorkItem.Command == DatabaseDataType.EventScript && important < 10) { doit = true; }
+
+                        if (doit) {
+                            n++;
                             var chunkId = GetChunkId(db, thisWorkItem.Command, thisWorkItem.ChunkValue, thisWorkItem.ColName);
                             if (!string.IsNullOrEmpty(chunkId)) {
                                 var rowchunk = GetOrMakechunk(chunks, db, chunkId);
                                 rowchunk.SaveToByteList(DatabaseDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
-                                if (n > 10000) { break; }
                             }
+                            if (thisWorkItem.Command == DatabaseDataType.EventScript) { important++; }
                         }
                     }
                 }

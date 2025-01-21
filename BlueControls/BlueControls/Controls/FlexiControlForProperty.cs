@@ -418,7 +418,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<Database?> adb:
-                var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
+                var db = Database.Get(Value, false, null);
                 if (db != null) { db.Editor = typeof(DatabaseHeadEditor); }
 
                 if (adb.Get() != db) {
@@ -520,7 +520,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Database db:
-                ValueSet(db.ConnectionData.UniqueId, true);
+                ValueSet(db.TableName, true);
                 break;
 
             case IEditable:

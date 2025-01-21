@@ -130,7 +130,7 @@ public class VariableRowItem : Variable {
 
             if (tx.Length != 2) { return (false, null); }
 
-            var db = Database.GetByFilename(tx[0], false, null, true, string.Empty);
+            var db = Database.Get(tx[0], false, null);
 
             if (db is null || db.IsDisposed) { return (false, null); }
 

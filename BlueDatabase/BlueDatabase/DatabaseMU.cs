@@ -60,9 +60,7 @@ public class DatabaseMu : Database {
 
     #region Properties
 
-    public new static string DatabaseId => nameof(DatabaseMu);
 
-    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
 
     /// <summary>
     /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt

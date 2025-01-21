@@ -84,8 +84,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
             if (value is Database dbx) {
                 db = dbx;
-            } else if (value is ConnectionInfo ci) {
-                db = Database.GetById(ci, false, null, true);
             }
 
             Database = db is { IsDisposed: false } ? db : null;
@@ -343,7 +341,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1) + "<br>";
         t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUtc + " " + Database.TemporaryDatabaseMasterUser + "<br>";
         t += "<b>Letzte Komplettierung:</b> <tab>" + Database.FileStateUtcDate.ToString7() + "<br>";
-        t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueId + "<br>";
         capInfo.Text = t.TrimEnd("<br>");
     }
 
