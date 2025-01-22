@@ -63,7 +63,7 @@ public class Method_AddRowsUnique : Method_Database {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
-        var db = DatabaseOf(scp, attvar.ValueStringGet(0));
+        var db = Database.Get(attvar.ValueStringGet(0), false, null); 
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);

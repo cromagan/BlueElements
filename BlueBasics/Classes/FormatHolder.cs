@@ -171,7 +171,7 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder SystemName = new("Systemname") {
         Image = QuickImage.Get(ImageCode.Variable, 16),
         AllowedChars = Constants.Char_AZ + Constants.Char_az + Constants.Char_Numerals + "_",
-        Regex = @"^[A-Za-z]\S*$",
+        Regex = @"^[A-Za-z]\S*[A-Za-z0-9]$",
         FormatierungErlaubt = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,

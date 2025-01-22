@@ -59,11 +59,6 @@ public abstract class Method_Database : Method {
         return MyDatabase(scp)?.Column[c.KeyName];
     }
 
-    protected Database? DatabaseOf(ScriptProperties scp, string tableName) {
-        if (!IsValidTableName(tableName)) { return null; }
-
-       return Database.Get(tableName, false, null); 
-    }
 
     #endregion
 }

@@ -47,7 +47,7 @@ public class Method_Lookup : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var db = DatabaseOf(scp, attvar.ValueStringGet(0));
+        var db = Database.Get(attvar.ValueStringGet(0), false, null);
         if (db == null) {
             return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
         }

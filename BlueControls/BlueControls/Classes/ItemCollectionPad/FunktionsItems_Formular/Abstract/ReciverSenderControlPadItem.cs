@@ -187,11 +187,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
                 _databaseOutputName = value.FromNonCritical();
                 _databaseOutputLoaded = false;
 
-                if (_databaseOutputName.IsFormat(FormatHolder.FilepathAndName)) {
-                    _databaseOutputName = _databaseOutputName.FilePath() + Database.MakeValidTableName(_databaseOutputName.FileNameWithoutSuffix()) + "." + _databaseOutputName.FileSuffix();
-                }
-
-                return true;
+               return true;
 
             case "senttochildids":
                 //value = value.Replace("\r", "|");

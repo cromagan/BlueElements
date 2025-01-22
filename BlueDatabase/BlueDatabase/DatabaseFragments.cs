@@ -34,7 +34,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class DatabaseMu : Database {
+public class DatabaseFragments : Database {
 
     #region Fields
 
@@ -48,13 +48,13 @@ public class DatabaseMu : Database {
 
     #region Constructors
 
-    public DatabaseMu(string tablename) : base(tablename) { }
+    public DatabaseFragments(string tablename) : base(tablename) { }
 
     #endregion
 
     #region Destructors
 
-    ~DatabaseMu() { Dispose(false); }
+    ~DatabaseFragments() { Dispose(false); }
 
     #endregion
 
@@ -239,7 +239,7 @@ public class DatabaseMu : Database {
             var tbn = new List<string>();
             var frgu = new List<string>();
             foreach (var thisdb in db) {
-                if (thisdb is DatabaseMu dbmu && string.IsNullOrEmpty(dbmu.FreezedReason)) {
+                if (thisdb is DatabaseFragments dbmu && string.IsNullOrEmpty(dbmu.FreezedReason)) {
                     tbn.AddIfNotExists(dbmu.TableName.ToUpperInvariant());
                     if (!string.IsNullOrEmpty(dbmu._myFragmentsFilename)) {
                         frgu.Add(dbmu._myFragmentsFilename);
@@ -313,7 +313,7 @@ public class DatabaseMu : Database {
         var filepath = Filename.FilePath();
 
         foreach (var thisDb in AllFiles) {
-            if (thisDb is DatabaseMu dbmu) {
+            if (thisDb is DatabaseFragments dbmu) {
                 if (dbmu.Filename.FilePath().Equals(filepath, StringComparison.OrdinalIgnoreCase)) {
                     oo.Add(dbmu);
                 }

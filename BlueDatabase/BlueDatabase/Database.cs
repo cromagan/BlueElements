@@ -505,7 +505,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    private static List<string> _allavailableTables  = [];
+    private static List<string> _allavailableTables = [];
 
     protected string? AdditionalFilesPfadtmp { get; set; }
 
@@ -662,6 +662,28 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public static Database? Get(string fileOrTableName, bool readOnly, NeedPassword? needPassword) {
 
+        if (fileOrTableName.Contains("|")) {
+            var t = fileOrTableName.SplitBy("|");
+            var tn = string.Empty;
+            var fn = string.Empty;
+
+            foreach (var thist in t) {
+                if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder.FilepathAndName)) {
+                    fn = thist;
+
+                }
+                if (string.IsNullOrEmpty(tn) && IsValidTableName(thist)) {
+                    tn = thist;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(fn)) {
+                fileOrTableName = fn;
+            } else if (!string.IsNullOrEmpty(tn)) {
+                fileOrTableName = tn;
+            }
+        }
+
         #region Schauen, ob die Datenbank bereits geladen ist
 
         var folder = new List<string>();
@@ -671,11 +693,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             fileOrTableName = fileOrTableName.FileNameWithoutSuffix();
         }
 
-        foreach (var thisFile in AllFiles) {
-            //if (string.Equals(thisFile.Filename, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
-            //    return thisFile;
-            //}
+        fileOrTableName = MakeValidTableName(fileOrTableName);
 
+        foreach (var thisFile in AllFiles) {
             if (string.Equals(thisFile.TableName, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
                 return thisFile;
             }
@@ -697,7 +717,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (FileExists(f + ".mbdb")) {
-                var db = new DatabaseMu(fileOrTableName);
+                var db = new DatabaseFragments(fileOrTableName);
                 db.LoadFromFile(f + ".mbdb", false, needPassword, string.Empty, readOnly);
                 return db;
             }
@@ -719,10 +739,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (t.StartsWith("SYS_")) { return false; }
         if (t.StartsWith("BAK_")) { return false; }
-        if (t.StartsWith("_")) { return false; }
-        if (t.EndsWith("_")) { return false; }
+        if (t.StartsWith("DATABASE")) { return false; }
 
-        if (!t.ContainsOnlyChars(Char_AZ + Char_Numerals + "_")) { return false; }
+        if (!tablename.IsFormat(FormatHolder.SystemName)) { return false; }
 
         if (tablename == "ALL_TAB_COLS") { return false; } // system-name
 
@@ -2272,7 +2291,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public virtual void ReorganizeChunks() { }
 
     public void RepairAfterParse() {
-        // Nicht IsInCache setzen, weil ansonsten DatabaseMU nicht mehr funktioniert
+        // Nicht IsInCache setzen, weil ansonsten DatabaseFragments nicht mehr funktioniert
 
         if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditAcut))) { return; }
 
@@ -2798,12 +2817,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             foreach (var thisa in allreadychecked) {
                 if (thisa is { IsDisposed: false } db) {
                     if (string.Equals(db.Filename.FilePath(), path) &&
-                        string.Equals(db.Filename.FileSuffix(), fx) ) { return null; }
+                        string.Equals(db.Filename.FileSuffix(), fx)) { return null; }
                 }
             }
         }
 
-       return Directory.GetFiles(path, "*." + fx, SearchOption.TopDirectoryOnly).ToList();
+        return Directory.GetFiles(path, "*." + fx, SearchOption.TopDirectoryOnly).ToList();
 
 
     }
@@ -2988,7 +3007,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         var masters = 0;
         foreach (var thisDb in AllFiles) {
-            if (thisDb is DatabaseMu && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+            if (thisDb is DatabaseFragments && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
                 masters++;
                 if (masters >= MaxMasterCount) { return false; }
             }
