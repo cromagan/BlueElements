@@ -82,7 +82,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         if (db == null || allFi.Database != db) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
-        if (!db.BeSureAllDataLoaded()) {
+        if (!db.BeSureAllDataLoaded(-1)) {
             return new DoItFeedback(ld, "Datenbank konnte nicht aktualisiert werden.");
         }
 

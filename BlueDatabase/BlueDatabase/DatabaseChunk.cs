@@ -293,17 +293,17 @@ public class DatabaseChunk : Database {
         if (!DirectoryExists(chunkPath)) { return true; }
 
 
-        var fileQuery = Directory.GetFiles(chunkPath, "*.bdbc")
-           .Select(f => new FileInfo(f))
-           .OrderBy(f => f.LastWriteTime);
+        var files = Directory.GetFiles(chunkPath, "*.bdbc");
+        var fileQuery = anzahl < 0 || anzahl >= files.Length
+            ? files
+            : files.Select(f => new FileInfo(f))
+                  .OrderBy(f => f.LastWriteTime)
+                  .Take(anzahl)
+                  .Select(f => f.FullName)
+                  .ToArray();
 
-        var filesToProcess = anzahl < 1 || anzahl >= fileQuery.Count()
-            ? fileQuery.ToList()
-            : fileQuery.Take(anzahl).ToList();
 
-
-        var chunkFiles = Directory.GetFiles(chunkPath, "*.bdbc");
-        foreach (var file in chunkFiles) {
+          foreach (var file in files) {
             var chunkId = file.FileNameWithoutSuffix();
 
             var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, false);
@@ -374,7 +374,7 @@ public class DatabaseChunk : Database {
 
         #region Erst alle Chunks laden
 
-        if (!BeSureAllDataLoaded()) {
+        if (!BeSureAllDataLoaded(-1)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Chunk laden!");
             return;
         }
