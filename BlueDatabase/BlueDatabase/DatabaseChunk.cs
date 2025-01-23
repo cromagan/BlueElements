@@ -279,16 +279,28 @@ public class DatabaseChunk : Database {
         return mins > ranges && mins < rangee;
     }
 
-    public override bool BeSureAllDataLoaded() {
-        if (!base.BeSureAllDataLoaded()) { return false; }
+
+
+
+    public override bool BeSureAllDataLoaded(int anzahl) {
+        if (!base.BeSureAllDataLoaded(anzahl)) { return false; }
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
-        //Column.GetSystems();
-        //if (Column.SplitColumn == null) { return true; }
+
 
         var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
 
         if (!DirectoryExists(chunkPath)) { return true; }
+
+
+        var fileQuery = Directory.GetFiles(chunkPath, "*.bdbc")
+           .Select(f => new FileInfo(f))
+           .OrderBy(f => f.LastWriteTime);
+
+        var filesToProcess = anzahl < 1 || anzahl >= fileQuery.Count()
+            ? fileQuery.ToList()
+            : fileQuery.Take(anzahl).ToList();
+
 
         var chunkFiles = Directory.GetFiles(chunkPath, "*.bdbc");
         foreach (var file in chunkFiles) {
@@ -332,7 +344,7 @@ public class DatabaseChunk : Database {
             if (!chk.NeedsReload(important)) { return (false, true); }
         }
 
-        if(string.IsNullOrEmpty(chunkId)) {
+        if (string.IsNullOrEmpty(chunkId)) {
             return (false, false);
         }
 

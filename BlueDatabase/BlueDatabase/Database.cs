@@ -1063,7 +1063,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
-    public virtual bool BeSureAllDataLoaded() {
+    public virtual bool BeSureAllDataLoaded(int anzahl) {
         if (IsDisposed) { return false; }
         return BeSureToBeUpDoDate();
     }
@@ -1191,6 +1191,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
         vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
+        vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
         vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
         vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
 
@@ -2922,6 +2923,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Abmelden der Events: " + ex.Message);
         }
     }
+
+  
 
     #endregion
 }
