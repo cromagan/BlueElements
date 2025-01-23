@@ -659,7 +659,11 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// </summary>
     /// <returns></returns>
     protected bool SwitchTabToDatabase(string tablename) {
+        MultiUserFile.SaveAll(false);
+        Database.ForceSaveAll();
+
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+            Database.Get(tablename, false, Table.Database_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -846,8 +850,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        MultiUserFile.SaveAll(false);
-        Database.ForceSaveAll();
+
 
         _ = SwitchTabToDatabase(e.Item.KeyName);
     }
@@ -918,7 +921,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
         Database.ForceSaveAll();
-        Database.CheckSysUndoNow(Database.AllFiles, true);
+        Database.GetLastetChanges(Database.AllFiles);
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
@@ -1031,10 +1034,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
         if (!FileExists(LoadTab.FileName)) { return; }
 
-        var db = Database.Get(LoadTab.FileName, false, null);
 
-        if (db == null) { return; }
-        _ = SwitchTabToDatabase(db.TableName);
+        _ = SwitchTabToDatabase(LoadTab.FileName);
     }
 
     private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {

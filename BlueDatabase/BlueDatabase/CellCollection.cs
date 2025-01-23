@@ -161,7 +161,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (row == null) {
-            if (!column.IsFirst()) {
+            if (!column.IsFirst() || db.Column.First() is not { } first) {
                 return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
             }
 
@@ -170,12 +170,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.SplitColumn is { } spc) {
-                var cn = FilterCollection.InitValue(filter, spc, false);
+                var value = FilterCollection.InitValue(filter, spc, false);
 
-                if (string.IsNullOrEmpty(cn)) {
+                if (string.IsNullOrEmpty(value)) {
                     return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
                 }
-                return db.IsChunkEditable(cn);
+                return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value);
             }
         } else {
             if (db.Column.SysLocked != null) {
@@ -187,8 +187,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.SplitColumn is { }) {
-                var cn = DatabaseChunk.GetChunkId(row);
-                return db.IsChunkEditable(cn);
+                var value = DatabaseChunk.GetChunkValue(row);
+                return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, column.KeyName, value);
             }
         }
 

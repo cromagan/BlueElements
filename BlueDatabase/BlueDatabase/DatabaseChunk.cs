@@ -62,11 +62,6 @@ public class DatabaseChunk : Database {
 
     #endregion
 
-    #region Properties
-
-
-    #endregion
-
     #region Methods
 
     public static List<Chunk>? GenerateNewChunks(Database db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
@@ -172,21 +167,18 @@ public class DatabaseChunk : Database {
                 }
 
                 mainChunk.SaveToByteList(DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
-
             } else {
                 var n = 0;
 
                 foreach (var thisWorkItem in db.Undo) {
                     if (thisWorkItem != null && thisWorkItem.LogsUndo(db)) {
-                
-
                         var doit = false;
                         if (n < 10000) { doit = true; }
                         if (thisWorkItem.Command == DatabaseDataType.EventScript && important < 10) { doit = true; }
 
                         if (doit) {
                             n++;
-                            var chunkId = GetChunkId(db, thisWorkItem.Command, thisWorkItem.ChunkValue, thisWorkItem.ColName);
+                            var chunkId = GetChunkId(db, thisWorkItem.Command, thisWorkItem.ColName, thisWorkItem.ChunkValue);
                             if (!string.IsNullOrEmpty(chunkId)) {
                                 var rowchunk = GetOrMakechunk(chunks, db, chunkId);
                                 rowchunk.SaveToByteList(DatabaseDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
@@ -217,10 +209,10 @@ public class DatabaseChunk : Database {
     public static string GetChunkId(RowItem r) {
         if (r.Database?.Column.SplitColumn is not { }) { return Chunk_MainData; }
 
-        return GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r), string.Empty);
+        return GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, string.Empty, GetChunkValue(r));
     }
 
-    public static string GetChunkId(Database db, DatabaseDataType type, string value, string columnItem) {
+    public static string GetChunkId(Database db, DatabaseDataType type, string columnName, string value) {
         if (db.Column.SplitColumn is not { } spc) { return Chunk_MainData; }
 
         if (type is DatabaseDataType.Command_RemoveRow or DatabaseDataType.Command_AddRow
@@ -228,7 +220,7 @@ public class DatabaseChunk : Database {
             or DatabaseDataType.Command_NewStart) { return string.Empty; }
 
         // Werteänderungen von Split-Spalten nicht loggen. Neue Zeilen werden mit dem Wert initialisert und sind somit noch nicht richtig zugeordnet
-        if (type.IsCellValue() && string.Equals(columnItem, spc.KeyName, StringComparison.OrdinalIgnoreCase)) { return string.Empty; }
+        if (type.IsCellValue() && string.Equals(columnName, spc.KeyName, StringComparison.OrdinalIgnoreCase)) { return string.Empty; }
 
         if (type.IsObsolete()) { return string.Empty; }
         if (type == DatabaseDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases; }
@@ -287,8 +279,9 @@ public class DatabaseChunk : Database {
         return mins > ranges && mins < rangee;
     }
 
-    public bool LoadAllChunks() {
-        if (IsDisposed) { return false; }
+    public override bool BeSureAllDataLoaded() {
+        if (!base.BeSureAllDataLoaded()) { return false; }
+
         if (string.IsNullOrEmpty(Filename)) { return true; }
         //Column.GetSystems();
         //if (Column.SplitColumn == null) { return true; }
@@ -311,11 +304,11 @@ public class DatabaseChunk : Database {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="ofValue"></param>
     /// <param name="important">Steuert, ob es dringend nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public override (bool loaded, bool ok) LoadChunkfromValue(string value, DatabaseDataType type, bool important, NeedPassword? needPassword) {
-        var chunkId = GetChunkId(this, type, value, string.Empty);
+    public override (bool loaded, bool ok) BeSureRowIsLoaded(string ofValue, DatabaseDataType type, bool important, NeedPassword? needPassword) {
+        var chunkId = GetChunkId(this, type, string.Empty, ofValue);
 
         if (string.IsNullOrEmpty(chunkId)) { return (false, false); }
 
@@ -337,6 +330,10 @@ public class DatabaseChunk : Database {
         if (_chunks.TryGetValue(chunkId.ToLower(), out var chk)) {
             if (chk.LoadFailed) { return (false, false); }
             if (!chk.NeedsReload(important)) { return (false, true); }
+        }
+
+        if(string.IsNullOrEmpty(chunkId)) {
+            return (false, false);
         }
 
         OnDropMessage(FehlerArt.Info, $"Lade Chunk '{chunkId.ToLower()}' der Datenbank '{Filename.FileNameWithoutSuffix()}'");
@@ -365,7 +362,7 @@ public class DatabaseChunk : Database {
 
         #region Erst alle Chunks laden
 
-        if (!LoadAllChunks()) {
+        if (!BeSureAllDataLoaded()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Chunk laden!");
             return;
         }
@@ -391,44 +388,47 @@ public class DatabaseChunk : Database {
         SaveInternal(FileStateUtcDate);
     }
 
-    public List<RowItem> RowsOfChunk(string chunkid) => Row.Where(r => GetChunkId(r) == chunkid.ToLower()).ToList();
+    public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName.ToLower()).ToList();
 
-    internal override string IsChunkEditable(string chunkid) {
-        var (_, ok) = LoadChunkWithChunkId(chunkid, true, null, true);
+    internal override string IsValueEditable(DatabaseDataType type, string columnName, string ofValue) {
+        var chunkId = GetChunkId(this, type, columnName, ofValue);
+
+        var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, true);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
-        if (!_chunks.TryGetValue(chunkid.ToLower(), out var chunk)) {
+        if (!_chunks.TryGetValue(chunkId.ToLower(), out var chunk)) {
             return "Interner Chunk-Fehler";
         }
 
-        var row = RowsOfChunk(chunkid);
-
-        return chunk.IsEditable(row);
-    }
-
-    protected override void CheckSysUndoNowOfMe() {
-        base.CheckSysUndoNowOfMe();
-
-        LoadChunkWithChunkId(Chunk_MainData, false, null, true);
-
-        Column.GetSystems();
-
-        if (Column.SplitColumn != null) {
-            LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null, true);
-            LoadChunkWithChunkId(Chunk_Master, false, null, true);
-            LoadChunkWithChunkId(Chunk_Variables, false, null, true);
-        }
-    }
-
-    protected override void DidLastChanges() {
-        base.DidLastChanges();
-        TryToSetMeTemporaryMaster();
+        return chunk.IsEditable(this);
     }
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         _chunks.Clear();
+    }
+
+    protected override bool BeSureToBeUpDoDate() {
+        if (!base.BeSureToBeUpDoDate()) { return false; }
+
+        OnDropMessage(FehlerArt.Info, "Lade Chunks von '" + TableName + "'");
+
+
+
+        if (!LoadChunkWithChunkId(Chunk_MainData, false, null, true).ok) { return false; }
+
+        Column.GetSystems();
+
+        if (Column.SplitColumn != null) {
+            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null, true).ok) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Master, false, null, true).ok) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Variables, false, null, true).ok) { return false; }
+        }
+        IsInCache = DateTime.UtcNow;
+
+        TryToSetMeTemporaryMaster();
+        return true;
     }
 
     protected override bool SaveInternal(DateTime setfileStateUtcDateTo) {
@@ -519,7 +519,7 @@ public class DatabaseChunk : Database {
     private bool Parse(Chunk chunk, NeedPassword? needPassword) {
         if (chunk.LoadFailed) { return false; }
 
-        var rowsToRemove = RowsOfChunk(chunk.KeyName);
+        var rowsToRemove = RowsOfChunk(chunk);
 
         if (rowsToRemove.Count > 0) {
             // Zeilen und zugehörige Zellen entfernen

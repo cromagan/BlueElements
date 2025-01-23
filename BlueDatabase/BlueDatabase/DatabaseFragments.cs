@@ -38,6 +38,14 @@ public class DatabaseFragments : Database {
 
     #region Fields
 
+    private static volatile bool _isInFragmentLoader;
+
+    /// <summary>
+    /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemacht werden.
+    /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
+    /// </summary>
+    private volatile int _doingChanges = 0;
+
     private bool _masterNeeded;
 
     private string _myFragmentsFilename = string.Empty;
@@ -59,8 +67,6 @@ public class DatabaseFragments : Database {
     #endregion
 
     #region Properties
-
-
 
     /// <summary>
     /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
@@ -97,6 +103,15 @@ public class DatabaseFragments : Database {
         return mins > ranges && mins < rangee;
     }
 
+    public override string EditableErrorReason(EditableErrorReasonType mode) {
+        var f = base.EditableErrorReason(mode);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (_doingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
+
+        return string.Empty;
+    }
+
     public override void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (FileExists(fileNameToLoad)) {
             Filename = fileNameToLoad;
@@ -117,11 +132,6 @@ public class DatabaseFragments : Database {
             }
             return true;
         } catch { return false; }
-    }
-
-    protected override void DidLastChanges() {
-        base.DidLastChanges();
-        TryToSetMeTemporaryMaster();
     }
 
     protected override void Dispose(bool disposing) {
@@ -225,105 +235,36 @@ public class DatabaseFragments : Database {
         }
     }
 
-    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime fromUtc, DateTime endTimeUtc) {
-        if (string.IsNullOrEmpty(FragmengtsPath())) { return new(); }
+    protected override bool BeSureToBeUpDoDate() {
+        if (!base.BeSureToBeUpDoDate()) { return false; }
 
-        if (!db.Any()) { return new(); }
-
-        CheckPath();
+        if (_isInFragmentLoader) { return false; }
+        _isInFragmentLoader = true;
 
         try {
+            OnDropMessage(FehlerArt.Info, "Lade Fragmente von '" + TableName + "'");
 
-            #region Namen aller Tabellen um UCase ermitteln (tbn), alle ungültigen FRG-Dateien ermitteln (frgu)
-
-            var tbn = new List<string>();
-            var frgu = new List<string>();
-            foreach (var thisdb in db) {
-                if (thisdb is DatabaseFragments dbmu && string.IsNullOrEmpty(dbmu.FreezedReason)) {
-                    tbn.AddIfNotExists(dbmu.TableName.ToUpperInvariant());
-                    if (!string.IsNullOrEmpty(dbmu._myFragmentsFilename)) {
-                        frgu.Add(dbmu._myFragmentsFilename);
-                    }
-                }
+            var lastFragmentDate = DateTime.UtcNow;
+            var (changes, files) = GetLastChanges(lastFragmentDate);
+            if (changes == null) {
+                _isInFragmentLoader = false;
+                return false;
             }
 
-            #endregion
-
-            #region Alle Fragment-Dateien im Verzeichniss ermitteln und eigene Ausfiltern (frgma)
-
-            var frgma = Directory.GetFiles(FragmengtsPath(), "*." + SuffixOfFragments(), SearchOption.TopDirectoryOnly).ToList();
-
-            if (!frgma.Contains(_myFragmentsFilename) && !string.IsNullOrEmpty(_myFragmentsFilename)) { return (null, null); }
-
-            frgma.RemoveRange(frgu);
-
-            #endregion
-
-            #region Alle Fragments-Dateien ermitteln, wo die Datenbank aktuell im Speicher ist (frgm)
-
-            var frgm = new List<string>();
-
-            foreach (var thisn in frgma) {
-                foreach (var thistbn in tbn) {
-                    if (thisn.ToUpperInvariant().Contains("\\" + thistbn + "-")) {
-                        frgm.Add(thisn);
-                        break;
-                    }
-                }
-            }
-
-            #endregion
-
-            if (frgm.Count == 0) { return ([], []); }
-
-            var l = new List<UndoItem>();
-
-            foreach (var thisf in frgm) {
-                var reader = new StreamReader(new FileStream(thisf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Encoding.UTF8);
-                var fil = reader.ReadToEnd();
-                reader.Close();
-
-                //var fil = File.ReadAllText(thisf, System.Text.Encoding.UTF8);
-                var fils = fil.SplitAndCutByCrToList();
-
-                foreach (var thist in fils) {
-                    if (!thist.StartsWith("-")) {
-                        var u = new UndoItem(thist);
-                        if (tbn.Contains(u.TableName.ToUpperInvariant())) {
-                            if (u.DateTimeUtc.Subtract(IsInCache).TotalSeconds > 0 &&
-                               u.DateTimeUtc.Subtract(endTimeUtc).TotalSeconds < 0) {
-                                u.Container = thisf;
-                                l.Add(u);
-                            }
-                        }
-                    }
-                }
-            }
-
-            return (l, frgm);
-        } catch { }
-        return (null, null);
-    }
-
-    protected override List<Database> LoadedDatabasesWithSameServer() {
-        var oo = new List<Database>();
-
-        if (string.IsNullOrEmpty(Filename)) { return oo; }
-
-        var filepath = Filename.FilePath();
-
-        foreach (var thisDb in AllFiles) {
-            if (thisDb is DatabaseFragments dbmu) {
-                if (dbmu.Filename.FilePath().Equals(filepath, StringComparison.OrdinalIgnoreCase)) {
-                    oo.Add(dbmu);
-                }
-            }
+            var start = DateTime.UtcNow;
+            Column.GetSystems();
+            InjectData(files, changes, start, lastFragmentDate);
+            TryToSetMeTemporaryMaster();
+        } catch {
+            _isInFragmentLoader = false;
+            return false;
         }
 
-        return oo;
+        _isInFragmentLoader = false;
+        return true;
     }
 
-    protected override bool SaveRequired() => true; // immer "speichern"
+    protected override bool SaveRequired() => true;
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunk) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment, chunk);
@@ -349,6 +290,7 @@ public class DatabaseFragments : Database {
         return string.Empty;
     }
 
+    // immer "speichern"
     private static string SuffixOfFragments() => "frg";
 
     private void CheckPath() {
@@ -363,6 +305,123 @@ public class DatabaseFragments : Database {
         return Filename.FilePath() + "Frgm\\";
     }
 
+    private (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(DateTime endTimeUtc) {
+        if (string.IsNullOrEmpty(FragmengtsPath())) { return (null, null); }
+
+        if (!string.IsNullOrEmpty(FreezedReason)) { return (null, null); }
+
+        CheckPath();
+
+        try {
+
+            #region Alle Fragment-Dateien im Verzeichniss ermitteln und eigene Ausfiltern (frgma)
+
+            var frgma = Directory.GetFiles(FragmengtsPath(), TableName.ToUpper() + "-*." + SuffixOfFragments(), SearchOption.TopDirectoryOnly).ToList();
+            frgma.Remove(_myFragmentsFilename);
+
+            #endregion
+
+            if (frgma.Count == 0) { return ([], []); }
+
+            var l = new List<UndoItem>();
+
+            foreach (var thisf in frgma) {
+                var reader = new StreamReader(new FileStream(thisf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Encoding.UTF8);
+                var fil = reader.ReadToEnd();
+                reader.Close();
+
+                var fils = fil.SplitAndCutByCrToList();
+
+                foreach (var thist in fils) {
+                    if (!thist.StartsWith("-")) {
+                        var u = new UndoItem(thist);
+
+                        if (u.DateTimeUtc.Subtract(IsInCache).TotalSeconds > 0 &&
+                           u.DateTimeUtc.Subtract(endTimeUtc).TotalSeconds < 0) {
+                            u.Container = thisf;
+                            l.Add(u);
+                        }
+                    }
+                }
+            }
+
+            return (l, frgma);
+        } catch { }
+        return (null, null);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="checkedDataFiles"></param>
+    /// <param name="data"></param>
+    /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
+    /// <param name="endTimeUtc"></param>
+    private void InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
+        if (data == null) { return; }
+        if (IsDisposed) { return; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
+
+        if (Column.SplitColumn is { }) {
+            // Split-Datenbanken und Fragmente gehen nicht, siehe kommentar weiter unten
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(Filename) && IsInCache.Year < 2000) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank noch nicht korrekt geladen!");
+            return;
+        }
+
+        data = data.OrderBy(obj => obj.DateTimeUtc).ToList();
+
+        try {
+            List<ColumnItem> columnsAdded = [];
+            List<RowItem> rowsAdded = [];
+            List<string> cellschanged = [];
+            List<string> myfiles = [];
+
+            if (checkedDataFiles != null) {
+                foreach (var thisf in checkedDataFiles) {
+                    if (thisf.Contains("\\" + TableName.ToUpperInvariant() + "-")) {
+                        myfiles.AddIfNotExists(thisf);
+                    }
+                }
+            }
+
+            _doingChanges++;
+            foreach (var thisWork in data) {
+                if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
+                    Undo.Add(thisWork);
+                    ChangesNotIncluded.Add(thisWork);
+
+                    var c = Column[thisWork.ColName];
+                    var r = Row.SearchByKey(thisWork.RowKey);
+
+                    // HIER Wird der falsche Chunk übergeben!
+                    var (error, columnchanged, rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate, string.Empty);
+
+                    if (!string.IsNullOrEmpty(error)) {
+                        Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
+                        //Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
+                        _doingChanges--;
+                        return;
+                    }
+
+                    if (c == null && columnchanged != null) { columnsAdded.AddIfNotExists(columnchanged); }
+                    if (r == null && rowchanged != null) { rowsAdded.AddIfNotExists(rowchanged); }
+                    if (rowchanged != null && columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
+                }
+            }
+            _doingChanges--;
+            IsInCache = endTimeUtc;
+            DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, startTimeUtc, endTimeUtc);
+            OnInvalidateView();
+        } catch {
+            Develop.CheckStackForOverflow();
+            InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc);
+        }
+    }
+
     private void StartWriter() {
         if (string.IsNullOrEmpty(FragmengtsPath())) {
             Freeze("Fragmentpfad nicht gesetzt. Stand: " + IsInCache.ToString5());
@@ -370,7 +429,7 @@ public class DatabaseFragments : Database {
         }
         CheckPath();
 
-        //CheckSysUndoNow();
+        //LoadFragmentsNow();
 
         _myFragmentsFilename = TempFile(FragmengtsPath(), TableName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
 

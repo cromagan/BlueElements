@@ -159,7 +159,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
                 return true;
 
             case "database":
-                Database = Database.Get(value.FromNonCritical(), false, null);
+                Database = Database.Get(value.FromNonCritical(), false, Table.Database_NeedPassword);
                 return true;
 
             case "rowid": // TODO: alt

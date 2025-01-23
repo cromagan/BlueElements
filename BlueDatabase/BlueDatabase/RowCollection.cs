@@ -376,6 +376,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisDb in l) {
             if (thisDb is { IsDisposed: false } db) {
                 if (!db.CanDoValueChangedScript()) { continue; }
+                db.BeSureAllDataLoaded();
                 r.AddRange(db.Row);
             }
         }

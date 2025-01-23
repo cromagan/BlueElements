@@ -66,7 +66,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
             if (_databaseOutputLoaded) { return _databaseOutput; }
 
-            _databaseOutput = Database.Get(_databaseOutputName, false, null);
+            _databaseOutput = Database.Get(_databaseOutputName, false, Table.Database_NeedPassword);
 
             _databaseOutputLoaded = true;
 
@@ -187,7 +187,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
                 _databaseOutputName = value.FromNonCritical();
                 _databaseOutputLoaded = false;
 
-               return true;
+                return true;
 
             case "senttochildids":
                 //value = value.Replace("\r", "|");

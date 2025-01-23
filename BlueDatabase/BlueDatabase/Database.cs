@@ -73,19 +73,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     protected readonly List<UndoItem> ChangesNotIncluded = [];
 
-    private static List<Type>? _databaseTypes;
-    private static volatile bool _isInTimer;
-    private static DateTime _lastTableCheck = new(1900, 1, 1);
+    private static List<string> _allavailableTables = [];
 
     /// <summary>
-    /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
+    /// Der Globale Timer, der die Datenbanken regelmäßig updated
     /// </summary>
-    private static Timer? _pendingChangesTimer;
+    private static Timer? _databaseUpdateTimer;
 
-    /// <summary>
-    /// Der Zeitstempel der letzten Abfrage des _pendingChangesTimer
-    /// </summary>
-    private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
+    private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
     private readonly List<string> _datenbankAdmin = [];
     private readonly List<DatabaseScriptDescription> _eventScript = [];
@@ -177,7 +172,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können.
         // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
         AllFiles.Add(this);
-        GenerateTimer();
+        GenerateDatabaseUpdateTimer();
     }
 
     #endregion
@@ -299,12 +294,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
     }
-
-    /// <summary>
-    /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemachte werden.
-    /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
-    /// </summary>
-    public int DoingChanges { get; private set; }
 
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
@@ -505,8 +494,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    private static List<string> _allavailableTables = [];
-
     protected string? AdditionalFilesPfadtmp { get; set; }
 
     /// <summary>
@@ -521,7 +508,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     #region Methods
 
     public static List<string> AllAvailableTables() {
-        if (DateTime.UtcNow.Subtract(_lastTableCheck).TotalMinutes < 20) {
+        if (DateTime.UtcNow.Subtract(_lastAvailableTableCheck).TotalMinutes < 20) {
             return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
 
@@ -559,76 +546,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
         _allavailableTables = _allavailableTables.SortedDistinctList();
-        _lastTableCheck = DateTime.UtcNow;
+        _lastAvailableTableCheck = DateTime.UtcNow;
         return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
-    }
-
-    public static void CheckSysUndoNow(ICollection<Database> offDatabases, bool mustDoIt) {
-        if (_isInTimer) { return; }
-        _isInTimer = true;
-
-        var fd = DateTime.UtcNow;
-
-        try {
-            var done = new List<Database>();
-
-            foreach (var thisDb in offDatabases) {
-                thisDb.Column.GetSystems();
-                if (!done.Contains(thisDb)) {
-                    if (offDatabases.Count == 1) {
-                        thisDb.OnDropMessage(FehlerArt.Info, "Überprüfe auf Veränderungen von '" + offDatabases.First().TableName + "'");
-                    } else {
-                        thisDb.OnDropMessage(FehlerArt.Info, "Überprüfe auf Veränderungen von " + offDatabases.Count + " Datenbanken des Typs '" + thisDb.GetType().Name + "'");
-                    }
-
-                    thisDb.CheckSysUndoNowOfMe();
-
-                    #region Datenbanken des gemeinsamen Servers ermittelen
-
-                    var dbwss = thisDb.LoadedDatabasesWithSameServer();
-                    done.AddRange(dbwss);
-                    done.Add(thisDb); // Falls LoadedDatabasesWithSameServer einen Fehler versursacht
-
-                    #endregion
-
-                    #region Auf Eingangs Datenbanken beschränken
-
-                    var db = new List<Database>();
-                    foreach (var thisDb2 in dbwss) {
-                        if (offDatabases.Contains(thisDb2)) { db.Add(thisDb2); }
-                    }
-
-                    #endregion
-
-                    var (changes, files) = thisDb.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
-                    if (changes == null) {
-                        _isInTimer = false;
-
-                        if (mustDoIt) {
-                            Develop.CheckStackForOverflow();
-                            Pause(1, false);
-                            CheckSysUndoNow(offDatabases, mustDoIt);
-                        }
-
-                        // Später ein neuer Versuch
-                        return;
-                    }
-
-                    var start = DateTime.UtcNow;
-                    db.Shuffle();
-                    foreach (var thisdb in db) {
-                        thisdb.DoLastChanges(files, changes, start, fd);
-                        thisdb.DidLastChanges();
-                    }
-                }
-            }
-        } catch {
-            _isInTimer = false;
-            return;
-        }
-
-        _timerTimeStamp = fd;
-        _isInTimer = false;
     }
 
     public static string EditableErrorReason(Database? database, EditableErrorReasonType mode) {
@@ -661,7 +580,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public static Database? Get(string fileOrTableName, bool readOnly, NeedPassword? needPassword) {
-
         if (fileOrTableName.Contains("|")) {
             var t = fileOrTableName.SplitBy("|");
             var tn = string.Empty;
@@ -670,7 +588,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             foreach (var thist in t) {
                 if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder.FilepathAndName)) {
                     fn = thist;
-
                 }
                 if (string.IsNullOrEmpty(tn) && IsValidTableName(thist)) {
                     tn = thist;
@@ -730,6 +647,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         return null;
+    }
+
+    public static void GetLastetChanges(ObservableCollection<Database> ofDatabases) {
+        List<Database> l = [..ofDatabases];
+
+
+        foreach (var db in l) {
+            db.BeSureToBeUpDoDate();
+        }
     }
 
     public static bool IsValidTableName(string tablename) {
@@ -1138,6 +1064,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
+    public virtual bool BeSureAllDataLoaded() {
+        if (IsDisposed) { return false; }
+        return BeSureToBeUpDoDate();
+    }
+
+    public virtual (bool loaded, bool ok) BeSureRowIsLoaded(string ofValue, DatabaseDataType type, bool important, NeedPassword? needPassword) => (false, true);
+
     public bool CanDoValueChangedScript() {
         if (!IsRowScriptPossible(true)) { return false; }
 
@@ -1164,7 +1097,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        var chunk = DatabaseChunk.GetChunkId(this, command, chunkvalue, column?.KeyName ?? string.Empty);
+        var chunk = DatabaseChunk.GetChunkId(this, command, column?.KeyName ?? string.Empty, chunkvalue);
 
         _saveRequired = true;
 
@@ -1233,7 +1166,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         return string.Empty;
     }
-
 
     public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable, bool addSysCorrect) {
 
@@ -1309,10 +1241,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    if (tagsToo) {
     //        Tags = new(sourceDatabase.Tags.Clone());
     //    }
-    public string EditableErrorReason(EditableErrorReasonType mode) {
+    public virtual string EditableErrorReason(EditableErrorReasonType mode) {
         if (IsDisposed) { return "Datenbank verworfen."; }
-
-        if (DoingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
 
         if (mode is EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
@@ -1722,8 +1652,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return r;
     }
 
-
-
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
             var db = Get(thisFile, true, null);
@@ -1987,8 +1915,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
-    public virtual (bool loaded, bool ok) LoadChunkfromValue(string value, DatabaseDataType type, bool important, NeedPassword? needPassword) => (false, true);
-
     public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
@@ -2037,7 +1963,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _saveRequired = false;
         IsInCache = FileStateUtcDate;
 
-        CheckSysUndoNow([this], true);
+        BeSureToBeUpDoDate();
 
         RepairAfterParse();
 
@@ -2349,6 +2275,28 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return base.ToString() + " " + TableName;
     }
 
+    /// <summary>
+    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
+    /// </summary>
+    public bool TryToSetMeTemporaryMaster() {
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return false; }
+
+        if (AmITemporaryMaster(0, 60)) { return true; }
+
+        if (!NewMasterPossible()) { return false; }
+
+        var code = MyMasterCode;
+
+        if (!string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.TemporaryDatabaseMasterUser, string.Empty, code))) {
+            return false;
+        }
+
+        RowCollection.WaitDelay = 0;
+        TemporaryDatabaseMasterUser = code;
+        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
+        return true;
+    }
+
     internal void DevelopWarnung(string t) {
         try {
             t += "\r\nColumn-Count: " + Column.Count;
@@ -2358,7 +2306,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
-    internal virtual string IsChunkEditable(string cn) => string.Empty;
+    internal virtual string IsValueEditable(DatabaseDataType type, string columnName, string ofValue) => string.Empty;
 
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
@@ -2396,9 +2344,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunkValue));
     }
 
-    protected virtual void CheckSysUndoNowOfMe() {
-    }
-
     protected void CreateWatcher() {
         if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
             if (_checker != null) {
@@ -2409,8 +2354,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             _ = _checker.Change(2000, 2000);
         }
     }
-
-    protected virtual void DidLastChanges() { }
 
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
@@ -2427,9 +2370,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     _checker = null;
                 }
 
-                if (_pendingChangesTimer != null) {
-                    _pendingChangesTimer.Dispose();
-                    _pendingChangesTimer = null;
+                if (_databaseUpdateTimer != null) {
+                    _databaseUpdateTimer.Dispose();
+                    _databaseUpdateTimer = null;
                 }
 
                 // Dann Collections disposen
@@ -2466,9 +2409,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected virtual void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime starttimeUtc, DateTime endTimeUtc) {
     }
 
-    protected virtual (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<Database> db, DateTime startTimeUtc, DateTime endTimeUtc) => ([], null);
-
-    protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
+    protected virtual bool BeSureToBeUpDoDate() => !IsDisposed;
 
     protected void OnAdditionalRepair() {
         if (IsDisposed) { return; }
@@ -2751,35 +2692,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return (string.Empty, null, null);
     }
 
-    /// <summary>
-    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
-    /// </summary>
-    protected void TryToSetMeTemporaryMaster() {
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
-
-        if (AmITemporaryMaster(0, 60)) { return; }
-
-        if (!NewMasterPossible()) { return; }
-
-        RowCollection.WaitDelay = 0;
-        TemporaryDatabaseMasterUser = MyMasterCode;
-        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
-    }
-
     protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
 
         return string.Empty;
-    }
-
-    private static void CheckSysUndo(object state) {
-        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 240) { return; }
-        //if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 180) { return; }
-
-        if (CriticalState()) { return; }
-        CheckSysUndoNow(AllFiles, false);
     }
 
     private static bool CriticalState() {
@@ -2791,6 +2709,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         return false;
+    }
+
+    private static void DatabaseUpdater(object state) {
+        if (CriticalState()) { return; }
+        GetLastetChanges(AllFiles);
     }
 
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
@@ -2823,8 +2746,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         return Directory.GetFiles(path, "*." + fx, SearchOption.TopDirectoryOnly).ToList();
-
-
     }
 
     private void Checker_Tick(object state) {
@@ -2883,78 +2804,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="files"></param>
-    /// <param name="data"></param>
-    /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
-    /// <param name="endTimeUtc"></param>
-    private void DoLastChanges(List<string>? files, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
-        if (data == null) { return; }
-        if (IsDisposed) { return; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
-
-        if (Column.SplitColumn is { }) {
-            // Split-Datenbanken und Fragmente gehen nicht, siehe kommentar weiter unten
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(Filename) && IsInCache.Year < 2000) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank noch nicht korrekt geladen!");
-            return;
-        }
-
-        data = data.OrderBy(obj => obj.DateTimeUtc).ToList();
-
-        try {
-            List<ColumnItem> columnsAdded = [];
-            List<RowItem> rowsAdded = [];
-            List<string> cellschanged = [];
-            List<string> myfiles = [];
-
-            if (files != null) {
-                foreach (var thisf in files) {
-                    if (thisf.Contains("\\" + TableName.ToUpperInvariant() + "-")) {
-                        myfiles.AddIfNotExists(thisf);
-                    }
-                }
-            }
-
-            DoingChanges++;
-            foreach (var thisWork in data) {
-                if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
-                    Undo.Add(thisWork);
-                    ChangesNotIncluded.Add(thisWork);
-
-                    var c = Column[thisWork.ColName];
-                    var r = Row.SearchByKey(thisWork.RowKey);
-
-                    // HIER Wird der falsche Chunk übergeben!
-                    var (error, columnchanged, rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate, string.Empty);
-
-                    if (!string.IsNullOrEmpty(error)) {
-                        Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
-                        //Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
-                        DoingChanges--;
-                        return;
-                    }
-
-                    if (c == null && columnchanged != null) { columnsAdded.AddIfNotExists(columnchanged); }
-                    if (r == null && rowchanged != null) { rowsAdded.AddIfNotExists(rowchanged); }
-                    if (rowchanged != null && columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
-                }
-            }
-            DoingChanges--;
-            IsInCache = endTimeUtc;
-            DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, startTimeUtc, endTimeUtc);
-            OnInvalidateView();
-        } catch {
-            Develop.CheckStackForOverflow();
-            DoLastChanges(files, data, startTimeUtc, endTimeUtc);
-        }
-    }
-
     private void EventScript_PropertyChanged(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
 
     private void EventScript_RemoveAll(bool isLoading) {
@@ -2968,12 +2817,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
     }
 
-    private void GenerateTimer() {
+    private void GenerateDatabaseUpdateTimer() {
         lock (this) {
-            if (_pendingChangesTimer != null) { return; }
-            _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
-            _pendingChangesTimer = new Timer(CheckSysUndo);
-            _ = _pendingChangesTimer.Change(10000, 10000);
+            if (_databaseUpdateTimer != null) { return; }
+            _databaseUpdateTimer = new Timer(DatabaseUpdater);
+            _ = _databaseUpdateTimer.Change(10000, 3 * 60 * 1000);
         }
     }
 

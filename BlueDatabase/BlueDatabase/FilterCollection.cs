@@ -59,6 +59,29 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _coment = coment;
     }
 
+
+    /// <summary>
+    /// Erstellt einen Filter, der den Zeilenschlüssel sucht. Mit der SplitColumn als zweiten Filter
+    /// </summary>
+    public FilterCollection(RowItem r, string coment) {
+        _coment = coment;
+        if (r.Database is not { } db) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Fehler im Filter");
+            return;
+        }
+
+        Database = db;
+
+
+        if (db.Column.SplitColumn is { } spc) {
+            Add(new FilterItem(spc, FilterType.Istgleich, r.CellGetString(spc)));
+        }
+
+
+        Add(new FilterItem(db, FilterType.RowKey, r.KeyName));
+    }
+
+
     public FilterCollection(FilterItem? fi, string coment) : this(fi?.Database, coment) {
         if (fi != null) { Add(fi); }
     }
@@ -171,15 +194,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     #region Methods
 
     public static List<RowItem> CalculateFilteredRows(Database? db, params FilterItem[] filter) {
-        //if (filter == null || filter.Length == 0) { return []; }
+        if (db == null || db.IsDisposed) { return []; }
 
-        //if (!filter[0].IsOk() || filter[0].Database is not { IsDisposed: false } db) { return []; }
-
-        //var fi2 = _internal.ToArray();
         if (db.Column.SplitColumn != null) {
             foreach (var fi in filter) {
                 if (fi.Column == db.Column.SplitColumn) {
-                    var (_, ok) = db.LoadChunkfromValue(fi.SearchValue[0], DatabaseDataType.UTF8Value_withoutSizeData, false, null);
+                    var (_, ok) = db.BeSureRowIsLoaded(fi.SearchValue[0], DatabaseDataType.UTF8Value_withoutSizeData, false, null);
                     if (!ok) { return []; }
                 }
             }

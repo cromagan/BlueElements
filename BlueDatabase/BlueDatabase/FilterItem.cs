@@ -101,12 +101,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         }
     }
 
-    /// <summary>
-    /// Erstellt einen Filter, der den Zeilenschhlüssel sucht.
-    /// </summary>
-    /// <param name="row"></param>
-    public FilterItem(RowItem row) : this(row.Database, FilterType.RowKey, row.KeyName) { }
-
     private FilterItem(Database? db, FilterType filterType, IList<string>? searchValue) {
         //Database?, weil AlwaysFalse keine Angaben braucht
         Database = db;

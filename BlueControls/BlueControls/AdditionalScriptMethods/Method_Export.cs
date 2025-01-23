@@ -82,8 +82,9 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         if (db == null || allFi.Database != db) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
-        Database.CheckSysUndoNow([db], true);
-        if (db is DatabaseChunk dbc) { dbc.LoadAllChunks(); }
+        if (!db.BeSureAllDataLoaded()) {
+            return new DoItFeedback(ld, "Datenbank konnte nicht aktualisiert werden.");
+        }
 
         #endregion
 

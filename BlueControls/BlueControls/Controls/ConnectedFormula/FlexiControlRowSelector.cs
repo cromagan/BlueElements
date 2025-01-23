@@ -159,8 +159,9 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
             Invalidate_FilterOutput();
             return;
         }
+        using var nfc = new FilterCollection(row, "FlexiControlRowSelector");
 
-        FilterOutput.ChangeTo(new FilterItem(row));
+        FilterOutput.ChangeTo(nfc);
     }
 
     #endregion

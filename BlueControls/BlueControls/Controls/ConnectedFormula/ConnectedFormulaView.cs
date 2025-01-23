@@ -375,7 +375,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         DoRows();
 
         if (RowSingleOrNull() is { IsDisposed: false } r) {
-            FilterOutput.ChangeTo(new FilterItem(r));
+            using var nfc = new FilterCollection(r, "ConnectedFormulaView");
+
+            FilterOutput.ChangeTo(nfc);
 
             btnScript.Visible = r.Database is { IsDisposed: false } db && !string.IsNullOrEmpty(db.ScriptNeedFix);
 

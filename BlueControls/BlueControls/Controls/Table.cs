@@ -826,7 +826,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             if (FilterOutputType == Filterausgabe.Gewähle_Zeile) {
                 if (row?.Row is { IsDisposed: false } setedrow) {
-                    FilterOutput.ChangeTo(new FilterItem(setedrow));
+                    using var nfc = new FilterCollection(setedrow, "TableOutput");
+                    FilterOutput.ChangeTo(nfc);
                 } else {
                     FilterOutput.ChangeTo(new FilterItem(db, "Dummy"));
                 }
@@ -1392,7 +1393,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        if (DesignMode || ShowWaitScreen || db.DoingChanges > 0) {
+        if (DesignMode || ShowWaitScreen) {
             DrawWaitScreen(gr, string.Empty, null);
             return;
         }

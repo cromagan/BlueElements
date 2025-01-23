@@ -366,7 +366,7 @@ public class Chunk : IHasKeyName {
         return true;
     }
 
-    internal string IsEditable(List<RowItem>? rows) {
+    internal string IsEditable(DatabaseChunk db) {
         if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2) {
@@ -375,6 +375,8 @@ public class Chunk : IHasKeyName {
             if (LastEditMachineName != Environment.MachineName) { return $"Anderes Computer bearbeitet: {LastEditMachineName}"; }
             return string.Empty;
         }
+
+        var rows = db.RowsOfChunk(this);
 
         if (rows == null) {
             return "Letzte Bearbeitung zu lange her";

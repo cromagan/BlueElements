@@ -418,7 +418,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<Database?> adb:
-                var db = Database.Get(Value, false, null);
+                var db = Database.Get(Value, false, Table.Database_NeedPassword);
                 if (db != null) { db.Editor = typeof(DatabaseHeadEditor); }
 
                 if (adb.Get() != db) {
