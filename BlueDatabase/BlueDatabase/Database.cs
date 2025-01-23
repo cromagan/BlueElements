@@ -649,9 +649,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return null;
     }
 
-    public static void GetLastetChanges(ObservableCollection<Database> ofDatabases) {
+    public static void BeSureToBeUpDoDate(ObservableCollection<Database> ofDatabases) {
         List<Database> l = [..ofDatabases];
-
 
         foreach (var db in l) {
             db.BeSureToBeUpDoDate();
@@ -2713,7 +2712,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     private static void DatabaseUpdater(object state) {
         if (CriticalState()) { return; }
-        GetLastetChanges(AllFiles);
+        BeSureToBeUpDoDate(AllFiles);
     }
 
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
