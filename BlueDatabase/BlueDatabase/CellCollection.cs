@@ -175,7 +175,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 if (string.IsNullOrEmpty(value)) {
                     return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
                 }
-                return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value);
+                return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, mode);
             }
         } else {
             if (db.Column.SysLocked != null) {
@@ -188,7 +188,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (db.Column?.SplitColumn is { }) {
                 var value = DatabaseChunk.GetChunkValue(row);
-                return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, column.KeyName, value);
+                return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, column.KeyName, value, mode);
             }
         }
 

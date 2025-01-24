@@ -116,23 +116,9 @@ public class Chunk : IHasKeyName {
     public void InitByteList() {
         LoadFailed = false;
 
-        // Zuerst Werte setzen
-        LastEditTimeUtc = DateTime.UtcNow;
-        LastEditUser = UserName;
-        LastEditApp = Develop.AppExe();
-        LastEditMachineName = Environment.MachineName;
-
         _lastcheck = DateTime.UtcNow;
 
         _bytes.Clear();
-
-        // Dann die Werte zur ByteList hinzufügen
-        SaveToByteList(DatabaseDataType.Version, Database.DatabaseVersion);
-        SaveToByteList(DatabaseDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
-        SaveToByteList(DatabaseDataType.LastEditUser, LastEditUser);
-        SaveToByteList(DatabaseDataType.LastEditApp, LastEditApp);
-        SaveToByteList(DatabaseDataType.LastEditMachineName, LastEditMachineName);
-        SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
     }
 
     /// <summary>
@@ -178,7 +164,9 @@ public class Chunk : IHasKeyName {
 
         try {
             Develop.SetUserDidSomething();
-            var datacompressed = _bytes.ToArray().ZipIt();
+
+            var head = GetHead();
+            var datacompressed = head.Concat(_bytes).ToArray().ZipIt();
             if (datacompressed is not { }) { return false; }
 
             Develop.SetUserDidSomething();
@@ -204,15 +192,15 @@ public class Chunk : IHasKeyName {
         _bytes.Add((byte)Routinen.CellFormatUTF8_V403);
 
         var columnKeyByte = column.KeyName.UTF8_ToByte();
-        SaveToByteList(columnKeyByte.Length, 1);
+        SaveToByteList(_bytes, columnKeyByte.Length, 1);
         _bytes.AddRange(columnKeyByte);
 
         var rowKeyByte = row.KeyName.UTF8_ToByte();
-        SaveToByteList(rowKeyByte.Length, 1);
+        SaveToByteList(_bytes, rowKeyByte.Length, 1);
         _bytes.AddRange(rowKeyByte);
 
         var cellContentByte = cellContent.UTF8_ToByte();
-        SaveToByteList(cellContentByte.Length, 2);
+        SaveToByteList(_bytes, cellContentByte.Length, 2);
         _bytes.AddRange(cellContentByte);
     }
 
@@ -222,12 +210,21 @@ public class Chunk : IHasKeyName {
         _bytes.Add((byte)databaseDataType);
 
         var n = columnname.UTF8_ToByte();
-        SaveToByteList(n.Length, 1);
+        SaveToByteList(_bytes, n.Length, 1);
         _bytes.AddRange(n);
 
         var b = content.UTF8_ToByte();
-        SaveToByteList(b.Length, 3);
+        SaveToByteList(_bytes, b.Length, 3);
         _bytes.AddRange(b);
+    }
+
+    public void SaveToByteList(List<byte> bytes, DatabaseDataType databaseDataType, string content) {
+        if (LoadFailed) { return; }
+        var b = content.UTF8_ToByte();
+        bytes.Add((byte)Routinen.DatenAllgemeinUTF8);
+        bytes.Add((byte)databaseDataType);
+        SaveToByteList(bytes, b.Length, 3);
+        bytes.AddRange(b);
     }
 
     public void SaveToByteList(DatabaseDataType databaseDataType, string content) {
@@ -235,11 +232,11 @@ public class Chunk : IHasKeyName {
         var b = content.UTF8_ToByte();
         _bytes.Add((byte)Routinen.DatenAllgemeinUTF8);
         _bytes.Add((byte)databaseDataType);
-        SaveToByteList(b.Length, 3);
+        SaveToByteList(_bytes, b.Length, 3);
         _bytes.AddRange(b);
     }
 
-    public void SaveToByteList(long numberToAdd, int byteCount) {
+    public void SaveToByteList(List<byte> bytes, long numberToAdd, int byteCount) {
         if (LoadFailed) { return; }
         do {
             byteCount--;
@@ -247,7 +244,7 @@ public class Chunk : IHasKeyName {
             // ReSharper disable once PossibleLossOfFraction
             var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
 
-            _bytes.Add(mu);
+            bytes.Add(mu);
             numberToAdd %= te;
         } while (byteCount > 0);
     }
@@ -366,7 +363,7 @@ public class Chunk : IHasKeyName {
         return true;
     }
 
-    internal string IsEditable(DatabaseChunk db) {
+    internal string IsEditable(EditableErrorReasonType reason) {
         if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2) {
@@ -376,17 +373,7 @@ public class Chunk : IHasKeyName {
             return string.Empty;
         }
 
-        var rows = db.RowsOfChunk(this);
-
-        if (rows == null) {
-            return "Letzte Bearbeitung zu lange her";
-        }
-
-        _bytes.Clear();
-
-        InitByteList();
-        SaveToByteList(rows);
-        SaveToByteListEOF();
+       if(reason is not EditableErrorReasonType.EditAcut and not EditableErrorReasonType.EditCurrently) { return string.Empty; } 
 
         if (!DoExtendedSave(5)) {
             LastEditTimeUtc = DateTime.MinValue;
@@ -408,8 +395,30 @@ public class Chunk : IHasKeyName {
     }
 
     internal void SaveToByteListEOF() {
-        if (LoadFailed) { return; }
         SaveToByteList(DatabaseDataType.EOF, "END");
+    }
+
+    private List<byte> GetHead() {
+        if (LoadFailed) { return []; }
+
+        var headBytes = new List<byte>();
+
+        // Zuerst Werte setzen
+        LastEditTimeUtc = DateTime.UtcNow;
+        LastEditUser = UserName;
+        LastEditApp = Develop.AppExe();
+        LastEditMachineName = Environment.MachineName;
+
+        // Dann die Werte zur ByteList hinzufügen
+        SaveToByteList(headBytes, DatabaseDataType.Version, Database.DatabaseVersion);
+        SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
+
+        SaveToByteList(headBytes, DatabaseDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
+        SaveToByteList(headBytes, DatabaseDataType.LastEditUser, LastEditUser);
+        SaveToByteList(headBytes, DatabaseDataType.LastEditApp, LastEditApp);
+        SaveToByteList(headBytes, DatabaseDataType.LastEditMachineName, LastEditMachineName);
+
+        return headBytes;
     }
 
     private void ParseLockData() {
