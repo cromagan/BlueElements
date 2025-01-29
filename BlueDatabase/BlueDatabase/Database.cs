@@ -1116,6 +1116,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public string CheckScriptError() {
+
         List<string> names = [];
 
         foreach (var thissc in _eventScript) {
@@ -1367,8 +1368,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         var name = script?.KeyName ?? "Allgemein";
 
-        var sce = CheckScriptError();
-        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, name); }
+   
+        if (!string.IsNullOrEmpty(ScriptNeedFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
 
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);

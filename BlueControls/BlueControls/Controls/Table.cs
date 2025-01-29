@@ -2935,9 +2935,18 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 }
             }
 
-            if (db.IsAdministrator() && !db.ReadOnly && !string.IsNullOrEmpty(db.ScriptNeedFix)) {
-                gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, 8);
-                ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, 12);
+            if (db.IsAdministrator() && !db.ReadOnly) {
+                if (!string.IsNullOrEmpty(db.ScriptNeedFix)) {
+                    gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, 8);
+                    ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, 12);
+                } else {
+                    foreach (var thisColumnItem in db.Column) {
+                        if (thisColumnItem.LinkedDatabase is { } dbl && !string.IsNullOrEmpty(dbl.ScriptNeedFix)) {
+                            gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, 8);
+                            ca.Font_RowChapter.DrawString(gr, $"Skripte von {dbl.Caption} müssen repariert werden", 90, 12);
+                        }
+                    }
+                }
             }
 
             if (db.AmITemporaryMaster(5, 55)) {

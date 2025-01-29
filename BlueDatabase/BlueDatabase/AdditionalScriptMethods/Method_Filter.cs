@@ -55,23 +55,26 @@ public class Method_Filter : Method_Database {
 
     #region Methods
 
-    public static FilterCollection? ObjectToFilter(VariableCollection attributes, int ab, Database? sourcedatabase, string user) {
+    public static (FilterCollection? allFi, string errorreason) ObjectToFilter(VariableCollection attributes, int ab, Database? sourcedatabase, string user, bool must) {
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {
-            if (attributes[z] is not VariableFilterItem fi) { return null; } // new DoItFeedback(infos.LogData, s, "Kein Filter übergeben.");
+            if (attributes[z] is not VariableFilterItem fi) { return (null, $"Attribut {z + 1} ist kein Filter."); } // new DoItFeedback(infos.LogData, s, "Kein Filter übergeben.");
 
-            if (fi.FilterItem is not { } fii) { return null; }
+            if (fi.FilterItem is not { } fii) { return (null, $"Attribut {z + 1} enthält keinen Filter,"); }
 
-            if(fii.Column?.Database is  { } db) {
+            if (fii.Column?.Database is { } db) {
                 fii.Column.AddSystemInfo("Value Used in Script-Filter", sourcedatabase ?? db, user);
+
+                if (db.IsDisposed) { return (null, "Datenbankfehler!"); }
+
+                if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt"); }
             }
 
-
-            if (!fii.IsOk()) { return null; }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
+            if (!fii.IsOk()) { return (null, $"Der Filter des Attributes {z + 1} ist fehlerhaft."); }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
 
             if (z > ab) {
-                if (fii.Database != allFi[0].Database) { return null; }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
+                if (fii.Database != allFi[0].Database) { return (null, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
             }
 
             if (fii.Clone() is FilterItem fin) {
@@ -80,11 +83,15 @@ public class Method_Filter : Method_Database {
             }
         }
 
-        if (allFi.Count < 1) { return null; }
-
         var f = new FilterCollection(allFi[0].Database, "method_filter");
+
+        if (allFi.Count < 1) {
+            if (!must) { return (f, string.Empty); }
+            return (null, "Fehler bei der Filtererstellung.");
+        }
+
         f.AddIfNotExists(allFi);
-        return f;
+        return (f, string.Empty);
     }
 
     public static FilterType StringToFilterType(string type) {
@@ -112,6 +119,8 @@ public class Method_Filter : Method_Database {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
+
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
 
         #region Spalte ermitteln
 

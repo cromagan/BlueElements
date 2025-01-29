@@ -67,36 +67,35 @@ internal class Method_Export : Method_Database, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        var myDb = MyDatabase(scp);
 
         #region  Filter ermitteln (allfi)
 
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3, MyDatabase(scp), scp.ScriptName);
-
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myDb, scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
         #endregion
 
+        var r = allFi.Rows;
+
         #region  Datenbank ermitteln (db)
 
-        var db = MyDatabase(scp);
+        if (myDb == null || allFi.Database != myDb) {
+            allFi.Dispose();
+            return new DoItFeedback(ld, "Datenbankfehler!");
+        }
 
-        if (db == null || allFi.Database != db) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+        allFi.Dispose();
 
-        if (!db.BeSureAllDataLoaded(-1)) {
+        if (!myDb.BeSureAllDataLoaded(-1)) {
             return new DoItFeedback(ld, "Datenbank konnte nicht aktualisiert werden.");
         }
 
         #endregion
 
-        #region  Zeilen Ermitteln (r)
-
-        var r = allFi.Rows;
-
-        #endregion
-
         #region  Ansicht ermitteln (cu)
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(myDb);
 
         var cu = tcvc.Get(attvar.ValueStringGet(2));
         if (string.IsNullOrEmpty(attvar.ValueStringGet(2)) || cu == null) {
@@ -128,7 +127,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "MDB":
                 case "BDB": {
-                        var chunks = DatabaseChunk.GenerateNewChunks(db, 100, db.FileStateUtcDate, false);
+                        var chunks = DatabaseChunk.GenerateNewChunks(myDb, 100, myDb.FileStateUtcDate, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
                         mainchunk.Save(filn, 100);
@@ -136,7 +135,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
                     }
 
                 case "CSV":
-                    var t = db.Export_CSV(FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
+                    var t = myDb.Export_CSV(FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
                     if (string.IsNullOrEmpty(t)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
                     if (!IO.WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei."); }
                     break;

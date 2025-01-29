@@ -69,15 +69,16 @@ public class Method_RowDelete : Method_Database, IUseableForButton {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName);
-        if (allFi is null || allFi.Count == 0) {
-            return new DoItFeedback(ld, "Fehler im Filter");
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+
+        if (!scp.ProduktivPhase) {
+            allFi.Dispose();
+            return DoItFeedback.TestModusInaktiv(ld);
         }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
-
         var r = RowCollection.Remove(allFi, null, "Script Command: RowDelete");
-
+        allFi.Dispose();
         return new DoItFeedback(r);
     }
 

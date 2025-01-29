@@ -343,18 +343,22 @@ public class Chunk : IHasKeyName {
         }
         Develop.SetUserDidSomething();
         // Haupt-Datei wird zum Backup umbenannt
-        MoveFile(filename, backup, false); // Kein Abbruch hier, die DAtei könnte ja nicht existieren
+        MoveFile(filename, backup, false); // Kein Abbruch hier, die Datei könnte ja nicht existieren
         Develop.SetUserDidSomething();
 
-        if (FileExists(filename)) {
-            // Paralleler Prozess hat gespeichert?!?
-            _ = DeleteFile(tempfile, false);
-
-            return false;
-        }
 
         // --- TmpFile wird zum Haupt ---
-        _ = MoveFile(tempfile, filename, true);
+        if (!MoveFile(tempfile, filename, false)) {
+            // Paralleler Prozess hat gespeichert?!?
+            Develop.SetUserDidSomething();
+            if (FileExists(filename)) {
+                _ = DeleteFile(tempfile, false);
+                Develop.SetUserDidSomething();
+                return false;
+            }
+            Develop.DebugPrint(FehlerArt.Fehler, $"Chunk defekt:\r\n{filename}\r\n{tempfile}");
+            return false;
+        }
         Develop.SetUserDidSomething();
 
         _lastcheck = DateTime.UtcNow;
@@ -373,7 +377,7 @@ public class Chunk : IHasKeyName {
             return string.Empty;
         }
 
-       if(reason is not EditableErrorReasonType.EditAcut and not EditableErrorReasonType.EditCurrently) { return string.Empty; } 
+        if (reason is not EditableErrorReasonType.EditAcut and not EditableErrorReasonType.EditCurrently) { return string.Empty; }
 
         if (!DoExtendedSave(5)) {
             LastEditTimeUtc = DateTime.MinValue;

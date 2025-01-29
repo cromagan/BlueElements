@@ -46,18 +46,23 @@ public class Method_LookupFilter : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3, MyDatabase(scp), scp.ScriptName);
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, MyDatabase(scp), scp.ScriptName, true);
 
-        if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
-        if (allFi.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+        if (allFi.Database is not { IsDisposed: false } db) {
+            allFi.Dispose();
+            return new DoItFeedback(ld, "Datenbankfehler!");
+        }
+
+        var r = allFi.Rows;
+        allFi.Dispose();
 
         var returncolumn = db.Column[attvar.ValueStringGet(0)];
         if (returncolumn == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
         var l = new List<string>();
 
-        var r = allFi.Rows;
         if (r.Count == 0) {
             l.Add(attvar.ValueStringGet(1));
             return new DoItFeedback(l);

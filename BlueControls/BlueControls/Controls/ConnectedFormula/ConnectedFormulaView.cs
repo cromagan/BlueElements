@@ -379,7 +379,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
             FilterOutput.ChangeTo(nfc);
 
-            btnScript.Visible = r.Database is { IsDisposed: false } db && !string.IsNullOrEmpty(db.ScriptNeedFix);
+            btnScript.Visible = r.Database is { IsDisposed: false } db && !string.IsNullOrEmpty(db.ScriptNeedFix) && db.IsAdministrator();
 
             if (btnScript.Visible) { btnScript.BringToFront(); }
         } else {
@@ -387,7 +387,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    //    Page = page;
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
@@ -421,8 +420,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
             IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
 
-            //var se = new_DatabaseScriptEditor(db);
-            //_ = se.ShowDialog();
         } else {
             MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }

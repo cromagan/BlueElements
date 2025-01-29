@@ -64,12 +64,11 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName);
-
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(ld, "Fehler im Filter"); }
-        if (allFi.Database is not { IsDisposed: false }) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
         var r = allFi.Rows;
+        allFi.Dispose();
         if (r.Count == 0) { return DoItFeedback.Null(); }
 
         List<string> a = [attvar.ValueStringGet(1)];
@@ -83,11 +82,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
                     ld.Protocol.AddRange(s2.Protocol);
                     return new DoItFeedback(ld, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");
                 }
-                //s.Sub--;
             }
-
-            //s.BreakFired = false;
-            //s.EndScript = false;
         }
 
         return DoItFeedback.Null();

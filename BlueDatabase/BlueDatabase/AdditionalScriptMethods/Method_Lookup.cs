@@ -48,9 +48,9 @@ public class Method_Lookup : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
-        if (db == null) {
-            return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
-        }
+        if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
+
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
 
         var c = db.Column[attvar.ValueStringGet(2)];
         if (c == null) {

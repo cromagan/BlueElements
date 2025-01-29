@@ -64,13 +64,11 @@ public class Method_CallRow : Method_Database, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        //if (SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
-
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
+        if (row is not { IsDisposed: false }) { return new DoItFeedback(ld, "Zeile nicht gefunden"); }
+        if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, $"In der Datenbank '{db.Caption}' sind die Skripte defekt"); }
 
-        if (row is not { IsDisposed: false }) {
-            return new DoItFeedback(ld, "Zeile nicht gefunden");
-        }
 
         #region Attributliste erzeugen
 

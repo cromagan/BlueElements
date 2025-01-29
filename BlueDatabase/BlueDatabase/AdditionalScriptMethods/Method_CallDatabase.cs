@@ -61,6 +61,8 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
+
         if (db == MyDatabase(scp)) { return new DoItFeedback(ld, "Befehl Call benutzen!"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);

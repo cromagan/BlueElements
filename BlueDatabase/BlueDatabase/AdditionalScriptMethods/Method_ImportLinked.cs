@@ -68,6 +68,8 @@ public class Method_ImportLinked : Method_Database {
             var linkedDatabase = thisColumn.LinkedDatabase;
             if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }
 
+            if (!string.IsNullOrEmpty(linkedDatabase.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + linkedDatabase.Caption + "' sind die Skripte defekt"); }
+
             var targetColumn = linkedDatabase.Column[thisColumn.LinkedCell_ColumnNameOfLinkedDatabase];
             if (targetColumn == null) { return new DoItFeedback(ld, "Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 

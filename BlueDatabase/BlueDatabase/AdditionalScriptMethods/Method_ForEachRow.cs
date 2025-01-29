@@ -65,18 +65,19 @@ internal class Method_ForEachRow : Method_Database {
             return new DoItFeedback(infos.LogData, "Variable " + varnam + " ist bereits vorhanden.");
         }
 
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName);
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName, true);
 
-        if (allFi is null) { return new DoItFeedback(infos.LogData, "Fehler im Filter"); }
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(infos.LogData, $"Filter-Fehler: {errorreason}"); }
 
-        //if (allFi.Database is not { IsDisposed: false } db) { return new DoItFeedback(infos.LogData, "Datenbankfehler!"); }
+        var r = allFi.Rows;
+        allFi.Dispose();
 
         var scx = new DoItFeedback(false, false);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1);
 
-        var l = allFi.Rows;
+       
 
-        foreach (var thisl in l) {
+        foreach (var thisl in r) {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEachRow-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null);

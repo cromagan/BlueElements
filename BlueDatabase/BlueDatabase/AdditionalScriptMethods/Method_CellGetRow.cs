@@ -49,15 +49,14 @@ public class Method_CellGetRow : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
+        if (row is not { IsDisposed: false }) { return new DoItFeedback(ld, "Zeile nicht gefunden"); }
         if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, $"In der Datenbank '{db.Caption}' sind die Skripte defekt"); }
 
         if (db.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
         var v = RowItem.CellToVariable(c, row, true, false);
         if (v == null) { return new DoItFeedback(ld, $"Wert der Variable konnte nicht gelesen werden - ist die Spalte {c.KeyName} 'im Skript vorhanden'?"); }
-        //if (v == null) {
-        //    return new DoItFeedback(ld, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(0));
-        //}
 
         var l = new List<string>();
 

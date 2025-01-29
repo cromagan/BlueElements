@@ -102,44 +102,34 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName);
-        if (allFi is null || allFi.Count == 0) {
-            return new DoItFeedback(ld, "Fehler im Filter");
-        }
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, mydb, scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
         foreach (var thisFi in allFi) {
             if (thisFi.Column is not { IsDisposed: false } c) {
+                allFi.Dispose();
                 return new DoItFeedback(ld, "Fehler im Filter, Spalte ungültig");
             }
 
             if (thisFi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) {
+                allFi.Dispose();
                 return new DoItFeedback(ld, "Fehler im Filter, nur 'is' ist erlaubt");
             }
 
             if (thisFi.SearchValue.Count != 1) {
+                allFi.Dispose();
                 return new DoItFeedback(ld, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
             }
             var l = FilterCollection.InitValue(allFi.ToList(), c, true);
             if (thisFi.SearchValue[0] != l) {
+                allFi.Dispose();
                 return new DoItFeedback(ld, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
             }
         }
 
-        //var r = allFi.Rows;
-
-        //if (r.Count > 1) {
-        //    q
-        //    return new DoItFeedback(ld, "RowUnique gescheitert, da bereits mehrere Zeilen vorhanden sind: " + allFi.ReadableText());
-        //}
-
-        //if (r.Count == 0) {
-        //    if (!scp.ProduktivPhase) { return new DoItFeedback(ld, "Zeile anlegen im Testmodus deaktiviert."); }
-        //    var nr = RowCollection.GenerateAndAdd(allFi, "Script-Befehl: 'RowUnique' von " + mydb.Caption);
-        //    if (nr.newrow == null) { return new DoItFeedback(ld, "Neue Zeile konnte nicht erstellt werden: " + nr.message); }
-        //    return Method_Row.RowToObjectFeedback(nr.newrow);
-        //}
-
-        return UniqueRow(ld, allFi, $"Script-Befehl: 'RowUnique' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
+        var fb = UniqueRow(ld, allFi, $"Script-Befehl: 'RowUnique' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
+        allFi.Dispose();
+        return fb;
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;

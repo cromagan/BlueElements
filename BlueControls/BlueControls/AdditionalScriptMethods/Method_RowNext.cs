@@ -66,9 +66,10 @@ public class Method_RowNext : Method_Database {
 
         List<RowItem> r = [];
         if (attvar.Attributes.Count > 2) {
-            using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName);
-            if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
+            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
+            if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
             r.AddRange(allFi.Rows);
+            allFi.Dispose();
         } else {
             r.AddRange(db.Row);
         }

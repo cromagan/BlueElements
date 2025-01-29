@@ -444,8 +444,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
     /// </summary>
     /// <param name="scriptname"></param>
-    /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
-    /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
     /// <param name="produktivphase"></param>
     /// <param name="tryforsceonds"></param>
     /// <param name="eventname"></param>
@@ -497,11 +495,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             CellSet(scd, DateTime.UtcNow, comment);
         }
         RowCollection.InvalidatedRows.AddIfNotExists(this);
-
-        //DoSystemColumns(db, null, Generic.UserName, DateTime.UtcNow, Reason.SetCommand);
-
-        //q
-        //CellSet(srs, string.Empty,comment);
     }
 
     public bool IsNullOrEmpty() {

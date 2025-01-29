@@ -1192,7 +1192,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             }
         }
 
-        if (!string.IsNullOrEmpty(db.ScriptNeedFix) || !string.IsNullOrEmpty(db.CheckScriptError())) {
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) {
             var d = ItemOf("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.ItemAdd(d);

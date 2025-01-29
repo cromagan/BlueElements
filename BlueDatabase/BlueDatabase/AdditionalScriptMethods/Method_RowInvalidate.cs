@@ -64,24 +64,18 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var myRow = Method_Row.ObjectToRow(attvar.Attributes[0]);
-        if (myRow?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
+        var row = Method_Row.ObjectToRow(attvar.Attributes[0]);
+        if (row is not { IsDisposed: false }) { return new DoItFeedback(ld, "Zeile nicht gefunden"); }
+        if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, $"In der Datenbank '{db.Caption}' sind die Skripte defekt"); }
 
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
 
-        var m = CellCollection.EditableErrorReason(srs, myRow, EditableErrorReasonType.EditAcut, false, false, true, false, null);
+        var m = CellCollection.EditableErrorReason(srs, row, EditableErrorReasonType.EditAcut, false, false, true, false, null);
         if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol, "Datenbanksperre: " + m); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        if (myRow == MyRow(scp)) {
-            return new DoItFeedback(ld, "Die eigene Zelle kann nicht invalidiert werden.");
-        }
-
-        //if (RowCollection.InvalidatedRows.Contains(myRow) ||
-        //    RowCollection.DidRows.Contains(myRow) ||
-        //    RowCollection.FailedRows.Contains(myRow)) {
-        //    return DoItFeedback.Null();
-        //}
+        if (row == MyRow(scp)) { return new DoItFeedback(ld, "Die eigene Zelle kann nicht invalidiert werden."); }
 
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
@@ -90,10 +84,10 @@ public class Method_RowInvalidate : Method_Database, IUseableForButton {
 
         if (d < 0.1) { return new DoItFeedback(ld, "Intervall zu kurz."); }
 
-        var v = myRow.CellGetDateTime(srs);
+        var v = row.CellGetDateTime(srs);
         if (DateTime.UtcNow.Subtract(v).TotalDays < d) { return DoItFeedback.Null(); }
 
-        myRow.InvalidateRowState($"Script-Befehl: 'RowInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
+        row.InvalidateRowState($"Script-Befehl: 'RowInvalidate' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}");
 
         return DoItFeedback.Null();
     }

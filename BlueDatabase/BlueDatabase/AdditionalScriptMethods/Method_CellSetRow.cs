@@ -53,7 +53,9 @@ public class Method_CellSetRow : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
+        if (row is not { IsDisposed: false }) { return new DoItFeedback(ld, "Zeile nicht gefunden"); }
         if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, $"In der Datenbank '{db.Caption}' sind die Skripte defekt"); }
 
         var columnToSet = db.Column[attvar.ValueStringGet(1)];
         if (columnToSet == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(1)); }

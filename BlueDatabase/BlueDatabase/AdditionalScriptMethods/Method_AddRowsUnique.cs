@@ -41,7 +41,7 @@ public class Method_AddRowsUnique : Method_Database {
                                           "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind!\r\n" +
                                           "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
                                           "Leere KeyValues werden übersprungen.\r\n" +
-                                          "Die Werte der Filter werden zusätzlich gesetzte.\r\n" +
+                                          "Die Werte der Filter werden zusätzlich gesetzt.\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
     public override bool GetCodeBlockAfter => false;
@@ -63,8 +63,9 @@ public class Method_AddRowsUnique : Method_Database {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
-        var db = Database.Get(attvar.ValueStringGet(0), false, null); 
+        var db = Database.Get(attvar.ValueStringGet(0), false, null);
         if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol, "Datenbanksperre: " + m); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
@@ -87,15 +88,14 @@ public class Method_AddRowsUnique : Method_Database {
 
             #region  Filter ermitteln (allfi)
 
-            var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName);
-            allFi ??= new FilterCollection(db, "Method_AddRows");
+            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, false);
+            if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
             #endregion
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
             var fb = Method_RowUnique.UniqueRow(ld, allFi, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
-
             allFi.Dispose();
             if (!fb.AllOk) { return fb; }
         }

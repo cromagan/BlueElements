@@ -57,9 +57,12 @@ internal class Method_EnsureDatabaseLoaded : Method {
 
         if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
 
-        var db = Database.Get(filn, false, null);
+        if (Database.Get(filn, false, null) is { } db) {
+            if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
+            return DoItFeedback.Wahr();
+        }
 
-        return new DoItFeedback(db != null);
+        return DoItFeedback.Falsch();
     }
 
     #endregion

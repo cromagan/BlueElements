@@ -75,14 +75,15 @@ public class Method_Row : Method_Database, IUseableForButton {
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName);
-        if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
         var r = allFi.Rows;
+        allFi.Dispose();
 
         if (r.Count > 1) { return new DoItFeedback(ld, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
-        if (r.Count == 0) {            return RowToObjectFeedback(null);        }
+        if (r.Count == 0) { return RowToObjectFeedback(null); }
 
         return RowToObjectFeedback(r[0]);
     }

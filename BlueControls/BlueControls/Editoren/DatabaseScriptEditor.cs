@@ -273,7 +273,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
-        Database.ScriptNeedFix = string.Empty;
+        Database.ScriptNeedFix = Database.CheckScriptError();
 
         #endregion
     }

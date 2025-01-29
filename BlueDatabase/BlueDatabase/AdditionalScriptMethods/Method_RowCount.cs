@@ -46,10 +46,11 @@ public class Method_RowCount : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName);
-        if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
         var r = allFi.Rows;
+        allFi.Dispose();
 
         return new DoItFeedback(r.Count);
     }

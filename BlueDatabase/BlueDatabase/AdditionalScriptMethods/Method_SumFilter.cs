@@ -48,20 +48,25 @@ public class Method_SumFilter : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName);
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
-        if (allFi is null) { return new DoItFeedback(ld, "Fehler im Filter"); }
+        if (allFi.Database is not { IsDisposed: false } db) {
+            allFi.Dispose();
+            return new DoItFeedback(ld, "Datenbankfehler!");
+        }
 
-        if (allFi.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+        var r = allFi.Rows;
+        allFi.Dispose();
 
         var returncolumn = db.Column[attvar.ReadableText(0)];
         if (returncolumn == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ReadableText(0)); }
 
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
-        var x = returncolumn.Summe(allFi.Rows);
+        var x = returncolumn.Summe(r);
 
-        if(x is not double xd) {
+        if (x is not double xd) {
             return new DoItFeedback(ld, "Summe konnte nicht berechnet werden.");
         }
 
