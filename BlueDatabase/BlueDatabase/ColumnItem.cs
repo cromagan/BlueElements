@@ -2399,16 +2399,16 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-        foreach (var thisFile in AllFiles) {
-            if (thisFile.TableName.Equals(_linkedDatabaseTableName, StringComparison.OrdinalIgnoreCase)) {
-                _linkedDatabase = thisFile;
-                break;
-            }
-        }
+        //foreach (var thisFile in AllFiles) {
+        //    if (thisFile.TableName.Equals(_linkedDatabaseTableName, StringComparison.OrdinalIgnoreCase)) {
+        //        _linkedDatabase = thisFile;
+        //        break;
+        //    }
+        //}
 
-        if (_linkedDatabase == null && IsValidTableName(_linkedDatabaseTableName)) {
-            _linkedDatabase = Database.Get(_linkedDatabaseTableName, false, null);
-        }
+        //if (_linkedDatabase == null && IsValidTableName(_linkedDatabaseTableName)) {
+        _linkedDatabase = Database.Get(_linkedDatabaseTableName, false, null);
+        //}
 
         if (_linkedDatabase != null) {
             _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
