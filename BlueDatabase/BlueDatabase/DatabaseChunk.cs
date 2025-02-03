@@ -148,10 +148,10 @@ public class DatabaseChunk : Database {
             if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
 
             #region Undos
+
             var important = 0;
             var undoCount = 0;
             List<string> works2 = [];
-
 
             foreach (var thisWorkItem in db.Undo) {
                 if (thisWorkItem != null && thisWorkItem.LogsUndo(db)) {
@@ -168,7 +168,6 @@ public class DatabaseChunk : Database {
                         } else {
                             works2.Add(thisWorkItem.ParseableItems().FinishParseable());
                         }
-
                     }
                 }
             }
@@ -215,7 +214,7 @@ public class DatabaseChunk : Database {
         if (type.IsObsolete()) { return string.Empty; }
         if (type == DatabaseDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases; }
         if (type == DatabaseDataType.DatabaseVariables) { return Chunk_Variables; }
-        if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC
+        if (type is DatabaseDataType.TemporaryDatabaseMasterUser
                  or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) { return Chunk_Master; }
 
         if (type.IsCellValue() || type == DatabaseDataType.Undo) {
@@ -269,19 +268,14 @@ public class DatabaseChunk : Database {
         return mins > ranges && mins < rangee;
     }
 
-
-
-
     public override bool BeSureAllDataLoaded(int anzahl) {
         if (!base.BeSureAllDataLoaded(anzahl)) { return false; }
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
-
         var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
 
         if (!DirectoryExists(chunkPath)) { return true; }
-
 
         var files = Directory.GetFiles(chunkPath, "*.bdbc");
         var fileQuery = anzahl < 0 || anzahl >= files.Length
@@ -291,7 +285,6 @@ public class DatabaseChunk : Database {
                   .Take(anzahl)
                   .Select(f => f.FullName)
                   .ToArray();
-
 
         foreach (var file in files) {
             var chunkId = file.FileNameWithoutSuffix();
@@ -406,17 +399,10 @@ public class DatabaseChunk : Database {
         return chunk.IsEditable(reason);
     }
 
-    protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-        _chunks.Clear();
-    }
-
     protected override bool BeSureToBeUpDoDate() {
         if (!base.BeSureToBeUpDoDate()) { return false; }
 
         OnDropMessage(FehlerArt.Info, "Lade Chunks von '" + TableName + "'");
-
-
 
         if (!LoadChunkWithChunkId(Chunk_MainData, false, null, true).ok) { return false; }
 
@@ -431,6 +417,11 @@ public class DatabaseChunk : Database {
 
         TryToSetMeTemporaryMaster();
         return true;
+    }
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        _chunks.Clear();
     }
 
     protected override bool SaveInternal(DateTime setfileStateUtcDateTo) {

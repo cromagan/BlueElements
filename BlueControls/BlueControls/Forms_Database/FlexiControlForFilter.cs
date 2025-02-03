@@ -45,11 +45,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     private readonly Renderer_Abstract _renderer;
     private bool _doFilterDeleteButton;
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
-
     private bool _fromInputFilter;
-
     private string _origin;
-
     private FlexiFilterDefaultOutput _standard_bei_keiner_eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #endregion
@@ -98,11 +95,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     public ColumnItem? FilterSingleColumn { get; }
 
     public bool SavesSettings { get; internal set; } = false;
-
     public List<string> Settings { get; } = [];
-
     public bool SettingsLoaded { get; set; }
-
     public string SettingsManualFilename { get; set; } = string.Empty;
 
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
@@ -114,6 +108,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             F_ValueChanged(null, System.EventArgs.Empty);
         }
     }
+
+    public bool UsesSettings => true;
 
     #endregion
 

@@ -33,6 +33,7 @@ public interface IHasSettings {
     public List<string> Settings { get; }
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; }
+    public bool UsesSettings { get; }
 
     #endregion
 }
@@ -42,6 +43,8 @@ public static class HasSettings {
     #region Methods
 
     public static string GetSettings(this IHasSettings settings, string tagname) {
+        if (!settings.UsesSettings) { return string.Empty; }
+
         settings.LoadSettingsFromDisk(false);
 
         return settings.Settings.TagGet(tagname).FromNonCritical();
@@ -49,6 +52,7 @@ public static class HasSettings {
 
     public static void LoadSettingsFromDisk(this IHasSettings settings, bool loadalways) {
         if (settings.SettingsLoaded && !loadalways) { return; }
+        if (!settings.UsesSettings) { return; }
 
         settings.Settings.Clear();
 
@@ -63,6 +67,7 @@ public static class HasSettings {
 
     public static void SaveSettingsToDisk(this IHasSettings settings) {
         if (Develop.AllReadOnly) { return; }
+        if (!settings.UsesSettings) { return; }
 
         var pf = settings.SettingsFileName().FilePath().CheckPath();
 
@@ -79,6 +84,7 @@ public static class HasSettings {
     }
 
     public static void SetSetting(this IHasSettings settings, string tagname, string value) {
+        if (!settings.UsesSettings) { return; }
         settings.LoadSettingsFromDisk(false);
 
         var nval = value.ToNonCritical();
@@ -97,6 +103,7 @@ public static class HasSettings {
     /// <param name="settings"></param>
     /// <param name="s"></param>
     public static void SettingsAdd(this IHasSettings settings, string s) {
+        if (!settings.UsesSettings) { return; }
         settings.LoadSettingsFromDisk(false);
 
         s = s.Replace("\r", string.Empty).Replace("\n", string.Empty);
@@ -109,7 +116,13 @@ public static class HasSettings {
         settings.SaveSettingsToDisk();
     }
 
-    private static string SettingsFileName(this IHasSettings settings) => !string.IsNullOrEmpty(settings.SettingsManualFilename) ? settings.SettingsManualFilename.CheckFile() : ("%homepath%\\" + Develop.AppName() + "\\" + settings.Name + ".ini").CheckFile();
+    private static string SettingsFileName(this IHasSettings settings) {
+        if (!settings.UsesSettings) { return string.Empty; }
+
+        return !string.IsNullOrEmpty(settings.SettingsManualFilename) ?
+            settings.SettingsManualFilename.CheckFile() :
+            ("%homepath%\\" + Develop.AppName() + "\\" + settings.Name + ".ini").CheckFile();
+    }
 
     #endregion
 }

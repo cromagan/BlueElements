@@ -83,13 +83,12 @@ public class Method_Filter : Method_Database {
             }
         }
 
-        var f = new FilterCollection(allFi[0].Database, "method_filter");
-
         if (allFi.Count < 1) {
-            if (!must) { return (f, string.Empty); }
+            if (!must) { return (null, string.Empty); }
             return (null, "Fehler bei der Filtererstellung.");
         }
 
+        var f = new FilterCollection(allFi[0].Database, "method_filter");
         f.AddIfNotExists(allFi);
         return (f, string.Empty);
     }

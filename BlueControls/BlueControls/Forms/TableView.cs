@@ -53,10 +53,12 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     #region Constructors
 
-    public TableView() : this(null, true, true) { }
+    public TableView() : this(null, true, true, true) { }
 
-    public TableView(Database? database, bool loadTabVisible, bool adminTabVisible) : base() {
+    public TableView(Database? database, bool loadTabVisible, bool adminTabVisible, bool usesSettings) : base() {
         InitializeComponent();
+
+        UsesSettings = usesSettings;
 
         if (!adminTabVisible) {
             grpAdminAllgemein.Visible = false;
@@ -95,6 +97,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     public bool SettingsLoaded { get => SettingsLoadedStatic; set => SettingsLoadedStatic = value; }
 
     public string SettingsManualFilename { get => Application.StartupPath + "\\" + Name + "-Settings.ini"; set { } }
+
+    public bool UsesSettings { get; private set; }
 
     #endregion
 
@@ -850,8 +854,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-
-
         _ = SwitchTabToDatabase(e.Item.KeyName);
     }
 
@@ -1033,7 +1035,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
         if (!FileExists(LoadTab.FileName)) { return; }
-
 
         _ = SwitchTabToDatabase(LoadTab.FileName);
     }

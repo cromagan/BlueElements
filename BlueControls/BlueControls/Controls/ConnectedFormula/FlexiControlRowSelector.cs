@@ -56,13 +56,11 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
     #region Properties
 
     public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal set => f.CaptionPosition = value; }
-
     public EditTypeFormula EditType { get => f.EditType; internal set => f.EditType = value; }
-
     public List<string> Settings { get; } = [];
-
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;
+    public bool UsesSettings => true;
 
     #endregion
 

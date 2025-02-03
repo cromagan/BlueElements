@@ -346,7 +346,6 @@ public class Chunk : IHasKeyName {
         MoveFile(filename, backup, false); // Kein Abbruch hier, die Datei könnte ja nicht existieren
         Develop.SetUserDidSomething();
 
-
         // --- TmpFile wird zum Haupt ---
         if (!MoveFile(tempfile, filename, false)) {
             // Paralleler Prozess hat gespeichert?!?

@@ -38,7 +38,6 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     private int _maxCount = 20;
     private bool _mustExists = true;
-
     private string _settingsManualFilename = string.Empty;
 
     #endregion
@@ -88,6 +87,8 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
             GenerateMenu();
         }
     }
+
+    public bool UsesSettings => true;
 
     #endregion
 

@@ -60,13 +60,13 @@ public class Method_RowNext : Method_Database {
         var column = Column(scp, attvar, 0);
         if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
 
-        if (mr.Database != column.Database) { return DoItFeedback.InternerFehler(ld); }
-
         if (mr.Database is not { IsDisposed: false } db) { return DoItFeedback.InternerFehler(ld); }
+
+        if (db != column.Database) { return DoItFeedback.InternerFehler(ld); }
 
         List<RowItem> r = [];
         if (attvar.Attributes.Count > 2) {
-            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
+            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, db, scp.ScriptName, true);
             if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
             r.AddRange(allFi.Rows);
             allFi.Dispose();

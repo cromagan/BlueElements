@@ -88,10 +88,17 @@ public class Method_AddRowsUnique : Method_Database {
 
             #region  Filter ermitteln (allfi)
 
-            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, false);
-            if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, mydb, scp.ScriptName, false);
+            if (!string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+
+            allFi ??= new FilterCollection(mydb, "AddRowsUnique");
 
             #endregion
+
+            if (allFi[c] is { }) {
+                allFi.Dispose();
+                return new DoItFeedback(ld, "Initialwert doppelt belegt");
+            }
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 

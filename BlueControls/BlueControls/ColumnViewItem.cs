@@ -345,7 +345,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public Rectangle AutoFilterLocation(float scale, float sliderx) {
-        if (!AutoFilterSymbolPossible) { return Rectangle.Empty; }
+        // Manchmal sind filter da, auch ohne Autofilter-Button
+        //if (!AutoFilterSymbolPossible) { return Rectangle.Empty; }
 
         var r = RealHead(scale, sliderx);
         var size = (int)(AutoFilterSize * scale);

@@ -66,14 +66,14 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void btnAusgehendeDatenbank_Click(object sender, System.EventArgs e) {
         if (_lastItem is ReciverSenderControlPadItem { DatabaseOutput: { IsDisposed: false } db }) {
-            var c = new TableView(db, false, true);
+            var c = new TableView(db, false, true, true);
             c.ShowDialog();
         }
     }
 
     private void btnEingehendeDatenbank_Click(object sender, System.EventArgs e) {
         if (_lastItem is ReciverControlPadItem { DatabaseInput: { IsDisposed: false } db }) {
-            var c = new TableView(db, false, true);
+            var c = new TableView(db, false, true, true);
             c.ShowDialog();
         }
     }

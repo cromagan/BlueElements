@@ -69,7 +69,7 @@ public class Method_RowDelete : Method_Database, IUseableForButton {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName, true);
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, mydb, scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
         if (!scp.ProduktivPhase) {

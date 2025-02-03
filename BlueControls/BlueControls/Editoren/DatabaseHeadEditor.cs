@@ -321,7 +321,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnTabellenAnsicht_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        var c = new TableView(db, false, true);
+        var c = new TableView(db, false, true, true);
         c.ShowDialog();
     }
 
