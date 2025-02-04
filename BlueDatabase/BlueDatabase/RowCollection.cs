@@ -428,7 +428,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? myRow;
 
         if (r.Count == 0) {
-            var (newrow, message, stoptrying) = db.Row.GenerateAndAdd(filter.ToList(), coment);
+            var (newrow, message, stoptrying) = db.Row.GenerateAndAdd(filter.ToArray(), coment);
             if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message, stoptrying); }
             myRow = newrow;
         } else {
@@ -547,7 +547,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="fc"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public (RowItem? newrow, string message, bool stoptrying) GenerateAndAdd(List<FilterItem> filter, string comment) {
+    public (RowItem? newrow, string message, bool stoptrying) GenerateAndAdd(FilterItem[] filter, string comment) {
         Database? db2 = null;
 
         foreach (var thisfi in filter) {
@@ -559,7 +559,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanken unterschiedlich", true); }
             db2 ??= db1;
 
-            if (thisfi.Column.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich", true); }
+            if (thisfi.Column?.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich", true); }
         }
 
         if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }
@@ -574,7 +574,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisColum in db2.Column) {
             if (thisColum.Function == ColumnFunction.First || thisColum == db2.Column.SplitColumn) {
-                var inval = FilterCollection.InitValue(filter, thisColum, true);
+                var inval = FilterCollection.InitValue(thisColum, true, filter);
                 if (inval == null || string.IsNullOrWhiteSpace(inval)) {
                     return (null, "Initalwert fehlt.", false);
                 }
@@ -627,10 +627,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdateAfterChange());
         if (rowToCheck != null) { return rowToCheck; }
 
-        if (db.AmITemporaryMaster(5, 55)) {
-            rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false, oldestTo));
-            if (rowToCheck != null) { return rowToCheck; }
-        }
+
+        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false, oldestTo));
+        if (rowToCheck != null) { return rowToCheck; }
+
 
         if (!oldestTo) { return null; }
 
@@ -885,7 +885,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="fc"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    private RowItem GenerateAndAddInternal(string key, List<FilterItem> fc, string comment) {
+    private RowItem GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Database is not { IsDisposed: false } db) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
             throw new Exception();
@@ -904,10 +904,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             throw new Exception();
         }
 
+
+        // Die Split-Colmn an den Anfang setzen
+        var chunkvalue = string.Empty;
+        List<ColumnItem> l = [.. db.Column];
+        if (db.Column.SplitColumn is { } spc) {
+            l.Remove(spc);
+            l.Insert(0, spc);
+            chunkvalue = FilterCollection.InitValue(spc, true, fc);
+        }
+
         var u = Generic.UserName;
         var d = DateTime.UtcNow;
 
-        var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty);
+        var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, chunkvalue);
         if (!string.IsNullOrEmpty(s)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
             throw new Exception();
@@ -921,14 +931,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         // Dann die Inital-Werte reinschreiben
 
-        List<ColumnItem> l = [.. db.Column];
-        if (db.Column.SplitColumn is { } spc) {
-            l.Remove(spc);
-            l.Insert(0, spc);
-        }
+
 
         foreach (var thisColum in l) {
-            var val = FilterCollection.InitValue(fc, thisColum, true);
+            var val = FilterCollection.InitValue(thisColum, true, fc);
             if (!string.IsNullOrWhiteSpace(val)) {
                 item.CellSet(thisColum, val, "Initialwert neuer Zeile");
             }

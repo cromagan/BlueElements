@@ -66,7 +66,7 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
 
         var time = attvar.ValueNumGet(2);
 
-        if (time < 0 || time > 5) {
+        if (time is < 0 or > 5) {
             return new DoItFeedback(ld, "Zeitintervall nur von 0 bis 5 Sekunden erlaubt");
         }
 

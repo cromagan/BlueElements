@@ -86,8 +86,8 @@ public class DatabaseFragments : Database {
     /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
     /// </param>
     /// <returns></returns>
-    public override bool AmITemporaryMaster(int ranges, int rangee) {
-        if (!base.AmITemporaryMaster(ranges, rangee)) { return false; }
+    public override bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) {
+        if (!base.AmITemporaryMaster(ranges, rangee, row)) { return false; }
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
         if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
 
@@ -176,7 +176,7 @@ public class DatabaseFragments : Database {
 
         #region Bei Bedarf neue Komplett-Datenbank erstellen
 
-        if (!Develop.AllReadOnly && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
+        if (!Develop.AllReadOnly && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55, null)) {
             if (ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
                 OnDropMessage(FehlerArt.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
                 if (!SaveInternal(IsInCache)) {
@@ -266,8 +266,8 @@ public class DatabaseFragments : Database {
 
     protected override bool SaveRequired() => true;
 
-    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunk) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment, chunk);
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment, chunkId);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
@@ -277,7 +277,7 @@ public class DatabaseFragments : Database {
         if (_writer == null) { StartWriter(); }
         if (_writer == null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", chunk);
+        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", chunkId);
 
         try {
             lock (_writer) {
@@ -398,7 +398,7 @@ public class DatabaseFragments : Database {
                     var r = Row.SearchByKey(thisWork.RowKey);
 
                     // HIER Wird der falsche Chunk übergeben!
-                    var (error, columnchanged, rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate, string.Empty);
+                    var (error, columnchanged, rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate);
 
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());

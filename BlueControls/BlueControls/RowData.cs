@@ -31,7 +31,10 @@ public static class RowDrawDataExtensions {
 
     #region Methods
 
-    public static RowData? Get(this List<RowData>? l, RowItem row) => l?.FirstOrDefault(thisr => thisr?.Row == row);
+    public static RowData? Get(this List<RowData>? l, RowItem? row) {
+        if (row == null) { return null; }
+        return l?.FirstOrDefault(thisr => thisr?.Row == row);
+    }
 
     #endregion
 

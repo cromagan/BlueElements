@@ -378,7 +378,7 @@ public class Chunk : IHasKeyName {
 
         if (reason is not EditableErrorReasonType.EditAcut and not EditableErrorReasonType.EditCurrently) { return string.Empty; }
 
-        if (!DoExtendedSave(5)) {
+        if (!DoExtendedSave(0)) {
             LastEditTimeUtc = DateTime.MinValue;
             return "Bearbeitung konnte nicht gesetzt werden.";
         }

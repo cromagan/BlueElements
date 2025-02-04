@@ -403,10 +403,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         StringBuilder r = new();
 
         foreach (var t in columns) {
-            if (t.LinkedDatabase is not { IsDisposed: false }) {
-                // LinkedDatabase = null - Ansonsten wird beim Sortieren alles immer wieder geladen,
-                _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
-            }
+            _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
         }
 
         _ = r.Append(Constants.SecondSortChar + KeyName);
@@ -594,7 +591,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!extendedAllowed && string.IsNullOrEmpty(CellGetString(srs))) { return false; }
 
         if (CellGetDateTime(srs) >= Database.EventScriptVersion) { return false; }
-        return ignoreFailed || !RowCollection.FailedRows.Contains(this);
+        if (!ignoreFailed && RowCollection.FailedRows.Contains(this)) { return false; }
+
+
+        return db.AmITemporaryMaster(5, 55, this);
+
     }
 
     /// <summary>

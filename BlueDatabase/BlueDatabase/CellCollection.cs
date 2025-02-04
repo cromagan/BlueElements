@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -122,7 +123,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="repairallowed"></param>
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
-    public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked, List<FilterItem>? filter) {
+    public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked, FilterItem[]? filter) {
         if (mode == EditableErrorReasonType.OnlyRead) {
             if (column == null || row == null) { return string.Empty; }
         }
@@ -170,7 +171,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.SplitColumn is { } spc) {
-                var value = FilterCollection.InitValue(filter, spc, false);
+                var value = FilterCollection.InitValue(spc, false, filter);
 
                 if (string.IsNullOrEmpty(value)) {
                     return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
@@ -367,7 +368,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             default: {
                     if (addRowIfNotExists) {
-                        targetRow = db.Row.GenerateAndAdd(fc.ToList(), "LinkedCell aus " + db.TableName).newrow;
+                        targetRow = db.Row.GenerateAndAdd(fc.ToArray(), "LinkedCell aus " + db.TableName).newrow;
                     } else {
                         cr = true;
                     }
@@ -502,7 +503,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         column.UcaseNamesSortedByLenght = null;
 
-        var message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment, DatabaseChunk.GetChunkValue(row));
+        var chunkValue = DatabaseChunk.GetChunkValue(row);
+
+        if (column == db.Column.SplitColumn) {
+            chunkValue = value;
+        }
+
+        var message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment, chunkValue);
 
         if (!string.IsNullOrEmpty(message)) { return message; }
 
@@ -536,7 +543,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return true;
     }
 
-    internal string CompareKey(ColumnItem column, RowItem row) => GetString(column, row).CompareKey(column.SortType);
+    internal string CompareKey(ColumnItem column, RowItem row) => GetStringCore(column, row).CompareKey(column.SortType);
 
     internal string GetStringCore(ColumnItem? column, RowItem? row) => this[column, row]?.Value ?? string.Empty;
 

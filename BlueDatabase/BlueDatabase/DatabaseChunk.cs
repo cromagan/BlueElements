@@ -26,7 +26,6 @@ using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
-using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -75,7 +74,7 @@ public class DatabaseChunk : Database {
 
         var usesChunk = mainChunk;
         var varChunk = mainChunk;
-        var masterUserChunk = mainChunk;
+        var masterUserChunk = mainChunk; // Masterchunk wird nicht gespeichert. Weil es pro chunk einen Masteruser geben kann.
 
         if (chunksAllowed) {
             usesChunk = new Chunk(db.Filename, Chunk_AdditionalUseCases);
@@ -88,7 +87,7 @@ public class DatabaseChunk : Database {
 
             masterUserChunk = new Chunk(db.Filename, Chunk_Master);
             masterUserChunk.InitByteList();
-            chunks.Add(masterUserChunk);
+            //chunks.Add(masterUserChunk); // Masterchunk wird nicht gespeichert. Weil es pro chunk einen Masteruser geben kann.
         }
 
         try {
@@ -160,7 +159,7 @@ public class DatabaseChunk : Database {
                         if (thisWorkItem.Command == DatabaseDataType.EventScript) { important++; }
 
                         if (chunksAllowed) {
-                            var targetChunkId = GetChunkId(db, thisWorkItem.Command, thisWorkItem.ColName, thisWorkItem.ChunkValue);
+                            var targetChunkId = GetChunkId(db, thisWorkItem.Command, thisWorkItem.ChunkValue);
                             if (!string.IsNullOrEmpty(targetChunkId)) {
                                 var targetChunk = GetOrMakechunk(chunks, db, targetChunkId);
                                 targetChunk.SaveToByteList(DatabaseDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
@@ -198,35 +197,36 @@ public class DatabaseChunk : Database {
     public static string GetChunkId(RowItem r) {
         if (r.Database?.Column.SplitColumn is not { }) { return Chunk_MainData; }
 
-        return GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, string.Empty, GetChunkValue(r));
+        return GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r));
     }
 
-    public static string GetChunkId(Database db, DatabaseDataType type, string columnName, string value) {
+    public static string GetChunkId(Database db, DatabaseDataType type, string chunkvalue) {
         if (db.Column.SplitColumn is not { } spc) { return Chunk_MainData; }
 
-        if (type is DatabaseDataType.Command_RemoveRow or DatabaseDataType.Command_AddRow
-            or DatabaseDataType.Command_RemoveColumn or DatabaseDataType.Command_AddColumnByName
-            or DatabaseDataType.Command_NewStart) { return string.Empty; }
+        if (type is DatabaseDataType.Command_RemoveColumn
+                or DatabaseDataType.Command_AddColumnByName) { return Chunk_MainData; }
 
-        // Werteänderungen von Split-Spalten nicht loggen. Neue Zeilen werden mit dem Wert initialisert und sind somit noch nicht richtig zugeordnet
-        if (type.IsCellValue() && string.Equals(columnName, spc.KeyName, StringComparison.OrdinalIgnoreCase)) { return string.Empty; }
+        if (type == DatabaseDataType.Command_NewStart) { return string.Empty; }
 
         if (type.IsObsolete()) { return string.Empty; }
         if (type == DatabaseDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases; }
         if (type == DatabaseDataType.DatabaseVariables) { return Chunk_Variables; }
         if (type is DatabaseDataType.TemporaryDatabaseMasterUser
-                 or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) { return Chunk_Master; }
+                 or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Sollte nicht passieren!");
+            return Chunk_Master;
+        }
 
-        if (type.IsCellValue() || type == DatabaseDataType.Undo) {
+        if (type.IsCellValue() || type is DatabaseDataType.Undo or DatabaseDataType.Command_AddRow or DatabaseDataType.Command_RemoveRow) {
             switch (spc.Function) {
                 case ColumnFunction.Split_Medium:
-                    return value.ToLower().GetHashString().Right(2).ToLower();
+                    return chunkvalue.ToLower().GetHashString().Right(2).ToLower();
 
                 case ColumnFunction.Split_Large:
-                    return value.ToLower().GetHashString().Right(3).ToLower();
+                    return chunkvalue.ToLower().GetHashString().Right(3).ToLower();
 
                 case ColumnFunction.Split_Name:
-                    var t = ColumnItem.MakeValidColumnName(value);
+                    var t = ColumnItem.MakeValidColumnName(chunkvalue);
                     return string.IsNullOrEmpty(t) ? "_" : t.ToLower().Left(12);
 
                 default:
@@ -239,33 +239,38 @@ public class DatabaseChunk : Database {
 
     public static string GetChunkValue(RowItem r) {
         if (r.Database?.Column.SplitColumn is not { } spc) { return string.Empty; }
-        return r.CellGetString(spc);
+        return r.Database.Cell.GetStringCore(spc, r);
+
+        //return r.CellGetString(spc);
     }
 
     /// <summary>
-    ///
+    /// row == null --> false
     /// </summary>
-    /// <param name="ranges">Unter 5 Minuten wird auch geprüft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
-    /// <param name="rangee">Bis 55 Minuten ist sicher, dass es der Master ist.
-    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
-    /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
-    /// </param>
+    /// <param name="ranges"></param>
+    /// <param name="rangee"></param>
+    /// <param name="row"></param>
     /// <returns></returns>
-    public override bool AmITemporaryMaster(int ranges, int rangee) {
-        if (!base.AmITemporaryMaster(ranges, rangee)) { return false; }
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
-        if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
+    public override bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) {
+        if (row == null) { return false; }
+        if (!base.AmITemporaryMaster(ranges, rangee, row)) { return false; }
 
-        var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
-        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
+        //var chk = GetChunkId(row);
 
-        ranges = Math.Max(ranges, 0);
-        //rangee = Math.Min(rangee, 55);
+        //if (Column.SplitColumn is { } spc) {
+        //    var value = FilterCollection.InitValue(filter, spc, false);
 
-        // Info:
-        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
-        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
-        return mins > ranges && mins < rangee;
+        //    if (string.IsNullOrEmpty(value)) {
+        //        return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
+        //    }
+        //    return IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, EditableErrorReasonType.EditCurrently);
+
+        if (Column?.SplitColumn is { }) {
+            var value = DatabaseChunk.GetChunkValue(row);
+            return string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, string.Empty, value, EditableErrorReasonType.EditCurrently));
+        }
+
+        return false;
     }
 
     public override bool BeSureAllDataLoaded(int anzahl) {
@@ -299,11 +304,11 @@ public class DatabaseChunk : Database {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="ofValue"></param>
+    /// <param name="chunkValue"></param>
     /// <param name="important">Steuert, ob es dringend nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public override (bool loaded, bool ok) BeSureRowIsLoaded(string ofValue, DatabaseDataType type, bool important, NeedPassword? needPassword) {
-        var chunkId = GetChunkId(this, type, string.Empty, ofValue);
+    public override (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, DatabaseDataType type, bool important, NeedPassword? needPassword) {
+        var chunkId = GetChunkId(this, type, chunkValue);
 
         if (string.IsNullOrEmpty(chunkId)) { return (false, false); }
 
@@ -386,7 +391,13 @@ public class DatabaseChunk : Database {
     public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName.ToLower()).ToList();
 
     internal override string IsValueEditable(DatabaseDataType type, string columnName, string ofValue, EditableErrorReasonType reason) {
-        var chunkId = GetChunkId(this, type, columnName, ofValue);
+        var f = base.IsValueEditable(type, columnName, ofValue, reason);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC or
+                    DatabaseDataType.TemporaryDatabaseMasterUser) { return "MasterUser in diesen Datenbanktyp nicht möglich"; }
+
+        var chunkId = GetChunkId(this, type, ofValue);
 
         var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, true);
 
@@ -410,7 +421,7 @@ public class DatabaseChunk : Database {
 
         if (Column.SplitColumn != null) {
             if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null, true).ok) { return false; }
-            if (!LoadChunkWithChunkId(Chunk_Master, false, null, true).ok) { return false; }
+            //if (!LoadChunkWithChunkId(Chunk_Master, false, null, true).ok) { return false; }
             if (!LoadChunkWithChunkId(Chunk_Variables, false, null, true).ok) { return false; }
         }
         IsInCache = DateTime.UtcNow;

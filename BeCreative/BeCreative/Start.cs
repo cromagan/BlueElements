@@ -59,7 +59,7 @@ namespace BeCreative {
 
         private void btnBildEditor_Click(object sender, EventArgs e) => DoForm(new MainWindow(true));
 
-        private void btnDatenbank_Click(object sender, EventArgs e) => DoForm(new TableView(null, true, true));
+        private void btnDatenbank_Click(object sender, EventArgs e) => DoForm(new TableView(null, true, true, true));
 
         private void btnFormular_Click(object sender, EventArgs e) => DoForm(new ConnectedFormulaEditor());
 
@@ -68,7 +68,6 @@ namespace BeCreative {
         private void btnHierachie_Click(object sender, EventArgs e) => DoForm(new RelationDiagram(null));
 
         private void btnLayout_Click(object sender, EventArgs e) => DoForm(new PadEditorWithFileAccess());
-
 
         private void DoForm(System.Windows.Forms.Form frm) {
             if (frm.IsDisposed) {

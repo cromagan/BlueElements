@@ -550,6 +550,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
+    public static void BeSureToBeUpDoDate(ObservableCollection<Database> ofDatabases) {
+        List<Database> l = [.. ofDatabases];
+
+        foreach (var db in l) {
+            db.BeSureToBeUpDoDate();
+        }
+    }
+
     public static string EditableErrorReason(Database? database, EditableErrorReasonType mode) {
         if (database is null) { return "Keine Datenbank zum Bearbeiten."; }
         return database.EditableErrorReason(mode);
@@ -647,14 +655,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         return null;
-    }
-
-    public static void BeSureToBeUpDoDate(ObservableCollection<Database> ofDatabases) {
-        List<Database> l = [..ofDatabases];
-
-        foreach (var db in l) {
-            db.BeSureToBeUpDoDate();
-        }
     }
 
     public static bool IsValidTableName(string tablename) {
@@ -1058,7 +1058,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
     /// </param>
     /// <returns></returns>
-    public virtual bool AmITemporaryMaster(int ranges, int rangee) {
+    public virtual bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) {
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
         return true;
     }
@@ -1068,7 +1068,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return BeSureToBeUpDoDate();
     }
 
-    public virtual (bool loaded, bool ok) BeSureRowIsLoaded(string ofValue, DatabaseDataType type, bool important, NeedPassword? needPassword) => (false, true);
+    public virtual (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, DatabaseDataType type, bool important, NeedPassword? needPassword) => (false, true);
 
     public bool CanDoValueChangedScript() {
         if (!IsRowScriptPossible(true)) { return false; }
@@ -1096,16 +1096,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        var chunk = DatabaseChunk.GetChunkId(this, command, column?.KeyName ?? string.Empty, chunkvalue);
-
         _saveRequired = true;
 
         if (!ReadOnly) {
-            var f2 = WriteValueToDiscOrServer(command, changedTo, column, row, user, datetimeutc, comment, chunk);
+            var chunkId = DatabaseChunk.GetChunkId(this, command, chunkvalue);
+            var f2 = WriteValueToDiscOrServer(command, changedTo, column, row, user, datetimeutc, comment, chunkId);
             if (!string.IsNullOrEmpty(f2)) { return f2; }
         }
 
-        var (error, _, _) = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand, chunk);
+        var (error, _, _) = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
         if (!string.IsNullOrEmpty(error)) { return error; }
 
         if (LogUndo) {
@@ -1116,7 +1115,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public string CheckScriptError() {
-
         List<string> names = [];
 
         foreach (var thissc in _eventScript) {
@@ -1368,7 +1366,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         var name = script?.KeyName ?? "Allgemein";
 
-   
         if (!string.IsNullOrEmpty(ScriptNeedFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
 
         var e = new CancelReasonEventArgs();
@@ -2137,7 +2134,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         break;
                     }
 
-                    var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate, string.Empty);
+                    var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
                     if (!string.IsNullOrEmpty(fehler.Error)) {
                         Freeze("Datenbank-Ladefehler");
                         Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + fehler);
@@ -2279,23 +2276,22 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <summary>
     /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
     /// </summary>
-    public bool TryToSetMeTemporaryMaster() {
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return false; }
+    public void TryToSetMeTemporaryMaster() {
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
 
-        if (AmITemporaryMaster(0, 60)) { return true; }
+        if (AmITemporaryMaster(0, 60, null)) { return; }
 
-        if (!NewMasterPossible()) { return false; }
+        if (!NewMasterPossible()) { return; }
 
         var code = MyMasterCode;
 
         if (!string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.TemporaryDatabaseMasterUser, string.Empty, code, EditableErrorReasonType.EditCurrently))) {
-            return false;
+            return;
         }
 
         RowCollection.WaitDelay = 0;
         TemporaryDatabaseMasterUser = code;
         TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
-        return true;
     }
 
     internal void DevelopWarnung(string t) {
@@ -2344,6 +2340,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunkValue));
     }
+
+    protected virtual bool BeSureToBeUpDoDate() => !IsDisposed;
 
     protected void CreateWatcher() {
         if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
@@ -2410,8 +2408,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected virtual void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime starttimeUtc, DateTime endTimeUtc) {
     }
 
-    protected virtual bool BeSureToBeUpDoDate() => !IsDisposed;
-
     protected void OnAdditionalRepair() {
         if (IsDisposed) { return; }
         //IsInCache = FileStateUTCDate;
@@ -2466,7 +2462,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="reason"></param>
     /// <param name="user"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    protected (string Error, ColumnItem? Columnchanged, RowItem? Rowchanged) SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason, string chunk) {
+    protected (string Error, ColumnItem? Columnchanged, RowItem? Rowchanged) SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
         if (IsDisposed) { return ("Datenbank verworfen!", null, null); }
         if ((reason != Reason.NoUndo_NoInvalidate) && !string.IsNullOrEmpty(FreezedReason)) { return ("Datenbank eingefroren: " + FreezedReason, null, null); }
         if (type.IsObsolete()) { return (string.Empty, null, null); }
@@ -2856,7 +2852,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         var masters = 0;
         foreach (var thisDb in AllFiles) {
-            if (thisDb is DatabaseFragments && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+            if (thisDb is DatabaseFragments && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45, null)) {
                 masters++;
                 if (masters >= MaxMasterCount) { return false; }
             }
@@ -2924,8 +2920,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Abmelden der Events: " + ex.Message);
         }
     }
-
-  
 
     #endregion
 }

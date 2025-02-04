@@ -910,7 +910,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Zoom = nz;
     }
 
-    public string EditableErrorReason(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview, List<FilterItem>? filter) {
+    public string EditableErrorReason(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview, FilterItem[]? filter) {
         var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false, filter);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
@@ -1895,7 +1895,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private static void NotEditableInfo(string reason) => Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
 
     private static void UserEdited(Table table, string newValue, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool formatWarnung) {
-        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true, table.Filter.ToList());
+        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true, table.Filter.ToArray());
         if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
 
         if (cellInThisDatabaseColumn?.Column is not { Function: not ColumnFunction.Virtuelle_Spalte }) { return; } // Dummy prüfung
@@ -1938,13 +1938,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 }
             }
 
-            var fe = table.EditableErrorReason(cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true, fc);
+            var fe = table.EditableErrorReason(cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true, fc.ToArray());
             if (!string.IsNullOrEmpty(fe)) {
                 NotEditableInfo(fe);
                 return;
             }
 
-            var newr = db.Row.GenerateAndAdd(fc, "Neue Zeile über Tabellen-Ansicht");
+            var newr = db.Row.GenerateAndAdd(fc.ToArray(), "Neue Zeile über Tabellen-Ansicht");
 
             if (!string.IsNullOrEmpty(newr.message)) {
                 NotEditableInfo(newr.message);
@@ -2244,7 +2244,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown) {
-        var f = EditableErrorReason(viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true, Filter.ToList());
+        var f = EditableErrorReason(viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true, Filter.ToArray());
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
         if (viewItem?.Column == null) { return; }// Klick ins Leere
 
@@ -2566,7 +2566,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 plus = p16;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
             } else {
-                txt = FilterCollection.InitValue(Filter.ToList(), cellInThisDatabaseColumn, false);
+                txt = FilterCollection.InitValue(cellInThisDatabaseColumn, false, Filter.ToArray());
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
             }
 
@@ -2949,9 +2949,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 }
             }
 
-            if (db.AmITemporaryMaster(5, 55)) {
+            if (db.AmITemporaryMaster(5, 55, null)) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, 0);
-            } else if (db.AmITemporaryMaster(0, 55)) {
+            } else if (db.AmITemporaryMaster(0, 55, null)) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, 0);
             }
         } catch {
@@ -3340,7 +3340,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
 
-        return string.IsNullOrEmpty(EditableErrorReason(fcv, null, EditableErrorReasonType.EditNormaly, true, true, false, Filter.ToList()));
+        return string.IsNullOrEmpty(EditableErrorReason(fcv, null, EditableErrorReasonType.EditNormaly, true, true, false, Filter.ToArray()));
     }
 
     #endregion

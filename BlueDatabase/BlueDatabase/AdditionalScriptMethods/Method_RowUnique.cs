@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using BlueBasics;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
@@ -120,7 +121,7 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
                 allFi.Dispose();
                 return new DoItFeedback(ld, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
             }
-            var l = FilterCollection.InitValue(allFi.ToList(), c, true);
+            var l = FilterCollection.InitValue(c, true, allFi.ToArray());
             if (thisFi.SearchValue[0] != l) {
                 allFi.Dispose();
                 return new DoItFeedback(ld, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");

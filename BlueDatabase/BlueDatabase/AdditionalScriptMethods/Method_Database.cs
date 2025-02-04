@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Structures;
-using static BlueDatabase.Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 

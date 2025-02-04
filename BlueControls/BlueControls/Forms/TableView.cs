@@ -121,10 +121,10 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         if (column != null) {
             e.ContextMenu.Add(ItemOf("Sortierung", true));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungDefault, column.Function.CanBeCheckedByRules()));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungDefault, true));
 
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, column.Function.CanBeCheckedByRules()));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, column.Function.CanBeCheckedByRules()));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, true));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, true));
             //_ = e.CurrentMenu.Add(AddSeparator());
 
             e.ContextMenu.Add(ItemOf("Zelle", true));

@@ -1223,7 +1223,7 @@ public static class Skin {
 
         if (r == null) {
             if (!db.ReadOnly) {
-                var fc = new List<FilterItem> { f1, f2 };
+                var fc = new FilterItem[] { f1, f2 };
                 db.Row.GenerateAndAdd(fc, "Unbekannter Stil");
             }
 

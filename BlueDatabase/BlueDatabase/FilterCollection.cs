@@ -196,13 +196,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static List<RowItem> CalculateFilteredRows(Database? db, params FilterItem[] filter) {
         if (db == null || db.IsDisposed) { return []; }
 
-        if (db.Column.SplitColumn != null) {
-            foreach (var fi in filter) {
-                if (fi.Column == db.Column.SplitColumn) {
-                    var (_, ok) = db.BeSureRowIsLoaded(fi.SearchValue[0], DatabaseDataType.UTF8Value_withoutSizeData, false, null);
+        if (db.Column.SplitColumn is { }spc) {
+            var i = InitValue(spc, true, filter);
+            //foreach (var fi in filter) {
+            //    if (fi.Column == db.Column.SplitColumn) {
+                    var (_, ok) = db.BeSureRowIsLoaded(i, DatabaseDataType.UTF8Value_withoutSizeData, false, null);
                     if (!ok) { return []; }
-                }
-            }
+            //    }
+            //}
         }
 
         List<RowItem> tmpVisibleRows = [];
@@ -230,8 +231,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="column"></param>
     /// <returns></returns>
-    public static string InitValue(List<FilterItem>? filter, ColumnItem column, bool firstToo) {
-        if (filter == null || filter.Count == 0) { return string.Empty; }
+    public static string InitValue(ColumnItem column, bool firstToo, params FilterItem[] filter) {
+        if (filter == null || !filter.Any()) { return string.Empty; }
         if (column is not { IsDisposed: false }) { return string.Empty; }
         if (column.Database is not { IsDisposed: false } db) { return string.Empty; }
 
