@@ -291,7 +291,7 @@ public class DatabaseChunk : Database {
                   .Select(f => f.FullName)
                   .ToArray();
 
-        foreach (var file in files) {
+        foreach (var file in fileQuery) {
             var chunkId = file.FileNameWithoutSuffix();
 
             var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, false);
