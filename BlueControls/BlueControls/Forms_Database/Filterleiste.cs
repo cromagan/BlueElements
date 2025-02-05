@@ -380,7 +380,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
     }
 
     private void Filter_ZeilenFilterSetzen() {
-        if (IsDisposed || _table is not { Database: { IsDisposed: false } db }) {
+        if (IsDisposed || _table is not { Database: { IsDisposed: false } }) {
             DoÄhnlich();
             return;
         }

@@ -146,6 +146,18 @@ public static class ColumnFunctionExtensions {
                                                                                      or ColumnFunction.Split_Name
                                                                                      or ColumnFunction.First;
 
+    public static bool CopyAble(this ColumnFunction function) => function is ColumnFunction.Normal
+                                                                                 or ColumnFunction.RelationText
+                                                                                 or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
+                                                                                 or ColumnFunction.Schlüsselspalte
+                                                                                 or ColumnFunction.Virtuelle_Spalte
+                                                                                 or ColumnFunction.Zeile
+                                                                                 or ColumnFunction.Split_Medium
+                                                                                 or ColumnFunction.Split_Large
+                                                                                 or ColumnFunction.Split_Name
+                                                                                 or ColumnFunction.First
+                                                                                 or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
+
     public static bool DropdownItemsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                       or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                       or ColumnFunction.RelationText

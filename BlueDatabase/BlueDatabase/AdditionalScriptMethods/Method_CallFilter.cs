@@ -88,7 +88,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + filterarg;
+    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1] + "," + filterarg;
 
     #endregion
 }

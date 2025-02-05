@@ -1942,14 +1942,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         OnLoading();
 
-        var l = Chunk.LoadBytesFromDisk(Filename);
+        var (bytes, fileinfo, failed) = Chunk.LoadBytesFromDisk(Filename);
 
-        if (l.failed) {
+        if (failed) {
             Freeze("Laden fehlgeschlagen!");
             return;
         }
 
-        var ok = Parse(l.bytes.ToArray(), true, needPassword);
+        var ok = Parse(bytes.ToArray(), true, needPassword);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");

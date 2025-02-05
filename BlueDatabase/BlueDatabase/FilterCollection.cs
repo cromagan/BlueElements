@@ -378,7 +378,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         // Handeln
         OnChanging();
-        List<FilterItem> t = [.. _internal];
+        //List<FilterItem> t = [.. _internal];
         UnRegisterEvents(_internal);
         _internal.Clear();
         Invalidate_FilteredRows();

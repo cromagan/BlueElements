@@ -101,7 +101,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (column is not { IsDisposed: false }) { return null; }
             if (row is not { IsDisposed: false }) { return null; }
 
-            if (column.Database != row.Database || column.Database != Database) { return null; }
+            if (column.Database != row.Database || column.Database != db) { return null; }
 
             var cellKey = KeyOfCell(column, row);
             return ContainsKey(cellKey) ? this[cellKey] : null;

@@ -467,7 +467,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
-            if (row != null && column != null && column.Function.CanBeCheckedByRules()) {
+            if (row != null && column != null && column.Function.CopyAble()) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");

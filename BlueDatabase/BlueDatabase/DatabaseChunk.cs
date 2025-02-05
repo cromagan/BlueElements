@@ -213,8 +213,8 @@ public class DatabaseChunk : Database {
         if (type == DatabaseDataType.DatabaseVariables) { return Chunk_Variables; }
         if (type is DatabaseDataType.TemporaryDatabaseMasterUser
                  or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Sollte nicht passieren!");
-            return Chunk_Master;
+            //Develop.DebugPrint(FehlerArt.Fehler, "Sollte nicht passieren!");
+            return Chunk_Master; // Alte Undos
         }
 
         if (type.IsCellValue() || type is DatabaseDataType.Undo or DatabaseDataType.Command_AddRow or DatabaseDataType.Command_RemoveRow) {

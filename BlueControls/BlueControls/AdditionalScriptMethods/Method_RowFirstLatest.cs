@@ -66,8 +66,8 @@ public class Method_RowFirstLatest : Method_Database {
         if (r.Count < 1) { return Method_Row.RowToObjectFeedback(null); }
 
         var rsd = new RowSortDefinition(db, column, attvar.ValueBoolGet(1));
-        var sr = Table.CalculateSortedRows(db, r, null, rsd);
-        return Method_Row.RowToObjectFeedback(sr.rows[0].Row);
+        var (rows, _) = Table.CalculateSortedRows(db, r, null, rsd);
+        return Method_Row.RowToObjectFeedback(rows[0].Row);
     }
 
     #endregion
