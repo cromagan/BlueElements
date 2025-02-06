@@ -495,17 +495,17 @@ public class DatabaseChunk : Database {
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
         var f = base.WriteValueToDiscOrServer(type, comment, column, row, user, datetimeutc, comment, chunkId);
 
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
-        //if (column != null && column == Column.SplitColumn) { return string.Empty; }
-
-        if (string.IsNullOrEmpty(f) && _chunks.TryGetValue(chunkId.ToLower(), out var chk)) {
+        if (_chunks.TryGetValue(chunkId.ToLower(), out var chk)) {
             chk.SaveRequired = true;
         }
 
-        return f;
+        return string.Empty;
     }
 
     private static Chunk GetOrMakechunk(List<Chunk> chunks, Database db, string chunkId) {

@@ -30,6 +30,7 @@ using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
+using System.Threading;
 
 namespace BlueDatabase;
 
@@ -337,7 +338,6 @@ public class Chunk : IHasKeyName {
         string tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
         if (!Save(tempfile, minbytes)) { return false; }
-
         if (FileExists(backup)) {
             if (!DeleteFile(backup, false)) { return false; }
         }
@@ -347,7 +347,17 @@ public class Chunk : IHasKeyName {
         Develop.SetUserDidSomething();
 
         // --- TmpFile wird zum Haupt ---
-        if (!MoveFile(tempfile, filename, false)) {
+        const int maxRetries = 5;
+        const int retryDelayMs = 1000;
+
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            if (MoveFile(tempfile, filename, false)) {
+                Develop.SetUserDidSomething();
+                _lastcheck = DateTime.UtcNow;
+                _fileinfo = GetFileInfo(ChunkFileName, true);
+                return true;
+            }
+
             // Paralleler Prozess hat gespeichert?!?
             Develop.SetUserDidSomething();
             if (FileExists(filename)) {
@@ -355,15 +365,17 @@ public class Chunk : IHasKeyName {
                 Develop.SetUserDidSomething();
                 return false;
             }
-            Develop.DebugPrint(FehlerArt.Fehler, $"Chunk defekt:\r\n{filename}\r\n{tempfile}");
+
+            if (attempt < maxRetries) {
+                Thread.Sleep(retryDelayMs);
+                continue;
+            }
+
+            Develop.DebugPrint(FehlerArt.Fehler, $"Chunk defekt nach {maxRetries} Versuchen:\r\n{filename}\r\n{tempfile}");
             return false;
         }
-        Develop.SetUserDidSomething();
 
-        _lastcheck = DateTime.UtcNow;
-        _fileinfo = GetFileInfo(ChunkFileName, true);
-
-        return true;
+        return false;
     }
 
     internal string IsEditable(EditableErrorReasonType reason) {
