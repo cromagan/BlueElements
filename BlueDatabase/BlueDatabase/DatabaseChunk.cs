@@ -542,12 +542,12 @@ public class DatabaseChunk : Database {
             Cell.Clear();
         }
 
-        _ = _chunks.TryRemove(chunk.KeyName, out _);
+        _chunks[chunk.KeyName] = chunk;
 
-        if (!_chunks.TryAdd(chunk.KeyName, chunk)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Chunk nicht eingespielt!");
-            return false;
-        }
+        //if (!_chunks.TryUpdate(chunk.KeyName, chunk)) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Chunk nicht eingespielt!");
+        //    return false;
+        //}
 
         if (chunk.Bytes.Length == 0) {
             // Datei gelöscht
