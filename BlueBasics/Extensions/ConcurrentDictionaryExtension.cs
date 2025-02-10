@@ -19,7 +19,7 @@
 
 using System.Collections.Concurrent;
 using System.Linq;
-using BlueBasics.Enums;
+using System.Threading;
 using BlueBasics.Interfaces;
 
 namespace BlueBasics;
@@ -30,16 +30,28 @@ public static partial class Extensions {
 
     public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<string, T>? l) where T : ICanBeEmpty? {
         if (l is not { Count: not 0 }) { return false; }
-        var remo = (from pair in l where pair.Value == null || pair.Value.IsNullOrEmpty() select pair.Key).ToList();
+
+        var snapshot = l.ToArray();
+        var remo = snapshot
+            .Where(pair => pair.Value == null || pair.Value.IsNullOrEmpty())
+            .Select(pair => pair.Key)
+            .ToList();
+
         if (remo.Count == 0) { return false; }
 
-        foreach (var thisInteger in remo) {
-            if (!l.TryRemove(thisInteger, out _)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Remove failed: " + thisInteger);
+        var removedAny = false;
+
+        foreach (var key in remo) {
+            while (l.ContainsKey(key)) {
+                if (l.TryRemove(key, out _)) {
+                    removedAny = true;
+                    break;
+                }
+                Thread.Sleep(1);
             }
         }
 
-        return true;
+        return removedAny;
     }
 
     #endregion

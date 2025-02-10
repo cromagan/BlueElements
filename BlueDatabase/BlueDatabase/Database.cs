@@ -550,7 +550,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
-    public static void BeSureToBeUpDoDate(ObservableCollection<Database> ofDatabases) {
+    public static void BeSureToBeUpToDate(ObservableCollection<Database> ofDatabases) {
         List<Database> l = [.. ofDatabases];
 
         foreach (var db in l) {
@@ -2710,7 +2710,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     private static void DatabaseUpdater(object state) {
         if (CriticalState()) { return; }
-        BeSureToBeUpDoDate(AllFiles);
+        BeSureToBeUpToDate(AllFiles);
     }
 
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];

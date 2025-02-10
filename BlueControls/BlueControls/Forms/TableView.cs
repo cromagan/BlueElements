@@ -923,7 +923,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
         Database.ForceSaveAll();
-        Database.BeSureToBeUpDoDate(Database.AllFiles);
+        Database.BeSureToBeUpToDate(Database.AllFiles);
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
