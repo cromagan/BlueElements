@@ -37,9 +37,9 @@ public class Method_AddRowsUnique : Method_Database {
     public override string Command => "addrowsunique";
     public override List<string> Constants => [];
 
-    public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeilen.\r\n" +
-                                          "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind!\r\n" +
-                                          "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
+    public override string Description => "Lädt eine andere Datenbank (Database) und erstellt mehrere neue Zeilen.\r\n" +
+                                          "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind.\r\n" +
+                                          "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5).\r\n" +
                                           "Leere KeyValues werden übersprungen.\r\n" +
                                           "Die Werte der Filter werden zusätzlich gesetzt.\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
@@ -53,7 +53,7 @@ public class Method_AddRowsUnique : Method_Database {
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRowsUnique(database, ZusätzlichesSkript, keyvalues, filter, ...);";
+    public override string Syntax => "AddRowsUnique(database, keyvalues, filter, ...);";
 
     #endregion
 
