@@ -26,7 +26,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -69,7 +68,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public DateTime LastUsedDate = DateTime.UtcNow;
 
     /// <summary>
-    ///  So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
+    /// So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
     /// </summary>
     protected readonly List<UndoItem> ChangesNotIncluded = [];
 
@@ -83,7 +82,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
     private readonly List<string> _datenbankAdmin = [];
-    private readonly List<DatabaseScriptDescription> _eventScript = [];
+    private ReadOnlyCollection<DatabaseScriptDescription> _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
+    private ReadOnlyCollection<DatabaseScriptDescription> _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
     private readonly List<string> _permissionGroupsNewRow = [];
     private readonly List<string> _tags = [];
     private readonly List<Variable> _variables = [];
@@ -99,7 +99,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _creator;
     private string _editNormalyError = string.Empty;
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-    private string _eventScriptTmp = string.Empty;
+    private string _eventScriptEditedTmp = string.Empty;
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
     //private float _globalScale = 1f;
@@ -306,11 +306,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var l = new List<DatabaseScriptDescription>();
             l.AddRange(value);
             l.Sort();
-
-            if (_eventScriptTmp == l.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            var tmp = _eventScript.ToString(false);
+            if (tmp == l.ToString(false)) { return; }
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, tmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
 
             ScriptNeedFix = string.Empty;
+        }
+    }
+
+
+    public ReadOnlyCollection<DatabaseScriptDescription> EventScriptEdited {
+        get => new(_eventScriptEdited);
+        set {
+            var l = new List<DatabaseScriptDescription>();
+            l.AddRange(value);
+            l.Sort();
+
+            if (_eventScriptEditedTmp == l.ToString(false)) { return; }
+            _ = ChangeData(DatabaseDataType.EventScriptEdited, null, null, _eventScriptEditedTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
     }
 
@@ -1333,24 +1346,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    }
     public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE");
 
-    //    if (cellDataToo) { Row.CloneFrom(sourceDatabase); }
-    public void EventScript_Add(DatabaseScriptDescription ev, bool isLoading) {
-        _eventScript.Add(ev);
-        ev.PropertyChanged += EventScript_PropertyChanged;
 
-        if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
 
-        foreach (var thisCom in Method.AllMethods) {
-            if (thisCom.Verwendung.Count < 3) {
-                if (ev.Script.ContainsWord(thisCom.Command + thisCom.StartSequence, RegexOptions.IgnoreCase)) {
-                    thisCom.Verwendung.AddIfNotExists($"Datenbank: {Caption} / {ev.KeyName}");
-                    if (thisCom.LastArgMinCount == 3) {
-                        thisCom.Verwendung.Add("[WEITERE VERWENDUNGEN VORHANDEN]");
-                    }
-                }
-            }
-        }
-    }
 
     //    Column.CloneFrom(sourceDatabase);
     /// <summary>
@@ -2381,8 +2378,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 // Listen leeren
 
                 Undo.Clear();
-                _eventScript.Clear();
-                _variables.Clear();
+                _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
+                _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
                 _datenbankAdmin.Clear();
                 _permissionGroupsNewRow.Clear();
                 _tags.Clear();
@@ -2615,14 +2612,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.EventScript:
-                _eventScriptTmp = value;
-                EventScript_RemoveAll(true);
-                List<string> ai = [.. value.SplitAndCutByCr()];
-                foreach (var t in ai) {
-                    EventScript_Add(new DatabaseScriptDescription(this, t), true);
+                List<string> ves = [.. value.SplitAndCutByCr()];
+                var vess = new List<DatabaseScriptDescription>();
+                foreach (var t in ves) {
+                    vess.Add(new DatabaseScriptDescription(this, t));
                 }
                 Row.InvalidateAllCheckData();
-                //CheckScriptError();
+                _eventScript = vess.AsReadOnly();
+                break;
+
+
+            case DatabaseDataType.EventScriptEdited:
+                _eventScriptEditedTmp = value;
+                List<string> vese = [.. value.SplitAndCutByCr()];
+                var veses = new List<DatabaseScriptDescription>();
+                foreach (var t in vese) {
+                    veses.Add(new DatabaseScriptDescription(this, t));
+                }
+                _eventScriptEdited = veses.AsReadOnly();
                 break;
 
             case DatabaseDataType.DatabaseVariables:
@@ -2801,18 +2808,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    private void EventScript_PropertyChanged(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
 
-    private void EventScript_RemoveAll(bool isLoading) {
-        while (_eventScript.Count > 0) {
-            var ev = _eventScript[_eventScript.Count - 1];
-            ev.PropertyChanged -= EventScript_PropertyChanged;
-
-            _eventScript.RemoveAt(_eventScript.Count - 1);
-        }
-
-        if (!isLoading) { EventScript_PropertyChanged(this, System.EventArgs.Empty); }
-    }
 
     private void GenerateDatabaseUpdateTimer() {
         lock (this) {
@@ -2912,10 +2908,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             SortParameterChanged = null;
             ViewChanged = null;
 
-            // EventScript Events
-            foreach (var script in _eventScript) {
-                script.PropertyChanged -= EventScript_PropertyChanged;
-            }
         } catch (Exception ex) {
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Abmelden der Events: " + ex.Message);
         }

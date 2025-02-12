@@ -123,6 +123,7 @@ public class DatabaseChunk : Database {
             mainChunk.SaveToByteList(DatabaseDataType.ColumnArrangement, db.ColumnArrangements);
 
             mainChunk.SaveToByteList(DatabaseDataType.EventScript, db.EventScript.ToString(true));
+            mainChunk.SaveToByteList(DatabaseDataType.EventScriptEdited, db.EventScriptEdited.ToString(true));
             mainChunk.SaveToByteList(DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
 
             usesChunk.SaveToByteList(DatabaseDataType.ScriptNeedFix, db.ScriptNeedFix);

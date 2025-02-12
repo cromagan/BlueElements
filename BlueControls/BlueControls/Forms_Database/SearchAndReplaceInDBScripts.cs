@@ -117,20 +117,19 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
 
         foreach (var thisDb in Database.AllFiles) {
             if (thisDb is { IsDisposed: false } db && !string.IsNullOrEmpty(db.Filename) && string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditAcut))) {
-                List<DatabaseScriptDescription> t = [.. db.EventScript.CloneWithClones()];
+                List<DatabaseScriptDescription> updatedScripts = new();
 
-                // db.EventScript =
-
-                foreach (var thiss in t) {
+                foreach (var thiss in db.EventScriptEdited) {
                     var neu = thiss.Script.Replace(txbAlt.Text, txbNeu.Text);
-
                     if (neu != thiss.Script) {
-                        thiss.Script = neu;
                         count++;
+                        updatedScripts.Add(thiss.WithUpdatedScript(neu));
+                    } else {
+                        updatedScripts.Add(thiss);
                     }
                 }
 
-                db.EventScript = t.AsReadOnly();
+                db.EventScriptEdited = updatedScripts.AsReadOnly();
             }
         }
 

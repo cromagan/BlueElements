@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -27,35 +28,20 @@ namespace BlueScript;
 
 public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyChangingAndKey, IDisposableExtended, IErrorCheckable, IComparable {
 
-    #region Fields
-
-    private string _admininfo;
-
-    private string _image;
-
-    private string _keyName;
-
-    private string _quickinfo;
-
-    private string _script;
-
-    private List<string> _usergroups;
-
-    #endregion
-
     #region Constructors
 
-    protected ScriptDescription(string name, string script) {
-        _keyName = name;
-        _script = script;
-
-        _admininfo = string.Empty;
-        _quickinfo = string.Empty;
-        _usergroups = [];
-        _image = string.Empty;
+    public ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, List<string> userGroups) {
+        AdminInfo = adminInfo;
+        Image = image;
+        KeyName = name;
+        QuickInfo = quickInfo;
+        Script = script;
+        UserGroups = userGroups.AsReadOnly();
     }
 
-    protected ScriptDescription() : this(string.Empty, string.Empty) { }
+    protected ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, []) { }
+
+    protected ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, []) { }
 
     #endregion
 
@@ -77,80 +63,21 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     #region Properties
 
-    public string AdminInfo {
-        //TODO: Implementieren
-        get => _admininfo;
-        set {
-            if (IsDisposed) { return; }
-            if (_admininfo == value) { return; }
-            _admininfo = value;
-            OnPropertyChanged();
-        }
-    }
-
-    //public bool ChangeValues {
-    //    get => _changeValues;
-    //    set {
-    //        if (IsDisposed) { return; }
-    //        if (_changeValues == value) { return; }
-    //        _changeValues = value;
-    //        OnPropertyChanged();
-    //    }
-    //}
+    public string AdminInfo { get; private set; }
 
     public string CompareKey => KeyName;
 
-    public string Image {
-        get => _image;
-        set {
-            if (IsDisposed) { return; }
-            if (_image == value) { return; }
-            _image = value;
-            OnPropertyChanged();
-        }
-    }
+    public string Image { get; private set; }
 
     public bool IsDisposed { get; private set; }
 
-    public string KeyName {
-        get => _keyName;
-        set {
-            if (IsDisposed) { return; }
-            if (_keyName == value) { return; }
-            _keyName = value;
-            OnPropertyChanged();
-        }
-    }
+    public string KeyName { get; private set; }
 
-    public string QuickInfo {
-        get => _quickinfo;
-        set {
-            if (IsDisposed) { return; }
-            if (_quickinfo == value) { return; }
-            _quickinfo = value;
-            OnPropertyChanged();
-        }
-    }
+    public string QuickInfo { get; private set; }
 
-    public string Script {
-        get => _script;
-        set {
-            if (IsDisposed) { return; }
-            if (_script == value) { return; }
-            _script = value;
-            OnPropertyChanged();
-        }
-    }
+    public string Script { get; private set; }
 
-    public List<string> UserGroups {
-        get => _usergroups;
-        set {
-            if (IsDisposed) { return; }
-            if (!_usergroups.IsDifferentTo(value)) { return; }
-            _usergroups = value;
-            OnPropertyChanged();
-        }
-    }
+    public ReadOnlyCollection<string> UserGroups { get; private set; }
 
     #endregion
 
@@ -179,14 +106,12 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             if (IsDisposed) { return []; }
             List<string> result = [];
 
-            result.ParseableAdd("Name", _keyName);
-            result.ParseableAdd("Script", _script);
-            //result.ParseableAdd("ManualExecutable", _manualexecutable);
-            //result.ParseableAdd("ChangeValues", _changeValues);
-            result.ParseableAdd("QuickInfo", _quickinfo);
-            result.ParseableAdd("AdminInfo", _admininfo);
-            result.ParseableAdd("Image", _image);
-            result.ParseableAdd("UserGroups", _usergroups, false);
+            result.ParseableAdd("Name", KeyName);
+            result.ParseableAdd("Script", Script);
+            result.ParseableAdd("QuickInfo", QuickInfo);
+            result.ParseableAdd("AdminInfo", AdminInfo);
+            result.ParseableAdd("Image", Image);
+            result.ParseableAdd("UserGroups", UserGroups, false);
 
             return result;
         } catch {
@@ -200,37 +125,36 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
     public virtual bool ParseThis(string key, string value) {
         switch (key) {
             case "name":
-                _keyName = value.FromNonCritical();
+                KeyName = value.FromNonCritical();
                 return true;
 
             case "script":
 
-                _script = value.FromNonCritical();
+                Script = value.FromNonCritical();
                 return true;
 
             case "manualexecutable":
-                if (value.FromPlusMinus()) {
-                    _usergroups.Add(Constants.Administrator);
-                    _usergroups = _usergroups.SortedDistinctList();
-                }
+                //if (value.FromPlusMinus()) {
+                //    UserGroups.Add(Constants.Administrator);
+                //    UserGroups = UserGroups.SortedDistinctList();
+                //}
 
                 return true;
 
             case "quickinfo":
-                _quickinfo = value.FromNonCritical();
+                QuickInfo = value.FromNonCritical();
                 return true;
 
             case "admininfo":
-                _admininfo = value.FromNonCritical();
+                AdminInfo = value.FromNonCritical();
                 return true;
 
             case "image":
-                _image = value.FromNonCritical();
+                Image = value.FromNonCritical();
                 return true;
 
             case "usergroups":
-                _usergroups.AddRange(value.FromNonCritical().SplitAndCutByCrToList());
-                _usergroups = _usergroups.SortedDistinctList();
+                UserGroups = value.FromNonCritical().SplitAndCutByCrToList().SortedDistinctList().AsReadOnly();
                 return true;
 
             case "changevalues": // Todo: 08.10.2024
@@ -252,14 +176,14 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     public virtual QuickImage? SymbolForReadableText() {
         if (!this.IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
-        if (!string.IsNullOrEmpty(_image)) {
-            if (_usergroups.Count > 0) {
-                return QuickImage.Get(_image + "|16");
+        if (!string.IsNullOrEmpty(Image)) {
+            if (UserGroups.Count > 0) {
+                return QuickImage.Get(Image + "|16");
             }
 
-            return QuickImage.Get(_image + "|16|||||170");
+            return QuickImage.Get(Image + "|16|||||170");
         }
-        //if (_manualexecutable) {            return QuickImage.Get(ImageCode.Person, 16, Color.Yellow, Color.Transparent);        }
+
         return null;
     }
 

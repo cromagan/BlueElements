@@ -362,7 +362,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         var l = new List<string>();
         // Durchlaufen aller Undo-Operationen in der Datenbank
         foreach (var thisUndo in db.Undo) {
-            if (thisUndo.Command == DatabaseDataType.EventScript) {
+            if (thisUndo.Command is DatabaseDataType.EventScript or DatabaseDataType.EventScriptEdited) {
                 l.Add("############################################################################");
                 l.Add("############################################################################");
                 l.Add("############################################################################");
@@ -370,7 +370,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 l.Add("############################################################################");
                 l.Add(thisUndo.DateTimeUtc.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + thisUndo.User);
 
-                l.Add(thisUndo.DateTimeUtc.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + thisUndo.User);
+                l.Add("Art: " + thisUndo.Command.ToString());
                 // Überprüfen, ob das Skript geändert wurde
                 List<string> ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
                 var found = false;
@@ -409,11 +409,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         Item.Image = cbxPic.Text.TrimEnd("|16");
     }
 
-    //private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
-    //    if (Item == null) { return; }
-
-    //    Item.ChangeValues = chkAendertWerte.Checked;
-    //}
 
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }

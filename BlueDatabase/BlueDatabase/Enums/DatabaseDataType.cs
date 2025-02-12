@@ -142,6 +142,7 @@ public enum DatabaseDataType : byte {
     LastEditApp = 76,
     LastEditMachineName = 77,
     LastEditTimeUTC = 78,
+    EventScriptEdited = 79,
 
     //Info_ColumDataSart = 100,
     //Info_ColumnDataEnd = 199,
