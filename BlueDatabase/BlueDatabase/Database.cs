@@ -2231,7 +2231,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (string.IsNullOrEmpty(_scriptNeedFix)) { ScriptNeedFix = CheckScriptError(); }
 
-        //if (EventScriptVersion < Date) { EventScriptVersion = 1; }
+
+        if(string.IsNullOrEmpty( _eventScriptEditedTmp)) {
+            EventScriptEdited = EventScript;
+        }
+
 
         OnAdditionalRepair();
     }
