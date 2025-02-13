@@ -100,6 +100,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _editNormalyError = string.Empty;
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _eventScriptEditedTmp = string.Empty;
+    private string _eventScriptTmp = string.Empty;
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
     //private float _globalScale = 1f;
@@ -306,9 +307,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var l = new List<DatabaseScriptDescription>();
             l.AddRange(value);
             l.Sort();
-            var tmp = _eventScript.ToString(false);
-            if (tmp == l.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, tmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+
+            if (_eventScriptTmp == l.ToString(false)) { return; }
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
     }
 
@@ -1358,10 +1359,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
+    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         var name = script?.KeyName ?? "Allgemein";
 
-        if (!string.IsNullOrEmpty(ScriptNeedFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
+        if (!ignoreError &&  !string.IsNullOrEmpty(ScriptNeedFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
 
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
@@ -1500,7 +1501,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             Develop.CheckStackForOverflow();
             ExecutingScript.Remove(scriptId);
             ExecutingScriptAnyDatabase.Remove(scriptId);
-            return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended);
+            return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, ignoreError);
         }
     }
 
@@ -1534,15 +1535,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (string.IsNullOrWhiteSpace(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) {
-                    return ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, extended);
+                    return ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, extended, false);
                 }
 
-                return ExecuteScript(null, produktivphase, row, attributes, dbVariables, extended);
+                return ExecuteScript(null, produktivphase, row, attributes, dbVariables, extended, false);
             }
 
             var script = EventScript.Get(scriptname);
             if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
-            return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended);
+            return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, false);
         } catch {
             Develop.CheckStackForOverflow();
             return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, dbVariables, extended);
@@ -2614,6 +2615,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.EventScript:
+                _eventScriptTmp = value;
                 List<string> ves = [.. value.SplitAndCutByCr()];
                 var vess = new List<DatabaseScriptDescription>();
                 foreach (var t in ves) {

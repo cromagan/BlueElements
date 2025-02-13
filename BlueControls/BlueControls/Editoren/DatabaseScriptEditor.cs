@@ -21,12 +21,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
+using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -229,12 +229,12 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         var ext = chkExtendend is { Checked: true, Visible: true };
 
         _allowTemporay = true;
-        var f = db.ExecuteScript(_item, !testmode, r, null, true, ext);
+        var f = db.ExecuteScript(_item, !testmode, r, null, true, ext, true);
         _allowTemporay = false;
 
         return f;
     }
-   
+
 
 
     public void UpdateValues(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, Database? database = null) {
@@ -244,7 +244,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         }
 
         lstEventScripts.Remove(_item.KeyName);
-         
+
 
         //DatabaseScriptDescription? newItem = null;
         //if (lstEventScripts.Checked.Count == 1 &&
@@ -302,9 +302,9 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
         Database.EventScriptEdited = new(t2);
-       
 
-   
+
+
 
         #endregion
     }
@@ -340,6 +340,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         _database.ScriptNeedFix = _database.CheckScriptError();
 
         txbNeedFix.Text = _database.ScriptNeedFix;
+        MultiUserFile.SaveAll(false);
     }
 
     private void btnScriptÜbertragen_Click(object sender, System.EventArgs e) {
@@ -348,6 +349,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         if (MessageBox.Show("Ihre Bearbeitungen werden Produktiv gesetzt!", ImageCode.Warnung, "OK", "Abbrechen") != 0) { return; }
         Item = null;
         _database.EventScript = _database.EventScriptEdited;
+        MultiUserFile.SaveAll(false);
         UpdateList();
     }
 
@@ -357,12 +359,19 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         if (MessageBox.Show("Ihre Bearbeitungen gehen verloren!", ImageCode.Warnung, "OK", "Abbrechen") != 0) { return; }
         Item = null;
         _database.EventScriptEdited = _database.EventScript;
+        MultiUserFile.SaveAll(false);
         UpdateList();
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
+    bool loaded = false;
+
     private void btnTest_Click(object sender, System.EventArgs e) {
+        if (!loaded && _database != null && _database.Row.Count == 0) {
+            loaded = true;
+            _database.BeSureAllDataLoaded(10);
+        }
         TesteScript(true);
     }
 
@@ -527,24 +536,24 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
         if (thisSet != null) {
-                var cap = "Sonstige";
+            var cap = "Sonstige";
 
-                if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
+            if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
 
-                var it = ItemOf(thisSet);
-                it.UserDefCompareKey = cap + SecondSortChar;
+            var it = ItemOf(thisSet);
+            it.UserDefCompareKey = cap + SecondSortChar;
 
-                lstEventScripts.ItemAdd(it);
+            lstEventScripts.ItemAdd(it);
 
-                if (lstEventScripts[cap] == null) {
-                    lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
-                }
-
-                if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
-                    didMessage = true;
-                    EnableScript();
-                }
+            if (lstEventScripts[cap] == null) {
+                lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
             }
+
+            if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
+                didMessage = true;
+                EnableScript();
+            }
+        }
     }
 
     #endregion

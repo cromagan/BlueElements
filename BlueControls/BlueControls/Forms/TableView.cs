@@ -1055,7 +1055,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 }
             } else {
                 //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-                var s = db.ExecuteScript(sc, sc.ChangeValues, null, null, true, false);
+                var s = db.ExecuteScript(sc, sc.ChangeValues, null, null, true, false, false);
                 m = s.Protocol.JoinWithCr();
             }
 
