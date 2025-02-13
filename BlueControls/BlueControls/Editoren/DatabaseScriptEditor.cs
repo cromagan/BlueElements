@@ -19,7 +19,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -49,6 +51,8 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private Database? _database;
 
     private DatabaseScriptDescription? _item;
+
+    private bool didMessage = false;
 
     #endregion
 
@@ -80,23 +84,8 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 _database.DisposingEvent += _database_Disposing;
                 _database.CanDoScript += Database_CanDoScript;
 
-                if (!string.IsNullOrEmpty(_database.ScriptNeedFix)) {
-                    List<string> l =
-                    [
-                        "### ACHTUNG - EINMALIGE ANZEIGE ###",
-                        "Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
-                        "Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
-                        "Datenbank: " + _database.Caption,
-                        " ",
-                        " ",
-                        "Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
-                        " ",
-                        _database.ScriptNeedFix
-                    ];
-                    l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
-                }
+                txbNeedFix.Text = _database.ScriptNeedFix;
 
-                _database.ScriptNeedFix = string.Empty;
                 tbcScriptEigenschaften.Enabled = true;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
@@ -115,7 +104,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
             WriteInfosBack();
-            UnRegisterEvent();
 
             _item = null; // Um keine werte zurück zu Schreiben werden des anzeigen
 
@@ -149,7 +137,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 lstPermissionExecute.Suggestions.Clear();
 
                 _item = value;
-                RegisterEvent();
 
                 btnVerlauf.Enabled = _item != null;
             } else {
@@ -170,7 +157,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 btnVerlauf.Enabled = false;
             }
 
-            _item_PropertyChanged(null, System.EventArgs.Empty);
+            UpdateValues();
         }
     }
 
@@ -247,6 +234,50 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         return f;
     }
+   
+
+
+    public void UpdateValues(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, Database? database = null) {
+        if (_item == null) {
+            capFehler.Text = string.Empty;
+            return;
+        }
+
+        lstEventScripts.Remove(_item.KeyName);
+         
+
+        //DatabaseScriptDescription? newItem = null;
+        //if (lstEventScripts.Checked.Count == 1 &&
+        //    !TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
+        //    if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem selectedlstEventScripts) {
+        //        newItem = selectedlstEventScripts.Item as DatabaseScriptDescription;
+        //    }
+        //}
+
+        //Item = newItem;
+
+
+
+        _item = new DatabaseScriptDescription(adminInfo ?? _item.AdminInfo,
+                                             image ?? _item.Image,
+                                             keyName ?? _item.KeyName,
+                                             quickInfo ?? _item.QuickInfo,
+                                             script ?? _item.Script,
+                                             userGroups ?? _item.UserGroups,
+                                             database ?? _item.Database,
+                                             eventTypes ?? _item.EventTypes,
+                                             needRow ?? _item.NeedRow);
+
+        AddTolist(_item);
+
+
+        if (_item.IsOk()) {
+            capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
+            return;
+        }
+
+        capFehler.Text = "<imagecode=Warnung|16> " + _item.ErrorReason();
+    }
 
     //    switch (e.Item.ToLowerInvariant()) {
     //        case "spalteneigenschaftenbearbeiten":
@@ -259,9 +290,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 IsDisposed: false
             }) { return; }
 
-        if (_item != null) {
-            _item.Script = Script;
-        }
+        UpdateValues(script: Script);
 
         #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
 
@@ -272,8 +301,10 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         }
 
         //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
-        Database.EventScript = new(t2);
-        Database.ScriptNeedFix = Database.CheckScriptError();
+        Database.EventScriptEdited = new(t2);
+       
+
+   
 
         #endregion
     }
@@ -288,37 +319,12 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
 
-        var didMessage = false;
-
         var im = QuickImage.Images();
         foreach (var thisIm in im) {
             cbxPic.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
 
-        lstEventScripts.ItemClear();
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-
-        foreach (var thisSet in Database.EventScript) {
-            if (thisSet != null) {
-                var cap = "Sonstige";
-
-                if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
-
-                var it = ItemOf(thisSet);
-                it.UserDefCompareKey = cap + SecondSortChar;
-
-                lstEventScripts.ItemAdd(it);
-
-                if (lstEventScripts[cap] == null) {
-                    lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
-                }
-
-                if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
-                    didMessage = true;
-                    EnableScript();
-                }
-            }
-        }
+        UpdateList();
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) {
@@ -326,21 +332,33 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         Close();
     }
 
-    private void _item_PropertyChanged(object? sender, System.EventArgs e) {
-        if (_item == null) {
-            capFehler.Text = string.Empty;
-            return;
-        }
+    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
 
-        if (_item.IsOk()) {
-            capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
-            return;
-        }
+    private void btnDeleteScriptNeedFix_Click(object sender, System.EventArgs e) {
+        if (_database == null) { return; }
 
-        capFehler.Text = "<imagecode=Warnung|16> " + _item.ErrorReason();
+        _database.ScriptNeedFix = _database.CheckScriptError();
+
+        txbNeedFix.Text = _database.ScriptNeedFix;
     }
 
-    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
+    private void btnScriptÜbertragen_Click(object sender, System.EventArgs e) {
+        if (_database == null) { return; }
+
+        if (MessageBox.Show("Ihre Bearbeitungen werden Produktiv gesetzt!", ImageCode.Warnung, "OK", "Abbrechen") != 0) { return; }
+        Item = null;
+        _database.EventScript = _database.EventScriptEdited;
+        UpdateList();
+    }
+
+    private void btnSkriptÄnderungVerwerfen_Click(object sender, System.EventArgs e) {
+        if (_database == null) { return; }
+
+        if (MessageBox.Show("Ihre Bearbeitungen gehen verloren!", ImageCode.Warnung, "OK", "Abbrechen") != 0) { return; }
+        Item = null;
+        _database.EventScriptEdited = _database.EventScript;
+        UpdateList();
+    }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
@@ -405,10 +423,8 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     }
 
     private void cbxPic_TextChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
-        Item.Image = cbxPic.Text.TrimEnd("|16");
+        UpdateValues(image: cbxPic.Text.TrimEnd("|16"));
     }
-
 
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
@@ -422,7 +438,8 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
         if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
         if (chkAuslöser_Fehlerfrei.Checked) { tmp |= ScriptEventTypes.correct_changed; }
-        Item.EventTypes = tmp;
+
+        UpdateValues(eventTypes: tmp);
     }
 
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
@@ -436,7 +453,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             return;
         }
 
-        Item.NeedRow = chkZeile.Checked;
+        UpdateValues(needRow: chkZeile.Checked);
         txbTestZeile.Enabled = chkZeile.Checked;
     }
 
@@ -486,30 +503,48 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     }
 
     private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        var tmp = lstPermissionExecute.Checked.ToList();
-        //_ = tmp.Remove(Constants.Administrator);
-        if (Item != null) { Item.UserGroups = [.. tmp]; }
-    }
-
-    private void RegisterEvent() {
-        if (_item == null) { return; }
-        _item.PropertyChanged += _item_PropertyChanged;
+        UpdateValues(userGroups: lstPermissionExecute.Checked.ToList().AsReadOnly());
     }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
-        Item.KeyName = txbName.Text;
+        UpdateValues(keyName: txbName.Text);
     }
 
     private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
-        Item.QuickInfo = txbQuickInfo.Text;
+        UpdateValues(quickInfo: txbQuickInfo.Text);
     }
 
-    private void UnRegisterEvent() {
-        if (_item == null) { return; }
+    private void UpdateList() {
+        lstEventScripts.ItemClear();
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-        _item.PropertyChanged -= _item_PropertyChanged;
+        foreach (var thisSet in Database.EventScriptEdited) {
+            AddTolist(thisSet);
+        }
+    }
+
+    private void AddTolist(DatabaseScriptDescription? thisSet) {
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+
+        if (thisSet != null) {
+                var cap = "Sonstige";
+
+                if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
+
+                var it = ItemOf(thisSet);
+                it.UserDefCompareKey = cap + SecondSortChar;
+
+                lstEventScripts.ItemAdd(it);
+
+                if (lstEventScripts[cap] == null) {
+                    lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
+                }
+
+                if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
+                    didMessage = true;
+                    EnableScript();
+                }
+            }
     }
 
     #endregion

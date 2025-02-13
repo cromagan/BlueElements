@@ -201,7 +201,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 break;
         }
 
-        ca.PermissionGroups_Show = new ReadOnlyCollection<string>(tmp);
+        ca.PermissionGroups_Show = tmp.AsReadOnly();
 
         if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Ansicht " + number; }
 

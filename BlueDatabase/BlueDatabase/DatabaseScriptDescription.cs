@@ -63,7 +63,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
 
     #region Constructors
 
-    public DatabaseScriptDescription(string adminInfo, string image, string keyName, string quickInfo, string script, List<string> userGroups, Database? database, ScriptEventTypes eventTypes, bool needRow) : base(adminInfo, image, keyName, quickInfo, script, userGroups) {
+    public DatabaseScriptDescription(string adminInfo, string image, string keyName, string quickInfo, string script, ReadOnlyCollection<string> userGroups, Database? database, ScriptEventTypes eventTypes, bool needRow) : base(adminInfo, image, keyName, quickInfo, script, userGroups) {
         Database = database;
         EventTypes = eventTypes;
         NeedRow = needRow;

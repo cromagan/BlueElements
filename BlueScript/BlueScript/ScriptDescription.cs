@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using static BlueBasics.Constants;
 
 namespace BlueScript;
 
@@ -30,18 +31,18 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     #region Constructors
 
-    public ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, List<string> userGroups) {
+    public ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups) {
         AdminInfo = adminInfo;
         Image = image;
         KeyName = name;
         QuickInfo = quickInfo;
         Script = script;
-        UserGroups = userGroups.AsReadOnly();
+        UserGroups = userGroups;
     }
 
-    protected ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, []) { }
+    protected ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, EmptyReadOnly) { }
 
-    protected ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, []) { }
+    protected ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly) { }
 
     #endregion
 

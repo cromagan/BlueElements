@@ -309,8 +309,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var tmp = _eventScript.ToString(false);
             if (tmp == l.ToString(false)) { return; }
             _ = ChangeData(DatabaseDataType.EventScript, null, null, tmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
-
-            ScriptNeedFix = string.Empty;
         }
     }
 

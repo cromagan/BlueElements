@@ -27,6 +27,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
+using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
@@ -97,7 +98,7 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         if (searchValue is { Count: > 0 }) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
         } else {
-            SearchValue = new List<string>().AsReadOnly();
+            SearchValue = EmptyReadOnly;
         }
     }
 
