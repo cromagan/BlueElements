@@ -308,6 +308,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public long VisibleRowCount { get; private set; }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public float Zoom {
         get => _zoom;
         set {

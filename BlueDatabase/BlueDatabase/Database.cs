@@ -82,8 +82,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
     private readonly List<string> _datenbankAdmin = [];
-    private ReadOnlyCollection<DatabaseScriptDescription> _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
-    private ReadOnlyCollection<DatabaseScriptDescription> _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
     private readonly List<string> _permissionGroupsNewRow = [];
     private readonly List<string> _tags = [];
     private readonly List<Variable> _variables = [];
@@ -99,6 +97,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _creator;
     private string _editNormalyError = string.Empty;
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
+    private ReadOnlyCollection<DatabaseScriptDescription> _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
+    private ReadOnlyCollection<DatabaseScriptDescription> _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
     private string _eventScriptEditedTmp = string.Empty;
     private string _eventScriptTmp = string.Empty;
     private DateTime _eventScriptVersion = DateTime.MinValue;
@@ -312,7 +312,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
     }
-
 
     public ReadOnlyCollection<DatabaseScriptDescription> EventScriptEdited {
         get => new(_eventScriptEdited);
@@ -772,7 +771,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return tmp;
     }
 
-    public static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
+    public static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer, string filename) {
         var colName = string.Empty;
         var rowKey = string.Empty;
         string value;
@@ -957,7 +956,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     value = string.Empty;
                     //width = 0;
                     //height = 0;
-                    Develop.DebugPrint(FehlerArt.Fehler, $"Laderoutine nicht definiert: {bLoaded[pointer]}");
+                    Develop.DebugPrint(FehlerArt.Fehler, $"Laderoutine nicht definiert: {bLoaded[pointer]} {filename}");
                     break;
                 }
         }
@@ -1345,9 +1344,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    }
     public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE");
 
-
-
-
     //    Column.CloneFrom(sourceDatabase);
     /// <summary>
     ///
@@ -1362,7 +1358,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         var name = script?.KeyName ?? "Allgemein";
 
-        if (!ignoreError &&  !string.IsNullOrEmpty(ScriptNeedFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
+        if (!ignoreError && !string.IsNullOrEmpty(ScriptNeedFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
 
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
@@ -1938,14 +1934,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         OnLoading();
 
-        var (bytes, fileinfo, failed) = Chunk.LoadBytesFromDisk(Filename);
+        var (bytes, _, failed) = Chunk.LoadBytesFromDisk(Filename);
 
         if (failed) {
             Freeze("Laden fehlgeschlagen!");
             return;
         }
 
-        var ok = Parse(bytes.ToArray(), true, needPassword);
+        var ok = Parse(bytes.ToArray(), true, needPassword, Filename);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");
@@ -1982,7 +1978,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt() ?? bLoaded; }
 
         OnLoading();
-        Parse(bLoaded, true, null);
+        Parse(bLoaded, true, null, "Stream");
         RepairAfterParse();
         Freeze("Stream-Datenbank");
         _saveRequired = false;
@@ -2044,7 +2040,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public bool Parse(byte[] data, bool isMain, NeedPassword? needPassword) {
+    public bool Parse(byte[] data, bool isMain, NeedPassword? needPassword, string filename) {
         var pointer = 0;
         var columnUsed = new List<ColumnItem>();
 
@@ -2062,7 +2058,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     break;
                 }
 
-                var (i, command, value, columname, rowKey) = Parse(data, pointer);
+                var (i, command, value, columname, rowKey) = Parse(data, pointer, filename);
                 pointer = i;
 
                 if (!command.IsObsolete()) {
@@ -2232,11 +2228,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (string.IsNullOrEmpty(_scriptNeedFix)) { ScriptNeedFix = CheckScriptError(); }
 
-
-        if(string.IsNullOrEmpty( _eventScriptEditedTmp)) {
+        if (string.IsNullOrEmpty(_eventScriptEditedTmp)) {
             EventScriptEdited = EventScript;
         }
-
 
         OnAdditionalRepair();
     }
@@ -2625,7 +2619,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 _eventScript = vess.AsReadOnly();
                 break;
 
-
             case DatabaseDataType.EventScriptEdited:
                 _eventScriptEditedTmp = value;
                 List<string> vese = [.. value.SplitAndCutByCr()];
@@ -2812,8 +2805,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-
-
     private void GenerateDatabaseUpdateTimer() {
         lock (this) {
             if (_databaseUpdateTimer != null) { return; }
@@ -2911,7 +2902,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             ProgressbarInfo = null;
             SortParameterChanged = null;
             ViewChanged = null;
-
         } catch (Exception ex) {
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Abmelden der Events: " + ex.Message);
         }

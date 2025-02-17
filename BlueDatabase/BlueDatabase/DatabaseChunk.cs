@@ -555,7 +555,7 @@ public class DatabaseChunk : Database {
             return true;
         }
 
-        Parse(chunk.Bytes, chunk.IsMain, needPassword);
+        Parse(chunk.Bytes, chunk.IsMain, needPassword, chunk.ChunkFileName);
 
         return true;
     }

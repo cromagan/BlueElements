@@ -58,17 +58,8 @@ public class Chunk : IHasKeyName {
     #region Properties
 
     public byte[] Bytes => _bytes.ToArray();
-    public long DataLenght => _bytes?.Count ?? 0;
-    public bool IsMain => string.Equals(KeyName, DatabaseChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
-    public string KeyName { get; private set; }
-    public string LastEditApp { get; private set; } = string.Empty;
-    public string LastEditMachineName { get; private set; } = string.Empty;
-    public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
-    public string LastEditUser { get; private set; } = string.Empty;
-    public bool LoadFailed { get; private set; } = false;
-    public bool SaveRequired { get; set; } = false;
 
-    private string ChunkFileName {
+    public string ChunkFileName {
         get {
             if (IsMain) { return MainFileName; }
 
@@ -78,6 +69,16 @@ public class Chunk : IHasKeyName {
             return $"{folder}{databasename}\\{KeyName}.bdbc";
         }
     }
+
+    public long DataLenght => _bytes?.Count ?? 0;
+    public bool IsMain => string.Equals(KeyName, DatabaseChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
+    public string KeyName { get; private set; }
+    public string LastEditApp { get; private set; } = string.Empty;
+    public string LastEditMachineName { get; private set; } = string.Empty;
+    public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
+    public string LastEditUser { get; private set; } = string.Empty;
+    public bool LoadFailed { get; private set; } = false;
+    public bool SaveRequired { get; set; } = false;
 
     #endregion
 
@@ -439,9 +440,10 @@ public class Chunk : IHasKeyName {
     private void ParseLockData() {
         int pointer = 0;
         var data = _bytes.ToArray();
+        var filename = ChunkFileName;
 
         while (pointer < data.Length) {
-            var (newPointer, type, value, _, _) = Database.Parse(data, pointer);
+            var (newPointer, type, value, _, _) = Database.Parse(data, pointer, filename);
             pointer = newPointer;
 
             switch (type) {
