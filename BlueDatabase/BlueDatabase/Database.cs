@@ -1419,7 +1419,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                                       "Benutzer: " + UserName + "\r\n" +
                                       "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
                                       "Extended: " + extended + "\r\n";
-                    if (row is { } r) { t = t + "Zeile: " + r.CellFirstString() + "\r\n"; }
+                    if (row is { } r) { 
+                        t = t + "Zeile: " + r.CellFirstString() + "\r\n";                  
+                        if(Column.SplitColumn is { } spc) {
+                            t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
+                        }
+                    }
 
                     ScriptNeedFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
                 }
