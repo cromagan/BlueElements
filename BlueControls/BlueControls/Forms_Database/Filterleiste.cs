@@ -152,12 +152,12 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
 
         #endregion
 
-        List<FlexiControlForFilter> flexsToDelete = [];
+        List<FlexiFilterControl> flexsToDelete = [];
 
         #region Vorhandene Flexis ermitteln
 
         foreach (var thisControl in Controls) {
-            if (thisControl is FlexiControlForFilter flx) { flexsToDelete.Add(flx); }
+            if (thisControl is FlexiFilterControl flx) { flexsToDelete.Add(flx); }
         }
 
         #endregion
@@ -222,7 +222,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
                         } else {
                             // Na gut, eben neuen Flex erstellen
                             var r = Table.RendererOf(thisColumn, Constants.Win11);
-                            flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, r);
+                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld, r);
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
@@ -399,9 +399,9 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
 
     private void Filterleiste_SizeChanged(object sender, System.EventArgs e) => FillFilters();
 
-    private FlexiControlForFilter? FlexiItemOf(ColumnItem column) {
+    private FlexiFilterControl? FlexiItemOf(ColumnItem column) {
         foreach (var thisControl in Controls) {
-            if (thisControl is FlexiControlForFilter flx) {
+            if (thisControl is FlexiFilterControl flx) {
                 if (flx.FilterSingleColumn == column) { return flx; }
             }
         }

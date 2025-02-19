@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using BlueDatabase.Enums;
 
 namespace BlueControls.Controls{
-    partial class FlexiControlForFilter {
+    partial class FlexiFilterControl {
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>

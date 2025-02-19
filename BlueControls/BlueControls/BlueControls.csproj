@@ -248,11 +248,11 @@
       <DependentUpon>FilterEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\SteuerelementVerhalten.cs" />
-    <Compile Include="Forms_Database\FlexiControlForFilter.cs">
+    <Compile Include="Forms_Database\FlexiFilterControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms_Database\FlexiControlForFilter.Designer.cs">
-      <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
+    <Compile Include="Forms_Database\FlexiFilterControl.Designer.cs">
+      <DependentUpon>FlexiFilterControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Editoren\ColumnArrangementPadEditor.cs">
       <SubType>Form</SubType>
@@ -819,8 +819,8 @@
       <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\FlexiControlForFilter.resx">
-      <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
+    <EmbeddedResource Include="Forms_Database\FlexiFilterControl.resx">
+      <DependentUpon>FlexiFilterControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\ColumnArrangementPadEditor.resx">
