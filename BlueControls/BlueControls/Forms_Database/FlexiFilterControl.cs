@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -132,9 +133,10 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     protected override void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
-            if (FilterOutput is { Count: 1, Rows.Count: 1 } fio && fio[0] is { } fi) {
-                var toAdd = $"{FilterHash()}|{fi.SearchValue.JoinWithCr()}";
-                this.SettingsAdd(toAdd);
+
+            if (FilterOutput is {  Rows.Count: 1 } fio && FilterSingleColumn is { } c) {
+                var vv = FilterCollection.InitValue(c, true, fio.ToArray());
+                this.SettingsAdd($"{FilterHash()}|{vv}");
             }
         }
 
@@ -177,10 +179,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
         if (e.Command != "Filter") {
-            Invalidate_FilterOutput();
             UpdateFilterData(null, false);
         } else {
-            FilterOutput.ChangeTo(e.Filter);
             UpdateFilterData(e.Filter, false);
         }
     }
