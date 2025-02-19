@@ -245,11 +245,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public bool Initializing { get; private set; }
 
-    ///// <summary>
-    ///// Wenn True, wird ValueChanged NICHT ausgelöst
-    ///// </summary>
-    public bool IsFilling { get; protected set; }
-
     [DefaultValue(4000)]
     public int MaxTextLenght {
         get => _maxTextLenght;
@@ -366,25 +361,27 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             return;
         }
 
+        Control? c = null;
+
         switch (_editType) {
             case EditTypeFormula.Line:
-                Control_Create_Line();
+                c = Control_Create_Line();
                 break;
 
             case EditTypeFormula.Textfeld:
-                Control_Create_TextBox();
+                c = Control_Create_TextBox();
                 break;
 
             case EditTypeFormula.Listbox:
-                Control_Create_ListBox();
+                c = Control_Create_ListBox();
                 break;
 
             case EditTypeFormula.Textfeld_mit_Auswahlknopf:
-                Control_Create_ComboBox();
+                c = Control_Create_ComboBox();
                 break;
 
             case EditTypeFormula.Ja_Nein_Knopf:
-                Control_Create_ButtonYesNo();
+                c = Control_Create_ButtonYesNo();
                 break;
 
             case EditTypeFormula.None:
@@ -392,7 +389,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             case EditTypeFormula.als_Überschrift_anzeigen:
                 _captionPosition = CaptionPosition.ohne;
-                Control_Create_GroupBox();
+                c = Control_Create_GroupBox();
                 break;
 
             case EditTypeFormula.nur_als_Text_anzeigen:
@@ -401,46 +398,32 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case EditTypeFormula.Farb_Auswahl_Dialog:
-                Control_Create_ButtonColor();
+                c = Control_Create_ButtonColor();
                 break;
 
             case EditTypeFormula.Button:
-                Control_Create_ButtonCommand();
+                c = Control_Create_ButtonCommand();
                 break;
 
             case EditTypeFormula.SwapListBox:
-                Control_Create_SwapListBox();
+                c = Control_Create_SwapListBox();
                 break;
-
-                //default:
-                //Develop.DebugPrint(_editType);
-                //return null;
         }
+
+        StandardBehandlung(c);
+        UpdateValueToControl();
+
         UpdateControls();
         Allinitialized = true;
         Initializing = false;
     }
 
-    public Button? GetButton() {
+    public T? GetControl<T>() where T : Control {
         CreateSubControls();
-        foreach (var thisc in Controls) {
-            if (thisc is Button bt) { return bt; }
-        }
-        return null;
-    }
-
-    public ComboBox? GetComboBox() {
-        CreateSubControls();
-        foreach (var thisc in Controls) {
-            if (thisc is ComboBox cbx) { return cbx; }
-        }
-        return null;
-    }
-
-    public TextBox? GetTextBox() {
-        CreateSubControls();
-        foreach (var thisc in Controls) {
-            if (thisc is TextBox txb) { return txb; }
+        foreach (var control in Controls) {
+            if (control is T typedControl) {
+                return typedControl;
+            }
         }
         return null;
     }
@@ -492,20 +475,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     protected void CommandButton_Click(object sender, System.EventArgs e) {
         if (_editType != EditTypeFormula.Button) { return; }
-        //ValueSet(true.ToPlusMinus(), false); // Geklickt, wurde hiermit vermerkt
         OnButtonClicked();
     }
 
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-                //if (ParentForm() is Form parentForm) {
-                //    parentForm.FormClosing -= ParentForm_FormClosing;
-                //}
-
                 _infoText = string.Empty;
-                //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
-                //DoInfoTextButton(); // Events entfernen!
                 RemoveAll(); // Events entfernen!
 
                 foreach (var thisc in Controls) {
@@ -555,71 +531,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected ListBox? GetListBox() {
-        CreateSubControls();
-        foreach (var thisc in Controls) {
-            if (thisc is ListBox lb) { return lb; }
-        }
-        return null;
-    }
+
 
     protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
-
-    protected override void OnControlAdded(ControlEventArgs e) {
-        base.OnControlAdded(e);
-        switch (e.Control) {
-            case ComboBox comboBox:
-                comboBox.TextChanged += ValueChanged_ComboBox;
-                comboBox.RaiseChangeDelay = 1;
-                break;
-
-            case TextBox textBox:
-                textBox.TextChanged += ValueChanged_TextBox;
-                textBox.RaiseChangeDelay = 1;
-                break;
-
-            case GroupBox:
-            case Caption _:
-            case Line:
-                break;
-
-            case SwapListBox swapListBox:
-                //swapListBox.ItemAdded += SwapListBox_ItemAdded;
-                //swapListBox.ItemRemoved += SwapListBox_ItemRemoved;
-                swapListBox.ItemCheckedChanged += SwapListBox_ItemCheckedChanged;
-                break;
-
-            case ListBox listBox:
-                listBox.ItemCheckedChanged += ListBox_ItemCheckedChanged;
-                //listBox.ItemRemoved += ListBox_ItemRemoved;
-                break;
-
-            case Button button:
-                switch (_editType) {
-                    case EditTypeFormula.Ja_Nein_Knopf:
-                        button.CheckedChanged += YesNoButton_CheckedChanged;
-                        break;
-
-                    case EditTypeFormula.Button:
-                        button.Click += CommandButton_Click;
-                        break;
-
-                    case EditTypeFormula.Farb_Auswahl_Dialog:
-                        button.Click += ColorButton_Click;
-                        break;
-
-                    default:
-                        Develop.DebugPrint_NichtImplementiert(true);
-                        break;
-                }
-                break;
-
-            default:
-                Develop.DebugPrint(Typ(e.Control));
-                break;
-        }
-        UpdateControls();
-    }
 
     protected override void OnControlRemoved(ControlEventArgs e) {
         base.OnControlRemoved(e);
@@ -684,7 +598,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
-    /// Entfernt alle Controls und löst dessen die Events auf. Setzt _allinitialized auf false.
+    /// Entfernt alle Controls und löst dessen die Events auf. Setzt Allinitialized auf false.
     /// </summary>
     protected void RemoveAll() {
         List<Control> l = [];
@@ -701,13 +615,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void _InfoCaption_Click(object sender, System.EventArgs e) {
-        foreach (var thisc in Controls) {
-            if (thisc is ComboBox cbx) {
+            if (GetControl<ComboBox>() is { } cbx) {
                 cbx.Focus();
                 cbx.ShowMenu(null, null);
-                return;
-            }
-        }
+            }       
     }
 
     private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert(false);
@@ -715,7 +626,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    private void Control_Create_ButtonColor() {
+    private Button Control_Create_ButtonColor() {
         Button control = new() {
             Enabled = Enabled,
             Name = "ColorButton",
@@ -723,13 +634,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             ButtonStyle = ButtonStyle.Button,
             Text = string.Empty
         };
-        StandardBehandlung(control);
+        control.Click += ColorButton_Click;
+        return control;
     }
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    private void Control_Create_ButtonCommand() {
+    private Button Control_Create_ButtonCommand() {
         Button control = new() {
             Enabled = Enabled,
             Name = "CommandButton",
@@ -737,14 +649,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             ButtonStyle = ButtonStyle.Button,
             Text = _caption
         };
-        StandardBehandlung(control);
+        control.Click += CommandButton_Click;
+        return control;
     }
 
-    /// <summary>
-    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
-
-    private void Control_Create_ButtonYesNo() {
+    private Button Control_Create_ButtonYesNo() {
         Button control = new() {
             Enabled = Enabled,
             Name = "YesNoButton",
@@ -752,8 +661,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Text = string.Empty,
             ImageCode = string.Empty
         };
-        StandardBehandlung(control);
-        UpdateValueToControl();
+        control.CheckedChanged += YesNoButton_CheckedChanged;
+        return control;
     }
 
     private void Control_Create_Caption() {
@@ -792,77 +701,57 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _captionObject.BringToFront();
     }
 
-    //public Size MeasureStringOfCaption(string text) => Skin.GetBlueFont(Design.Caption, States.Standard).MeasureString(text);
-
-    /// <summary>
-    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
-
-    private void Control_Create_ComboBox() {
+    private ComboBox Control_Create_ComboBox() {
         ComboBox control = new();
         StyleComboBox(control, null, ComboBoxStyle.DropDownList, false);
-        StandardBehandlung(control);
-        UpdateValueToControl();
+        control.TextChanged += ValueChanged_ComboBox;
+        control.RaiseChangeDelay = 1;
+        return control;
     }
 
-    /// <summary>
-    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
-    private void Control_Create_GroupBox() {
+    private GroupBox Control_Create_GroupBox() {
         GroupBox control = new() {
             Enabled = Enabled,
             GroupBoxStyle = GroupBoxStyle.NormalBold,
             Text = _caption
         };
-        StandardBehandlung(control);
-        UpdateValueToControl();
+        return control;
     }
 
-    /// <summary>
-    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
-    private void Control_Create_Line() {
+    private Line Control_Create_Line() {
         Line control = new() {
             Enabled = Enabled,
             Orientation = Orientation.Waagerecht
         };
-        StandardBehandlung(control);
+        return control;
     }
 
-    /// <summary>
-    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
-
-    private void Control_Create_ListBox() {
+    private ListBox Control_Create_ListBox() {
         ListBox control = new() {
-            Enabled = Enabled
+            Enabled = Enabled,
+            CheckBehavior = CheckBehavior.MultiSelection
         };
         control.ItemClear();
-        control.CheckBehavior = CheckBehavior.MultiSelection;
-        StandardBehandlung(control);
-        UpdateValueToControl();
+
+        control.ItemCheckedChanged += ListBox_ItemCheckedChanged;
+        return control;
     }
 
-    // Nimmt Teilweise die Routinen der Listbox her
-
-    private void Control_Create_SwapListBox() {
+    private SwapListBox Control_Create_SwapListBox() {
         SwapListBox control = new() {
             Enabled = Enabled
         };
         control.UnCheck();
-        StandardBehandlung(control);
-        UpdateValueToControl();
+        control.ItemCheckedChanged += SwapListBox_ItemCheckedChanged;
+        return control;
     }
 
-    /// <summary>
-    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
-
-    private void Control_Create_TextBox() {
+    private TextBox Control_Create_TextBox() {
         TextBox control = new();
         StyleTextBox(control);
-        StandardBehandlung(control);
-        UpdateValueToControl();
+        control.TextChanged += ValueChanged_TextBox;
+        control.RaiseChangeDelay = 1;
+        return control;
     }
 
     private void DoInfoTextCaption(string disabledReason) {
@@ -916,19 +805,17 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void ListBox_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (IsFilling) { return; }
-        ValueSet(((ListBox)sender).Checked.JoinWithCr(), false);
-    }
+    private void ListBox_ItemCheckedChanged(object sender, System.EventArgs e) => ValueSet(((ListBox)sender).Checked.JoinWithCr(), false);
 
-    // Versuchen, die Werte noch zurückzugeben
     /// <summary>
     /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
     /// Kümmert sich dann um die Position des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
     /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
     /// </summary>
     /// <param name="control"></param>
-    private void StandardBehandlung(Control control) {
+    private void StandardBehandlung(Control? control) {
+        if (control == null) { return; }
+
         Control_Create_Caption();
         switch (_captionPosition) {
             case CaptionPosition.ohne:
@@ -965,10 +852,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //DoInfoTextCaption();
     }
 
-    private void SwapListBox_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (IsFilling) { return; }
-        ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
-    }
+    private void SwapListBox_ItemCheckedChanged(object sender, System.EventArgs e) => ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
 
     private void UpdateControls() {
         if (_captionObject is { IsDisposed: false } c) { c.Translate = _translateCaption; }
@@ -991,7 +875,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
     /// </summary>
     private void UpdateValueTo_Button(Button control) {
-        //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling und Creating False!"); }
         switch (_editType) {
             case EditTypeFormula.Ja_Nein_Knopf:
                 control.Checked = Value.FromPlusMinus();
@@ -1014,18 +897,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
     /// </summary>
     private void UpdateValueTo_Caption() {
-        //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-        //if (Column  ==null || Column .IsDisposed) { return; } // nur mögloch bei verbundenen Datenbanken
         if (_editType != EditTypeFormula.nur_als_Text_anzeigen) { return; } // und auch dann nur als reine Text anzeige
         if (_captionObject == null) { return; }
         _captionObject.Width = Width;
         _captionObject.Translate = false;
         _captionObject.Text = _caption + " <i>" + Value;
     }
-
-    /// <summary>
-    /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
-    /// </summary>
 
     private void UpdateValueTo_Combobox(TextBox control) => control.Text = Value;
 
@@ -1052,7 +929,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void UpdateValueToControl() {
         if (!Allinitialized && !Initializing) { CreateSubControls(); }
-        IsFilling = true;
+
         foreach (Control control in Controls) {
             switch (control) {
                 case ComboBox comboBox:
@@ -1081,9 +958,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
                 case GroupBox:
                 case Line:
-                    //if (!string.IsNullOrEmpty(Value)) {
-                    //    Develop.DebugPrint(FehlerArt.Fehler, "Line kann keine Value erhalten: '" + Value + "'");
-                    //}
                     break;
 
                 default:
@@ -1091,18 +965,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                     break;
             }
         }
-        IsFilling = false;
     }
 
-    private void ValueChanged_ComboBox(object sender, System.EventArgs e) {
-        if (IsFilling) { return; }
-        ValueSet(((ComboBox)sender).Text, false);
-    }
+    private void ValueChanged_ComboBox(object sender, System.EventArgs e) => ValueSet(((ComboBox)sender).Text, false);
 
-    private void ValueChanged_TextBox(object sender, System.EventArgs e) {
-        if (IsFilling) { return; }
-        ValueSet(((TextBox)sender).Text, false);
-    }
+    private void ValueChanged_TextBox(object sender, System.EventArgs e) => ValueSet(((TextBox)sender).Text, false);
 
     private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false);
 

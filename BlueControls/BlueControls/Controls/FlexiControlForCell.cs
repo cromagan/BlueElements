@@ -709,7 +709,6 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private void TextBox_TextChanged(object sender, System.EventArgs e) => RestartMarker();
 
     private void ValueToCell() {
-        if (f.IsFilling) { return; }
         if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
         if (_column is not { IsDisposed: false }) { return; }

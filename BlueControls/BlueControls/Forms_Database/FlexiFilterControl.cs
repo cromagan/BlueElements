@@ -153,7 +153,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         if (filterSingle != null) {
             _isDeleteButtonVisible = filterSingle.FilterType != FilterType.Instr_GroßKleinEgal ||
                                     filterSingle.SearchValue.Count > 1 ||
-                                    (f.GetComboBox() is { IsDisposed: false } cb && cb.WasThisValueClicked());
+                                    (f.GetControl<ComboBox>() is { IsDisposed: false } cb && cb.WasThisValueClicked());
             _isFilterFromInput = true;
             _filterOrigin = filterSingle.Origin;
         } else {
@@ -308,7 +308,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
                         filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _filterOrigin);
                     }
                 } else {
-                    if (f.GetComboBox() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
+                    if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
                         _isDeleteButtonVisible = true;
                         filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
                     } else if (_defaultTextInputFilter == FlexiFilterDefaultFilter.Textteil) {
@@ -402,7 +402,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             f.CaptionPosition = DefaultCaptionPosition;
             f.Caption = FilterSingleColumn.ReadableText() + ":";
             f.EditType = EditTypeFormula.Button;
-            if (f.GetButton() is { IsDisposed: false } b) { DoButtonStyle(b); }
+            if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
             return;
         }
 
@@ -413,7 +413,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         if (showDelFilterButton) {
             f.CaptionPosition = CaptionPosition.ohne;
             f.EditType = EditTypeFormula.Button;
-            if (f.GetButton() is { IsDisposed: false } b) { DoButtonStyle(b); }
+            if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
             return;
         }
 

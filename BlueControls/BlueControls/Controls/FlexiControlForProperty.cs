@@ -132,7 +132,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
 
-                    StyleListBox(GetListBox(), list, checkBehavior, addallowed);
+                    StyleListBox(GetControl<ListBox>(), list, checkBehavior, addallowed);
 
                     break;
                 }
@@ -147,13 +147,13 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
-                        StyleComboBox(GetComboBox(), list, comboBoxStyle, true);
+                        StyleComboBox(GetControl<ComboBox>(), list, comboBoxStyle, true);
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
                         var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
                         Size = new Size(s1.Width + 30, 22);
 
-                        if (GetButton() is { IsDisposed: false } b) {
+                        if (GetControl<Button>() is { IsDisposed: false } b) {
                             b.ImageCode = "Stift|16";
                             b.Text = "bearbeiten";
                         }
@@ -199,7 +199,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                             }
                         }
 
-                        StyleTextBox(GetTextBox());
+                        StyleTextBox(GetControl<TextBox>());
                     }
                     break;
                 }
