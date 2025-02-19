@@ -44,11 +44,11 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     private const int MaxRecentFilterEntries = 20;
     private readonly Renderer_Abstract _renderer;
-    private bool _isDeleteButtonVisible;
     private FlexiFilterDefaultFilter _defaultTextInputFilter = FlexiFilterDefaultFilter.Textteil;
-    private bool _isFilterFromInput;
-    private string _filterOrigin;
     private FlexiFilterDefaultOutput _emptyInputBehavior = FlexiFilterDefaultOutput.Alles_Anzeigen;
+    private string _filterOrigin;
+    private bool _isDeleteButtonVisible;
+    private bool _isFilterFromInput;
 
     #endregion
 
@@ -134,7 +134,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
 
-            if (FilterOutput is {  Rows.Count: 1 } fio && FilterSingleColumn is { } c) {
+            if (FilterOutput is { Rows.Count: 1 } fio && FilterSingleColumn is { } c) {
                 var vv = FilterCollection.InitValue(c, true, fio.ToArray());
                 this.SettingsAdd($"{FilterHash()}|{vv}");
             }
@@ -364,12 +364,15 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private void UpdateFilterData(FilterItem? filterSingle, bool showDelFilterButton) {
         if (IsDisposed || f is null) { return; }
 
-        if (FilterSingleColumn == null) {
-            Invalidate_FilterOutput();
-        } else {
-            FilterOutput.ChangeTo((FilterItem?)filterSingle?.Clone());
-        }
+        if (FilterSingleColumn?.Database is { } db && filterSingle?.Clone() is FilterItem fi) {
+            DoInputFilter(null, false);
+            using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(db, "UpadteFilterData");
 
+            fic?.RemoveOtherAndAdd(fi.Clone() as FilterItem);
+            FilterOutput.ChangeTo(fic);
+        } else {
+            Invalidate_FilterOutput();
+        }
         var nvalue = string.Empty;
         if (filterSingle != null) {
             nvalue = filterSingle.SearchValue.JoinWithCr();
