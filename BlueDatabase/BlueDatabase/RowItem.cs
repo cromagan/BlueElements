@@ -505,9 +505,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool MatchesTo(FilterItem fi) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return false; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return false; }
 
-        if (fi.Database != Database) { return false; }
+        if (fi.Database != db) { return false; }
 
         if (fi.FilterType == FilterType.AlwaysFalse) { return false; }
 
@@ -518,17 +518,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return KeyName == fi.SearchValue[0];
         }
 
-        if (fi.Column == null) {
-            if (!fi.FilterType.HasFlag(FilterType.GroﬂKleinEgal)) { fi.FilterType |= FilterType.GroﬂKleinEgal; }
-            if (fi.FilterType is not FilterType.Instr_GroﬂKleinEgal and not FilterType.Instr_UND_GroﬂKleinEgal) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit Instr mˆglich!"); }
-            if (fi.SearchValue.Count < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert mˆglich"); }
+        if (fi.Column == null) { return fi.SearchValue.All(RowFilterMatch); }
 
-            return fi.SearchValue.All(RowFilterMatch);
-        }
-
-        if (!MatchesTo(fi.Column, fi.FilterType, fi.SearchValue)) { return false; }
-
-        return true;
+        return MatchesTo(fi.Column, fi.FilterType, fi.SearchValue);
     }
 
     public bool MatchesTo(params FilterItem[]? filter) {

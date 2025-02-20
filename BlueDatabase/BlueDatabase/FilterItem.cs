@@ -31,20 +31,11 @@ using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParseable, ICanBeEmpty, IErrorCheckable, IHasDatabase, ICloneable, IEditable {
+public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorCheckable, IHasDatabase {
 
     #region Fields
 
-    private ColumnItem? _column;
-
     private Database? _database;
-
-    private FilterType _filterType = FilterType.AlwaysFalse;
-
-    private string _origin = string.Empty;
-
-    private object? _parent;
-    private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
 
     #endregion
 
@@ -57,18 +48,16 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     /// </summary>
     public FilterItem(Database? database, string origin) {
         Database = database;
-        _filterType = FilterType.AlwaysFalse;
-        _column = null;
-        KeyName = string.Empty;
-        _origin = origin;
+        FilterType = FilterType.AlwaysFalse;
+        Column = null;
+        Origin = origin;
         SearchValue = new List<string>().AsReadOnly();
     }
 
-    public FilterItem(string filterCode, Database? db) {
+    public FilterItem(string filterCode, Database? database) {
         // Database?, weil always False keine Datenbank braucht
-        Database = db;
-
-        KeyName = Generic.GetUniqueKey();
+        Database = database;
+        Origin = string.Empty;
 
         SearchValue = new List<string>().AsReadOnly();
 
@@ -80,20 +69,17 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     /// <summary>
     /// Bei diesem Construktor muss der Tag 'Database' vorkommen!
     /// </summary>
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType,
-        [searchValue], string.Empty) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, [searchValue], string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType,
-        [searchValue], origin) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, [searchValue], origin) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string>? searchValue, string origin) {
-        KeyName = Generic.GetUniqueKey();
         Database = column.Database;
-        _column = column;
-        _filterType = filterType;
-        _origin = origin;
+        Column = column;
+        FilterType = filterType;
+        Origin = origin;
 
         if (searchValue is { Count: > 0 }) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
@@ -102,12 +88,30 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         }
     }
 
-    private FilterItem(Database? db, FilterType filterType, IList<string>? searchValue) {
-        //Database?, weil AlwaysFalse keine Angaben braucht
-        Database = db;
-        KeyName = Generic.GetUniqueKey();
+    public FilterItem(Database? database, ColumnItem? column, FilterType filterType, IList<string>? searchValue, string origin) {
+        Database = database ?? column?.Database;
 
-        _filterType = filterType;
+        Column = column;
+
+        FilterType = filterType;
+
+        Origin = origin;
+
+        // Setze SearchValue
+        if (searchValue is { Count: > 0 }) {
+            SearchValue = new ReadOnlyCollection<string>(searchValue);
+        } else {
+            SearchValue = EmptyReadOnly;
+        }
+    }
+
+    private FilterItem(Database? database, FilterType filterType, IList<string>? searchValue) {
+        //Database?, weil AlwaysFalse keine Angaben braucht
+        Database = database;
+
+        FilterType = filterType;
+        Origin = string.Empty;
+
         if (searchValue is { Count: > 0 }) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
         } else {
@@ -117,27 +121,9 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? PropertyChanged;
-
-    public event EventHandler? PropertyChanging;
-
-    #endregion
-
     #region Properties
 
-    public string CaptionForEditor => "Filter";
-
-    public ColumnItem? Column {
-        get => _column;
-        set {
-            if (value == _column) { return; }
-            OnChanging();
-            _column = value;
-            OnPropertyChanged();
-        }
-    }
+    public ColumnItem? Column { get; private set; }
 
     /// <summary>
     /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
@@ -152,7 +138,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
                 _database.DisposingEvent -= _database_Disposing;
             }
             _database = value;
-            OnPropertyChanged();
 
             if (_database != null) {
                 _database.DisposingEvent += _database_Disposing;
@@ -160,114 +145,54 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         }
     }
 
-    public Type? Editor { get; set; }
+    public FilterType FilterType { get; private set; }
 
-    public FilterType FilterType {
-        get => _filterType;
-        set {
-            if (value == _filterType) { return; }
-            OnChanging();
-            _filterType = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public string KeyName { get; private set; }
-
-    public string Origin {
-        get => _origin;
-        set {
-            if (value == _origin) { return; }
-            OnChanging();
-            _origin = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public object? Parent {
-        get => _parent;
-        set {
-            if (_parent == value) { return; }
-            _parent = value;
-            OnPropertyChanged();
-        }
-    }
+    public string Origin { get; private set; }
 
     public string QuickInfo => ReadableText();
 
-    public ReadOnlyCollection<string> SearchValue {
-        get => _searchValue;
-        set {
-            if (!value.IsDifferentTo(_searchValue)) { return; }
-            OnChanging();
-            _searchValue = value;
-            OnPropertyChanged();
-        }
-    }
+    public ReadOnlyCollection<string> SearchValue { get; private set; }
 
     #endregion
 
     #region Methods
 
-    public void Changeto(FilterType type, IEnumerable<string> searchvalue) {
-        var svl = searchvalue.ToList();
-        if (type == _filterType && !svl.IsDifferentTo(_searchValue)) { return; }
-        OnChanging();
-        _filterType = type;
-        _searchValue = svl.AsReadOnly();
-        OnPropertyChanged();
-    }
-
-    public void Changeto(FilterType type, string searchvalue) => Changeto(type, (List<string>)[searchvalue]);
-
-    public object Clone() {
-        var fi = new FilterItem(Database, _filterType, _searchValue);
-        fi.Column = _column;
-        fi.Origin = _origin;
-        fi.KeyName = KeyName;
-        fi.Database = Database;
-        return fi;
-    }
-
     public bool Equals(FilterItem? thisFilter) => thisFilter != null &&
-                                                  thisFilter.FilterType == _filterType &&
-                                                  thisFilter.Column == _column &&
-                                                  thisFilter._origin == _origin &&
-                                                  thisFilter.SearchValue.JoinWithCr() == _searchValue.JoinWithCr();
+                                                  thisFilter.FilterType == FilterType &&
+                                                  thisFilter.Column == Column &&
+                                                  thisFilter.Origin == Origin &&
+                                                  thisFilter.SearchValue.JoinWithCr() == SearchValue.JoinWithCr();
 
     public string ErrorReason() {
-        if (Database == null) { return "Keine Datenbank angegeben"; }
+        if (_database == null) { return "Keine Datenbank angegeben"; }
 
-        if (Database.IsDisposed) { return "Datenbank verworfen"; }
-        //if (IsDisposed) { return "Filter verworfen"; }
+        if (_database.IsDisposed) { return "Datenbank verworfen"; }
 
-        //if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
+        if (FilterType == FilterType.AlwaysFalse) { return string.Empty; }
 
-        if (_filterType == FilterType.AlwaysFalse) { return string.Empty; }
+        if (FilterType is FilterType.GroßKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
 
-        if (_filterType is FilterType.GroßKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
-
-        if (_column != null && _column?.Database != Database) { return "Datenbanken inkonsistent"; }
+        if (Column != null && Column?.Database != Database) { return "Datenbanken inkonsistent"; }
 
         if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
 
-        if (_filterType == FilterType.RowKey) {
-            if (_column != null) { return "RowKey suche mit Spaltenangabe"; }
+        if (FilterType == FilterType.RowKey) {
+            if (Column != null) { return "RowKey suche mit Spaltenangabe"; }
             if (SearchValue.Count != 1) { return "RowKey mit ungültiger Suche"; }
             return string.Empty;
         }
 
-        if (_column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
+        if (Column == null && !FilterType.HasFlag(FilterType.Instr_GroßKleinEgal)) { return "Fehlerhafter Zeilenfilter"; }
 
-        if (_filterType.HasFlag(FilterType.Instr)) {
+        if (FilterType.HasFlag(FilterType.Instr)) {
             foreach (var thisV in SearchValue) {
                 if (string.IsNullOrEmpty(thisV)) { return "Instr-Filter ohne Suchtext"; }
             }
         }
 
-        if (_column != null && _column == _column.Database?.Column.SplitColumn) {
+        if (Column != null && Column == Column.Database?.Column.SplitColumn) {
             if (SearchValue.Count != 1) { return "Split-Spalte mit ungültiger Suche"; }
-            if (_filterType is not FilterType.Istgleich
+            if (FilterType is not FilterType.Istgleich
                 and not FilterType.Istgleich_GroßKleinEgal
                 and not FilterType.Istgleich_MultiRowIgnorieren
                 and not FilterType.Istgleich_ODER_GroßKleinEgal
@@ -279,29 +204,6 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
 
     public bool IsNullOrEmpty() => !this.IsOk();
 
-    public void Normalize() {
-        _searchValue = _searchValue.SortedDistinctList().AsReadOnly();
-
-        KeyName = "Normalized";
-
-        _origin = "Normalize";
-
-        if (_column != null) { _database = _column.Database; }
-
-        if (_searchValue.Count < 2) {
-            if (_filterType.HasFlag(FilterType.ODER)) { _filterType ^= FilterType.ODER; }
-            if (_filterType.HasFlag(FilterType.UND)) { _filterType ^= FilterType.UND; }
-        }
-    }
-
-    public void OnChanging() {
-        PropertyChanging?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    public void OnPropertyChanged() {
-        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
-    }
-
     public List<string> ParseableItems() {
         try {
             // Für FlexiForFilter werden auch "ungültige" Filter benötigt
@@ -309,12 +211,11 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             //if (!this.IsOk()) { return string.Empty; }
 
             List<string> result = [];
-            result.ParseableAdd("ID", KeyName);
-            result.ParseableAdd("Type", _filterType);
+            result.ParseableAdd("Type", FilterType);
             result.ParseableAdd("Database", Database);
-            result.ParseableAdd("ColumnName", _column);
-            result.ParseableAdd("Values", _searchValue, false);
-            result.ParseableAdd("Origin", _origin);
+            result.ParseableAdd("ColumnName", Column);
+            result.ParseableAdd("Values", SearchValue, false);
+            result.ParseableAdd("Origin", Origin);
             return result;
         } catch {
             Develop.CheckStackForOverflow();
@@ -339,12 +240,12 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
                 return true;
 
             case "type":
-                _filterType = (FilterType)IntParse(value);
+                FilterType = (FilterType)IntParse(value);
                 return true;
 
             case "columnname":
             case "column":
-                _column = Database?.Column[value];
+                Column = Database?.Column[value];
                 return true;
 
             case "columnkey":
@@ -354,20 +255,19 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             case "values":
 
                 if (string.IsNullOrEmpty(value)) {
-                    _searchValue = new List<string> { string.Empty }.AsReadOnly();
+                    SearchValue = new List<string> { string.Empty }.AsReadOnly();
                 } else {
-                    _searchValue = value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
+                    SearchValue = value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
                 }
 
                 return true;
 
             case "origin":
             case "herkunft":
-                _origin = value.FromNonCritical();
+                Origin = value.FromNonCritical();
                 return true;
 
             case "id":
-                KeyName = value.FromNonCritical();
                 return true;
         }
 
@@ -378,21 +278,21 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
         // Bei Nich OK schön en Text zurück geben für FlexiControlForFilter
         if (!this.IsOk()) { return "Filter ohne Funktion"; }
 
-        if (_filterType == FilterType.AlwaysFalse) {
+        if (FilterType == FilterType.AlwaysFalse) {
             return "Immer FALSCH";
         }
 
-        if (_column == null) {
+        if (Column == null) {
             if (SearchValue.Count == 0) {
                 return "Zeilen-Filter";
             }
 
             return "Zeilen-Filter: " + SearchValue[0];
         }
-        var nam = _column.ReadableText();
+        var nam = Column.ReadableText();
 
         if (SearchValue.Count > 1) {
-            switch (_filterType) {
+            switch (FilterType) {
                 case FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroßKleinEgal
                     or FilterType.Istgleich_ODER_GroßKleinEgal:
                     return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
@@ -405,12 +305,12 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
             }
         }
 
-        if (_column == Database?.Column.SysCorrect && _filterType.HasFlag(FilterType.Istgleich)) {
+        if (Column == Database?.Column.SysCorrect && FilterType.HasFlag(FilterType.Istgleich)) {
             if (SearchValue[0].FromPlusMinus()) { return "Fehlerfreie Zeilen"; }
             if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
         }
 
-        switch (_filterType) {
+        switch (FilterType) {
             case FilterType.Istgleich:
 
             case FilterType.Istgleich_GroßKleinEgal:
@@ -466,6 +366,19 @@ public sealed class FilterItem : IReadableTextWithPropertyChangingAndKey, IParse
     public QuickImage? SymbolForReadableText() => null;
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    internal FilterItem Normalized() {
+        var db = _database ?? Column?.Database;
+
+        var f = FilterType;
+
+        if (SearchValue.Count < 2) {
+            if (f.HasFlag(FilterType.ODER)) { f ^= FilterType.ODER; }
+            if (f.HasFlag(FilterType.UND)) { f ^= FilterType.UND; }
+        }
+
+        return new FilterItem(db, Column, f, SearchValue.SortedDistinctList().AsReadOnly(), "Normalize");
+    }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Database = null;
 

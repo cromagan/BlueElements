@@ -229,23 +229,11 @@
     <Compile Include="Editoren\EditorEasy.Designer.cs">
       <DependentUpon>EditorEasy.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editoren\FilterCollectionEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editoren\FilterCollectionEditor.Designer.cs">
-      <DependentUpon>FilterCollectionEditor.cs</DependentUpon>
-    </Compile>
     <Compile Include="Editoren\RowEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Editoren\RowEditor.Designer.cs">
       <DependentUpon>RowEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editoren\FilterEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editoren\FilterEditor.Designer.cs">
-      <DependentUpon>FilterEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\SteuerelementVerhalten.cs" />
     <Compile Include="Forms_Database\FlexiFilterControl.cs">
@@ -800,14 +788,8 @@
     <EmbeddedResource Include="Editoren\EditorEasy.resx">
       <DependentUpon>EditorEasy.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editoren\FilterCollectionEditor.resx">
-      <DependentUpon>FilterCollectionEditor.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Editoren\RowEditor.resx">
       <DependentUpon>RowEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editoren\FilterEditor.resx">
-      <DependentUpon>FilterEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms_Database\AutoFilter.resx">
       <DependentUpon>AutoFilter.cs</DependentUpon>

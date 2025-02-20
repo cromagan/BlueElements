@@ -281,8 +281,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         FilterInput = GetInputFilter(mustbeDatabase, doEmptyFilterToo);
 
         if (FilterInput is { Database: null }) {
-            FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter");
-            FilterInput.Add(new FilterItem(mustbeDatabase, string.Empty));
+            FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter") {
+                new FilterItem(mustbeDatabase, string.Empty)
+            };
             //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
         }
         Invalidate_RowsInput();
@@ -327,12 +328,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (!fc.IsOk()) { return string.Empty; }
 
         if (fc.HasAlwaysFalse()) { return ("FALSE|" + Mode).GetHashString(); }
-        var fn = (FilterCollection)fc.Clone("Normalize");
-        fn.Normalize();
-
+        using var fn = fc.Normalized();
         var n = ("F" + fn.ParseableItems().FinishParseable() + Mode).GetHashString();
-        fn.Dispose();
-
         return n;
     }
 
@@ -360,8 +357,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             RowsInputChangedHandled = false;
             Invalidate();
         }
-
-      
     }
 
     protected override void OnCreateControl() {
@@ -409,9 +404,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 fc ??= new FilterCollection(fi.Database, "filterofsender");
 
                 foreach (var thifi in fi) {
-                    if (thifi.Clone() is FilterItem fic) {
-                        fc.AddIfNotExists(fic);
-                    }
+                    fc.AddIfNotExists(thifi);
                 }
             }
         }

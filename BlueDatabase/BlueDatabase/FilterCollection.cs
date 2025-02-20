@@ -59,7 +59,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _coment = coment;
     }
 
-
     /// <summary>
     /// Erstellt einen Filter, der den Zeilenschlüssel sucht. Mit der SplitColumn als zweiten Filter
     /// </summary>
@@ -72,15 +71,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         Database = db;
 
-
         if (db.Column.SplitColumn is { } spc) {
             Add(new FilterItem(spc, FilterType.Istgleich, r.CellGetString(spc)));
         }
 
-
         Add(new FilterItem(db, FilterType.RowKey, r.KeyName));
     }
-
 
     public FilterCollection(FilterItem? fi, string coment) : this(fi?.Database, coment) {
         if (fi != null) { Add(fi); }
@@ -121,11 +117,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             OnChanging();
             UnRegisterDatabaseEvents();
 
-            _database = null;
-            UnRegisterEvents(_internal);
-            _internal.Clear();
-
             _database = value;
+            _internal.Clear();
 
             RegisterDatabaseEvents();
 
@@ -146,11 +139,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         set {
             if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-            var f = this[null];
-            if (f != null) {
-                if (string.Equals(f.SearchValue[0], value, StringComparison.OrdinalIgnoreCase)) { return; }
-                f.Changeto(f.FilterType, value);
-                return;
+            if (this[null] is { } f) {
+                if (f.SearchValue.Count == 1 && f.SearchValue[0] == value) { return; }
+                Remove(f);
             }
 
             var fi = new FilterItem(Database, FilterType.Instr_UND_GroßKleinEgal, value);
@@ -196,12 +187,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static List<RowItem> CalculateFilteredRows(Database? db, params FilterItem[] filter) {
         if (db == null || db.IsDisposed) { return []; }
 
-        if (db.Column.SplitColumn is { }spc) {
+        if (db.Column.SplitColumn is { } spc) {
             var i = InitValue(spc, true, filter);
             //foreach (var fi in filter) {
             //    if (fi.Column == db.Column.SplitColumn) {
-                    var (_, ok) = db.BeSureRowIsLoaded(i, DatabaseDataType.UTF8Value_withoutSizeData, false, null);
-                    if (!ok) { return []; }
+            var (_, ok) = db.BeSureRowIsLoaded(i, DatabaseDataType.UTF8Value_withoutSizeData, false, null);
+            if (!ok) { return []; }
             //    }
             //}
         }
@@ -276,16 +267,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void Add(FilterItem fi) {
         if (IsDisposed) { return; }
 
-        if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) {
-            fi.Column = fi.Database?.Column.First();
-            fi.FilterType = FilterType.AlwaysFalse;
-            //Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!");
-        }
-        //if (!fi.IsOk()) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
-
         OnChanging();
 
-        AddAndRegisterEvents(fi);
+        AddInternal(fi);
         Invalidate_FilteredRows();
         OnPropertyChanged();
     }
@@ -302,7 +286,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (newItems.Any()) {
             OnChanging();
-            AddAndRegisterEvents(newItems);
+            AddInternal(newItems);
             Invalidate_FilteredRows();
             OnPropertyChanged();
         }
@@ -320,11 +304,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             RegisterDatabaseEvents();
         }
 
-        UnRegisterEvents(_internal);
         _internal.Clear();
 
         if (fi != null) {
-            AddAndRegisterEvents(fi);
+            AddInternal(fi);
         }
         Invalidate_FilteredRows();
 
@@ -345,13 +328,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _database = fc?.Database;
         RegisterDatabaseEvents();
 
-        UnRegisterEvents(_internal);
         _internal.Clear();
 
         if (fc != null) {
             var reallydifferent = fc.ParseableItems().FinishParseable() != ParseableItems().FinishParseable();
             foreach (var thisf in fc) {
-                if (!Exists(thisf) && thisf.IsOk() && thisf.Clone() is FilterItem nfi) { AddAndRegisterEvents(nfi); }
+                if (!Exists(thisf) && thisf.IsOk()) { AddInternal(thisf); }
             }
 
             if (reallydifferent) {
@@ -376,18 +358,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return; }
         if (_internal.Count == 0) { return; }
 
-        // Handeln
         OnChanging();
-        //List<FilterItem> t = [.. _internal];
-        UnRegisterEvents(_internal);
         _internal.Clear();
         Invalidate_FilteredRows();
         OnPropertyChanged();
-
-        //// Aufräumen
-        //foreach (var thisF in t) {
-        //    thisF.Dispose();
-        //}
     }
 
     /// <summary>
@@ -468,17 +442,18 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public bool MayHaveRowFilter(ColumnItem? column) => column is { IgnoreAtRowFilter: false } && IsRowFilterActiv();
 
-    public void Normalize() {
-        foreach (var thisf in this) {
-            thisf.Normalize();
-        }
-        _coment = "Normalize";
-
+    public FilterCollection Normalized() {
         var tmp = new List<FilterItem>();
-        tmp.AddRange(_internal);
 
-        _internal.Clear();
-        _internal.AddRange(tmp.OrderBy(e => e.ReadableText()).ToList());
+        foreach (var thisf in _internal) {
+            tmp.Add(thisf.Normalized());
+        }
+
+        var fcn = new FilterCollection(Database, "Normalize");
+        foreach (var thisf in tmp.OrderBy(e => e.ReadableText()).ToList()) {
+            fcn.Add(thisf);
+        }
+        return fcn;
     }
 
     public void OnPropertyChanged() {
@@ -511,7 +486,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             case "filter":
 
                 var fi = new FilterItem(value.FromNonCritical(), Database);
-                if (!Exists(fi)) { AddAndRegisterEvents(fi); }
+                if (!Exists(fi)) { AddInternal(fi); }
 
                 return true;
         }
@@ -541,7 +516,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (!_internal.Contains(fi)) { return; }
 
         OnChanging();
-        UnRegisterEvents(fi);
         _internal.Remove(fi);
         Invalidate_FilteredRows();
         OnPropertyChanged();
@@ -550,10 +524,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void Remove_RowFilter() => Remove(null as ColumnItem);
 
     public void RemoveOtherAndAdd(FilterItem fi, string newOrigin) {
-        if (fi.Clone() is FilterItem fi2) {
-            fi2.Origin = newOrigin;
-            RemoveOtherAndAdd(fi2);
+        var fin = fi;
+        if (fi.Origin != newOrigin) {
+            fin = new FilterItem(fi.Database, fi.Column, fi.FilterType, fi.SearchValue, newOrigin);
         }
+
+        RemoveOtherAndAdd(fin);
     }
 
     /// <summary>
@@ -568,24 +544,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             return;
         }
 
-        var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();
-
-        if (existingColumnFilter.Count == 0 && fi.Clone() is FilterItem fin) {
-            Add(fin);
-            return;
-        }
-
-        if (existingColumnFilter.Count == 1) {
-            existingColumnFilter[0].Changeto(fi.FilterType, fi.SearchValue);
-            return;
-        }
+        var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column);
 
         OnChanging();
         foreach (var thisItem in existingColumnFilter) {
-            UnRegisterEvents(thisItem);
             _internal.Remove(thisItem);
         }
-        AddAndRegisterEvents(fi);
+        AddInternal(fi);
         Invalidate_FilteredRows();
         OnPropertyChanged();
     }
@@ -624,7 +589,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                     OnChanging();
                     did = true;
                 }
-                UnRegisterEvents(thisItem);
                 _internal.Remove(thisItem);
             }
         }
@@ -677,32 +641,29 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// Löst keine Ereignisse aus
     /// </summary>
     /// <param name="fi"></param>
-    private void AddAndRegisterEvents(FilterItem fi) {
+    private void AddInternal(FilterItem fi) {
         if (_internal.Count > 0) {
-            if (fi.FilterType != FilterType.AlwaysFalse && _internal[0].FilterType != FilterType.AlwaysFalse) {
-                if (_internal[0].Database != fi.Database) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
+            foreach (var internalFilter in _internal) {
+                if (fi.FilterType != FilterType.AlwaysFalse && internalFilter.FilterType != FilterType.AlwaysFalse) {
+                    if (internalFilter.Database != fi.Database) {
+                        fi = new FilterItem(null, "AddInternal");
+                        break;
+                    }
                 }
             }
         }
 
         if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) {
-            fi.FilterType = FilterType.AlwaysFalse;
+            fi = new FilterItem(null, "AddInternal");
         }
 
-        if (fi.Parent != null) { Develop.DebugPrint(FehlerArt.Fehler, "Doppelte Filterverwendung!"); }
-
-        fi.Parent = this;
-
-        fi.PropertyChanging += Filter_PropertyChanging;
-        fi.PropertyChanged += Filter_PropertyChanged;
         _internal.Add(fi);
         Invalidate_FilteredRows();
     }
 
-    private void AddAndRegisterEvents(List<FilterItem> fi) {
+    private void AddInternal(List<FilterItem> fi) {
         foreach (var thisfio in fi) {
-            AddAndRegisterEvents(thisfio);
+            AddInternal(thisfio);
         }
     }
 
@@ -720,7 +681,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 //}
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
-            UnRegisterEvents(_internal);
             _internal.Clear();
             IsDisposed = true;
         }
@@ -732,17 +692,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
 
         return false;
-    }
-
-    private void Filter_PropertyChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate_FilteredRows();
-        OnPropertyChanged();
-    }
-
-    private void Filter_PropertyChanging(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        OnChanging();
     }
 
     private void OnChanging() {
@@ -783,17 +732,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             _database.Row.RowAdded -= Row_Added;
             _database.Cell.CellValueChanged -= _Database_CellValueChanged;
         }
-    }
-
-    private void UnRegisterEvents(List<FilterItem> fi) {
-        foreach (var thisfi in fi) {
-            UnRegisterEvents(thisfi);
-        }
-    }
-
-    private void UnRegisterEvents(FilterItem fi) {
-        fi.PropertyChanging -= Filter_PropertyChanging;
-        fi.PropertyChanged -= Filter_PropertyChanged;
     }
 
     #endregion
