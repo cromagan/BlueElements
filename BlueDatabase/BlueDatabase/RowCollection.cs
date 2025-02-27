@@ -575,7 +575,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisColum in db2.Column) {
             if (thisColum.Function == ColumnFunction.First || thisColum == db2.Column.SplitColumn) {
                 var inval = FilterCollection.InitValue(thisColum, true, filter);
-                if (inval is { } || string.IsNullOrWhiteSpace(inval)) {
+                if (inval is not { } || string.IsNullOrWhiteSpace(inval)) {
                     return (null, "Initalwert fehlt.", false);
                 }
             }
