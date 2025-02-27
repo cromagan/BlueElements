@@ -91,7 +91,7 @@ public class Method_AddRowsUnique : Method_Database {
             var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, mydb, scp.ScriptName, false);
             if (!string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
-            allFi ??= new FilterCollection(mydb, "AddRowsUnique");
+            allFi ??= new FilterCollection(db, "AddRowsUnique");
 
             #endregion
 

@@ -35,8 +35,8 @@ public class Method_RowNext : Method_Database {
     public override string Command => "rownext";
     public override List<string> Constants => [];
 
-    public override string Description => "Sucht eine Zeilen mittels dem gegebenen Filter und sortiert diese.\r\n" +
-                                          "Sucht in dieser Zeilen die eigene Zeile und gibt die darauffolgende zurück.\r\n" +
+    public override string Description => "Sucht Zeilen mittels dem gegebenen Filter und sortiert diese.\r\n" +
+                                          "Sucht in diesen Zeilen die eigene Zeile und gibt die darauffolgende zurück.\r\n" +
                                           "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
                                           "Wird kein Filter angegeben, werden alle Zeilen berücksichtigt.\r\n" +
                                           "Ist die eigene Zeile nicht in der Liste, wird null zurückgegeben.";

@@ -551,15 +551,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Database? db2 = null;
 
         foreach (var thisfi in filter) {
-            //if (thisfi.FilterType is not FilterType.Istgleich
-            //    and not FilterType.Istgleich_GroßKleinEgal
-            //    and not FilterType.Istgleich_ODER_GroßKleinEgal) { return (null, "Filtertyp wird nicht unterstützt", true); }
-
-            //if (thisfi.Column == null) { return (null, "Leere Spalte angekommen", true); }
-            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanken unterschiedlich", true); }
+            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanke eines Filters nicht angegeben", true); }
             db2 ??= db1;
 
-            if (thisfi.Column?.Database != db2) { return (null, "Spalten-Datenbanken unterschiedlich", true); }
+            if (thisfi.Column?.Database != db2) { return (null, "Datenbanken der Spalten im Filter unterschiedlich", true); }
         }
 
         if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }

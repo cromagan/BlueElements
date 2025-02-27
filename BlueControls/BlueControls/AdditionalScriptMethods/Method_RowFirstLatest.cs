@@ -32,12 +32,14 @@ public class Method_RowFirstLatest : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => [StringVal, BoolVal, FilterVar];
-    public override string Command => "rowfirstlatest";
+    public override string Command => "rowfirstlastest";
     public override List<string> Constants => [];
 
     public override string Description => "Sucht eine Zeilen mittels dem gegebenen Filter und sortiert diese.\r\n" +
                                           "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
-                                          "Gibt dann die erste bwz. letzte Zeile zurück.";
+                                          "Gibt dann die erste bzw. letzte Zeile zurück.\r\n" + 
+                                          "Der gefundene Wert kann in eine Spalte mit dem Typ Row geschrieben werden.\r\n" +
+                                          "Mit dem Befehl 'RowNext' kann dann weitergearbeitet werden.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -45,7 +47,7 @@ public class Method_RowFirstLatest : Method_Database {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableRowItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "RowFirstLatest(SortColumn, first, Filter, ...)";
+    public override string Syntax => "RowFirstLastest(SortColumn, first/last , Filter, ...)";
 
     #endregion
 
