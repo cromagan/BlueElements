@@ -575,7 +575,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisColum in db2.Column) {
             if (thisColum.Function == ColumnFunction.First || thisColum == db2.Column.SplitColumn) {
                 var inval = FilterCollection.InitValue(thisColum, true, filter);
-                if (inval == null || string.IsNullOrWhiteSpace(inval)) {
+                if (inval is { } || string.IsNullOrWhiteSpace(inval)) {
                     return (null, "Initalwert fehlt.", false);
                 }
             }
@@ -627,10 +627,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdateAfterChange());
         if (rowToCheck != null) { return rowToCheck; }
 
-
         rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false, oldestTo));
         if (rowToCheck != null) { return rowToCheck; }
-
 
         if (!oldestTo) { return null; }
 
@@ -904,14 +902,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             throw new Exception();
         }
 
-
         // Die Split-Colmn an den Anfang setzen
         var chunkvalue = string.Empty;
         List<ColumnItem> l = [.. db.Column];
         if (db.Column.SplitColumn is { } spc) {
             l.Remove(spc);
             l.Insert(0, spc);
-            chunkvalue = FilterCollection.InitValue(spc, true, fc);
+            chunkvalue = FilterCollection.InitValue(spc, true, fc) ?? string.Empty;
         }
 
         var u = Generic.UserName;
@@ -931,11 +928,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         // Dann die Inital-Werte reinschreiben
 
-
-
         foreach (var thisColum in l) {
             var val = FilterCollection.InitValue(thisColum, true, fc);
-            if (!string.IsNullOrWhiteSpace(val)) {
+            if (val is { } && !string.IsNullOrWhiteSpace(val)) {
                 item.CellSet(thisColum, val, "Initialwert neuer Zeile");
             }
         }

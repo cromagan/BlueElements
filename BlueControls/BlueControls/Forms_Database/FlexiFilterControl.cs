@@ -135,8 +135,9 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             this.LoadSettingsFromDisk(false);
 
             if (FilterOutput is { Rows.Count: 1 } fio && FilterSingleColumn is { } c) {
-                var vv = FilterCollection.InitValue(c, true, fio.ToArray());
-                this.SettingsAdd($"{FilterHash()}|{vv}");
+                if (FilterCollection.InitValue(c, true, fio.ToArray()) is { } vv) {
+                    this.SettingsAdd($"{FilterHash()}|{vv}");
+                }
             }
         }
 

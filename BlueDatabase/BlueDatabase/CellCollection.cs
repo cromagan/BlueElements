@@ -171,9 +171,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.SplitColumn is { } spc) {
+
+                if (filter is not { }) {
+                    return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
+                }
+
                 var value = FilterCollection.InitValue(spc, false, filter);
 
-                if (string.IsNullOrEmpty(value)) {
+                if (value is not { } || string.IsNullOrEmpty(value)) {
                     return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
                 }
                 return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, mode);

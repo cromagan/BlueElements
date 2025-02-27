@@ -203,7 +203,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
             case "Skript":
                 if (row is { IsDisposed: false }) {
-                    var t = row.ExecuteScript(null, ev[1], true, 10, null, true, false);
+                    var t = row.ExecuteScript(null, ev[1], true, 10, null, true, true);
 
                     if (t is { Successful: true, AllOk: true }) {
                         MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");

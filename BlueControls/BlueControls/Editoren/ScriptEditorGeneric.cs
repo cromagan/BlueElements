@@ -124,7 +124,19 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         grpVariablen.ToEdit = f.Variables;
         WriteCommandsToList();
 
-        Message(f.AllOk ? "Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden." : f.ProtocolText);
+        if (!f.AllOk) {
+            Message(f.ProtocolText);
+            return;
+        }
+
+        var nsr = f.Variables?.GetString("Notsuccessfulreason") ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(nsr)) {
+            Message("NICHT erfolgreich, aber kein Skript Fehler: " + nsr);
+            return;
+        }
+
+        Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
     }
 
     public virtual void WriteInfosBack() { }

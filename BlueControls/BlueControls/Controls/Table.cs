@@ -2569,7 +2569,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 plus = p16;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
             } else {
-                txt = FilterCollection.InitValue(cellInThisDatabaseColumn, false, Filter.ToArray());
+                txt = FilterCollection.InitValue(cellInThisDatabaseColumn, false, Filter.ToArray()) ?? string.Empty;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
             }
 

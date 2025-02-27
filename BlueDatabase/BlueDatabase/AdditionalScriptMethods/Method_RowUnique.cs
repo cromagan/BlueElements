@@ -121,7 +121,13 @@ public class Method_RowUnique : Method_Database, IUseableForButton {
                 allFi.Dispose();
                 return new DoItFeedback(ld, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
             }
-            var l = FilterCollection.InitValue(c, true, allFi.ToArray());
+
+            if (FilterCollection.InitValue(c, true, allFi.ToArray()) is not { } l) {
+                allFi.Dispose();
+                return new DoItFeedback(ld, "Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.");
+            }
+
+
             if (thisFi.SearchValue[0] != l) {
                 allFi.Dispose();
                 return new DoItFeedback(ld, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");

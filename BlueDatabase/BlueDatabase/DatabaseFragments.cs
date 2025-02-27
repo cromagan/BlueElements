@@ -112,6 +112,11 @@ public class DatabaseFragments : Database {
         return string.Empty;
     }
 
+    public override void Freeze(string reason) {
+        CloseWriter();
+        base.Freeze(reason);
+    }
+
     public override void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (FileExists(fileNameToLoad)) {
             Filename = fileNameToLoad;
@@ -134,23 +139,41 @@ public class DatabaseFragments : Database {
         } catch { return false; }
     }
 
+    protected override bool BeSureToBeUpDoDate() {
+        if (!base.BeSureToBeUpDoDate()) { return false; }
+
+        if (_isInFragmentLoader) { return false; }
+        _isInFragmentLoader = true;
+
+        try {
+            OnDropMessage(FehlerArt.Info, "Lade Fragmente von '" + TableName + "'");
+
+            var lastFragmentDate = DateTime.UtcNow;
+            var (changes, files) = GetLastChanges(lastFragmentDate);
+            if (changes == null) {
+                _isInFragmentLoader = false;
+                return false;
+            }
+
+            var start = DateTime.UtcNow;
+            Column.GetSystems();
+            InjectData(files, changes, start, lastFragmentDate);
+            TryToSetMeTemporaryMaster();
+        } catch {
+            _isInFragmentLoader = false;
+            return false;
+        }
+
+        _isInFragmentLoader = false;
+        return true;
+    }
+
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
-        if (disposing) {
-        }
+        if (disposing) { }
 
-        if (_writer != null) {
-            lock (_writer) {
-                try {
-                    _writer.WriteLine("- EOF");
-                    _writer.Flush();
-                    _writer.Close();
-                    _writer.Dispose();
-                } catch { }
-            }
-            _writer = null;
-        }
+        CloseWriter();
 
         base.Dispose(disposing);
     }
@@ -235,35 +258,6 @@ public class DatabaseFragments : Database {
         }
     }
 
-    protected override bool BeSureToBeUpDoDate() {
-        if (!base.BeSureToBeUpDoDate()) { return false; }
-
-        if (_isInFragmentLoader) { return false; }
-        _isInFragmentLoader = true;
-
-        try {
-            OnDropMessage(FehlerArt.Info, "Lade Fragmente von '" + TableName + "'");
-
-            var lastFragmentDate = DateTime.UtcNow;
-            var (changes, files) = GetLastChanges(lastFragmentDate);
-            if (changes == null) {
-                _isInFragmentLoader = false;
-                return false;
-            }
-
-            var start = DateTime.UtcNow;
-            Column.GetSystems();
-            InjectData(files, changes, start, lastFragmentDate);
-            TryToSetMeTemporaryMaster();
-        } catch {
-            _isInFragmentLoader = false;
-            return false;
-        }
-
-        _isInFragmentLoader = false;
-        return true;
-    }
-
     protected override bool SaveRequired() => true;
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
@@ -298,6 +292,20 @@ public class DatabaseFragments : Database {
 
         Directory.CreateDirectory(FragmengtsPath());
         //Directory.CreateDirectory(OldFragmengtsPath());
+    }
+
+    private void CloseWriter() {
+        if (_writer != null) {
+            lock (_writer) {
+                try {
+                    _writer.WriteLine("- EOF");
+                    _writer.Flush();
+                    _writer.Close();
+                    _writer.Dispose();
+                } catch { }
+            }
+            _writer = null;
+        }
     }
 
     private string FragmengtsPath() {

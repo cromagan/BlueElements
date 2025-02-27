@@ -21,11 +21,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -633,6 +635,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         foreach (var thisFile in AllFiles) {
             if (string.Equals(thisFile.TableName, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
+                thisFile.WaitInitialDone();
                 return thisFile;
             }
 
@@ -649,18 +652,21 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (FileExists(f + ".cbdb")) {
                 var db = new DatabaseChunk(fileOrTableName);
                 db.LoadFromFile(f + ".cbdb", false, needPassword, string.Empty, readOnly);
+                db.WaitInitialDone();
                 return db;
             }
 
             if (FileExists(f + ".mbdb")) {
                 var db = new DatabaseFragments(fileOrTableName);
                 db.LoadFromFile(f + ".mbdb", false, needPassword, string.Empty, readOnly);
+                db.WaitInitialDone();
                 return db;
             }
 
             if (FileExists(f + ".bdb")) {
                 var db = new Database(fileOrTableName);
                 db.LoadFromFile(f + ".bdb", false, needPassword, string.Empty, readOnly);
+                db.WaitInitialDone();
                 return db;
             }
         }
@@ -1419,9 +1425,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                                       "Benutzer: " + UserName + "\r\n" +
                                       "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
                                       "Extended: " + extended + "\r\n";
-                    if (row is { } r) { 
-                        t = t + "Zeile: " + r.CellFirstString() + "\r\n";                  
-                        if(Column.SplitColumn is { } spc) {
+                    if (row is { } r) {
+                        t = t + "Zeile: " + r.CellFirstString() + "\r\n";
+                        if (Column.SplitColumn is { } spc) {
                             t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
                         }
                     }
@@ -1620,7 +1626,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Setzt auch ReadOnly.
     /// </summary>
     /// <param name="reason"></param>
-    public void Freeze(string reason) {
+    public virtual void Freeze(string reason) {
         SetReadOnly();
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
         FreezedReason = reason;
@@ -2909,6 +2915,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             ViewChanged = null;
         } catch (Exception ex) {
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Abmelden der Events: " + ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgeführt wurde
+    /// </summary>
+    private void WaitInitialDone() {
+        var t = Stopwatch.StartNew();
+
+        while (IsInCache.Year < 2000) {
+            Thread.Sleep(1);
+            if (t.ElapsedMilliseconds > 1200000) { return; }
         }
     }
 

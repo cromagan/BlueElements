@@ -188,13 +188,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (db == null || db.IsDisposed) { return []; }
 
         if (db.Column.SplitColumn is { } spc) {
-            var i = InitValue(spc, true, filter);
-            //foreach (var fi in filter) {
-            //    if (fi.Column == db.Column.SplitColumn) {
-            var (_, ok) = db.BeSureRowIsLoaded(i, DatabaseDataType.UTF8Value_withoutSizeData, false, null);
-            if (!ok) { return []; }
-            //    }
-            //}
+            if (InitValue(spc, true, filter) is { } i) {
+                var (_, ok) = db.BeSureRowIsLoaded(i, DatabaseDataType.UTF8Value_withoutSizeData, false, null);
+                if (!ok) { return []; }
+            }
         }
 
         List<RowItem> tmpVisibleRows = [];
@@ -222,10 +219,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="column"></param>
     /// <returns></returns>
-    public static string InitValue(ColumnItem column, bool firstToo, params FilterItem[] filter) {
-        if (filter == null || !filter.Any()) { return string.Empty; }
-        if (column is not { IsDisposed: false }) { return string.Empty; }
-        if (column.Database is not { IsDisposed: false } db) { return string.Empty; }
+    public static string? InitValue(ColumnItem column, bool firstToo, params FilterItem[] filter) {
+        if (filter == null || !filter.Any()) { return null; }
+        if (column is not { IsDisposed: false }) { return null; }
+        if (column.Database is not { IsDisposed: false } db) { return null; }
 
         if (column.Function is not ColumnFunction.Normal
                            and not ColumnFunction.First
@@ -234,9 +231,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                            and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                            and not ColumnFunction.Split_Medium
                            and not ColumnFunction.Split_Large
-                           and not ColumnFunction.Split_Name) { return string.Empty; }
+                           and not ColumnFunction.Split_Name) { return null; }
 
-        if (!firstToo && db.Column.First() == column) { return string.Empty; }
+        if (!firstToo && db.Column.First() == column) { return null; }
 
         if (column == db.Column.SysCorrect ||
             column == db.Column.SysRowChangeDate ||
@@ -244,7 +241,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             column == db.Column.SysRowCreator ||
             column == db.Column.SysRowCreateDate ||
             column == db.Column.SysLocked ||
-            column == db.Column.SysRowState) { return string.Empty; }
+            column == db.Column.SysRowState) { return null; }
 
         var fi = filter.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.IsOk())
                               .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
@@ -259,7 +256,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 and not FilterType.Instr_UND_GroﬂKleinEgal
                 and not FilterType.Istgleich_MultiRowIgnorieren
                 and not FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren)
-        }) { return string.Empty; }
+        }) { return null; }
 
         return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
     }
