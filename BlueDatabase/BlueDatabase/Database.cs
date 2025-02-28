@@ -101,8 +101,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private ReadOnlyCollection<DatabaseScriptDescription> _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
     private ReadOnlyCollection<DatabaseScriptDescription> _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
-    private string _eventScriptEditedTmp = string.Empty;
-    private string _eventScriptTmp = string.Empty;
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
     //private float _globalScale = 1f;
@@ -310,8 +308,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             l.AddRange(value);
             l.Sort();
 
-            if (_eventScriptTmp == l.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            var eventScriptOld = _eventScript.ToString(false);
+            var eventScriptNew = l.ToString(false);
+
+            if (eventScriptOld == eventScriptNew) { return; }
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, eventScriptOld, eventScriptNew, UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
     }
 
@@ -322,8 +323,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             l.AddRange(value);
             l.Sort();
 
-            if (_eventScriptEditedTmp == l.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptEdited, null, null, _eventScriptEditedTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            var eventScriptEditedOld = _eventScriptEdited.ToString(false);
+            var eventScriptEditedNew = l.ToString(false);
+
+            if (eventScriptEditedOld == eventScriptEditedNew) { return; }
+            _ = ChangeData(DatabaseDataType.EventScriptEdited, null, null, eventScriptEditedOld, eventScriptEditedNew, UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
     }
 
@@ -354,15 +358,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
 
-    //public float GlobalScale {
-    //    get => _globalScale;
-    //    set {
-    //        if (Math.Abs(_globalScale - value) < DefaultTolerance) { return; }
-    //        _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToStringFloat2(), value.ToStringFloat2(), UserName, DateTime.UtcNow, string.Empty);
-    //        Cell.InvalidateAllSizes();
-    //    }
-    //}
-
     public string GlobalShowPass {
         get => _globalShowPass;
         set {
@@ -370,8 +365,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             _ = ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
     }
-
-    //public bool HasPendingChanges => _chunksChanged.Count > 0;
 
     public bool IsDisposed { get; private set; }
 
@@ -1085,7 +1078,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return BeSureToBeUpDoDate();
     }
 
-    public virtual (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, DatabaseDataType type, bool important, NeedPassword? needPassword) => (false, true);
+    public virtual (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) => (false, true);
 
     public bool CanDoValueChangedScript() {
         if (!IsRowScriptPossible(true)) { return false; }
@@ -1350,7 +1343,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    }
     public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE");
 
-    //    Column.CloneFrom(sourceDatabase);
     /// <summary>
     ///
     /// </summary>
@@ -1908,6 +1900,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
 
+    public bool IsEventScriptCheckeIn() {
+        var eventScriptEditedOld = _eventScriptEdited.ToString(false);
+        var eventScriptOld = _eventScript.ToString(false);
+
+        return eventScriptEditedOld == eventScriptOld;
+    }
+
     public bool IsRowScriptPossible(bool checkMessageTo) {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
@@ -2238,10 +2237,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
 
         if (string.IsNullOrEmpty(_scriptNeedFix)) { ScriptNeedFix = CheckScriptError(); }
-
-        if (string.IsNullOrEmpty(_eventScriptEditedTmp)) {
-            EventScriptEdited = EventScript;
-        }
 
         OnAdditionalRepair();
     }
@@ -2620,7 +2615,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.EventScript:
-                _eventScriptTmp = value;
                 List<string> ves = [.. value.SplitAndCutByCr()];
                 var vess = new List<DatabaseScriptDescription>();
                 foreach (var t in ves) {
@@ -2631,7 +2625,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.EventScriptEdited:
-                _eventScriptEditedTmp = value;
                 List<string> vese = [.. value.SplitAndCutByCr()];
                 var veses = new List<DatabaseScriptDescription>();
                 foreach (var t in vese) {

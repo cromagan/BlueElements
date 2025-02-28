@@ -31,6 +31,7 @@ using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
 using System.Threading;
+using System.Diagnostics;
 
 namespace BlueDatabase;
 
@@ -40,8 +41,11 @@ public class Chunk : IHasKeyName {
     #region Fields
 
     public readonly string MainFileName = string.Empty;
+
     private List<byte> _bytes = new List<byte>();
+
     private string _fileinfo = string.Empty;
+
     private DateTime _lastcheck = DateTime.MinValue;
 
     #endregion
@@ -71,13 +75,21 @@ public class Chunk : IHasKeyName {
     }
 
     public long DataLenght => _bytes?.Count ?? 0;
+
     public bool IsMain => string.Equals(KeyName, DatabaseChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
+
     public string KeyName { get; private set; }
+
     public string LastEditApp { get; private set; } = string.Empty;
+
     public string LastEditMachineName { get; private set; } = string.Empty;
+
     public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
+
     public string LastEditUser { get; private set; } = string.Empty;
+
     public bool LoadFailed { get; private set; } = false;
+
     public bool SaveRequired { get; set; } = false;
 
     #endregion
@@ -134,7 +146,7 @@ public class Chunk : IHasKeyName {
         var c = ChunkFileName;
 
         if (!FileExists(c)) {
-            _bytes.Clear();
+            InitByteList();
             return;
         }
 
@@ -321,9 +333,16 @@ public class Chunk : IHasKeyName {
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
     }
 
-    public void SaveToByteList(List<RowItem> thisRow) {
-        if (LoadFailed) { return; }
-        foreach (RowItem rowItem in thisRow) { SaveToByteList(rowItem); }
+    /// <summary>
+    /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgeführt wurde
+    /// </summary>
+    public void WaitInitialDone() {
+        var t = Stopwatch.StartNew();
+
+        while (_lastcheck.Year < 2000) {
+            Thread.Sleep(1);
+            if (t.ElapsedMilliseconds > 1200000) { return; }
+        }
     }
 
     internal bool Delete() {

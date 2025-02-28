@@ -189,7 +189,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (db.Column.SplitColumn is { } spc) {
             if (InitValue(spc, true, filter) is { } i) {
-                var (_, ok) = db.BeSureRowIsLoaded(i, DatabaseDataType.UTF8Value_withoutSizeData, false, null);
+                var (_, ok) = db.BeSureRowIsLoaded(i, null);
                 if (!ok) { return []; }
             }
         }

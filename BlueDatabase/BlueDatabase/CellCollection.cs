@@ -171,7 +171,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.SplitColumn is { } spc) {
-
                 if (filter is not { }) {
                     return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
                 }
@@ -233,6 +232,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 // und auch diese abgefragt werden
                 value = row.ReplaceVariables(value, true, varcol);
             }
+
+            if (value != c.AutoCorrect(value, true)) { return (null, "Wert kann nicht gesetzt werden."); }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }

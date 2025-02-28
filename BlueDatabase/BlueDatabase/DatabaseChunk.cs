@@ -308,12 +308,12 @@ public class DatabaseChunk : Database {
     /// <param name="chunkValue"></param>
     /// <param name="important">Steuert, ob es dringend nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public override (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, DatabaseDataType type, bool important, NeedPassword? needPassword) {
-        var chunkId = GetChunkId(this, type, chunkValue);
+    public override (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) {
+        var chunkId = GetChunkId(this, DatabaseDataType.UTF8Value_withoutSizeData, chunkValue);
 
         if (string.IsNullOrEmpty(chunkId)) { return (false, false); }
 
-        return LoadChunkWithChunkId(chunkId, important, needPassword, false);
+        return LoadChunkWithChunkId(chunkId, false, needPassword, false);
     }
 
     /// <summary>
@@ -329,6 +329,7 @@ public class DatabaseChunk : Database {
         if (string.IsNullOrEmpty(Filename)) { return (true, true); } // Temporäre Datenbanken
 
         if (_chunks.TryGetValue(chunkId.ToLower(), out var chk)) {
+            chk.WaitInitialDone();
             if (chk.LoadFailed) { return (false, false); }
             if (!chk.NeedsReload(important)) { return (false, true); }
         }

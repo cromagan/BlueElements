@@ -114,24 +114,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? this[string primärSchlüssel] {
         get {
             if (Database?.Column.First() is { IsDisposed: false } c) {
-                //foreach(var thisRow in _internal.Values) {
-                //    if(thisRow != null && !thisRow.IsDisposed) {
-                //       var  txt = _database?.Cell.GetStringCore(c, thisRow) ?? string.Empty;
-                //        if (RowItem.CompareValues(txt, primärSchlüssel, FilterType.Istgleich_GroßKleinEgal)) {  return thisRow}
-
-                //    }
-
-                //}
-
-                //var result = _internal.Values.AsParallel()
-                //    .Where(thisRow => thisRow != null && !thisRow.IsDisposed)
-                //    .Select(thisRow => new {
-                //        Row = thisRow,
-                //        Text = _database?.Cell.GetStringCore(c, thisRow) ?? string.Empty
-                //    })
-                //    .FirstOrDefault(x => RowItem.CompareValues(x.Text, primärSchlüssel, FilterType.Istgleich_GroßKleinEgal)).Row;
-
-                //return result;
+                if (Database.Column.SplitColumn == c) {
+                    var (_, ok) = Database.BeSureRowIsLoaded(primärSchlüssel, null);
+                    if (!ok) { return null; }
+                }
 
                 var parallelQuery = _internal.Values.AsParallel()
                                     .Where(thisRow => thisRow != null)
@@ -145,11 +131,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public RowItem? this[params FilterItem[] filter] {
         get {
-            var parallelQuery = _internal.Values.AsParallel()
-                                                .Where(thisRow => thisRow != null)
-                                                .FirstOrDefault(thisRow => thisRow.MatchesTo(filter));
+            var f = FilterCollection.CalculateFilteredRows(Database, filter);
 
-            return parallelQuery;
+            //var parallelQuery = _internal.Values.AsParallel()
+            //                                    .Where(thisRow => thisRow != null)
+            //                                    .FirstOrDefault(thisRow => thisRow.MatchesTo(filter));
+
+            //return parallelQuery;
+            if (f.Count == 0) { return null; }
+            return f[0];
         }
     }
 
@@ -513,7 +503,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
-            var scx = rows[0].ExecuteScript(eventname, scriptname, true, 0, null, true, false);
+            var scx = rows[0].ExecuteScript(eventname, scriptname, true, 0, null, true, true);
 
             if (!scx.AllOk) {
                 var w = rows[0].CellFirstString();
@@ -551,7 +541,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Database? db2 = null;
 
         foreach (var thisfi in filter) {
-            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbanke eines Filters nicht angegeben", true); }
+            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbank eines Filters nicht angegeben", true); }
             db2 ??= db1;
 
             if (thisfi.Column?.Database != db2) { return (null, "Datenbanken der Spalten im Filter unterschiedlich", true); }

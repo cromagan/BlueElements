@@ -54,6 +54,8 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     private bool didMessage = false;
 
+    private bool loaded = false;
+
     #endregion
 
     #region Constructors
@@ -235,8 +237,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         return f;
     }
 
-
-
     public void UpdateValues(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, Database? database = null) {
         if (_item == null) {
             capFehler.Text = string.Empty;
@@ -244,7 +244,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         }
 
         lstEventScripts.Remove(_item.KeyName);
-
 
         //DatabaseScriptDescription? newItem = null;
         //if (lstEventScripts.Checked.Count == 1 &&
@@ -255,8 +254,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         //}
 
         //Item = newItem;
-
-
 
         _item = new DatabaseScriptDescription(adminInfo ?? _item.AdminInfo,
                                              image ?? _item.Image,
@@ -269,7 +266,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                                              needRow ?? _item.NeedRow);
 
         AddTolist(_item);
-
 
         if (_item.IsOk()) {
             capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
@@ -303,14 +299,15 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
         Database.EventScriptEdited = new(t2);
 
-
-
-
         #endregion
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
+
+        if (Database is { } db && !db.IsEventScriptCheckeIn()) {
+            MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok");
+        }
 
         Item = null; // erst das Item!
         Database = null;
@@ -330,6 +327,30 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private void _database_Disposing(object sender, System.EventArgs e) {
         Database = null;
         Close();
+    }
+
+    private void AddTolist(DatabaseScriptDescription? thisSet) {
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+
+        if (thisSet != null) {
+            var cap = "Sonstige";
+
+            if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
+
+            var it = ItemOf(thisSet);
+            it.UserDefCompareKey = cap + SecondSortChar;
+
+            lstEventScripts.ItemAdd(it);
+
+            if (lstEventScripts[cap] == null) {
+                lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
+            }
+
+            if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
+                didMessage = true;
+                EnableScript();
+            }
+        }
     }
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
@@ -364,8 +385,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
-
-    bool loaded = false;
 
     private void btnTest_Click(object sender, System.EventArgs e) {
         if (!loaded && _database != null && _database.Row.Count == 0) {
@@ -529,30 +548,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         foreach (var thisSet in Database.EventScriptEdited) {
             AddTolist(thisSet);
-        }
-    }
-
-    private void AddTolist(DatabaseScriptDescription? thisSet) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-
-        if (thisSet != null) {
-            var cap = "Sonstige";
-
-            if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
-
-            var it = ItemOf(thisSet);
-            it.UserDefCompareKey = cap + SecondSortChar;
-
-            lstEventScripts.ItemAdd(it);
-
-            if (lstEventScripts[cap] == null) {
-                lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
-            }
-
-            if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
-                didMessage = true;
-                EnableScript();
-            }
         }
     }
 

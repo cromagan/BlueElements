@@ -1776,7 +1776,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                             switch (c.Function) {
                                 case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
 
-                                    var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, false);
+                                    var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, true);
                                     if (lcolumn != null) { QuickInfo = QuickInfoText(lcolumn, c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
                                     if (!string.IsNullOrEmpty(info) && db.IsAdministrator()) {
