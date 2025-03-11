@@ -1424,7 +1424,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         }
                     }
 
-                    ScriptNeedFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
+                    if (produktivphase && !ignoreError) {
+                        ScriptNeedFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
+                    }
                 }
             }
 

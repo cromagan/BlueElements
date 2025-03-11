@@ -541,7 +541,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             return;
         }
 
-        var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column);
+        var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();
 
         OnChanging();
         foreach (var thisItem in existingColumnFilter) {

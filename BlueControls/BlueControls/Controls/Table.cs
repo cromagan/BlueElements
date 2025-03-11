@@ -3341,6 +3341,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (db.Column.Count == 0) { return false; }
         if (CurrentArrangement?[fc] is not { } fcv) { return false; }
 
+        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return false; }
+
         if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
 
         return string.IsNullOrEmpty(EditableErrorReason(fcv, null, EditableErrorReasonType.EditNormaly, true, true, false, Filter.ToArray()));

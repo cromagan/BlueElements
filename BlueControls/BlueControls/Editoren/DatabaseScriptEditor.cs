@@ -305,8 +305,14 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
 
-        if (Database is { } db && !db.IsEventScriptCheckeIn()) {
-            MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok");
+        if (Database is { } db) {
+            if (!db.IsEventScriptCheckeIn()) {
+                MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok");
+            }
+
+            if (!string.IsNullOrEmpty(db.ScriptNeedFix)) {
+                MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok");
+            }
         }
 
         Item = null; // erst das Item!
