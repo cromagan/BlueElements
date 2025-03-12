@@ -402,25 +402,35 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     }
 
     internal int WordEnd(int pos) {
-        if (Count == 0) { return -1; }
-        if (pos < 0 || pos >= Count) { return -1; }
-        if (this[pos].IsWordSeperator()) { return -1; }
-        do {
-            pos++;
-            if (pos >= Count) { return Count; }
-            if (this[pos].IsWordSeperator()) { return pos; }
-        } while (true);
+        // Frühe Validierung und Abbruch
+        if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeperator()) {
+            return -1;
+        }
+
+        // Direkte Suche ohne while-Schleife
+        while (++pos < Count) {
+            if (this[pos].IsWordSeperator()) {
+                return pos;
+            }
+        }
+
+        return Count;
     }
 
     internal int WordStart(int pos) {
-        if (Count == 0) { return -1; }
-        if (pos < 0 || pos >= Count) { return -1; }
-        if (this[pos].IsWordSeperator()) { return -1; }
-        do {
-            pos--;
-            if (pos < 0) { return 0; }
-            if (this[pos].IsWordSeperator()) { return pos + 1; }
-        } while (true);
+        // Frühe Validierung und Abbruch
+        if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeperator()) {
+            return -1;
+        }
+
+        // Direkte Suche ohne while-Schleife
+        while (--pos >= 0) {
+            if (this[pos].IsWordSeperator()) {
+                return pos + 1;
+            }
+        }
+
+        return 0;
     }
 
     private int AddSpecialEntities(string htmltext, int position, PadStyles stil, BlueFont font) {

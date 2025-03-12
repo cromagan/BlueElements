@@ -95,7 +95,7 @@ public abstract class Method : IReadableTextWithKey {
 
     public abstract string Syntax { get; }
 
-    public List<string> Verwendung { get; } = [];
+    public List<string> UsesInDB { get; } = [];
 
     #endregion
 
@@ -448,11 +448,11 @@ public abstract class Method : IReadableTextWithKey {
         //    co += "Diese Methode kann auch im Formular durch einen Knopfdruck ausgelöst werden.\r\n";
         //}
 
-        if (Verwendung.Count > 0) {
+        if (UsesInDB.Count > 0) {
             co += "\r\n";
-            co += "Aktuelle Verwendung in Skripten:\r\n";
-            co += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n";
-            co += Verwendung.JoinWithCr();
+            co += "Aktuelle Verwendung in DATENBANK-Skripten:\r\n";
+            co += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n";
+            co += UsesInDB.JoinWithCr();
         }
 
         return co;
@@ -470,7 +470,6 @@ public abstract class Method : IReadableTextWithKey {
         var s = varCol.Get("notsuccessfulreason");
 
         if (s is VariableString vs) { vs.ValueString = reason; }
-
     }
 
     private static List<string>? SplitAttributeToString(string attributtext) {

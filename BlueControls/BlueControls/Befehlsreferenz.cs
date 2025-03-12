@@ -18,7 +18,9 @@
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
+using BlueDatabase;
 using BlueScript.Methods;
+using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 #nullable enable
@@ -40,9 +42,24 @@ public partial class Befehlsreferenz : Form {
 
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
+    private void GetUses(Method thisc, int max) {
+        if (thisc.UsesInDB.Count >= max) { return; }
+
+        foreach (var thisDb in Database.AllFiles) {
+            if (!thisDb.IsDisposed && !string.IsNullOrEmpty(thisDb.Filename)) {
+                if (thisDb.EventScript.ToString(false).ContainsWord(thisc.KeyName, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
+                    thisc.UsesInDB.AddIfNotExists("Datenbank: " + thisDb.Caption);
+                    if (thisc.UsesInDB.Count >= max) { return; }
+                }
+            }
+        }
+    }
+
     private void lstCommands_ItemClicked(object sender, AbstractListItemEventArgs e) {
         var co = string.Empty;
         if (e.Item is ReadableListItem { Item: Method thisc }) {
+            GetUses(thisc, 5);
+
             co += thisc.HintText();
         }
         txbComms.Text = co;

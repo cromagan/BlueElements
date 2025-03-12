@@ -51,7 +51,7 @@ public static partial class Extensions {
             position++;
             if (position >= input.Length) { return l; }
 
-            if (!input[position].IsWordSeperator()) { continue; }
+            if (!WordSeparators.Contains(input[position])) { continue; }
 
             if (position > lastSeperator + 1) {
                 l.Add(input.Substring(lastSeperator + 1, position - lastSeperator - 1));
@@ -393,26 +393,49 @@ public static partial class Extensions {
     }
 
     public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
-        if (options == RegexOptions.IgnoreCase) {
-            value = value.ToUpperInvariant();
-            input = " " + input.ToUpperInvariant() + " ";
-        } else {
-            input = " " + input + " ";
+        if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(value)) { return -1; }
+
+        // Unicode-Wortgrenzen definieren: Buchstaben und Zahlen gelten als Wortzeichen
+        // \p{L} - alle Buchstaben (Letter)
+        // \p{N} - alle Ziffern (Number)
+        // \p{M} - alle Markierungen/Akzente (Mark)
+
+        string pattern = $@"(?<![\p{{L}}\p{{N}}\p{{M}}]){Regex.Escape(value)}(?![\p{{L}}\p{{N}}\p{{M}}])";
+
+        // IgnoreCase-Option, falls benötigt
+        RegexOptions actualOptions = options;
+        if ((options & RegexOptions.IgnoreCase) != 0) {
+            // CultureInvariant für bessere Handhabung internationaler Zeichen
+            actualOptions |= RegexOptions.CultureInvariant;
         }
 
-        startIndex++;
-        while (true) {
-            if (startIndex > input.Length - 1) { return -1; }
-            startIndex = input.IndexOf(value, startIndex, StringComparison.Ordinal);
-            if (startIndex < 0) { return -1; }
-            if (startIndex > 0 && startIndex < input.Length - value.Length) {
-                if (input[startIndex - 1].IsWordSeperator() && input[startIndex + value.Length].IsWordSeperator()) {
-                    return startIndex - 1; // -1, weil ein Leereichen hinzugefügt wurde.
-                }
-                startIndex += value.Length;
-            }
-        }
+        var regex = new Regex(pattern, actualOptions);
+        var match = regex.Match(input, startIndex);
+
+        return match.Success ? match.Index : -1;
     }
+
+    //public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
+    //    if (options == RegexOptions.IgnoreCase) {
+    //        value = value.ToUpperInvariant();
+    //        input = " " + input.ToUpperInvariant() + " ";
+    //    } else {
+    //        input = " " + input + " ";
+    //    }
+
+    //    startIndex++;
+    //    while (true) {
+    //        if (startIndex > input.Length - 1) { return -1; }
+    //        startIndex = input.IndexOf(value, startIndex, StringComparison.Ordinal);
+    //        if (startIndex < 0) { return -1; }
+    //        if (startIndex > 0 && startIndex < input.Length - value.Length) {
+    //            if (input[startIndex - 1].IsWordSeparator() && input[startIndex + value.Length].IsWordSeparator()) {
+    //                return startIndex - 1; // -1, weil ein Leereichen hinzugefügt wurde.
+    //            }
+    //            startIndex += value.Length;
+    //        }
+    //    }
+    //}
 
     public static string Insert(this string tXt, string insertTxt, string afterTxt, string whenNotContais) {
         if (string.IsNullOrEmpty(afterTxt)) { return tXt; }
@@ -444,23 +467,6 @@ public static partial class Extensions {
     public static bool IsLong(this string? txt) => txt is not null && long.TryParse(txt, out _);
 
     public static bool IsNumeral(this string? txt) => txt is not null && (txt.IsLong() || txt.IsDouble());
-
-    // public static List<byte> ToByteList(this string TXT) {
-    //    var x = new List<byte>();
-    //    x.AddRange(Encoding.ASCII.GetBytes(TXT));
-    //    return x;
-    // }
-    public static bool IsPossibleLineBreak(this char value) {
-        const string tr = " ?!%/\\}])-.,;_°~€|\r\n\t";
-        // Kein Doppelpunkt, weil auch 3:50 Uhr möglich ist
-        return tr.Contains(value.ToString());
-    }
-
-    public static bool IsWordSeperator(this char value) {
-        const string tr = "~|=<>+`´\r\n\t";
-        if (value == '_') { return false; }
-        return char.IsPunctuation(value) || char.IsSeparator(value) || tr.Contains(value.ToString());
-    }
 
     public static string Left(this string value, int length) {
         if (string.IsNullOrEmpty(value) || length <= 0) {

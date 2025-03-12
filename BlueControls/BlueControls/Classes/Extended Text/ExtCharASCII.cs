@@ -76,17 +76,17 @@ public class ExtCharAscii : ExtChar {
         //}
     }
 
-    public override string HtmlText() => Convert.ToChar(_char).ToString().CreateHtmlCodes(false);
+    public override string HtmlText() => _char.ToString().CreateHtmlCodes(false);
 
     public override bool IsLineBreak() => (int)_char is 11 or 13;
 
-    public override bool IsPossibleLineBreak() => _char.IsPossibleLineBreak();
+    public override bool IsPossibleLineBreak() => Constants.PossibleLineBreaks.Contains(_char);
 
     public override bool IsSpace() => (int)_char is 32 or 0 or 9;
 
-    public override bool IsWordSeperator() => _char.IsWordSeperator();
+    public override bool IsWordSeperator() => Constants.WordSeparators.Contains(_char);
 
-    public override string PlainText() => Convert.ToChar(_char).ToString();
+    public override string PlainText() => _char.ToString();
 
     protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
 

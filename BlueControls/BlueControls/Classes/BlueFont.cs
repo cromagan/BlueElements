@@ -195,7 +195,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             pos++;
             var toTEst = rest.Substring(0, pos);
             var s = font.MeasureString(toTEst);
-            if (pos < rest.Length && Convert.ToChar(rest.Substring(pos, 1)).IsPossibleLineBreak()) { foundCut = pos; }
+            if (pos < rest.Length && PossibleLineBreaks.Contains(rest[pos])) { foundCut = pos; }
             if (s.Width > maxWidth || pos == rest.Length) {
                 if (pos == rest.Length) {
                     broken.Add(rest);
