@@ -75,7 +75,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdditionalScriptMethods\Method_AddRowsUnique.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_AddRows.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallDatabase.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SumFilter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
@@ -88,7 +88,6 @@
     <Compile Include="AdditionalScriptMethods\Method_ImportLinked.cs" />
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterAllValues.cs" />
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterFirstValue.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowInvalidate.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowDelete.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />
@@ -101,9 +100,9 @@
     <Compile Include="AdditionalScriptMethods\Method_ImportCSV.cs" />
     <Compile Include="AdditionalScriptMethods\Method_IsDropDownItem.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowCount.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_UniqueRowID.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_UniqueRowKey.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowIsNull.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_RowUnique.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
     <Compile Include="AdditionalScriptMethods\Method_MatchColumnFormat.cs" />
     <Compile Include="AdditionalScriptMethods\Method_LookupFilter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Lookup.cs" />
@@ -156,6 +155,7 @@
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterItem.cs" />
     <Compile Include="Interfaces\IUseableForButton.cs" />
+    <Compile Include="InvalidatedRowsManager.cs" />
     <Compile Include="LanguageTool.cs" />
     <Compile Include="RowCollection.cs" />
     <Compile Include="RowItem.cs" />

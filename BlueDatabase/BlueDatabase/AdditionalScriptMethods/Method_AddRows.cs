@@ -29,12 +29,12 @@ using BlueScript.Variables;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_AddRowsUnique : Method_Database {
+public class Method_AddRows : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, ListStringVar, FilterVar];
-    public override string Command => "addrowsunique";
+    public override List<List<string>> Args => [StringVal, FloatVal, ListStringVar, FilterVar];
+    public override string Command => "addrows";
     public override List<string> Constants => [];
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt mehrere neue Zeilen.\r\n" +
@@ -42,7 +42,8 @@ public class Method_AddRowsUnique : Method_Database {
                                           "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5).\r\n" +
                                           "Leere KeyValues werden übersprungen.\r\n" +
                                           "Die Werte der Filter werden zusätzlich gesetzt.\r\n" +
-                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
+                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen\r\n" +
+        "Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
@@ -53,7 +54,7 @@ public class Method_AddRowsUnique : Method_Database {
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRowsUnique(database, keyvalues, filter, ...);";
+    public override string Syntax => "AddRows(database, AgeInDays keyvalues, filter, ...);";
 
     #endregion
 
@@ -70,7 +71,7 @@ public class Method_AddRowsUnique : Method_Database {
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol, "Datenbanksperre: " + m); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
 
-        var keys = attvar.ValueListStringGet(1);
+        var keys = attvar.ValueListStringGet(2);
         keys = keys.SortedDistinctList();
 
         StackTrace stackTrace = new();
@@ -84,14 +85,17 @@ public class Method_AddRowsUnique : Method_Database {
 
         if (c == null) { return new DoItFeedback(ld, "Erste Spalte nicht vorhanden"); }
 
+        var d = attvar.ValueNumGet(1);
+
+
         foreach (var thisKey in keys) {
 
             #region  Filter ermitteln (allfi)
 
-            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, mydb, scp.ScriptName, false);
+            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, mydb, scp.ScriptName, false);
             if (!string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
-            allFi ??= new FilterCollection(db, "AddRowsUnique");
+            allFi ??= new FilterCollection(db, "AddRows");
 
             #endregion
 
@@ -102,7 +106,7 @@ public class Method_AddRowsUnique : Method_Database {
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
-            var fb = Method_RowUnique.UniqueRow(ld, allFi, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
+            var fb = Method_Row.UniqueRow(varCol, ld, allFi, d, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
             allFi.Dispose();
             if (!fb.AllOk) { return fb; }
         }

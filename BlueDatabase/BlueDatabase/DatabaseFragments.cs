@@ -446,7 +446,7 @@ public class DatabaseFragments : Database {
         try {
             _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), Encoding.UTF8);
         } catch {
-            Generic.Pause(3, false);
+            Pause(3, false);
             Develop.CheckStackForOverflow();
             StartWriter();
             return;

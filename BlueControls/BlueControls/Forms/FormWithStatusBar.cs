@@ -117,7 +117,8 @@ public partial class FormWithStatusBar : Form {
                 Develop.DebugPrint(FehlerArt.Warnung, message);
 
                 if (type == FehlerArt.Fehler) {
-                    MessageBox.Show(message, imagecode, "Ok");
+                    Notification.Show(message, imagecode);
+                    //MessageBox.Show(message, imagecode, "Ok");
                     return true;
                 }
             }

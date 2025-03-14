@@ -31,16 +31,16 @@ public class Method_UniqueRowId : Method {
     #region Properties
 
     public override List<List<string>> Args => [];
-    public override string Command => "uniquerowid";
+    public override string Command => "uniquerowkey";
     public override List<string> Constants => [];
-    public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
+    public override string Description => "Gibt einen systemweit einzigartigen Zeilenschlüssel aller geladenen Datenbanken aus.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "UniqueRowID()";
+    public override string Syntax => "UniqueRowKey()";
 
     #endregion
 

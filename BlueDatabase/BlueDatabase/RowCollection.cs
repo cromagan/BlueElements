@@ -38,9 +38,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Fields
 
-    public static readonly List<RowItem> DidRows = [];
-    public static readonly List<RowItem> FailedRows = [];
-    public static readonly List<RowItem> InvalidatedRows = [];
+    public static readonly ConcurrentDictionary<RowItem, byte> FailedRows = [];
+    public static readonly InvalidatedRowsManager InvalidatedRowsManager = new InvalidatedRowsManager();
     public static int WaitDelay;
     private static readonly object Executingchangedrowslock = new();
     private static readonly List<BackgroundWorker> Pendingworker = [];
@@ -165,51 +164,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         l.RunWorkerAsync(row);
 
         db.OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString());
-    }
-
-    public static void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed) {
-        var t = Stopwatch.StartNew();
-
-        do {
-            if (DidRows.Count > 0) { return; }
-            if (InvalidatedRows.Count == 0) { return; }
-            if (t.Elapsed.TotalMinutes > 5) { return; }
-            Generic.Pause(1, true);
-        } while (Database.ExecutingScriptAnyDatabase.Count > 0);
-
-        var ra = 0;
-        var n = 0;
-
-        //DidRows.Clear();
-
-        while (InvalidatedRows.Count > 0) {
-            if (InvalidatedRows.Count > ra) {
-                masterRow?.OnDropMessage(FehlerArt.Info, $"{InvalidatedRows.Count - ra} neue Einträge zum Abarbeiten ({InvalidatedRows.Count + DidRows.Count} insgesamt)");
-                ra = InvalidatedRows.Count;
-            }
-
-            n++;
-            RowItem? r = null;
-
-            try {
-                r = InvalidatedRows[0];
-                InvalidatedRows.RemoveAt(0);
-            } catch { }
-
-            if (r is { IsDisposed: false, Database.IsDisposed: false } && !DidRows.Contains(r)) {
-                DidRows.Add(r);
-                if (r.NeedsRowUpdate(false, true)) {
-                    if (masterRow?.Database != null) {
-                        r.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
-                        masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {n} von {InvalidatedRows.Count + DidRows.Count}: Aktualisiere {r.Database.Caption} / {r.CellFirstString()}");
-                    } else {
-                        r.UpdateRow(extendedAllowed, true, "Normales Update");
-                    }
-                }
-            }
-        }
-        DidRows.Clear();
-        masterRow?.OnDropMessage(FehlerArt.Info, "Updates abgearbeitet");
     }
 
     public static void ExecuteValueChangedEvent() {
@@ -623,7 +577,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisRow in db.Row) {
             var dateofmyrow = thisRow.CellGetDateTime(srs);
-            if (dateofmyrow < datefoundmax && !FailedRows.Contains(thisRow)) {
+            if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow)) {
                 datefoundmax = dateofmyrow;
                 foundrow = thisRow;
             }
@@ -841,7 +795,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (reason != Reason.NoUndo_NoInvalidate) {
             OnRowAdded(new RowEventArgs(row));
             if (Database?.Column.SysRowState != null) {
-                InvalidatedRows.AddIfNotExists(row);
+                InvalidatedRowsManager.AddInvalidatedRow(row);
             }
         }
 

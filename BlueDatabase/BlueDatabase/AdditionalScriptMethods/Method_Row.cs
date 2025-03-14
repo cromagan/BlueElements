@@ -17,7 +17,12 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript;
@@ -27,65 +32,141 @@ using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable once UnusedMember.Global
 public class Method_Row : Method_Database, IUseableForButton {
+
+    public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
+
+
 
     #region Properties
 
-    public override List<List<string>> Args => [FilterVar];
+    public override List<List<string>> Args => [FloatVal, FilterVar];
 
     public List<List<string>> ArgsForButton => [];
 
     public List<string> ArgsForButtonDescription => [];
 
-    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
+    public ButtonArgs ClickableWhen => ButtonArgs.Keine_Zeile;
 
     public override string Command => "row";
 
     public override List<string> Constants => [];
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
-                                          "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
-                                          "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
-                                          "Werden mehrere Zeilen gefunden, wird das Programm abgebrochen. Um das zu verhindern, kann RowCount benutzt werden.\r\n" +
-                                          "Alternative: Der Befehl RowUnique kümmert sich darum, das immer eine Zeile zurückgegeben wird.";
+                                              "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
+                                          "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
+                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.\r\n" +
+        "Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.";
 
     public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType => MethodType.Standard;
+    // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
+    public override MethodType MethodType => MethodType.Database | MethodType.ManipulatesUser;
 
-    public override bool MustUseReturnValue => true;
+    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
-    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen - auf jeden Fall!";
+    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen, wenn diese noch nicht vorhanden ist.";
 
     public override string Returns => VariableRowItem.ShortName_Variable;
 
     public override string StartSequence => "(";
-
-    public override string Syntax => "Row(Filter, ...)";
+    public override string Syntax => "Row(AgeInDays, Filter, ...)";
 
     #endregion
 
     #region Methods
 
-    public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
+    public static DoItFeedback UniqueRow(VariableCollection varCol, LogData ld, FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp) {
+        RowItem? newrow;
+        string message;
 
+        if (invalidateinDays < 0.1) { return new DoItFeedback(ld, "Intervall zu kurz."); }
+
+        if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Filter"); }
+        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
+
+
+        foreach (var thisFi in fic) {
+            if (thisFi.Column is not { IsDisposed: false } c) {
+                return new DoItFeedback(ld, "Fehler im Filter, Spalte ungültig");
+            }
+
+            if (thisFi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) {
+                return new DoItFeedback(ld, "Fehler im Filter, nur 'is' ist erlaubt");
+            }
+
+            if (thisFi.SearchValue.Count != 1) {
+                return new DoItFeedback(ld, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
+            }
+
+            if (FilterCollection.InitValue(c, true, fic.ToArray()) is not { } l) {
+                return new DoItFeedback(ld, "Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.");
+            }
+
+            if (thisFi.SearchValue[0] != l) {
+                return new DoItFeedback(ld, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
+            }
+        }
+
+
+
+        var t = Stopwatch.StartNew();
+
+        do {
+            (newrow, message, var stoptrying) = RowCollection.UniqueRow(fic, coment);
+
+            if (newrow != null && string.IsNullOrEmpty(message)) { break; }
+            if (stoptrying) { break; }
+            if (t.Elapsed.TotalMinutes > 5) { break; }
+            if (t.Elapsed.TotalSeconds > 10 && !scp.ProduktivPhase) { break; }
+
+            Generic.Pause(5, false);
+        } while (true);
+
+        if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(ld, message); }
+
+        if (newrow is { } r) {
+            RowCollection.InvalidatedRowsManager.AddInvalidatedRow(r);
+            //if (scp.AdditionalInfo is RowItem masterRow && r.Database is { } db) {
+            //    masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Zugehöriger Eintrag: {r.CellFirstString()} ({db.Caption})");
+            //}
+
+
+
+            var v = r.CellGetDateTime(srs);
+            if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
+                if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+                var m = CellCollection.EditableErrorReason(srs, r, EditableErrorReasonType.EditAcut, false, false, true, false, null);
+                if (!string.IsNullOrEmpty(m)) {
+                    SetNotSuccesful(varCol, "Datenbanksperre: " + m);
+                    return RowToObjectFeedback(null);
+                }
+                r.InvalidateRowState(coment);
+            }
+        }
+
+
+
+        return RowToObjectFeedback(newrow);
+    }
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyDatabase(scp), scp.ScriptName, true);
+        var mydb = MyDatabase(scp);
+        if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
+
+        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, mydb, scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
-        var r = allFi.Rows;
+        var d = attvar.ValueNumGet(0);
+
+        var fb = UniqueRow(varCol, ld, allFi, d, $"Script-Befehl: 'Row' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
         allFi.Dispose();
 
-        if (r.Count > 1) { return new DoItFeedback(ld, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
-
-        if (r.Count == 0) { return RowToObjectFeedback(null); }
-
-        return RowToObjectFeedback(r[0]);
+        return fb;
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;

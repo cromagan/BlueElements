@@ -267,7 +267,7 @@ public class DatabaseChunk : Database {
         //    return IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, EditableErrorReasonType.EditCurrently);
 
         if (Column?.SplitColumn is { }) {
-            var value = DatabaseChunk.GetChunkValue(row);
+            var value = GetChunkValue(row);
             return string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, string.Empty, value, EditableErrorReasonType.EditCurrently));
         }
 

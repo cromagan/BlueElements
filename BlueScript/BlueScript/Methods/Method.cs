@@ -223,6 +223,16 @@ public abstract class Method : IReadableTextWithKey {
         } while (true);
     }
 
+    public static void SetNotSuccesful(VariableCollection varCol, string reason) {
+        var b = varCol.Get("successful");
+
+        if (b is VariableBool vb) { vb.ValueBool = false; }
+
+        var s = varCol.Get("notsuccessfulreason");
+
+        if (s is VariableString vs) { vs.ValueString = reason; }
+    }
+
     public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, int lastArgMinCount, LogData? ld, ScriptProperties? scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
@@ -461,16 +471,6 @@ public abstract class Method : IReadableTextWithKey {
     public string ReadableText() => Syntax;
 
     public QuickImage? SymbolForReadableText() => null;
-
-    protected void SetNotSuccesful(VariableCollection varCol, string reason) {
-        var b = varCol.Get("successful");
-
-        if (b is VariableBool vb) { vb.ValueBool = false; }
-
-        var s = varCol.Get("notsuccessfulreason");
-
-        if (s is VariableString vs) { vs.ValueString = reason; }
-    }
 
     private static List<string>? SplitAttributeToString(string attributtext) {
         if (string.IsNullOrEmpty(attributtext)) { return null; }

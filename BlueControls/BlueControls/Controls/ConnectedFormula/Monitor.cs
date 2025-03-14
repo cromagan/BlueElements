@@ -108,6 +108,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
             lstDone.ItemAdd(ItemOf(e, _n.ToStringInt7()));
         }
 
+        lstDone.Refresh();
         //capInfo.Text = e.Message;
     }
 

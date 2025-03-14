@@ -330,7 +330,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
-        if (RowCollection.FailedRows.Contains(this)) {
+        if (RowCollection.FailedRows.ContainsKey(this)) {
             LastCheckedMessage = "Das Skript konnte die Zeile nicht durchrechnen.";
             return;
         }
@@ -491,7 +491,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd) {
             CellSet(scd, DateTime.UtcNow, comment);
         }
-        RowCollection.InvalidatedRows.AddIfNotExists(this);
+        RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
     }
 
     public bool IsNullOrEmpty() {
@@ -561,7 +561,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
         if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 
-        if (RowCollection.FailedRows.Contains(this)) { return false; }
+        if (RowCollection.FailedRows.ContainsKey(this)) { return false; }
 
         if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
 
@@ -583,11 +583,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!extendedAllowed && string.IsNullOrEmpty(CellGetString(srs))) { return false; }
 
         if (CellGetDateTime(srs) >= Database.EventScriptVersion) { return false; }
-        if (!ignoreFailed && RowCollection.FailedRows.Contains(this)) { return false; }
-
+        if (!ignoreFailed && RowCollection.FailedRows.ContainsKey(this)) { return false; }
 
         return db.AmITemporaryMaster(5, 55, this);
-
     }
 
     /// <summary>
@@ -739,7 +737,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             OnDropMessage(FehlerArt.Info, $"Aktualisiere ({reason})");
 
             if (extendedAllowed) {
-                RowCollection.InvalidatedRows.Remove(this);
+                RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
             }
 
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
@@ -748,7 +746,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
                 LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verständigen." + ok.NotSuccessfulReason;
 
-                RowCollection.FailedRows.AddIfNotExists(this);
+                RowCollection.FailedRows.TryAdd(this, 0);
                 return ok;
             }
 
@@ -765,7 +763,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
 
-            RowCollection.FailedRows.Remove(this);
+            RowCollection.FailedRows.TryRemove(this, out _);
 
             InvalidateCheckData();
             CheckRowDataIfNeeded();
@@ -877,7 +875,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 
         if (db.Column.SysRowState is { IsDisposed: false } srs && srs != column) {
-            RowCollection.FailedRows.Remove(this);
+            RowCollection.FailedRows.TryRemove(this, out _);
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
                 //if (reason != Reason.UpdateChanges)

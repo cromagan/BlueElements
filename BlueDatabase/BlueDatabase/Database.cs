@@ -1494,7 +1494,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             ExecutingScriptAnyDatabase.Remove(scriptId);
 
             if (produktivphase && ExecutingScript.Count == 0 && ExecutingScriptAnyDatabase.Count == 0) {
-                RowCollection.DoAllInvalidatedRows(row, extended);
+                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, extended);
             }
 
             return scf;

@@ -305,10 +305,10 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         var f = ufb.DoIt(vars, args, fis, rn, ai);
 
-        if (RowCollection.DidRows.Count > 0) {
+        if (RowCollection.InvalidatedRowsManager.IsProcessing) {
             f = "Ein anderer Prozess ist noch aktiv.";
         } else {
-            RowCollection.DoAllInvalidatedRows(row, true);
+            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true);
         }
 
         if (!string.IsNullOrEmpty(f)) {

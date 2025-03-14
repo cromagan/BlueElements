@@ -2595,7 +2595,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     if (rowScript) {
                         if (cellInThisDatabaseRow.NeedsRowUpdate(true, true)) {
                             gr.FillRectangle(BrushRedTransparent, cellrectangle);
-                            if (RowCollection.FailedRows.Contains(cellInThisDatabaseRow)) {
+                            if (RowCollection.FailedRows.ContainsKey(cellInThisDatabaseRow)) {
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
