@@ -83,7 +83,7 @@ public class Method_Row : Method_Database, IUseableForButton {
         RowItem? newrow;
         string message;
 
-        if (invalidateinDays < 0.1) { return new DoItFeedback(ld, "Intervall zu kurz."); }
+        if (invalidateinDays < 0.01) { return new DoItFeedback(ld, "Intervall zu kurz."); }
 
         if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Filter"); }
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
