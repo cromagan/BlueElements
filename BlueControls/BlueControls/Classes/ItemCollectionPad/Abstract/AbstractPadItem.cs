@@ -258,7 +258,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             return SaveOrder.CompareTo(v.SaveOrder);
         }
 
-        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
         return 0;
     }
 
@@ -614,12 +614,12 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         _jointReferenceSecond ??= secondPoint;
 
         if (firstPoint != _jointReferenceFirst) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Refernz-Punkt falsch!");
+            Develop.DebugPrint(ErrorType.Error, "Refernz-Punkt falsch!");
             return;
         }
 
         if (_jointReferenceSecond != secondPoint) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Refernz-Punkt falsch!");
+            Develop.DebugPrint(ErrorType.Error, "Refernz-Punkt falsch!");
             return;
         }
 

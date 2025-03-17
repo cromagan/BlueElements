@@ -529,11 +529,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public void Add(AbstractPadItem? item) {
-        if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
-        if (_internal.Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
-        if (this[item.KeyName] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.KeyName); return; }
+        if (item == null) { Develop.DebugPrint(ErrorType.Error, "Item ist null"); return; }
+        if (_internal.Contains(item)) { Develop.DebugPrint(ErrorType.Error, "Bereits vorhanden!"); return; }
+        if (this[item.KeyName] != null) { Develop.DebugPrint(ErrorType.Warning, "Name bereits vorhanden: " + item.KeyName); return; }
 
-        if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
+        if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(ErrorType.Error, "Item ohne Namen!"); return; }
 
         _internal.Add(item);
         item.AddedToCollection(this);
@@ -1040,7 +1040,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     internal AbstractPadItem? Next(AbstractPadItem bpi) {
         var itemCount = _internal.IndexOf(bpi);
-        if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
+        if (itemCount < 0) { Develop.DebugPrint(ErrorType.Error, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount++;
             if (itemCount >= _internal.Count) { return null; }
@@ -1050,7 +1050,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     internal AbstractPadItem? Previous(AbstractPadItem bpi) {
         var itemCount = _internal.IndexOf(bpi);
-        if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
+        if (itemCount < 0) { Develop.DebugPrint(ErrorType.Error, "Item im SortDefinition nicht enthalten"); }
         do {
             itemCount--;
             if (itemCount < 0) { return null; }
@@ -1260,7 +1260,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     break;
 
                 default:
-                    Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                    Develop.DebugPrint(ErrorType.Warning, "Tag unbekannt: " + pair.Key);
                     break;
             }
         }
@@ -1310,7 +1310,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     break;
 
                 default:
-                    Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                    Develop.DebugPrint(ErrorType.Warning, "Tag unbekannt: " + pair.Key);
                     break;
             }
         }

@@ -134,7 +134,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
             return string.Compare(CompareKey(), robj.CompareKey(), StringComparison.OrdinalIgnoreCase);
         }
 
-        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
         return 0;
     }
 
@@ -147,7 +147,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
 
     public void GetDataFrom(RowData thisRowData) {
         if (Row != thisRowData.Row || RowChapter != thisRowData.RowChapter) {
-            Develop.DebugPrint(FehlerArt.Warnung, "RowData Kopie fehlgeschlagen!");
+            Develop.DebugPrint(ErrorType.Warning, "RowData Kopie fehlgeschlagen!");
         }
 
         PinStateSortAddition = thisRowData.PinStateSortAddition;

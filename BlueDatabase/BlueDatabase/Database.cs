@@ -137,7 +137,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         TableName = MakeValidTableName(tablename);
 
         if (!IsValidTableName(TableName)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+            Develop.DebugPrint(ErrorType.Error, "Tabellenname ungültig: " + tablename);
         }
 
         Cell = new CellCollection(this);
@@ -754,7 +754,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             db.LoadFromStream(d);
             return db;
         }
-        if (fehlerAusgeben) { Develop.DebugPrint(FehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
+        if (fehlerAusgeben) { Develop.DebugPrint(ErrorType.Error, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
         return null;
     }
 
@@ -955,7 +955,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     value = string.Empty;
                     //width = 0;
                     //height = 0;
-                    Develop.DebugPrint(FehlerArt.Fehler, $"Laderoutine nicht definiert: {bLoaded[pointer]} {filename}");
+                    Develop.DebugPrint(ErrorType.Error, $"Laderoutine nicht definiert: {bLoaded[pointer]} {filename}");
                     break;
                 }
         }
@@ -1016,7 +1016,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var x = 9999;
         do {
             x += 1;
-            if (x > 99999) { Develop.DebugPrint(FehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
+            if (x > 99999) { Develop.DebugPrint(ErrorType.Error, "Unique ID konnte nicht erzeugt werden"); }
 
             var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToStringInt5()).RemoveChars(Char_DateiSonderZeichen + " _.");
             var ok = true;
@@ -1433,7 +1433,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (!scf.AllOk) {
                 ExecutingScript.Remove(scriptId);
                 ExecutingScriptAnyDatabase.Remove(scriptId);
-                OnDropMessage(FehlerArt.Info, "Das Skript '" + script.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
+                OnDropMessage(ErrorType.Info, "Das Skript '" + script.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
                 return scf;
             }
 
@@ -1525,7 +1525,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             scriptname ??= string.Empty;
 
             if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
+                Develop.DebugPrint(ErrorType.Error, "Event und Skript angekommen!");
                 return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
             }
 
@@ -1697,7 +1697,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var f = EditableErrorReason(EditableErrorReasonType.EditNormaly);
 
         if (!string.IsNullOrEmpty(f)) {
-            OnDropMessage(FehlerArt.Warnung, "Abbruch, " + f);
+            OnDropMessage(ErrorType.Warning, "Abbruch, " + f);
             return "Abbruch, " + f;
         }
 
@@ -1724,7 +1724,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         if (zeil.Count == 0) {
-            OnDropMessage(FehlerArt.Warnung, "Abbruch, keine Zeilen zum Importieren erkannt.");
+            OnDropMessage(ErrorType.Warning, "Abbruch, keine Zeilen zum Importieren erkannt.");
             return "Abbruch, keine Zeilen zum Importieren erkannt.";
         }
 
@@ -1739,7 +1739,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             startZ = 1;
             for (var spaltNo = 0; spaltNo < zeil[0].GetUpperBound(0) + 1; spaltNo++) {
                 if (string.IsNullOrEmpty(zeil[0][spaltNo])) {
-                    OnDropMessage(FehlerArt.Warnung, "Abbruch, leerer Spaltenname.");
+                    OnDropMessage(ErrorType.Warning, "Abbruch, leerer Spaltenname.");
                     return "Abbruch,<br>leerer Spaltenname.";
                 }
                 zeil[0][spaltNo] = ColumnItem.MakeValidColumnName(zeil[0][spaltNo]);
@@ -1747,7 +1747,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 var col = Column[zeil[0][spaltNo]];
                 if (col == null) {
                     if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
-                        OnDropMessage(FehlerArt.Warnung, "Abbruch, ungültiger Spaltenname.");
+                        OnDropMessage(ErrorType.Warning, "Abbruch, ungültiger Spaltenname.");
                         return "Abbruch,<br>ungültiger Spaltenname.";
                     }
 
@@ -1759,7 +1759,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
 
                 if (col == null) {
-                    OnDropMessage(FehlerArt.Warnung, "Abbruch, Spaltenfehler.");
+                    OnDropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
                     return "Abbruch,<br>Spaltenfehler.";
                 }
 
@@ -1776,7 +1776,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
 
                 if (newc == null) {
-                    OnDropMessage(FehlerArt.Warnung, "Abbruch, Spaltenfehler.");
+                    OnDropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
                     return "Abbruch, Spaltenfehler.";
                 }
                 columns.Add(newc);
@@ -1815,7 +1815,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (!string.IsNullOrEmpty(cv) && !dictVorhanden.ContainsKey(cv)) {
                     dictVorhanden.Add(cv, thisR);
                 } else {
-                    OnDropMessage(FehlerArt.Warnung, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption + "' sind nicht eindeutig.");
+                    OnDropMessage(ErrorType.Warning, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption + "' sind nicht eindeutig.");
                     return "Abbruch, vorhandene Zeilen sind nicht eindeutig.";
                 }
             }
@@ -1837,7 +1837,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var maxColCount = Math.Min(thisD.Value.GetUpperBound(0) + 1, columns.Count);
 
             if (maxColCount == 0) {
-                OnDropMessage(FehlerArt.Warnung, "Abbruch, Leere Zeile im Import.");
+                OnDropMessage(ErrorType.Warning, "Abbruch, Leere Zeile im Import.");
                 return "Abbruch, Leere Zeile im Import.";
             }
 
@@ -1856,7 +1856,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (row == null) {
-                OnDropMessage(FehlerArt.Warnung, "Abbruch, Import-Fehler.");
+                OnDropMessage(ErrorType.Warning, "Abbruch, Import-Fehler.");
                 return "Abbruch, Import-Fehler.";
             }
 
@@ -1873,13 +1873,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             #region Speichern und Ausgabe
 
             if (DateTime.Now.Subtract(d1).TotalMinutes > 5) {
-                OnDropMessage(FehlerArt.Info, "Import: Zwischenspeichern der Datenbank");
+                OnDropMessage(ErrorType.Info, "Import: Zwischenspeichern der Datenbank");
                 Save();
                 d1 = DateTime.Now;
             }
 
             if (DateTime.Now.Subtract(d2).TotalSeconds > 4.5) {
-                OnDropMessage(FehlerArt.Info, "Import: Zeile " + no + " von " + zeil.Count);
+                OnDropMessage(ErrorType.Info, "Import: Zeile " + no + " von " + zeil.Count);
                 d2 = DateTime.Now;
             }
             Develop.SetUserDidSomething();
@@ -1890,7 +1890,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         #endregion
 
         Save();
-        OnDropMessage(FehlerArt.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
+        OnDropMessage(ErrorType.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
         return string.Empty;
     }
 
@@ -1919,8 +1919,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
+        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
 
         if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
@@ -1928,12 +1928,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!FileExists(fileNameToLoad)) {
             if (createWhenNotExisting) {
                 if (ReadOnly) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Readonly kann keine Datei erzeugen<br>" + fileNameToLoad);
+                    Develop.DebugPrint(ErrorType.Error, "Readonly kann keine Datei erzeugen<br>" + fileNameToLoad);
                     return;
                 }
                 SaveAsAndChangeTo(fileNameToLoad);
             } else {
-                Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
+                Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
                 Freeze("Datei existiert nicht");
                 return;
             }
@@ -2085,7 +2085,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         }
 
                         if (row is not { IsDisposed: false }) {
-                            Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
+                            Develop.DebugPrint(ErrorType.Error, "Zeile hinzufügen Fehler");
                             Freeze("Zeile hinzufügen Fehler");
                             return false;
                         }
@@ -2107,7 +2107,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         }
 
                         if (column is not { IsDisposed: false }) {
-                            Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                            Develop.DebugPrint(ErrorType.Error, "Spalte hinzufügen Fehler");
                             Freeze("Spalte hinzufügen Fehler");
                             return false;
                         }
@@ -2188,7 +2188,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 return true;
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Rechte-Check", ex);
+            Develop.DebugPrint(ErrorType.Warning, "Fehler beim Rechte-Check", ex);
         }
         return false;
     }
@@ -2227,7 +2227,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (!string.IsNullOrEmpty(Filename)) {
             if (!string.Equals(TableName, MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Tabellenname stimmt nicht: " + Filename);
+                Develop.DebugPrint(ErrorType.Warning, "Tabellenname stimmt nicht: " + Filename);
             }
         }
 
@@ -2256,7 +2256,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public void SaveAsAndChangeTo(string newFileName) {
-        if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
+        if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!"); }
         _ = Save(); // Original-Datei speichern, die ist ja dann weg.
         // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
         // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
@@ -2302,12 +2302,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             t += "\r\nRow-Count: " + Row.Count;
             t += "\r\nTable: " + TableName;
         } catch { }
-        Develop.DebugPrint(FehlerArt.Warnung, t);
+        Develop.DebugPrint(ErrorType.Warning, t);
     }
 
     internal virtual string IsValueEditable(DatabaseDataType type, string columnName, string ofValue, EditableErrorReasonType reason) => string.Empty;
 
-    internal void OnDropMessage(FehlerArt type, string message) {
+    internal void OnDropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
@@ -2392,7 +2392,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 // Aus statischer Liste entfernen
                 _ = AllFiles.Remove(this);
             } catch (Exception ex) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Dispose: " + ex.Message);
+                Develop.DebugPrint(ErrorType.Error, "Fehler beim Dispose: " + ex.Message);
             }
 
             IsDisposed = true;
@@ -2492,7 +2492,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (type.IsColumnTag()) {
             if (column is not { IsDisposed: false } || Column.IsDisposed) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
+                Develop.DebugPrint(ErrorType.Warning, "Spalte ist null! " + type);
                 //return ("Wert nicht gesetzt!", null, null);
                 return (string.Empty, null, null);
             }
@@ -2534,7 +2534,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (LoadedVersion == DatabaseVersion) {
                         Freeze("Ladefehler der Datenbank");
                         if (!ReadOnly) {
-                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
+                            Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
                         }
                     }
                     return ("Befehl unbekannt.", null, null);
@@ -2690,7 +2690,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (LoadedVersion == DatabaseVersion) {
                     Freeze("Ladefehler der Datenbank");
                     if (!ReadOnly) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
+                        Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
                     }
                 }
 
@@ -2824,7 +2824,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (thisFile is { IsDisposed: false } db) {
                 if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                     _ = thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
+                    Develop.DebugPrint(ErrorType.Warning, "Doppletes Laden von " + fileName);
                     return false;
                 }
             }
@@ -2909,7 +2909,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             SortParameterChanged = null;
             ViewChanged = null;
         } catch (Exception ex) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Abmelden der Events: " + ex.Message);
+            Develop.DebugPrint(ErrorType.Warning, "Fehler beim Abmelden der Events: " + ex.Message);
         }
     }
 

@@ -355,7 +355,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Initializing = true;
 
         if (Width < 5 || Height < 5) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Width / Height zu klein");
+            Develop.DebugPrint(ErrorType.Warning, "Width / Height zu klein");
             Allinitialized = true;
             Initializing = false;
             return;

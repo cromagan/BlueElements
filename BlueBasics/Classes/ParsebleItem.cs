@@ -43,7 +43,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
                 return ci;
             }
 
-            Develop.DebugPrint(FehlerArt.Fehler, "ClassID nicht gefunden!");
+            Develop.DebugPrint(ErrorType.Error, "ClassID nicht gefunden!");
             return string.Empty;
         }
     }
@@ -90,7 +90,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
         if (types.Count == 0) { return default; }
 
         if (string.IsNullOrEmpty(typname)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Typ unbekannt: " + typname);
+            Develop.DebugPrint(ErrorType.Error, "Typ unbekannt: " + typname);
             return default;
         }
 

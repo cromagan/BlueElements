@@ -186,7 +186,7 @@ public static class AbstractListItemExtension {
                 symbol = QuickImage.Get(ImageCode.Fragezeichen);
                 break;
         }
-        if (string.IsNullOrEmpty(internalName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben:" + command); }
+        if (string.IsNullOrEmpty(internalName)) { Develop.DebugPrint(ErrorType.Error, "Interner Name nicht vergeben:" + command); }
         return ItemOf(readableText, internalName, symbol, enabled);
     }
 
@@ -329,7 +329,7 @@ public static class AbstractListItemExtension {
 
         if (values == null) { return l; }
         if (values.Count > 10000) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Values > 100000");
+            Develop.DebugPrint(ErrorType.Error, "Values > 100000");
             return l;
         }
 
@@ -369,7 +369,7 @@ public static class AbstractListItemExtension {
             return l;
         }
 
-        Develop.DebugPrint(FehlerArt.Fehler, "Typ unbekannt");
+        Develop.DebugPrint(ErrorType.Error, "Typ unbekannt");
         return l;
     }
 

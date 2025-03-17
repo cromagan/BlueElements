@@ -423,7 +423,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
         var cd = cellKey.SplitBy("|");
-        if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(FehlerArt.Fehler, "Falscher CellKey übergeben: " + cellKey); }
+        if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(ErrorType.Error, "Falscher CellKey übergeben: " + cellKey); }
         column = Database?.Column[cd[0]];
         row = Database?.Row.SearchByKey(cd[1]);
     }
@@ -440,18 +440,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         try {
             if (IsDisposed || Database is not { IsDisposed: false }) {
                 Database?.DevelopWarnung("Datenbank ungültig!");
-                Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!");
+                Develop.DebugPrint(ErrorType.Error, "Datenbank ungültig!");
                 return string.Empty;
             }
 
             if (column is not { IsDisposed: false }) {
                 Database?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + Database?.TableName);
+                Develop.DebugPrint(ErrorType.Error, "Spalte ungültig!<br>" + Database?.TableName);
                 return string.Empty;
             }
 
             if (row is not { IsDisposed: false }) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database.TableName);
+                Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Database.TableName);
                 return string.Empty;
             }
 

@@ -115,14 +115,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public ColumnItem(Database database, string name) {
         if (!IsValidColumnName(name)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+            Develop.DebugPrint(ErrorType.Error, "Spaltenname nicht erlaubt!");
         }
 
         Database = database;
 
         var ex = database.Column[name];
         if (ex != null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits");
+            Develop.DebugPrint(ErrorType.Error, "Key existiert bereits");
         }
 
         #region Standard-Werte
@@ -589,12 +589,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (value == _name.ToUpperInvariant()) { return; }
 
             if (!ColumNameAllowed(value)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt: " + _name);
+                Develop.DebugPrint(ErrorType.Warning, "Spaltenname nicht erlaubt: " + _name);
                 return;
             }
 
             if (Database?.Column[value] != null) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
+                Develop.DebugPrint(ErrorType.Warning, "Name existiert bereits!");
                 return;
             }
 
@@ -1039,7 +1039,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 return _captionGroup3;
 
             default:
-                Develop.DebugPrint(FehlerArt.Warnung, "Nummer " + number + " nicht erlaubt.");
+                Develop.DebugPrint(ErrorType.Warning, "Nummer " + number + " nicht erlaubt.");
                 return string.Empty;
         }
     }

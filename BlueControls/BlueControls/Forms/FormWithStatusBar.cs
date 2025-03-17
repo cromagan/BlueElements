@@ -59,7 +59,7 @@ public partial class FormWithStatusBar : Form {
 
     #region Methods
 
-    public static void UpdateStatusBar(FehlerArt type, string text, bool addtime) {
+    public static void UpdateStatusBar(ErrorType type, string text, bool addtime) {
         if (addtime && !string.IsNullOrEmpty(text)) {
             text = DateTime.Now.ToString("HH:mm:ss") + " " + text;
         }
@@ -75,7 +75,7 @@ public partial class FormWithStatusBar : Form {
         } catch { }
     }
 
-    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) {
+    public bool UpdateStatus(ErrorType type, string message, bool didAlreadyMessagebox) {
         try {
             if (IsDisposed) { return false; }
             if (DesignMode) { return false; }
@@ -104,19 +104,19 @@ public partial class FormWithStatusBar : Form {
             message = message.Replace("; ; ", "; ");
             message = message.TrimEnd("; ");
 
-            if (type == FehlerArt.Warnung) { imagecode = ImageCode.Warnung; }
-            if (type == FehlerArt.Fehler) { imagecode = ImageCode.Kritisch; }
+            if (type == ErrorType.Warning) { imagecode = ImageCode.Warnung; }
+            if (type == ErrorType.Error) { imagecode = ImageCode.Kritisch; }
 
-            if (type is FehlerArt.Info or FehlerArt.DevelopInfo || !DropMessages || didAlreadyMessagebox) {
+            if (type is ErrorType.Info || !DropMessages || didAlreadyMessagebox) {
                 capStatusBar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16) + "> " + message;
                 capStatusBar.Refresh();
                 return false;
             }
 
             if (DropMessages) {
-                Develop.DebugPrint(FehlerArt.Warnung, message);
+                Develop.DebugPrint(ErrorType.Warning, message);
 
-                if (type == FehlerArt.Fehler) {
+                if (type == ErrorType.Error) {
                     Notification.Show(message, imagecode);
                     //MessageBox.Show(message, imagecode, "Ok");
                     return true;

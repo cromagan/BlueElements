@@ -310,7 +310,7 @@ public static partial class Extensions {
                 return false;
 
             default:
-                Develop.DebugPrint(FehlerArt.Warnung, "'" + value + "' unbekannt!");
+                Develop.DebugPrint(ErrorType.Warning, "'" + value + "' unbekannt!");
                 return false;
         }
     }
@@ -329,13 +329,13 @@ public static partial class Extensions {
         var noarunde = true;
         do {
             var (gleichpos, _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
-            if (gleichpos < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value); }
+            if (gleichpos < 0) { Develop.DebugPrint(ErrorType.Error, "Parsen nicht möglich:" + value); }
 
             var tag = value.Substring(start, gleichpos - start).Trim().ToLowerInvariant();
             tag = tag.Trim(" ");
             tag = tag.Trim(",");
             tag = tag.Trim(" ");
-            if (string.IsNullOrEmpty(tag)) { Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value); }
+            if (string.IsNullOrEmpty(tag)) { Develop.DebugPrint(ErrorType.Error, "Parsen nicht möglich:" + value); }
 
             var (kommapos, _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
 
@@ -641,8 +641,8 @@ public static partial class Extensions {
     public static string RemoveXmlTags(this string text) => Regex.Replace(text, "<.*?>", string.Empty);
 
     public static string Replace(this string txt, string alt, string neu, RegexOptions options) {
-        if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
-        if (string.IsNullOrEmpty(alt)) { Develop.DebugPrint(FehlerArt.Fehler, "ALT is Empty"); }
+        if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(ErrorType.Error, "Regex option nicht erlaubt."); }
+        if (string.IsNullOrEmpty(alt)) { Develop.DebugPrint(ErrorType.Error, "ALT is Empty"); }
         var oldPos = 0;
         while (true) {
             if (string.IsNullOrEmpty(txt)) { return txt; }
@@ -658,7 +658,7 @@ public static partial class Extensions {
 
     public static string ReplaceWord(this string input, string alt, string replacement, RegexOptions options) {
         // return Regex.Replace(input, "\\b" + Alt + "\\b", replacement);
-        if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
+        if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(ErrorType.Error, "Regex option nicht erlaubt."); }
         if (replacement.IndexOf(alt, StringComparison.OrdinalIgnoreCase) >= 0) {
             const string du = "@DUMMY@";
             input = ReplaceWord(input, alt, du, options);
@@ -951,7 +951,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string TrimEnd(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        if (was.Length < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
+        if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
         was = was.ToUpperInvariant();
         while (tXt.Length >= was.Length && tXt.Substring(tXt.Length - was.Length).ToUpperInvariant() == was) {
             tXt = tXt.Remove(tXt.Length - was.Length);
@@ -968,7 +968,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string TrimStart(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        if (was.Length < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
+        if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
         was = was.ToUpperInvariant();
         while (tXt.Length >= was.Length && tXt.Substring(0, was.Length).ToUpperInvariant() == was) {
             tXt = tXt.Remove(0, was.Length);

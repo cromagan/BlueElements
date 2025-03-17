@@ -108,7 +108,7 @@ public class Chunk : IHasKeyName {
             } catch (Exception ex) {
                 // Home Office kann lange blockieren....
                 if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
+                    Develop.DebugPrint(ErrorType.Error, "Die Datei<br>" + filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
 
                     return ([], string.Empty, true);
                 }
@@ -391,7 +391,7 @@ public class Chunk : IHasKeyName {
                 continue;
             }
 
-            Develop.DebugPrint(FehlerArt.Fehler, $"Chunk defekt nach {maxRetries} Versuchen:\r\n{filename}\r\n{tempfile}");
+            Develop.DebugPrint(ErrorType.Error, $"Chunk defekt nach {maxRetries} Versuchen:\r\n{filename}\r\n{tempfile}");
             return false;
         }
 

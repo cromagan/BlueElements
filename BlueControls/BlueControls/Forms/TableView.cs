@@ -553,7 +553,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                         break;
 
                     default:
-                        DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
+                        DebugPrint(ErrorType.Warning, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
@@ -633,7 +633,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
 
         if (!maybeok) {
-            UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + tablename, true);
+            UpdateStatusBar(ErrorType.Info, "Lade Datenbank " + tablename, true);
         }
 
         #endregion

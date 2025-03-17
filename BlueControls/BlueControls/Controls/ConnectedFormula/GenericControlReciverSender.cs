@@ -70,7 +70,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     internal void ChildIsBorn(GenericControlReciver child) {
         if (child.RowsInputManualSeted) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
+            Develop.DebugPrint(ErrorType.Error, "Manuelle Filterung kann keine Parents empfangen.");
         }
 
         if (child.IsDisposed || IsDisposed) { return; }

@@ -447,7 +447,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             return endpos;
         }
 
-        Develop.DebugPrint(FehlerArt.Info, "Unbekannter Code: " + entity);
+        Develop.DebugPrint(ErrorType.Info, "Unbekannter Code: " + entity);
         Add(new ExtCharAscii(this, stil, font, '&'));
         return position + 1;
     }

@@ -128,7 +128,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         set {
             var (cando, result) = TryParse(value, null, null);
             if (!cando) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler");
+                Develop.DebugPrint(ErrorType.Error, "Variablenfehler");
             }
             SetValue(result);
         }
@@ -247,7 +247,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }
 
-        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
         return 0;
     }
 

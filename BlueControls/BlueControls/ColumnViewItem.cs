@@ -493,7 +493,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public bool ParseThis(string key, string value) {
         if (Parent?.Database is not { IsDisposed: false } db) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank unbekannt");
+            Develop.DebugPrint(ErrorType.Error, "Datenbank unbekannt");
             return false;
         }
 

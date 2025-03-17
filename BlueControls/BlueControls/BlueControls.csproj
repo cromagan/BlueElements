@@ -126,6 +126,12 @@
     <Compile Include="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
     <Compile Include="AdditionalScriptMethods\VariablePadItem.cs" />
     <Compile Include="Allgemein.cs" />
+    <Compile Include="GlobalMonitor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GlobalMonitor.Designer.cs">
+      <DependentUpon>GlobalMonitor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\TimerPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\ScaledViewPadItem.cs" />
     <Compile Include="Classes\ItemCollectionPad\ComicCompPadItem.cs" />
@@ -746,6 +752,9 @@
     <Compile Include="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="GlobalMonitor.resx">
+      <DependentUpon>GlobalMonitor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedCreativePad.resx">
       <DependentUpon>ConnectedCreativePad.cs</DependentUpon>
     </EmbeddedResource>

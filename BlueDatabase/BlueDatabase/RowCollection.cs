@@ -163,7 +163,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Pendingworker.Add(l);
         l.RunWorkerAsync(row);
 
-        db.OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString());
+        db.OnDropMessage(ErrorType.Info, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString());
     }
 
     public static void ExecuteValueChangedEvent() {
@@ -292,7 +292,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             db ??= thisr.Database;
 
             if (db != thisr.Database) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent");
+                Develop.DebugPrint(ErrorType.Error, "Datenbanken inkonsitent");
                 return false;
             }
         }
@@ -332,7 +332,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var x = 9999;
         do {
             x += 1;
-            if (x > 99999) { Develop.DebugPrint(FehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
+            if (x > 99999) { Develop.DebugPrint(ErrorType.Error, "Unique ID konnte nicht erzeugt werden"); }
 
             var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToStringInt5()).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             var ok = true;
@@ -463,7 +463,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 var w = rows[0].CellFirstString();
                 rows.Clear();
                 Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
-                Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w);
+                Database.OnDropMessage(ErrorType.Warning, "Skript fehlerhaft bei " + w);
                 return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol[0];
             }
 
@@ -644,7 +644,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         try {
             var r = _internal.TryGetValue(key, out var value) ? value : null;
             if (r is { IsDisposed: true }) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Interner Zeilenfehler: " + key);
+                Develop.DebugPrint(ErrorType.Error, "Interner Zeilenfehler: " + key);
                 return null;
             }
 
@@ -824,20 +824,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     private RowItem GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Database is not { IsDisposed: false } db) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
+            Develop.DebugPrint(ErrorType.Error, "Datenbank verworfen!");
             throw new Exception();
         }
 
         var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
 
         if (!string.IsNullOrEmpty(f)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
+            Develop.DebugPrint(ErrorType.Error, "Neue Zeilen nicht möglich: " + f);
             throw new Exception();
         }
 
         var item = SearchByKey(key);
         if (item != null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
+            Develop.DebugPrint(ErrorType.Error, "Schlüssel belegt!");
             throw new Exception();
         }
 
@@ -855,13 +855,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, chunkvalue);
         if (!string.IsNullOrEmpty(s)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
+            Develop.DebugPrint(ErrorType.Error, "Erstellung fehlgeschlagen: " + s);
             throw new Exception();
         }
 
         item = SearchByKey(key);
         if (item == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen, ID Fehler");
+            Develop.DebugPrint(ErrorType.Error, "Erstellung fehlgeschlagen, ID Fehler");
             throw new Exception();
         }
 

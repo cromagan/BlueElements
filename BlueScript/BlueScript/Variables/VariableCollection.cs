@@ -278,7 +278,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         }
 
         if (v is not VariableString vf) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
+            Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
             return false;
         }
 
@@ -309,7 +309,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         }
 
         if (v is not VariableFloat vf) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
+            Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
             return false;
         }
 
@@ -334,7 +334,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         }
 
         if (v is not VariableListString vf) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
+            Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
             return false;
         }
 
@@ -359,7 +359,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         }
 
         if (v is not VariableBool vf) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
+            Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
             return false;
         }
 

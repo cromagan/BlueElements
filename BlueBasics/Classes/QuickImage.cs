@@ -83,8 +83,8 @@ public sealed class QuickImage : IReadableText, IEditable {
             return;
         }
 
-        if (Exists(name)) { Develop.DebugPrint(FehlerArt.Warnung, "Doppeltes Bild:" + name); }
-        if (name.Contains("|")) { Develop.DebugPrint(FehlerArt.Warnung, "Fehlerhafter Name:" + name); }
+        if (Exists(name)) { Develop.DebugPrint(ErrorType.Warning, "Doppeltes Bild:" + name); }
+        if (name.Contains("|")) { Develop.DebugPrint(ErrorType.Warning, "Fehlerhafter Name:" + name); }
 
         Name = name;
         Code = Name;

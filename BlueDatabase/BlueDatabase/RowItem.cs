@@ -426,7 +426,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
         }
 
-        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
         return 0;
     }
 
@@ -607,7 +607,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return NeedsRowUpdate(false, false) && t is { TotalMinutes: < 20, TotalSeconds: > 3 };
     }
 
-    public void OnDropMessage(FehlerArt type, string message) {
+    public void OnDropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
@@ -733,8 +733,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
-            db.OnDropMessage(FehlerArt.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
-            OnDropMessage(FehlerArt.Info, $"Aktualisiere ({reason})");
+            db.OnDropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
+            OnDropMessage(ErrorType.Info, $"Aktualisiere ({reason})");
 
             if (extendedAllowed) {
                 RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
@@ -742,8 +742,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
             if (!ok.Successful) {
-                db.OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
-                OnDropMessage(FehlerArt.Info, $"Fehlgeschlagen ({reason})");
+                db.OnDropMessage(ErrorType.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
+                OnDropMessage(ErrorType.Info, $"Fehlgeschlagen ({reason})");
                 LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verständigen." + ok.NotSuccessfulReason;
 
                 RowCollection.FailedRows.TryAdd(this, 0);

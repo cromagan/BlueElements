@@ -57,7 +57,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     protected AbstractListItem(string keyName, bool enabled) {
         _keyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
-        if (string.IsNullOrEmpty(_keyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
+        if (string.IsNullOrEmpty(_keyName)) { Develop.DebugPrint(ErrorType.Error, "Interner Name nicht vergeben."); }
         _enabled = enabled;
         Pos = Rectangle.Empty;
         _userDefCompareKey = string.Empty;
@@ -139,7 +139,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
             return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
         }
 
-        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
         return 0;
     }
 

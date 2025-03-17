@@ -30,7 +30,7 @@ public static class ParseableExtension {
             var i = parsable.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
 
             if (!i) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
+                Develop.DebugPrint(ErrorType.Warning, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
             }
         }
         parsable.ParseFinished(toParse);

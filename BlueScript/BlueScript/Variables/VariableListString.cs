@@ -133,7 +133,7 @@ public class VariableListString : Variable {
         if (x is List<string> val) {
             _list = val;
         } else {
-            Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
+            Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
         }
     }
 

@@ -139,7 +139,7 @@
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="Classes\MultiUserFile.cs" />
     <Compile Include="Enums\SW.cs" />
-    <Compile Include="Enums\FehlerArt.cs" />
+    <Compile Include="Enums\ErrorType.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
     <Compile Include="Classes\ParsebleItem.cs" />
     <Compile Include="Classes_Static\Polygons.cs" />

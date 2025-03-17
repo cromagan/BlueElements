@@ -113,7 +113,7 @@ public class VariableFloat : Variable {
         } else if (x is double vald) {
             _double = vald;
         } else {
-            Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
+            Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
         }
     }
 

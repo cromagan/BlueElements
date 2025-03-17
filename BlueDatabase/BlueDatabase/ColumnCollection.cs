@@ -128,7 +128,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 columnName = columnName.ToUpperInvariant();
                 var col = _internal.TryGetValue(columnName, out var value) ? value : null;
                 if (col is { IsDisposed: true }) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
+                    Develop.DebugPrint(ErrorType.Error, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
                     return null;
                 }
                 return col;
@@ -179,7 +179,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat? format, string quickinfo) {
         if (!ColumnItem.IsValidColumnName(keyName)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht erlaubt!");
+            Develop.DebugPrint(ErrorType.Error, "Spaltenname nicht erlaubt!");
             return null;
         }
 
@@ -193,7 +193,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, null, string.Empty, keyName, Generic.UserName, DateTime.UtcNow, string.Empty, string.Empty);
         var item = this[keyName];
         if (item == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
+            Develop.DebugPrint(ErrorType.Error, "Erstellung fehlgeschlagen.");
             return null;
         }
 
@@ -336,7 +336,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
                         default:
 
-                            Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.KeyName);
+                            Develop.DebugPrint(ErrorType.Error, "Unbekannte Kennung: " + thisColumnItem.KeyName);
                             break;
                     }
                 }
@@ -450,14 +450,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 l.CloneFrom(thisColumn, true);
 
                 if (l.KeyName != thisColumn.KeyName) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");
+                    Develop.DebugPrint(ErrorType.Error, "Name nicht korrekt!");
                 }
 
                 //if (l.KeyName != thisColumn.KeyName) {
                 //    Develop.DebugPrint(FehlerArt.Fehler, "KeyName nicht korrekt!");
                 //}
             } else {
-                Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht erzeugt!");
+                Develop.DebugPrint(ErrorType.Error, "Spalte nicht erzeugt!");
             }
         }
     }

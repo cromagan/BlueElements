@@ -274,7 +274,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                 thisFile.Save(true);
-                Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
+                Develop.DebugPrint(ErrorType.Warning, "Doppletes Laden von " + fileName);
                 return false;
             }
         }
@@ -283,8 +283,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     public void Load(string fileNameToLoad, bool createWhenNotExisting) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
+        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
         //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
@@ -292,7 +292,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             //if (createWhenNotExisting) {
             //    SaveAsAndChangeTo(fileNameToLoad);
             //} else {
-            Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
+            Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
             return;
             //}
         }
@@ -370,7 +370,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (_lockCount < 1) {
             if (!LockEditing()) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Änderungen nicht möglich!");
+                Develop.DebugPrint(ErrorType.Error, "Änderungen nicht möglich!");
                 return;
             }
         }
@@ -436,7 +436,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             if (string.IsNullOrEmpty(f) || !mustSave) { break; }
 
             if (tim.ElapsedMilliseconds > 40000) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Datei nicht gespeichert: " + Filename + " " + f);
+                Develop.DebugPrint(ErrorType.Warning, "Datei nicht gespeichert: " + Filename + " " + f);
                 break;
             }
         }
@@ -552,13 +552,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
                 
 
-                if (tim.ElapsedMilliseconds > 20000) { Develop.DebugPrint(FehlerArt.Info, "Datei wurde während des Ladens verändert.\r\n" + Filename); }
+                if (tim.ElapsedMilliseconds > 20000) { Develop.DebugPrint(ErrorType.Info, "Datei wurde während des Ladens verändert.\r\n" + Filename); }
 
                 Pause(0.5, false);
             } catch (Exception ex) {
                 // Home Office kann lange blokieren....
                 if (tim.ElapsedMilliseconds > 300000) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
+                    Develop.DebugPrint(ErrorType.Error, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
                     return (string.Empty, string.Empty);
                 }
             }
@@ -717,7 +717,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             }
 
             if (count > 15) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename);
+                Develop.DebugPrint(ErrorType.Warning, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename);
                 return (string.Empty, string.Empty, string.Empty);
             }
 

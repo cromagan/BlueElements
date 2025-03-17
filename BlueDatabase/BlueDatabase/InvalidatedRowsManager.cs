@@ -128,7 +128,7 @@ public class InvalidatedRowsManager {
 
                 // Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
                 if (newEntries > 0) {
-                    masterRow?.OnDropMessage(FehlerArt.Info, $"{newEntries} neue Einträge zum Abarbeiten ({keysToProcess.Count + _processedRowIds.Count} insgesamt)");
+                    masterRow?.OnDropMessage(ErrorType.Info, $"{newEntries} neue Einträge zum Abarbeiten ({keysToProcess.Count + _processedRowIds.Count} insgesamt)");
                 }
 
 
@@ -148,11 +148,11 @@ public class InvalidatedRowsManager {
 
                         totalProcessedCount++;
                     } else {
-                        masterRow?.OnDropMessage(FehlerArt.Warnung, $"Fehler beim Abarbeiten.");
+                        masterRow?.OnDropMessage(ErrorType.Warning, $"Fehler beim Abarbeiten.");
                         Thread.Sleep(1000);
                         fehlercount++;
                         if (fehlercount > 20) {
-                            masterRow?.OnDropMessage(FehlerArt.Warnung, $"Abbruch wegen zu vieler Fehler.");
+                            masterRow?.OnDropMessage(ErrorType.Warning, $"Abbruch wegen zu vieler Fehler.");
                             break;
                         }
                     }
@@ -201,7 +201,7 @@ public class InvalidatedRowsManager {
 
         if (row.NeedsRowUpdate(false, true)) {
             if (masterRow?.Database != null) {
-                masterRow.OnDropMessage(FehlerArt.Info, $"Nr. {currentIndex} von {PendingRowsCount}: Aktualisiere {db.Caption} / {row.CellFirstString()}");
+                masterRow.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex} von {PendingRowsCount}: Aktualisiere {db.Caption} / {row.CellFirstString()}");
                 row.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
             } else {
                 row.UpdateRow(extendedAllowed, true, "Normales Update");

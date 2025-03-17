@@ -57,7 +57,7 @@ public class LogData {
 
     public void LineAdd(int c) {
         if (c < 0) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Wert unter null nicht erlaubt!");
+            Develop.DebugPrint(ErrorType.Error, "Wert unter null nicht erlaubt!");
         }
 
         Line += c;

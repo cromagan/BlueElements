@@ -470,7 +470,7 @@ public static class IO {
             mytry++;
             if (mytry > tries) {
                 if (!toBeSure) { return false; }
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(FehlerArt.Fehler, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2); }
+                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(ErrorType.Error, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2); }
             }
             Pause(0.2, false);
         }

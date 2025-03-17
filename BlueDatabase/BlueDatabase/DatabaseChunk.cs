@@ -338,7 +338,7 @@ public class DatabaseChunk : Database {
             return (false, false);
         }
 
-        OnDropMessage(FehlerArt.Info, $"Lade Chunk '{chunkId.ToLower()}' der Datenbank '{Filename.FileNameWithoutSuffix()}'");
+        OnDropMessage(ErrorType.Info, $"Lade Chunk '{chunkId.ToLower()}' der Datenbank '{Filename.FileNameWithoutSuffix()}'");
 
         var chunk = new Chunk(Filename, chunkId);
         chunk.LoadBytesFromDisk();
@@ -365,7 +365,7 @@ public class DatabaseChunk : Database {
         #region Erst alle Chunks laden
 
         if (!BeSureAllDataLoaded(-1)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Chunk laden!");
+            Develop.DebugPrint(ErrorType.Error, "Fehler beim Chunk laden!");
             return;
         }
 
@@ -415,7 +415,7 @@ public class DatabaseChunk : Database {
     protected override bool BeSureToBeUpDoDate() {
         if (!base.BeSureToBeUpDoDate()) { return false; }
 
-        OnDropMessage(FehlerArt.Info, "Lade Chunks von '" + TableName + "'");
+        OnDropMessage(ErrorType.Info, "Lade Chunks von '" + TableName + "'");
 
         if (!LoadChunkWithChunkId(Chunk_MainData, false, null, true).ok) { return false; }
 
@@ -450,14 +450,14 @@ public class DatabaseChunk : Database {
 
         #region Neue Chunks-Erstellen
 
-        OnDropMessage(FehlerArt.Info, $"Erstelle Chunks der Datenank '{Caption}'");
+        OnDropMessage(ErrorType.Info, $"Erstelle Chunks der Datenank '{Caption}'");
 
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
         if (chunksnew == null || chunksnew.Count == 0) { return false; }
         foreach (var thisChunk in chunksnew) {
             _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
             if (existingChunk == null || existingChunk.SaveRequired) {
-                OnDropMessage(FehlerArt.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
+                OnDropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
                 if (!thisChunk.DoExtendedSave(5)) {
                     return false;
                 }
@@ -476,7 +476,7 @@ public class DatabaseChunk : Database {
         chunks.AddRange(_chunks.Values);
         foreach (var thisChunk in chunks) {
             if (thisChunk.SaveRequired) {
-                OnDropMessage(FehlerArt.Info, $"Lösche alten Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
+                OnDropMessage(ErrorType.Info, $"Lösche alten Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
                 thisChunk.Delete();
                 _ = _chunks.TryRemove(thisChunk.KeyName, out _); // Den alten Fehlerhaften Chunk entfernen
                 //thisChunk.InitByteList();

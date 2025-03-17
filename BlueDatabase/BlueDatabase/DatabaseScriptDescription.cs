@@ -158,7 +158,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }
 
-        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
         return 0;
     }
 

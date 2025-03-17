@@ -33,7 +33,7 @@ public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
 
     #region Constructors
 
-    public MessageEventArgs(FehlerArt type, string message) {
+    public MessageEventArgs(ErrorType type, string message) {
         Message = message;
         Type = type;
     }
@@ -45,7 +45,7 @@ public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
     public string KeyName => Generic.GetUniqueKey();
     public string Message { get; }
     public string QuickInfo => Message;
-    public FehlerArt Type { get; }
+    public ErrorType Type { get; }
 
     #endregion
 
@@ -55,10 +55,10 @@ public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
 
     public QuickImage? SymbolForReadableText() {
         switch (Type) {
-            case FehlerArt.Warnung:
+            case ErrorType.Warning:
                 return QuickImage.Get(ImageCode.Warnung, 16);
 
-            case FehlerArt.Fehler:
+            case ErrorType.Error:
                 return QuickImage.Get(ImageCode.Kreis, 16);
 
             default:

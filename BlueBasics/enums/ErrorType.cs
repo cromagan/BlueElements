@@ -19,9 +19,9 @@
 
 namespace BlueBasics.Enums;
 
-public enum FehlerArt {
-    Fehler = 1,
-    Warnung = 2,
+public enum ErrorType {
+    Error = 1,
+    Warning = 2,
     Info = 3,
     DevelopInfo = 4
 }

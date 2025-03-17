@@ -67,7 +67,7 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
         if (db == null) { return new DoItFeedback(ld, "Datenbankfehler!"); }
 
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
-        db.OnDropMessage(FehlerArt.Info, txt);
+        db.OnDropMessage(ErrorType.Info, txt);
 
         return DoItFeedback.Null();
     }

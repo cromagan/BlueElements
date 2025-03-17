@@ -182,7 +182,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (FilterInputChangedHandled) {
             if (_filterInputChangedHandling) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Filter wird gerade berechnet");
+                Develop.DebugPrint(ErrorType.Error, "Filter wird gerade berechnet");
             }
 
             FilterInputChangedHandled = false;
@@ -197,8 +197,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (DesignMode) { return null; }
 
         if (!RowsInputManualSeted) {
-            if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "FilterInput nicht gehandelt"); }
-            if (!RowsInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "RowInput nicht gehandelt"); }
+            if (!FilterInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "FilterInput nicht gehandelt"); }
+            if (!RowsInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "RowInput nicht gehandelt"); }
         }
 
         if (RowsInput is not { Count: 1 } r) { return null; }
@@ -209,7 +209,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     public void SetToRow(RowItem? row) {
         if (IsDisposed) { return; }
         if (Parents.Count > 0) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Element wird von Parents gesteuert!");
+            Develop.DebugPrint(ErrorType.Error, "Element wird von Parents gesteuert!");
         }
 
         var doAtabaseAfter = _databaseInput == null;
@@ -300,7 +300,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         _rowsInputChangedHandling = true;
 
-        if (!FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "Filter unbehandelt!"); }
+        if (!FilterInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "Filter unbehandelt!"); }
 
         if (FilterInput == null) {
             RowsInput = [];
@@ -350,7 +350,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (RowsInputChangedHandled) {
             if (_rowsInputChangedHandling) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Rows werden gerade berechnet");
+                Develop.DebugPrint(ErrorType.Error, "Rows werden gerade berechnet");
             }
 
             if (!RowsInputManualSeted) { RowsInput = null; }

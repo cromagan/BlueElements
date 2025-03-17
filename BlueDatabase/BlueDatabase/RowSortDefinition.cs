@@ -88,7 +88,7 @@ public sealed class RowSortDefinition : IParseable {
     public bool ParseThis(string key, string value) {
         switch (key) {
             case "identifier":
-                if (value != "SortDefinition") { Develop.DebugPrint(FehlerArt.Fehler, "Identifier fehlerhaft: " + value); }
+                if (value != "SortDefinition") { Develop.DebugPrint(ErrorType.Error, "Identifier fehlerhaft: " + value); }
                 return true;
 
             case "direction":

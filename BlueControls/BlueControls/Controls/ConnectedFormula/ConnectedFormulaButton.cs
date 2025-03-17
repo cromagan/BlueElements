@@ -296,7 +296,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         if (row != null) {
             vars.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
             ai = row;
-            row.OnDropMessage(FehlerArt.Info, "Knopfdruck mit dieser Zeile");
+            row.OnDropMessage(ErrorType.Info, "Knopfdruck mit dieser Zeile");
         }
 
         #endregion
@@ -315,7 +315,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
             MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
 
-        row?.OnDropMessage(FehlerArt.Info, "Knopfdruck ausgeführt");
+        row?.OnDropMessage(ErrorType.Info, "Knopfdruck ausgeführt");
         main.Enabled = true;
         main.Refresh();
     }

@@ -134,7 +134,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
             clonedBitmap.RotateFlip(b);
             OnOverridePic(clonedBitmap, true);
         } catch (Exception ex) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Spiegeln/Drehen fehlgeschlagen", ex);
+            Develop.DebugPrint(ErrorType.Warning, "Spiegeln/Drehen fehlgeschlagen", ex);
             Notification.Show("Befehl konnte nicht\r\nausgeführt werden.");
         }
 
