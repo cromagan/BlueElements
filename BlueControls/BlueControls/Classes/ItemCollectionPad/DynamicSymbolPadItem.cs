@@ -128,7 +128,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
         //using var gr = Graphics.FromImage(bmp);
 
-        var scp = new ScriptProperties("DynamicSymbol", m, true, [], bmp, 0);
+        var scp = new ScriptProperties("DynamicSymbol", m, true, [], bmp, "DynamicSymbol");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

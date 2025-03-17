@@ -15,11 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.EventArgs;
+using BlueBasics;
 using BlueControls.Forms;
-using BlueControls.ItemCollectionList;
-using BlueDatabase;
-using BlueScript.Methods;
+using System;
 using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -29,31 +27,66 @@ namespace BlueControls;
 
 public partial class GlobalMonitor : Form {
 
+    #region Fields
+
+    private int _n = 0;
+
+    #endregion
+
     #region Constructors
 
     public GlobalMonitor() {
         InitializeComponent();
+
+        Develop.MonitorMessage = Message;
     }
 
     #endregion
 
     #region Methods
 
+    public void Message(string category, string symbol, string message, int indent) {
+        if (Disposing || IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(() => Message(category, symbol, message, indent)));
+                return;
+            } catch {
+                return;
+            }
+        }
+
+        _n--;
+        if (_n < 0) { _n = 99999; }
+
+        var e = $"[{DateTime.Now.ToString7()}] {category}: {new string(' ', indent * 4)} {message}";
+
+        lstLog.ItemAdd(ItemOf(e, _n.ToStringInt7()));
+
+        lstLog.Refresh();
+    }
+
+    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+        Develop.MonitorMessage = null;
+        base.OnFormClosing(e);
+    }
+
+    protected override void OnShown(System.EventArgs e) {
+        base.OnShown(e);
+        Develop.MonitorMessage?.Invoke("Global", "Information", "Monitoring gestartet", 0);
+    }
+
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
-
-
+    private void btnLeeren_Click(object sender, System.EventArgs e) {
+        lstLog.ItemClear();
+    }
 
     private void txbFilter_TextChanged(object sender, System.EventArgs e) {
         lstLog.FilterText = txbFilter.Text;
         btnFilterDel.Enabled = Enabled && !string.IsNullOrEmpty(txbFilter.Text);
     }
 
-
-
     #endregion
-
-    private void btnLeeren_Click(object sender, System.EventArgs e) {
-        lstLog.ItemClear();
-    }
 }

@@ -72,7 +72,7 @@ public static class UseableForButton {
         var ld = new LogData("Knopfdruck", 0);
         var cdw = new CanDoFeedback(0, t.reducedText, string.Empty, ld);
 
-        var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, 0);
+        var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, "Button");
         ufb.DoIt(varCol, cdw, scp);
 
         return cdw.LogData.Protocol.JoinWithCr();

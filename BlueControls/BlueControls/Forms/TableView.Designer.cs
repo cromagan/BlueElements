@@ -98,6 +98,7 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.grpAufräumen = new BlueControls.Controls.Button();
+            this.btnMonitoring = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -498,7 +499,7 @@ namespace BlueControls.Forms {
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminZeilen.Location = new System.Drawing.Point(648, 0);
+            this.grpAdminZeilen.Location = new System.Drawing.Point(720, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
             this.grpAdminZeilen.Size = new System.Drawing.Size(232, 81);
             this.grpAdminZeilen.TabIndex = 8;
@@ -544,6 +545,7 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminAllgemein.CausesValidation = false;
+            this.grpAdminAllgemein.Controls.Add(this.btnMonitoring);
             this.grpAdminAllgemein.Controls.Add(this.btnUserInfo);
             this.grpAdminAllgemein.Controls.Add(this.btnSaveLoad);
             this.grpAdminAllgemein.Controls.Add(this.btnPowerBearbeitung);
@@ -552,7 +554,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminAllgemein.Location = new System.Drawing.Point(376, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
-            this.grpAdminAllgemein.Size = new System.Drawing.Size(272, 81);
+            this.grpAdminAllgemein.Size = new System.Drawing.Size(344, 81);
             this.grpAdminAllgemein.TabIndex = 7;
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
@@ -846,7 +848,6 @@ namespace BlueControls.Forms {
             this.Table.SheetStyle = "Windows 11";
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
-            this.Table.Zoom = 1F;
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
             this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Table_ContextMenuItemClicked);
             this.Table.DatabaseChanged += new System.EventHandler(this.Table_DatabaseChanged);
@@ -908,6 +909,7 @@ namespace BlueControls.Forms {
             this.CFO.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.CFO.Location = new System.Drawing.Point(0, 0);
             this.CFO.Name = "CFO";
+            this.CFO.Page = null;
             this.CFO.Size = new System.Drawing.Size(338, 566);
             this.CFO.TabIndex = 0;
             this.CFO.TabStop = false;
@@ -929,7 +931,8 @@ namespace BlueControls.Forms {
             // 
             // SaveTab
             // 
-            this.SaveTab.Filter = "*.BDB Datenbanken|*.BDB|*.MBDB Datenbanken|*.MBDB|*.CBDB Datenbanken|*.CBDB|*.* Alle Dateien|*";
+            this.SaveTab.Filter = "*.BDB Datenbanken|*.BDB|*.MBDB Datenbanken|*.MBDB|*.CBDB Datenbanken|*.CBDB|*.* A" +
+    "lle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             // 
             // grpAufräumen
@@ -942,6 +945,18 @@ namespace BlueControls.Forms {
             this.grpAufräumen.Size = new System.Drawing.Size(72, 66);
             this.grpAufräumen.TabIndex = 45;
             this.grpAufräumen.Text = "Zeilen löschen";
+            // 
+            // btnMonitoring
+            // 
+            this.btnMonitoring.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnMonitoring.ImageCode = "Monitor|16";
+            this.btnMonitoring.Location = new System.Drawing.Point(264, 2);
+            this.btnMonitoring.Name = "btnMonitoring";
+            this.btnMonitoring.QuickInfo = "A";
+            this.btnMonitoring.Size = new System.Drawing.Size(72, 66);
+            this.btnMonitoring.TabIndex = 45;
+            this.btnMonitoring.Text = "Monitoring starten";
+            this.btnMonitoring.Click += new System.EventHandler(this.btnMonitoring_Click);
             // 
             // TableView
             // 
@@ -1052,5 +1067,6 @@ namespace BlueControls.Forms {
         protected Button btnZoomOut;
         protected Button btnZoomIn;
         protected Button btnZoomFit;
+        private Button btnMonitoring;
     }
 }

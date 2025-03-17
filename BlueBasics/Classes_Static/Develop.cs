@@ -42,6 +42,7 @@ public static class Develop {
     public static bool AllReadOnly = false;
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
+    public static Message? MonitorMessage = null;
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
 
     private static readonly object SyncLockObject = new();
@@ -57,6 +58,12 @@ public static class Develop {
     private static DateTime _lastDebugTime = DateTime.UtcNow;
 
     private static TextWriterTraceListener? _traceListener;
+
+    #endregion
+
+    #region Delegates
+
+    public delegate void Message(string category, string symbol, string message, int indent);
 
     #endregion
 
@@ -119,8 +126,6 @@ public static class Develop {
     public static void DebugPrint<T>(T @enum) where T : Enum => DebugPrint(ErrorType.Warning, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
 
     public static void DebugPrint(ErrorType art, string meldung) {
-
- 
         lock (SyncLockObject) {
             try {
                 if (_isTraceLogging) {
@@ -144,14 +149,14 @@ public static class Develop {
                 List<string>? l = null;
                 Trace.WriteLine("<tr>");
                 switch (art) {
-                    //case ErrorType.DevelopInfo:
-                    //    if (!IsHostRunning()) {
-                    //        _isTraceLogging = false;
-                    //        return;
-                    //    }
-                    //    Trace.WriteLine("<th><font size = 3>Runtime-Info");
-                    //    nr = 5;
-                    //    break;
+                    case ErrorType.DevelopInfo:
+                        if (!IsHostRunning()) {
+                            _isTraceLogging = false;
+                            return;
+                        }
+                        Trace.WriteLine("<th><font size = 3>Runtime-Info");
+                        nr = 5;
+                        break;
 
                     case ErrorType.Info:
                         Trace.WriteLine("<th><font size = 3>Info");

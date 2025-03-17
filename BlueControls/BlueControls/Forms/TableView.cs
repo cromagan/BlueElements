@@ -47,6 +47,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     #region Fields
 
+    private static GlobalMonitor? Monitor;
     private bool _firstOne = true;
 
     #endregion
@@ -863,6 +864,15 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
 
         Table.ImportBdb();
+    }
+
+    private void btnMonitoring_Click(object sender, System.EventArgs e) {
+        if (Monitor == null || Monitor.IsDisposed) {
+            Monitor = new GlobalMonitor();
+            Monitor.Show();
+        }
+
+        Monitor.BringToFront();
     }
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {

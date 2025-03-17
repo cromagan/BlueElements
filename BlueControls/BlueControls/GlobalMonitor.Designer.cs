@@ -63,7 +63,6 @@ namespace BlueControls {
             // btnLeeren
             // 
             this.btnLeeren.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLeeren.Enabled = false;
             this.btnLeeren.ImageCode = "Kreuz|16";
             this.btnLeeren.Location = new System.Drawing.Point(752, 416);
             this.btnLeeren.Name = "btnLeeren";
@@ -75,7 +74,6 @@ namespace BlueControls {
             // btnFilterDel
             // 
             this.btnFilterDel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFilterDel.Enabled = false;
             this.btnFilterDel.ImageCode = "Trichter|16||1";
             this.btnFilterDel.Location = new System.Drawing.Point(752, 24);
             this.btnFilterDel.Name = "btnFilterDel";

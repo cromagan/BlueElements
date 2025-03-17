@@ -19,10 +19,8 @@
 
 using BlueBasics.Enums;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace BlueDatabase;
 
@@ -122,7 +120,6 @@ public class InvalidatedRowsManager {
                 var keysToProcess = _invalidatedRows.Keys.ToList();
                 if (keysToProcess.Count == 0) { break; }// Keine Einträge mehr vorhanden
 
-
                 // Prüfe, ob neue Einträge hinzugekommen sind
                 int newEntries = keysToProcess.Count - entriesBeforeProcessing;
 
@@ -131,10 +128,8 @@ public class InvalidatedRowsManager {
                     masterRow?.OnDropMessage(ErrorType.Info, $"{newEntries} neue Einträge zum Abarbeiten ({keysToProcess.Count + _processedRowIds.Count} insgesamt)");
                 }
 
-
                 // Anzahl der zu verarbeitenden Zeilen vor der Verarbeitung merken
                 entriesBeforeProcessing = keysToProcess.Count;
-
 
                 // Verarbeite alle Zeilen
                 foreach (var key in keysToProcess) {
@@ -158,12 +153,9 @@ public class InvalidatedRowsManager {
                     }
                 }
 
-
                 if (fehlercount > 20) { break; }
 
                 Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
-
-
             } while (true);
         } finally {
             // Verarbeitung beenden, egal was passiert

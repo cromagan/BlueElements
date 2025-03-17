@@ -122,7 +122,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
         //using var gr = Graphics.FromImage(bmp);
 
-        var scp = new ScriptProperties("Timer", Method.AllMethods, true, [], null, 0);
+        var scp = new ScriptProperties("Timer", Method.AllMethods, true, [], null, "Timer");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

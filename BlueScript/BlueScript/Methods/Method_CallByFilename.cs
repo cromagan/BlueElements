@@ -73,13 +73,16 @@ public class Method_CallByFilename : Method {
     /// <param name="varCol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, LogData ld, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, Variable? addMe, List<string>? attributes) {
+    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, LogData ld, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog) {
         ScriptEndedFeedback scx;
 
         if (scp.Stufe > 10) {
             return new DoItFeedback(ld, "'" + subname + "' wird zu verschachtelt aufgerufen.");
         }
-        var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1);
+
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, scp.Chain + "\\" + chainlog);
+
+        Develop.MonitorMessage?.Invoke(subname, "", "Skript: " + scp.Chain, scp.Stufe);
 
         if (keepVariables) {
             if (addMe != null) { varCol.Add(addMe); }
@@ -149,7 +152,7 @@ public class Method_CallByFilename : Method {
 
         #endregion
 
-        var scx = CallSub(varCol, scp, ld, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null, a);
+        var scx = CallSub(varCol, scp, ld, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null, a, vs);
         if (!scx.AllOk) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }

@@ -122,7 +122,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
         var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
 
-        var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, 0);
+        var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, "Row-Adder");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

@@ -960,7 +960,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
 
-        var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, 0);
+        var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, "CreativePad-Generator");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
