@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.IO.Ports;
 using BlueScript.Methods;
 
 namespace BlueScript.Structures;
@@ -26,7 +27,7 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties(string scriptname, List<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain) {
+    public ScriptProperties(string scriptname, List<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ProduktivPhase = produktivphase;
@@ -34,9 +35,10 @@ public class ScriptProperties {
         AdditionalInfo = additionalInfo;
         Stufe = 0;
         Chain = chain;
+        MainInfo = mainInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, List<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain) {
+    public ScriptProperties(ScriptProperties scriptProperties, List<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) {
         Stufe = stufe;
     }
 
@@ -47,6 +49,8 @@ public class ScriptProperties {
     public object? AdditionalInfo { get; }
     public List<Method> AllowedMethods { get; }
     public string Chain { get; } = string.Empty;
+
+    public string MainInfo { get; } = string.Empty;
     public bool ProduktivPhase { get; }
 
     /// <summary>

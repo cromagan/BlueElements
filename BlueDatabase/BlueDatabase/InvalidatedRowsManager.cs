@@ -17,9 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 
 namespace BlueDatabase;
@@ -107,10 +110,15 @@ public class InvalidatedRowsManager {
             if (_isProcessing) { return; }
             _isProcessing = true;
         }
-
         var fehlercount = 0;
 
+
+
+
+
         try {
+
+            Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "", $"Arbeite {_invalidatedRows.Keys.ToList().Count()} invalide Zeilen ab", 0);
             int totalProcessedCount = 0;
             var entriesBeforeProcessing = 0;
 
@@ -157,6 +165,13 @@ public class InvalidatedRowsManager {
 
                 Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
             } while (true);
+
+            Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "", $"InvalidatetRowManager fertig", 0);
+
+        } catch {
+            Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "", $"InvalidatetRowManager unerwartet abgebrochen", 0);
+
+
         } finally {
             // Verarbeitung beenden, egal was passiert
             lock (_processingLock) {

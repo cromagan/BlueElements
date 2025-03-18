@@ -62,7 +62,7 @@ namespace BlueControls {
             // 
             // btnLeeren
             // 
-            this.btnLeeren.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLeeren.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLeeren.ImageCode = "Kreuz|16";
             this.btnLeeren.Location = new System.Drawing.Point(752, 416);
             this.btnLeeren.Name = "btnLeeren";
@@ -103,7 +103,6 @@ namespace BlueControls {
             this.Controls.Add(this.grpLogal);
             this.Name = "GlobalMonitor";
             this.Text = "Monitoring";
-            this.TopMost = true;
             this.grpLogal.ResumeLayout(false);
             this.ResumeLayout(false);
 

@@ -46,6 +46,7 @@ public class Chunk : IHasKeyName {
 
     private string _fileinfo = string.Empty;
 
+    private string _keyname = string.Empty;
     private DateTime _lastcheck = DateTime.MinValue;
 
     #endregion
@@ -54,7 +55,7 @@ public class Chunk : IHasKeyName {
 
     public Chunk(string mainFileName, string chunkId) {
         MainFileName = mainFileName;
-        KeyName = chunkId.ToLower();
+        KeyName = chunkId;
     }
 
     #endregion
@@ -78,7 +79,12 @@ public class Chunk : IHasKeyName {
 
     public bool IsMain => string.Equals(KeyName, DatabaseChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
-    public string KeyName { get; private set; }
+    public string KeyName {
+        get => _keyname;
+        private set {
+            _keyname = value.ToLower();
+        }
+    }
 
     public string LastEditApp { get; private set; } = string.Empty;
 
@@ -88,7 +94,7 @@ public class Chunk : IHasKeyName {
 
     public string LastEditUser { get; private set; } = string.Empty;
 
-    public bool LoadFailed { get; private set; } = false;
+    public bool LoadFailed { get; set; } = false;
 
     public bool SaveRequired { get; set; } = false;
 
@@ -339,9 +345,19 @@ public class Chunk : IHasKeyName {
     public void WaitInitialDone() {
         var t = Stopwatch.StartNew();
 
+        var x = 0;
+
         while (_lastcheck.Year < 2000) {
             Thread.Sleep(1);
-            if (t.ElapsedMilliseconds > 1200000) { return; }
+            if (t.ElapsedMilliseconds > 1200000) {
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Abbruch, Chunk wurde nicht richtig initialisiert", 0);
+                return;
+            }
+            x += 1;
+            if (x > 5000) {
+                x = 0;
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Warte auf Abschluss der Initialsierung", 0);
+            }
         }
     }
 

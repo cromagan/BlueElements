@@ -35,7 +35,7 @@ internal class Method_Remove : Method {
     public override List<List<string>> Args => [ListStringVar, BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "remove";
     public override List<string> Constants => [];
-    public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
+    public override string Description => "Entfernt aus der Liste die angegebenen Werte.\r\nIst der Wert nicht in der Liste, wird kein Fehler ausgelöst.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;

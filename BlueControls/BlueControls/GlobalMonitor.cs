@@ -60,7 +60,7 @@ public partial class GlobalMonitor : Form {
         _n--;
         if (_n < 0) { _n = 99999; }
 
-        var e = $"[{DateTime.Now.ToString7()}] {category}: {new string(' ', indent * 4)} {message}";
+        var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent+1}] {category}: {new string(' ', indent * 6)} {message}";
 
         lstLog.ItemAdd(ItemOf(e, _n.ToStringInt7()));
 

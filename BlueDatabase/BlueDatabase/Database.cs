@@ -1397,7 +1397,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Script ausführen
 
-            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, Caption + "\\" + script.KeyName);
+            var ki = Caption;
+
+            if (row is { IsDisposed: false }) { ki = ki + "\\" + row.CellFirstString(); }
+
+            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, script.KeyName, ki);
 
             vars.Add(new VariableString("AdditionalFilesPfad", (AdditionalFilesPfadWhole().Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
 
