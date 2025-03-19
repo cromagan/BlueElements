@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueControls.Forms;
 using System;
+using System.Threading;
 using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -29,6 +30,8 @@ public partial class GlobalMonitor : Form {
 
     #region Fields
 
+    private static Thread? _monitorThread;
+    private static GlobalMonitor? Monitor;
     private int _n = 0;
 
     #endregion
@@ -60,11 +63,44 @@ public partial class GlobalMonitor : Form {
         _n--;
         if (_n < 0) { _n = 99999; }
 
-        var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent+1}] {category}: {new string(' ', indent * 6)} {message}";
+        var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent + 1}] {category}: {new string(' ', indent * 6)} {message}";
 
         lstLog.ItemAdd(ItemOf(e, _n.ToStringInt7()));
 
         lstLog.Refresh();
+    }
+
+    internal static void Start() {
+        // Prüfe, ob Thread und Monitor bereits funktionieren
+        if (_monitorThread != null && _monitorThread.IsAlive && Monitor != null && !Monitor.IsDisposed) {
+            // Thread läuft und Fenster existiert, bringe es in den Vordergrund
+            try {
+                Monitor.BeginInvoke(new Action(() => {
+                    Monitor.BringToFront();
+                    if (Monitor.WindowState == System.Windows.Forms.FormWindowState.Minimized) {
+                        Monitor.WindowState = System.Windows.Forms.FormWindowState.Normal;
+                    }
+                }));
+                return; // Alles in Ordnung, früher beenden
+            } catch {
+                // Formular bereits entsorgt, wird im nächsten Block neu erstellt
+                DisposeMonitor();
+            }
+        }
+
+        // Neustart des Threads und/oder Monitors erforderlich
+        DisposeMonitor();
+        _monitorThread = new Thread(new ThreadStart(StartMonitorInThread));
+        _monitorThread.IsBackground = true;
+        _monitorThread.SetApartmentState(ApartmentState.STA);
+        _monitorThread.Start();
+
+        // Warte kurz, bis das Fenster erstellt wurde
+        int attempts = 0;
+        while (Monitor == null && attempts < 50) {
+            Thread.Sleep(10);
+            attempts++;
+        }
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
@@ -77,10 +113,37 @@ public partial class GlobalMonitor : Form {
         Develop.MonitorMessage?.Invoke("Global", "Information", "Monitoring gestartet", 0);
     }
 
+    private static void DisposeMonitor() {
+        if (Monitor != null) {
+            Develop.MonitorMessage = null; // Delegat zurücksetzen
+            Monitor.Dispose();
+            Monitor = null;
+        }
+    }
+
+    private static void StartMonitorInThread() {
+        try {
+            // STA-Modus für den Thread festlegen (wichtig für Windows Forms)
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+
+            // Erstelle eine neue Instanz des Monitors
+            Monitor = new GlobalMonitor();
+
+            // Starte den MessageLoop für das Formular
+            System.Windows.Forms.Application.Run(Monitor);
+        } catch (Exception ex) {
+            // Fehlerbehandlung
+            Develop.DebugPrint(ex.Message);
+            DisposeMonitor();            // Monitor zurücksetzen, damit ein Neustart möglich ist
+        }
+    }
+
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
         lstLog.ItemClear();
+        Develop.MonitorMessage?.Invoke("Global", "Information", "Monitoring-Log geleert", 0);
     }
 
     private void txbFilter_TextChanged(object sender, System.EventArgs e) {

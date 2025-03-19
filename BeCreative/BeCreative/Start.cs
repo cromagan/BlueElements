@@ -39,7 +39,7 @@ namespace BeCreative {
         #region Methods
 
         public static void Ende() {
-            DebugPrint(FehlerArt.Info, "Schließe Programm...");
+            DebugPrint(ErrorType.Info, "Schließe Programm...");
 
             var p = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
             Database.ForceSaveAll();
@@ -49,7 +49,7 @@ namespace BeCreative {
             Database.ForceSaveAll();
             MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
 
-            DebugPrint(FehlerArt.Info, "Schließe Programm, noch ein SaveAll.");
+            DebugPrint(ErrorType.Info, "Schließe Programm, noch ein SaveAll.");
             p.Update("Programm wird beendet<br><i>Fast geschafft!");
             MultiUserFile.SaveAll(true); // Nun aber
 

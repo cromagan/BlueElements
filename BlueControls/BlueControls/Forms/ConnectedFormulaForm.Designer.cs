@@ -31,8 +31,8 @@ namespace BlueControls.Forms {
         private void InitializeComponent() {
             this.ribMain = new BlueControls.Controls.RibbonBar();
             this.tabFile = new System.Windows.Forms.TabPage();
-            this.btnTopMost = new BlueControls.Controls.Button();
             this.grpDatei = new BlueControls.Controls.GroupBox();
+            this.btnTopMost = new BlueControls.Controls.Button();
             this.btnLastFormulas = new BlueControls.Controls.LastFilesCombo();
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
@@ -48,13 +48,17 @@ namespace BlueControls.Forms {
             this.btnFormular = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
+            this.grpSpezial = new BlueControls.Controls.GroupBox();
+            this.btnMonitoring = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpDatei.SuspendLayout();
+            this.tabAllgemein.SuspendLayout();
             this.tabAdmin.SuspendLayout();
             this.grpAdminAllgemein.SuspendLayout();
             this.grpAdminBearbeiten.SuspendLayout();
+            this.grpSpezial.SuspendLayout();
             this.SuspendLayout();
             // 
             // capStatusBar
@@ -85,23 +89,12 @@ namespace BlueControls.Forms {
             // 
             this.tabFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabFile.Controls.Add(this.grpDatei);
-            this.tabFile.Location = new System.Drawing.Point(4, 29);
+            this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(598, 77);
+            this.tabFile.Size = new System.Drawing.Size(598, 81);
             this.tabFile.TabIndex = 3;
             this.tabFile.Text = "Datei";
-            // 
-            // btnTopMost
-            // 
-            this.btnTopMost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTopMost.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
-            this.btnTopMost.ImageCode = "Pinnadel|24";
-            this.btnTopMost.Location = new System.Drawing.Point(176, 2);
-            this.btnTopMost.Name = "btnTopMost";
-            this.btnTopMost.Size = new System.Drawing.Size(32, 22);
-            this.btnTopMost.TabIndex = 5;
-            this.btnTopMost.CheckedChanged += new System.EventHandler(this.btnTopMost_CheckedChanged);
             // 
             // grpDatei
             // 
@@ -114,10 +107,21 @@ namespace BlueControls.Forms {
             this.grpDatei.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpDatei.Location = new System.Drawing.Point(0, 0);
             this.grpDatei.Name = "grpDatei";
-            this.grpDatei.Size = new System.Drawing.Size(320, 77);
+            this.grpDatei.Size = new System.Drawing.Size(320, 81);
             this.grpDatei.TabIndex = 4;
             this.grpDatei.TabStop = false;
             this.grpDatei.Text = "Datei";
+            // 
+            // btnTopMost
+            // 
+            this.btnTopMost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTopMost.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
+            this.btnTopMost.ImageCode = "Pinnadel|24";
+            this.btnTopMost.Location = new System.Drawing.Point(176, 2);
+            this.btnTopMost.Name = "btnTopMost";
+            this.btnTopMost.Size = new System.Drawing.Size(32, 22);
+            this.btnTopMost.TabIndex = 5;
+            this.btnTopMost.CheckedChanged += new System.EventHandler(this.btnTopMost_CheckedChanged);
             // 
             // btnLastFormulas
             // 
@@ -148,9 +152,10 @@ namespace BlueControls.Forms {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabAllgemein.Location = new System.Drawing.Point(4, 29);
+            this.tabAllgemein.Controls.Add(this.grpSpezial);
+            this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
             this.tabAllgemein.Name = "tabAllgemein";
-            this.tabAllgemein.Size = new System.Drawing.Size(1194, 77);
+            this.tabAllgemein.Size = new System.Drawing.Size(598, 81);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
             // 
@@ -159,9 +164,9 @@ namespace BlueControls.Forms {
             this.tabAdmin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabAdmin.Controls.Add(this.grpAdminAllgemein);
             this.tabAdmin.Controls.Add(this.grpAdminBearbeiten);
-            this.tabAdmin.Location = new System.Drawing.Point(4, 29);
+            this.tabAdmin.Location = new System.Drawing.Point(4, 25);
             this.tabAdmin.Name = "tabAdmin";
-            this.tabAdmin.Size = new System.Drawing.Size(1194, 77);
+            this.tabAdmin.Size = new System.Drawing.Size(598, 81);
             this.tabAdmin.TabIndex = 0;
             this.tabAdmin.Text = "Administration";
             // 
@@ -175,7 +180,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminAllgemein.Location = new System.Drawing.Point(400, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
-            this.grpAdminAllgemein.Size = new System.Drawing.Size(72, 77);
+            this.grpAdminAllgemein.Size = new System.Drawing.Size(72, 81);
             this.grpAdminAllgemein.TabIndex = 7;
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
@@ -205,7 +210,7 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminBearbeiten.Location = new System.Drawing.Point(0, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(400, 77);
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(400, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
@@ -297,9 +302,35 @@ namespace BlueControls.Forms {
             this.CFormula.Text = "CFO";
             this.CFormula.ChildGotFocus += new System.EventHandler<System.Windows.Forms.ControlEventArgs>(this.CFormula_ChildGotFocus);
             // 
+            // grpSpezial
+            // 
+            this.grpSpezial.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpSpezial.CausesValidation = false;
+            this.grpSpezial.Controls.Add(this.btnMonitoring);
+            this.grpSpezial.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpSpezial.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpSpezial.Location = new System.Drawing.Point(0, 0);
+            this.grpSpezial.Name = "grpSpezial";
+            this.grpSpezial.Size = new System.Drawing.Size(80, 81);
+            this.grpSpezial.TabIndex = 5;
+            this.grpSpezial.TabStop = false;
+            this.grpSpezial.Text = "Spezial";
+            // 
+            // btnMonitoring
+            // 
+            this.btnMonitoring.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnMonitoring.ImageCode = "Monitor|16";
+            this.btnMonitoring.Location = new System.Drawing.Point(0, 2);
+            this.btnMonitoring.Name = "btnMonitoring";
+            this.btnMonitoring.QuickInfo = "A";
+            this.btnMonitoring.Size = new System.Drawing.Size(72, 66);
+            this.btnMonitoring.TabIndex = 46;
+            this.btnMonitoring.Text = "Monitoring starten";
+            this.btnMonitoring.Click += new System.EventHandler(this.btnMonitoring_Click);
+            // 
             // ConnectedFormulaForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(606, 450);
             this.Controls.Add(this.CFormula);
@@ -314,9 +345,11 @@ namespace BlueControls.Forms {
             this.ribMain.ResumeLayout(false);
             this.tabFile.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
+            this.tabAllgemein.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
             this.grpAdminAllgemein.ResumeLayout(false);
             this.grpAdminBearbeiten.ResumeLayout(false);
+            this.grpSpezial.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -342,5 +375,7 @@ namespace BlueControls.Forms {
         private Button btnElementBearbeiten;
         private Button btnScript;
         public Button btnTopMost;
+        private GroupBox grpSpezial;
+        private Button btnMonitoring;
     }
 }

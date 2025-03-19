@@ -356,7 +356,6 @@ public class DatabaseChunk : Database {
                 Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen", 0);
             }
 
-
             System.Threading.Thread.Sleep(1000);
         } while (true);
 
@@ -365,7 +364,10 @@ public class DatabaseChunk : Database {
         var chunk = new Chunk(Filename, chunkId);
         chunk.LoadBytesFromDisk();
 
-        if (chunk.LoadFailed) { return (false, false); }
+        if (chunk.LoadFailed) {
+            Freeze($"Chunk {chunk.KeyName} Laden fehlgeschlagen");
+            return (false, false);
+        }
         OnLoading();
         var ok = Parse(chunk, needPassword);
 
@@ -531,7 +533,7 @@ public class DatabaseChunk : Database {
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
         chunkId = chunkId.ToLower();
-        
+
         var f = base.WriteValueToDiscOrServer(type, comment, column, row, user, datetimeutc, comment, chunkId);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -592,6 +594,7 @@ public class DatabaseChunk : Database {
 
         if (!parseSuccessful) {
             chunk.LoadFailed = true;
+            Freeze($"Chunk {chunk.KeyName} Parsen fehlgeschlagen");
             // Fehlerhaften Chunk nicht in die Dictionary einfügen
             return false;
         }

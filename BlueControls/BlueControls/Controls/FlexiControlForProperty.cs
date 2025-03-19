@@ -46,7 +46,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     private readonly Accessor<T>? _accessor;
 
-    private readonly Timer _checker;
+    private readonly Timer? _checker;
 
     #endregion
 
@@ -233,13 +233,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
     #region Methods
 
     protected override void Dispose(bool disposing) {
-        if (disposing) {
+        if (disposing && _checker != null) {
+            _checker.Enabled = false;
+            _checker.Tick -= Checker_Tick;
             _checker.Dispose();
         }
-
-        _checker.Enabled = false;
-        _checker.Tick -= Checker_Tick;
-        //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
         base.Dispose(disposing);
     }
 

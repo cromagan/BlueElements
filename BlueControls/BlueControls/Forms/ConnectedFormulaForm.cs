@@ -119,6 +119,8 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         FormulaSet(e.Item.KeyName);
     }
 
+    private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
+
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
         Database.ForceSaveAll();
