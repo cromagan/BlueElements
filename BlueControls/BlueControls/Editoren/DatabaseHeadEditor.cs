@@ -202,7 +202,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         _ = db.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
         var az = db.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
         _ = db.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
         _ = db.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
@@ -222,7 +222,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 Text_anzeigen = false,
                 Bild_anzeigen = true
             };
-
+            c.DefaultRenderer = o.MyClassId;
             c.RendererSettings = o.ParseableItems().FinishParseable();
         }
 

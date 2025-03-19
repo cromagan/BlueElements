@@ -1,9 +1,11 @@
 ﻿using BlueBasics;
+using BlueControls.CellRenderer;
 using BlueControls.Forms;
+using BlueDatabase;
 using System;
 using System.Threading;
 using static BlueBasics.Extensions;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using BlueControls.Controls;
 
 #nullable enable
 
@@ -24,6 +26,7 @@ public partial class GlobalMonitor : Form {
 
     public GlobalMonitor() {
         InitializeComponent();
+        GenerateUndoTabelle(tblLog);
 
         Develop.MonitorMessage = Message;
     }
@@ -32,8 +35,62 @@ public partial class GlobalMonitor : Form {
 
     #region Methods
 
+
+    public static void GenerateUndoTabelle(Table tblLog) {
+        //    public void Message(string category, string symbol, string message, int indent) {
+
+
+        Database db = new(Database.UniqueKeyValue());
+        db.LogUndo = false;
+        _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
+        var az = db.Column.GenerateAndAdd("Time", "Zeit", ColumnFormatHolder.DateTime);
+        _ = db.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolder.Text);
+        _ = db.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolder.Long);
+
+
+        foreach (var thisColumn in db.Column) {
+            if (!thisColumn.IsSystemColumn()) {
+                thisColumn.MultiLine = true;
+                thisColumn.TextBearbeitungErlaubt = false;
+                thisColumn.DropdownBearbeitungErlaubt = false;
+                thisColumn.DefaultRenderer = Renderer_TextOneLine.ClassId;
+            }
+        }
+
+        if (db.Column["Symbol"] is { IsDisposed: false } c) {
+            var o = new Renderer_ImageAndText {
+                Text_anzeigen = false,
+                Bild_anzeigen = true
+            };
+            c.DefaultRenderer = o.MyClassId;
+            c.RendererSettings = o.ParseableItems().FinishParseable();
+        }
+
+        db.RepairAfterParse();
+
+        var tcvc = ColumnViewCollection.ParseAll(db);
+        tcvc[1].ShowColumns("Symbol", "Time", "category", "indent", "Message");
+
+        db.ColumnArrangements = tcvc.ToString(false);
+
+        tblLog.DatabaseSet(db, string.Empty);
+        tblLog.Arrangement = string.Empty;
+        tblLog.SortDefinitionTemporary = new RowSortDefinition(db, az, true);
+    }
+
+
+
+
+
+
+
+
     public void Message(string category, string symbol, string message, int indent) {
         if (Disposing || IsDisposed) { return; }
+
+        if(string.IsNullOrEmpty(category)) { return; }
 
         if (InvokeRequired) {
             try {
@@ -47,11 +104,26 @@ public partial class GlobalMonitor : Form {
         _n--;
         if (_n < 0) { _n = 99999; }
 
-        var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent + 1}] {category}: {new string(' ', indent * 6)} {message}";
+        //var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent + 1}] {category}: {new string(' ', indent * 6)} {message}";
 
-        lstLog.ItemAdd(ItemOf(e, _n.ToStringInt7()));
+        //lstLog.ItemAdd(ItemOf(e, _n.ToStringInt7()));
 
-        lstLog.Refresh();
+        //lstLog.Refresh();
+
+
+
+
+        var r = tblLog.Database?.Row.GenerateAndAdd(_n.ToString(), "New Undo Item");
+        if (r == null) { return; }
+
+
+
+        if (!string.IsNullOrEmpty(symbol)) { r.CellSet("symbol", symbol + "|16", string.Empty); }
+        r.CellSet("Time", DateTime.Now.ToString7(), string.Empty);
+        r.CellSet("category", category, string.Empty);
+        r.CellSet("message", message, string.Empty);
+        r.CellSet("indent", indent, string.Empty);
+        //tblLog.Refresh();
     }
 
     internal static void Start() {
@@ -172,17 +244,18 @@ public partial class GlobalMonitor : Form {
         }
     }
 
-    private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
-        lstLog.ItemClear();
+
+        if (tblLog.Database is { } db) {
+            db.Row.Clear("Monitoring-Log geleert");
+        }
+
+
         Develop.MonitorMessage?.Invoke("Global", "Information", "Monitoring-Log geleert", 0);
     }
 
-    private void txbFilter_TextChanged(object sender, System.EventArgs e) {
-        lstLog.FilterText = txbFilter.Text;
-        btnFilterDel.Enabled = Enabled && !string.IsNullOrEmpty(txbFilter.Text);
-    }
+
 
     #endregion
 }

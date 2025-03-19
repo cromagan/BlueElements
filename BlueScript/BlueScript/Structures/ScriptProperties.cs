@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.IO.Ports;
 using BlueScript.Methods;
 
 namespace BlueScript.Structures;

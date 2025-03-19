@@ -2200,7 +2200,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         _autoFilter.Position_LocateToPosition(new Point(screenx + headPos.Left, screeny + headPos.Bottom));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
-        Develop.Debugprint_BackgroundThread();
+        //Develop.Debugprint_BackgroundThread();
     }
 
     private int Autofilter_Text(ColumnViewItem viewItem) {
