@@ -332,7 +332,7 @@ public class DatabaseChunk : Database {
         if (string.IsNullOrEmpty(chunkId)) { return (false, false); }
 
         var t = Stopwatch.StartNew();
-        var x = 0;
+        var lastMessageTime = 0L;
 
         chunkId = chunkId.ToLower();
 
@@ -350,9 +350,8 @@ public class DatabaseChunk : Database {
                 return (false, false);
             }
 
-            x += 1001;
-            if (x > 5000) {
-                x = 0;
+            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
+                lastMessageTime = t.ElapsedMilliseconds;
                 Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen", 0);
             }
 

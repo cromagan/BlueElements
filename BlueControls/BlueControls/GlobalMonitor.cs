@@ -1,21 +1,4 @@
-﻿// Authors:
-// Christian Peter
-//
-// Copyright (c) 2025 Christian Peter
-// https://github.com/cromagan/BlueElements
-//
-// License: GNU Affero General Public License v3.0
-// https://github.com/cromagan/BlueElements/blob/master/LICENSE
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-
-using BlueBasics;
+﻿using BlueBasics;
 using BlueControls.Forms;
 using System;
 using System.Threading;
@@ -30,6 +13,7 @@ public partial class GlobalMonitor : Form {
 
     #region Fields
 
+    private static CancellationTokenSource? _cancellationTokenSource;
     private static Thread? _monitorThread;
     private static GlobalMonitor? Monitor;
     private int _n = 0;
@@ -90,7 +74,11 @@ public partial class GlobalMonitor : Form {
 
         // Neustart des Threads und/oder Monitors erforderlich
         DisposeMonitor();
-        _monitorThread = new Thread(new ThreadStart(StartMonitorInThread));
+
+        // Neuen CancellationTokenSource erstellen
+        _cancellationTokenSource = new CancellationTokenSource();
+
+        _monitorThread = new Thread(() => StartMonitorInThread(_cancellationTokenSource.Token));
         _monitorThread.IsBackground = true;
         _monitorThread.SetApartmentState(ApartmentState.STA);
         _monitorThread.Start();
@@ -114,14 +102,46 @@ public partial class GlobalMonitor : Form {
     }
 
     private static void DisposeMonitor() {
+        // Breche den aktuellen Thread ab
+        try {
+            if (_cancellationTokenSource != null) {
+                if (!_cancellationTokenSource.IsCancellationRequested) {
+                    _cancellationTokenSource.Cancel();
+                }
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+            }
+        } catch {
+            // Ignoriere Fehler beim Abbrechen
+        }
+
+        // Warte eine kurze Zeit, damit der Thread auf die Abbruchanforderung reagieren kann
+        if (_monitorThread != null && _monitorThread.IsAlive) {
+            try {
+                // Kurze Wartezeit für geordnetes Beenden
+                if (!_monitorThread.Join(100)) {
+                    // Falls der Thread nicht innerhalb der Wartezeit beendet wurde
+                    // Setze ihn auf null, damit er beim Garbage Collector landen kann
+                }
+            } catch {
+                // Ignoriere Fehler beim Warten
+            }
+            _monitorThread = null;
+        }
+
+        // Setze den Monitor zurück
         if (Monitor != null) {
             Develop.MonitorMessage = null; // Delegat zurücksetzen
-            Monitor.Dispose();
+            try {
+                Monitor.Dispose();
+            } catch {
+                // Ignoriere Fehler beim Entsorgen
+            }
             Monitor = null;
         }
     }
 
-    private static void StartMonitorInThread() {
+    private static void StartMonitorInThread(CancellationToken cancellationToken) {
         try {
             // STA-Modus für den Thread festlegen (wichtig für Windows Forms)
             System.Windows.Forms.Application.EnableVisualStyles();
@@ -130,12 +150,25 @@ public partial class GlobalMonitor : Form {
             // Erstelle eine neue Instanz des Monitors
             Monitor = new GlobalMonitor();
 
-            // Starte den MessageLoop für das Formular
-            System.Windows.Forms.Application.Run(Monitor);
+            // Registriere die Formularschließung beim CancellationToken
+            cancellationToken.Register(() => {
+                try {
+                    if (Monitor != null && !Monitor.IsDisposed) {
+                        Monitor.BeginInvoke(new Action(() => Monitor.Close()));
+                    }
+                } catch {
+                    // Ignoriere Fehler beim Schließen
+                }
+            });
+
+            // Starte den MessageLoop für das Formular, wenn das Token nicht abgebrochen wurde
+            if (!cancellationToken.IsCancellationRequested) {
+                System.Windows.Forms.Application.Run(Monitor);
+            }
         } catch (Exception ex) {
             // Fehlerbehandlung
             Develop.DebugPrint(ex.Message);
-            DisposeMonitor();            // Monitor zurücksetzen, damit ein Neustart möglich ist
+            DisposeMonitor();  // Monitor zurücksetzen, damit ein Neustart möglich ist
         }
     }
 

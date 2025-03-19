@@ -372,9 +372,15 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     }
 
     public void Check(IEnumerable<string> ali) {
-        foreach (var thiss in ali) {
-            Check(thiss);
-        }
+        if (ali == null) { return; }
+
+        // Sammle nur die Items, die noch nicht in der checked-Liste sind
+        var itemsToAdd = ali.Where(name => !IsChecked(name)).ToList();
+
+        if (itemsToAdd.Count == 0) { return; } // Nichts zu tun
+
+        // Erstelle eine neue Liste mit kombiniertem Inhalt
+        ValidateCheckStates([.. _checked, .. itemsToAdd], itemsToAdd.FirstOrDefault());
     }
 
     public void Check(AbstractListItem ali) => Check(ali.KeyName);
@@ -541,11 +547,19 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
     public void UnCheck(AbstractListItem ali) => UnCheck(ali.KeyName);
 
-    //public void UnCheck(IEnumerable<string> ali) {
-    //    foreach (var thiss in ali) {
-    //        UnCheck(thiss);
-    //    }
-    //}
+    public void UnCheck(IEnumerable<string> ali) {
+        if (ali == null) { return; }
+
+        // Filtere die zu entfernenden Items aus der vorhandenen Liste
+        var newCheckedList = _checked.Except(ali).ToList();
+
+        // Wenn sich nichts geändert hat, früh zurückkehren
+        if (newCheckedList.Count == _checked.Count) { return; }
+
+        // Validiere alle auf einmal
+        ValidateCheckStates(newCheckedList, string.Empty);
+    }
+
     public void UnCheck(string name) {
         if (!IsChecked(name)) { return; }
 

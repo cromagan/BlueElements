@@ -1538,6 +1538,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (string.IsNullOrWhiteSpace(scriptname) && eventname != null) {
+                Develop.MonitorMessage?.Invoke($"{Caption}", "", $"Ereignis ausgelöst: {eventname.ToString()}", 0);
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) {
                     return ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, extended, false);
@@ -1627,6 +1628,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public virtual void Freeze(string reason) {
         SetReadOnly();
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
+
+        if (string.IsNullOrEmpty(FreezedReason)) {
+            Develop.MonitorMessage?.Invoke("Global", TableName, $"Datenbank {TableName} wird eingefohren: {reason}", 0);
+        }
+
         FreezedReason = reason;
     }
 
@@ -1922,7 +1928,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
-        Develop.MonitorMessage?.Invoke("Global", "Information", $"Lade DAtenbank von Dateisystem {fileNameToLoad.FileNameWithSuffix()}", 0);
+        //Develop.MonitorMessage?.Invoke("Global", "Information", $"Lade Datenbank von Dateisystem {fileNameToLoad.FileNameWithSuffix()}", 0);
 
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
@@ -1941,6 +1947,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             } else {
                 Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
                 Freeze("Datei existiert nicht");
+                Develop.MonitorMessage?.Invoke("Global", "Information", $"Datenbank nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0);
                 return;
             }
         }
@@ -1970,6 +1977,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
         _saveRequired = false;
         IsInCache = FileStateUtcDate;
+
+        Develop.MonitorMessage?.Invoke("Global", "Information", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
 
         BeSureToBeUpDoDate();
 
@@ -2925,9 +2934,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private void WaitInitialDone() {
         var t = Stopwatch.StartNew();
 
+        var lastMessageTime = 0L;
+
         while (IsInCache.Year < 2000) {
             Thread.Sleep(1);
-            if (t.ElapsedMilliseconds > 1200000) { return; }
+            if (t.ElapsedMilliseconds > 120 * 1000) {
+                Develop.MonitorMessage?.Invoke("Datenbank-Laden", "", $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} wurde nicht richtig initialisiert", 0);
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(FreezedReason)) {
+                Develop.MonitorMessage?.Invoke("Datenbank-Laden", "", $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} eingefrohren {FreezedReason}", 0);
+                return;
+            }
+
+            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
+                lastMessageTime = t.ElapsedMilliseconds;
+                Develop.MonitorMessage?.Invoke("Datenbank-Laden", "", $"Warte auf Abschluss der Initialsierung von {TableName}\\{Filename.FileNameWithSuffix()}", 0);
+            }
         }
     }
 

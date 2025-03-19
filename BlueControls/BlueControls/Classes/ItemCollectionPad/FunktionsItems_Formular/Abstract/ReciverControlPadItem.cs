@@ -162,6 +162,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             var tmp = Database.RepairUserGroups(value);
             if (!_visibleFor.IsDifferentTo(tmp)) { return; }
 
+            ConnectedFormula.ConnectedFormula.Invalidate_VisibleFor_AllUsed();
+
             _visibleFor = tmp.AsReadOnly();
             OnPropertyChanged();
         }

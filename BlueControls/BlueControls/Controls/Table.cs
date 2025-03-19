@@ -1520,7 +1520,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnDoubleClick(System.EventArgs e) {
-        //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereigniss ausgelöst
+        //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereignis ausgelöst
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }

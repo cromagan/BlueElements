@@ -435,7 +435,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
             if (string.IsNullOrEmpty(f) || !mustSave) { break; }
 
-            if (tim.ElapsedMilliseconds > 40000) {
+            if (tim.ElapsedMilliseconds > 40 * 1000) {
                 Develop.DebugPrint(ErrorType.Warning, "Datei nicht gespeichert: " + Filename + " " + f);
                 break;
             }
@@ -552,12 +552,12 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
                 
 
-                if (tim.ElapsedMilliseconds > 20000) { Develop.DebugPrint(ErrorType.Info, "Datei wurde während des Ladens verändert.\r\n" + Filename); }
+                if (tim.ElapsedMilliseconds > 20 * 1000) { Develop.DebugPrint(ErrorType.Info, "Datei wurde während des Ladens verändert.\r\n" + Filename); }
 
                 Pause(0.5, false);
             } catch (Exception ex) {
                 // Home Office kann lange blokieren....
-                if (tim.ElapsedMilliseconds > 300000) {
+                if (tim.ElapsedMilliseconds > 300 * 1000) {
                     Develop.DebugPrint(ErrorType.Error, "Die Datei<br>" + Filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
                     return (string.Empty, string.Empty);
                 }

@@ -199,9 +199,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (e.Cancel) { break; }
 
             Develop.SetUserDidSomething();
-            row.UpdateRow(true, false, "Allgemeines Updates");
+            row.UpdateRow(true, false, "Allgemeines Update (User Idle)");
             Develop.SetUserDidSomething();
-            if (tim.ElapsedMilliseconds > 30000) { break; }
+            if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
         }
 
         lock (Executingchangedrowslock) {

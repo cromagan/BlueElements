@@ -276,7 +276,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
     //    return s;
     //}
     protected override void OnClick(System.EventArgs e) {
-        // Click wird vor dem MouseUpEreigniss ausgelöst
+        // Click wird vor dem MouseUpEreignis ausgelöst
         if (_isFireing || IsDisposed || !Enabled || _clickFired) { return; }
 
         _clickFired = true;

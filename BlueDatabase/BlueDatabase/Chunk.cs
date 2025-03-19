@@ -345,18 +345,17 @@ public class Chunk : IHasKeyName {
     public void WaitInitialDone() {
         var t = Stopwatch.StartNew();
 
-        var x = 0;
+        var lastMessageTime = 0L;
 
         while (_lastcheck.Year < 2000) {
             Thread.Sleep(1);
-            if (t.ElapsedMilliseconds > 1200000) {
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Abbruch, Chunk wurde nicht richtig initialisiert", 0);
+            if (t.ElapsedMilliseconds > 120 * 1000) {
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
                 return;
             }
-            x += 1;
-            if (x > 5000) {
-                x = 0;
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Warte auf Abschluss der Initialsierung", 0);
+            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
+                lastMessageTime = t.ElapsedMilliseconds;
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Warte auf Abschluss der Initialsierung des Chunks {KeyName}", 0);
             }
         }
     }

@@ -47,6 +47,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
 
+    private static List<string>? _visibleFor_AllUsed;
     private readonly List<string> _notAllowedChilds = [];
 
     private ItemCollectionPadItem? _pages;
@@ -145,16 +146,21 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return !FileExists(filename) ? null : new ConnectedFormula(filename);
     }
 
+    public static void Invalidate_VisibleFor_AllUsed() => _visibleFor_AllUsed = null;
+
     public static List<string> VisibleFor_AllUsed() {
-        var l = new List<string>();
+        if (_visibleFor_AllUsed != null) { return _visibleFor_AllUsed; }
+
+        _visibleFor_AllUsed = new List<string>();
 
         foreach (var thisCf in AllFiles) {
             if (thisCf is { IsDisposed: false, _pages: { IsDisposed: false } icp }) {
-                l.AddRange(icp.VisibleFor_AllUsed());
+                _visibleFor_AllUsed.AddRange(icp.VisibleFor_AllUsed());
             }
         }
 
-        return l.SortedDistinctList();
+        _visibleFor_AllUsed = _visibleFor_AllUsed.SortedDistinctList();
+        return _visibleFor_AllUsed;
     }
 
     public List<string> AllPages() {
