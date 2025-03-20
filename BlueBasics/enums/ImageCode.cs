@@ -116,6 +116,7 @@ public enum ImageCode {
     Pipette,
     PlusZeichen,
     PowerPoint,
+    Puzzle,
     Querformat,
     Radiergummi,
     Raster,

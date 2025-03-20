@@ -129,10 +129,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             return;
         }
 
-        var nsr = f.Variables?.GetString("Notsuccessfulreason") ?? string.Empty;
-
-        if (!string.IsNullOrEmpty(nsr)) {
-            Message("NICHT erfolgreich, aber kein Skript Fehler: " + nsr);
+        if (!string.IsNullOrEmpty(f.NotSuccessfulReason)) {
+            Message("NICHT erfolgreich, aber kein Skript Fehler: " + f.NotSuccessfulReason);
             return;
         }
 

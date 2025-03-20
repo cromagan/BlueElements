@@ -346,13 +346,13 @@ public class DatabaseChunk : Database {
             if (chunksBeingSaved.Count == 0) { break; }
 
             if (t.ElapsedMilliseconds > 150 * 1000) {
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Abbruch, {chunksBeingSaved.Count} Chunks wurden noch nicht gespeichert.", 0);
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Abbruch, {chunksBeingSaved.Count} Chunks wurden noch nicht gespeichert.", 0);
                 return (false, false);
             }
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen", 0);
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen", 0);
             }
 
             System.Threading.Thread.Sleep(1000);

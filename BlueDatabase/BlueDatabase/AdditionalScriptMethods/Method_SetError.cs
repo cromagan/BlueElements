@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
@@ -65,13 +66,16 @@ public class Method_SetError : Method_Database {
         var r = MyRow(scp);
         if (r is not { IsDisposed: false }) { return DoItFeedback.InternerFehler(ld); }
 
-        r.LastCheckedRowFeedback ??= [];
+        if (varCol.Get("ErrorColumns") is not VariableListString vls) { return DoItFeedback.InternerFehler(ld); }
+        var l = vls.ValueList;
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(scp, attvar, z);
             if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(z)); }
-            r.LastCheckedRowFeedback.Add(column.KeyName.ToUpperInvariant() + "|" + attvar.ValueStringGet(0));
+            l.Add(column.KeyName.ToUpperInvariant() + "|" + attvar.ValueStringGet(0));
         }
+
+        vls.ValueList = l.SortedDistinctList();
 
         return DoItFeedback.Null();
     }

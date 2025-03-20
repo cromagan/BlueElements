@@ -96,13 +96,19 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
     public ColumnItem? OriginIDColumn { get; internal set; }
 
     [DefaultValue("")]
-    public string Script { get; set; } = string.Empty;
+    public string Script_After { get; set; } = string.Empty;
+
+    [DefaultValue("")]
+    public string Script_Before { get; set; } = string.Empty;
+
+    [DefaultValue("")]
+    public string Script_MenuGeneration { get; set; } = string.Empty;
 
     #endregion
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string entitiId, RowItem rowIn) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string entitiId, RowItem rowIn, bool isMenuGeneration, string info) {
         var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -210,7 +216,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
         if (!string.IsNullOrEmpty(nowGeneratedId.msg)) { Fehler(nowGeneratedId.msg, ImageCode.Kritisch); return; }
 
-        if (string.IsNullOrEmpty(Script)) {
+        if (string.IsNullOrEmpty(Script_MenuGeneration)) {
             Fehler("Interner Fehler: Kein Skript vorhanden", ImageCode.Kritisch);
             return;
         }
@@ -412,7 +418,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
         _infos = [];
 
-        var scf = ExecuteScript(Script, Mode, EntityID, rowIn);
+        var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
 
         if (!scf.AllOk) {
             if (Generic.UserGroup == Constants.Administrator) {

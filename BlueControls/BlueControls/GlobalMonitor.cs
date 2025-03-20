@@ -35,11 +35,8 @@ public partial class GlobalMonitor : Form {
 
     #region Methods
 
-
     public static void GenerateUndoTabelle(Table tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
-
-
         Database db = new(Database.UniqueKeyValue());
         db.LogUndo = false;
         _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
@@ -48,7 +45,6 @@ public partial class GlobalMonitor : Form {
         _ = db.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolder.Long);
-
 
         foreach (var thisColumn in db.Column) {
             if (!thisColumn.IsSystemColumn()) {
@@ -80,53 +76,7 @@ public partial class GlobalMonitor : Form {
         tblLog.SortDefinitionTemporary = new RowSortDefinition(db, az, true);
     }
 
-
-
-
-
-
-
-
-    public void Message(string category, string symbol, string message, int indent) {
-        if (Disposing || IsDisposed) { return; }
-
-        if(string.IsNullOrEmpty(category)) { return; }
-
-        if (InvokeRequired) {
-            try {
-                _ = Invoke(new Action(() => Message(category, symbol, message, indent)));
-                return;
-            } catch {
-                return;
-            }
-        }
-
-        _n--;
-        if (_n < 0) { _n = 99999; }
-
-        //var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent + 1}] {category}: {new string(' ', indent * 6)} {message}";
-
-        //lstLog.ItemAdd(ItemOf(e, _n.ToStringInt7()));
-
-        //lstLog.Refresh();
-
-
-
-
-        var r = tblLog.Database?.Row.GenerateAndAdd(_n.ToString(), "New Undo Item");
-        if (r == null) { return; }
-
-
-
-        if (!string.IsNullOrEmpty(symbol)) { r.CellSet("symbol", symbol + "|16", string.Empty); }
-        r.CellSet("Time", DateTime.Now.ToString7(), string.Empty);
-        r.CellSet("category", category, string.Empty);
-        r.CellSet("message", message, string.Empty);
-        r.CellSet("indent", indent, string.Empty);
-        //tblLog.Refresh();
-    }
-
-    internal static void Start() {
+    public static void Start() {
         // Prüfe, ob Thread und Monitor bereits funktionieren
         if (_monitorThread != null && _monitorThread.IsAlive && Monitor != null && !Monitor.IsDisposed) {
             // Thread läuft und Fenster existiert, bringe es in den Vordergrund
@@ -161,6 +111,40 @@ public partial class GlobalMonitor : Form {
             Thread.Sleep(10);
             attempts++;
         }
+    }
+
+    public void Message(string category, string symbol, string message, int indent) {
+        if (Disposing || IsDisposed) { return; }
+
+        if (string.IsNullOrEmpty(category)) { return; }
+
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(() => Message(category, symbol, message, indent)));
+                return;
+            } catch {
+                return;
+            }
+        }
+
+        _n--;
+        if (_n < 0) { _n = 99999; }
+
+        //var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent + 1}] {category}: {new string(' ', indent * 6)} {message}";
+
+        //lstLog.ItemAdd(ItemOf(e, _n.ToStringInt7()));
+
+        //lstLog.Refresh();
+
+        var r = tblLog.Database?.Row.GenerateAndAdd(_n.ToString(), "New Undo Item");
+        if (r == null) { return; }
+
+        if (!string.IsNullOrEmpty(symbol)) { r.CellSet("symbol", symbol + "|16", string.Empty); }
+        r.CellSet("Time", DateTime.Now.ToString7(), string.Empty);
+        r.CellSet("category", category, string.Empty);
+        r.CellSet("message", message, string.Empty);
+        r.CellSet("indent", indent, string.Empty);
+        //tblLog.Refresh();
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
@@ -244,18 +228,13 @@ public partial class GlobalMonitor : Form {
         }
     }
 
-
     private void btnLeeren_Click(object sender, System.EventArgs e) {
-
         if (tblLog.Database is { } db) {
             db.Row.Clear("Monitoring-Log geleert");
         }
 
-
         Develop.MonitorMessage?.Invoke("Global", "Information", "Monitoring-Log geleert", 0);
     }
-
-
 
     #endregion
 }

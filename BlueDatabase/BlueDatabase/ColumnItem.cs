@@ -1125,7 +1125,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
             if (thisRowItem != null) {
-                if (_function == ColumnFunction.Virtuelle_Spalte) { thisRowItem.CheckRowDataIfNeeded(); }
+                if (_function == ColumnFunction.Virtuelle_Spalte) { thisRowItem.CheckRow(); }
 
                 if (_multiLine) {
                     list.AddRange(thisRowItem.CellGetList(this));

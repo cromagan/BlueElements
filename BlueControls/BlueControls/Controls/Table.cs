@@ -2620,7 +2620,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 #region Draw_CellTransparent
 
                 if (cellInThisDatabaseColumn.Function == ColumnFunction.Virtuelle_Spalte) {
-                    cellInThisDatabaseRow.CheckRowDataIfNeeded();
+                    cellInThisDatabaseRow.CheckRow();
                 }
 
                 var toDrawd = cellInThisDatabaseRow.CellGetString(cellInThisDatabaseColumn);

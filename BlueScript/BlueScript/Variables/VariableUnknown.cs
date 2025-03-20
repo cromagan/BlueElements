@@ -111,7 +111,12 @@ public class VariableUnknown : Variable {
         }
     }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (true, txt);
+    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
+        if (scp != null) {
+            Develop.MonitorMessage?.Invoke(scp.MainInfo, "Formel", "Unbekannte Variable erstellt (ukn): " + txt, scp.Stufe);
+        }
+        return (true, txt);
+    }
 
     #endregion
 }

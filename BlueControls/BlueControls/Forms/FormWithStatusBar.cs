@@ -60,8 +60,19 @@ public partial class FormWithStatusBar : Form {
     #region Methods
 
     public static void UpdateStatusBar(ErrorType type, string text, bool addtime) {
+        switch (type) {
+            case ErrorType.Error:
+                Develop.MonitorMessage?.Invoke("Status-Bar, Fehler", "Kritisch", text, 0);
+                break;
 
-        Develop.MonitorMessage?.Invoke("Status-Bar", string.Empty, text, 0);
+            case ErrorType.Warning:
+                Develop.MonitorMessage?.Invoke("Status-Bar, Warnung", "Warnung", text, 0);
+                break;
+
+            default:
+                Develop.MonitorMessage?.Invoke("Status-Bar, Info", "Information", text, 0);
+                break;
+        }
 
         if (addtime && !string.IsNullOrEmpty(text)) {
             text = DateTime.Now.ToString("HH:mm:ss") + " " + text;

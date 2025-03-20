@@ -180,11 +180,11 @@ public class Script {
             }
         }
 
-        Develop.MonitorMessage?.Invoke(scp.MainInfo, "", $"Parsen: {scp.Chain} START", scp.Stufe);
+        Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain} START", scp.Stufe);
 
         do {
             if (pos >= redScriptText.Length || endScript) {
-                Develop.MonitorMessage?.Invoke(scp.MainInfo, "", $"Parsen: {scp.Chain} ENDE, reguläres Ende bei Pos. {pos + 1}", scp.Stufe);
+                Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
                 return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, endScript);
             }
@@ -195,7 +195,7 @@ public class Script {
             } else {
                 var f = CommandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
                 if (!f.AllOk) {
-                    Develop.MonitorMessage?.Invoke(scp.MainInfo, "", $"Parsen: {scp.Chain} ENDE bei Pos. {pos + 1} wegen Fehler {ld.Protocol.Last()}", scp.Stufe);
+                    Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE wegen Fehler {ld.Protocol.Last()}", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, false);
                 }
 
@@ -204,7 +204,7 @@ public class Script {
                 pos = f.Position;
                 ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
                 if (f.BreakFired) {
-                    Develop.MonitorMessage?.Invoke(scp.MainInfo, "", $"Parsen: {scp.Chain} BREAK bei Pos. {pos + 1}", scp.Stufe);
+                    Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
 
                     return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, true, false);
                 }

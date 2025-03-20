@@ -113,8 +113,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
         string? va;
         if (lastInputRow != null) {
-            lastInputRow.CheckRowDataIfNeeded();
-            va = lastInputRow.ReplaceVariables(_filterwert, true, lastInputRow.LastCheckedEventArgs?.Variables);
+            va = lastInputRow.ReplaceVariables(_filterwert, true, lastInputRow.CheckRow()?.Variables);
         } else {
             if (FilterInput != null) {
                 FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Database, "IO"));

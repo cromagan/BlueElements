@@ -268,17 +268,10 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         SetValueFromCell(_column, _lastrow);
         CheckEnabledState(_column, _lastrow);
 
-        _lastrow?.CheckRowDataIfNeeded();
-
-        if (_lastrow?.LastCheckedEventArgs is { } rce) {
+        if (_lastrow?.CheckRow() is { } rce) {
             DatabaseInput_RowChecked(this, rce);
         }
     }
-
-    //protected override void RemoveAll() {
-    //    ValueToCell();
-    //    base.RemoveAll();
-    //}
 
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {

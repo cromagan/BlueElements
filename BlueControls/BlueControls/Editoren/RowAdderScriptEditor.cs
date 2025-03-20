@@ -40,6 +40,13 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
 
     private RowAdderPadItem? _item;
 
+    /// <summary>
+    /// 1 = Before
+    /// 2 = Menu
+    /// 3 = After
+    /// </summary>
+    private int scriptNo = 2;
+
     #endregion
 
     #region Constructors
@@ -101,7 +108,26 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
 
             if (value is RowAdderPadItem cpi) {
                 tbcScriptEigenschaften.Enabled = true;
-                Script = cpi.Script;
+
+                switch (scriptNo) {
+                    case 1:
+                        Script = cpi.Script_Before;
+                        break;
+
+                    case 2:
+                        Script = cpi.Script_MenuGeneration;
+                        break;
+
+                    case 3:
+                        Script = cpi.Script_After;
+                        break;
+
+                    default:
+                        tbcScriptEigenschaften.Enabled = false;
+                        Script = string.Empty;
+                        break;
+                }
+
                 _item = cpi;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
@@ -151,14 +177,35 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
             return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         }
 
-        return RowAdder.ExecuteScript(_item.Script, "Testmodus", _item.EntityID, r);
+        switch (scriptNo) {
+            case 1:
+                return RowAdder.ExecuteScript(_item.Script_Before, "Testmodus", _item.EntityID, r, true, "Before");
+
+            case 3:
+                return RowAdder.ExecuteScript(_item.Script_After, "Testmodus", _item.EntityID, r, true, "After");
+
+            default:
+                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, "Testmodus", _item.EntityID, r, true, "Menu");
+        }
     }
 
     public override void WriteInfosBack() {
         //if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
 
         if (_item != null) {
-            _item.Script = Script;
+            switch (scriptNo) {
+                case 1:
+                    _item.Script_Before = Script;
+                    break;
+
+                case 2:
+                    _item.Script_MenuGeneration = Script;
+                    break;
+
+                case 3:
+                    _item.Script_After = Script;
+                    break;
+            }
         }
     }
 

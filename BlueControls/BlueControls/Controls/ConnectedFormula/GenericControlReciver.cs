@@ -202,7 +202,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         if (RowsInput is not { Count: 1 } r) { return null; }
-        r[0].CheckRowDataIfNeeded();
+        r[0].CheckRow();
         return r[0];
     }
 
@@ -231,7 +231,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (row?.Database is { IsDisposed: false }) {
             RowsInput.Add(row);
-            row.CheckRowDataIfNeeded();
+            row.CheckRow();
 
             if (doAtabaseAfter) { RegisterEvents(); }
         }
@@ -311,7 +311,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         RowsInput = [.. FilterInput.Rows];
 
         if (RowSingleOrNull() is { IsDisposed: false } r) {
-            r.CheckRowDataIfNeeded();
+            r.CheckRow();
         }
 
         _rowsInputChangedHandling = false;

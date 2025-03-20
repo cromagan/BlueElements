@@ -60,7 +60,9 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// </summary>
     private string _originIdColumnName = string.Empty;
 
-    private string _script = string.Empty;
+    private string _script_After = string.Empty;
+    private string _script_Before = string.Empty;
+    private string _script_MenuGeneration = string.Empty;
 
     #endregion
 
@@ -68,8 +70,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public RowAdderPadItem() : this(string.Empty, null, null) { }
 
-    public RowAdderPadItem(string keyName,  ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
-
+    public RowAdderPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
     public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
@@ -161,12 +162,32 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         }
     }
 
-    public string Script {
-        get => _script;
+    public string Script_After {
+        get => _script_After;
 
         set {
-            if (value == _script) { return; }
-            _script = value;
+            if (value == _script_After) { return; }
+            _script_After = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Script_Before {
+        get => _script_Before;
+
+        set {
+            if (value == _script_Before) { return; }
+            _script_Before = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Script_MenuGeneration {
+        get => _script_MenuGeneration;
+
+        set {
+            if (value == _script_MenuGeneration) { return; }
+            _script_MenuGeneration = value;
             OnPropertyChanged();
         }
     }
@@ -180,7 +201,9 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             EntityID = EntityID,
             OriginIDColumn = OriginIDColumn,
             AdditionalInfoColumn = AdditionalInfoColumn,
-            Script = Script
+            Script_MenuGeneration = Script_MenuGeneration,
+            Script_Before = Script_Before,
+            Script_After = Script_After,
         };
 
         con.DoDefaultSettings(parent, this, mode);
@@ -212,8 +235,8 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         //    return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";
         //}
 
-        if (string.IsNullOrEmpty(Script)) {
-            return "Kein Skript definiert.";
+        if (string.IsNullOrEmpty(Script_MenuGeneration)) {
+            return "Kein Skript für die Menugenerierung definiert.";
         }
 
         return base.ErrorReason();
@@ -249,7 +272,9 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         result.ParseableAdd("EntityID", _entityId);
         result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
         result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
-        result.ParseableAdd("Script", _script);
+        result.ParseableAdd("ScriptMenu", _script_MenuGeneration);
+        result.ParseableAdd("ScriptAfter", _script_After);
+        result.ParseableAdd("ScriptBefore", _script_Before);
         return result;
     }
 
@@ -268,7 +293,16 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
                 return true;
 
             case "script":
-                _script = value.FromNonCritical();
+            case "scriptmenu":
+                _script_MenuGeneration = value.FromNonCritical();
+                return true;
+
+            case "scriptbefore":
+                _script_Before = value.FromNonCritical();
+                return true;
+
+            case "scriptafter":
+                _script_After = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);

@@ -289,7 +289,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                     row.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
                     RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true);
                     //row.CheckRowDataIfNeeded();
-                    MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");
+                    MessageBox.Show("Datenüberprüfung:\r\n" + row.CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
                 }
                 break;
 

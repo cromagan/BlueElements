@@ -160,19 +160,19 @@ public static class Develop {
 
                     case ErrorType.Info:
                         Trace.WriteLine("<th><font size = 3>Info");
-                        MonitorMessage?.Invoke("Info", "", meldung, 0);
+                        MonitorMessage?.Invoke("Info", "Information", meldung, 0);
                         nr = 5;
                         break;
 
                     case ErrorType.Warning:
-                        MonitorMessage?.Invoke("Warnung", "", meldung, 0);
+                        MonitorMessage?.Invoke("Warnung", "Warnung", meldung, 0);
                         if (IsHostRunning()) { Debugger.Break(); }
                         Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
                         _deleteTraceLog = false;
                         break;
 
                     case ErrorType.Error:
-                        MonitorMessage?.Invoke("Fehler, Programmabbruch", "", meldung, 0);
+                        MonitorMessage?.Invoke("Fehler, Programmabbruch", "Kritisch", meldung, 0);
                         if (IsHostRunning()) { Debugger.Break(); }
                         if (!FileExists(tmp)) { l = []; }
                         Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
@@ -180,7 +180,7 @@ public static class Develop {
                         break;
 
                     default:
-                        MonitorMessage?.Invoke("Info Unbekannten Typs", "", meldung, 0);
+                        MonitorMessage?.Invoke("Info Unbekannten Typs", "Sonne", meldung, 0);
                         Trace.WriteLine("<th>?");
                         _deleteTraceLog = false;
                         break;

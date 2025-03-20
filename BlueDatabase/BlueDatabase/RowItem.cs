@@ -44,13 +44,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Fields
 
-    public RowCheckedEventArgs? LastCheckedEventArgs;
-
-    public string? LastCheckedMessage;
-
-    public List<string>? LastCheckedRowFeedback;
-
     private Database? _database;
+    private RowCheckedEventArgs? _lastCheckedEventArgs;
 
     private string? _tmpQuickInfo;
 
@@ -285,8 +280,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return Database.Cell.GetString(column, this);
     }
 
-    //public List<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? [];
-
     public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column[columnName], this) ?? true;
 
     public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? true;
@@ -319,67 +312,56 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CellSet(ColumnItem column, DateTime value, string comment) => Database?.Cell.Set(column, this, value.ToString5(), comment);
 
-    public void CheckRowDataIfNeeded() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) {
-            LastCheckedMessage = "Datenbank verworfen";
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(Database.ScriptNeedFix)) {
-            LastCheckedMessage = "Skripte fehlerhaft und müssen repariert werden.";
-            return;
-        }
-
-        if (RowCollection.FailedRows.ContainsKey(this)) {
-            LastCheckedMessage = "Das Skript konnte die Zeile nicht durchrechnen.";
-            return;
-        }
-        if (LastCheckedEventArgs != null) { return; }
+    public RowCheckedEventArgs CheckRow() {
+        if (_lastCheckedEventArgs != null) { return _lastCheckedEventArgs; }
 
         var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, 0, null, true, false);
 
-        LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
-
         if (!sef.AllOk) {
-            LastCheckedMessage += "Das Skript enthält Fehler und muss repariert werden.";
-            return;
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, "Das Skript enthält Fehler und muss repariert werden.");
+            return _lastCheckedEventArgs;
         }
+
         if (!sef.Successful) {
-            LastCheckedMessage += "Das Skript konnte die Zeile nicht durchrechnen: " + sef.NotSuccessfulReason;
-            return;
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, "Das Skript konnte die Zeile nicht durchrechnen: " + sef.NotSuccessfulReason);
+            return _lastCheckedEventArgs;
         }
 
         List<string> cols = [];
 
-        var tmp = LastCheckedRowFeedback;
+        var m = string.Empty;
+
+        var tmp = sef.Variables?.GetList("ErrorColumns");
         if (tmp is { Count: > 0 }) {
             foreach (var thiss in tmp) {
                 _ = cols.AddIfNotExists(thiss);
                 var t = thiss.SplitBy("|");
-                var thisc = db?.Column[t[0]];
-                if (thisc != null) {
-                    LastCheckedMessage = LastCheckedMessage + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+
+                if (Database?.Column[t[0]] is { } thisc) {
+                    m = m + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
                 }
             }
         } else {
-            LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
+            m += "Diese Zeile ist fehlerfrei.";
         }
 
-        if (db?.Column.SysCorrect is { IsDisposed: false } sc) {
-            if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(db.Column.SysCorrect)) {
-                CellSet(db.Column.SysCorrect, cols.Count == 0, "Fehlerprüfung");
+        if (Database?.Column.SysCorrect is { IsDisposed: false } sc) {
+            if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(sc)) {
+                CellSet(sc, cols.Count == 0, "Fehlerprüfung");
 
                 var erg2 = ExecuteScript(ScriptEventTypes.correct_changed, string.Empty, true, 3, null, true, false);
 
                 if (!erg2.AllOk) {
-                    LastCheckedMessage += "Das Skripte enthalten Fehler und müssen repariert werden.";
+                    m += "Das Skripte enthalten Fehler und müssen repariert werden.";
                 }
             }
         }
 
-        LastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef.Variables);
+        _lastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef.Variables, m);
 
-        OnRowChecked(LastCheckedEventArgs);
+        OnRowChecked(_lastCheckedEventArgs);
+
+        return _lastCheckedEventArgs;
     }
 
     //public void CloneFrom(RowItem source, bool nameAndKeyToo) {
@@ -448,7 +430,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
         var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m) || Database is not { } db) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
+
+        if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         do {
@@ -475,10 +459,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void InvalidateCheckData() {
-        LastCheckedRowFeedback?.Clear();
-        LastCheckedRowFeedback = null;
-        LastCheckedEventArgs = null;
-        LastCheckedMessage = null;
+        RowCollection.FailedRows.TryRemove(this, out _);
+        _lastCheckedEventArgs = null;
     }
 
     public void InvalidateRowState(string comment) {
@@ -733,7 +715,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
-            Develop.MonitorMessage?.Invoke($"{db.Caption}/{CellFirstString()}","", $"Datenüberprüfung Start: Extended {extendedAllowed} Grund: {reason})",0);
+            Develop.MonitorMessage?.Invoke($"{db.Caption}/{CellFirstString()}", "Skript", $"Datenüberprüfung Start: Extended {extendedAllowed} Grund: {reason})", 0);
             db.OnDropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
             OnDropMessage(ErrorType.Info, $"Aktualisiere ({reason})");
 
@@ -745,7 +727,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (!ok.Successful) {
                 db.OnDropMessage(ErrorType.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
                 OnDropMessage(ErrorType.Info, $"Fehlgeschlagen ({reason})");
-                LastCheckedMessage = "Konnte intern nicht berechnet werden. Administrator verständigen." + ok.NotSuccessfulReason;
+                //LastCheckedMessagex = "Konnte intern nicht berechnet werden. Administrator verständigen." + ok.NotSuccessfulReason;
 
                 RowCollection.FailedRows.TryAdd(this, 0);
                 return ok;
@@ -764,10 +746,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
 
-            RowCollection.FailedRows.TryRemove(this, out _);
-
             InvalidateCheckData();
-            CheckRowDataIfNeeded();
             RowCollection.AddBackgroundWorker(this);
             db.OnInvalidateView();
             return ok;
@@ -876,7 +855,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 
         if (db.Column.SysRowState is { IsDisposed: false } srs && srs != column) {
-            RowCollection.FailedRows.TryRemove(this, out _);
+            InvalidateCheckData();
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
                 //if (reason != Reason.UpdateChanges)
@@ -1034,7 +1013,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 //    break;
 
                 case ColumnFunction.Virtuelle_Spalte:
-                    CheckRowDataIfNeeded();
+                    CheckRow();
                     txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
                     break;
 

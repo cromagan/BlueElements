@@ -1219,6 +1219,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         vars.Add(new VariableBool("Successful", true, false, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
         vars.Add(new VariableString("NotSuccessfulReason", string.Empty, false, "Die letzte Meldung, warum es nicht erfolgreich war."));
         vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
+        vars.Add(new VariableListString("ErrorColumns", [], false, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
         #endregion
 
@@ -1373,6 +1374,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, name); }
         if (!script.NeedRow) { row = null; }
+
+        if (row != null && RowCollection.FailedRows.ContainsKey(row)) {
+            return new ScriptEndedFeedback("Das Skript konnte die Zeile nicht durchrechnen.", false, false, name);
+        }
 
         var n = row?.CellFirstString() ?? "ohne Zeile";
 
@@ -1538,7 +1543,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (string.IsNullOrWhiteSpace(scriptname) && eventname != null) {
-                Develop.MonitorMessage?.Invoke($"{Caption}", "", $"Ereignis ausgelöst: {eventname.ToString()}", 0);
+                Develop.MonitorMessage?.Invoke($"{Caption}", "Blitz", $"Ereignis ausgelöst: {eventname.ToString()}", 0);
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) {
                     return ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, extended, false);
@@ -1630,7 +1635,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
 
         if (string.IsNullOrEmpty(FreezedReason)) {
-            Develop.MonitorMessage?.Invoke("Global", TableName, $"Datenbank {TableName} wird eingefohren: {reason}", 0);
+            Develop.MonitorMessage?.Invoke(TableName, "Datenbank", $"Datenbank {TableName} wird eingefohren: {reason}", 0);
         }
 
         FreezedReason = reason;
@@ -1928,7 +1933,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
-        //Develop.MonitorMessage?.Invoke("Global", "Information", $"Lade Datenbank von Dateisystem {fileNameToLoad.FileNameWithSuffix()}", 0);
+        //Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Lade Datenbank von Dateisystem {fileNameToLoad.FileNameWithSuffix()}", 0);
 
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
@@ -1947,7 +1952,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             } else {
                 Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
                 Freeze("Datei existiert nicht");
-                Develop.MonitorMessage?.Invoke("Global", "Information", $"Datenbank nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0);
+                Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Datenbank nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0);
                 return;
             }
         }
@@ -1978,7 +1983,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _saveRequired = false;
         IsInCache = FileStateUtcDate;
 
-        Develop.MonitorMessage?.Invoke("Global", "Information", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
+        Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
 
         BeSureToBeUpDoDate();
 
@@ -2939,18 +2944,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         while (IsInCache.Year < 2000) {
             Thread.Sleep(1);
             if (t.ElapsedMilliseconds > 120 * 1000) {
-                Develop.MonitorMessage?.Invoke("Datenbank-Laden", "", $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} wurde nicht richtig initialisiert", 0);
+                Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} wurde nicht richtig initialisiert", 0);
                 return;
             }
 
             if (!string.IsNullOrEmpty(FreezedReason)) {
-                Develop.MonitorMessage?.Invoke("Datenbank-Laden", "", $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} eingefrohren {FreezedReason}", 0);
+                Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} eingefrohren {FreezedReason}", 0);
                 return;
             }
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                Develop.MonitorMessage?.Invoke("Datenbank-Laden", "", $"Warte auf Abschluss der Initialsierung von {TableName}\\{Filename.FileNameWithSuffix()}", 0);
+                Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Warte auf Abschluss der Initialsierung von {TableName}\\{Filename.FileNameWithSuffix()}", 0);
             }
         }
     }

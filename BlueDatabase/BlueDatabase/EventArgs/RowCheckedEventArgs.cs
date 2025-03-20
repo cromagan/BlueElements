@@ -24,11 +24,23 @@ namespace BlueDatabase.EventArgs;
 
 public class RowCheckedEventArgs : RowEventArgs {
 
+    #region Fields
+
+    public readonly string Message;
+
+    #endregion
+
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, VariableCollection? variables) : base(row) {
+    public RowCheckedEventArgs(RowItem row, string message) : base(row) {
+        Message = "<b><u>" + row.CellFirstString() + "</b></u><br><br>" + message;
+    }
+
+    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, VariableCollection? variables, string message) : base(row) {
         ColumnsWithErrors = columnsWithErrors;
         Variables = variables;
+        Message = string.Empty;
+        Message = "<b><u>" + row.CellFirstString() + "</b></u><br><br>" + message;
     }
 
     #endregion

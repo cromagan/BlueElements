@@ -350,12 +350,12 @@ public class Chunk : IHasKeyName {
         while (_lastcheck.Year < 2000) {
             Thread.Sleep(1);
             if (t.ElapsedMilliseconds > 120 * 1000) {
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
                 return;
             }
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "", $"Warte auf Abschluss der Initialsierung des Chunks {KeyName}", 0);
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Warte auf Abschluss der Initialsierung des Chunks {KeyName}", 0);
             }
         }
     }
