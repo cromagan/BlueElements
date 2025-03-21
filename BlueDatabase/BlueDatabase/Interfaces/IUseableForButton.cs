@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.Interfaces;
 
@@ -63,17 +63,17 @@ public static class UseableForButton {
 
         var sx = ufb.TranslateButtonArgs(args, filterarg, rowarg);
 
-        var t = Script.ReduceText(sx);
+        var (reducedText, error) = Script.ReduceText(sx);
 
-        if (!string.IsNullOrEmpty(t.error)) {
-            return "Fehler beim Berechnen der Attribute: " + t.error;
+        if (!string.IsNullOrEmpty(error)) {
+            return "Fehler beim Berechnen der Attribute: " + error;
         }
 
         var ld = new LogData("Knopfdruck", 0);
-        var cdw = new CanDoFeedback(0, t.reducedText, string.Empty, ld);
+        var cdw = new CanDoFeedback(0, reducedText, string.Empty, ld);
 
         var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, "Button", "Button");
-        ufb.DoIt(varCol, cdw, scp);
+        _ = ufb.DoIt(varCol, cdw, scp);
 
         return cdw.LogData.Protocol.JoinWithCr();
     }

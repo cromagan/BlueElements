@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -35,6 +31,10 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -191,8 +191,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     public static void GenerateUndoTabelle(Table tblUndo) {
-        Database db = new(Database.UniqueKeyValue());
-        db.LogUndo = false;
+        Database db = new(Database.UniqueKeyValue()) {
+            LogUndo = false
+        };
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("Database", "Datenbank", ColumnFormatHolder.Text);
@@ -309,7 +310,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnSkripte_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+        _ = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
         //var se = new_DatabaseScriptEditor(db);
         //_ = se.ShowDialog();
     }
@@ -319,7 +320,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         var tcvc = ColumnViewCollection.ParseAll(db);
         tcvc[1].Edit();
-        Table.RepairColumnArrangements(db);
+        _ = Table.RepairColumnArrangements(db);
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
@@ -328,7 +329,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         var c = new TableView(db, false, true, true);
-        c.ShowDialog();
+        _ = c.ShowDialog();
     }
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {

@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
+using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Constants;
 using static BlueBasics.Interfaces.ParseableExtension;
 

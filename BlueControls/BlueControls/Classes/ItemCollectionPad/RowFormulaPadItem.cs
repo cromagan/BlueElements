@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -29,6 +26,9 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad;
@@ -113,12 +113,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
 
     public RowItem? Row => Database?.Row.SearchByKey(_rowKey);
 
-    public string SheetStyle {
-        get {
-            if (Parent is IStyleable ist) { return ist.SheetStyle; }
-            return string.Empty;
-        }
-    }
+    public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     protected override int SaveOrder => 999;
 
@@ -204,8 +199,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
             return;
         }
 
-        icp.ResetVariables();
-        icp.ReplaceVariables(db, _rowKey);
+        _ = icp.ResetVariables();
+        _ = icp.ReplaceVariables(db, _rowKey);
         GeneratedBitmap = icp.ToBitmap(1);
     }
 

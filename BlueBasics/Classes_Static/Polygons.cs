@@ -17,10 +17,10 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using BlueBasics.Enums;
 
 namespace BlueBasics;
 

@@ -17,15 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Printing;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -37,6 +28,15 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Printing;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -67,8 +67,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         Unselect();
 
         if (row is { }) {
-            Items.ResetVariables();
-            Items.ReplaceVariables(row);
+            _ = Items.ResetVariables();
+            _ = Items.ReplaceVariables(row);
         }
     }
 
@@ -77,7 +77,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
     }
-
     #endregion
 
     #region Events
@@ -249,7 +248,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
             switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "löschen":
                     if (pm.Parent is AbstractPadItem api) {
-                        api.JointPoints.Remove(pm);
+                        _ = api.JointPoints.Remove(pm);
                     }
 
                     return;
@@ -538,11 +537,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 Unselect();
             }
 
-            if (hotitem is AbstractPadItem api) {
-                LastClickedItem = api;
-            } else {
-                LastClickedItem = null;
-            }
+            LastClickedItem = hotitem is AbstractPadItem api ? api : null;
         }
     }
 
@@ -557,11 +552,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         QuickInfo = string.Empty;
 
         if (e.Button == MouseButtons.None && it is AbstractPadItem bpi) {
-            if (!string.IsNullOrEmpty(bpi.ColumnQuickInfo)) {
-                QuickInfo = bpi.ColumnQuickInfo + "<hr>" + bpi.Description;
-            } else {
-                QuickInfo = bpi.Description;
-            }
+            QuickInfo = !string.IsNullOrEmpty(bpi.ColumnQuickInfo) ? bpi.ColumnQuickInfo + "<hr>" + bpi.Description : bpi.Description;
         }
 
         if (e.Button == MouseButtons.Left) {

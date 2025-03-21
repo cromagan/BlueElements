@@ -17,13 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -35,12 +28,17 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.Polygons;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-
-#nullable enable
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
@@ -110,12 +108,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     public abstract bool InputMustBeOneRow { get; }
 
-    public override bool MoveXByMouse {
-        get {
-            if (_xPosition != XPosition.frei) { return false; }
-            return base.MoveXByMouse;
-        }
-    }
+    public override bool MoveXByMouse => _xPosition == XPosition.frei && base.MoveXByMouse;
 
     public abstract bool MustBeInDrawingArea { get; }
 

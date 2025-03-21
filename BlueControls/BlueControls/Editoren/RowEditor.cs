@@ -33,12 +33,7 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
 
     #region Properties
 
-    public Database? Database {
-        get {
-            if (ToEdit is not RowItem { IsDisposed: false } r) { return null; }
-            return r.Database;
-        }
-    }
+    public Database? Database => ToEdit is not RowItem { IsDisposed: false } r ? null : r.Database;
 
     #endregion
 

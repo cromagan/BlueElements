@@ -17,10 +17,10 @@
 
 #nullable enable
 
+using BlueBasics;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using BlueBasics;
 using static BlueBasics.IO;
 
 namespace BlueControls.Interfaces;
@@ -78,7 +78,7 @@ public static class HasSettings {
         }
 
         if (CanWriteInDirectory(pf)) {
-            settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
+            _ = settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
             settings.SettingsLoaded = true;
         }
     }

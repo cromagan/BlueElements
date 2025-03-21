@@ -17,18 +17,16 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ExtractFirstText : Method {
 
     #region Properties
@@ -56,11 +54,7 @@ internal class Method_ExtractFirstText : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
 
-        if (tags is not { Count: not 0 }) {
-            return new DoItFeedback(attvar.ValueStringGet(2));
-        }
-
-        return new DoItFeedback(tags[0]);
+        return tags is not { Count: not 0 } ? new DoItFeedback(attvar.ValueStringGet(2)) : new DoItFeedback(tags[0]);
     }
 
     #endregion

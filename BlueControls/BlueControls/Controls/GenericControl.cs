@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Interfaces;
+using BlueControls.Enums;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -24,11 +29,6 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Interfaces;
-using BlueControls.Enums;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using Form = System.Windows.Forms.Form;
 
 //Inherits UserControl ' -> Gibt Focus an Child!
@@ -241,13 +241,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     public bool ContainsMouse() => DoDrawings() && ClientRectangle.Contains(PointToClient(Cursor.Position));
 
-    public bool DoDrawings() {
-        if (IsDisposed || Disposing) { return false; }
-        if (DesignMode) { return true; }
-        if (_pform is not { IsDisposed: false, Visible: true } or Forms.Form { IsClosing: true }) { return false; }
-
-        return Visible;
-    }
+    public bool DoDrawings() => !IsDisposed && !Disposing
+&& (DesignMode || (_pform is { IsDisposed: false, Visible: true } and not Forms.Form { IsClosing: true } && Visible));
 
     public void DoQuickInfo() {
         if (!string.IsNullOrEmpty(_quickInfo) && ContainsMouse()) {

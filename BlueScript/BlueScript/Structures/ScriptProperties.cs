@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Methods;
+using System.Collections.Generic;
 
 namespace BlueScript.Structures;
 
@@ -37,9 +37,7 @@ public class ScriptProperties {
         MainInfo = mainInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, List<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) {
-        Stufe = stufe;
-    }
+    public ScriptProperties(ScriptProperties scriptProperties, List<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
 
     #endregion
 

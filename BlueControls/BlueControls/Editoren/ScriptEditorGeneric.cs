@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
@@ -29,6 +26,9 @@ using BlueControls.ItemCollectionList;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using FastColoredTextBoxNS;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;

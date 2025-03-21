@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls;
@@ -30,6 +25,11 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using static BlueBasics.Constants;
 
 namespace BlueDatabase;
@@ -137,11 +137,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public ColumnViewItem? this[int index] => index >= 0 && index < _internal.Count ? _internal[index] : null;
 
-    public ColumnViewItem? this[ColumnItem? column] {
-        get {
-            return column == null ? null : _internal.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == column);
-        }
-    }
+    public ColumnViewItem? this[ColumnItem? column] => column == null ? null : _internal.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == column);
 
     #endregion
 
@@ -422,9 +418,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return x;
     }
 
-    public void RemoveAll() {
-        _internal.Clear();
-    }
+    public void RemoveAll() => _internal.Clear();
 
     public void RemoveAt(int z) => _internal.RemoveAt(z);
 

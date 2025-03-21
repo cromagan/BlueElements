@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -29,6 +26,9 @@ using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
@@ -340,11 +340,11 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
                 no = no.Replace(",", "_");
                 no = no.Replace("__", "_");
                 var newn = IO.TempFile(fl.SelectedPath, no, "txt");
-                t.WriteAllText(newn, Constants.Win1252, false);
+                _ = t.WriteAllText(newn, Constants.Win1252, false);
             }
         }
         var newn2 = IO.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
-        l.WriteAllText(newn2, Constants.Win1252, true);
+        _ = l.WriteAllText(newn2, Constants.Win1252, true);
     }
 
     private void Hinzu_Click(object sender, System.EventArgs e) {

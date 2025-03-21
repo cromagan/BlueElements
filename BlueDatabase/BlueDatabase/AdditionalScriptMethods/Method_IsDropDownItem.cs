@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptMethods;
@@ -57,11 +57,7 @@ internal class Method_IsDropDownItem : Method_Database {
 
         tocheck = tocheck.SortedDistinctList();
 
-        if (tocheck.Any(thisstring => !column.DropDownItems.Contains(thisstring))) {
-            return DoItFeedback.Falsch();
-        }
-
-        return DoItFeedback.Wahr();
+        return tocheck.Any(thisstring => !column.DropDownItems.Contains(thisstring)) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
     #endregion

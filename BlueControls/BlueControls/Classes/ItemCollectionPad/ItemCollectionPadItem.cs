@@ -17,19 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Windows.Data;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -46,6 +33,19 @@ using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Windows.Data;
+using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
@@ -149,10 +149,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public override string Description => "Eine Sammlung von Anzeige-Objekten";
 
     public bool Endless {
-        get {
-            if (Parent != null) { return false; }
-            return _endless;
-        }
+        get => Parent == null && _endless;
         set {
             if (Parent != null) { value = false; }
             if (value == _endless) { return; }
@@ -212,10 +209,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public string SheetStyle {
-        get {
-            if (Parent is IStyleable ist) { return ist.SheetStyle; }
-            return _sheetStyle;
-        }
+        get => Parent is IStyleable ist ? ist.SheetStyle : _sheetStyle;
         set {
             if (IsDisposed) { return; }
 
@@ -521,12 +515,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public static PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) => new((float)((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
             (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
 
-    public static float ZoomFitValue(RectangleF maxBounds, Size sizeOfPaintArea) {
-        if (maxBounds.IsEmpty) { return 1f; }
-
-        return Math.Min(sizeOfPaintArea.Width / maxBounds.Width,
+    public static float ZoomFitValue(RectangleF maxBounds, Size sizeOfPaintArea) => maxBounds.IsEmpty
+            ? 1f
+            : Math.Min(sizeOfPaintArea.Width / maxBounds.Width,
             sizeOfPaintArea.Height / maxBounds.Height);
-    }
 
     public void Add(AbstractPadItem? item) {
         if (item == null) { Develop.DebugPrint(ErrorType.Error, "Item ist null"); return; }
@@ -549,7 +541,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void BringToFront(AbstractPadItem thisItem) {
         if (_internal.IndexOf(thisItem) == _internal.Count - 1) { return; }
-        _internal.Remove(thisItem);
+        _ = _internal.Remove(thisItem);
         _internal.Add(thisItem);
     }
 
@@ -893,7 +885,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void SendToBack(AbstractPadItem thisItem) {
         if (_internal.IndexOf(thisItem) == 0) { return; }
-        _internal.Remove(thisItem);
+        _ = _internal.Remove(thisItem);
         _internal.Insert(0, thisItem);
     }
 
@@ -904,11 +896,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         OnPropertyChanged("Items");
     }
 
-    public override QuickImage SymbolForReadableText() {
-        if (IsHead()) { return QuickImage.Get(ImageCode.Diskette); }
-
-        return QuickImage.Get(ImageCode.Gruppe);
-    }
+    public override QuickImage SymbolForReadableText() => IsHead() ? QuickImage.Get(ImageCode.Diskette) : QuickImage.Get(ImageCode.Gruppe);
 
     public List<string> VisibleFor_AllUsed() {
         var l = new List<string>();
@@ -947,16 +935,16 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false, false) ?? [];
 
         //var vars = new VariableCollection();
-        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
-        vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-        vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        _ = vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
+        _ = vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        _ = vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         //vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
         //vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
         //vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
-        vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
+        _ = vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
 
-        vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
+        _ = vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
 
         var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
 

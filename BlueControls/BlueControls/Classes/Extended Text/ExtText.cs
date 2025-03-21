@@ -17,16 +17,16 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Text;
 using static BlueBasics.Converter;
 using Color = System.Drawing.Color;
 using Pen = System.Drawing.Pen;
@@ -302,9 +302,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     //        if (checkstate) {
     //            this[cc].SheetStyle = tmp;
-    public void Dispose() {
-        IsDisposed = true;
-    }
+    public void Dispose() => IsDisposed = true;
 
     //public void Check(int first, int last, bool checkstate) {
     //    for (var cc = first; cc <= last; cc++) {
@@ -443,7 +441,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         }
 
         var entity = htmltext.Substring(position, endpos - position + 1);
-        if (Constants.ReverseHtmlEntities.TryGetValue(entity, out char c)) {
+        if (Constants.ReverseHtmlEntities.TryGetValue(entity, out var c)) {
             Add(new ExtCharAscii(this, style, font, c));
             return endpos;
         }
@@ -462,10 +460,10 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
         for (var z = 0; z < Count; z++) {
             if (lastStufe != this[z].Font) {
-                t.Append("<H").Append(this[z].GetStyle()).Append('>');
+                _ = t.Append("<H").Append(this[z].GetStyle()).Append('>');
                 lastStufe = this[z].Font;
             }
-            t.Append(this[z].HtmlText());
+            _ = t.Append(this[z].HtmlText());
         }
         return t.ToString();
     }
@@ -491,7 +489,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         var zeichen = -1;
 
         while (pos < cactext.Length) {
-            char ch = cactext[pos];
+            var ch = cactext[pos];
 
             if (isRich) {
                 switch (ch) {
@@ -499,7 +497,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                         if (temp.Length > 0) {
                             zeichen++;
                             Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
-                            temp.Clear();
+                            _ = temp.Clear();
                         }
                         // HTML-Code verarbeiten
                         DoHtmlCode(cactext, pos, ref zeichen, ref font, ref style);
@@ -512,7 +510,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                         if (temp.Length > 0) {
                             zeichen++;
                             Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
-                            temp.Clear();
+                            _ = temp.Clear();
                         }
                         pos = AddSpecialEntities(cactext, pos, style, font);
                         zeichen++;

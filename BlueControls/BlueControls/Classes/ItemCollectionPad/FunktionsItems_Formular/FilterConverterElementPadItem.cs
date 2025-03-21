@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -29,6 +25,10 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -146,8 +146,9 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var o = DatabaseOutput?.Column[_filterSpalte];
-        var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype);
-        con.ErrorText = _fehlerText;
+        var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype) {
+            ErrorText = _fehlerText
+        };
         con.DoDefaultSettings(parent, this, mode);
 
         return con;

@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 
 namespace BlueControls.AdditionalScriptMethods;
 

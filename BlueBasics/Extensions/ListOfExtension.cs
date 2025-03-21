@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -27,8 +29,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -234,7 +234,7 @@ public static partial class Extensions {
             _ = l.Append("|");
         }
 
-        if (l.Length > 0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
+        if (l.Length > 0) { _ = l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
 
         col.Add(tagname + "=" + l);
     }
@@ -268,7 +268,7 @@ public static partial class Extensions {
     public static void Remove<T>(this List<T> items, string name) where T : class, IHasKeyName {
         if (string.IsNullOrEmpty(name)) { return; }
 
-        items.RemoveAll(item => item != null && string.Equals(item.KeyName, name, StringComparison.OrdinalIgnoreCase));
+        _ = items.RemoveAll(item => item != null && string.Equals(item.KeyName, name, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Enums;
 using BlueDatabase;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
@@ -72,7 +72,7 @@ public partial class Form : System.Windows.Forms.Form {
         set => base.AutoSize = false;
     }
 
-    public override sealed Color BackColor {
+    public sealed override Color BackColor {
         get => base.BackColor;
         // ReSharper disable once ValueParameterNotUsed
         set => base.BackColor = value;

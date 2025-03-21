@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -31,6 +26,11 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using Orientation = BlueBasics.Enums.Orientation;
 
@@ -85,11 +85,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public FlexiControl(string captionText, int width, bool isCaption) : base(false, false, false) {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        if (isCaption) {
-            _editType = EditTypeFormula.als_Überschrift_anzeigen;
-        } else {
-            _editType = EditTypeFormula.nur_als_Text_anzeigen;
-        }
+        _editType = isCaption ? EditTypeFormula.als_Überschrift_anzeigen : EditTypeFormula.nur_als_Text_anzeigen;
 
         _caption = captionText;
         _captionPosition = CaptionPosition.Links_neben_dem_Feld;
@@ -614,7 +610,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void _InfoCaption_Click(object sender, System.EventArgs e) {
         if (GetControl<ComboBox>() is { } cbx) {
-            cbx.Focus();
+            _ = cbx.Focus();
             cbx.ShowMenu(null, null);
         }
     }
@@ -680,12 +676,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
         // Text_abschneiden, wäre Cool, weil dann der Quickmode verfügbar ist
 
-        if (_captionPosition is CaptionPosition.Links_neben_dem_Feld_unsichtbar
-                     or CaptionPosition.Über_dem_Feld_unsichtbar) {
-            _captionObject.Text = " ";
-        } else {
-            _captionObject.Text = _caption;
-        }
+        _captionObject.Text = _captionPosition is CaptionPosition.Links_neben_dem_Feld_unsichtbar
+                     or CaptionPosition.Über_dem_Feld_unsichtbar
+            ? " "
+            : _caption;
 
         if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
             // Kann alles sein, Beschriftung und was weiß ich.

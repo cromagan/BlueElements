@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using static BlueBasics.Constants;
 using static BlueBasics.Extensions;
 
@@ -299,10 +299,9 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return false;
     }
 
-    public string ReplaceInText(string txt) {
-        if (!txt.ToLowerInvariant().Contains("~" + KeyName.ToLowerInvariant() + "~")) { return txt; }
-        return txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
-    }
+    public string ReplaceInText(string txt) => !txt.ToLowerInvariant().Contains("~" + KeyName.ToLowerInvariant() + "~")
+            ? txt
+            : txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
 
     protected abstract Variable? NewWithThisValue(object? x);
 

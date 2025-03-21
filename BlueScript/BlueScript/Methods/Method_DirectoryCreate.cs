@@ -17,19 +17,17 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.IO;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_DirectoryCreate : Method {
 
     #region Properties

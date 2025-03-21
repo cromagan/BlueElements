@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Converter;
 
 namespace BlueScript.Methods;
@@ -75,11 +75,7 @@ internal class Method_Min : Method {
             }
         }
 
-        if (l.Count > 0) {
-            return new DoItFeedback(l.Min());
-        }
-
-        return new DoItFeedback(ld, "Keine gültigen Werte angekommen");
+        return l.Count > 0 ? new DoItFeedback(l.Min()) : new DoItFeedback(ld, "Keine gültigen Werte angekommen");
     }
 
     #endregion

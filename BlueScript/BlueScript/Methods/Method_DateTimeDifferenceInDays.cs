@@ -17,16 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_DateTimeDifferenceInDays : Method {
 
     #region Properties
@@ -56,11 +54,9 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
         var d2 = attvar.ValueDateGet(1);
 
-        if (d2 == null) {
-            return new DoItFeedback(ld, "Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.");
-        }
-
-        return new DoItFeedback(d1.Value.Subtract(d2.Value).TotalDays);
+        return d2 == null
+            ? new DoItFeedback(ld, "Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.")
+            : new DoItFeedback(d1.Value.Subtract(d2.Value).TotalDays);
     }
 
     #endregion

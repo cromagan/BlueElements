@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BlueScript.Variables;
 
@@ -46,7 +46,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
 
     public VariableCollection(List<Variable> v, bool readOnly) {
         foreach (var thisV in v) {
-            Add(thisV);
+            _ = Add(thisV);
         }
         ReadOnly = readOnly;
     }
@@ -58,7 +58,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
     public VariableCollection(List<VariableString>? v) {
         if (v != null) {
             foreach (var thisV in v) {
-                Add(thisV);
+                _ = Add(thisV);
             }
         }
         ReadOnly = true;
@@ -78,12 +78,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
 
     #region Indexers
 
-    public Variable? this[int index] {
-        get {
-            if (index < 0 || index >= _internal.Count) { return null; }
-            return _internal[index];
-        }
-    }
+    public Variable? this[int index] => index < 0 || index >= _internal.Count ? null : _internal[index];
 
     #endregion
 
@@ -239,10 +234,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         return vf.ValueString;
     }
 
-    public bool Remove(Variable v) {
-        if (ReadOnly) { return false; }
-        return _internal.Remove(v);
-    }
+    public bool Remove(Variable v) => !ReadOnly && _internal.Remove(v);
 
     public void RemoveWithComment(string comment) {
         if (ReadOnly) { return; }

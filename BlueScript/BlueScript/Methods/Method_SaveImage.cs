@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.IO;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
 using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;

@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -32,6 +27,11 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -87,13 +87,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
             if (value == _column) { return; }
             if (IsDisposed) { return; }
 
-            if (_column is { IsDisposed: false }) { AllOk(); }
+            if (_column is { IsDisposed: false }) { _ = AllOk(); }
 
-            if (value is ColumnItem c) {
-                _column = c;
-            } else {
-                _column = null;
-            }
+            _column = value is ColumnItem c ? c : null;
             Column_DatenAuslesen();
         }
     }
@@ -231,7 +227,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void btnSpaltenkopf_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Database is not { IsDisposed: false } db) { return; }
 
-        db.Edit(typeof(DatabaseHeadEditor));
+        _ = db.Edit(typeof(DatabaseHeadEditor));
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {
@@ -558,8 +554,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (linkdb == null) { return; }
 
         if (tblFilterliste.Database == null) {
-            Database db = new(Database.UniqueKeyValue());
-            db.LogUndo = false;
+            Database db = new(Database.UniqueKeyValue()) {
+                LogUndo = false
+            };
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 

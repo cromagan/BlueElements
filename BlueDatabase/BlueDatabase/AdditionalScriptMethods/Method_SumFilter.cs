@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -66,11 +66,7 @@ public class Method_SumFilter : Method_Database {
 
         var x = returncolumn.Summe(r);
 
-        if (x is not double xd) {
-            return new DoItFeedback(ld, "Summe konnte nicht berechnet werden.");
-        }
-
-        return new DoItFeedback(xd);
+        return x is not double xd ? new DoItFeedback(ld, "Summe konnte nicht berechnet werden.") : new DoItFeedback(xd);
     }
 
     #endregion

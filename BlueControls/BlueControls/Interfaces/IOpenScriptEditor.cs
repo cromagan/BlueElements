@@ -25,6 +25,5 @@ public interface IOpenScriptEditor {
 
     public void OpenScriptEditor();
 
-
     #endregion
 }

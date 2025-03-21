@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.ItemCollectionList;
+using System.Collections.Generic;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;

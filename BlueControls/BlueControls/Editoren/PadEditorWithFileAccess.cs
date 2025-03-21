@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -30,6 +25,11 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.Temporär;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -128,7 +128,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
-        ItemCollectionPadItem b = new();
+        ItemCollectionPadItem b = [];
         Pad.AddCentered(b);
         b.SetCoordinates(new RectangleF(10, 10, 200, 200));
     }
@@ -152,7 +152,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
         if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }
 
-        LoadSymbol.ShowDialog();
+        _ = LoadSymbol.ShowDialog();
     }
 
     private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
@@ -190,7 +190,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         if (MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
 
         var t = Pad.Items.ParseableItems().FinishParseable();
-        WriteAllText(_lastFileName, t, Constants.Win1252, false);
+        _ = WriteAllText(_lastFileName, t, Constants.Win1252, false);
     }
 
     private void LoadSymbol_FileOk(object sender, CancelEventArgs e) {
@@ -212,7 +212,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         if (Pad?.Items == null) { return; }
 
         var t = Pad.Items.ParseableItems().FinishParseable();
-        WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
+        _ = WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
         btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
         _lastFileName = SaveTab.FileName;
     }

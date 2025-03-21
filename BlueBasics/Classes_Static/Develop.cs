@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,8 +30,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using static BlueBasics.IO;
 using Timer = System.Windows.Forms.Timer;
 
@@ -220,7 +220,7 @@ public static class Develop {
                         if (l != null) { endl.AddRange(l); }
                     }
                     HTML_AddFoot(endl);
-                    endl.WriteAllText(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
+                    _ = endl.WriteAllText(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
                     AbortExe();
                     return;
                 }
@@ -243,16 +243,12 @@ public static class Develop {
 
     public static void DebugPrint_MissingCommand(string command) => DebugPrint(ErrorType.Warning, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
 
-    public static void DebugPrint_NichtImplementiert(bool doend) {
-        DebugPrint(doend ? ErrorType.Error : ErrorType.Warning,
+    public static void DebugPrint_NichtImplementiert(bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning,
             "Diese Funktion ist vom Entwickler noch nicht implementiert.");
-    }
 
     public static void DebugPrint_ReadOnly() => DebugPrint(ErrorType.Warning, "Der Wert ist schreibgeschützt.");
 
-    public static void DebugPrint_RoutineMussUeberschriebenWerden(bool doend) {
-        DebugPrint(doend ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
-    }
+    public static void DebugPrint_RoutineMussUeberschriebenWerden(bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
 
     public static void DoEvents() => Application.DoEvents();
 

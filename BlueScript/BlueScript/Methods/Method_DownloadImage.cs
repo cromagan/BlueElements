@@ -17,18 +17,16 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_DownloadImage : Method {
 
     #region Fields
@@ -72,7 +70,7 @@ internal class Method_DownloadImage : Method {
             Bitmap? bmp = null;
             if (img is Bitmap bmp2) { bmp = bmp2; }
 
-            Last.Add(new VariableBitmap(varn, bmp, true, string.Empty));
+            _ = Last.Add(new VariableBitmap(varn, bmp, true, string.Empty));
             return new DoItFeedback(bmp);
         } catch {
             return new DoItFeedback(null as Bitmap);

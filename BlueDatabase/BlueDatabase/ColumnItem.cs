@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,12 +31,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -901,15 +901,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (name.ToUpperInvariant() == "OFFLINE") { return false; } // SQL System-Name
         if (name.ToUpperInvariant() == "ONLINE") { return false; } // SQL System-Name
 
-        if (name.ToUpperInvariant() == TmpNewDummy) { return false; } // BlueDatabase name bei neuen Spalten
-
-        return true;
+        return name.ToUpperInvariant() != TmpNewDummy; // BlueDatabase name bei neuen Spalten
     }
 
-    public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool preverDropDown) {
-        if (column is not { IsDisposed: false }) { return EditTypeTable.None; }
-        return UserEditDialogTypeInTable(column.Function, preverDropDown && column.EditableWithDropdown, column.EditableWithTextInput, column.MultiLine);
-    }
+    public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool preverDropDown) => column is not { IsDisposed: false }
+            ? EditTypeTable.None
+            : UserEditDialogTypeInTable(column.Function, preverDropDown && column.EditableWithDropdown, column.EditableWithTextInput, column.MultiLine);
 
     public void AddSystemInfo(string type, string user) {
         var t = ColumnSystemInfo.SplitAndCutByCrToList();
@@ -1093,7 +1090,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         return true;
     }
-
     public List<string> Contents() => Contents(Database?.Row.ToList());
 
     public List<string> Contents(FilterCollection fc, List<RowItem>? pinned) {
@@ -1103,7 +1099,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         var r2 = new List<RowItem>();
         r2.AddRange(r);
 
-        if (pinned != null) { r2.AddIfNotExists(pinned); }
+        if (pinned != null) { _ = r2.AddIfNotExists(pinned); }
 
         return Contents(r2);
     }
@@ -1114,7 +1110,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
             if (thisRowItem != null) {
-                if (_function == ColumnFunction.Virtuelle_Spalte) { thisRowItem.CheckRow(); }
+                if (_function == ColumnFunction.Virtuelle_Spalte) { _ = thisRowItem.CheckRow(); }
 
                 if (_multiLine) {
                     list.AddRange(thisRowItem.CellGetList(this));
@@ -1738,7 +1734,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             l.Add(maxCount + " - " + keyValue);
         } while (d.Count > 0);
 
-        l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
+        _ = l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
     }
 
     public double? Summe(FilterCollection fc) {
@@ -2230,20 +2226,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case DatabaseDataType.ColumnNameOfLinkedDatabase:
 
-                if (newvalue.IsFormat(FormatHolder.Long)) {
-                    _columnNameOfLinkedDatabase = string.Empty;
-                } else {
-                    _columnNameOfLinkedDatabase = newvalue;
-                }
+                _columnNameOfLinkedDatabase = newvalue.IsFormat(FormatHolder.Long) ? string.Empty : newvalue;
 
                 break;
 
             case DatabaseDataType.SortType:
-                if (string.IsNullOrEmpty(newvalue)) {
-                    _sortType = SortierTyp.Original_String;
-                } else {
-                    _sortType = (SortierTyp)LongParse(newvalue);
-                }
+                _sortType = string.IsNullOrEmpty(newvalue) ? SortierTyp.Original_String : (SortierTyp)LongParse(newvalue);
                 break;
 
             case DatabaseDataType.ColumnAlign:
@@ -2332,7 +2320,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (fc != null && string.IsNullOrWhiteSpace(info)) {
                 foreach (var thisRow in fc.Rows) {
                     if (thisRow.CellGetString(this) != val) {
-                        CellCollection.LinkedCellData(this, thisRow, true, false);
+                        _ = CellCollection.LinkedCellData(this, thisRow, true, false);
                     }
                 }
                 fc.Dispose();

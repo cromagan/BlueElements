@@ -17,18 +17,16 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_BackupControl : Method {
 
     #region Properties
@@ -60,8 +58,7 @@ internal class Method_BackupControl : Method {
 
         var bvw = new BackupVerwalter(2, 20);
         var m = bvw.CleanUpDirectory(filn, attvar.ValueStringGet(1));
-        if (string.IsNullOrEmpty(m)) { return DoItFeedback.Null(); }
-        return new DoItFeedback(ld, "Fehler beim Ausführen");
+        return string.IsNullOrEmpty(m) ? DoItFeedback.Null() : new DoItFeedback(ld, "Fehler beim Ausführen");
     }
 
     #endregion

@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System;
-using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueDatabase;
+using System;
+using System.ComponentModel;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;

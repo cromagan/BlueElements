@@ -98,13 +98,7 @@ public class VariableFilterItem : Variable {
 
     protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
 
-    private void GetText() {
-        if (_filter == null || !_filter.IsOk()) {
-            _lastText = "Filter: [ERROR]";
-        } else {
-            _lastText = "Filter: " + _filter.ReadableText();
-        }
-    }
+    private void GetText() => _lastText = _filter == null || !_filter.IsOk() ? "Filter: [ERROR]" : "Filter: " + _filter.ReadableText();
 
     #endregion
 }

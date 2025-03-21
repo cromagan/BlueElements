@@ -17,17 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Decrypt : Method {
 
     #region Properties
@@ -51,9 +49,7 @@ internal class Method_Decrypt : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var wert = attvar.ValueStringGet(0).Decrypt(attvar.ValueStringGet(1));
 
-        if (wert == null) { return new DoItFeedback(ld, "Entschlüsselung fehlgeschlagen."); }
-
-        return new DoItFeedback(wert);
+        return wert == null ? new DoItFeedback(ld, "Entschlüsselung fehlgeschlagen.") : new DoItFeedback(wert);
     }
 
     #endregion

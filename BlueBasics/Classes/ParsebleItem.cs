@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 
 namespace BlueBasics;
 

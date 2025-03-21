@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -86,7 +86,6 @@ public class Method_AddRows : Method_Database {
         if (c == null) { return new DoItFeedback(ld, "Erste Spalte nicht vorhanden"); }
 
         var d = attvar.ValueNumGet(1);
-
 
         foreach (var thisKey in keys) {
 

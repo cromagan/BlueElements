@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.ComponentModel;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System.ComponentModel;
+using System.Windows.Forms;
 using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls.Editoren;

@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System.Windows.Forms;
 using BlueBasics.Interfaces;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad;
@@ -25,6 +24,7 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.Structures;
+using System.Windows.Forms;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -67,11 +67,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
     }
 
     public override object? Object {
-        get {
-            if (IsDisposed) { return null; }
-
-            return _item;
-        }
+        get => IsDisposed ? null : (object?)_item;
         set {
             if (value is not CreativePadItem) { value = null; }
             if (_item == value) { return; }
@@ -132,8 +128,9 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
             return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         }
 
-        var p = new ItemCollectionPadItem();
-        p.Endless = true;
+        var p = new ItemCollectionPadItem {
+            Endless = true
+        };
         var f = p.ExecuteScript(_item.Script, "Testmodus", r);
 
         cpad.Items = p;

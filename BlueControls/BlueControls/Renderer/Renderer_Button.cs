@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueControls.Interfaces;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.CellRenderer;
 
@@ -183,11 +183,7 @@ public class Renderer_Button : Renderer_Abstract {
     private QuickImage? QImage(string content) {
         var t = content.SplitBy(";");
 
-        if (_bild_anzeigen) {
-            return QuickImage.Get(t[0]);
-        }
-
-        return null;
+        return _bild_anzeigen ? QuickImage.Get(t[0]) : null;
     }
 
     #endregion

@@ -83,7 +83,6 @@
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
     <Compile Include="AdditionalScriptMethods\Method_EnsureDatabaseLoaded.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_FilterinMyDB.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ForEachRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ImportLinked.cs" />
     <Compile Include="AdditionalScriptMethods\Method_LookupFilterAllValues.cs" />

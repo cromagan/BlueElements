@@ -17,12 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -36,6 +30,12 @@ using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -76,7 +76,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem());
 
-        FormulaSet(filename, notAllowedchilds);
+        _ = FormulaSet(filename, notAllowedchilds);
 
         //MultiUserFile.SaveAll(false);
         //Database.ForceSaveAll();
@@ -244,7 +244,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(true);
-        FormulaSet(e.Item.KeyName, null);
+        _ = FormulaSet(e.Item.KeyName, null);
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
@@ -295,10 +295,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        var p = new ItemCollectionPadItem();
-        p.Caption = n;
-        p.Breite = 100;
-        p.Höhe = 100;
+        var p = new ItemCollectionPadItem {
+            Caption = n,
+            Breite = 100,
+            Höhe = 100
+        };
 
         var it = new RowEntryPadItem();
         p.Add(it);
@@ -322,7 +323,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
         if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }
 
-        LoadSymbol.ShowDialog();
+        _ = LoadSymbol.ShowDialog();
     }
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {

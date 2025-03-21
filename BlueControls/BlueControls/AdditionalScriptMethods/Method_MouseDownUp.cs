@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -28,11 +26,11 @@ using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_MouseDownUp : Method, IComandBuilder {
 
     #region Properties
@@ -73,11 +71,11 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
         var xup = attvar.ValueIntGet(3);
         var yup = attvar.ValueIntGet(4);
 
-        WindowsRemoteControl.MoveMouse(xdown, ydown);
+        _ = WindowsRemoteControl.MoveMouse(xdown, ydown);
         Generic.Pause(0.01, false);
         WindowsRemoteControl.MouseAction(MouseEventFlags.MOUSEEVENTF_LEFTDOWN, xdown, ydown);
         Generic.Pause(time, false);
-        WindowsRemoteControl.MoveMouse(xup, yup);
+        _ = WindowsRemoteControl.MoveMouse(xup, yup);
         Generic.Pause(0.01, false);
         WindowsRemoteControl.MouseAction(MouseEventFlags.MOUSEEVENTF_LEFTUP, xup, yup);
         return DoItFeedback.Null();

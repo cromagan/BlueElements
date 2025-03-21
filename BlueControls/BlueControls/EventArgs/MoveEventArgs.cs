@@ -23,9 +23,7 @@ public class MoveEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public MoveEventArgs(bool byMouse) {
-        ByMouse = byMouse;
-    }
+    public MoveEventArgs(bool byMouse) => ByMouse = byMouse;
 
     #endregion
 

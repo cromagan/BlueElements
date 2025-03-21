@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using System.Windows.Forms;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Structures;
+using System.Windows.Forms;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -43,10 +43,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
     #region Properties
 
     public override object? Object {
-        get {
-            if (IsDisposed) { return null; }
-            return _item;
-        }
+        get => IsDisposed ? null : (object?)_item;
         set {
             if (value is not TimerPadItem) { value = null; }
             if (_item == value) { return; }

@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.EventArgs;
 
@@ -32,9 +32,7 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, string message) : base(row) {
-        Message = "<b><u>" + row.CellFirstString() + "</b></u><br><br>" + message;
-    }
+    public RowCheckedEventArgs(RowItem row, string message) : base(row) => Message = "<b><u>" + row.CellFirstString() + "</b></u><br><br>" + message;
 
     public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, VariableCollection? variables, string message) : base(row) {
         ColumnsWithErrors = columnsWithErrors;

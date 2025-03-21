@@ -17,18 +17,16 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ExtractText : Method {
 
     #region Properties
@@ -55,11 +53,7 @@ internal class Method_ExtractText : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
 
-        if (tags == null) {
-            return new DoItFeedback(ld, "Nichts extrahiert - Searchpattern fehlerhaft?");
-        }
-
-        return new DoItFeedback(tags);
+        return tags == null ? new DoItFeedback(ld, "Nichts extrahiert - Searchpattern fehlerhaft?") : new DoItFeedback(tags);
     }
 
     #endregion

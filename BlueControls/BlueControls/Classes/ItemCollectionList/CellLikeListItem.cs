@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.CellRenderer;
 using BlueControls.Enums;
 using BlueDatabase.Enums;
+using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -65,11 +65,8 @@ public class CellLikeListItem : AbstractListItem {
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
-        //if (_cellRenderer == null) { return new Size(16, 0); }
-
-        return _cellRenderer.ContentSize(KeyName, _translate);
-    }
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) =>
+        _cellRenderer.ContentSize(KeyName, _translate);
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {

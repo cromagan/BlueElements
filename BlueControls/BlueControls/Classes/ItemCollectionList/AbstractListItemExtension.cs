@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -29,6 +26,9 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -280,9 +280,7 @@ public static class AbstractListItemExtension {
             l = l.SortedDistinctList();
         }
 
-        if (maxItems > 0 && l.Count > maxItems) { return []; }
-
-        return ItemsOf(l, column, cellRenderer);
+        return maxItems > 0 && l.Count > maxItems ? ([]) : ItemsOf(l, column, cellRenderer);
     }
 
     public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {

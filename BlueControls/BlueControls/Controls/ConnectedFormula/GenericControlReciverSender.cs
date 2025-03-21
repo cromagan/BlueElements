@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace BlueControls.Controls;
 
@@ -79,9 +79,9 @@ public class GenericControlReciverSender : GenericControlReciver {
         var newFilters = FilterOutput.Count > 0;
         //var doDatabaseAfter = DatabaseInput == null;
 
-        if (isnew) { child.Parents.AddIfNotExists(this); }
+        if (isnew) { _ = child.Parents.AddIfNotExists(this); }
 
-        Childs.AddIfNotExists(child);
+        _ = Childs.AddIfNotExists(child);
 
         if (newFilters && isnew) { child.Invalidate_FilterInput(); }
 
@@ -96,7 +96,7 @@ public class GenericControlReciverSender : GenericControlReciver {
             FilterOutput.Dispose();
 
             foreach (var thisChild in Childs) {
-                thisChild.Parents.Remove(this);
+                _ = thisChild.Parents.Remove(this);
             }
 
             Childs.Clear();

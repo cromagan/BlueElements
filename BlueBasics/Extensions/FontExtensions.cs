@@ -63,8 +63,9 @@ public static partial class Extensions {
     public static SizeF MeasureString(this Font font, string text) => font.MeasureString(text, StringFormat.GenericDefault);
 
     public static SizeF MeasureString(this Font font, string text, StringFormat stringFormat) {
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrEmpty(text)) {
             return SizeF.Empty;
+        }
 
         try {
             // Graphics-Objekt wiederverwendbar machen über static

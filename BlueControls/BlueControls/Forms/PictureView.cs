@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Interfaces;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.Forms;
@@ -81,7 +81,7 @@ public partial class PictureView : Form, IDisposableExtended {
 
     #region Properties
 
-    public override sealed string Text {
+    public sealed override string Text {
         get => base.Text;
         set => base.Text = value;
     }

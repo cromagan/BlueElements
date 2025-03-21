@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace BlueControls.Controls;
 
@@ -97,7 +97,7 @@ internal class AdderItem : IReadableTextWithKey {
                         additionalInfoColumn.AdminInfo = "Diese Spalte wird für Zusatzinfos de Textgenerators benutzt.";
                         r.CellSet(additionalInfoColumn, info, "Zeilengenerator im Formular");
                     }
-                    r.UpdateRow(true, true, "Zeile erstellt");
+                    _ = r.UpdateRow(true, true, "Zeile erstellt");
                 }
             }
         }
@@ -109,7 +109,7 @@ internal class AdderItem : IReadableTextWithKey {
         var fi = new FilterCollection(db, "Zeilengenerator im Formular");
         var key = OriginId(keyName + "#", originIdColumn, generatedEntityId);
         fi.Add(new FilterItem(originIdColumn, FilterType.Istgleich_UND_GroßKleinEgal, key));
-        RowCollection.Remove(fi, null, "Zeilengenerator im Formular");
+        _ = RowCollection.Remove(fi, null, "Zeilengenerator im Formular");
         fi.Dispose();
 
         //fi = new FilterCollection(db, "Zeilengenerator im Formular");

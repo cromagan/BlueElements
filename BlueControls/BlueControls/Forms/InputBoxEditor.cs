@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System;
-using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
 using BlueControls.Interfaces;
+using System;
+using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
@@ -167,7 +167,7 @@ public static class InputBoxEditorExtension {
     public static void Edit(this IEditable? toEdit) {
         if (toEdit == null) { return; }
 
-        InputBoxEditor.Show(toEdit, true, false);
+        _ = InputBoxEditor.Show(toEdit, true, false);
     }
 
     /// <summary>
@@ -177,11 +177,7 @@ public static class InputBoxEditorExtension {
     /// <param name="isDialog"></param>
     /// <param name="supportsCancel"></param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Edit(this IEditable? toEdit, bool isDialog, bool supportsCancel) {
-        if (toEdit == null) { return false; }
-
-        return InputBoxEditor.Show(toEdit, isDialog, supportsCancel);
-    }
+    public static bool Edit(this IEditable? toEdit, bool isDialog, bool supportsCancel) => toEdit != null && InputBoxEditor.Show(toEdit, isDialog, supportsCancel);
 
     /// <summary>
     /// Erweitert, setzt auch gleich den Bearbeitungs-Modus.
@@ -189,11 +185,7 @@ public static class InputBoxEditorExtension {
     /// <param name="toEdit"></param>
     /// <param name="type"></param>
     ///     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Edit(this IEditable? toEdit, Type? type) {
-        if (toEdit == null || type == null) { return false; }
-
-        return InputBoxEditor.Show(toEdit, type, true);
-    }
+    public static bool Edit(this IEditable? toEdit, Type? type) => toEdit != null && type != null && InputBoxEditor.Show(toEdit, type, true);
 
     /// <summary>
     /// Erweitert, setzt auch gleich den Bearbeitungs-Modus.
@@ -204,7 +196,7 @@ public static class InputBoxEditorExtension {
     public static void Edit(this IEditable? toEdit, Type? type, bool isDialog) {
         if (toEdit == null || type == null) { return; }
 
-        InputBoxEditor.Show(toEdit, type, isDialog);
+        _ = InputBoxEditor.Show(toEdit, type, isDialog);
     }
 
     #endregion

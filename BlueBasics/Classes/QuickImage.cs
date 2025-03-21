@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -25,9 +28,6 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text;
 using System.Windows.Data;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -52,8 +52,8 @@ public sealed class QuickImage : IReadableText, IEditable {
         var w = (imageCode + "||||||||||").Split('|');
 
         Name = w[0];
-        int.TryParse(w[1], out var width);
-        int.TryParse(w[2], out var height);
+        _ = int.TryParse(w[1], out var width);
+        _ = int.TryParse(w[2], out var height);
 
         Effekt = (ImageCodeEffect)IntParse(w[3]);
         Färbung = w[4];
@@ -241,10 +241,7 @@ public sealed class QuickImage : IReadableText, IEditable {
     public static QuickImage Get(QuickImage qi, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? qi
             : Get(GenerateCode(qi.Name, qi.Width, qi.Height, qi.Effekt | additionalState, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
 
-    public static QuickImage Get(string code) {
-        if (Pics.TryGetValue(code, out var p)) { return p; }
-        return new QuickImage(code);
-    }
+    public static QuickImage Get(string code) => Pics.TryGetValue(code, out var p) ? p : new QuickImage(code);
 
     public static QuickImage Get(string image, int squareWidth) {
         //if (string.IsNullOrEmpty(image)) { return null; }
@@ -471,10 +468,7 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         var bmp = bmpTmp.CloneOfBitmap()?.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
 
-        if (bmp == null) {
-            return (new Bitmap(Width, Height), true);
-        }
-        return (bmp, false);
+        return bmp == null ? ((Bitmap bmp, bool isError))(new Bitmap(Width, Height), true) : ((Bitmap bmp, bool isError))(bmp, false);
     }
 
     private Bitmap GenerateErrorImage(int width, int height) {

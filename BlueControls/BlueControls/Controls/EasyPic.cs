@@ -17,12 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -30,6 +24,12 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -92,11 +92,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
             _filename = value;
 
-            if (!FileExists(_filename)) {
-                _bitmap = null;
-            } else {
-                _bitmap = (Bitmap?)Image_FromFile(_filename);
-            }
+            _bitmap = !FileExists(_filename) ? null : (Bitmap?)Image_FromFile(_filename);
             InvalidateAndCheckButtons();
         }
     }
@@ -342,7 +338,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
             var bytes = memory.ToArray();
             fs.Write(bytes, 0, bytes.Length);
         } catch (Exception ex) {
-            System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
+            _ = System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
         }
     }
 

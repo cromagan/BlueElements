@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using System.Windows.Forms;
 using BlueControls.Forms;
 using BlueDatabase;
+using System.Windows.Forms;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

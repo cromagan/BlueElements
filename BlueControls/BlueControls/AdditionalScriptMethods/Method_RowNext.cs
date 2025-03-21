@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueControls.Controls;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -81,21 +81,20 @@ public class Method_RowNext : Method_Database {
         if (!r.Contains(mr)) { return Method_Row.RowToObjectFeedback(null); }
 
         var rsd = new RowSortDefinition(db, column, attvar.ValueBoolGet(1));
-
-        var sr = Table.CalculateSortedRows(db, r, null, rsd);
+        var (rows, _) = Table.CalculateSortedRows(db, r, null, rsd);
 
         var givebackrow = -1;
 
-        for (var z = 0; z < sr.rows.Count; z++) {
-            if (sr.rows[z].Row == mr) {
+        for (var z = 0; z < rows.Count; z++) {
+            if (rows[z].Row == mr) {
                 givebackrow = z + 1;
                 break;
             }
         }
 
-        if (givebackrow < 0 || givebackrow >= sr.rows.Count) { return Method_Row.RowToObjectFeedback(null); }
-
-        return Method_Row.RowToObjectFeedback(sr.rows[givebackrow].Row);
+        return givebackrow < 0 || givebackrow >= rows.Count
+            ? Method_Row.RowToObjectFeedback(null)
+            : Method_Row.RowToObjectFeedback(rows[givebackrow].Row);
     }
 
     #endregion

@@ -1,11 +1,11 @@
 ﻿using BlueBasics;
 using BlueControls.CellRenderer;
+using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
 using System;
 using System.Threading;
 using static BlueBasics.Extensions;
-using BlueControls.Controls;
 
 #nullable enable
 
@@ -37,8 +37,9 @@ public partial class GlobalMonitor : Form {
 
     public static void GenerateUndoTabelle(Table tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
-        Database db = new(Database.UniqueKeyValue());
-        db.LogUndo = false;
+        Database db = new(Database.UniqueKeyValue()) {
+            LogUndo = false
+        };
         _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
         var az = db.Column.GenerateAndAdd("Time", "Zeit", ColumnFormatHolder.DateTime);
@@ -81,7 +82,7 @@ public partial class GlobalMonitor : Form {
         if (_monitorThread != null && _monitorThread.IsAlive && Monitor != null && !Monitor.IsDisposed) {
             // Thread läuft und Fenster existiert, bringe es in den Vordergrund
             try {
-                Monitor.BeginInvoke(new Action(() => {
+                _ = Monitor.BeginInvoke(new Action(() => {
                     Monitor.BringToFront();
                     if (Monitor.WindowState == System.Windows.Forms.FormWindowState.Minimized) {
                         Monitor.WindowState = System.Windows.Forms.FormWindowState.Normal;
@@ -100,13 +101,14 @@ public partial class GlobalMonitor : Form {
         // Neuen CancellationTokenSource erstellen
         _cancellationTokenSource = new CancellationTokenSource();
 
-        _monitorThread = new Thread(() => StartMonitorInThread(_cancellationTokenSource.Token));
-        _monitorThread.IsBackground = true;
+        _monitorThread = new Thread(() => StartMonitorInThread(_cancellationTokenSource.Token)) {
+            IsBackground = true
+        };
         _monitorThread.SetApartmentState(ApartmentState.STA);
         _monitorThread.Start();
 
         // Warte kurz, bis das Fenster erstellt wurde
-        int attempts = 0;
+        var attempts = 0;
         while (Monitor == null && attempts < 50) {
             Thread.Sleep(10);
             attempts++;
@@ -207,10 +209,10 @@ public partial class GlobalMonitor : Form {
             Monitor = new GlobalMonitor();
 
             // Registriere die Formularschließung beim CancellationToken
-            cancellationToken.Register(() => {
+            _ = cancellationToken.Register(() => {
                 try {
                     if (Monitor != null && !Monitor.IsDisposed) {
-                        Monitor.BeginInvoke(new Action(() => Monitor.Close()));
+                        _ = Monitor.BeginInvoke(new Action(() => Monitor.Close()));
                     }
                 } catch {
                     // Ignoriere Fehler beim Schließen
@@ -230,7 +232,7 @@ public partial class GlobalMonitor : Form {
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
         if (tblLog.Database is { } db) {
-            db.Row.Clear("Monitoring-Log geleert");
+            _ = db.Row.Clear("Monitoring-Log geleert");
         }
 
         Develop.MonitorMessage?.Invoke("Global", "Information", "Monitoring-Log geleert", 0);

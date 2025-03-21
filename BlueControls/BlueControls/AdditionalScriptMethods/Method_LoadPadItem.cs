@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.IO;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad;
@@ -29,11 +25,13 @@ using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_LoadPadItem : Method {
 
     #region Properties
@@ -58,8 +56,9 @@ internal class Method_LoadPadItem : Method {
     #region Methods
 
     public static TextPadItem DummyItem() {
-        var t = new TextPadItem();
-        t.Text = "FEHLER!";
+        var t = new TextPadItem {
+            Text = "FEHLER!"
+        };
         t.SetCoordinates(new RectangleF(0, 0, 100, 100));
 
         return t;

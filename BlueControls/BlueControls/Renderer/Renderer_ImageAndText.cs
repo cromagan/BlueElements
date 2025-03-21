@@ -17,17 +17,17 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Interfaces;
+using BlueDatabase;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueDatabase;
-using BlueDatabase.Enums;
 using static BlueBasics.Converter;
-using BlueControls.Interfaces;
 
 namespace BlueControls.CellRenderer;
 

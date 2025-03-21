@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.CellRenderer;
@@ -30,6 +26,10 @@ using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -260,7 +260,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         var doJoker = !string.IsNullOrEmpty(_column.AutoFilterJoker);
         if (_negativAuswahl) { doJoker = false; }
         List<string> l = [e.Item.KeyName];
-        if (doJoker) { l.AddIfNotExists(_column.AutoFilterJoker); }
+        if (doJoker) { _ = l.AddIfNotExists(_column.AutoFilterJoker); }
         if (_negativAuswahl) {
             // Nur ohne Multirow
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal, l));

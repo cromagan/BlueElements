@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
@@ -27,6 +25,8 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.Structures;
+using System.Collections.Generic;
+using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
 
@@ -68,7 +68,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
             "Parallel dazu kann die Variable Infos erstellt werden.",
             "Freie Texte."
         ];
-        l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
+        _ = l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
     }
 
     #endregion
@@ -93,11 +93,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
     }
 
     public override object? Object {
-        get {
-            if (IsDisposed) { return null; }
-
-            return _item;
-        }
+        get => IsDisposed ? null : (object?)_item;
         set {
             if (value is not RowAdderPadItem) { value = null; }
             if (_item == value) { return; }

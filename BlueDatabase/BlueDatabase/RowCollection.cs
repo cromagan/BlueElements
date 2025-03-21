@@ -17,13 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -31,6 +24,13 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 
 namespace BlueDatabase;
 
@@ -137,8 +137,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             //                                    .FirstOrDefault(thisRow => thisRow.MatchesTo(filter));
 
             //return parallelQuery;
-            if (f.Count == 0) { return null; }
-            return f[0];
+            return f.Count == 0 ? null : f[0];
         }
     }
 
@@ -155,8 +154,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (db.EventScript.Get(ScriptEventTypes.value_changed_extra_thread).Count != 1) { return; }
         if (!db.IsRowScriptPossible(true)) { return; }
 
-        var l = new BackgroundWorker();
-        l.WorkerReportsProgress = true;
+        var l = new BackgroundWorker {
+            WorkerReportsProgress = true
+        };
         l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
         l.DoWork += PendingWorker_DoWork;
 
@@ -199,7 +199,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (e.Cancel) { break; }
 
             Develop.SetUserDidSomething();
-            row.UpdateRow(true, false, "Allgemeines Update (User Idle)");
+            _ = row.UpdateRow(true, false, "Allgemeines Update (User Idle)");
             Develop.SetUserDidSomething();
             if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
         }
@@ -304,10 +304,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return did;
     }
 
-    public static bool Remove(RowItem? row, string comment) {
-        if (row is not { IsDisposed: false } r) { return false; }
-        return string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, DatabaseChunk.GetChunkValue(r)));
-    }
+    public static bool Remove(RowItem? row, string comment) => row is { IsDisposed: false } r
+&& string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, DatabaseChunk.GetChunkValue(r)));
 
     /// <summary>
     /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
@@ -320,7 +318,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisDb in l) {
             if (thisDb is { IsDisposed: false } db) {
                 if (!db.CanDoValueChangedScript()) { continue; }
-                db.BeSureAllDataLoaded(30);
+                _ = db.BeSureAllDataLoaded(30);
                 r.AddRange(db.Row);
             }
         }
@@ -470,11 +468,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             rows.RemoveAt(0);
 
             if (DateTime.UtcNow.Subtract(start).TotalMinutes > 1) {
-                db.Save();
+                _ = db.Save();
                 start = DateTime.UtcNow;
             }
         }
-        db.Save();
+        _ = db.Save();
         Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
         return string.Empty;
     }
@@ -530,7 +528,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).newrow;
     }
-
     //    List<Database> done = new();
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
@@ -629,10 +626,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        Remove(toDel, "RowCleanUp");
+        _ = Remove(toDel, "RowCleanUp");
 
         if (reduceToOne) {
-            l.Remove(toDel);
+            _ = l.Remove(toDel);
             if (l.Count > 1) { RemoveYoungest(l, true); }
         }
 
@@ -692,10 +689,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var f = Add(row, reason);
 
             if (string.IsNullOrEmpty(f) && user != null && datetimeutc is { } dt) {
-                if (db.Column.SysRowCreator is { IsDisposed: false } src) { row.SetValueInternal(src, user, reason); }
-                if (db.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.SetValueInternal(scd, dt.ToString5(), reason); }
-                if (db.Column.SysLocked is { IsDisposed: false } sl) { row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
-                if (db.Column.SysCorrect is { IsDisposed: false } sc) { row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
+                if (db.Column.SysRowCreator is { IsDisposed: false } src) { _ = row.SetValueInternal(src, user, reason); }
+                if (db.Column.SysRowCreateDate is { IsDisposed: false } scd) { _ = row.SetValueInternal(scd, dt.ToString5(), reason); }
+                if (db.Column.SysLocked is { IsDisposed: false } sl) { _ = row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
+                if (db.Column.SysCorrect is { IsDisposed: false } sc) { _ = row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
             }
 
             if (reason == Reason.SetCommand && db.LogUndo) {
@@ -713,12 +710,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (reason == Reason.SetCommand) {
-                row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
+                _ = row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
             }
 
             foreach (var thisColumn in db.Column) {
                 if (thisColumn != null) {
-                    row.SetValueInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
+                    _ = row.SetValueInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
                 }
             }
 
@@ -795,7 +792,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (reason != Reason.NoUndo_NoInvalidate) {
             OnRowAdded(new RowEventArgs(row));
             if (Database?.Column.SysRowState != null) {
-                InvalidatedRowsManager.AddInvalidatedRow(row);
+                _ = InvalidatedRowsManager.AddInvalidatedRow(row);
             }
         }
 
@@ -845,7 +842,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var chunkvalue = string.Empty;
         List<ColumnItem> l = [.. db.Column];
         if (db.Column.SplitColumn is { } spc) {
-            l.Remove(spc);
+            _ = l.Remove(spc);
             l.Insert(0, spc);
             chunkvalue = FilterCollection.InitValue(spc, true, fc) ?? string.Empty;
         }

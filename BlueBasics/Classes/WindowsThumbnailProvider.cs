@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
-using BlueBasics.Enums;
 
 namespace BlueBasics;
 
@@ -128,19 +128,13 @@ public class WindowsThumbnailProvider {
             srcBitmap.UnlockBits(srcData);
         }
 
-        if (isAlplaBitmap) {
-            return result;
-        }
-
-        return srcBitmap;
+        return isAlplaBitmap ? result : srcBitmap;
     }
 
     public static Bitmap GetBitmapFromHBitmap(IntPtr nativeHBitmap) {
         var bmp = Image.FromHbitmap(nativeHBitmap);
 
-        if (Image.GetPixelFormatSize(bmp.PixelFormat) < 32) { return bmp; }
-
-        return CreateAlphaBitmap(bmp, PixelFormat.Format32bppArgb);
+        return Image.GetPixelFormatSize(bmp.PixelFormat) < 32 ? bmp : CreateAlphaBitmap(bmp, PixelFormat.Format32bppArgb);
     }
 
     public static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options) {
@@ -190,9 +184,7 @@ public class WindowsThumbnailProvider {
 
         _ = Marshal.ReleaseComObject(nativeShellItem);
 
-        if (hr == HResult.Ok) { return hBitmap; }
-
-        return null;
+        return hr == HResult.Ok ? hBitmap : null;
         //throw Marshal.GetExceptionForHR((int)hr);
     }
 

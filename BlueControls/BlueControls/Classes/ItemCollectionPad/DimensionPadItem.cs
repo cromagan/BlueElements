@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -27,6 +24,9 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;
@@ -128,12 +128,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     public string Präfix { get; set; } = string.Empty;
 
-    public string SheetStyle {
-        get {
-            if (Parent is IStyleable ist) { return ist.SheetStyle; }
-            return string.Empty;
-        }
-    }
+    public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public PadStyles Style {
         get => _style;

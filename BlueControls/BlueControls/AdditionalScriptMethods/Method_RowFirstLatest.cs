@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueControls.Controls;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -37,7 +37,7 @@ public class Method_RowFirstLatest : Method_Database {
 
     public override string Description => "Sucht eine Zeilen mittels dem gegebenen Filter und sortiert diese.\r\n" +
                                           "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
-                                          "Gibt dann die erste bzw. letzte Zeile zurück.\r\n" + 
+                                          "Gibt dann die erste bzw. letzte Zeile zurück.\r\n" +
                                           "Der gefundene Wert kann in eine Spalte mit dem Typ Row geschrieben werden.\r\n" +
                                           "Mit dem Befehl 'RowNext' kann dann weitergearbeitet werden.";
 

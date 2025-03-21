@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.ComponentModel;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -29,6 +26,9 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
+using System;
+using System.ComponentModel;
+using System.Windows.Forms;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
@@ -221,11 +221,11 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         if (!string.IsNullOrEmpty(LoadAtRowChange)) {
             if (LoadAtRowChange.FileType() is FileFormat.BlueCreativeFile) {
                 pad.Items = new ItemCollectionPadItem(LoadAtRowChange);
-                pad.Items.ResetVariables();
-                pad.Items.ReplaceVariables(_lastRow);
+                _ = pad.Items.ResetVariables();
+                _ = pad.Items.ReplaceVariables(_lastRow);
             }
         } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
-            pad.Items = new ItemCollectionPadItem();
+            pad.Items = [];
             pad.Items.Endless = true;
 
             if (Skin.StyleDb?.Row != null) {
@@ -233,7 +233,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             }
 
             if (_lastRow != null) {
-                pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, _lastRow);
+                _ = pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, _lastRow);
             }
         }
 

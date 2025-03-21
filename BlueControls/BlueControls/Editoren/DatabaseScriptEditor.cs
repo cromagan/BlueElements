@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -35,6 +30,11 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Structures;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -96,11 +96,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     }
 
     public DatabaseScriptDescription? Item {
-        get {
-            if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
-
-            return _item;
-        }
+        get => IsDisposed || Database is not { IsDisposed: false } ? null : _item;
         set {
             if (_item == value) { return; }
             if (IsDisposed || Database is not { IsDisposed: false }) { return; }
@@ -133,7 +129,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
                 lstPermissionExecute.ItemClear();
                 var l = Table.Permission_AllUsed(false).ToList();
-                l.AddIfNotExists(Administrator);
+                _ = l.AddIfNotExists(Administrator);
                 lstPermissionExecute.ItemAddRange(l);
                 lstPermissionExecute.Check(value.UserGroups);
                 lstPermissionExecute.Suggestions.Clear();
@@ -165,13 +161,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     public override object? Object {
         get => Database;
-        set {
-            if (value is Database db) {
-                Database = db;
-            } else {
-                Database = null;
-            }
-        }
+        set => Database = value is Database db ? db : null;
     }
 
     /// <summary>
@@ -354,7 +344,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
             if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
                 didMessage = true;
-                EnableScript();
+                _ = EnableScript();
             }
         }
     }
@@ -395,7 +385,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private void btnTest_Click(object sender, System.EventArgs e) {
         if (!loaded && _database != null && _database.Row.Count == 0) {
             loaded = true;
-            _database.BeSureAllDataLoaded(10);
+            _ = _database.BeSureAllDataLoaded(10);
         }
         TesteScript(true);
     }
@@ -424,7 +414,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
                 l.Add("Art: " + thisUndo.Command.ToString());
                 // Überprüfen, ob das Skript geändert wurde
-                List<string> ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
+                var ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
                 var found = false;
                 foreach (var t in ai) {
                     var s = new DatabaseScriptDescription(db, t);
@@ -440,7 +430,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             }
         }
         // Schreiben der Liste in eine temporäre Datei
-        l.WriteAllText(TempFile(string.Empty, "Scrip.txt"), Win1252, true);
+        _ = l.WriteAllText(TempFile(string.Empty, "Scrip.txt"), Win1252, true);
     }
 
     private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {
@@ -453,12 +443,10 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-        ExecuteFile(db.AdditionalFilesPfadWhole());
+        _ = ExecuteFile(db.AdditionalFilesPfadWhole());
     }
 
-    private void cbxPic_TextChanged(object sender, System.EventArgs e) {
-        UpdateValues(image: cbxPic.Text.TrimEnd("|16"));
-    }
+    private void cbxPic_TextChanged(object sender, System.EventArgs e) => UpdateValues(image: cbxPic.Text.TrimEnd("|16"));
 
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
@@ -536,17 +524,11 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         Item = newItem;
     }
 
-    private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        UpdateValues(userGroups: lstPermissionExecute.Checked.ToList().AsReadOnly());
-    }
+    private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) => UpdateValues(userGroups: lstPermissionExecute.Checked.ToList().AsReadOnly());
 
-    private void txbName_TextChanged(object sender, System.EventArgs e) {
-        UpdateValues(keyName: txbName.Text);
-    }
+    private void txbName_TextChanged(object sender, System.EventArgs e) => UpdateValues(keyName: txbName.Text);
 
-    private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) {
-        UpdateValues(quickInfo: txbQuickInfo.Text);
-    }
+    private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) => UpdateValues(quickInfo: txbQuickInfo.Text);
 
     private void UpdateList() {
         lstEventScripts.ItemClear();

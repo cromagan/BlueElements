@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace BlueScript;
 
@@ -160,10 +160,7 @@ public class Script {
         return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], ld);
     }
 
-    public static int Line(string? txt, int? pos) {
-        if (pos == null || txt == null) { return 0; }
-        return txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
-    }
+    public static int Line(string? txt, int? pos) => pos == null || txt == null ? 0 : txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string redScriptText, int lineadd, string subname, List<string>? attributes) {
         var pos = 0;
@@ -176,7 +173,7 @@ public class Script {
             // Ansonsten werden bei Try / If / For diese gelöscht
             varCol.RemoveWithComment("Attribut");
             for (var z = 0; z < attributes.Count; z++) {
-                varCol.Add(new VariableString("Attribut" + z, attributes[z], true, "Attribut"));
+                _ = varCol.Add(new VariableString("Attribut" + z, attributes[z], true, "Attribut"));
             }
         }
 
@@ -261,11 +258,9 @@ public class Script {
     public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes) {
         (ReducedScriptText, var error) = ReduceText(ScriptText);
 
-        if (!string.IsNullOrEmpty(error)) {
-            return new ScriptEndedFeedback(error, false, true, subname);
-        }
-
-        return Parse(Variables, Properties, ReducedScriptText, lineadd, subname, attributes);
+        return !string.IsNullOrEmpty(error)
+            ? new ScriptEndedFeedback(error, false, true, subname)
+            : Parse(Variables, Properties, ReducedScriptText, lineadd, subname, attributes);
     }
 
     #endregion

@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueControls;
 
@@ -53,26 +53,21 @@ public partial class VariableEditor : EditorEasy {
 
         foreach (var thisr in db.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
-            list.Add(v);
+            _ = list.Add(v);
         }
 
         return list;
     }
 
-    public RowItem? RowOfVariable(string variable) {
-        if (tableVariablen?.Database is not { IsDisposed: false } db) { return null; }
-        return db.Row[variable];
-    }
+    public RowItem? RowOfVariable(string variable) => tableVariablen?.Database is not { IsDisposed: false } db ? null : db.Row[variable];
 
-    public RowItem? RowOfVariable(Variable variable) {
-        if (IsDisposed || tableVariablen?.Database is not { IsDisposed: false } db) { return null; }
-        return db.Row[variable.KeyName];
-    }
+    public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Database is not { IsDisposed: false } db ? null : db.Row[variable.KeyName];
 
     protected override void InitializeComponentDefaultValues() {
-        Database db = new(Database.UniqueKeyValue());
-        db.LogUndo = false;
-        db.DropMessages = false;
+        Database db = new(Database.UniqueKeyValue()) {
+            LogUndo = false,
+            DropMessages = false
+        };
         var na = db.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = db.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
         _ = db.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
@@ -156,8 +151,9 @@ public partial class VariableEditor : EditorEasy {
     private void TableVariablen_CellValueChanged(object sender, CellEventArgs e) {
         var c = tableVariablen.Database?.Column.First();
         if (e.Column == c) {
-            if (e.Row.CellIsNullOrEmpty(c))
-                RowCollection.Remove(e.Row, "Variable gelöscht");
+            if (e.Row.CellIsNullOrEmpty(c)) {
+                _ = RowCollection.Remove(e.Row, "Variable gelöscht");
+            }
         }
     }
 

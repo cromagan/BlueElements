@@ -17,12 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Linq.Expressions;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -32,6 +26,12 @@ using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Linq.Expressions;
+using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -214,9 +214,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         _ = CheckEnabledState();
 
-        _checker = new Timer();
-        _checker.Enabled = true;
-        _checker.Interval = 1000;
+        _checker = new Timer {
+            Enabled = true,
+            Interval = 1000
+        };
         _checker.Tick += Checker_Tick;
     }
 

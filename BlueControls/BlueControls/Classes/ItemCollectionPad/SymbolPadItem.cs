@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -27,6 +24,9 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -66,12 +66,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
     public Color Randfarbe { get; set; }
 
-    public string SheetStyle {
-        get {
-            if (Parent is IStyleable ist) { return ist.SheetStyle; }
-            return string.Empty;
-        }
-    }
+    public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public PadStyles Style {
         get => _style;

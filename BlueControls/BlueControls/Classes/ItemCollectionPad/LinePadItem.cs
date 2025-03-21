@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -29,6 +25,10 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -85,12 +85,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     public ConectorStyle Linien_Verhalten { get; set; }
 
-    public string SheetStyle {
-        get {
-            if (Parent is IStyleable ist) { return ist.SheetStyle; }
-            return string.Empty;
-        }
-    }
+    public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public PadStyles Style {
         get => _style;

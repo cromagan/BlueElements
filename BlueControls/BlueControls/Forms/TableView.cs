@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -35,6 +30,11 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
@@ -263,7 +263,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 if (!db.IsAdministrator() || tbl == null || column == null) { return; }
 
                 var v = new Voting(column, [.. tbl.Filter.Rows]);
-                v.ShowDialog();
+                _ = v.ShowDialog();
                 break;
 
             case "Statistik":
@@ -286,7 +286,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             case "#datenüberprüfung":
                 if (row is { IsDisposed: false }) {
                     row.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-                    row.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
+                    _ = row.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
                     RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true);
                     //row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
@@ -398,7 +398,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     public static void OpenScriptEditor(Database? db) {
         if (db is not { IsDisposed: false }) { return; }
 
-        IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+        _ = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
     }
 
     /// <summary>
@@ -497,11 +497,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         btnOeffnen.Enabled = true;
         btnDrucken.Enabled = datenbankDa;
 
-        if (Table.Database is { IsDisposed: false } db) {
-            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(db.Filename);
-        } else {
-            btnDatenbankenSpeicherort.Enabled = false;
-        }
+        btnDatenbankenSpeicherort.Enabled = Table.Database is { IsDisposed: false } db && !string.IsNullOrEmpty(db.Filename);
 
         btnZeileLöschen.Enabled = datenbankDa;
         lstAufgaben.Enabled = datenbankDa;
@@ -667,7 +663,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         Database.ForceSaveAll();
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            Database.Get(tablename, false, Table.Database_NeedPassword);
+            _ = Database.Get(tablename, false, Table.Database_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -699,13 +695,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
     /// </summary>
     /// <returns></returns>
-    protected bool SwitchTabToDatabase(Database? database) {
-        if (database is null || database.IsDisposed) {
-            return false;
-        }
-
-        return SwitchTabToDatabase(database.TableName);
-    }
+    protected bool SwitchTabToDatabase(Database? database) => database is not null && !database.IsDisposed && SwitchTabToDatabase(database.TableName);
 
     protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (IsDisposed || sender is not Table { Database: { IsDisposed: false } db } tbl) { return; }
@@ -843,7 +833,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         if (x.IsClosed || x.IsDisposed) { return; }
 
-        x.ShowDialog();
+        _ = x.ShowDialog();
     }
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
@@ -853,9 +843,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         OpenLayoutEditor(db, string.Empty);
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        _ = SwitchTabToDatabase(e.Item.KeyName);
-    }
+    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) => _ = SwitchTabToDatabase(e.Item.KeyName);
 
     private void btnMDBImport_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table.Database is not { IsDisposed: false } db || !db.IsAdministrator()) {
@@ -933,7 +921,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         var tcvc = ColumnViewCollection.ParseAll(db);
         tcvc.Get(cbxColumnArr.Text)?.Edit();
-        Table.RepairColumnArrangements(db);
+        _ = Table.RepairColumnArrangements(db);
     }
 
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Database?.Column.GenerateOverView();
@@ -1050,11 +1038,9 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             string m;
 
             if (sc.NeedRow) {
-                if (MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
-                    m = db.Row.ExecuteScript(null, e.Item.KeyName, Table.RowsVisibleUnique());
-                } else {
-                    m = "Durch Benutzer abgebrochen";
-                }
+                m = MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0
+                    ? db.Row.ExecuteScript(null, e.Item.KeyName, Table.RowsVisibleUnique())
+                    : "Durch Benutzer abgebrochen";
             } else {
                 //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
                 var s = db.ExecuteScript(sc, sc.ChangeValues, null, null, true, true, false);
@@ -1101,7 +1087,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
                     foreach (var thisR in rows) {
                         thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-                        thisR.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
+                        _ = thisR.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
                     }
 
                     RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true);

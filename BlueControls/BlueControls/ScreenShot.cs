@@ -17,139 +17,138 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueControls.Enums;
+using BlueControls.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueControls.Forms;
 using Form = System.Windows.Forms.Form;
-using BlueControls.Enums;
 
-namespace BlueControls {
+namespace BlueControls;
 
-    public sealed partial class ScreenShot : Form {
+public sealed partial class ScreenShot : Form {
 
-        #region Fields
+    #region Fields
 
-        private readonly string _drawText = string.Empty;
-        private readonly ScreenData _feedBack;
-        private readonly bool _onlyMouseDown;
+    private readonly string _drawText = string.Empty;
+    private readonly ScreenData _feedBack;
+    private readonly bool _onlyMouseDown;
 
-        private Helpers _helpers = Helpers.None;
+    private readonly Helpers _helpers = Helpers.None;
 
-        #endregion
+    #endregion
 
-        #region Constructors
+    #region Constructors
 
-        public ScreenShot() : base() {
-            InitializeComponent();
-            _feedBack = new ScreenData();
-        }
+    public ScreenShot() : base() {
+        InitializeComponent();
+        _feedBack = new ScreenData();
+    }
 
-        private ScreenShot(string text, bool onlyMouseDown, Helpers helper) : this() {
-            _drawText = text;
-            _onlyMouseDown = onlyMouseDown;
-            _helpers = helper;
-        }
+    private ScreenShot(string text, bool onlyMouseDown, Helpers helper) : this() {
+        _drawText = text;
+        _onlyMouseDown = onlyMouseDown;
+        _helpers = helper;
+    }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public static Bitmap GrabAllScreens() {
-            do {
-                try {
-                    var r = Generic.RectangleOfAllScreens();
-                    Bitmap b = new(r.Width, r.Height, PixelFormat.Format32bppPArgb);
-                    using var gr = Graphics.FromImage(b);
-                    gr.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
-                    return b;
-                } catch {
-                    Generic.CollectGarbage();
-                }
-            } while (true);
-        }
-
-        /// <summary>
-        /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.
-        /// </summary>
-        /// <param name="frm">Diese Form wird automatisch minimiert und wieder maximiert.</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static ScreenData GrabArea(Form? frm) {
-            using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, Helpers.DrawRectangle | Helpers.Magnifier);
-            return x.Start(frm);
-        }
-
-        internal static ScreenData GrabAndClick(string txt, Form? frm, Helpers helper) {
-            using ScreenShot x = new(txt, true, helper);
-            return x.Start(frm);
-        }
-
-        private ScreenData Start(Form? frm) {
+    public static Bitmap GrabAllScreens() {
+        do {
             try {
-                var op = 0d;
-
-                QuickInfo.Close();
-
-                if (frm != null) {
-                    op = frm.Opacity;
-                    frm.Opacity = 0;
-                    frm.Refresh();
-                }
-
-                // Hole das Rectangle aller Screens
                 var r = Generic.RectangleOfAllScreens();
-
-                // Setze die Form-Position und Größe VOR dem Screen-Grab
-                this.StartPosition = FormStartPosition.Manual;
-                this.Left = r.Left;
-                this.Top = r.Top;
-                this.Width = r.Width;
-                this.Height = r.Height;
-
-                // Führe den Screenshot durch
-                _feedBack.Screen = GrabAllScreens();
-                zoomPic.Bmp = _feedBack.Screen;
-                zoomPic.InfoText = _drawText;
-                zoomPic.Helper = _helpers;
-
-                // Zeige die Form
-                _ = ShowDialog();
-
-                if (frm != null) { frm.Opacity = op; }
-
-                return _feedBack;
+                Bitmap b = new(r.Width, r.Height, PixelFormat.Format32bppPArgb);
+                using var gr = Graphics.FromImage(b);
+                gr.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
+                return b;
             } catch {
-                return new ScreenData();
+                Generic.CollectGarbage();
             }
+        } while (true);
+    }
+
+    /// <summary>
+    /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.
+    /// </summary>
+    /// <param name="frm">Diese Form wird automatisch minimiert und wieder maximiert.</param>
+    /// <returns></returns>
+    /// <remarks></remarks>
+    public static ScreenData GrabArea(Form? frm) {
+        using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, Helpers.DrawRectangle | Helpers.Magnifier);
+        return x.Start(frm);
+    }
+
+    internal static ScreenData GrabAndClick(string txt, Form? frm, Helpers helper) {
+        using ScreenShot x = new(txt, true, helper);
+        return x.Start(frm);
+    }
+
+    private ScreenData Start(Form? frm) {
+        try {
+            var op = 0d;
+
+            QuickInfo.Close();
+
+            if (frm != null) {
+                op = frm.Opacity;
+                frm.Opacity = 0;
+                frm.Refresh();
+            }
+
+            // Hole das Rectangle aller Screens
+            var r = Generic.RectangleOfAllScreens();
+
+            // Setze die Form-Position und Größe VOR dem Screen-Grab
+            StartPosition = FormStartPosition.Manual;
+            Left = r.Left;
+            Top = r.Top;
+            Width = r.Width;
+            Height = r.Height;
+
+            // Führe den Screenshot durch
+            _feedBack.Screen = GrabAllScreens();
+            zoomPic.Bmp = _feedBack.Screen;
+            zoomPic.InfoText = _drawText;
+            zoomPic.Helper = _helpers;
+
+            // Zeige die Form
+            _ = ShowDialog();
+
+            if (frm != null) { frm.Opacity = op; }
+
+            return _feedBack;
+        } catch {
+            return new ScreenData();
         }
+    }
 
-        private void zoomPic_MouseDown(object sender, MouseEventArgs e) {
-            _feedBack.Point1 = new Point(e.X, e.Y);
+    private void zoomPic_MouseDown(object sender, MouseEventArgs e) {
+        _feedBack.Point1 = new Point(e.X, e.Y);
 
-            if (_onlyMouseDown) {
-                Close();
-            }
-        }
-
-        private void zoomPic_MouseUp(object sender, MouseEventArgs e) {
-            _feedBack.Point2 = new Point(e.X, e.Y);
-
-            var r = _feedBack.AreaRectangle();
-            if (r.Width < 2 || r.Height < 2) { return; }
-
-            _feedBack.Area = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
-
-            if (_feedBack.Screen != null) {
-                using var gr = Graphics.FromImage(_feedBack.Area);
-                gr.Clear(Color.Black);
-                gr.DrawImage(_feedBack.Screen, 0, 0, r, GraphicsUnit.Pixel);
-            }
-
+        if (_onlyMouseDown) {
             Close();
         }
-
-        #endregion
     }
+
+    private void zoomPic_MouseUp(object sender, MouseEventArgs e) {
+        _feedBack.Point2 = new Point(e.X, e.Y);
+
+        var r = _feedBack.AreaRectangle();
+        if (r.Width < 2 || r.Height < 2) { return; }
+
+        _feedBack.Area = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
+
+        if (_feedBack.Screen != null) {
+            using var gr = Graphics.FromImage(_feedBack.Area);
+            gr.Clear(Color.Black);
+            gr.DrawImage(_feedBack.Screen, 0, 0, r, GraphicsUnit.Pixel);
+        }
+
+        Close();
+    }
+
+    #endregion
 }

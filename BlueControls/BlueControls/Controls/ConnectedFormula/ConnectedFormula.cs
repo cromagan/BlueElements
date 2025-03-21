@@ -17,13 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -36,6 +29,13 @@ using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -152,7 +152,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public static List<string> VisibleFor_AllUsed() {
         if (_visibleFor_AllUsed != null) { return _visibleFor_AllUsed; }
 
-        _visibleFor_AllUsed = new List<string>();
+        _visibleFor_AllUsed = [];
 
         foreach (var thisCf in AllFiles) {
             if (thisCf is { IsDisposed: false, _pages: { IsDisposed: false } icp }) {
@@ -236,7 +236,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         #region Sicherstellen, das Pages initialisiert ist
 
         if (Pages == null) {
-            Pages = new ItemCollectionPadItem();
+            Pages = [];
             Pages.Breite = 100;
             Pages.Höhe = 100;
         }
@@ -320,11 +320,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         #endregion
     }
 
-    public QuickImage SymbolForReadableText() {
-        if (!string.IsNullOrWhiteSpace(Filename)) { return QuickImage.Get(ImageCode.Diskette, 16); }
-
-        return QuickImage.Get(ImageCode.Warnung, 16);
-    }
+    public QuickImage SymbolForReadableText() => !string.IsNullOrWhiteSpace(Filename) ? QuickImage.Get(ImageCode.Diskette, 16) : QuickImage.Get(ImageCode.Warnung, 16);
 
     /// <summary>
     /// Leert die eingehende Liste und fügt alle bekannten Fomulare hinzu - außer die in notAllowedChilds

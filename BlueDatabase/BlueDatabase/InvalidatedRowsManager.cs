@@ -60,20 +60,12 @@ public class InvalidatedRowsManager {
     /// <summary>
     /// Gibt die aktuelle Anzahl der zu verarbeitenden Zeilen zurück.
     /// </summary>
-    public int PendingRowsCount {
-        get {
-            return _invalidatedRows.Count;
-        }
-    }
+    public int PendingRowsCount => _invalidatedRows.Count;
 
     /// <summary>
     /// Gibt die aktuelle Anzahl der bereits verarbeiteten Zeilen zurück.
     /// </summary>
-    public int ProcessedRowsCount {
-        get {
-            return _processedRowIds.Count;
-        }
-    }
+    public int ProcessedRowsCount => _processedRowIds.Count;
 
     #endregion
 
@@ -112,7 +104,7 @@ public class InvalidatedRowsManager {
 
         try {
             Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "Taschenrechner", $"Arbeite {_invalidatedRows.Keys.ToList().Count()} invalide Zeilen ab", 0);
-            int totalProcessedCount = 0;
+            var totalProcessedCount = 0;
             var entriesBeforeProcessing = 0;
 
             // Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
@@ -122,7 +114,7 @@ public class InvalidatedRowsManager {
                 if (keysToProcess.Count == 0) { break; }// Keine Einträge mehr vorhanden
 
                 // Prüfe, ob neue Einträge hinzugekommen sind
-                int newEntries = keysToProcess.Count - entriesBeforeProcessing;
+                var newEntries = keysToProcess.Count - entriesBeforeProcessing;
 
                 // Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
                 if (newEntries > 0) {
@@ -180,7 +172,7 @@ public class InvalidatedRowsManager {
         if (rowItem == null) { return false; }
 
         // Versuche die Zeile aus der Liste der zu verarbeitenden zu entfernen
-        _invalidatedRows.TryRemove(rowItem.KeyName, out _);
+        _ = _invalidatedRows.TryRemove(rowItem.KeyName, out _);
 
         // Markiere die Zeile als verarbeitet
         return _processedRowIds.TryAdd(rowItem.KeyName, true);
@@ -199,9 +191,9 @@ public class InvalidatedRowsManager {
         if (row.NeedsRowUpdate(false, true)) {
             if (masterRow?.Database != null) {
                 masterRow.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex} von {PendingRowsCount}: Aktualisiere {db.Caption} / {row.CellFirstString()}");
-                row.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
+                _ = row.UpdateRow(extendedAllowed, true, "Update von " + masterRow.CellFirstString());
             } else {
-                row.UpdateRow(extendedAllowed, true, "Normales Update");
+                _ = row.UpdateRow(extendedAllowed, true, "Normales Update");
             }
         }
     }

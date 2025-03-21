@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
+using System;
+using System.Collections.Generic;
 
 namespace BlueControls.Forms;
 
@@ -158,13 +158,9 @@ public partial class Voting : System.Windows.Forms.Form {
             return;
         }
 
-        string key;
-        if (string.Compare(_fr1.KeyName, _fr2.KeyName, StringComparison.Ordinal) > 0) {
-            key = _fr1.KeyName + "|" + _fr2.KeyName;
-        } else {
-            key = _fr2.KeyName + "|" + _fr1.KeyName;
-        }
-
+        var key = string.Compare(_fr1.KeyName, _fr2.KeyName, StringComparison.Ordinal) > 0
+            ? _fr1.KeyName + "|" + _fr2.KeyName
+            : _fr2.KeyName + "|" + _fr1.KeyName;
         if (_done.TryGetValue(key, out var value)) {
             //Pad1.Refresh();
             //Pad2.Refresh();
@@ -178,16 +174,16 @@ public partial class Voting : System.Windows.Forms.Form {
         }
 
         var p1 = new ItemCollectionPadItem(_filename);
-        p1.ResetVariables();
-        p1.ReplaceVariables(_fr1);
+        _ = p1.ResetVariables();
+        _ = p1.ReplaceVariables(_fr1);
 
         Pad1.Items = p1;
         Pad1.ShowInPrintMode = true;
         Pad1.ZoomFit();
 
         var p2 = new ItemCollectionPadItem(_filename);
-        p2.ResetVariables();
-        p2.ReplaceVariables(_fr2);
+        _ = p2.ResetVariables();
+        _ = p2.ReplaceVariables(_fr2);
 
         Pad2.Items = p2;
         Pad2.ShowInPrintMode = true;

@@ -171,8 +171,8 @@ public static class Constants {
         var result = new HashSet<char>(lineBreakChars.Length);
 
         // Füge alle Zeichen zum HashSet hinzu
-        foreach (char c in lineBreakChars) {
-            result.Add(c);
+        foreach (var c in lineBreakChars) {
+            _ = result.Add(c);
         }
 
         // Hinweis im Kommentar: Kein Doppelpunkt, weil auch 3:50 Uhr möglich ist
@@ -184,19 +184,19 @@ public static class Constants {
 
         // Füge alle Sonderzeichen hinzu
         const string specialSeparators = "~|=<>+`´\r\n\t()";
-        foreach (char c in specialSeparators) {
-            separators.Add(c);
+        foreach (var c in specialSeparators) {
+            _ = separators.Add(c);
         }
 
         // Füge alle Unicode-Punktuationszeichen hinzu
-        for (char c = char.MinValue; c < char.MaxValue; c++) {
+        for (var c = char.MinValue; c < char.MaxValue; c++) {
             if (char.IsPunctuation(c) || char.IsSeparator(c)) {
-                separators.Add(c);
+                _ = separators.Add(c);
             }
         }
 
         // Unterstrich ist kein Separator
-        separators.Remove('_');
+        _ = separators.Remove('_');
 
         return separators;
     }

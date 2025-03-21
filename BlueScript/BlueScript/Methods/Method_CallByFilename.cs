@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
@@ -80,17 +80,17 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback(ld, "'" + subname + "' wird zu verschachtelt aufgerufen.");
         }
 
-        var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd+1}] {chainlog}");
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");
 
         //Develop.MonitorMessage?.Invoke(subname, "Skript", "Skript: " + scp.Chain, scp.Stufe);
 
         if (keepVariables) {
-            if (addMe != null) { varCol.Add(addMe); }
+            if (addMe != null) { _ = varCol.Add(addMe); }
             scx = Script.Parse(varCol, scp2, reducedscripttext, lineadd, subname, attributes);
         } else {
             var tmpv = new VariableCollection();
-            tmpv.AddRange(varCol);
-            if (addMe != null) { tmpv.Add(addMe); }
+            _ = tmpv.AddRange(varCol);
+            if (addMe != null) { _ = tmpv.Add(addMe); }
 
             scx = Script.Parse(tmpv, scp2, reducedscripttext, lineadd, subname, attributes);
 
@@ -107,7 +107,7 @@ public class Method_CallByFilename : Method {
             if (!scx.AllOk) {
                 // Beim Abbruch sollen die aktuellen Variabeln angezeigt werden
                 varCol.Clear();
-                varCol.AddRange(tmpv);
+                _ = varCol.AddRange(tmpv);
             }
         }
 

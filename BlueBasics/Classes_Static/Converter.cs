@@ -80,13 +80,7 @@ public static class Converter {
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
-    public static double DoubleParse(string? s) {
-        if (string.IsNullOrEmpty(s)) { return 0; }
-
-        if (DoubleTryParse(s, out var v)) { return v; }
-
-        return 0f;
-    }
+    public static double DoubleParse(string? s) => string.IsNullOrEmpty(s) ? 0 : DoubleTryParse(s, out var v) ? v : (double)0f;
 
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
@@ -108,13 +102,7 @@ public static class Converter {
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
-    public static float FloatParse(string? s) {
-        if (string.IsNullOrEmpty(s)) { return 0; }
-
-        if (FloatTryParse(s, out var v)) { return v; }
-
-        return 0f;
-    }
+    public static float FloatParse(string? s) => string.IsNullOrEmpty(s) ? 0 : FloatTryParse(s, out var v) ? v : 0f;
 
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
@@ -136,32 +124,18 @@ public static class Converter {
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
-    public static int IntParse(string? s) {
-        if (int.TryParse(s, out var v)) { return v; }
+    public static int IntParse(string? s) => int.TryParse(s, out var v) ? v : 0;
 
-        return 0;
-    }
+    public static int IntParse(int? s) => s == null ? 0 : (int)s;
 
-    public static int IntParse(int? s) {
-        if (s == null) { return 0; }
-        return (int)s;
-    }
-
-    public static int IntParse(double? s) {
-        if (s == null) { return 0; }
-        return (int)Math.Round((double)s, 0, MidpointRounding.AwayFromZero);
-    }
+    public static int IntParse(double? s) => s == null ? 0 : (int)Math.Round((double)s, 0, MidpointRounding.AwayFromZero);
 
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
-    public static long LongParse(string? s) {
-        if (long.TryParse(s, out var v)) { return v; }
-
-        return 0;
-    }
+    public static long LongParse(string? s) => long.TryParse(s, out var v) ? v : 0;
 
     public static float MmToPixel(float mM, int dPi) => mM * dPi / 25.4f;
 

@@ -17,17 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Number : Method {
 
     #region Properties
@@ -57,9 +55,7 @@ internal class Method_Number : Method {
             }
         }
 
-        if (attvar.Attributes[1] is { } v) { return new DoItFeedback(v); }
-
-        return new DoItFeedback(attvar.ValueNumGet(1));
+        return attvar.Attributes[1] is { } v ? new DoItFeedback(v) : new DoItFeedback(attvar.ValueNumGet(1));
     }
 
     #endregion

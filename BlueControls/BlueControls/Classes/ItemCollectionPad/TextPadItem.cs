@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,6 +27,10 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -95,12 +95,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
     public BlueFont? Font { get; set; }
 
-    public string SheetStyle {
-        get {
-            if (Parent is IStyleable ist) { return ist.SheetStyle; }
-            return string.Empty;
-        }
-    }
+    public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public PadStyles Style {
         get => _style;
@@ -296,14 +291,15 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 return;
             }
 
-            _txt = new ExtText(SheetStyle, _style);
-            _txt.HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}";
-            //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
-            //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
-            //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / SheetStyleScale), -1);
-            //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-            _txt.TextDimensions = new Size((int)(UsedArea.Width / _textScale), -1);
-            _txt.Ausrichtung = _ausrichtung;
+            _txt = new ExtText(SheetStyle, _style) {
+                HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}",
+                //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
+                //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
+                //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / SheetStyleScale), -1);
+                //etxt.LineBreakWidth = etxt.DrawingArea.Width;
+                TextDimensions = new Size((int)(UsedArea.Width / _textScale), -1),
+                Ausrichtung = _ausrichtung
+            };
         }
     }
 

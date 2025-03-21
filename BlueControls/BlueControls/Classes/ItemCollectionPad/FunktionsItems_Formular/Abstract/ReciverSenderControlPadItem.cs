@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -25,9 +24,8 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
+using System.Collections.Generic;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-
-#nullable enable
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 

@@ -53,6 +53,6 @@ public enum Routinen : byte {
 
     [Obsolete("Wird zukünftig entfernt werden", false)]
     CellFormatUTF8_V402 = 10, // Ohne ColumnName, mit RowKey
-    
+
     CellFormatUTF8_V403 = 11 // Mit ColumnName und RowKey
 }

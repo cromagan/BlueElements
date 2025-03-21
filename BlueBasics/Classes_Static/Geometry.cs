@@ -37,7 +37,6 @@ public static class Geometry {
 
     public static float Cosinus(float winkel) => (float)Math.Cos(winkel * Rad);
 
-
     /// <summary>
     ///  Calculate the distance between the point and the segment
     /// </summary>
@@ -72,7 +71,6 @@ public static class Geometry {
         var ya = y2 - y1;
         return ya == 0f ? xa <= 0f ? 180f : 0f : ya < 0f ? 90f + ArcTangens(xa / ya) : 270f + ArcTangens(xa / ya);
     }
-
 
     public static float GetLenght(Point sP, Point ep) {
         // Berechnet die Länge einer Strecke
@@ -192,7 +190,6 @@ public static class Geometry {
                 return new PointF(r * Cosinus(winkel), -r * Sinus(winkel));
         }
     }
-
 
     public static float Sinus(float winkel) => (float)Math.Sin(winkel * Rad);
 

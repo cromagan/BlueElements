@@ -17,14 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -33,6 +25,14 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
 using static BlueBasics.Generic;
 using static BlueBasics.Geometry;
 
@@ -178,16 +178,14 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     public bool ShowAlways {
         get {
             if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ShowAlways; }
-            if (this is ItemCollectionPadItem { IsDisposed: false } icip2) { return icip2.ShowAlways; } // Wichtig, wegen NEW!
-            return false;
+            return this is ItemCollectionPadItem { IsDisposed: false } icip2 && icip2.ShowAlways; // Wichtig, wegen NEW!
         }
     }
 
     public bool ShowJointPoints {
         get {
             if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ShowJointPoints; }
-            if (this is ItemCollectionPadItem { IsDisposed: false } icip2) { return icip2.ShowJointPoints; } // Wichtig, wegen NEW!
-            return false;
+            return this is ItemCollectionPadItem { IsDisposed: false } icip2 && icip2.ShowJointPoints; // Wichtig, wegen NEW!
         }
     }
 
@@ -601,7 +599,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
 
         foreach (var thispoint in j) {
             if (names.Count == 0 || names.Contains(thispoint.KeyName, false)) {
-                JointPoints.Remove(thispoint);
+                _ = JointPoints.Remove(thispoint);
             }
         }
     }

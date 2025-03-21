@@ -17,18 +17,16 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_FileExists : Method {
 
     #region Properties
@@ -52,9 +50,9 @@ internal class Method_FileExists : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
-        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
-
-        return new DoItFeedback(IO.FileExists(filn));
+        return !filn.IsFormat(FormatHolder.FilepathAndName)
+            ? new DoItFeedback(ld, "Dateinamen-Fehler!")
+            : new DoItFeedback(IO.FileExists(filn));
     }
 
     #endregion

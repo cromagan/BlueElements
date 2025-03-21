@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,9 +27,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using Timer = System.Threading.Timer;
@@ -350,7 +350,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             try {
-                DeleteFile(Blockdateiname(), false);
+                _ = DeleteFile(Blockdateiname(), false);
                 File.WriteAllText(Blockdateiname(), tmpInhalt, Constants.Win1252);
                 _inhaltBlockdatei = tmpInhalt;
             } catch {
@@ -466,14 +466,14 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         try {
             inhalt = File.ReadAllText(Blockdateiname(), Constants.Win1252);
         } catch {
-            if (!silent) { MessageBox.Show("Dateisystem Fehler"); }
+            if (!silent) { _ = MessageBox.Show("Dateisystem Fehler"); }
             return false;
         }
 
         if (_inhaltBlockdatei == inhalt) { return true; }
 
         if (!silent) {
-            MessageBox.Show("<b>Bearbeiten nicht möglich.</b>\r\n" + inhalt);
+            _ = MessageBox.Show("<b>Bearbeiten nicht möglich.</b>\r\n" + inhalt);
         }
 
         return false;
@@ -512,7 +512,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         } else if (!_isSaved) {
             if (_checkerTickCount > saveDelaySecond) { Save(false); }
         } else if (mustReload) {
-            if (_checkerTickCount > reloadDelaySecond) { Load_Reload(); }
+            if (_checkerTickCount > reloadDelaySecond) { _ = Load_Reload(); }
         }
     }
 

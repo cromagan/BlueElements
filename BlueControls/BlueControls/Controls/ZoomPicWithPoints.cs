@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,12 +31,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.ItemCollectionList;
 using static BlueBasics.Constants;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
@@ -204,7 +204,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
             Tags.TagSet("Erstellt", Generic.UserName);
             Tags.TagSet("Datum", DateTime.UtcNow.ToString5());
-            Tags.WriteAllText(pathtxt, Win1252, false);
+            _ = Tags.WriteAllText(pathtxt, Win1252, false);
         } catch {
             Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
             _ = MessageBox.Show("Fehler beim Speichern");
@@ -364,8 +364,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
                 var scaledStart = startPoint.ZoomAndMove(eg);
 
                 // Berechne die skalierten Dimensionen
-                float scaledWidth = 20 * eg.Zoom;  // 20 Pixel Breite
-                float scaledHeight = 10 * eg.Zoom;  // 10 Pixel Höhe
+                var scaledWidth = 20 * eg.Zoom;  // 20 Pixel Breite
+                var scaledHeight = 10 * eg.Zoom;  // 10 Pixel Höhe
 
                 // Zeichne das Rechteck mit den skalierten Werten
                 eg.G.DrawRectangle(PenRotTransp,
@@ -415,14 +415,14 @@ public partial class ZoomPicWithPoints : ZoomPic {
         foreach (var screen in screens) {
             // Konvertiere Bildschirmkoordinaten in Control-Koordinaten
             var screenBounds = screen.Bounds;
-            var controlPoint = this.PointToClient(new Point(screenBounds.X, screenBounds.Y));
+            var controlPoint = PointToClient(new Point(screenBounds.X, screenBounds.Y));
 
             // Berechne die Position für diesen Bildschirm
             var textSize = gr.MeasureString(_infoText, fn);
 
             // Prüfe ob die Maus auf diesem Bildschirm ist
-            var mouseScreenPoint = this.PointToScreen(new Point((int)MousePos11.X, (int)MousePos11.Y));
-            bool mouseOnThisScreen = screen.Bounds.Contains(mouseScreenPoint);
+            var mouseScreenPoint = PointToScreen(new Point(MousePos11.X, MousePos11.Y));
+            var mouseOnThisScreen = screen.Bounds.Contains(mouseScreenPoint);
 
             // Bestimme Y-Position unter Berücksichtigung der Scrollbars
             float yPos;

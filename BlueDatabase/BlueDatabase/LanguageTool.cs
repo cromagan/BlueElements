@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.ObjectModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
+using System.Collections.ObjectModel;
 
 namespace BlueDatabase;
 
@@ -115,9 +115,7 @@ public static class LanguageTool {
             }
         }
 
-        if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot.Equals(txt)) { return txt; }
-
-        return $"{ot} ({txt})";
+        return style is ShortenStyle.Replaced or ShortenStyle.HTML || ot.Equals(txt) ? txt : $"{ot} ({txt})";
     }
 
     #endregion

@@ -17,21 +17,21 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using static BlueBasics.Converter;
-using System.Threading;
-using System.Diagnostics;
 
 namespace BlueDatabase;
 
@@ -42,7 +42,7 @@ public class Chunk : IHasKeyName {
 
     public readonly string MainFileName = string.Empty;
 
-    private List<byte> _bytes = new List<byte>();
+    private List<byte> _bytes = [];
 
     private string _fileinfo = string.Empty;
 
@@ -81,9 +81,7 @@ public class Chunk : IHasKeyName {
 
     public string KeyName {
         get => _keyname;
-        private set {
-            _keyname = value.ToLower();
-        }
+        private set => _keyname = value.ToLower();
     }
 
     public string LastEditApp { get; private set; } = string.Empty;
@@ -122,12 +120,6 @@ public class Chunk : IHasKeyName {
 
             Pause(0.5, false);
         }
-    }
-
-    public bool DataOk(int minLen) {
-        if (LoadFailed) { return true; }
-
-        return _bytes.Count >= minLen;
     }
 
     /// <summary>
@@ -180,7 +172,11 @@ public class Chunk : IHasKeyName {
     }
 
     public bool Save(string filename, int minBytes) {
-        if (!DataOk(minBytes)) { return false; }
+        if(LoadFailed) { return false; }
+        if (minBytes < _bytes.Count) { return false; }
+
+
+        if(_lastcheck.Year < 2000) { return false; }
 
         try {
             Develop.SetUserDidSomething();
@@ -362,15 +358,15 @@ public class Chunk : IHasKeyName {
 
     internal bool Delete() {
         _bytes.Clear();
-        string filename = ChunkFileName;
+        var filename = ChunkFileName;
         return DeleteFile(filename, false);
     }
 
     internal bool DoExtendedSave(int minbytes) {
-        string filename = ChunkFileName;
+        var filename = ChunkFileName;
 
-        string backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
-        string tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+        var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
+        var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
         if (!Save(tempfile, minbytes)) { return false; }
         if (FileExists(backup)) {
@@ -378,14 +374,14 @@ public class Chunk : IHasKeyName {
         }
         Develop.SetUserDidSomething();
         // Haupt-Datei wird zum Backup umbenannt
-        MoveFile(filename, backup, false); // Kein Abbruch hier, die Datei könnte ja nicht existieren
+        _ = MoveFile(filename, backup, false); // Kein Abbruch hier, die Datei könnte ja nicht existieren
         Develop.SetUserDidSomething();
 
         // --- TmpFile wird zum Haupt ---
         const int maxRetries = 5;
         const int retryDelayMs = 1000;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+        for (var attempt = 1; attempt <= maxRetries; attempt++) {
             if (MoveFile(tempfile, filename, false)) {
                 Develop.SetUserDidSomething();
                 _lastcheck = DateTime.UtcNow;
@@ -417,10 +413,11 @@ public class Chunk : IHasKeyName {
         if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2) {
-            if (LastEditUser != UserName) { return $"Aktueller Bearbeiter: {LastEditUser}"; }
-            if (LastEditApp != Develop.AppExe()) { return $"Anderes Programm bearbeitet: {LastEditApp}"; }
-            if (LastEditMachineName != Environment.MachineName) { return $"Anderes Computer bearbeitet: {LastEditMachineName}"; }
-            return string.Empty;
+            return LastEditUser != UserName
+                ? $"Aktueller Bearbeiter: {LastEditUser}"
+                : LastEditApp != Develop.AppExe()
+                ? $"Anderes Programm bearbeitet: {LastEditApp}"
+                : LastEditMachineName != Environment.MachineName ? $"Anderes Computer bearbeitet: {LastEditMachineName}" : string.Empty;
         }
 
         if (reason is not EditableErrorReasonType.EditAcut and not EditableErrorReasonType.EditCurrently) { return string.Empty; }
@@ -444,9 +441,7 @@ public class Chunk : IHasKeyName {
         }
     }
 
-    internal void SaveToByteListEOF() {
-        SaveToByteList(DatabaseDataType.EOF, "END");
-    }
+    internal void SaveToByteListEOF() => SaveToByteList(DatabaseDataType.EOF, "END");
 
     private List<byte> GetHead() {
         if (LoadFailed) { return []; }
@@ -472,7 +467,7 @@ public class Chunk : IHasKeyName {
     }
 
     private void ParseLockData() {
-        int pointer = 0;
+        var pointer = 0;
         var data = _bytes.ToArray();
         var filename = ChunkFileName;
 

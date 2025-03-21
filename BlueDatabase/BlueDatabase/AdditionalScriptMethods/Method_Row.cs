@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -29,6 +25,10 @@ using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -36,8 +36,6 @@ namespace BlueDatabase.AdditionalScriptMethods;
 public class Method_Row : Method_Database, IUseableForButton {
 
     public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
-
-
 
     #region Properties
 
@@ -88,7 +86,6 @@ public class Method_Row : Method_Database, IUseableForButton {
         if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Filter"); }
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
 
-
         foreach (var thisFi in fic) {
             if (thisFi.Column is not { IsDisposed: false } c) {
                 return new DoItFeedback(ld, "Fehler im Filter, Spalte ungültig");
@@ -111,8 +108,6 @@ public class Method_Row : Method_Database, IUseableForButton {
             }
         }
 
-
-
         var t = Stopwatch.StartNew();
 
         do {
@@ -129,12 +124,10 @@ public class Method_Row : Method_Database, IUseableForButton {
         if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(ld, message); }
 
         if (newrow is { } r) {
-            RowCollection.InvalidatedRowsManager.AddInvalidatedRow(r);
+            _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(r);
             //if (scp.AdditionalInfo is RowItem masterRow && r.Database is { } db) {
             //    masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Zugehöriger Eintrag: {r.CellFirstString()} ({db.Caption})");
             //}
-
-
 
             var v = r.CellGetDateTime(srs);
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
@@ -147,8 +140,6 @@ public class Method_Row : Method_Database, IUseableForButton {
                 r.InvalidateRowState(coment);
             }
         }
-
-
 
         return RowToObjectFeedback(newrow);
     }

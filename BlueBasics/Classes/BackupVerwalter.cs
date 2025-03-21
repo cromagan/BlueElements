@@ -86,7 +86,7 @@ public class BackupVerwalter {
             }
 
             foreach (var thisF in Deleteable) {
-                IO.DeleteFile(thisF, false);
+                _ = IO.DeleteFile(thisF, false);
             }
 
             return string.Empty;
@@ -128,8 +128,7 @@ public class BackupVerwalter {
 
     private string? FileOf(DateTime date) {
         var dts = date.ToString6();
-        if (!_data.ContainsKey(dts)) { return null; }
-        return !_data.TryGetValue(dts, out var file) ? null : file;
+        return !_data.ContainsKey(dts) ? null : !_data.TryGetValue(dts, out var file) ? null : file;
     }
 
     private bool IsThereALaterVersion(int myAge, int maxAge) {

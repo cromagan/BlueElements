@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using System.ComponentModel;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
@@ -28,6 +26,8 @@ using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using System.ComponentModel;
+using System.Windows.Forms;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
 
@@ -67,14 +67,14 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void btnAusgehendeDatenbank_Click(object sender, System.EventArgs e) {
         if (_lastItem is ReciverSenderControlPadItem { DatabaseOutput: { IsDisposed: false } db }) {
             var c = new TableView(db, false, true, true);
-            c.ShowDialog();
+            _ = c.ShowDialog();
         }
     }
 
     private void btnEingehendeDatenbank_Click(object sender, System.EventArgs e) {
         if (_lastItem is ReciverControlPadItem { DatabaseInput: { IsDisposed: false } db }) {
             var c = new TableView(db, false, true, true);
-            c.ShowDialog();
+            _ = c.ShowDialog();
         }
     }
 
@@ -104,13 +104,13 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         if (!cf.LockEditing()) { return; }
 
-        this.Opacity = 0f;
+        Opacity = 0f;
         using var x = new ConnectedFormulaEditor(cf.Filename, null);
 
-        x.ShowDialog();
+        _ = x.ShowDialog();
         cf.UnlockEditing();
         CFormula.InvalidateView();
-        this.Opacity = 1f;
+        Opacity = 1f;
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -224,11 +224,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void SetItem(object? control) {
         if (control is GenericControlReciver grc) {
             _lastItem = grc.GeneratedFrom;
-            if (control is IOpenScriptEditor ose) {
-                _lastObject = ose;
-            } else {
-                _lastObject = null;
-            }
+            _lastObject = control is IOpenScriptEditor ose ? ose : null;
         } else if (control is Control c) {
             SetItem(c.Parent);
             return;

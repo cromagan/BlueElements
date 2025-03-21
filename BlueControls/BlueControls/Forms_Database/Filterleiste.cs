@@ -17,17 +17,17 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -380,7 +380,7 @@ public partial class Filterleiste : GenericControlReciverSender //  System.Windo
     }
 
     private void Filter_ZeilenFilterSetzen() {
-        if (IsDisposed || _table is not { Database: { IsDisposed: false } }) {
+        if (IsDisposed || (_table?.Database?.IsDisposed ?? true)) {
             DoÄhnlich();
             return;
         }

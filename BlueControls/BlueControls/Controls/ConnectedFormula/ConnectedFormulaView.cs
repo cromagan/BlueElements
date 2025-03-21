@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -33,6 +28,11 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -186,7 +186,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
             }
         }
 
-        unused.Remove(btnScript);
+        _ = unused.Remove(btnScript);
 
         #endregion
 
@@ -212,11 +212,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
                 if (con != null) {
                     _ = unused.Remove(con);
 
-                    if (thisit is ReciverControlPadItem cspi) {
-                        con.Visible = cspi.IsVisibleForMe(Mode, true);
-                    } else {
-                        con.Visible = true;
-                    }
+                    con.Visible = thisit is not ReciverControlPadItem cspi || cspi.IsVisibleForMe(Mode, true);
 
                     if (thisit is IAutosizable) {
                         foreach (var (item, newpos) in l) {
@@ -319,11 +315,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() {
-        if (Page == null) { return null; }
-
-        return Page.GetConnectedFormula();
-    }
+    internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() => Page?.GetConnectedFormula();
 
     //        if (FilterOutput.Database is { IsDisposed: false } db2) {
     //            db2.DisposingEvent += _database_Disposing;
@@ -418,7 +410,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         if (Generic.IsAdministrator()) {
             if (IsDisposed || RowSingleOrNull()?.Database is not { IsDisposed: false } db) { return; }
 
-            IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+            _ = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
 
         } else {
             MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");

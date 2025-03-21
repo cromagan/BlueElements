@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -77,9 +77,8 @@ public class Method_Filter : Method_Database {
                 if (fii.Database != allFi[0].Database) { return (null, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
             }
 
+            allFi.Add(fii);
 
-                allFi.Add(fii);
-            
         }
 
         if (allFi.Count < 1) {

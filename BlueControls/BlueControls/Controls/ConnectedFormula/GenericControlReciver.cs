@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -31,6 +28,9 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.Controls;
 
@@ -202,7 +202,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         if (RowsInput is not { Count: 1 } r) { return null; }
-        r[0].CheckRow();
+        _ = r[0].CheckRow();
         return r[0];
     }
 
@@ -231,7 +231,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (row?.Database is { IsDisposed: false }) {
             RowsInput.Add(row);
-            row.CheckRow();
+            _ = row.CheckRow();
 
             if (doAtabaseAfter) { RegisterEvents(); }
         }
@@ -258,7 +258,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             Invalidate_FilterInput();
 
             foreach (var thisParent in Parents) {
-                thisParent.Childs.Remove(this);
+                _ = thisParent.Childs.Remove(this);
             }
 
             Parent?.Controls.Remove(this);
@@ -311,7 +311,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         RowsInput = [.. FilterInput.Rows];
 
         if (RowSingleOrNull() is { IsDisposed: false } r) {
-            r.CheckRow();
+            _ = r.CheckRow();
         }
 
         _rowsInputChangedHandling = false;
@@ -375,10 +375,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private FilterCollection? GetInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
         if (Parents.Count == 0) {
-            if (doEmptyFilterToo && mustbeDatabase != null) {
-                return new FilterCollection(mustbeDatabase, "Empty Input Filter");
-            }
-            return null;
+            return doEmptyFilterToo && mustbeDatabase != null ? new FilterCollection(mustbeDatabase, "Empty Input Filter") : null;
         }
 
         if (Parents.Count == 1) {

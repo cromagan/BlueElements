@@ -42,11 +42,7 @@ public static class StyleableOneExtension {
 
     #region Methods
 
-    public static BlueFont GetFont(this IStyleableOne o, float additionalScale) {
-        if (Math.Abs(1 - additionalScale) < Constants.DefaultTolerance) { return GetFont(o); }
-
-        return GetFont(o).Scale(additionalScale);
-    }
+    public static BlueFont GetFont(this IStyleableOne o, float additionalScale) => Math.Abs(1 - additionalScale) < Constants.DefaultTolerance ? GetFont(o) : GetFont(o).Scale(additionalScale);
 
     public static BlueFont GetFont(this IStyleableOne o) {
         o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Style);

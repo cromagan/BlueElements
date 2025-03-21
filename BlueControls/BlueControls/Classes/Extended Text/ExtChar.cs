@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System;
-using System.Drawing;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System;
+using System.Drawing;
 
 namespace BlueControls.Extended_Text;
 
@@ -82,12 +82,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     public bool IsDisposed { get; private set; }
     public MarkState Marking { get; set; }
 
-    public string SheetStyle {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return string.Empty;
-        }
-    }
+    public string SheetStyle => _parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
     public SizeF Size {
         get {
@@ -128,9 +123,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
 
         var r = db.Row[f1, f2];
 
-        if (r == null) { return PadStyles.Standard; }
-
-        return (PadStyles)r.CellGetInteger("Style");
+        return r == null ? PadStyles.Standard : (PadStyles)r.CellGetInteger("Style");
     }
 
     public abstract string HtmlText();

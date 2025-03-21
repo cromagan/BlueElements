@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,7 +26,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using BlueBasics.Enums;
 using static BlueBasics.Generic;
 
 namespace BlueBasics;

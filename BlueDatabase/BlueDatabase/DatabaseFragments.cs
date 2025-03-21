@@ -17,15 +17,15 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
@@ -117,10 +117,11 @@ public class DatabaseFragments : Database {
         base.Freeze(reason);
     }
 
+    [Obsolete]
     public override void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (FileExists(fileNameToLoad)) {
             Filename = fileNameToLoad;
-            Directory.CreateDirectory(FragmengtsPath());
+            _ = Directory.CreateDirectory(FragmengtsPath());
             //Directory.CreateDirectory(OldFragmengtsPath());
             Filename = string.Empty;
         }
@@ -191,7 +192,7 @@ public class DatabaseFragments : Database {
 
         foreach (var thisch in ChangesNotIncluded) {
             if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalMinutes < 20) {
-                files.Remove(thisch.Container);
+                _ = files.Remove(thisch.Container);
             }
         }
 
@@ -218,7 +219,7 @@ public class DatabaseFragments : Database {
         if (ChangesNotIncluded.Any()) {
             foreach (var thisch in ChangesNotIncluded) {
                 //if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalHours < 12) {
-                files.Remove(thisch.Container);
+                _ = files.Remove(thisch.Container);
                 //}
             }
         }
@@ -251,7 +252,7 @@ public class DatabaseFragments : Database {
 
             if (del) {
                 OnDropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-                DeleteFile(thisf, 1, false);
+                _ = DeleteFile(thisf, 1, false);
                 //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
                 if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { break; }
             }
@@ -290,7 +291,7 @@ public class DatabaseFragments : Database {
     private void CheckPath() {
         if (string.IsNullOrEmpty(Filename)) { return; }
 
-        Directory.CreateDirectory(FragmengtsPath());
+        _ = Directory.CreateDirectory(FragmengtsPath());
         //Directory.CreateDirectory(OldFragmengtsPath());
     }
 
@@ -308,10 +309,7 @@ public class DatabaseFragments : Database {
         }
     }
 
-    private string FragmengtsPath() {
-        if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
-        return Filename.FilePath() + "Frgm\\";
-    }
+    private string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
 
     private (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(DateTime endTimeUtc) {
         if (string.IsNullOrEmpty(FragmengtsPath())) { return (null, null); }
@@ -325,7 +323,7 @@ public class DatabaseFragments : Database {
             #region Alle Fragment-Dateien im Verzeichniss ermitteln und eigene Ausfiltern (frgma)
 
             var frgma = Directory.GetFiles(FragmengtsPath(), TableName.ToUpper() + "-*." + SuffixOfFragments(), SearchOption.TopDirectoryOnly).ToList();
-            frgma.Remove(_myFragmentsFilename);
+            _ = frgma.Remove(_myFragmentsFilename);
 
             #endregion
 
@@ -391,7 +389,7 @@ public class DatabaseFragments : Database {
             if (checkedDataFiles != null) {
                 foreach (var thisf in checkedDataFiles) {
                     if (thisf.Contains("\\" + TableName.ToUpperInvariant() + "-")) {
-                        myfiles.AddIfNotExists(thisf);
+                        _ = myfiles.AddIfNotExists(thisf);
                     }
                 }
             }
@@ -415,9 +413,9 @@ public class DatabaseFragments : Database {
                         return;
                     }
 
-                    if (c == null && columnchanged != null) { columnsAdded.AddIfNotExists(columnchanged); }
-                    if (r == null && rowchanged != null) { rowsAdded.AddIfNotExists(rowchanged); }
-                    if (rowchanged != null && columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
+                    if (c == null && columnchanged != null) { _ = columnsAdded.AddIfNotExists(columnchanged); }
+                    if (r == null && rowchanged != null) { _ = rowsAdded.AddIfNotExists(rowchanged); }
+                    if (rowchanged != null && columnchanged != null) { _ = cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
                 }
             }
             _doingChanges--;

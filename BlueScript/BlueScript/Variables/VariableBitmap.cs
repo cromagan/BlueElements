@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueScript.Structures;
+using System.Collections.Generic;
+using System.Drawing;
 using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;

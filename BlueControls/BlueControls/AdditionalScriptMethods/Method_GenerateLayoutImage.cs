@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -76,7 +76,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         if (!l.Any()) { return new DoItFeedback(ld, "Layout nicht gefunden oder fehlerhaft."); }
 
-        l.ResetVariables();
+        _ = l.ResetVariables();
         var scx = l.ReplaceVariables(r);
 
         if (!scx.AllOk) {

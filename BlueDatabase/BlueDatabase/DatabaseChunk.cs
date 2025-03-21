@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,9 +27,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -48,7 +48,7 @@ public class DatabaseChunk : Database {
     /// </summary>
     private readonly ConcurrentDictionary<string, Chunk> _chunks = new();
 
-    private ConcurrentDictionary<string, byte> chunksBeingSaved = new ConcurrentDictionary<string, byte>();
+    private readonly ConcurrentDictionary<string, byte> chunksBeingSaved = new ConcurrentDictionary<string, byte>();
 
     #endregion
 
@@ -189,20 +189,16 @@ public class DatabaseChunk : Database {
 
             if (l < minLen) { return null; }
 
-            if (x != db.LastChange) { return null; } // Stand stimmt nicht mehr
-
-            return chunks;
+            return x != db.LastChange ? null : chunks; // Stand stimmt nicht mehr
         } catch {
             Develop.CheckStackForOverflow();
             return GenerateNewChunks(db, minLen, fileStateUtcDateToSave, chunksAllowed);
         }
     }
 
-    public static string GetChunkId(RowItem r) {
-        if (r.Database?.Column.SplitColumn is not { }) { return Chunk_MainData; }
-
-        return GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r));
-    }
+    public static string GetChunkId(RowItem r) => r.Database?.Column.SplitColumn is not { }
+            ? Chunk_MainData
+            : GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r));
 
     public static string GetChunkId(Database db, DatabaseDataType type, string chunkvalue) {
         if (db.Column.SplitColumn is not { } spc) { return Chunk_MainData.ToLower(); }
@@ -241,12 +237,7 @@ public class DatabaseChunk : Database {
         return Chunk_MainData.ToLower();
     }
 
-    public static string GetChunkValue(RowItem r) {
-        if (r.Database?.Column.SplitColumn is not { } spc) { return string.Empty; }
-        return r.Database.Cell.GetStringCore(spc, r);
-
-        //return r.CellGetString(spc);
-    }
+    public static string GetChunkValue(RowItem r) => r.Database?.Column.SplitColumn is not { } spc ? string.Empty : r.Database.Cell.GetStringCore(spc, r);
 
     /// <summary>
     /// row == null --> false
@@ -314,9 +305,7 @@ public class DatabaseChunk : Database {
     public override (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) {
         var chunkId = GetChunkId(this, DatabaseDataType.UTF8Value_withoutSizeData, chunkValue);
 
-        if (string.IsNullOrEmpty(chunkId)) { return (false, false); }
-
-        return LoadChunkWithChunkId(chunkId, false, needPassword, false);
+        return string.IsNullOrEmpty(chunkId) ? ((bool loaded, bool ok))(false, false) : LoadChunkWithChunkId(chunkId, false, needPassword, false);
     }
 
     /// <summary>
@@ -405,13 +394,13 @@ public class DatabaseChunk : Database {
             var chunkFiles = Directory.GetFiles(chunkPath, "*.bdbc");
 
             foreach (var file in chunkFiles) {
-                DeleteFile(file, false);
+                _ = DeleteFile(file, false);
             }
         }
 
         #endregion
 
-        SaveInternal(FileStateUtcDate);
+        _ = SaveInternal(FileStateUtcDate);
     }
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName).ToList();
@@ -427,13 +416,7 @@ public class DatabaseChunk : Database {
 
         var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, true);
 
-        if (!ok) { return "Chunk Lade-Fehler"; }
-
-        if (!_chunks.TryGetValue(chunkId, out var chunk)) {
-            return "Interner Chunk-Fehler";
-        }
-
-        return chunk.IsEditable(reason);
+        return !ok ? "Chunk Lade-Fehler" : !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.IsEditable(reason);
     }
 
     protected override bool BeSureToBeUpDoDate() {
@@ -480,9 +463,9 @@ public class DatabaseChunk : Database {
         if (chunksnew == null || chunksnew.Count == 0) { return false; }
 
         foreach (var thisChunk in chunksnew) {
-            _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
+            _ = _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
             if (existingChunk == null || existingChunk.SaveRequired) {
-                chunksBeingSaved.TryAdd(thisChunk.KeyName, 0);
+                _ = chunksBeingSaved.TryAdd(thisChunk.KeyName, 0);
             }
         }
 
@@ -495,11 +478,11 @@ public class DatabaseChunk : Database {
                 if (!thisChunk.DoExtendedSave(5)) {
                     allok = false;
                 } else {
-                    _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
+                    _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
                 }
 
                 // Chunk-ID aus dem Set entfernen
-                chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
+                _ = chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
             }
         }
 
@@ -515,7 +498,7 @@ public class DatabaseChunk : Database {
         foreach (var thisChunk in chunks) {
             if (thisChunk.SaveRequired) {
                 OnDropMessage(ErrorType.Info, $"Lösche alten Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
-                thisChunk.Delete();
+                _ = thisChunk.Delete();
                 _ = _chunks.TryRemove(thisChunk.KeyName, out _); // Den alten Fehlerhaften Chunk entfernen
             }
         }
@@ -526,9 +509,7 @@ public class DatabaseChunk : Database {
         return true;
     }
 
-    protected override bool SaveRequired() {
-        return _chunks.Values.Any(chunk => chunk.SaveRequired);
-    }
+    protected override bool SaveRequired() => _chunks.Values.Any(chunk => chunk.SaveRequired);
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
         chunkId = chunkId.ToLower();
@@ -560,6 +541,7 @@ public class DatabaseChunk : Database {
         return rowchunk;
     }
 
+    [Obsolete]
     private bool Parse(Chunk chunk, NeedPassword? needPassword) {
         if (chunk.LoadFailed) { return false; }
 
@@ -568,7 +550,7 @@ public class DatabaseChunk : Database {
         if (rowsToRemove.Count > 0) {
             // Zeilen und zugehörige Zellen entfernen
             foreach (var row in rowsToRemove) {
-                Row.ExecuteCommand(DatabaseDataType.Command_RemoveRow, row.KeyName, Reason.NoUndo_NoInvalidate, null, null);
+                _ = Row.ExecuteCommand(DatabaseDataType.Command_RemoveRow, row.KeyName, Reason.NoUndo_NoInvalidate, null, null);
             }
 
             // Verwaiste Zellen entfernen
@@ -584,12 +566,12 @@ public class DatabaseChunk : Database {
 
         if (chunk.Bytes.Length == 0) {
             // Bei leerer Datei trotzdem in Dictionary einfügen
-            _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
+            _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
             return true;
         }
 
         // Zuerst parsen, bevor der Chunk in die Dictionary kommt
-        bool parseSuccessful = Parse(chunk.Bytes, chunk.IsMain, needPassword, chunk.ChunkFileName);
+        var parseSuccessful = Parse(chunk.Bytes, chunk.IsMain, needPassword, chunk.ChunkFileName);
 
         if (!parseSuccessful) {
             chunk.LoadFailed = true;
@@ -599,7 +581,7 @@ public class DatabaseChunk : Database {
         }
 
         // Nur erfolgreich geparste Chunks werden zur Dictionary hinzugefügt
-        _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
+        _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
 
         return true;
     }

@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -60,11 +60,7 @@ internal class Method_ImportCsv : Method_Database {
 
         var sx = db.ImportCsv(txt, true, true, sep, false, false);
 
-        if (string.IsNullOrEmpty(sx)) {
-            return DoItFeedback.Null();
-        }
-
-        return new DoItFeedback(ld, sx);
+        return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(ld, sx);
     }
 
     #endregion

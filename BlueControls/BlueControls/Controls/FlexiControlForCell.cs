@@ -17,12 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -37,6 +31,12 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -398,15 +398,8 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
     private ColumnItem? GetTmpColumn() {
         try {
-            ColumnItem? tmpColumn;
-
-            if (DatabaseInput is { IsDisposed: false } db) {
-                tmpColumn = db.Column[_columnName];
-            } else {
-                tmpColumn = null;
-            }
-
-            return tmpColumn;
+            return DatabaseInput is { IsDisposed: false } db ? db.Column[_columnName] : null;
+   
         } catch {
             // Multitasking sei dank kann _database trotzem null sein...
             Develop.CheckStackForOverflow();
@@ -634,7 +627,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
                     foreach (var thisItem in item) {
                         if (!column.DropDownItems.Contains(thisItem.KeyName)) {
                             again = true;
-                            item.Remove(thisItem);
+                            _ = item.Remove(thisItem);
                             break;
                         }
                     }

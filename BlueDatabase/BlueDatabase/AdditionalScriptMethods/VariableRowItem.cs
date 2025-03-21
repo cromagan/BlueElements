@@ -75,15 +75,7 @@ public class VariableRowItem : Variable {
 
     public override bool ToStringPossible => true;
 
-    public override string ValueForReplace {
-        get {
-            if (_row is null || _row.Database is not { IsDisposed: false } db) {
-                return "{ROW:?}";
-            }
-
-            return "{ROW:" + db.TableName + ";" + _row.KeyName + "}";
-        }
-    }
+    public override string ValueForReplace => _row is null || _row.Database is not { IsDisposed: false } db ? "{ROW:?}" : "{ROW:" + db.TableName + ";" + _row.KeyName + "}";
 
     #endregion
 
@@ -136,21 +128,13 @@ public class VariableRowItem : Variable {
 
             var row = db.Row.SearchByKey(tx[1]);
 
-            if (row is null || row.IsDisposed) { return (false, null); }
-
-            return (true, row);
+            return row is null || row.IsDisposed ? ((bool cando, object? result))(false, null) : ((bool cando, object? result))(true, row);
         }
 
         return (false, null);
     }
 
-    private void GetText() {
-        if (_row == null) {
-            _lastText = "Row: [NULL]";
-        } else {
-            _lastText = "Row: " + _row.CellFirstString();
-        }
-    }
+    private void GetText() => _lastText = _row == null ? "Row: [NULL]" : "Row: " + _row.CellFirstString();
 
     #endregion
 }

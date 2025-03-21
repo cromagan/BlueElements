@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using BlueControls;
+using BlueControls.Controls;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BlueControls;
-using BlueControls.Controls;
 
 namespace BlueBasics.Interfaces;
 
@@ -103,10 +103,11 @@ public static class SimpleEditorExtension {
     }
 
     public static UserControl GetControl(this ISimpleEditor? element, int widthOfControl) {
-        var l = new UserControl();
-        l.Width = widthOfControl;
-        l.Height = 100;
-        l.Visible = true;
+        var l = new UserControl {
+            Width = widthOfControl,
+            Height = 100,
+            Visible = true
+        };
 
         element.DoForm(l);
 

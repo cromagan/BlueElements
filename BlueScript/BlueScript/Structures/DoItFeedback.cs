@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing;
 using BlueScript.Methods;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueScript.Structures;
 
-public struct DoItFeedback {
+public readonly struct DoItFeedback {
 
     #region Constructors
 
@@ -115,11 +115,11 @@ public struct DoItFeedback {
     public static DoItFeedback Schreibgschützt(LogData ld) => new(ld, "Variable ist schreibgeschützt.");
 
     public static DoItFeedback VerschiedeneTypen(LogData ld, Variable var1, Variable var2) =>
-        new(ld, $"Variable '{var1.KeyName}' ist nicht der erwartete Typ {var2.MyClassId }, sondern {var1.MyClassId}");
+        new(ld, $"Variable '{var1.KeyName}' ist nicht der erwartete Typ {var2.MyClassId}, sondern {var1.MyClassId}");
 
     public static DoItFeedback Wahr() => new(true);
 
-    public static DoItFeedback WertKonnteNichtGesetztWerden(LogData ld, int atno) => new(ld, $"Der Wert das Attributes {atno+1} konnte nicht gesetzt werden.");
+    public static DoItFeedback WertKonnteNichtGesetztWerden(LogData ld, int atno) => new(ld, $"Der Wert das Attributes {atno + 1} konnte nicht gesetzt werden.");
 
     #endregion
 }

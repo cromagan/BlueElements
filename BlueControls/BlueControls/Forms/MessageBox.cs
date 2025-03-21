@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
 using BlueDatabase;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using Button = BlueControls.Controls.Button;
 
@@ -74,7 +74,7 @@ public partial class MessageBox : Form {
 
     #region Properties
 
-    public override sealed string Text {
+    public sealed override string Text {
         get => base.Text;
         set => base.Text = value;
     }

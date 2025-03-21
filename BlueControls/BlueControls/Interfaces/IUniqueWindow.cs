@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using BlueBasics.Interfaces;
 
 namespace BlueControls.Interfaces;
@@ -91,7 +90,7 @@ public static class IUniqueWindowExtension {
     #region Methods
 
     public static T ShowOrCreate<T>(object o) where T : IUniqueWindow, new() {
-        Type windowType = typeof(T);
+        var windowType = typeof(T);
 
         foreach (var form in FormManager.Forms) {
             if (form.GetType() == windowType && form is T { IsDisposed: false } uniqueWindow) {
@@ -103,8 +102,9 @@ public static class IUniqueWindowExtension {
         }
 
         // Wenn kein passendes Fenster gefunden wurde, erstellen Sie ein neues
-        T newWindow = new T();
-        newWindow.Object = o;
+        var newWindow = new T {
+            Object = o
+        };
         newWindow.Show();
         return newWindow;
     }

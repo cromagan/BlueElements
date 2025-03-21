@@ -17,16 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Element : Method {
 
     #region Properties
@@ -50,11 +48,9 @@ internal class Method_Element : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var i = attvar.ValueIntGet(1);
         var list = attvar.ValueListStringGet(0);
-        if (i < 0 || i >= list.Count) {
-            return new DoItFeedback(ld, "Element '" + i + "' nicht in der Liste vorhanden");
-        }
-
-        return new DoItFeedback(list[i]);
+        return i < 0 || i >= list.Count
+            ? new DoItFeedback(ld, "Element '" + i + "' nicht in der Liste vorhanden")
+            : new DoItFeedback(list[i]);
     }
 
     #endregion

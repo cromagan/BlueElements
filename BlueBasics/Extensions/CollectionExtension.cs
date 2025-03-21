@@ -28,10 +28,9 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static bool Contains(this IEnumerable<string> collection, string searchKeyword, bool caseSensitive) {
-        if (caseSensitive) { return collection.Contains(searchKeyword); }
-        return collection.Any(item => string.Equals(item, searchKeyword, StringComparison.OrdinalIgnoreCase));
-    }
+    public static bool Contains(this IEnumerable<string> collection, string searchKeyword, bool caseSensitive) => caseSensitive
+            ? collection.Contains(searchKeyword)
+            : collection.Any(item => string.Equals(item, searchKeyword, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Verbindet die Collection mit Trennzeichen und doppelte Trennzeichen am Ende werden nicht abgeschnitten
@@ -39,11 +38,7 @@ public static partial class Extensions {
     /// <param name="collection"></param>
     /// <param name="joinChar"></param>
     /// <returns></returns>
-    public static string JoinWith(this IEnumerable<string>? collection, string joinChar) {
-        if (collection == null) { return string.Empty; }
-
-        return string.Join(joinChar, collection);
-    }
+    public static string JoinWith(this IEnumerable<string>? collection, string joinChar) => collection == null ? string.Empty : string.Join(joinChar, collection);
 
     /// <summary>
     /// Verbindet die Collection mit \r und doppelte \r am Ende werden nicht abgeschnitten.

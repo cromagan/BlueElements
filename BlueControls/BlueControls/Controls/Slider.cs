@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Constants;
 using Orientation = BlueBasics.Enums.Orientation;
 

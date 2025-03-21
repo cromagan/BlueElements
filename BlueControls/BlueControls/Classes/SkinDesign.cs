@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueControls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System.Collections.Generic;
+using System.Drawing;
 using static BlueBasics.Converter;
 
 public static class SkinDesignExtensions {

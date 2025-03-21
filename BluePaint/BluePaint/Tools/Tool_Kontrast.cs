@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System;
-using System.Drawing;
 using BlueBasics;
 using BlueControls.EventArgs;
+using System;
+using System.Drawing;
 
 namespace BluePaint;
 
@@ -39,9 +39,9 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
         using var picPreview = new BitmapExt(originalPic);
 
-        if (sldKontrast.Value != 0) { picPreview.ApplyFilter("Contrast", sldKontrast.Value); }
-        if (Math.Abs(sldGamma.Value - 1) > 0.001) { picPreview.ApplyFilter("Gamma", sldGamma.Value); }
-        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { picPreview.ApplyFilter("Brightness", sldHelligkeit.Value); }
+        if (sldKontrast.Value != 0) { _ = picPreview.ApplyFilter("Contrast", sldKontrast.Value); }
+        if (Math.Abs(sldGamma.Value - 1) > 0.001) { _ = picPreview.ApplyFilter("Gamma", sldGamma.Value); }
+        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { _ = picPreview.ApplyFilter("Brightness", sldHelligkeit.Value); }
 
         e.DrawImage(picPreview.CloneOfBitmap());
     }
@@ -51,7 +51,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         if (pic == null) { return; }
         var picPreview = new BitmapExt(pic);
 
-        picPreview.ApplyFilter("AllePixelZuSchwarz", 0.95f);
+        _ = picPreview.ApplyFilter("AllePixelZuSchwarz", 0.95f);
 
         OnOverridePic(picPreview.CloneOfBitmap(), false);
         sldGamma.Value = 1f;
@@ -64,7 +64,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         if (pic == null) { return; }
         var picPreview = new BitmapExt(pic);
 
-        picPreview.ApplyFilter("Ausdünnen", 4);
+        _ = picPreview.ApplyFilter("Ausdünnen", 4);
 
         OnOverridePic(picPreview.CloneOfBitmap(), false);
         sldGamma.Value = 1f;
@@ -114,9 +114,9 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
         var picPreview = new BitmapExt(pic);
 
-        if (sldKontrast.Value != 0) { picPreview.ApplyFilter("Contrast", sldKontrast.Value); }
-        if (Math.Abs(sldGamma.Value - 1) > 0.001) { picPreview.ApplyFilter("Gamma", sldGamma.Value); }
-        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { picPreview.ApplyFilter("Brightness", sldHelligkeit.Value); }
+        if (sldKontrast.Value != 0) { _ = picPreview.ApplyFilter("Contrast", sldKontrast.Value); }
+        if (Math.Abs(sldGamma.Value - 1) > 0.001) { _ = picPreview.ApplyFilter("Gamma", sldGamma.Value); }
+        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { _ = picPreview.ApplyFilter("Brightness", sldHelligkeit.Value); }
 
         OnOverridePic(picPreview.CloneOfBitmap(), false);
         sldGamma.Value = 1f;

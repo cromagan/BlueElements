@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics.Enums;
-using BlueControls.EventArgs;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;

@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -38,6 +33,11 @@ using BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -377,7 +377,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
                 if (thiscol != null && ca[thiscol] is null) {
                     if (MessageBox.Show("Spalte <b>" + thiscol.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                             "Ja", "Nein") == 0) {
-                        db.Column.Remove(thiscol, "Benutzer löscht im ColArrangement Editor");
+                        _ = db.Column.Remove(thiscol, "Benutzer löscht im ColArrangement Editor");
                         did = true;
                     }
                 }
@@ -422,7 +422,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
     private void ShowOrder() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        Pad.Items = new ItemCollectionPadItem();
+        Pad.Items = [];
         Pad.Items.Endless = true;
         Pad.Items.ForPrinting = true;
 
@@ -492,7 +492,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
                             foreach (var thisitem in c.LinkedCellFilter) {
                                 var tmp = thisitem.SplitBy("|");
 
-                                if (c.Database is { IsDisposed: false } db2)
+                                if (c.Database is { IsDisposed: false } db2) {
                                     foreach (var thisc2 in db2.Column) {
                                         if (tmp[2].Contains("~" + thisc2.KeyName + "~")) {
                                             if (thisc2.Database is { IsDisposed: false } db3) {
@@ -503,6 +503,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
                                             }
                                         }
                                     }
+                                }
                             }
 
                             var c2 = c.LinkedDatabase.Column[c.ColumnNameOfLinkedDatabase];

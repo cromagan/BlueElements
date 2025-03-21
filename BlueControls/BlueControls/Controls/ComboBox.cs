@@ -17,13 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Design;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -34,6 +27,13 @@ using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Design;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -175,9 +175,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     public AbstractListItem? this[int no] {
         get {
             try {
-                if (no < 0 || no >= _items.Count) { return null; }
-
-                return _items[no];
+                return no < 0 || no >= _items.Count ? null : _items[no];
             } catch {
                 Develop.CheckStackForOverflow();
                 return this[no];
@@ -238,7 +236,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     internal void Remove(AbstractListItem thisit) {
         if (!_items.Contains(thisit)) { return; }
-        _items.Remove(thisit);
+        _ = _items.Remove(thisit);
         Invalidate();
     }
 

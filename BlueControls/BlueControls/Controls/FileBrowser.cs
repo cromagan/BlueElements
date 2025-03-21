@@ -17,6 +17,14 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.ItemCollectionList;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,14 +34,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.ItemCollectionList;
-using Microsoft.Win32;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -759,7 +759,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     private void Watcher_Changed(object sender, FileSystemEventArgs e) {
         var fi = new FileInfo(e.Name);
-        AddThis(fi);
+        _ = AddThis(fi);
 
         //if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
         //if(e.ChangeType == WatcherChangeTypes.Changed) { return; }

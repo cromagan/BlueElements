@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -84,11 +84,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         var f = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
 
-        if (!f.AllOk) {
-            return new DoItFeedback(ld, f.ProtocolText);
-        }
-
-        return DoItFeedback.Null();
+        return !f.AllOk ? new DoItFeedback(ld, f.ProtocolText) : DoItFeedback.Null();
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1] + "," + args[2];

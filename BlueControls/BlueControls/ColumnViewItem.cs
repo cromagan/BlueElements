@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -31,6 +27,10 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -101,13 +101,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
 
     public Color BackColor_ColumnCell {
-        get {
-            if (Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()) {
-                return Column.BackColor;
-            }
-
-            return _backColor_ColumnCell;
-        }
+        get => Column != null && _backColor_ColumnHead.IsMagentaOrTransparent() ? Column.BackColor : _backColor_ColumnCell;
         set {
             if (_backColor_ColumnCell.ToArgb() == value.ToArgb()) { return; }
             _backColor_ColumnCell = value;
@@ -116,13 +110,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public Color BackColor_ColumnHead {
-        get {
-            if (Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()) {
-                return Column.BackColor.MixColor(Color.LightGray, 0.6);
-            }
-
-            return _backColor_ColumnHead;
-        }
+        get => Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()
+                ? Column.BackColor.MixColor(Color.LightGray, 0.6)
+                : _backColor_ColumnHead;
 
         set {
             if (_backColor_ColumnHead.ToArgb() == value.ToArgb()) { return; }
@@ -186,13 +176,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public BlueFont Font_Head_Default {
-        get {
-            if (IsDisposed) { return BlueFont.DefaultFont; }
-
-            return _font_Head_Default ??= Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
-        }
-    }
+    public BlueFont Font_Head_Default => IsDisposed ? BlueFont.DefaultFont : (_font_Head_Default ??= Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben));
 
     public BlueFont Font_Numbers {
         get {
@@ -218,13 +202,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public Color FontColor_Caption {
-        get {
-            if (Column != null && _fontColor_Caption.IsMagentaOrTransparent()) {
-                return Column.ForeColor;
-            }
-
-            return _fontColor_Caption;
-        }
+        get => Column != null && _fontColor_Caption.IsMagentaOrTransparent() ? Column.ForeColor : _fontColor_Caption;
         set {
             if (_fontColor_Caption.ToArgb() == value.ToArgb()) { return; }
             _fontColor_Caption = value;
@@ -234,13 +212,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public bool Horizontal {
-        get {
-            if (Column == null) {
-                return false;
-            }
-
-            return _horizontal;
-        }
+        get => Column != null && _horizontal;
         set {
             if (_horizontal = value) { return; }
             _horizontal = value;
@@ -295,12 +267,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string RendererSettings { get; set; }
 
-    public string SheetStyle {
-        get {
-            if (_parent is IStyleable ist) { return ist.SheetStyle; }
-            return Win11;
-        }
-    }
+    public string SheetStyle => _parent is IStyleable ist ? ist.SheetStyle : Win11;
 
     public int? TmpIfFilterRemoved { get; set; } = null;
 
@@ -449,9 +416,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         _drawWidth = null;
 
-        if (_parent != null) {
-            _parent.Invalidate_XOfAllItems();
-        }
+        _parent?.Invalidate_XOfAllItems();
     }
 
     public void Invalidate_Head() {

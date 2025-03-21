@@ -17,17 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_FreeFileName : Method {
 
     #region Properties
@@ -58,10 +56,8 @@ internal class Method_FreeFileName : Method {
         }
 
         if (!string.IsNullOrEmpty(nam)) {
-            return new DoItFeedback(TempFile(pf,nam,suf) );
+            return new DoItFeedback(TempFile(pf, nam, suf));
         }
-
-
 
         var zeichen = BlueBasics.Constants.Char_AZ.ToLowerInvariant() + BlueBasics.Constants.Char_Numerals + BlueBasics.Constants.Char_AZ.ToUpperInvariant();
         // Ja, lower und upper macht keinen sinn, sieht aber verrückter aus

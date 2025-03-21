@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,7 +32,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using Microsoft.Win32;
 using static BlueBasics.IO;
 using Clipboard = System.Windows.Clipboard;
 using Point = System.Drawing.Point;

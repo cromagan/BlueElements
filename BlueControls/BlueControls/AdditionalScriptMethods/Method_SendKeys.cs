@@ -1,17 +1,15 @@
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_SendKeys : Method {
 
     #region Properties
@@ -119,9 +117,7 @@ internal class Method_SendKeys : Method {
         };
     }
 
-    private static bool IsShiftRequired(char c) {
-        return "~!@#$%^&*()_+{}|:\"<>?".IndexOf(c) >= 0;
-    }
+    private static bool IsShiftRequired(char c) => "~!@#$%^&*()_+{}|:\"<>?".IndexOf(c) >= 0;
 
     private static bool SendSpecialKey(string key) {
         var specialKey = key switch {

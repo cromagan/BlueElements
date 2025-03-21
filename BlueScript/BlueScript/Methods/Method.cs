@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
 using static BlueBasics.Constants;
 using static BlueBasics.Extensions;
 
@@ -281,7 +281,7 @@ public abstract class Method : IReadableTextWithKey {
 
             if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
 
-            feedbackVariables.Add(v);
+            _ = feedbackVariables.Add(v);
 
             //if (s != null) { line += lb; }
         }
@@ -328,7 +328,7 @@ public abstract class Method : IReadableTextWithKey {
             if (generateVariable) {
                 v.KeyName = varnam.ToLowerInvariant();
                 v.ReadOnly = false;
-                varCol.Add(v);
+                _ = varCol.Add(v);
                 return new DoItFeedback(v);
             }
 
@@ -382,9 +382,9 @@ public abstract class Method : IReadableTextWithKey {
 
     public virtual DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
-
-        return DoIt(varCol, attvar, scp, infos.LogData);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage)
+            ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
+            : DoIt(varCol, attvar, scp, infos.LogData);
     }
 
     public abstract DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld);
@@ -431,11 +431,9 @@ public abstract class Method : IReadableTextWithKey {
         if (string.IsNullOrEmpty(Returns)) {
             co += "  - Rückgabetyp: -\r\n";
         } else {
-            if (MustUseReturnValue) {
-                co = co + "  - Rückgabetyp: " + Returns + "(muss verwendet werden)\r\n";
-            } else {
-                co = co + "  - Rückgabetyp: " + Returns + " (darf verworfen werden)\r\n";
-            }
+            co = MustUseReturnValue
+                ? co + "  - Rückgabetyp: " + Returns + "(muss verwendet werden)\r\n"
+                : co + "  - Rückgabetyp: " + Returns + " (darf verworfen werden)\r\n";
         }
 
         co += "\r\n";

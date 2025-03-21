@@ -17,15 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Data;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -37,6 +28,15 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Data;
+using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
@@ -281,9 +281,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     public AbstractListItem? this[int no] {
         get {
             try {
-                if (no < 0 || no > _item.Count) { return null; }
-
-                return _item[no];
+                return no < 0 || no > _item.Count ? null : _item[no];
             } catch {
                 Develop.CheckStackForOverflow();
                 return this[no];
@@ -346,9 +344,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     public AbstractListItem? Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
 
-        if (string.IsNullOrEmpty(val)) { return null; }
-
-        return ItemOf(val);
+        return string.IsNullOrEmpty(val) ? null : (AbstractListItem)ItemOf(val);
     }
 
     public AbstractListItem? Add_TextBySuggestion() {
@@ -359,9 +355,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
         var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, CheckBehavior.SingleSelection, null, AddType.None);
 
-        if (rück is not { Count: not 0 }) { return null; }
-
-        return Suggestions.Get(rück[0]);
+        return rück is not { Count: not 0 } ? null : Suggestions.Get(rück[0]);
     }
 
     public Size CalculateColumnAndSize(Renderer_Abstract renderer) {
@@ -564,7 +558,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         if (!IsChecked(name)) { return; }
 
         List<string> l = [.. _checked];
-        l.Remove(name);
+        _ = l.Remove(name);
 
         ValidateCheckStates(l, string.Empty);
     }
@@ -741,17 +735,11 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
         // und die Mains auffüllen
         foreach (var thisString in zuwenig) {
-            AbstractListItem? it;
-            if (IO.FileExists(thisString)) {
-                if (thisString.FileType() == FileFormat.Image) {
-                    it = ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix());
-                } else {
-                    it = ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
-                }
-            } else {
-                it = ItemOf(thisString);
-            }
-
+            var it = IO.FileExists(thisString)
+                ? thisString.FileType() == FileFormat.Image
+                    ? ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix())
+                    : ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48))
+                : (AbstractListItem)ItemOf(thisString);
             AddAndRegister(it);
         }
 
@@ -806,7 +794,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         object locker = new();
         DoItemOrder();
 
-        Parallel.ForEach(_item, thisItem => {
+        _ = Parallel.ForEach(_item, thisItem => {
             var currentItem = thisItem;
             if (currentItem.Position.IntersectsWith(visArea)) {
                 var itemState = tmpState;
@@ -1187,8 +1175,8 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     private void RemoveAndUnRegister(AbstractListItem item) {
         item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
         item.PropertyChanged -= Item_PropertyChanged;
-        _item.Remove(item);
-        _checked.Remove(item.KeyName);
+        _ = _item.Remove(item);
+        _ = _checked.Remove(item.KeyName);
         InvalidateItemOrder();
     }
 

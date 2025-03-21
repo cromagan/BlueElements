@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 
 namespace BlueControls.Forms;
 
@@ -44,7 +44,7 @@ public partial class FormWithStatusBar : Form {
 
     public FormWithStatusBar() : base() {
         InitializeComponent();
-        _formsWithStatusBar.AddIfNotExists(this);
+        _ = _formsWithStatusBar.AddIfNotExists(this);
     }
 
     #endregion
@@ -146,13 +146,13 @@ public partial class FormWithStatusBar : Form {
     internal static void GotMessageDropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
 
     protected override void OnFormClosed(FormClosedEventArgs e) {
-        _formsWithStatusBar.Remove(this);
+        _ = _formsWithStatusBar.Remove(this);
         base.OnFormClosed(e);
     }
 
     private void timMessageClearer_Tick(object sender, System.EventArgs e) {
         if (InvokeRequired) {
-            Invoke(new Action(() => timMessageClearer_Tick(sender, e)));
+            _ = Invoke(new Action(() => timMessageClearer_Tick(sender, e)));
             return;
         }
 

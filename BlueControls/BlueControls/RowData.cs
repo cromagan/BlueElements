@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 
 namespace BlueDatabase;
 
@@ -31,10 +31,7 @@ public static class RowDrawDataExtensions {
 
     #region Methods
 
-    public static RowData? Get(this List<RowData>? l, RowItem? row) {
-        if (row == null) { return null; }
-        return l?.FirstOrDefault(thisr => thisr?.Row == row);
-    }
+    public static RowData? Get(this List<RowData>? l, RowItem? row) => row == null ? null : (l?.FirstOrDefault(thisr => thisr?.Row == row));
 
     #endregion
 

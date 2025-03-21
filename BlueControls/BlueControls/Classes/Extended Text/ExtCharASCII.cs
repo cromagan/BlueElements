@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Drawing;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System.Drawing;
 
 namespace BlueControls.Extended_Text;
 
@@ -34,13 +34,9 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
-    internal ExtCharAscii(ExtText parent, PadStyles style, BlueFont font, char charcode) : base(parent, style, font) {
-        _char = charcode;
-    }
+    internal ExtCharAscii(ExtText parent, PadStyles style, BlueFont font, char charcode) : base(parent, style, font) => _char = charcode;
 
-    internal ExtCharAscii(ExtText parent, int styleFromPos, char charcode) : base(parent, styleFromPos) {
-        _char = charcode;
-    }
+    internal ExtCharAscii(ExtText parent, int styleFromPos, char charcode) : base(parent, styleFromPos) => _char = charcode;
 
     #endregion
 

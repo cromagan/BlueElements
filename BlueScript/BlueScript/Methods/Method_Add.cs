@@ -17,16 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Add : Method {
 
     #region Properties
@@ -63,9 +61,7 @@ internal class Method_Add : Method {
             }
         }
 
-        if (attvar.ValueListStringSet(0, tmpList, ld) is { } dif) { return dif; }
-
-        return DoItFeedback.Null();
+        return attvar.ValueListStringSet(0, tmpList, ld) is { } dif ? dif : DoItFeedback.Null();
     }
 
     #endregion

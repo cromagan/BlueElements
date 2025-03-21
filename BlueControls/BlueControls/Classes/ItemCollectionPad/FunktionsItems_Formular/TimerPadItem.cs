@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -32,6 +27,11 @@ using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -183,9 +183,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         return base.ParseThis(key, value);
     }
 
-    public override string ReadableText() {
-        return "Timer";
-    }
+    public override string ReadableText() => "Timer";
 
     /// <summary>
     /// Internes Skript
@@ -195,9 +193,10 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
         if (f != null) { f.Opacity = 0f; }
 
-        var tse = new TimerScriptEditor();
-        tse.Object = this;
-        tse.ShowDialog();
+        var tse = new TimerScriptEditor {
+            Object = this
+        };
+        _ = tse.ShowDialog();
 
         //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
 

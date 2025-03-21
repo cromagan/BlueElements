@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Specialized;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
+using System;
+using System.Collections.Specialized;
 
 namespace BlueControls;
 
@@ -37,7 +37,6 @@ public static class Allgemein {
 
     #region Methods
 
-
     public static void CheckMemory() {
         try {
             var availableMemoryGB = GC.GetTotalMemory(false) / 1024 / 1024 / 1024; // In MB
@@ -47,7 +46,7 @@ public static class Allgemein {
             if (availableMemoryGB > Math.Min(totalSystemMemoryGB * 0.2, 8)) {
                 BlueFont.TrimAllCaches(1000, 100);
                 Generic.CollectGarbage();
-                
+
             }
         } catch {
             // Fallback, wenn Speicherabfrage fehlschlägt
@@ -55,7 +54,6 @@ public static class Allgemein {
             Generic.CollectGarbage();
         }
     }
-
 
     public static void StartGlobalService() {
         if (_serviceStarted) { return; }

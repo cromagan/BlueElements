@@ -17,14 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -34,6 +26,14 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.Drawing.Printing;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -134,7 +134,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (rowsForExport is not { Count: >= 1 }) { return -1; }
 
         var tmp = new ItemCollectionPadItem(layoutFileName);
-        tmp.ResetVariables();
+        _ = tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (!scx.AllOk) { return -1; }
 
@@ -159,7 +159,7 @@ public sealed partial class ExportDialog : IHasDatabase {
                 var it = new ItemCollectionPadItem(layoutFileName);
 
                 //if (it._internal is { }) {
-                it.ReplaceVariables(rowsForExport[startNr]);
+                _ = it.ReplaceVariables(rowsForExport[startNr]);
                 //    it.GridShow = -1;
                 //}
                 pad.Items.Add(it);
@@ -278,8 +278,8 @@ public sealed partial class ExportDialog : IHasDatabase {
         } else {
             padVorschau.ShowInPrintMode = true;
             padVorschau.Items = new ItemCollectionPadItem(cbxLayoutWahl.Text);
-            padVorschau.Items.ResetVariables();
-            padVorschau.Items.ReplaceVariables(_rowsForExport[0]);
+            _ = padVorschau.Items.ResetVariables();
+            _ = padVorschau.Items.ReplaceVariables(_rowsForExport[0]);
             padVorschau.ZoomFit();
         }
     }

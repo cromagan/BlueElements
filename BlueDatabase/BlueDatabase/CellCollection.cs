@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -29,6 +24,11 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using BlueScript.Variables;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using static BlueBasics.Generic;
 
 namespace BlueDatabase;
@@ -177,10 +177,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
                 var value = FilterCollection.InitValue(spc, false, filter);
 
-                if (value is not { } || string.IsNullOrEmpty(value)) {
-                    return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
-                }
-                return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, mode);
+                return value is not { } || string.IsNullOrEmpty(value)
+                    ? "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein."
+                    : db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, mode);
             }
         } else {
             if (db.Column.SysLocked != null) {
@@ -197,11 +196,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
 
-        if (checkUserRights && !db.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
-            return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
-        }
-
-        return string.Empty;
+        return checkUserRights && !db.PermissionCheck(column.PermissionGroupsChangeCell, row)
+            ? "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern."
+            : string.Empty;
     }
 
     /// <summary>
@@ -602,13 +599,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
             List<RowItem?> r = [];
-            if (names != null)
+            if (names != null) {
                 for (var z = names.Count - 1; z > -1; z--) {
                     if (tmp.IndexOfWord(names[z], 0, RegexOptions.IgnoreCase) > -1) {
                         r.Add(row.Database.Row[names[z]]);
                         tmp = tmp.Replace(names[z], string.Empty);
                     }
                 }
+            }
 
             if (r.Count == 1 || r.Contains(row)) { _ = allRows.AddIfNotExists(r); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
         }
@@ -768,7 +766,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
         currentString = ChangeTextFromRowId(currentString);
         if (currentString != GetString(column, row)) {
-            Set(column, row, currentString, "Bezugstextänderung");
+            _ = Set(column, row, currentString, "Bezugstextänderung");
             return;
         }
         var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();
@@ -780,11 +778,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 foreach (var thisRow in x) {
                     if (thisRow != null && thisRow != row) {
                         var ex = thisRow.CellGetList(column);
-                        if (x.Contains(row)) {
-                            _ = ex.Remove(t);
-                        } else {
-                            _ = ex.Remove(t.ReplaceWord(thisRow.CellFirstString(), row.CellFirstString(), RegexOptions.IgnoreCase));
-                        }
+                        _ = x.Contains(row)
+                            ? ex.Remove(t)
+                            : ex.Remove(t.ReplaceWord(thisRow.CellFirstString(), row.CellFirstString(), RegexOptions.IgnoreCase));
                         thisRow.CellSet(column, ex.SortedDistinctList(), "Bezugstextänderung / Löschung");
                     }
                 }

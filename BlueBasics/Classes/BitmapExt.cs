@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,8 +31,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using static BlueBasics.Extensions;
 
 namespace BlueBasics;
@@ -367,8 +367,10 @@ public class BitmapExt : IDisposableExtended {
                 l.Clear();
                 Generic.CollectGarbage();
                 var x = (Bitmap?)Image_FromFile(fileName);
-                if (x != null)
+                if (x != null) {
                     l.Add(x.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                }
+
                 if (frames > 1) {
                     Bitmap x2 = new(200, 200);
                     var gr = Graphics.FromImage(x2);
@@ -455,8 +457,7 @@ public class BitmapExt : IDisposableExtended {
         UnlockBits(true);
         var bmp = _bitmap.Clone();
         LockBits();
-        if (bmp is Bitmap bitmap) { return bitmap; }
-        return null;
+        return bmp is Bitmap bitmap ? bitmap : null;
     }
 
     public Bitmap Crop(Rectangle re) {

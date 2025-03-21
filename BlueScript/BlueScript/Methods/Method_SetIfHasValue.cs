@@ -17,16 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_SetIfHasValue : Method {
 
     #region Properties
@@ -57,15 +55,13 @@ internal class Method_SetIfHasValue : Method {
             switch (attvar.Attributes[z]) {
                 case VariableFloat vf:
                     if (vf.ValueNum != 0) {
-                        if (attvar.ValueNumSet(0, vf.ValueNum, ld) is { } dif) { return dif; }
-                        return DoItFeedback.Null();
+                        return attvar.ValueNumSet(0, vf.ValueNum, ld) is { } dif ? dif : DoItFeedback.Null();
                     }
                     break;
 
                 case VariableString vs:
                     if (!string.IsNullOrEmpty(vs.ValueString)) {
-                        if (attvar.ValueStringSet(0, vs.ValueString, ld) is { } dif2) { return dif2; }
-                        return DoItFeedback.Null();
+                        return attvar.ValueStringSet(0, vs.ValueString, ld) is { } dif2 ? dif2 : DoItFeedback.Null();
                     }
                     break;
 

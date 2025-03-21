@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
+using System;
+using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -80,7 +80,6 @@ public class RowFormulaListItem : AbstractListItem {
                 : _row.CellFirstString().CreateHtmlCodes(true);
         }
     }
-
     public RowItem? Row {
         get => _row;
         set {
@@ -141,7 +140,7 @@ public class RowFormulaListItem : AbstractListItem {
             return;
         }
         ItemCollectionPadItem pad = new(_layoutFileName);
-        pad.ResetVariables();
+        _ = pad.ResetVariables();
         var l = pad.ReplaceVariables(Row);
         if (!l.AllOk) {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);

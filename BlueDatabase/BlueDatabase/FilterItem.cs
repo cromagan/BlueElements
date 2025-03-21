@@ -17,16 +17,16 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using static BlueBasics.Constants;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -80,11 +80,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         FilterType = filterType;
         Origin = origin;
 
-        if (searchValue is { Count: > 0 }) {
-            SearchValue = new ReadOnlyCollection<string>(searchValue);
-        } else {
-            SearchValue = EmptyReadOnly;
-        }
+        SearchValue = searchValue is { Count: > 0 } ? new ReadOnlyCollection<string>(searchValue) : EmptyReadOnly;
     }
 
     public FilterItem(Database? database, ColumnItem? column, FilterType filterType, IList<string>? searchValue, string origin) {
@@ -97,11 +93,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         Origin = origin;
 
         // Setze SearchValue
-        if (searchValue is { Count: > 0 }) {
-            SearchValue = new ReadOnlyCollection<string>(searchValue);
-        } else {
-            SearchValue = EmptyReadOnly;
-        }
+        SearchValue = searchValue is { Count: > 0 } ? new ReadOnlyCollection<string>(searchValue) : EmptyReadOnly;
     }
 
     private FilterItem(Database? database, FilterType filterType, IList<string>? searchValue) {
@@ -111,11 +103,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         FilterType = filterType;
         Origin = string.Empty;
 
-        if (searchValue is { Count: > 0 }) {
-            SearchValue = new ReadOnlyCollection<string>(searchValue);
-        } else {
-            SearchValue = new List<string>().AsReadOnly();
-        }
+        SearchValue = searchValue is { Count: > 0 } ? new ReadOnlyCollection<string>(searchValue) : new List<string>().AsReadOnly();
     }
 
     #endregion
@@ -253,11 +241,9 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
             case "values":
 
-                if (string.IsNullOrEmpty(value)) {
-                    SearchValue = new List<string> { string.Empty }.AsReadOnly();
-                } else {
-                    SearchValue = value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
-                }
+                SearchValue = string.IsNullOrEmpty(value)
+                    ? new List<string> { string.Empty }.AsReadOnly()
+                    : value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
 
                 return true;
 
@@ -282,11 +268,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         }
 
         if (Column == null) {
-            if (SearchValue.Count == 0) {
-                return "Zeilen-Filter";
-            }
-
-            return "Zeilen-Filter: " + SearchValue[0];
+            return SearchValue.Count == 0 ? "Zeilen-Filter" : "Zeilen-Filter: " + SearchValue[0];
         }
         var nam = Column.ReadableText();
 

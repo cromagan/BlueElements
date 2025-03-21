@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using BlueControls.Enums;
+using BlueControls.Interfaces;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
 
 namespace BlueControls.Controls;
 
@@ -41,7 +41,7 @@ public class TabControl : AbstractTabControl, ISendsFocusedChild {
 
     #region Properties
 
-    public override sealed Color BackColor {
+    public sealed override Color BackColor {
         get => base.BackColor;
         set => base.BackColor = value;
     }

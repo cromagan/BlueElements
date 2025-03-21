@@ -17,17 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ExtractTags : Method {
 
     #region Properties
@@ -67,7 +65,7 @@ internal class Method_ExtractTags : Method {
                 var vn = x[0].ToLowerInvariant().ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                    varCol.Add(new VariableString("extracted_" + vn, thisv, true, comment));
+                    _ = varCol.Add(new VariableString("extracted_" + vn, thisv, true, comment));
                 }
             }
         }

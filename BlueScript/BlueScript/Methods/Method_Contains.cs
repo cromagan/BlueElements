@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueScript.Methods;
 
@@ -64,10 +64,7 @@ internal class Method_Contains : Method {
 
         if (attvar.Attributes[0] is VariableListString vl2) {
             var x = vl2.ValueList;
-            if (wordlist.Any(thisW => x.Contains(thisW, attvar.ValueBoolGet(1)))) {
-                return DoItFeedback.Wahr();
-            }
-            return DoItFeedback.Falsch();
+            return wordlist.Any(thisW => x.Contains(thisW, attvar.ValueBoolGet(1))) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         if (attvar.Attributes[0] is VariableString vs2) {

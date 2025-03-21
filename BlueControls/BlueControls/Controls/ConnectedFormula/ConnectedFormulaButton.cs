@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -29,6 +26,9 @@ using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
@@ -279,7 +279,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
             for (var fz = 0; fz < fi.Count; fz++) {
                 if (fi[fz] is { } thisf) {
                     var nam = "Filter" + fz;
-                    vars.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
+                    _ = vars.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
                     fis = fis + nam + ",";
                 }
             }
@@ -294,7 +294,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         var rn = "thisrow";
 
         if (row != null) {
-            vars.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
+            _ = vars.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
             ai = row;
             row.OnDropMessage(ErrorType.Info, "Knopfdruck mit dieser Zeile");
         }

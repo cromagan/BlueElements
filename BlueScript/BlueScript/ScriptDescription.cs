@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using static BlueBasics.Constants;
 
 namespace BlueScript;
@@ -167,11 +167,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     public string ReadableText() {
         var t = ErrorReason();
-        if (!string.IsNullOrEmpty(t)) {
-            return "Fehler: " + t;
-        }
-
-        return KeyName;
+        return !string.IsNullOrEmpty(t) ? "Fehler: " + t : KeyName;
     }
 
     public virtual QuickImage? SymbolForReadableText() {

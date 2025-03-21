@@ -17,11 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -38,6 +33,11 @@ using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -236,7 +236,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
         _lastGeneratedEntityId = nowGeneratedId.newid;
 
-        List<string> olditems = f.Items.ToListOfString().Select(s => s.Trim(_lastGeneratedEntityId + "\\")).ToList();
+        var olditems = f.Items.ToListOfString().Select(s => s.Trim(_lastGeneratedEntityId + "\\")).ToList();
 
         foreach (var thisIT in f.Items) {
             if (thisIT is ReadableListItem { Item: AdderItem ai }) {
@@ -271,7 +271,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
                 rli.Enabled = !HasChildNode(selected, key);
 
-                olditems.Remove(key);
+                _ = olditems.Remove(key);
 
                 #endregion
             } else if (dd_BoxItem is DropDownListItem dli && dd_isItem) {
@@ -299,7 +299,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     dli.DropDownItems.Add(itDD);
                     dli.Enabled = !HasChildNode(selected, key);
                 }
-                olditems.Remove(dd_Name);
+                _ = olditems.Remove(dd_Name);
 
                 #endregion
             } else {
@@ -320,7 +320,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
                     it.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
                     f.ItemAdd(it);
-                    olditems.Remove(key);
+                    _ = olditems.Remove(key);
                     it.UserDefCompareKey = z.ToStringInt10();
                     it.Enabled = !HasChildNode(selected, key);
 
@@ -333,7 +333,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     ndli.DropDownItems.Add(it);
                     ndli.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
                     f.ItemAdd(ndli);
-                    olditems.Remove(dd_Name);
+                    _ = olditems.Remove(dd_Name);
                     ndli.UserDefCompareKey = z.ToStringInt10();
                     ndli.Enabled = !HasChildNode(selected, key);
 
@@ -435,7 +435,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     " ",
                     scf.ProtocolText
                 ];
-                l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
+                _ = l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
             }
 
             return "Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText;
@@ -534,9 +534,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
     private bool ShowMe(ICollection<string> selected, string textkey) {
         var t = RepairTextKey(textkey);
-        if (t.CountString("\\") < 1) { return true; }
-        if (Selected(selected, t)) { return true; }
-        return Selected(selected, t.PathParent());
+        return t.CountString("\\") < 1 || Selected(selected, t) || Selected(selected, t.PathParent());
     }
 
     #endregion

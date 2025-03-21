@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -28,6 +24,10 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
@@ -75,8 +75,9 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new TabControl();
-        con.Name = this.DefaultItemToControlName(parent?.Page?.KeyName);
+        var con = new TabControl {
+            Name = this.DefaultItemToControlName(parent?.Page?.KeyName)
+        };
         // Die Input-Settings werden direkt auf das erzeugte
         //con.DoInputSettings(parent, this);
         //con.DoOutputSettings(parent, this);
@@ -121,8 +122,9 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                     };
                     tabctrl.TabPages.Add(t);
 
-                    cc = new ConnectedFormulaView(mode, thisPage);
-                    cc.GroupBoxStyle = GroupBoxStyle.Nothing;
+                    cc = new ConnectedFormulaView(mode, thisPage) {
+                        GroupBoxStyle = GroupBoxStyle.Nothing
+                    };
                     t.Controls.Add(cc);
                     //cc.InitFormula(thisPage, cc.DatabaseInput);
                     cc.Dock = DockStyle.Fill;
@@ -189,7 +191,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         var tmp = new List<ItemCollectionPadItem>();
 
         foreach (var thisc in _childs) {
-            if (GetChild(thisc) is { } icpi) { tmp.AddIfNotExists(icpi); }
+            if (GetChild(thisc) is { } icpi) { _ = tmp.AddIfNotExists(icpi); }
         }
         return tmp;
     }
@@ -219,7 +221,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                 var tmp = value.FromNonCritical().SplitBy("|");
                 _childs.Clear();
                 foreach (var thiss in tmp) {
-                    _childs.AddIfNotExists(thiss.FromNonCritical());
+                    _ = _childs.AddIfNotExists(thiss.FromNonCritical());
                 }
                 return true;
 

@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,8 +27,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
@@ -126,18 +126,18 @@ public static partial class Extensions {
         var sb = new StringBuilder(txt.Length + (txt.Length / 10));
 
         // Einmaliger Durchlauf durch den String
-        for (int i = 0; i < txt.Length; i++) {
+        for (var i = 0; i < txt.Length; i++) {
             if (txt[i] == '\r' && i + 1 < txt.Length && txt[i + 1] == '\n') {
-                sb.Append("<br>");
+                _ = sb.Append("<br>");
                 i++; // Überspringe das \n
             } else if (txt[i] == '<' && i + 1 < txt.Length && txt[i + 1] == '<' && i + 2 < txt.Length && txt[i + 2] == '>') {
-                sb.Append("&lt;");
+                _ = sb.Append("&lt;");
                 i += 2; // Überspringe die restlichen Zeichen
             } else if (txt[i] == '<' && i + 1 < txt.Length && txt[i + 1] == '>' && i + 2 < txt.Length && txt[i + 2] == '>') {
-                sb.Append("&gt;");
+                _ = sb.Append("&gt;");
                 i += 2; // Überspringe die restlichen Zeichen
             } else {
-                sb.Append(txt[i]);
+                _ = sb.Append(txt[i]);
             }
         }
 
@@ -214,7 +214,7 @@ public static partial class Extensions {
     }
 
     public static string? Decrypt(this string cipherText, string key) {
-        key = key + "!äQsWERadf§$%öü,";
+        key += "!äQsWERadf§$%öü,";
         var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
 
         try {
@@ -242,7 +242,7 @@ public static partial class Extensions {
         try {
             byte[] array;
 
-            key = key + "!äQsWERadf§$%öü,";
+            key += "!äQsWERadf§$%öü,";
             var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
 
             using (var aes = Aes.Create()) {
@@ -400,10 +400,10 @@ public static partial class Extensions {
         // \p{N} - alle Ziffern (Number)
         // \p{M} - alle Markierungen/Akzente (Mark)
 
-        string pattern = $@"(?<![\p{{L}}\p{{N}}\p{{M}}]){Regex.Escape(value)}(?![\p{{L}}\p{{N}}\p{{M}}])";
+        var pattern = $@"(?<![\p{{L}}\p{{N}}\p{{M}}]){Regex.Escape(value)}(?![\p{{L}}\p{{N}}\p{{M}}])";
 
         // IgnoreCase-Option, falls benötigt
-        RegexOptions actualOptions = options;
+        var actualOptions = options;
         if ((options & RegexOptions.IgnoreCase) != 0) {
             // CultureInvariant für bessere Handhabung internationaler Zeichen
             actualOptions |= RegexOptions.CultureInvariant;
@@ -625,7 +625,7 @@ public static partial class Extensions {
 
         foreach (var currentChar in input) {
             if (previousChar != currentChar) {
-                result.Append(currentChar);
+                _ = result.Append(currentChar);
                 previousChar = currentChar;
             }
         }
@@ -864,9 +864,7 @@ public static partial class Extensions {
             tXt = tXt.Replace(replacement.Key, replacement.Value);
         }
 
-        if (!removedupes) { return tXt; }
-
-        return tXt.RemoveDuplicateChars();
+        return !removedupes ? tXt : tXt.RemoveDuplicateChars();
     }
 
     /// <summary>
@@ -976,10 +974,7 @@ public static partial class Extensions {
         return tXt;
     }
 
-    public static byte[] UTF8_ToByte(this string? tXt) {
-        if (tXt == null || string.IsNullOrEmpty(tXt)) { return []; }
-        return Encoding.UTF8.GetBytes(tXt);
-    }
+    public static byte[] UTF8_ToByte(this string? tXt) => tXt == null || string.IsNullOrEmpty(tXt) ? ([]) : Encoding.UTF8.GetBytes(tXt);
 
     #endregion
 }

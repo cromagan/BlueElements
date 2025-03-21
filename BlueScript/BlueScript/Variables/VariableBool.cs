@@ -175,7 +175,6 @@ public class VariableBool : Variable {
             }
 
             #endregion
-
             switch (check) {
                 case "==": {
                         if (v1 == null) { return (false, null); }

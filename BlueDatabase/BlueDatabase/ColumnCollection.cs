@@ -17,16 +17,16 @@
 
 #nullable enable
 
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -270,7 +270,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         da.TableEnd();
         da.AddFoot();
-        da.Save(TempFile(string.Empty, "Spaltenliste.html"), true);
+        _ = da.Save(TempFile(string.Empty, "Spaltenliste.html"), true);
     }
 
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
@@ -344,10 +344,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    public bool Remove(ColumnItem column, string comment) {
-        if (column.IsDisposed) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty));
-    }
+    public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
+&& string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty));
 
     //    Database.DevelopWarnung("Spalten-Index nicht gefunden: " + column.Caption);
     //    return -1;
@@ -438,7 +436,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (l == null) { names.Add(thisColumn); }
         }
         foreach (var thisname in names) {
-            Remove(thisname, "Clone - Spalte zu viel");
+            _ = Remove(thisname, "Clone - Spalte zu viel");
         }
 
         // Spalten erzeugen und Format übertragen
@@ -535,7 +533,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void Column_DisposingEvent(object sender, System.EventArgs e) {
         if (sender is ColumnItem c) {
             c.DisposingEvent -= Column_DisposingEvent;
-            _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
+            _ = _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
             OnColumnDisposed(new ColumnEventArgs(c));
             //Remove(c, "Disposing");
         }

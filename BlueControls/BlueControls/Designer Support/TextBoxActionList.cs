@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.Design;
-using BlueBasics;
+﻿using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using System.ComponentModel;
+using System.ComponentModel.Design;
 
 namespace BlueControls.Designer_Support;
 

@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System;
-using System.ComponentModel;
-using System.Drawing;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+using System;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace BlueControls.Controls;
 

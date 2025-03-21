@@ -17,17 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_IsNullOrZero : Method {
 
     #region Properties
@@ -52,11 +50,9 @@ internal class Method_IsNullOrZero : Method {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
 
         if (attvar.Attributes.Count == 0) {
-            if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(infos.LogData, this, attvar);
-            }
-
-            return DoItFeedback.Wahr();
+            return attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden
+                ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
+                : DoItFeedback.Wahr();
         }
 
         var v = attvar.Attributes[0];

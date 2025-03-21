@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 // ReSharper disable All
 
@@ -134,11 +134,7 @@ public sealed class RowSortDefinition : IParseable {
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    public bool UsedForRowSort(ColumnItem? vcolumn) {
-        if (Columns.Count == 0) { return false; }
-
-        return Columns.Any(thisColumn => thisColumn == vcolumn);
-    }
+    public bool UsedForRowSort(ColumnItem? vcolumn) => Columns.Count != 0 && Columns.Any(thisColumn => thisColumn == vcolumn);
 
     #endregion
 

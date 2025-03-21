@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.IO;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
@@ -26,6 +24,8 @@ using BlueDatabase.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.IO;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -130,7 +130,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
                         var chunks = DatabaseChunk.GenerateNewChunks(myDb, 100, myDb.FileStateUtcDate, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
-                        mainchunk.Save(filn, 100);
+                        _ = mainchunk.Save(filn, 100);
                         break;
                     }
 

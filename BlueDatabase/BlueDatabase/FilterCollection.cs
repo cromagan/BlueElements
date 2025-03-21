@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,16 +31,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
-
-#nullable enable
 
 public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable, IErrorCheckable {
 
@@ -43,7 +41,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private readonly List<FilterItem> _internal = [];
 
     //TODO: Kommentar wieder entfernen
-    private string _coment;
+    private readonly string _coment;
 
     private Database? _database;
 
@@ -174,12 +172,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _internal.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.IsOk())
         .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
-    public FilterItem? this[int no] {
-        get {
-            if (no < 0 || no >= _internal.Count) { return null; }
-            return _internal[no];
-        }
-    }
+    public FilterItem? this[int no] => no < 0 || no >= _internal.Count ? null : _internal[no];
 
     #endregion
 
@@ -247,7 +240,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var fi = filter.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.IsOk())
                               .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
-        if (fi is not {
+        return fi is not {
             FilterType: not (not FilterType.Istgleich
                 and not FilterType.Istgleich_GroﬂKleinEgal
                 and not FilterType.Istgleich_ODER_GroﬂKleinEgal
@@ -257,9 +250,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 and not FilterType.Instr_UND_GroﬂKleinEgal
                 and not FilterType.Istgleich_MultiRowIgnorieren
                 and not FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren)
-        }) { return null; }
-
-        return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
+        }
+            ? null
+            : column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
     }
 
     public void Add(FilterItem fi) {
@@ -471,7 +464,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         foreach (var thisFilterItem in _internal) {
             if (thisFilterItem is { } && thisFilterItem.IsOk()) {
-                result.ParseableAdd("Filter", thisFilterItem as IStringable);
+                result.ParseableAdd("Filter", thisFilterItem);
             }
         }
         return result;
@@ -514,7 +507,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (!_internal.Contains(fi)) { return; }
 
         OnChanging();
-        _internal.Remove(fi);
+        _ = _internal.Remove(fi);
         Invalidate_FilteredRows();
         OnPropertyChanged("FilterItems");
     }
@@ -546,7 +539,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         OnChanging();
         foreach (var thisItem in existingColumnFilter) {
-            _internal.Remove(thisItem);
+            _ = _internal.Remove(thisItem);
         }
         AddInternal(fi);
         Invalidate_FilteredRows();
@@ -587,7 +580,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                     OnChanging();
                     did = true;
                 }
-                _internal.Remove(thisItem);
+                _ = _internal.Remove(thisItem);
             }
         }
 
@@ -631,9 +624,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    private void _database_Loaded(object sender, System.EventArgs e) {
-        Invalidate_FilteredRows();
-    }
+    private void _database_Loaded(object sender, System.EventArgs e) => Invalidate_FilteredRows();
 
     /// <summary>
     /// Lˆst keine Ereignisse aus

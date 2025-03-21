@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using BlueBasics;
-using BlueBasics.Enums;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -50,22 +50,18 @@ public static class Export {
         string sav;
         var fehler = string.Empty;
         if (liste.Count == 1 || eineGrosseDatei) {
-            if (!string.IsNullOrEmpty(optionalFileName)) {
-                sav = TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix());
-            } else {
-                sav = TempFile(zielPfad, liste[0].CellFirstString(), lad.FileSuffix());
-            }
+            sav = !string.IsNullOrEmpty(optionalFileName)
+                ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
+                : TempFile(zielPfad, liste[0].CellFirstString(), lad.FileSuffix());
 
             fehler = CreateLayout(liste, lad, sav);
             l.Add(sav);
         } else {
             foreach (var thisRow in liste) {
-                if (!string.IsNullOrEmpty(optionalFileName)) {
-                    sav = TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(),
-                        lad.FileSuffix());
-                } else {
-                    sav = TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
-                }
+                sav = !string.IsNullOrEmpty(optionalFileName)
+                    ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(),
+                        lad.FileSuffix())
+                    : TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
 
                 fehler = CreateLayout(thisRow, lad, sav);
                 l.Add(sav);
@@ -92,10 +88,9 @@ public static class Export {
         return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
     }
 
-    private static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile) {
-        if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
-        return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
-    }
+    private static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile) => !FileExists(loadFile)
+            ? "Datei nicht gefunden."
+            : InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
 
     //Shared Sub SaveAsBitmap(Row As RowItem)
     //    If Row Is Nothing Then
@@ -504,7 +499,7 @@ public static class Export {
             if (thisRow is { IsDisposed: false }) {
                 var tmpBody = body;
 
-                thisRow.CheckRow(); // Virtuelle Spalten
+                _ = thisRow.CheckRow(); // Virtuelle Spalten
                 var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
 
                 if (!script.AllOk) {
@@ -525,12 +520,10 @@ public static class Export {
         tmpSave += foot;
         if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne Suffix-Angabe können nicht gespeichert werden
         {
-            WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
+            _ = WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
         }
 
-        if (!string.IsNullOrEmpty(f)) { return "Fehler bei:\r\n" + f + "\r\nDie Meldung des letzten Eintrages:\r\n" + onemled; }
-
-        return string.Empty;
+        return !string.IsNullOrEmpty(f) ? "Fehler bei:\r\n" + f + "\r\nDie Meldung des letzten Eintrages:\r\n" + onemled : string.Empty;
     }
 
     #endregion

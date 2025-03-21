@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics.Enums;
+using System.Collections.Generic;
 
 namespace BlueBasics.Interfaces;
 
