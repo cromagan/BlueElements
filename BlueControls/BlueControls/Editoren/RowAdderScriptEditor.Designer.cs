@@ -25,9 +25,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.btnDatenbankKopf = new BlueControls.Controls.Button();
+            this.grpScripte = new BlueControls.Controls.GroupBox();
+            this.btnScriptBefore = new BlueControls.Controls.Button();
+            this.btnScriptMenu = new BlueControls.Controls.Button();
+            this.btnScriptAfter = new BlueControls.Controls.Button();
+            this.capScriptMenu = new BlueControls.Controls.Caption();
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
+            this.grpScripte.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpInfos
@@ -49,6 +55,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpAktionen
             // 
             this.grpAktionen.Location = new System.Drawing.Point(608, 3);
+            // 
+            // tbcScriptEigenschaften
+            // 
+            this.tbcScriptEigenschaften.Location = new System.Drawing.Point(248, 110);
+            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(536, 427);
             // 
             // txbTestZeile
             // 
@@ -78,15 +89,76 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnDatenbankKopf.Text = "Datenbank-Kopf";
             this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
             // 
+            // grpScripte
+            // 
+            this.grpScripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpScripte.Controls.Add(this.capScriptMenu);
+            this.grpScripte.Controls.Add(this.btnScriptAfter);
+            this.grpScripte.Controls.Add(this.btnScriptMenu);
+            this.grpScripte.Controls.Add(this.btnScriptBefore);
+            this.grpScripte.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpScripte.Location = new System.Drawing.Point(0, 110);
+            this.grpScripte.Name = "grpScripte";
+            this.grpScripte.Size = new System.Drawing.Size(248, 427);
+            this.grpScripte.TabIndex = 99;
+            this.grpScripte.TabStop = false;
+            this.grpScripte.Text = "Scripte";
+            // 
+            // btnScriptBefore
+            // 
+            this.btnScriptBefore.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnScriptBefore.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox;
+            this.btnScriptBefore.Location = new System.Drawing.Point(8, 16);
+            this.btnScriptBefore.Name = "btnScriptBefore";
+            this.btnScriptBefore.Size = new System.Drawing.Size(232, 32);
+            this.btnScriptBefore.TabIndex = 0;
+            this.btnScriptBefore.Text = "Before";
+            // 
+            // btnScriptMenu
+            // 
+            this.btnScriptMenu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnScriptMenu.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox;
+            this.btnScriptMenu.Location = new System.Drawing.Point(8, 104);
+            this.btnScriptMenu.Name = "btnScriptMenu";
+            this.btnScriptMenu.Size = new System.Drawing.Size(232, 32);
+            this.btnScriptMenu.TabIndex = 1;
+            this.btnScriptMenu.Text = "Menu Generation";
+            // 
+            // btnScriptAfter
+            // 
+            this.btnScriptAfter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnScriptAfter.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox;
+            this.btnScriptAfter.Location = new System.Drawing.Point(8, 232);
+            this.btnScriptAfter.Name = "btnScriptAfter";
+            this.btnScriptAfter.Size = new System.Drawing.Size(232, 32);
+            this.btnScriptAfter.TabIndex = 2;
+            this.btnScriptAfter.Text = "After";
+            // 
+            // capScriptMenu
+            // 
+            this.capScriptMenu.CausesValidation = false;
+            this.capScriptMenu.Location = new System.Drawing.Point(16, 144);
+            this.capScriptMenu.Name = "capScriptMenu";
+            this.capScriptMenu.Size = new System.Drawing.Size(216, 56);
+            // 
             // RowAdderScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.ClientSize = new System.Drawing.Size(784, 561);
+            this.Controls.Add(this.grpScripte);
             this.Name = "RowAdderScriptEditor";
             this.Text = "Datenbank-Eigenschaften";
+            this.Controls.SetChildIndex(this.ribMain, 0);
+            this.Controls.SetChildIndex(this.pnlStatusBar, 0);
+            this.Controls.SetChildIndex(this.grpScripte, 0);
+            this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
             this.grpInfos.ResumeLayout(false);
             this.grpAusführen.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
+            this.grpScripte.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -94,5 +166,10 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbTestZeile;
         private Caption cpZeile;
         private Button btnDatenbankKopf;
+        private GroupBox grpScripte;
+        private Button btnScriptBefore;
+        private Button btnScriptAfter;
+        private Button btnScriptMenu;
+        private Caption capScriptMenu;
     }
 }

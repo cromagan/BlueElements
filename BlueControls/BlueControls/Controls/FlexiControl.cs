@@ -58,7 +58,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private string _infoText = string.Empty;
     private int _maxTextLenght = 4000;
     private bool _multiLine;
-    private string _regex = string.Empty;
+    private string _regexCheck = string.Empty;
     private bool _showInfoWhenDisabled;
     private bool _spellChecking;
     private string _suffix = string.Empty;
@@ -223,10 +223,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     [DefaultValue(false)]
-    public bool FormatierungErlaubt {
+    public bool TextFormatingAllowed {
         get => _formatierungErlaubt;
         set {
-            if (value == FormatierungErlaubt) { return; }
+            if (value == TextFormatingAllowed) { return; }
             _formatierungErlaubt = value;
             UpdateControls();
         }
@@ -269,11 +269,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     [DefaultValue("")]
-    public string Regex {
-        get => _regex;
+    public string RegexCheck {
+        get => _regexCheck;
         set {
-            if (_regex == value) { return; }
-            _regex = value;
+            if (_regexCheck == value) { return; }
+            _regexCheck = value;
             UpdateControls();
         }
     }
@@ -531,8 +531,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-
-
     protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
 
     protected override void OnControlRemoved(ControlEventArgs e) {
@@ -615,10 +613,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void _InfoCaption_Click(object sender, System.EventArgs e) {
-            if (GetControl<ComboBox>() is { } cbx) {
-                cbx.Focus();
-                cbx.ShowMenu(null, null);
-            }       
+        if (GetControl<ComboBox>() is { } cbx) {
+            cbx.Focus();
+            cbx.ShowMenu(null, null);
+        }
     }
 
     private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert(false);

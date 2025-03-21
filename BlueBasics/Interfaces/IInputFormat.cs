@@ -33,11 +33,11 @@ public interface IInputFormat {
 
     //public int BildCode_ConstantHeight { get; set; }
     //public BildTextVerhalten BildTextVerhalten { get; set; }
-    public bool FormatierungErlaubt { get; set; }
+    public bool TextFormatingAllowed { get; set; }
 
     public int MaxTextLenght { get; set; }
     public bool MultiLine { get; set; }
-    public string Regex { get; set; }
+    public string RegexCheck { get; set; }
 
     //public enSortierTyp SortType { get; set; }
     public bool SpellCheckingEnabled { get; set; }
@@ -61,11 +61,11 @@ public static class InputFormatExtensions {
 
         t.AdditionalFormatCheck = source.AdditionalFormatCheck;
         t.AllowedChars = source.AllowedChars;
-        t.Regex = source.Regex;
+        t.RegexCheck = source.RegexCheck;
         t.MultiLine = source.MultiLine;
         t.MaxTextLenght = source.MaxTextLenght;
         t.SpellCheckingEnabled = source.SpellCheckingEnabled;
-        t.FormatierungErlaubt = source.FormatierungErlaubt;
+        t.TextFormatingAllowed = source.TextFormatingAllowed;
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ public static class InputFormatExtensions {
                     return false;
                 }
 
-                if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) {
+                if (!string.IsNullOrEmpty(formatToCheck.RegexCheck) && !thisString.RegexMatch(formatToCheck.RegexCheck)) {
                     return false;
                 }
 
@@ -140,10 +140,10 @@ public static class InputFormatExtensions {
 
     public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
         t.AllowedChars == source.AllowedChars &&
-        t.Regex == source.Regex &&
+        t.RegexCheck == source.RegexCheck &&
         t.MultiLine == source.MultiLine &&
         t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
-        t.FormatierungErlaubt == source.FormatierungErlaubt &&
+        t.TextFormatingAllowed == source.TextFormatingAllowed &&
         t.MaxTextLenght == source.MaxTextLenght;
 
     /// <summary>
@@ -155,9 +155,9 @@ public static class InputFormatExtensions {
     public static bool IsFormatIdenticalSoft(this IInputFormat t, IInputFormat source) {
         var x = t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
                    t.AllowedChars == source.AllowedChars &&
-                   t.Regex == source.Regex &&
+                   t.RegexCheck == source.RegexCheck &&
                    t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
-                   t.FormatierungErlaubt == source.FormatierungErlaubt;
+                   t.TextFormatingAllowed == source.TextFormatingAllowed;
         if (!x) { return false; }
 
         if (t.MaxTextLenght < 4000) {

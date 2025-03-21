@@ -300,7 +300,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         if (!FloatingForm.IsShowing(this)) {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
-            var r = i.Pos;
+            var r = i.Position;
             var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height) / 2.0);
             i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height));
             i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert);

@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -79,7 +80,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     public event EventHandler? Loaded;
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -344,7 +345,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (AgeOfBlockDatei is < 0 or > 3600) {
             //if (AmIBlocker()) { return false; }
 
-            if(Develop.AllReadOnly) { return true; }
+            if (Develop.AllReadOnly) { return true; }
 
             var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
@@ -364,7 +365,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return true;
     }
 
-    public void OnPropertyChanged() {
+    public void OnPropertyChanged(string propertyname) {
         if (IsDisposed) { return; }
         if (_isSaving || _isLoading) { return; }
 
@@ -377,7 +378,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         //Develop.CheckStackForOverflow();
         _isSaved = false;
-        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
     }
 
     public virtual List<string> ParseableItems() {
@@ -543,14 +544,10 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             try {
                 if (_initialLoadDone && !ReloadNeeded) { return (string.Empty, string.Empty); } // Problem hat sich aufgelöst
 
-    
-                    var tmpFileInfo = GetFileInfo(Filename, true);
-                    data = File.ReadAllText(Filename, Constants.Win1252);
-                    fileinfo = GetFileInfo(Filename, true);
-                    if (tmpFileInfo == fileinfo) { break; }
-
-
-                
+                var tmpFileInfo = GetFileInfo(Filename, true);
+                data = File.ReadAllText(Filename, Constants.Win1252);
+                fileinfo = GetFileInfo(Filename, true);
+                if (tmpFileInfo == fileinfo) { break; }
 
                 if (tim.ElapsedMilliseconds > 20 * 1000) { Develop.DebugPrint(ErrorType.Info, "Datei wurde während des Ladens verändert.\r\n" + Filename); }
 

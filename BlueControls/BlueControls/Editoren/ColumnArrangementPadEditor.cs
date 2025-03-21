@@ -505,7 +505,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
                                     }
                             }
 
-                            var c2 = c.LinkedDatabase.Column[c.LinkedCell_ColumnNameOfLinkedDatabase];
+                            var c2 = c.LinkedDatabase.Column[c.ColumnNameOfLinkedDatabase];
                             if (c2 != null) {
                                 var it2 = new ColumnPadItem(new ColumnViewItem(c2, ca), thisc.GetRenderer(Constants.Win11));
                                 Pad.Items.Add(it2);

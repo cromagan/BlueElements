@@ -356,7 +356,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row is not { IsDisposed: false }) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
 
-        targetColumn = linkedDatabase.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
+        targetColumn = linkedDatabase.Column[column.ColumnNameOfLinkedDatabase];
         if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
         var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row, null);

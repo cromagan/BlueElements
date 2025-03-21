@@ -584,7 +584,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
                         item2.AddRange(ItemsOf(realColumn, null, 10000, r));
                     }
 
-                    if (realColumn is { TextBearbeitungErlaubt: true }) {
+                    if (realColumn is { EditableWithTextInput: true }) {
                         f.StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
                     } else {
                         f.StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true);
@@ -624,10 +624,10 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         if (column is not { IsDisposed: false }) { return; }
 
         var item = new List<AbstractListItem>();
-        if (column.DropdownBearbeitungErlaubt) {
+        if (column.EditableWithDropdown) {
             var r = Table.RendererOf(column, Constants.Win11);
             item.AddRange(ItemsOf(column, null, 10000, r));
-            if (!column.DropdownWerteAndererZellenAnzeigen) {
+            if (!column.ShowValuesOfOtherCellsInDropdown) {
                 bool again;
                 do {
                     again = false;

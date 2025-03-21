@@ -42,9 +42,9 @@ public class MessageEventArgs : System.EventArgs, IReadableTextWithKey {
 
     #region Properties
 
+    public string ColumnQuickInfo => Message;
     public string KeyName => Generic.GetUniqueKey();
     public string Message { get; }
-    public string QuickInfo => Message;
     public ErrorType Type { get; }
 
     #endregion

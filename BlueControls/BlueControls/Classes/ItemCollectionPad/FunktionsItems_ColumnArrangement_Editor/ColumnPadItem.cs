@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -106,7 +107,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             //new FlexiControlForProperty<string>(() => Column.CaptionGroup2),
             //new FlexiControlForProperty<string>(() => Column.CaptionGroup3),
             new FlexiControl(),
-            new FlexiControlForProperty<string>(() => col.QuickInfo, 5),
+            new FlexiControlForProperty<string>(() => col.ColumnQuickInfo, 5),
             new FlexiControlForProperty<string>(() => col.AdminInfo, 5)
         ];
 
@@ -188,10 +189,10 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         GeneratedBitmap = bmp;
     }
 
-    private void Column_PropertyChanged(object sender, System.EventArgs e) {
+    private void Column_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         RemovePic();
-        OnPropertyChanged();
+        OnPropertyChanged(e.PropertyName);
     }
 
     #endregion

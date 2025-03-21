@@ -96,7 +96,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     [Category("Darstellung")]
     [DefaultValue("")]
     [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
-    [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
+    [Description("QuickInfo des Steuerelementes. Es können Codes wie <b> oder <u> verwendet werden.")]
     public string QuickInfo {
         get => _quickInfo;
         set {

@@ -42,10 +42,10 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     #region Fields
 
+    private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
     private string _columnName = string.Empty;
     private FlexiFilterDefaultFilter _filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _standard_Bei_Keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-    private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
 
@@ -66,12 +66,12 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public bool AutoSizeableHeight => false;
 
     public CaptionPosition CaptionPosition {
-        get => _überschriftanordung;
+        get => _captionPosition;
         set {
             if (IsDisposed) { return; }
-            if (_überschriftanordung == value) { return; }
-            _überschriftanordung = value;
-            OnPropertyChanged();
+            if (_captionPosition == value) { return; }
+            _captionPosition = value;
+            OnPropertyChanged("CaptionPosition");
         }
     }
 
@@ -88,7 +88,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             if (IsDisposed) { return; }
             if (_columnName == value) { return; }
             _columnName = value;
-            OnPropertyChanged();
+            OnPropertyChanged("ColumnName");
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -103,7 +103,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             if (IsDisposed) { return; }
             if (_filterart_Bei_Texteingabe == value) { return; }
             _filterart_Bei_Texteingabe = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Filterart_bei_Texteingabe");
         }
     }
 
@@ -116,7 +116,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             if (IsDisposed) { return; }
             if (_standard_Bei_Keiner_Eingabe == value) { return; }
             _standard_Bei_Keiner_Eingabe = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Standard_bei_keiner_Eingabe");
         }
     }
 
@@ -129,7 +129,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var r = Table.RendererOf(Column, Constants.Win11);
 
-        var con = new FlexiFilterControl(Column, _überschriftanordung, r) {
+        var con = new FlexiFilterControl(Column, _captionPosition, r) {
             Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,
             Filterart_Bei_Texteingabe = _filterart_Bei_Texteingabe,
             SavesSettings = true
@@ -184,7 +184,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         result.ParseableAdd("ColumnName", _columnName);
         //result.ParseableAdd("CaptionText", _überschrift);
         //result.ParseableAdd("ShowFormat", _anzeige);
-        result.ParseableAdd("Caption", _überschriftanordung);
+        result.ParseableAdd("Caption", _captionPosition);
         result.ParseableAdd("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
         result.ParseableAdd("DefaultTextFilter", _filterart_Bei_Texteingabe);
 
@@ -198,7 +198,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
                 return true;
 
             case "caption":
-                _überschriftanordung = (CaptionPosition)IntParse(value);
+                _captionPosition = (CaptionPosition)IntParse(value);
                 return true;
 
             case "columnname":

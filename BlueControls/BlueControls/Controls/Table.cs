@@ -455,9 +455,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
 
-        if (!string.IsNullOrEmpty(column.SystemInfo)) {
+        if (!string.IsNullOrEmpty(column.ColumnSystemInfo)) {
             t += "<br><br><b>Gesammelte Infos:</b><br>";
-            t += column.SystemInfo;
+            t += column.ColumnSystemInfo;
         }
         var l = column.Contents();
         if (l.Count > 0) {
@@ -582,9 +582,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (col.IsDisposed || col.Database is not { IsDisposed: false }) { return string.Empty; }
 
         var T = string.Empty;
-        if (!string.IsNullOrEmpty(col.QuickInfo)) { T += col.QuickInfo; }
+        if (!string.IsNullOrEmpty(col.ColumnQuickInfo)) { T += col.ColumnQuickInfo; }
         if (col.Database.IsAdministrator() && !string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
-        if (col.Database.IsAdministrator() && col.Tags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.Tags.JoinWith("<br>"); }
+        if (col.Database.IsAdministrator() && col.ColumnTags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.ColumnTags.JoinWith("<br>"); }
         if (col.Database.IsAdministrator()) { T = T + "<br><br>" + ColumnUsage(col); }
         T = T.Trim();
         T = T.Trim("<br>");
@@ -672,7 +672,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
             //}
 
-            if (column?.Column is { FormatierungErlaubt: true }) {
+            if (column?.Column is { TextFormatingAllowed: true }) {
                 ExtText l = new(Design.TextBox, States.Standard) {
                     HtmlText = ist1
                 };
@@ -2364,13 +2364,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r));
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
-            if (contentHolderCellColumn.TextBearbeitungErlaubt) { Cell_Edit(ca, viewItem, cellInThisDatabaseRow, false); } else {
+            if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(ca, viewItem, cellInThisDatabaseRow, false); } else {
                 NotEditableInfo("Keine Items zum Auswählen vorhanden.");
             }
             return;
         }
 
-        if (contentHolderCellColumn.TextBearbeitungErlaubt) {
+        if (contentHolderCellColumn.EditableWithTextInput) {
             if (t.Count == 0 && (cellInThisDatabaseRow?.Row.CellIsNullOrEmpty(viewItem.Column) ?? true)) {
                 // Bei nur einem Wert, wenn Texteingabe erlaubt, Dropdown öffnen
                 Cell_Edit(ca, viewItem, cellInThisDatabaseRow, false);
@@ -3044,7 +3044,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var li = r.CellGetList(c);
             if (li.Contains(toAdd, false)) {
                 // Ist das angeklickte Element schon vorhanden, dann soll es wohl abgewählt (gelöscht) werden.
-                if (li.Count > -1 || c.DropdownAllesAbwählenErlaubt) {
+                if (li.Count > -1 || c.DropdownDeselectAllAllowed) {
                     toRemove = toAdd;
                     toAdd = string.Empty;
                 }
@@ -3053,7 +3053,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (!string.IsNullOrEmpty(toAdd)) { li.Add(toAdd); }
             UserEdited(this, li.JoinWithCr(), ck.ColumnView, ck.RowData, false);
         } else {
-            if (c.DropdownAllesAbwählenErlaubt) {
+            if (c.DropdownDeselectAllAllowed) {
                 if (toAdd == ck.RowData.Row.CellGetString(c)) {
                     UserEdited(this, string.Empty, ck.ColumnView, ck.RowData, false);
                     return;

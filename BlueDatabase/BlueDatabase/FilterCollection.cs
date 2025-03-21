@@ -21,6 +21,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -94,7 +95,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public event EventHandler? DisposingEvent;
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public event EventHandler? PropertyChanging;
 
@@ -123,7 +124,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             RegisterDatabaseEvents();
 
             Invalidate_FilteredRows();
-            OnPropertyChanged();
+            OnPropertyChanged("Database");
         }
     }
 
@@ -268,7 +269,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         AddInternal(fi);
         Invalidate_FilteredRows();
-        OnPropertyChanged();
+        OnPropertyChanged("FilterItems");
     }
 
     public void AddIfNotExists(FilterItem fi) {
@@ -285,7 +286,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             OnChanging();
             AddInternal(newItems);
             Invalidate_FilteredRows();
-            OnPropertyChanged();
+            OnPropertyChanged("FilterItems");
         }
     }
 
@@ -308,7 +309,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
         Invalidate_FilteredRows();
 
-        OnPropertyChanged();
+        OnPropertyChanged("FilterItems");
     }
 
     //public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
@@ -348,7 +349,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             }
         }
 
-        OnPropertyChanged();
+        OnPropertyChanged("FilterItems");
     }
 
     public void Clear() {
@@ -358,7 +359,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnChanging();
         _internal.Clear();
         Invalidate_FilteredRows();
-        OnPropertyChanged();
+        OnPropertyChanged("FilterItems");
     }
 
     /// <summary>
@@ -453,9 +454,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return fcn;
     }
 
-    public void OnPropertyChanged() {
+    public void OnPropertyChanged(string propertyname) {
         if (IsDisposed) { return; }
-        PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
     }
 
     public void OnRowsChanged() {
@@ -515,7 +516,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnChanging();
         _internal.Remove(fi);
         Invalidate_FilteredRows();
-        OnPropertyChanged();
+        OnPropertyChanged("FilterItems");
     }
 
     public void Remove_RowFilter() => Remove(null as ColumnItem);
@@ -549,7 +550,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
         AddInternal(fi);
         Invalidate_FilteredRows();
-        OnPropertyChanged();
+        OnPropertyChanged("FilterItems");
     }
 
     /// <summary>
@@ -592,7 +593,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (did) {
             Invalidate_FilteredRows();
-            OnPropertyChanged();
+            OnPropertyChanged("FilterItems");
         }
     }
 

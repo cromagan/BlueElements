@@ -92,13 +92,13 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged();
+            OnPropertyChanged("Style");
         }
     }
 
@@ -139,7 +139,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         List<GenericControl> result =
         [
             new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt),
-            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(SheetStyle, true))
+            new FlexiControlForProperty<PadStyles>(() => Style, Skin.GetRahmenArt(SheetStyle, true))
         ];
 
         result.AddRange(base.GetProperties(widthOfControl));

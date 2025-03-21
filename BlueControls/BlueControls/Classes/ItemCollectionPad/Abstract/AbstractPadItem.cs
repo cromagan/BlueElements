@@ -102,10 +102,11 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             if (IsDisposed) { return; }
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Bei_Export_sichtbar");
         }
     }
 
+    public virtual string ColumnQuickInfo { get; set; } = string.Empty;
     public abstract string Description { get; }
 
     public bool ForPrinting {
@@ -137,7 +138,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         set {
             if (_keyName == value) { return; }
             _keyName = value;
-            OnPropertyChanged();
+            OnPropertyChanged("KeyName");
         }
     }
 
@@ -173,8 +174,6 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     /// wenn das ganze Objekt verschoben werden muss.
     /// </summary>
     public List<PointM> PointsForSuccesfullyMove { get; } = [];
-
-    public virtual string QuickInfo { get; set; } = string.Empty;
 
     public bool ShowAlways {
         get {
@@ -414,15 +413,15 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
         // JointPoint werden bewegt, wenn der JointParentPoint angesprochen wird
 
-        OnPropertyChanged();
+        OnPropertyChanged("Position");
     }
 
     /// <summary>
     /// Invalidiert UsedArea und löst das Ereignis Changed aus
     /// </summary>
-    public override void OnPropertyChanged() {
+    public override void OnPropertyChanged(string propertyname) {
         _usedArea = default;
-        base.OnPropertyChanged();
+        base.OnPropertyChanged(propertyname);
     }
 
     //}
@@ -431,7 +430,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Key", KeyName);
         result.ParseableAdd("Print", _beiExportSichtbar);
-        result.ParseableAdd("QuickInfo", QuickInfo);
+        result.ParseableAdd("QuickInfo", ColumnQuickInfo);
         //result.ParseableAdd("ZoomPadding", _zoomPadding);
 
         foreach (var thisPoint in MovablePoint) {
@@ -504,7 +503,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
                 return true;
 
             case "quickinfo":
-                QuickInfo = value.FromNonCritical();
+                ColumnQuickInfo = value.FromNonCritical();
                 return true;
 
             case "page":
@@ -529,7 +528,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             DoJointPoint(p);
         }
 
-        OnPropertyChanged();
+        OnPropertyChanged("JointPoint");
     }
 
     public abstract string ReadableText();
@@ -687,7 +686,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             Develop.DebugPrint_NichtImplementiert(true);
         }
 
-        OnPropertyChanged();
+        OnPropertyChanged("JointPoint");
     }
 
     private void Spiegeln_Horizontal() {

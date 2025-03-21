@@ -97,7 +97,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
             if (IsDisposed) { return; }
             if (_drehwinkel == value) { return; }
             _drehwinkel = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Drehwinkel");
         }
     }
 

@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
+using System.ComponentModel;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -38,17 +39,17 @@ public class ReadableListItem : TextListItem {
     #region Properties
 
     public IReadableTextWithKey Item { get; }
-    public override string QuickInfo => Item.QuickInfo;
+    public override string QuickInfo => Item.ColumnQuickInfo;
 
     #endregion
 
     #region Methods
 
-    private void Item_PropertyChanged(object sender, System.EventArgs e) {
+    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         Text = Item.ReadableText();
         Symbol = Item.SymbolForReadableText();
         KeyName = Item.KeyName;
-        OnPropertyChanged(); // Um den Refresh zu bewirken
+        OnPropertyChanged(e.PropertyName); // Um den Refresh zu bewirken
     }
 
     #endregion

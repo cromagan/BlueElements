@@ -246,7 +246,7 @@ public static class AbstractListItemExtension {
         if (column.IsDisposed) { return []; }
 
         l.AddRange(column.DropDownItems);
-        if (column.DropdownWerteAndererZellenAnzeigen) { l.AddRange(column.Contents()); }
+        if (column.ShowValuesOfOtherCellsInDropdown) { l.AddRange(column.Contents()); }
 
         switch (column.Function) {
             case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
@@ -254,7 +254,7 @@ public static class AbstractListItemExtension {
                 if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return []; }
 
                 // Spalte aus der Ziel-Datenbank ermitteln
-                var targetColumn = db2.Column[column.LinkedCell_ColumnNameOfLinkedDatabase];
+                var targetColumn = db2.Column[column.ColumnNameOfLinkedDatabase];
                 if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return []; }
 
                 var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow, null);
@@ -297,7 +297,7 @@ public static class AbstractListItemExtension {
                 thisColumnItem.Editor = typeof(ColumnEditor);
 
                 if (doCaptionSort) {
-                    var capt = thisColumnItem.Ueberschriften;
+                    var capt = thisColumnItem.CaptionsCombined;
 
                     co.UserDefCompareKey = capt + Constants.SecondSortChar + thisColumnItem.KeyName;
 

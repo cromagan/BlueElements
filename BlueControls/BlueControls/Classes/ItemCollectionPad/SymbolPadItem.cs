@@ -73,13 +73,13 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged();
+            OnPropertyChanged("Style");
         }
     }
 

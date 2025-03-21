@@ -49,8 +49,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     public FilterConverterElementPadItem() : this(string.Empty, null, null) { }
 
-    public FilterConverterElementPadItem(string keyName,  ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
-
+    public FilterConverterElementPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
     public FilterConverterElementPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
@@ -74,7 +73,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _fehlerText) { return; }
             _fehlerText = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Fehler_Text");
         }
     }
 
@@ -87,7 +86,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     //        if (value == _eingangsWertSpalte) { return; }
     //        _eingangsWertSpalte = value;
     //        this.DoChilds();
-    //        OnPropertyChanged();
+    //        OnPropertyChanged(string propertyname);
     //    }
     //}
     [Description("Dieser Filter-Typ wird angewendet.")]
@@ -98,7 +97,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filtertype) { return; }
             _filtertype = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Filter");
         }
     }
 
@@ -110,7 +109,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filterSpalte) { return; }
             _filterSpalte = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Filter_Spalte");
         }
     }
 
@@ -122,7 +121,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             if (IsDisposed) { return; }
             if (value == _filterwert) { return; }
             _filterwert = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Filter_Wert");
         }
     }
 
@@ -135,7 +134,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     //        if (IsDisposed) { return; }
     //        if (_standard_bei_keiner_Eingabe == value) { return; }
     //        _standard_bei_keiner_Eingabe = value;
-    //        OnPropertyChanged();
+    //        OnPropertyChanged(string propertyname);
     //    }
     //}
 

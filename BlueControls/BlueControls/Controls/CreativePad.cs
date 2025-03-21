@@ -100,7 +100,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     public event PrintPageEventHandler? PrintPage;
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -318,7 +318,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
 
     //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public void OpenSaveDialog(string title) {
         title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
@@ -557,8 +557,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         QuickInfo = string.Empty;
 
         if (e.Button == MouseButtons.None && it is AbstractPadItem bpi) {
-            if (!string.IsNullOrEmpty(bpi.QuickInfo)) {
-                QuickInfo = bpi.QuickInfo + "<hr>" + bpi.Description;
+            if (!string.IsNullOrEmpty(bpi.ColumnQuickInfo)) {
+                QuickInfo = bpi.ColumnQuickInfo + "<hr>" + bpi.Description;
             } else {
                 QuickInfo = bpi.Description;
             }
@@ -643,10 +643,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         return tmp;
     }
 
-    private void Items_PropertyChanged(object sender, System.EventArgs e) {
+    private void Items_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         Invalidate();
-        OnPropertyChanged();
+        OnPropertyChanged(e.PropertyName);
     }
 
     private void MoveItems(float x, float y, bool doSnap, bool modifyMouseDown) {

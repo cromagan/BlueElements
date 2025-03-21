@@ -80,6 +80,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
+    public string ColumnQuickInfo => string.Empty;
     public int Count => _internal.Count;
 
     public Database? Database {
@@ -116,7 +117,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public string QuickInfo => string.Empty;
     public int RowChapterHeight { get; internal set; } = 20;
 
     public string SheetStyle {

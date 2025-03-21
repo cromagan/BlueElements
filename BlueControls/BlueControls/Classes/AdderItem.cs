@@ -50,6 +50,9 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Properties
 
+    //public ColumnItem? OriginIDColumn { get; }
+    public string ColumnQuickInfo => KeyName;
+
     /// <summary>
     /// Enstpricht TextKey  (ZUTATEN\\MEHL\\) OHNE #
     /// </summary>
@@ -58,9 +61,6 @@ internal class AdderItem : IReadableTextWithKey {
     public List<string> KeysAndInfo { get; } = [];
 
     public string Last { get; }
-
-    //public ColumnItem? OriginIDColumn { get; }
-    public string QuickInfo => KeyName;
 
     #endregion
 

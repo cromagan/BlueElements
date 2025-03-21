@@ -26,7 +26,7 @@ internal class ExtCharStoreXCode : ExtChar {
 
     #region Constructors
 
-    public ExtCharStoreXCode(ExtText parent, PadStyles stil, BlueFont font) : base(parent, stil, font) { }
+    public ExtCharStoreXCode(ExtText parent, PadStyles style, BlueFont font) : base(parent, style, font) { }
 
     #endregion
 

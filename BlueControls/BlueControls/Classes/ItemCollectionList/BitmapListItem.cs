@@ -75,7 +75,7 @@ public class BitmapListItem : AbstractListItem {
         set {
             _imageFilename = string.Empty;
             _bitmap = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Bitmap");
         }
     }
 
@@ -85,7 +85,7 @@ public class BitmapListItem : AbstractListItem {
             if (_caption == value) { return; }
             _caption = value;
             _captiontmp.Clear();
-            OnPropertyChanged();
+            OnPropertyChanged("Caption");
         }
     }
 
@@ -96,7 +96,7 @@ public class BitmapListItem : AbstractListItem {
     //        if (_captionlines == value) { return; }
     //        _captionlines = value;
     //        _captiontmp.Clear();
-    //        OnPropertyChanged();
+    //        OnPropertyChanged(string propertyname);
     //    }
     //}
 

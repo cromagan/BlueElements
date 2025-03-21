@@ -41,7 +41,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     #region Fields
 
     private string _child = string.Empty;
-    private GroupBoxStyle _rahmenStil = GroupBoxStyle.Normal;
+    private GroupBoxStyle _borderStyle = GroupBoxStyle.Normal;
 
     #endregion
 
@@ -69,7 +69,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
             if (IsDisposed) { return; }
             if (_child == value) { return; }
             _child = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Child");
         }
     }
 
@@ -81,11 +81,11 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle RahmenStil {
-        get => _rahmenStil;
+        get => _borderStyle;
         set {
-            if (_rahmenStil == value) { return; }
-            _rahmenStil = value;
-            OnPropertyChanged();
+            if (_borderStyle == value) { return; }
+            _borderStyle = value;
+            OnPropertyChanged("RahmenStil");
         }
     }
 
@@ -99,10 +99,10 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         var icpi = GetChild(_child);
 
         var con = new ConnectedFormulaView(mode, icpi) {
-            GroupBoxStyle = _rahmenStil
+            GroupBoxStyle = _borderStyle
         };
 
-        if (_rahmenStil != GroupBoxStyle.Nothing) {
+        if (_borderStyle != GroupBoxStyle.Nothing) {
             con.Text = icpi?.BestCaption() ?? "?";
         }
 
@@ -144,7 +144,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
         result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
         result.ParseableAdd("Child", _child);
-        result.ParseableAdd("BorderStyle", _rahmenStil);
+        result.ParseableAdd("BorderStyle", _borderStyle);
         return result;
     }
 
@@ -162,7 +162,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
                 return true;
 
             case "borderstyle":
-                _rahmenStil = (GroupBoxStyle)IntParse(value);
+                _borderStyle = (GroupBoxStyle)IntParse(value);
                 return true;
 
             case "style":
@@ -242,7 +242,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
             Child = string.Empty;
         }
 
-        //OnPropertyChanged();
+        //OnPropertyChanged(string propertyname);
     }
 
     #endregion

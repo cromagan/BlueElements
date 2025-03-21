@@ -69,7 +69,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             if (_bild_anzeigen == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _bild_anzeigen = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Bild_anzeigen");
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -81,7 +81,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _imagereplacement = value.SplitByCr().ToList();
-            OnPropertyChanged();
+            OnPropertyChanged("Bild_ersetzen");
 
             if (string.IsNullOrEmpty(old) != string.IsNullOrEmpty(value)) {
                 OnDoUpdateSideOptionMenu();
@@ -98,7 +98,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             var vc = string.IsNullOrEmpty(_imgpräfix) == string.IsNullOrEmpty(value);
 
             _imgpräfix = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Bild_Präfix");
 
             if (!vc) {
                 OnDoUpdateSideOptionMenu();
@@ -116,7 +116,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             if (_constantWidth == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _constantWidth = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Konstante_Breite_von_Bildern");
         }
     }
 
@@ -128,7 +128,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             if (_constantHeight == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _constantHeight = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Konstante_Höhe_von_Bildern");
         }
     }
 
@@ -138,7 +138,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             if (_defaultImage == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _defaultImage = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Standard_Bild");
         }
     }
 
@@ -147,7 +147,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         set {
             if (_text_anzeigen == value) { return; }
             _text_anzeigen = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Text_anzeigen");
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -155,18 +155,12 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public string Text_ersetzen {
         get => _opticalReplace.JoinWithCr();
         set {
-
             var old = Text_ersetzen;
             if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
 
-     
-
             _opticalReplace = value.SplitByCr().ToList();
 
-
-
-
-            OnPropertyChanged();
+            OnPropertyChanged("Text_ersetzen");
 
             if (string.IsNullOrEmpty(old) != string.IsNullOrEmpty(value)) {
                 OnDoUpdateSideOptionMenu();
@@ -247,7 +241,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         result.ParseableAdd("ShowText", _text_anzeigen);
 
         // nur wenn Text angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
-        if (_text_anzeigen) {       
+        if (_text_anzeigen) {
             result.ParseableAdd("TextReplace", _opticalReplace, true);
         }
 

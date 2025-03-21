@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -82,6 +83,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     public string CaptionForEditor => "Formular";
 
+    public string ColumnQuickInfo => string.Empty;
     public Type? Editor { get; set; }
 
     public ReadOnlyCollection<string> NotAllowedChilds {
@@ -92,7 +94,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
             _notAllowedChilds.Clear();
             _notAllowedChilds.AddRange(l);
-            OnPropertyChanged();
+            OnPropertyChanged("NotAllowedChilds");
         }
     }
 
@@ -112,11 +114,10 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 _pages.PropertyChanged += PadData_PropertyChanged;
             }
 
-            OnPropertyChanged();
+            OnPropertyChanged("Pages");
         }
     }
 
-    public string QuickInfo => string.Empty;
     public override string Type => "ConnectedFormula";
 
     /// <summary>
@@ -373,7 +374,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         base.OnLoaded();
     }
 
-    private void PadData_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
+    private void PadData_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(e.PropertyName);
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {

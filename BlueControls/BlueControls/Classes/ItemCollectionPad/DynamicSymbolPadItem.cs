@@ -73,7 +73,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
         set {
             if (value == _script) { return; }
             _script = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Script");
         }
     }
 
@@ -84,13 +84,13 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged();
+            OnPropertyChanged("style");
         }
     }
 

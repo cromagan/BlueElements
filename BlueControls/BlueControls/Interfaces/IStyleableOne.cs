@@ -33,7 +33,7 @@ public interface IStyleableOne : IStyleable {
 
     public BlueFont? Font { get; set; }
 
-    public PadStyles Stil { get; }
+    public PadStyles Style { get; }
 
     #endregion
 }
@@ -49,12 +49,12 @@ public static class StyleableOneExtension {
     }
 
     public static BlueFont GetFont(this IStyleableOne o) {
-        o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Stil);
+        o.Font ??= Skin.GetBlueFont(o.SheetStyle, o.Style);
         return o.Font;
     }
 
     public static void InvalidateFont(this IStyleableOne o) {
-        if (o.Stil != PadStyles.Undefiniert) {
+        if (o.Style != PadStyles.Undefiniert) {
             o.Font = null;
         }
     }

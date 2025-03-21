@@ -76,7 +76,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         get => _bild_modus; set {
             if (_bild_modus == value) { return; }
             _bild_modus = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Bild_Modus");
         }
     }
 
@@ -84,7 +84,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         get => _bitmap; set {
             if (_bitmap == value) { return; }
             _bitmap = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Bitmap");
         }
     }
 
@@ -98,7 +98,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         get => _platzhalter_für_layout; set {
             if (_platzhalter_für_layout == value) { return; }
             _platzhalter_für_layout = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Platzhalter_Für_Layout");
         }
     }
 
@@ -109,13 +109,13 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged();
+            OnPropertyChanged("style");
         }
     }
 
@@ -130,7 +130,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         Bitmap = ScreenShot.GrabArea(null).Area;
-        OnPropertyChanged();
     }
 
     public void Datei_laden() {
@@ -147,7 +146,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
         if (!FileExists(e.FileName)) { return; }
         Bitmap = (Bitmap?)Image_FromFile(e.FileName);
-        OnPropertyChanged();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -172,7 +170,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             new FlexiControl(),
             new FlexiControlForProperty<SizeModes>(() => Bild_Modus, comms),
             new FlexiControl(),
-            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(SheetStyle, true)),
+            new FlexiControlForProperty<PadStyles>(() => Style, Skin.GetRahmenArt(SheetStyle, true)),
             new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen),
             new FlexiControl(),
             ..base.GetProperties(widthOfControl)
@@ -196,7 +194,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             _bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
         }
 
-        OnPropertyChanged();
+        OnPropertyChanged("Bitmap");
     }
 
     public override List<string> ParseableItems() {
@@ -265,7 +263,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
         if (ot != null) {
             Bitmap = ot;
-            OnPropertyChanged();
             return true;
         }
 
@@ -275,9 +272,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public bool ResetVariables() {
         if (IsDisposed) { return false; }
         if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
-            Bitmap?.Dispose();
             Bitmap = null;
-            OnPropertyChanged();
             return true;
         }
         return false;

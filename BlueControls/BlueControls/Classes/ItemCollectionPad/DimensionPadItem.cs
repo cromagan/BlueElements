@@ -67,7 +67,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     private string _textOben = string.Empty;
 
     private float _textScale = 3.07f;
-
+    private string _textUnten = string.Empty;
     private float _winkel;
 
     #endregion
@@ -135,13 +135,13 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged();
+            OnPropertyChanged("Style");
         }
     }
 
@@ -153,11 +153,19 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             if (IsDisposed) { return; }
             if (_textOben == Länge_In_Mm.ToStringFloat3()) { value = string.Empty; }
             _textOben = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Text_Oben");
         }
     }
 
-    public string Text_Unten { get; set; }
+    public string Text_Unten {
+        get => _textUnten;
+        set {
+            if (IsDisposed) { return; }
+            if (_textUnten == value) { value = string.Empty; }
+            _textUnten = value;
+            OnPropertyChanged("Text_Unten");
+        }
+    }
 
     public float TextScale {
         get => _textScale;
@@ -166,7 +174,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             value = Math.Min(value, 20);
             if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
-            OnPropertyChanged();
+            OnPropertyChanged("TextScale");
         }
     }
 
@@ -216,7 +224,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             new FlexiControlForProperty<string>(() => Text_Unten),
 
             new FlexiControlForProperty<string>(() => Präfix),
-            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetFonts(SheetStyle)),
+            new FlexiControlForProperty<PadStyles>(() => Style, Skin.GetFonts(SheetStyle)),
             new FlexiControlForProperty<float>(() => TextScale)
         ];
         result.AddRange(base.GetProperties(widthOfControl));

@@ -34,7 +34,7 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
-    internal ExtCharAscii(ExtText parent, PadStyles stil, BlueFont font, char charcode) : base(parent, stil, font) {
+    internal ExtCharAscii(ExtText parent, PadStyles style, BlueFont font, char charcode) : base(parent, style, font) {
         _char = charcode;
     }
 

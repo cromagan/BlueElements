@@ -141,7 +141,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             _getFilterFromKeys.AddRange(value);
 
             CalculateInputColorIds();
-            OnPropertyChanged();
+            OnPropertyChanged("Parents");
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -165,7 +165,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             ConnectedFormula.ConnectedFormula.Invalidate_VisibleFor_AllUsed();
 
             _visibleFor = tmp.AsReadOnly();
-            OnPropertyChanged();
+            OnPropertyChanged("VisibleFor");
         }
     }
 
@@ -175,7 +175,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         set {
             if (_xPosition == value) { return; }
             _xPosition = value;
-            OnPropertyChanged();
+            OnPropertyChanged("X_Position");
 
             if (_xPosition != XPosition.frei) {
                 PointMoved(_pLo, new MoveEventArgs(false));
@@ -191,7 +191,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     //    if (IsDisposed) { return; }
     //    base.AddedToCollection(parent);
     //    CalculateColorIds();
-    //    OnPropertyChanged();
+    //    OnPropertyChanged(string propertyname);
     //}
 
     #region Methods
@@ -350,9 +350,9 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         return false;
     }
 
-    public override void OnPropertyChanged() {
+    public override void OnPropertyChanged(string propertyname) {
         if (IsDisposed) { return; }
-        base.OnPropertyChanged();
+        base.OnPropertyChanged(propertyname);
         this.RaiseVersion();
     }
 
@@ -434,7 +434,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     //    if (x.Height < he) { x.Height = he; }
     //    SetCoordinates(x, true);
-    //    OnPropertyChanged();
+    //    OnPropertyChanged(string propertyname);
     //}
     protected static void DrawArrow(Graphics gr, RectangleF positionModified, float scale, int colorId, Alignment al, float valueArrow, float xmod) {
         var p = positionModified.PointOf(al);

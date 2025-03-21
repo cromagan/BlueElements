@@ -70,7 +70,7 @@ public class Method_ImportLinked : Method_Database {
 
             if (!string.IsNullOrEmpty(linkedDatabase.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + linkedDatabase.Caption + "' sind die Skripte defekt"); }
 
-            var targetColumn = linkedDatabase.Column[thisColumn.LinkedCell_ColumnNameOfLinkedDatabase];
+            var targetColumn = linkedDatabase.Column[thisColumn.ColumnNameOfLinkedDatabase];
             if (targetColumn == null) { return new DoItFeedback(ld, "Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
             var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedDatabase, thisColumn, r, varCol);

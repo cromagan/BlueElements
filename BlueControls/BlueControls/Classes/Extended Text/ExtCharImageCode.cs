@@ -35,9 +35,9 @@ internal class ExtCharImageCode : ExtChar {
 
     #region Constructors
 
-    public ExtCharImageCode(ExtText parent, PadStyles stil, BlueFont font, QuickImage? qi) : base(parent, stil, font) => _qi = qi;
+    public ExtCharImageCode(ExtText parent, PadStyles style, BlueFont font, QuickImage? qi) : base(parent, style, font) => _qi = qi;
 
-    public ExtCharImageCode(ExtText parent, PadStyles stil, BlueFont font, string imagecode) : base(parent, stil, font) => _qi = QuickImage.Get(imagecode);
+    public ExtCharImageCode(ExtText parent, PadStyles style, BlueFont font, string imagecode) : base(parent, style, font) => _qi = QuickImage.Get(imagecode);
 
     internal ExtCharImageCode(ExtText parent, int styleFromPos, string imagecode) : base(parent, styleFromPos) {
         _qi = QuickImage.Get(imagecode);

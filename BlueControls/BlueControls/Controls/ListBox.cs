@@ -658,26 +658,26 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                     }
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
-                            if (previtem.Pos.Right + colWidth > controlDrawingArea.Width || thisItem.IsCaption) {
+                            if (previtem.Position.Right + colWidth > controlDrawingArea.Width || thisItem.IsCaption) {
                                 cx = 0;
-                                cy = previtem.Pos.Bottom;
+                                cy = previtem.Position.Bottom;
                             } else {
-                                cx = previtem.Pos.Right;
-                                cy = previtem.Pos.Top;
+                                cx = previtem.Position.Right;
+                                cy = previtem.Position.Top;
                             }
                         } else {
                             if (itenc % BreakAfterItems == 0) {
-                                cx = previtem.Pos.Right;
+                                cx = previtem.Position.Right;
                                 cy = 0;
                             } else {
-                                cx = previtem.Pos.Left;
-                                cy = previtem.Pos.Bottom;
+                                cx = previtem.Position.Left;
+                                cy = previtem.Position.Bottom;
                             }
                         }
                     }
                     thisItem.SetCoordinates(new Rectangle(cx, cy, wi, he));
-                    maxX = Math.Max(thisItem.Pos.Right, maxX);
-                    maxy = Math.Max(thisItem.Pos.Bottom, maxy);
+                    maxX = Math.Max(thisItem.Position.Right, maxX);
+                    maxy = Math.Max(thisItem.Position.Bottom, maxy);
                     previtem = thisItem;
                 }
             }
@@ -808,7 +808,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
         Parallel.ForEach(_item, thisItem => {
             var currentItem = thisItem;
-            if (currentItem.Pos.IntersectsWith(visArea)) {
+            if (currentItem.Position.IntersectsWith(visArea)) {
                 var itemState = tmpState;
                 if (_mouseOverItem == currentItem && Enabled) { itemState |= States.Standard_MouseOver; }
 
@@ -1069,7 +1069,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         _mouseOverItem = nd;
 
         if (_mouseOverItem != null && _mousemoved) {
-            var pos = _mouseOverItem.Pos.Right;
+            var pos = _mouseOverItem.Position.Right;
 
             #region down-Button
 
@@ -1080,7 +1080,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 btnDown.Width = 16;
                 btnDown.Height = 16;
                 pos -= btnDown.Width;
-                btnDown.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
+                btnDown.Top = _mouseOverItem.Position.Y - (int)SliderY.Value;
                 btnDown.Left = pos;
                 btnDown.Visible = true;
                 btnDown.Enabled = _item[_item.Count - 1] != _mouseOverItem;
@@ -1096,7 +1096,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 btnUp.Width = 16;
                 btnUp.Height = 16;
                 pos -= btnUp.Width;
-                btnUp.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
+                btnUp.Top = _mouseOverItem.Position.Y - (int)SliderY.Value;
                 btnUp.Left = pos;
                 btnUp.Visible = true;
                 btnUp.Enabled = _item[0] != _mouseOverItem;
@@ -1117,7 +1117,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 btnMinus.Width = 16;
                 btnMinus.Height = 16;
                 pos -= btnMinus.Width;
-                btnMinus.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
+                btnMinus.Top = _mouseOverItem.Position.Y - (int)SliderY.Value;
                 btnMinus.Left = pos;
                 btnMinus.Visible = true;
                 btnMinus.Enabled = true;
@@ -1140,7 +1140,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 btnEdit.Width = 16;
                 btnEdit.Height = 16;
                 pos -= btnEdit.Width;
-                btnEdit.Top = _mouseOverItem.Pos.Y - (int)SliderY.Value;
+                btnEdit.Top = _mouseOverItem.Position.Y - (int)SliderY.Value;
                 btnEdit.Left = pos;
                 btnEdit.Visible = true;
                 btnEdit.Enabled = true;

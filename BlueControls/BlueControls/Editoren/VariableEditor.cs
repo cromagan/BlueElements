@@ -82,8 +82,8 @@ public partial class VariableEditor : EditorEasy {
         foreach (var thisColumn in db.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
-                thisColumn.TextBearbeitungErlaubt = false;
-                thisColumn.DropdownBearbeitungErlaubt = false;
+                thisColumn.EditableWithTextInput = false;
+                thisColumn.EditableWithDropdown = false;
             }
         }
 
@@ -94,7 +94,7 @@ public partial class VariableEditor : EditorEasy {
 
             foreach (var thisColumn2 in l) {
                 if (thisColumn2 != null) {
-                    thisColumn2.TextBearbeitungErlaubt = true;
+                    thisColumn2.EditableWithTextInput = true;
                     thisColumn2.MultiLine = false;
                     thisColumn2.PermissionGroupsChangeCell = new([Constants.Everybody]);
                 }

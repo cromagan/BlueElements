@@ -53,7 +53,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public TableViewPadItem() : this(string.Empty, null, null) { }
 
-    public TableViewPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null,  cformula) { }
+    public TableViewPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
     public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
@@ -75,7 +75,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
             if (IsDisposed) { return; }
             if (_filterOutputType == value) { return; }
             _filterOutputType = value;
-            OnPropertyChanged();
+            OnPropertyChanged("FilterOutputType");
         }
     }
 
@@ -89,7 +89,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
             if (IsDisposed) { return; }
             if (_defaultArrangement == value) { return; }
             _defaultArrangement = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Standard_Ansicht");
         }
     }
 

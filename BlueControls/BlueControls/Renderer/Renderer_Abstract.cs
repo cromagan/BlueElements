@@ -72,11 +72,11 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
             if (_sheetStyle == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _sheetStyle = value;
-            OnPropertyChanged();
+            OnPropertyChanged("SheetStyle");
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }
@@ -108,10 +108,10 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
-    public override void OnPropertyChanged() {
+    public override void OnPropertyChanged(string propertyname) {
         _lastCode = ParseableItems().FinishParseable();
 
-        base.OnPropertyChanged();
+        base.OnPropertyChanged(propertyname);
     }
 
     public override List<string> ParseableItems() {

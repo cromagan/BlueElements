@@ -123,7 +123,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public override bool Focused => base.Focused || (_sliderY != null && _sliderY.Focused());
 
     [DefaultValue(false)]
-    public bool FormatierungErlaubt {
+    public bool TextFormatingAllowed {
         get => _formatierungErlaubt;
         set {
             if (value == _formatierungErlaubt) { return; }
@@ -171,7 +171,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     [DefaultValue("")]
-    public string Regex {
+    public string RegexCheck {
         get => _regex;
         set {
             if (value == _regex) { return; }

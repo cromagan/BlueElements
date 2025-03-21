@@ -49,8 +49,8 @@ public partial class GlobalMonitor : Form {
         foreach (var thisColumn in db.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
-                thisColumn.TextBearbeitungErlaubt = false;
-                thisColumn.DropdownBearbeitungErlaubt = false;
+                thisColumn.EditableWithTextInput = false;
+                thisColumn.EditableWithDropdown = false;
                 thisColumn.DefaultRenderer = Renderer_TextOneLine.ClassId;
             }
         }

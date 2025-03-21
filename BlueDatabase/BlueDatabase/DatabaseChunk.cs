@@ -117,7 +117,7 @@ public class DatabaseChunk : Database {
             foreach (var columnitem in db.Column) {
                 if (columnitem != null && !string.IsNullOrEmpty(columnitem.KeyName) && !columnitem.IsDisposed) {
                     mainChunk.SaveToByteList(columnitem);
-                    usesChunk.SaveToByteList(DatabaseDataType.ColumnSystemInfo, columnitem.SystemInfo, columnitem.KeyName);
+                    usesChunk.SaveToByteList(DatabaseDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
                 }
             }
 

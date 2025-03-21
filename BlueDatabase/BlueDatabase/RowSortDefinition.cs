@@ -125,7 +125,7 @@ public sealed class RowSortDefinition : IParseable {
         for (var i = 0; i < Columns.Count; i++) {
             if (Columns[i] is not ColumnItem { IsDisposed: false }) {
                 Columns.RemoveAt(i);
-                //OnPropertyChanged();
+                //OnPropertyChanged(string propertyname);
                 Repair();
                 return;
             }

@@ -18,25 +18,15 @@
 #nullable enable
 
 using System;
+using System.ComponentModel;
 
 namespace BlueBasics.Interfaces;
 
-public interface IPropertyChangedFeedback {
-
-    #region Events
-
-    /// <summary>
-    /// Wird ausgelöst, wenn sich ein Objekt verändert.
-    /// Wird nicht bei der Neuerstellung des Objektes oder beim Parsen ausgelöst.
-    /// </summary>
-    event EventHandler? PropertyChanged;
-
-    #endregion
+public interface IPropertyChangedFeedback : INotifyPropertyChanged {
 
     #region Methods
 
-    void OnPropertyChanged();
+    void OnPropertyChanged(string propertyname);
 
     #endregion
-
 }

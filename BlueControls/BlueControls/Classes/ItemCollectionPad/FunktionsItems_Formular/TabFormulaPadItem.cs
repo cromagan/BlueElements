@@ -334,7 +334,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         }
 
         //_childs.AddRange(((ListBox)sender).Checked);
-        OnPropertyChanged();
+        OnPropertyChanged("Childs");
         this.RaiseVersion();
         OnDoUpdateSideOptionMenu();
     }
@@ -353,7 +353,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
             _ = _childs.Remove(thisl);
         }
 
-        //OnPropertyChanged();
+        //OnPropertyChanged(string propertyname);
     }
 
     #endregion

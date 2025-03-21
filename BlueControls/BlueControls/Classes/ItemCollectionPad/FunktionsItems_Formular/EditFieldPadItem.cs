@@ -46,8 +46,8 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     private bool _autoX = true;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+    private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
     private string _columnName = string.Empty;
-    private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
 
@@ -72,7 +72,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
                 return (int)UsedArea.Height > AutosizableExtension.MinHeigthCaption;
             }
 
-            if (_überschriftanordung is CaptionPosition.Links_neben_dem_Feld or CaptionPosition.ohne) {
+            if (_captionPosition is CaptionPosition.Links_neben_dem_Feld or CaptionPosition.ohne) {
                 return (int)UsedArea.Height > AutosizableExtension.MinHeigthTextBox;
             }
 
@@ -87,17 +87,17 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             if (IsDisposed) { return; }
             if (_autoX == value) { return; }
             _autoX = value;
-            OnPropertyChanged();
+            OnPropertyChanged("AutoX");
         }
     }
 
     public CaptionPosition CaptionPosition {
-        get => _überschriftanordung;
+        get => _captionPosition;
         set {
             if (IsDisposed) { return; }
-            if (_überschriftanordung == value) { return; }
-            _überschriftanordung = value;
-            OnPropertyChanged();
+            if (_captionPosition == value) { return; }
+            _captionPosition = value;
+            OnPropertyChanged("CaptionPosition");
         }
     }
 
@@ -114,7 +114,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             if (IsDisposed) { return; }
             if (_columnName == value) { return; }
             _columnName = value;
-            OnPropertyChanged();
+            OnPropertyChanged("ColumnName");
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -128,7 +128,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             if (IsDisposed) { return; }
             if (_bearbeitung == value) { return; }
             _bearbeitung = value;
-            OnPropertyChanged();
+            OnPropertyChanged("EditType");
         }
     }
 
@@ -206,7 +206,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
         result.ParseableAdd("ColumnName", _columnName);
         result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschriftanordung);
+        result.ParseableAdd("Caption", _captionPosition);
         result.ParseableAdd("AutoDistance", _autoX);
         return result;
     }
@@ -226,7 +226,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
                 return true;
 
             case "caption":
-                _überschriftanordung = (CaptionPosition)IntParse(value);
+                _captionPosition = (CaptionPosition)IntParse(value);
                 return true;
 
             case "autodistance":
@@ -276,7 +276,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     //    var ot = vbmp.ValueBitmap;
     //    if (ot is Bitmap bmp) {
     //        Bitmap = bmp;
-    //        OnPropertyChanged();
+    //        OnPropertyChanged(string propertyname);
     //        return true;
     //    }
 
@@ -338,7 +338,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     //    }
     //    Hintergrund_weiß_füllen = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
     //    Bild_Modus = (enSizeModes)IntParse(Tags.TagGet("Bild-Modus"));
-    //    Stil = (PadStyles)IntParse(Tags.TagGet("Umrandung"));
+    //    Style = (PadStyles)IntParse(Tags.TagGet("Umrandung"));
     //    Platzhalter_für_Layout = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
     //}
 }

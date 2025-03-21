@@ -137,7 +137,6 @@ public enum DatabaseDataType : byte {
     /// </summary>
     FileStateUTCDate = 74,
 
-
     LastEditUser = 75,
     LastEditApp = 76,
     LastEditMachineName = 77,
@@ -231,7 +230,7 @@ public enum DatabaseDataType : byte {
 
     //co_AutoFilterJokerModus = 165
     //co_ID = 166
-    LinkedDatabase = 166,
+    LinkedDatabaseTableName = 166,
 
     //co_LinkKeyKennung = 167,
     //co_BestFile_StandardSuffix = 168,
@@ -307,5 +306,6 @@ public enum DatabaseDataType : byte {
     //StatisticInOne = 252
     //Statistic = 253
     Undo = 254,
+
     EOF = 255
 }

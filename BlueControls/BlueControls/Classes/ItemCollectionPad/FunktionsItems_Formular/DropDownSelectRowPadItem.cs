@@ -42,8 +42,8 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-    private string _überschrift = string.Empty;
-    private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
+    private string _caption = string.Empty;
+    private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
 
     #endregion
 
@@ -71,19 +71,29 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
             if (IsDisposed) { return; }
             if (_anzeige == value) { return; }
             _anzeige = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Anzeige");
         }
     }
 
     public bool AutoSizeableHeight => false;
 
-    public CaptionPosition CaptionPosition {
-        get => _überschriftanordung;
+    public string Caption {
+        get => _caption;
         set {
             if (IsDisposed) { return; }
-            if (_überschriftanordung == value) { return; }
-            _überschriftanordung = value;
-            OnPropertyChanged();
+            if (_caption == value) { return; }
+            _caption = value;
+            OnPropertyChanged("Caption");
+        }
+    }
+
+    public CaptionPosition CaptionPosition {
+        get => _captionPosition;
+        set {
+            if (IsDisposed) { return; }
+            if (_captionPosition == value) { return; }
+            _captionPosition = value;
+            OnPropertyChanged("CaptionPosition");
         }
     }
 
@@ -92,17 +102,6 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann, die durch die Vor-Filter bestimmt wurden.";
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-
-    public string Überschrift {
-        get => _überschrift;
-        set {
-            if (IsDisposed) { return; }
-            if (_überschrift == value) { return; }
-            _überschrift = value;
-            OnPropertyChanged();
-        }
-    }
-
     protected override int SaveOrder => 1;
 
     #endregion
@@ -110,7 +109,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiControlRowSelector(DatabaseOutput, _überschrift, _anzeige) {
+        var con = new FlexiControlRowSelector(DatabaseOutput, _caption, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition
         };
@@ -125,7 +124,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         [
             .. base.GetProperties(widthOfControl),
             new FlexiControl("Einstellungen:", -1, true),
-            new FlexiControlForProperty<string>(() => Überschrift),
+            new FlexiControlForProperty<string>(() => Caption),
             new FlexiControlForProperty<string>(() => Anzeige),
         ];
 
@@ -140,10 +139,10 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("CaptionText", _überschrift);
+        result.ParseableAdd("CaptionText", _caption);
         result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschriftanordung);
+        result.ParseableAdd("Caption", _captionPosition);
         //result.ParseableAdd("ID", ColorId);
 
         return result;
@@ -160,11 +159,11 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
                 return true;
 
             case "caption":
-                _überschriftanordung = (CaptionPosition)IntParse(value);
+                _captionPosition = (CaptionPosition)IntParse(value);
                 return true;
 
             case "captiontext":
-                _überschrift = value.FromNonCritical();
+                _caption = value.FromNonCritical();
                 return true;
 
             case "showformat":
@@ -185,10 +184,10 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (!ForPrinting) {
             DrawArrowOutput(gr, positionModified, scale, ForPrinting, OutputColorId);
-            DrawFakeControl(gr, positionModified, scale, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionModified, scale, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
             DrawColorScheme(gr, positionModified, scale, null, true, true, true);
         } else {
-            DrawFakeControl(gr, positionModified, scale, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionModified, scale, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
         }
 
         base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);

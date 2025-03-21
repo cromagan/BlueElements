@@ -162,7 +162,7 @@ namespace BlueControls.Forms {
             this.btnLastFiles.ImageCode = "Ordner";
             this.btnLastFiles.Location = new System.Drawing.Point(136, 2);
             this.btnLastFiles.Name = "btnLastFiles";
-            this.btnLastFiles.Regex = null;
+            this.btnLastFiles.RegexCheck = null;
             this.btnLastFiles.SettingsLoaded = false;
             this.btnLastFiles.Size = new System.Drawing.Size(104, 66);
             this.btnLastFiles.TabIndex = 11;

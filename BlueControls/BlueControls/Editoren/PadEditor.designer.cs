@@ -207,7 +207,7 @@ namespace BlueControls.Forms {
             this.txbRasterFangen.Cursor = Cursors.IBeam;
             this.txbRasterFangen.Location = new Point(128, 46);
             this.txbRasterFangen.Name = "txbRasterFangen";
-            this.txbRasterFangen.Regex = "(^-?([1-9]\\d*)|^0)([.]\\d*[1-9])?$";
+            this.txbRasterFangen.RegexCheck = "(^-?([1-9]\\d*)|^0)([.]\\d*[1-9])?$";
             this.txbRasterFangen.Size = new Size(64, 22);
             this.txbRasterFangen.Suffix = "mm";
             this.txbRasterFangen.TabIndex = 19;
@@ -221,7 +221,7 @@ namespace BlueControls.Forms {
             this.txbRasterAnzeige.Cursor = Cursors.IBeam;
             this.txbRasterAnzeige.Location = new Point(128, 24);
             this.txbRasterAnzeige.Name = "txbRasterAnzeige";
-            this.txbRasterAnzeige.Regex = "(^-?([1-9]\\d*)|^0)([.]\\d*[1-9])?$";
+            this.txbRasterAnzeige.RegexCheck = "(^-?([1-9]\\d*)|^0)([.]\\d*[1-9])?$";
             this.txbRasterAnzeige.Size = new Size(64, 22);
             this.txbRasterAnzeige.Suffix = "mm";
             this.txbRasterAnzeige.TabIndex = 18;
@@ -434,7 +434,7 @@ namespace BlueControls.Forms {
             this.PadDesign.DropDownStyle = ComboBoxStyle.DropDownList;
             this.PadDesign.Location = new Point(112, 24);
             this.PadDesign.Name = "PadDesign";
-            this.PadDesign.Regex = null;
+            this.PadDesign.RegexCheck = null;
             this.PadDesign.Size = new Size(264, 22);
             this.PadDesign.TabIndex = 1;
             this.PadDesign.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.PadDesign_ItemClicked);

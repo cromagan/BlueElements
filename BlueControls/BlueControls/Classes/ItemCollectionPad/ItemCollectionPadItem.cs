@@ -140,7 +140,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         set {
             if (_caption == value) { return; }
             _caption = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Caption");
         }
     }
 
@@ -158,7 +158,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (value == _endless) { return; }
 
             _endless = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Endless");
         }
     }
 
@@ -174,7 +174,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (IsDisposed) { return; }
             if (Math.Abs(_gridShow - value) < DefaultTolerance) { return; }
             _gridShow = value;
-            OnPropertyChanged();
+            OnPropertyChanged("GridShow");
         }
     }
 
@@ -188,7 +188,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (IsDisposed) { return; }
             if (Math.Abs(_gridsnap - value) < DefaultTolerance) { return; }
             _gridsnap = value;
-            OnPropertyChanged();
+            OnPropertyChanged("GridSnap");
         }
     }
 
@@ -207,7 +207,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         get => _randinMm;
         set {
             _randinMm = new Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
-            OnPropertyChanged();
+            OnPropertyChanged("RandInMM");
         }
     }
 
@@ -224,7 +224,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
             OnStyleChanged();
-            OnPropertyChanged();
+            OnPropertyChanged("SheetStyle");
         }
     }
 
@@ -239,7 +239,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (IsDisposed) { return; }
             if (_snapMode == value) { return; }
             _snapMode = value;
-            OnPropertyChanged();
+            OnPropertyChanged("SnapMode");
         }
     }
 
@@ -700,9 +700,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    public override void OnPropertyChanged() {
+    public override void OnPropertyChanged(string propertyname) {
         IsSaved = false;
-        base.OnPropertyChanged();
+        base.OnPropertyChanged(propertyname);
     }
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
@@ -820,7 +820,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         _ = _internal.Remove(item);
         item.Parent = null;
         OnItemRemoved();
-        OnPropertyChanged();
+        OnPropertyChanged("Items");
     }
 
     public void RemoveRange(List<AbstractPadItem> remove) {
@@ -863,7 +863,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 if (variables.ResetVariables()) { did = true; }
             }
         }
-        if (did) { OnPropertyChanged(); }
+        if (did) { OnPropertyChanged("Variables"); }
         return did;
     }
 
@@ -901,7 +901,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (IsDisposed) { return; }
         if (index1 == index2) { return; }
         (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
-        OnPropertyChanged();
+        OnPropertyChanged("Items");
     }
 
     public override QuickImage SymbolForReadableText() {
@@ -1195,7 +1195,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         if (IsDisposed) { return; }
-        OnPropertyChanged();
+        OnPropertyChanged("Connections");
     }
 
     private void CreateConnection(string toParse) {
@@ -1272,18 +1272,18 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    private void Item_PropertyChanged(object sender, System.EventArgs e) => OnPropertyChanged();
+    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(e.PropertyName);
 
     private void OnItemAdded() {
         if (IsDisposed) { return; }
         ItemAdded?.Invoke(this, System.EventArgs.Empty);
-        OnPropertyChanged();
+        OnPropertyChanged("Items");
     }
 
     private void OnItemRemoved() {
         ItemRemoved?.Invoke(this, System.EventArgs.Empty);
         if (IsDisposed) { return; }
-        OnPropertyChanged();
+        OnPropertyChanged("Items");
     }
 
     private void ParseItems(string toParse) {

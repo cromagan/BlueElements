@@ -67,7 +67,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             if (IsDisposed) { return; }
             if (value == _ausrichtung) { return; }
             _ausrichtung = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Ausrichtung");
         }
     }
 
@@ -76,7 +76,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         internal set {
             if (value == _caption) { return; }
             _caption = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Caption");
         }
     }
 
@@ -90,7 +90,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             if (!_includedjointPoints.IsDifferentTo(value)) { return; }
             _includedjointPoints = value;
             CalculateSize();
-            OnPropertyChanged();
+            OnPropertyChanged("JointPoints");
         }
     }
 
@@ -102,7 +102,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             if (Math.Abs(value - _scale) < Constants.DefaultTolerance) { return; }
             _scale = value;
             CalculateSize();
-            OnPropertyChanged();
+            OnPropertyChanged("Scale");
         }
     }
 
@@ -113,13 +113,13 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged();
+            OnPropertyChanged("Style");
         }
     }
 
@@ -130,7 +130,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             value = Math.Min(value, 20);
             if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
-            OnPropertyChanged();
+            OnPropertyChanged("TextScale");
         }
     }
 

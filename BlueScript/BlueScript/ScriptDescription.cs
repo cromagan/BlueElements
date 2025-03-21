@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -35,7 +36,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         AdminInfo = adminInfo;
         Image = image;
         KeyName = name;
-        QuickInfo = quickInfo;
+        ColumnQuickInfo = quickInfo;
         Script = script;
         UserGroups = userGroups;
     }
@@ -58,7 +59,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -66,6 +67,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     public string AdminInfo { get; private set; }
 
+    public string ColumnQuickInfo { get; private set; }
     public string CompareKey => KeyName;
 
     public string Image { get; private set; }
@@ -73,9 +75,6 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
     public bool IsDisposed { get; private set; }
 
     public string KeyName { get; private set; }
-
-    public string QuickInfo { get; private set; }
-
     public string Script { get; private set; }
 
     public ReadOnlyCollection<string> UserGroups { get; private set; }
@@ -100,7 +99,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         return string.Empty;
     }
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public virtual List<string> ParseableItems() {
         try {
@@ -109,7 +108,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
             result.ParseableAdd("Name", KeyName);
             result.ParseableAdd("Script", Script);
-            result.ParseableAdd("QuickInfo", QuickInfo);
+            result.ParseableAdd("QuickInfo", ColumnQuickInfo);
             result.ParseableAdd("AdminInfo", AdminInfo);
             result.ParseableAdd("Image", Image);
             result.ParseableAdd("UserGroups", UserGroups, false);
@@ -143,7 +142,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
                 return true;
 
             case "quickinfo":
-                QuickInfo = value.FromNonCritical();
+                ColumnQuickInfo = value.FromNonCritical();
                 return true;
 
             case "admininfo":

@@ -113,7 +113,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 tbcScriptEigenschaften.Enabled = true;
                 tbcScriptEigenschaften.Enabled = true;
                 txbName.Text = value.KeyName;
-                txbQuickInfo.Text = value.QuickInfo;
+                txbQuickInfo.Text = value.ColumnQuickInfo;
 
                 cbxPic.Text = value.Image;
 
@@ -258,7 +258,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         _item = new DatabaseScriptDescription(adminInfo ?? _item.AdminInfo,
                                              image ?? _item.Image,
                                              keyName ?? _item.KeyName,
-                                             quickInfo ?? _item.QuickInfo,
+                                             quickInfo ?? _item.ColumnQuickInfo,
                                              script ?? _item.Script,
                                              userGroups ?? _item.UserGroups,
                                              database ?? _item.Database,

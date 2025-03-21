@@ -32,15 +32,15 @@ public interface IColumnInputFormat : IInputFormat {
     public AlignmentHorizontal Align { get; set; }
     public string DefaultRenderer { get; set; }
     public TranslationType DoOpticalTranslation { get; set; }
-    public bool DropdownAllesAbwählenErlaubt { get; set; }
-    public bool DropdownBearbeitungErlaubt { get; set; }
+    public bool DropdownDeselectAllAllowed { get; set; }
     public ReadOnlyCollection<string> DropDownItems { get; set; }
-    public bool DropdownWerteAndererZellenAnzeigen { get; set; }
+    public bool EditableWithDropdown { get; set; }
+    public bool EditableWithTextInput { get; set; }
     public ColumnFunction Function { get; set; }
     public string RendererSettings { get; set; }
     public ScriptType ScriptType { get; set; }
+    public bool ShowValuesOfOtherCellsInDropdown { get; set; }
     public SortierTyp SortType { get; set; }
-    public bool TextBearbeitungErlaubt { get; set; }
 
     #endregion
 }
@@ -57,14 +57,14 @@ public static class ColumnInputFormatExtensions {
         t.AfterEditQuickSortRemoveDouble = source.AfterEditQuickSortRemoveDouble;
         t.Align = source.Align;
         t.DoOpticalTranslation = source.DoOpticalTranslation;
-        t.DropdownAllesAbwählenErlaubt = source.DropdownAllesAbwählenErlaubt;
-        t.DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
+        t.DropdownDeselectAllAllowed = source.DropdownDeselectAllAllowed;
+        t.EditableWithDropdown = source.EditableWithDropdown;
         t.DropDownItems = source.DropDownItems;
-        t.DropdownWerteAndererZellenAnzeigen = source.DropdownWerteAndererZellenAnzeigen;
+        t.ShowValuesOfOtherCellsInDropdown = source.ShowValuesOfOtherCellsInDropdown;
         t.Function = source.Function;
         t.ScriptType = source.ScriptType;
         t.SortType = source.SortType;
-        t.TextBearbeitungErlaubt = source.TextBearbeitungErlaubt;
+        t.EditableWithTextInput = source.EditableWithTextInput;
         t.MaxTextLenght = source.MaxTextLenght;
         t.DefaultRenderer = source.DefaultRenderer;
         t.RendererSettings = source.RendererSettings;

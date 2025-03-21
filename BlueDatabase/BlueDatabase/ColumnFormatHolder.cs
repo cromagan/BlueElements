@@ -38,11 +38,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = true,
-        DropdownBearbeitungErlaubt = true,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = true,
+        EditableWithDropdown = true,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = true,
+        ShowValuesOfOtherCellsInDropdown = true,
         DefaultRenderer = "ImageAndText",
         RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageWidth=16, ImageHeight=16}"
     };
@@ -54,11 +54,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.Bool,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = true,
-        TextBearbeitungErlaubt = false,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = true,
+        EditableWithTextInput = false,
         DropDownItems = new(["+", "-"]),
-        DropdownWerteAndererZellenAnzeigen = true,
+        ShowValuesOfOtherCellsInDropdown = true,
         DefaultRenderer = "ImageAndText",
         RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageReplace=+[G]Häkchen|o[G]Kreis2|-[G]Kreuz, ImageWidth=16, ImageHeight=16}"
     };
@@ -70,11 +70,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Datum,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -86,11 +86,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Datum,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -102,11 +102,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -118,11 +118,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Zahl,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.Numeral,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -135,11 +135,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Zahl,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.Numeral,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -151,11 +151,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Zahl,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.Numeral,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -167,11 +167,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Zahl,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.Numeral,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -183,11 +183,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -199,11 +199,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -215,11 +215,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -232,11 +232,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "ImageAndText",
         RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=-, ShowText=+}"
     };
@@ -248,11 +248,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Übersetzen,
         AfterEditQuickSortRemoveDouble = true,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = true,
-        DropdownBearbeitungErlaubt = true,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = true,
+        EditableWithDropdown = true,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = true,
+        ShowValuesOfOtherCellsInDropdown = true,
         MultiLine = true // Verhalten von Setformat überschreiben
     };
 
@@ -263,11 +263,11 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
         AfterEditQuickSortRemoveDouble = false,
         ScriptType = ScriptType.String,
-        DropdownAllesAbwählenErlaubt = false,
-        DropdownBearbeitungErlaubt = false,
-        TextBearbeitungErlaubt = true,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
-        DropdownWerteAndererZellenAnzeigen = false,
+        ShowValuesOfOtherCellsInDropdown = false,
         DefaultRenderer = "TextOneLine",
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
@@ -289,15 +289,15 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     public AlignmentHorizontal Align { get; set; }
     public string DefaultRenderer { get; set; }
     public TranslationType DoOpticalTranslation { get; set; }
-    public bool DropdownAllesAbwählenErlaubt { get; set; }
-    public bool DropdownBearbeitungErlaubt { get; set; }
+    public bool DropdownDeselectAllAllowed { get; set; }
     public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
-    public bool DropdownWerteAndererZellenAnzeigen { get; set; }
+    public bool EditableWithDropdown { get; set; }
+    public bool EditableWithTextInput { get; set; }
     public ColumnFunction Function { get; set; }
     public string RendererSettings { get; set; }
     public ScriptType ScriptType { get; set; }
+    public bool ShowValuesOfOtherCellsInDropdown { get; set; }
     public SortierTyp SortType { get; set; }
-    public bool TextBearbeitungErlaubt { get; set; }
 
     #endregion
 }

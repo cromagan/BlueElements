@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 
@@ -28,7 +29,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -106,7 +107,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
         return default;
     }
 
-    public virtual void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public virtual void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public virtual List<string> ParseableItems() {
         List<string> result = [];

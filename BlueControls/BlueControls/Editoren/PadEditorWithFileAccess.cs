@@ -121,7 +121,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnAddText_Click(object sender, System.EventArgs e) {
         TextPadItem b = new() {
             Text = string.Empty,
-            Stil = PadStyles.Standard
+            Style = PadStyles.Standard
         };
         Pad.AddCentered(b);
         b.SetCoordinates(new RectangleF(10, 10, 200, 200));

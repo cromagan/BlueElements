@@ -72,8 +72,8 @@ public static class SkinDesignExtensions {
             Skin.InitStyles();
             var fl = font.SplitAndCutBy("|");
             des.SheetStyle = fl[0];
-            des.Stil = (PadStyles)IntParse(fl[1]);
-            des.Font = Skin.GetBlueFont(des.SheetStyle, des.Stil);
+            des.Style = (PadStyles)IntParse(fl[1]);
+            des.Font = Skin.GetBlueFont(des.SheetStyle, des.Style);
         }
 
         des.Image = pic;
@@ -100,7 +100,7 @@ public class SkinDesign : IStyleableOne {
     public RahmenArt RahmenArt { get; set; }
     public string SheetStyle { get; set; } = string.Empty;
     public States Status { get; set; }
-    public PadStyles Stil { get; set; }
+    public PadStyles Style { get; set; }
     public int X1 { get; set; }
 
     public int X2 { get; set; }

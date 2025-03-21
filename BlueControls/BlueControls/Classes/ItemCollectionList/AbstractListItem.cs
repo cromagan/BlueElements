@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -30,7 +31,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     #region Fields
 
-    public Rectangle Pos;
+    public Rectangle Position;
 
     /// <summary>
     /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
@@ -59,7 +60,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         _keyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
         if (string.IsNullOrEmpty(_keyName)) { Develop.DebugPrint(ErrorType.Error, "Interner Name nicht vergeben."); }
         _enabled = enabled;
-        Pos = Rectangle.Empty;
+        Position = Rectangle.Empty;
         _userDefCompareKey = string.Empty;
     }
 
@@ -69,7 +70,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     public event EventHandler? CompareKeyChanged;
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -80,7 +81,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         set {
             if (_enabled == value) { return; }
             _enabled = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Enabled");
         }
     }
 
@@ -91,7 +92,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         protected set {
             if (_isCaption == value) { return; }
             _isCaption = value;
-            OnPropertyChanged();
+            OnPropertyChanged("IsCaption");
         }
     }
 
@@ -100,7 +101,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         set {
             if (_keyName == value) { return; }
             _keyName = value;
-            OnPropertyChanged();
+            OnPropertyChanged("KeyName");
         }
     }
 
@@ -112,7 +113,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
             if (_userDefCompareKey == value) { return; }
             _userDefCompareKey = value;
             OnCompareKeyChanged();
-            OnPropertyChanged();
+            OnPropertyChanged("UserDefCompareKey");
         }
     }
 
@@ -127,7 +128,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
     //public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
     public string CompareKey() {
         if (!string.IsNullOrEmpty(UserDefCompareKey)) {
-            if(UserDefCompareKey.Length > 0 && UserDefCompareKey[0] < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
+            if (UserDefCompareKey.Length > 0 && UserDefCompareKey[0] < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
 
             return UserDefCompareKey;// + Constants.FirstSortChar + Parent?.IndexOf(this).ToString(Constants.Format_Integer6);
         }
@@ -143,7 +144,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         return 0;
     }
 
-    public bool Contains(int x, int y) => Pos.Contains(x, y);
+    public bool Contains(int x, int y) => Position.Contains(x, y);
 
     /// <summary>
     /// Vereinfacung für Null Conditional Operator.
@@ -152,7 +153,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign) {
         if (itemdesign == Design.Undefiniert) { return; }
-        var positionModified = Pos with { X = Pos.X - xModifier + (Indent * 20), Y = Pos.Y - yModifier, Width = Pos.Width - (Indent * 20) };
+        var positionModified = Position with { X = Position.X - xModifier + (Indent * 20), Y = Position.Y - yModifier, Width = Position.Width - (Indent * 20) };
 
         if (checkboxDesign != Design.Undefiniert) {
             var design = Skin.DesignOf(checkboxDesign, state);
@@ -180,11 +181,11 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public void SetCoordinates(Rectangle r) {
-        Pos = r;
-        OnPropertyChanged();
+        Position = r;
+        OnPropertyChanged("Position");
     }
 
     public Size SizeUntouchedForListBox(Design itemdesign) {

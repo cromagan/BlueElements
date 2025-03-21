@@ -26,7 +26,7 @@ internal class ExtCharTabCode : ExtChar {
 
     #region Constructors
 
-    public ExtCharTabCode(ExtText parent, PadStyles stil, BlueFont font) : base(parent, stil, font) { }
+    public ExtCharTabCode(ExtText parent, PadStyles style, BlueFont font) : base(parent, style, font) { }
 
     #endregion
 

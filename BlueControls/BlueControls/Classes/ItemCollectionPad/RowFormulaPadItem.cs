@@ -63,6 +63,23 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
 
     public static string ClassId => "ROW";
 
+    public override string ColumnQuickInfo {
+        get {
+            var r = Row;
+            if (r is not { IsDisposed: false }) { return string.Empty; }
+            if (_lastQuickInfo == r.QuickInfo) { return _tmpQuickInfo; }
+            _lastQuickInfo = r.QuickInfo;
+            _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + r.CellFirstString() + "]</b>");
+            return _tmpQuickInfo;
+        }
+        // ReSharper disable once ValueParameterNotUsed
+        set {
+            // Werte zurücksetzen
+            _lastQuickInfo = string.Empty;
+            _tmpQuickInfo = string.Empty;
+        }
+    }
+
     public Database? Database {
         get => _database;
         private set {
@@ -91,23 +108,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase, ISty
             if (value == _layoutFileName) { return; }
             _layoutFileName = value;
             RemovePic();
-        }
-    }
-
-    public override string QuickInfo {
-        get {
-            var r = Row;
-            if (r is not { IsDisposed: false }) { return string.Empty; }
-            if (_lastQuickInfo == r.QuickInfo) { return _tmpQuickInfo; }
-            _lastQuickInfo = r.QuickInfo;
-            _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + r.CellFirstString() + "]</b>");
-            return _tmpQuickInfo;
-        }
-        // ReSharper disable once ValueParameterNotUsed
-        set {
-            // Werte zurücksetzen
-            _lastQuickInfo = string.Empty;
-            _tmpQuickInfo = string.Empty;
         }
     }
 

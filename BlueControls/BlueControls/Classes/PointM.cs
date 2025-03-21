@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Interfaces;
@@ -98,7 +99,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public event EventHandler<MoveEventArgs>? Moved;
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -136,7 +137,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         set {
             if (_parent == value) { return; }
             _parent = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Parent");
         }
     }
 
@@ -203,7 +204,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public List<string> ParseableItems() {
         List<string> result = [];
@@ -288,7 +289,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         _x = x;
         _y = y;
         OnMoved(new MoveEventArgs(byMouse));
-        OnPropertyChanged();
+        OnPropertyChanged("Position");
     }
 
     public void SetTo(PointM startPoint, float länge, float alpha, bool byMouse) {

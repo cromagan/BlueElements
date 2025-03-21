@@ -201,7 +201,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         item.Caption = caption;
 
         item.GetStyleFrom(format);
-        item.QuickInfo = quickinfo;
+        item.ColumnQuickInfo = quickinfo;
         return item;
     }
 
@@ -260,9 +260,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 }
                 da.CellAdd(name + " (" + thisColumnItem.MaxCellLenght + " Char)");
                 da.CellAdd(thisColumnItem.Function.ToString());
-                da.CellAdd(thisColumnItem.QuickInfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.ColumnQuickInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
-                da.CellAdd(thisColumnItem.Tags.JoinWith("<br>"));
+                da.CellAdd(thisColumnItem.ColumnTags.JoinWith("<br>"));
                 da.CellAdd(thisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
                 da.RowEnd();
             }
@@ -444,7 +444,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Spalten erzeugen und Format übertragen
         foreach (var thisColumn in sourceDatabase.Column) {
             var l = this[thisColumn.KeyName] ??
-                GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, null, thisColumn.QuickInfo);
+                GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, null, thisColumn.ColumnQuickInfo);
 
             if (l != null) {
                 l.CloneFrom(thisColumn, true);

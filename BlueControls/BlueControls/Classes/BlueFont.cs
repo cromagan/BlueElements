@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -37,6 +38,8 @@ namespace BlueControls;
 public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, IEditable, IParseable {
 
     #region Fields
+
+    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
     private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new();
     private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
     private static readonly ConcurrentDictionary<string, Font> _fontCache = new();
@@ -44,7 +47,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
     private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();
     private readonly ConcurrentDictionary<string, string> _transformCache = new();
-    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
 
     /// <summary>
     /// Die Schriftart, mit allen Attributen, die nativ unterstützt werden.
@@ -80,7 +82,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -449,7 +451,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _nameInStyleSym;
     }
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower, ColorBack.ToHtmlCode());
 

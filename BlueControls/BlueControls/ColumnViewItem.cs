@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -91,7 +92,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -110,7 +111,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set {
             if (_backColor_ColumnCell.ToArgb() == value.ToArgb()) { return; }
             _backColor_ColumnCell = value;
-            OnPropertyChanged();
+            OnPropertyChanged("BackColor_ColumnCell");
         }
     }
 
@@ -126,7 +127,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set {
             if (_backColor_ColumnHead.ToArgb() == value.ToArgb()) { return; }
             _backColor_ColumnHead = value;
-            OnPropertyChanged();
+            OnPropertyChanged("BackColor_ColumnHead");
         }
     }
 
@@ -228,7 +229,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             if (_fontColor_Caption.ToArgb() == value.ToArgb()) { return; }
             _fontColor_Caption = value;
             Invalidate_Fonts();
-            OnPropertyChanged();
+            OnPropertyChanged("FontColor_Caption");
         }
     }
 
@@ -243,15 +244,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set {
             if (_horizontal = value) { return; }
             _horizontal = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Horizontal");
         }
     }
 
     public bool IsDisposed { get; private set; }
 
-    public ColumnLineStyle LineLeft => Column?.LineLeft ?? ColumnLineStyle.Dünn;
+    public ColumnLineStyle LineLeft => Column?.LineStyleLeft ?? ColumnLineStyle.Dünn;
 
-    public ColumnLineStyle LineRight => Column?.LineRight ?? ColumnLineStyle.Ohne;
+    public ColumnLineStyle LineRight => Column?.LineStyleRight ?? ColumnLineStyle.Ohne;
 
     ///// <summary>
     ///// Koordinate der Spalte mit einbrechneten Slider
@@ -309,7 +310,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             if (_viewType != value) {
                 _viewType = value;
                 Invalidate_DrawWidth();
-                OnPropertyChanged();
+                OnPropertyChanged("ViewType");
             }
         }
     }
@@ -462,7 +463,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }

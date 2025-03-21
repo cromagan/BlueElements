@@ -40,9 +40,9 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
 
     #region Constructors
 
-    public ExtChar(ExtText parent, PadStyles stil, BlueFont font) : base() {
+    public ExtChar(ExtText parent, PadStyles style, BlueFont font) : base() {
         _size = SizeF.Empty;
-        _style = stil;
+        _style = style;
         _parent = parent;
         _font = font;
         _parent.StyleChanged += _parent_StyleChanged;
@@ -53,10 +53,10 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
         styleFromPos = Math.Min(styleFromPos, parent.Count - 1);
 
         if (styleFromPos < 0) {
-            Stil = PadStyles.Standard;
-            _font = Skin.GetBlueFont(parent.SheetStyle, Stil);
+            Style = PadStyles.Standard;
+            _font = Skin.GetBlueFont(parent.SheetStyle, Style);
         } else {
-            Stil = parent[styleFromPos].Stil;
+            Style = parent[styleFromPos].Style;
             _font = parent[styleFromPos].Font;
         }
 
@@ -96,7 +96,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }

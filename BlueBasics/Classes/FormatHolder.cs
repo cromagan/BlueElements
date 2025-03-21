@@ -32,8 +32,8 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder Bit = new("Bit") {
         Image = QuickImage.Get(ImageCode.Häkchen, 16),
         AllowedChars = "+-",
-        Regex = "^([+]|[-])$",
-        FormatierungErlaubt = false,
+        RegexCheck = "^([+]|[-])$",
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -42,9 +42,9 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public static readonly FormatHolder Date = new("Date") {
         Image = QuickImage.Get(ImageCode.Uhr, 16),
-        Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$",
+        RegexCheck = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$",
         AllowedChars = Constants.Char_Numerals + ".",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.DateTime,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -53,9 +53,9 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public static readonly FormatHolder DateTime = new("DateTime") {
         Image = QuickImage.Get(ImageCode.Uhr, 16),
-        Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$",
+        RegexCheck = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$",
         AllowedChars = Constants.Char_Numerals + ":. ",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.DateTime,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -64,9 +64,9 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public static readonly FormatHolder DateTimeWithMilliSeconds = new("DateTimeWithMilliSeconds") {
         Image = QuickImage.Get(ImageCode.Uhr, 16),
-        Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9][.][0-9][0-9][0-9]$",
+        RegexCheck = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9][.][0-9][0-9][0-9]$",
         AllowedChars = Constants.Char_Numerals + ":. ",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.DateTime,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -77,9 +77,9 @@ public class FormatHolder : IInputFormat, IReadableText {
         //https://en.wikipedia.org/wiki/Email_address#:~:text=The%20format%20of%20an%20email,a%20maximum%20of%20255%20octets.
         Image = QuickImage.Get(ImageCode.Brief, 16),
         //http://emailregex.com/
-        Regex = "^[a-z0-9A-Z._-]{1,63}[@][a-z0-9A-Z.-]{1,63}[.][a-zA-Z.]{1,63}$",
+        RegexCheck = "^[a-z0-9A-Z._-]{1,63}[@][a-z0-9A-Z.-]{1,63}[.][a-zA-Z.]{1,63}$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@.-_",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -89,9 +89,9 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder Filepath = new("Filepath") {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
-        Regex = @"^[A-Za-z]:\\.*\\$",
+        RegexCheck = @"^[A-Za-z]:\\.*\\$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\%()[]{}!&#:.,=+-_ ",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.Path,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -101,9 +101,9 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder FilepathAndName = new("FilepathAndName") {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
-        Regex = @"^[A-Za-z]:\\.*[.].*$",
+        RegexCheck = @"^[A-Za-z]:\\.*[.].*$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\%()[]{}!&#:.,=+-_ ",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -113,9 +113,9 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder Float = new("Float") {
         Image = QuickImage.Get(ImageCode.Gleitkommazahl, 16),
         //https://regex101.com/r/onr0NZ/1
-        Regex = @"(^-?([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
+        RegexCheck = @"(^-?([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
         AllowedChars = Constants.Char_Numerals + ".,-",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.Float,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -125,9 +125,9 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder FloatPositive = new("Float only Positive") {
         Image = QuickImage.Get(ImageCode.Gleitkommazahl, 16),
         //https://regex101.com/r/onr0NZ/1
-        Regex = @"(^([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
+        RegexCheck = @"(^([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
         AllowedChars = Constants.Char_Numerals + ".,",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.Float,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -136,9 +136,9 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public static readonly FormatHolder Long = new("Long") {
         Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
-        Regex = @"^((-?[1-9]\d*)|0)$",
+        RegexCheck = @"^((-?[1-9]\d*)|0)$",
         AllowedChars = Constants.Char_Numerals + "-",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -147,9 +147,9 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public static readonly FormatHolder LongPositive = new("Long only Positive") {
         Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
-        Regex = @"^(([1-9]\d*)|0)$",
+        RegexCheck = @"^(([1-9]\d*)|0)$",
         AllowedChars = Constants.Char_Numerals,
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -159,9 +159,9 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder PhoneNumber = new("PhoneNumber") {
         Image = QuickImage.Get(ImageCode.Telefon, 16),
         //https://regex101.com/r/OzJr8j/1
-        Regex = @"^[+][1-9][\s0-9]*[0-9]$",
+        RegexCheck = @"^[+][1-9][\s0-9]*[0-9]$",
         AllowedChars = Constants.Char_Numerals + "+ ",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -171,8 +171,8 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder SystemName = new("Systemname") {
         Image = QuickImage.Get(ImageCode.Variable, 16),
         AllowedChars = Constants.Char_AZ + Constants.Char_az + Constants.Char_Numerals + "_",
-        Regex = @"^[A-Za-z]\S*[A-Za-z0-9]$",
-        FormatierungErlaubt = false,
+        RegexCheck = @"^[A-Za-z]\S*[A-Za-z0-9]$",
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -182,8 +182,8 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder Text = new("Text") {
         Image = QuickImage.Get(ImageCode.Textfeld, 16),
         AllowedChars = string.Empty,
-        Regex = string.Empty,
-        FormatierungErlaubt = false,
+        RegexCheck = string.Empty,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = true,
         MultiLine = false,
@@ -193,8 +193,8 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder TextMitFormatierung = new("Text with format") {
         Image = QuickImage.Get(ImageCode.Word, 16),
         AllowedChars = string.Empty,
-        Regex = string.Empty,
-        FormatierungErlaubt = true,
+        RegexCheck = string.Empty,
+        TextFormatingAllowed = true,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = true,
         MultiLine = true,
@@ -204,9 +204,9 @@ public class FormatHolder : IInputFormat, IReadableText {
     public static readonly FormatHolder Url = new("Url") {
         Image = QuickImage.Get(ImageCode.Globus, 16),
         //    https://regex101.com/r/S2CbwM/1
-        Regex = @"^(https:|http:|www\.)\S*$",
+        RegexCheck = @"^(https:|http:|www\.)\S*$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "äöüÄÖÜ:?=&.,-_/",
-        FormatierungErlaubt = false,
+        TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
@@ -228,12 +228,12 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
-    public bool FormatierungErlaubt { get; set; }
+    public bool TextFormatingAllowed { get; set; }
     public QuickImage? Image { get; private set; }
     public int MaxTextLenght { get; set; }
     public bool MultiLine { get; set; }
     public string Name { get; }
-    public string Regex { get; set; } = string.Empty;
+    public string RegexCheck { get; set; } = string.Empty;
     public bool SpellCheckingEnabled { get; set; }
 
     #endregion

@@ -60,7 +60,7 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -72,7 +72,7 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
         set {
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Bei_Export_sichtbar");
         }
     }
 
@@ -100,7 +100,7 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
         }
     }
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public List<string> ParseableItems() {
         List<string> result = [];

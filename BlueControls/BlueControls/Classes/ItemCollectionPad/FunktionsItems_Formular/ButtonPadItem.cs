@@ -44,24 +44,15 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     private string _action = string.Empty;
 
-    private string _anzeige = string.Empty;
-
     private string _arg1 = string.Empty;
-
     private string _arg2 = string.Empty;
-
     private string _arg3 = string.Empty;
-
     private string _arg4 = string.Empty;
-
     private string _arg5 = string.Empty;
-
     private string _arg6 = string.Empty;
-
     private string _arg7 = string.Empty;
-
     private string _arg8 = string.Empty;
-
+    private string _beschriftung = string.Empty;
     private ButtonArgs _enabledwhenrows;
 
     private ExtText? _eTxt;
@@ -92,7 +83,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_action == value) { return; }
             _action = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Aktion");
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -106,7 +97,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg1 == value) { return; }
             _arg1 = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Arg1");
         }
     }
 
@@ -117,7 +108,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg2 == value) { return; }
             _arg2 = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Arg2");
         }
     }
 
@@ -128,7 +119,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg3 == value) { return; }
             _arg3 = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Arg3");
         }
     }
 
@@ -139,7 +130,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg4 == value) { return; }
             _arg4 = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Arg4");
         }
     }
 
@@ -150,7 +141,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg5 == value) { return; }
             _arg5 = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Arg5");
         }
     }
 
@@ -161,7 +152,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg6 == value) { return; }
             _arg6 = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Arg6");
         }
     }
 
@@ -172,7 +163,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg7 == value) { return; }
             _arg7 = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Arg7");
         }
     }
 
@@ -183,7 +174,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg8 == value) { return; }
             _arg8 = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Arg8");
         }
     }
 
@@ -191,12 +182,12 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     [Description("Die Beschriftung der Schaltfläche.")]
     public string Beschriftung {
-        get => _anzeige;
+        get => _beschriftung;
         set {
             if (IsDisposed) { return; }
-            if (_anzeige == value) { return; }
-            _anzeige = value;
-            OnPropertyChanged();
+            if (_beschriftung == value) { return; }
+            _beschriftung = value;
+            OnPropertyChanged("Beschriftung");
         }
     }
 
@@ -207,7 +198,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_image == value) { return; }
             _image = value;
-            OnPropertyChanged();
+            OnPropertyChanged("Bild");
         }
     }
 
@@ -218,7 +209,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_quickinfo == value) { return; }
             _quickinfo = value;
-            OnPropertyChanged();
+            OnPropertyChanged("ButtonQuickInfo");
         }
     }
 
@@ -233,7 +224,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (_enabledwhenrows == value) { return; }
             _enabledwhenrows = value;
             if (!PossibleFor(Method.AllMethods.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
-            OnPropertyChanged();
+            OnPropertyChanged("Drückbar_wenn");
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -314,7 +305,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new ConnectedFormulaButton {
-            Text = _anzeige,
+            Text = _beschriftung,
             ImageCode = _image + "|16",
             Drückbar_wenn = _enabledwhenrows,
             Arg1 = _arg1,
@@ -397,7 +388,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Caption", _anzeige);
+        result.ParseableAdd("Caption", _beschriftung);
         result.ParseableAdd("Image", _image);
 
         result.ParseableAdd("Arg1", _arg1);
@@ -418,7 +409,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "caption":
-                _anzeige = value.FromNonCritical();
+                _beschriftung = value.FromNonCritical();
                 return true;
 
             case "image":
@@ -486,7 +477,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         _eTxt ??= new ExtText(Design.Button, States.Standard);
-        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _anzeige, positionModified.ToRect(), false);
+        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _beschriftung, positionModified.ToRect(), false);
 
         if (!ForPrinting) {
             DrawColorScheme(gr, positionModified, scale, InputColorId, false, false, true);

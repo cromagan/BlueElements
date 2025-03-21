@@ -87,7 +87,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             if (value == _ausrichtung) { return; }
             _ausrichtung = value;
             InvalidateText();
-            OnPropertyChanged();
+            OnPropertyChanged("Ausrichtung");
         }
     }
 
@@ -102,13 +102,13 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         }
     }
 
-    public PadStyles Stil {
+    public PadStyles Style {
         get => _style;
         set {
             if (_style == value) { return; }
             _style = value;
             InvalidateText();
-            OnPropertyChanged();
+            OnPropertyChanged("Style");
         }
     }
 
@@ -125,7 +125,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             _textReplaced = value;
             InvalidateText();
             //CalculateSlavePoints();
-            OnPropertyChanged();
+            OnPropertyChanged("Text");
         }
     }
 
@@ -136,7 +136,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             value = Math.Min(value, 20);
             if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
-            OnPropertyChanged();
+            OnPropertyChanged("TextScale");
         }
     }
 
@@ -159,7 +159,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             new FlexiControlForProperty<string>(() => Text, 5),
             new FlexiControlForProperty<Alignment>(() => Ausrichtung, aursicht),
             new FlexiControlForProperty<float>(() => TextScale),
-            new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(SheetStyle, true))
+            new FlexiControlForProperty<PadStyles>(() => Style, Skin.GetRahmenArt(SheetStyle, true))
         ];
         result.AddRange(base.GetProperties(widthOfControl));
         return result;
@@ -222,7 +222,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         if (nt == _textReplaced) { return false; }
         _textReplaced = nt;
         InvalidateText();
-        OnPropertyChanged();
+        OnPropertyChanged("Variables");
         return true;
     }
 
@@ -231,7 +231,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         if (_textOriginal == _textReplaced) { return false; }
         _textReplaced = _textOriginal;
         InvalidateText();
-        OnPropertyChanged();
+        OnPropertyChanged("Variables");
         return true;
     }
 

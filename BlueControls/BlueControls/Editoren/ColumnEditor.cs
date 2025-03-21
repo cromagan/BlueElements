@@ -331,7 +331,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             }
         }
         //cbxTargetColumn.Item.Sort();
-        cbxTargetColumn.Text = _column.LinkedCell_ColumnNameOfLinkedDatabase;
+        cbxTargetColumn.Text = _column.ColumnNameOfLinkedDatabase;
         //SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedDatabase);
         cbxTargetColumn.Enabled = cbxTargetColumn.ItemCount > 0;
         capTargetColumn.Enabled = cbxTargetColumn.Enabled;
@@ -399,8 +399,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).Code;
         btnMultiline.Checked = _column.MultiLine;
         cbxFunction.Text = ((int)_column.Function).ToString();
-        cbxRandLinks.Text = ((int)_column.LineLeft).ToString();
-        cbxRandRechts.Text = ((int)_column.LineRight).ToString();
+        cbxRandLinks.Text = ((int)_column.LineStyleLeft).ToString();
+        cbxRandRechts.Text = ((int)_column.LineStyleRight).ToString();
         cbxAlign.Text = ((int)_column.Align).ToString();
         cbxAdditionalCheck.Text = ((int)_column.AdditionalFormatCheck).ToString();
         cbxScriptType.Text = ((int)_column.ScriptType).ToString();
@@ -414,9 +414,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
         chkFilterOnlyOr.Checked = _column.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
         chkFilterOnlyAND.Checked = _column.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed);
         btnZeilenFilterIgnorieren.Checked = _column.IgnoreAtRowFilter;
-        btnEditableStandard.Checked = _column.TextBearbeitungErlaubt;
-        btnEditableDropdown.Checked = _column.DropdownBearbeitungErlaubt;
-        btnCanBeEmpty.Checked = _column.DropdownAllesAbwählenErlaubt;
+        btnEditableStandard.Checked = _column.EditableWithTextInput;
+        btnEditableDropdown.Checked = _column.EditableWithDropdown;
+        btnCanBeEmpty.Checked = _column.DropdownDeselectAllAllowed;
         btnAutoEditAutoSort.Checked = _column.AfterEditQuickSortRemoveDouble;
         txbRunden.Text = _column.RoundAfterEdit is > -1 and < 7 ? _column.RoundAfterEdit.ToString() : string.Empty;
         txbFixedColumnWidth.Text = _column.FixedColumnWidth > 0 ? _column.FixedColumnWidth.ToString() : string.Empty;
@@ -428,21 +428,21 @@ internal sealed partial class ColumnEditor : IIsEditor {
         txbUeberschift3.Text = _column.CaptionGroup3;
         txbSpaltenbild.Text = _column.CaptionBitmapCode;
         btnLogUndo.Checked = _column.ShowUndo;
-        btnFormatierungErlaubt.Checked = _column.FormatierungErlaubt;
+        btnFormatierungErlaubt.Checked = _column.TextFormatingAllowed;
         btnSpellChecking.Checked = _column.SpellCheckingEnabled;
         txbAuswaehlbareWerte.Text = _column.DropDownItems.JoinWithCr();
         txbAutoReplace.Text = _column.AfterEditAutoReplace.JoinWithCr();
-        txbRegex.Text = _column.Regex;
-        txbTags.Text = _column.Tags.JoinWithCr();
+        txbRegex.Text = _column.RegexCheck;
+        txbTags.Text = _column.ColumnTags.JoinWithCr();
         lbxCellEditor.UncheckAll();
         lbxCellEditor.Check(_column.PermissionGroupsChangeCell);
         txbAllowedChars.Text = _column.AllowedChars;
         txbMaxTextLenght.Text = _column.MaxTextLenght.ToString();
         txbMaxCellLenght.Text = _column.MaxCellLenght.ToString();
-        btnOtherValuesToo.Checked = _column.DropdownWerteAndererZellenAnzeigen;
+        btnOtherValuesToo.Checked = _column.ShowValuesOfOtherCellsInDropdown;
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
         txbAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        txbQuickinfo.Text = _column.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        txbQuickinfo.Text = _column.ColumnQuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         cbxLinkedDatabase.Text = _column.LinkedDatabaseTableName;
         txbAutoRemove.Text = _column.AutoRemove;
         cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
@@ -465,12 +465,12 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         _column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
         _column.Function = (ColumnFunction)IntParse(cbxFunction.Text);
-        _column.QuickInfo = txbQuickinfo.Text.Replace("\r", "<BR>");
+        _column.ColumnQuickInfo = txbQuickinfo.Text.Replace("\r", "<BR>");
         _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<BR>");
         _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
-        _column.LineLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
-        _column.LineRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
+        _column.LineStyleLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
+        _column.LineStyleRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
         _column.MultiLine = btnMultiline.Checked;
         _column.AfterEditQuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
         if (txbRunden.Text.IsLong()) {
@@ -491,7 +491,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.AfterEditDoUCase = btnAutoEditToUpper.Checked;
         _column.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
         _column.ShowUndo = btnLogUndo.Checked;
-        _column.FormatierungErlaubt = btnFormatierungErlaubt.Checked;
+        _column.TextFormatingAllowed = btnFormatierungErlaubt.Checked;
         _column.SpellCheckingEnabled = btnSpellChecking.Checked;
         var tmpf = FilterOptions.None;
         if (btnAutoFilterMoeglich.Checked) { tmpf |= FilterOptions.Enabled; }
@@ -513,18 +513,18 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.CaptionGroup2 = txbUeberschift2.Text;
         _column.CaptionGroup3 = txbUeberschift3.Text;
         _column.CaptionBitmapCode = txbSpaltenbild.Text;
-        _column.Tags = txbTags.Text.SplitAndCutByCrToList();
-        _column.Regex = txbRegex.Text;
-        _column.TextBearbeitungErlaubt = btnEditableStandard.Checked;
-        _column.DropdownBearbeitungErlaubt = btnEditableDropdown.Checked;
-        _column.DropdownAllesAbwählenErlaubt = btnCanBeEmpty.Checked;
-        _column.DropdownWerteAndererZellenAnzeigen = btnOtherValuesToo.Checked;
+        _column.ColumnTags = txbTags.Text.SplitAndCutByCrToList();
+        _column.RegexCheck = txbRegex.Text;
+        _column.EditableWithTextInput = btnEditableStandard.Checked;
+        _column.EditableWithDropdown = btnEditableDropdown.Checked;
+        _column.DropdownDeselectAllAllowed = btnCanBeEmpty.Checked;
+        _column.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
         _column.EditAllowedDespiteLock = btnIgnoreLock.Checked;
         _column.AllowedChars = txbAllowedChars.Text;
         _column.MaxTextLenght = IntParse(txbMaxTextLenght.Text);
         _column.MaxCellLenght = IntParse(txbMaxCellLenght.Text);
         _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
-        _column.LinkedCell_ColumnNameOfLinkedDatabase = cbxTargetColumn.Text; // LINKED DATABASE
+        _column.ColumnNameOfLinkedDatabase = cbxTargetColumn.Text; // LINKED DATABASE
         _column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
         _column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
         _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
@@ -572,11 +572,11 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
             if (b is not { IsDisposed: false }) { return; }
-            b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
+            b.ColumnQuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
-            b.TextBearbeitungErlaubt = true;
-            b.DropdownAllesAbwählenErlaubt = true;
-            b.DropdownBearbeitungErlaubt = true;
+            b.EditableWithTextInput = true;
+            b.DropdownDeselectAllAllowed = true;
+            b.EditableWithDropdown = true;
 
             var dd = b.DropDownItems.Clone();
             var or = new List<string>();

@@ -215,7 +215,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxRenderer.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxRenderer.Location = new Point(416, 24);
             this.cbxRenderer.Name = "cbxRenderer";
-            this.cbxRenderer.Regex = null;
+            this.cbxRenderer.RegexCheck = null;
             this.cbxRenderer.Size = new Size(673, 24);
             this.cbxRenderer.TabIndex = 44;
             this.cbxRenderer.TextChanged += new EventHandler(this.cbxRenderer_TextChanged);
@@ -225,7 +225,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbSpaltenbild.Cursor = Cursors.IBeam;
             this.txbSpaltenbild.Location = new Point(8, 360);
             this.txbSpaltenbild.Name = "txbSpaltenbild";
-            this.txbSpaltenbild.Regex = null;
+            this.txbSpaltenbild.RegexCheck = null;
             this.txbSpaltenbild.Size = new Size(400, 24);
             this.txbSpaltenbild.TabIndex = 40;
             // 
@@ -234,7 +234,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift1.Cursor = Cursors.IBeam;
             this.txbUeberschift1.Location = new Point(104, 256);
             this.txbUeberschift1.Name = "txbUeberschift1";
-            this.txbUeberschift1.Regex = null;
+            this.txbUeberschift1.RegexCheck = null;
             this.txbUeberschift1.Size = new Size(304, 24);
             this.txbUeberschift1.TabIndex = 36;
             // 
@@ -243,7 +243,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift3.Cursor = Cursors.IBeam;
             this.txbUeberschift3.Location = new Point(104, 303);
             this.txbUeberschift3.Name = "txbUeberschift3";
-            this.txbUeberschift3.Regex = null;
+            this.txbUeberschift3.RegexCheck = null;
             this.txbUeberschift3.Size = new Size(304, 24);
             this.txbUeberschift3.TabIndex = 38;
             // 
@@ -293,7 +293,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift2.Cursor = Cursors.IBeam;
             this.txbUeberschift2.Location = new Point(104, 279);
             this.txbUeberschift2.Name = "txbUeberschift2";
-            this.txbUeberschift2.Regex = null;
+            this.txbUeberschift2.RegexCheck = null;
             this.txbUeberschift2.Size = new Size(304, 24);
             this.txbUeberschift2.TabIndex = 37;
             // 
@@ -356,7 +356,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxTranslate.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxTranslate.Location = new Point(104, 152);
             this.cbxTranslate.Name = "cbxTranslate";
-            this.cbxTranslate.Regex = null;
+            this.cbxTranslate.RegexCheck = null;
             this.cbxTranslate.Size = new Size(304, 24);
             this.cbxTranslate.TabIndex = 37;
             // 
@@ -392,7 +392,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxAlign.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxAlign.Location = new Point(104, 120);
             this.cbxAlign.Name = "cbxAlign";
-            this.cbxAlign.Regex = null;
+            this.cbxAlign.RegexCheck = null;
             this.cbxAlign.Size = new Size(304, 24);
             this.cbxAlign.TabIndex = 7;
             // 
@@ -402,7 +402,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxRandLinks.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxRandLinks.Location = new Point(8, 80);
             this.cbxRandLinks.Name = "cbxRandLinks";
-            this.cbxRandLinks.Regex = null;
+            this.cbxRandLinks.RegexCheck = null;
             this.cbxRandLinks.Size = new Size(128, 24);
             this.cbxRandLinks.TabIndex = 24;
             // 
@@ -430,7 +430,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxRandRechts.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxRandRechts.Location = new Point(144, 80);
             this.cbxRandRechts.Name = "cbxRandRechts";
-            this.cbxRandRechts.Regex = null;
+            this.cbxRandRechts.RegexCheck = null;
             this.cbxRandRechts.Size = new Size(128, 24);
             this.cbxRandRechts.TabIndex = 25;
             // 
@@ -448,7 +448,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxScriptType.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxScriptType.Location = new Point(232, 272);
             this.cbxScriptType.Name = "cbxScriptType";
-            this.cbxScriptType.Regex = null;
+            this.cbxScriptType.RegexCheck = null;
             this.cbxScriptType.Size = new Size(304, 24);
             this.cbxScriptType.TabIndex = 43;
             // 
@@ -475,7 +475,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxAdditionalCheck.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxAdditionalCheck.Location = new Point(232, 232);
             this.cbxAdditionalCheck.Name = "cbxAdditionalCheck";
-            this.cbxAdditionalCheck.Regex = null;
+            this.cbxAdditionalCheck.RegexCheck = null;
             this.cbxAdditionalCheck.Size = new Size(304, 24);
             this.cbxAdditionalCheck.TabIndex = 34;
             // 
@@ -494,7 +494,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxFunction.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxFunction.Location = new Point(8, 32);
             this.cbxFunction.Name = "cbxFunction";
-            this.cbxFunction.Regex = null;
+            this.cbxFunction.RegexCheck = null;
             this.cbxFunction.Size = new Size(312, 24);
             this.cbxFunction.TabIndex = 27;
             this.cbxFunction.TextChanged += new EventHandler(this.cbxFunction_TextChanged);
@@ -572,7 +572,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAuswaehlbareWerte.Location = new Point(8, 64);
             this.txbAuswaehlbareWerte.MultiLine = true;
             this.txbAuswaehlbareWerte.Name = "txbAuswaehlbareWerte";
-            this.txbAuswaehlbareWerte.Regex = null;
+            this.txbAuswaehlbareWerte.RegexCheck = null;
             this.txbAuswaehlbareWerte.Size = new Size(520, 392);
             this.txbAuswaehlbareWerte.SpellCheckingEnabled = true;
             this.txbAuswaehlbareWerte.TabIndex = 0;
@@ -693,7 +693,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAutoReplace.MultiLine = true;
             this.txbAutoReplace.Name = "txbAutoReplace";
             this.txbAutoReplace.QuickInfo = resources.GetString("txbAutoReplace.QuickInfo");
-            this.txbAutoReplace.Regex = null;
+            this.txbAutoReplace.RegexCheck = null;
             this.txbAutoReplace.Size = new Size(1073, 392);
             this.txbAutoReplace.SpellCheckingEnabled = true;
             this.txbAutoReplace.TabIndex = 39;
@@ -715,7 +715,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbMaxCellLenght.MaxTextLenght = 255;
             this.txbMaxCellLenght.Name = "txbMaxCellLenght";
             this.txbMaxCellLenght.QuickInfo = resources.GetString("txbMaxCellLenght.QuickInfo");
-            this.txbMaxCellLenght.Regex = "^((-?[1-9]\\d*)|0)$";
+            this.txbMaxCellLenght.RegexCheck = "^((-?[1-9]\\d*)|0)$";
             this.txbMaxCellLenght.Size = new Size(96, 24);
             this.txbMaxCellLenght.TabIndex = 45;
             // 
@@ -726,7 +726,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAutoRemove.Cursor = Cursors.IBeam;
             this.txbAutoRemove.Location = new Point(16, 136);
             this.txbAutoRemove.Name = "txbAutoRemove";
-            this.txbAutoRemove.Regex = null;
+            this.txbAutoRemove.RegexCheck = null;
             this.txbAutoRemove.Size = new Size(1073, 24);
             this.txbAutoRemove.TabIndex = 37;
             // 
@@ -772,7 +772,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbRunden.Cursor = Cursors.IBeam;
             this.txbRunden.Location = new Point(216, 48);
             this.txbRunden.Name = "txbRunden";
-            this.txbRunden.Regex = null;
+            this.txbRunden.RegexCheck = null;
             this.txbRunden.Size = new Size(96, 24);
             this.txbRunden.TabIndex = 11;
             // 
@@ -844,7 +844,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbJoker.Cursor = Cursors.IBeam;
             this.txbJoker.Location = new Point(4, 233);
             this.txbJoker.Name = "txbJoker";
-            this.txbJoker.Regex = null;
+            this.txbJoker.RegexCheck = null;
             this.txbJoker.Size = new Size(312, 24);
             this.txbJoker.TabIndex = 7;
             // 
@@ -907,7 +907,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAdminInfo.Location = new Point(617, 24);
             this.txbAdminInfo.MultiLine = true;
             this.txbAdminInfo.Name = "txbAdminInfo";
-            this.txbAdminInfo.Regex = null;
+            this.txbAdminInfo.RegexCheck = null;
             this.txbAdminInfo.Size = new Size(473, 528);
             this.txbAdminInfo.SpellCheckingEnabled = true;
             this.txbAdminInfo.TabIndex = 3;
@@ -922,7 +922,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbQuickinfo.Location = new Point(8, 24);
             this.txbQuickinfo.MultiLine = true;
             this.txbQuickinfo.Name = "txbQuickinfo";
-            this.txbQuickinfo.Regex = null;
+            this.txbQuickinfo.RegexCheck = null;
             this.txbQuickinfo.Size = new Size(601, 528);
             this.txbQuickinfo.SpellCheckingEnabled = true;
             this.txbQuickinfo.TabIndex = 0;
@@ -978,7 +978,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbTags.Location = new Point(8, 32);
             this.txbTags.MultiLine = true;
             this.txbTags.Name = "txbTags";
-            this.txbTags.Regex = null;
+            this.txbTags.RegexCheck = null;
             this.txbTags.Size = new Size(1080, 552);
             this.txbTags.TabIndex = 30;
             this.txbTags.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
@@ -998,7 +998,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxSort.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxSort.Location = new Point(232, 312);
             this.cbxSort.Name = "cbxSort";
-            this.cbxSort.Regex = null;
+            this.cbxSort.RegexCheck = null;
             this.cbxSort.Size = new Size(304, 24);
             this.cbxSort.TabIndex = 35;
             // 
@@ -1036,7 +1036,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAllowedChars.Cursor = Cursors.IBeam;
             this.txbAllowedChars.Location = new Point(8, 88);
             this.txbAllowedChars.Name = "txbAllowedChars";
-            this.txbAllowedChars.Regex = null;
+            this.txbAllowedChars.RegexCheck = null;
             this.txbAllowedChars.Size = new Size(1081, 56);
             this.txbAllowedChars.TabIndex = 30;
             this.txbAllowedChars.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
@@ -1057,7 +1057,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxLinkedDatabase.Cursor = Cursors.IBeam;
             this.cbxLinkedDatabase.Location = new Point(224, 16);
             this.cbxLinkedDatabase.Name = "cbxLinkedDatabase";
-            this.cbxLinkedDatabase.Regex = null;
+            this.cbxLinkedDatabase.RegexCheck = null;
             this.cbxLinkedDatabase.Size = new Size(857, 24);
             this.cbxLinkedDatabase.TabIndex = 38;
             this.cbxLinkedDatabase.TextChanged += new EventHandler(this.cbxLinkedDatabase_TextChanged);
@@ -1123,7 +1123,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbName.Cursor = Cursors.IBeam;
             this.txbName.Location = new Point(8, 56);
             this.txbName.Name = "txbName";
-            this.txbName.Regex = null;
+            this.txbName.RegexCheck = null;
             this.txbName.Size = new Size(296, 24);
             this.txbName.TabIndex = 0;
             // 
@@ -1144,7 +1144,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbCaption.Location = new Point(312, 32);
             this.txbCaption.MultiLine = true;
             this.txbCaption.Name = "txbCaption";
-            this.txbCaption.Regex = null;
+            this.txbCaption.RegexCheck = null;
             this.txbCaption.Size = new Size(785, 64);
             this.txbCaption.TabIndex = 2;
             // 
@@ -1228,7 +1228,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbMaxTextLenght.MaxTextLenght = 255;
             this.txbMaxTextLenght.Name = "txbMaxTextLenght";
             this.txbMaxTextLenght.QuickInfo = resources.GetString("txbMaxTextLenght.QuickInfo");
-            this.txbMaxTextLenght.Regex = "^((-?[1-9]\\d*)|0)$";
+            this.txbMaxTextLenght.RegexCheck = "^((-?[1-9]\\d*)|0)$";
             this.txbMaxTextLenght.Size = new Size(96, 24);
             this.txbMaxTextLenght.TabIndex = 47;
             // 
@@ -1398,7 +1398,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxTargetColumn.DropDownStyle = ComboBoxStyle.DropDownList;
             this.cbxTargetColumn.Location = new Point(224, 48);
             this.cbxTargetColumn.Name = "cbxTargetColumn";
-            this.cbxTargetColumn.Regex = null;
+            this.cbxTargetColumn.RegexCheck = null;
             this.cbxTargetColumn.Size = new Size(857, 24);
             this.cbxTargetColumn.TabIndex = 5;
             this.cbxTargetColumn.TextChanged += new EventHandler(this.cbxTargetColumn_TextChanged);

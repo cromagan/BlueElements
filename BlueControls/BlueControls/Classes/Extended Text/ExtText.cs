@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 using BlueBasics;
@@ -92,7 +93,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     public ExtText(Design design, States state) : this() {
         var sh = Skin.DesignOf(design, state);
-        StyleBeginns = sh.Stil;
+        StyleBeginns = sh.Style;
         //Font = sh.Font;
         _sheetStyle = Constants.Win11;
     }
@@ -107,7 +108,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     #region Events
 
-    public event EventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public event EventHandler? StyleChanged;
 
@@ -139,7 +140,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             if (IsDisposed) { return; }
             if (HtmlText == value) { return; }
             ConvertTextToChar(value, true);
-            OnPropertyChanged();
+            OnPropertyChanged("HtmlText");
         }
     }
 
@@ -157,7 +158,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             if (IsDisposed) { return; }
             if (PlainText == value) { return; }
             ConvertTextToChar(value, false);
-            OnPropertyChanged();
+            OnPropertyChanged("PlainText");
         }
     }
 
@@ -171,7 +172,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
             DoQuickFont();
 
-            OnPropertyChanged();
+            OnPropertyChanged("SheetStyle");
         }
     }
 
@@ -187,7 +188,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             if (_textDimensions.Width == value.Width && _textDimensions.Height == value.Height) { return; }
             _textDimensions = value;
             ResetPosition(false);
-            OnPropertyChanged();
+            OnPropertyChanged("TextDimensions");
         }
     }
 
@@ -198,7 +199,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             if (Math.Abs(value - _zeilenabstand) < 0.01) { return; }
             _zeilenabstand = value;
             ResetPosition(false);
-            OnPropertyChanged();
+            OnPropertyChanged("Zeilenabstand");
         }
     }
 
@@ -206,9 +207,9 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
     #region Methods
 
-    public void ChangeStyle(int first, int last, PadStyles stil) {
+    public void ChangeStyle(int first, int last, PadStyles style) {
         for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
-            this[cc].Stil = stil;
+            this[cc].Style = style;
         }
         ResetPosition(true);
     }
@@ -347,7 +348,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return _height == null || _width < 5 || _height < 5 ? new Size(32, 16) : new Size((int)_width + 1, (int)_height + 1);
     }
 
-    public void OnPropertyChanged() => PropertyChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
@@ -433,22 +434,22 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         return 0;
     }
 
-    private int AddSpecialEntities(string htmltext, int position, PadStyles stil, BlueFont font) {
+    private int AddSpecialEntities(string htmltext, int position, PadStyles style, BlueFont font) {
         var endpos = htmltext.IndexOf(';', position + 1);
 
         if (endpos <= position || endpos > position + 10) {
-            Add(new ExtCharAscii(this, stil, font, '&'));
+            Add(new ExtCharAscii(this, style, font, '&'));
             return position + 1;
         }
 
         var entity = htmltext.Substring(position, endpos - position + 1);
         if (Constants.ReverseHtmlEntities.TryGetValue(entity, out char c)) {
-            Add(new ExtCharAscii(this, stil, font, c));
+            Add(new ExtCharAscii(this, style, font, c));
             return endpos;
         }
 
         Develop.DebugPrint(ErrorType.Info, "Unbekannter Code: " + entity);
-        Add(new ExtCharAscii(this, stil, font, '&'));
+        Add(new ExtCharAscii(this, style, font, '&'));
         return position + 1;
     }
 
@@ -481,7 +482,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
         Clear();
         ResetPosition(true);
-        var stil = StyleBeginns;
+        var style = StyleBeginns;
         var font = Skin.GetBlueFont(SheetStyle, StyleBeginns);
 
         // StringBuilder für temporäre String-Operationen
@@ -497,11 +498,11 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                     case '<':
                         if (temp.Length > 0) {
                             zeichen++;
-                            Add(new ExtCharAscii(this, stil, font, temp.ToString()[0]));
+                            Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
                             temp.Clear();
                         }
                         // HTML-Code verarbeiten
-                        DoHtmlCode(cactext, pos, ref zeichen, ref font, ref stil);
+                        DoHtmlCode(cactext, pos, ref zeichen, ref font, ref style);
                         // Position zum Ende des HTML-Tags bewegen
                         var endTag = cactext.IndexOf('>', pos + 1);
                         pos = endTag != -1 ? endTag : cactext.Length;
@@ -510,21 +511,21 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
                     case '&':
                         if (temp.Length > 0) {
                             zeichen++;
-                            Add(new ExtCharAscii(this, stil, font, temp.ToString()[0]));
+                            Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
                             temp.Clear();
                         }
-                        pos = AddSpecialEntities(cactext, pos, stil, font);
+                        pos = AddSpecialEntities(cactext, pos, style, font);
                         zeichen++;
                         break;
 
                     default:
                         zeichen++;
-                        Add(new ExtCharAscii(this, stil, font, ch));
+                        Add(new ExtCharAscii(this, style, font, ch));
                         break;
                 }
             } else {
                 zeichen++;
-                Add(new ExtCharAscii(this, stil, font, ch));
+                Add(new ExtCharAscii(this, style, font, ch));
             }
             pos++;
         }
@@ -532,7 +533,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         ResetPosition(true);
     }
 
-    private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles stil) {
+    private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles style) {
         var endpos = htmlText.IndexOf('>', start + 1);
         if (endpos <= start) {
             Develop.DebugPrint("String-Fehler, > erwartet. " + htmlText);
@@ -553,73 +554,73 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
 
         switch (cod) {
             case "B":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, true, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "/B":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, false, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "I":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, true, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "/I":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, false, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "U":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, true, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "/U":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, false, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "STRIKE":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, true, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "/STRIKE":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, false, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             //case "3":
-            //    stil = PadStyles.Undefiniert;
+            //    style = PadStyles.Undefiniert;
             //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
             //    break;
 
             //case "/3":
-            //    stil = PadStyles.Undefiniert;
+            //    style = PadStyles.Undefiniert;
             //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
             //break;
 
             case "FONTSIZE":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 _ = FloatTryParse(attribut, out var fs);
                 font = BlueFont.Get(font.FontName, fs, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "FONTNAME":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(attribut, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "FONTCOLOR":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, attribut, font.ColorOutline.ToHtmlCode(), font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack.ToHtmlCode());
                 break;
 
             case "FONTOUTLINE":
-                stil = PadStyles.Undefiniert;
+                style = PadStyles.Undefiniert;
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain.ToHtmlCode(), attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack.ToHtmlCode());
                 break;
 
@@ -631,64 +632,64 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             //    break;
             case "BR":
                 position++;
-                Add(new ExtCharCrlfCode(this, stil, font));
+                Add(new ExtCharCrlfCode(this, style, font));
                 break;
 
             case "TAB":
                 position++;
-                Add(new ExtCharTabCode(this, stil, font));
+                Add(new ExtCharTabCode(this, style, font));
                 break;
 
             case "ZBX_STORE":
                 position++;
-                Add(new ExtCharStoreXCode(this, stil, font));
+                Add(new ExtCharStoreXCode(this, style, font));
                 break;
 
             case "TOP":
                 position++;
-                Add(new ExtCharTopCode(this, stil, font));
+                Add(new ExtCharTopCode(this, style, font));
                 break;
 
             case "IMAGECODE":
                 var x = !attribut.Contains("|") ? QuickImage.Get(attribut, (int)font.Oberlänge(1)) : QuickImage.Get(attribut);
                 position++;
-                Add(new ExtCharImageCode(this, stil, font, x));
+                Add(new ExtCharImageCode(this, style, font, x));
                 break;
 
             case "H7":
-                stil = PadStyles.Hervorgehoben;
-                font = Skin.GetBlueFont(_sheetStyle, stil);
+                style = PadStyles.Hervorgehoben;
+                font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
             case "H6":
-                stil = PadStyles.Alternativ;
-                font = Skin.GetBlueFont(_sheetStyle, stil);
+                style = PadStyles.Alternativ;
+                font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
             case "H5":
-                stil = PadStyles.Kleiner_Zusatz;
-                font = Skin.GetBlueFont(_sheetStyle, stil);
+                style = PadStyles.Kleiner_Zusatz;
+                font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
             case "H0":
             case "H4":
-                stil = PadStyles.Standard;
-                font = Skin.GetBlueFont(_sheetStyle, stil);
+                style = PadStyles.Standard;
+                font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
             case "H3":
-                stil = PadStyles.Kapitel;
-                font = Skin.GetBlueFont(_sheetStyle, stil);
+                style = PadStyles.Kapitel;
+                font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
             case "H2":
-                stil = PadStyles.Untertitel;
-                font = Skin.GetBlueFont(_sheetStyle, stil);
+                style = PadStyles.Untertitel;
+                font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
             case "H1":
-                stil = PadStyles.Überschrift;
-                font = Skin.GetBlueFont(_sheetStyle, stil);
+                style = PadStyles.Überschrift;
+                font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
             //case "MARKSTATE":
@@ -706,8 +707,8 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
         var f = BlueFont.DefaultFont;
 
         foreach (var thisChar in this) {
-            if (thisChar.Stil != last) {
-                last = thisChar.Stil;
+            if (thisChar.Style != last) {
+                last = thisChar.Style;
                 f = thisChar.Font;
             } else {
                 thisChar.Font = f;
@@ -929,7 +930,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             _tmpHtmlText = null;
             _tmpPlainText = null;
         }
-        OnPropertyChanged();
+        OnPropertyChanged("Position");
     }
 
     private float Row_SetOnLine(int first, int last) {
