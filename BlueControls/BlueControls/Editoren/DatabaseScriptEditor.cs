@@ -297,11 +297,15 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         if (Database is { } db) {
             if (!db.IsEventScriptCheckeIn()) {
-                MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok");
+                if (MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok", "Aktiv schalten") == 1) {
+                    db.EventScript = db.EventScriptEdited;
+                }
             }
 
             if (!string.IsNullOrEmpty(db.ScriptNeedFix)) {
-                MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok");
+                if (MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok", "Leeren") == 1) {
+                    db.ScriptNeedFix = db.CheckScriptError();
+                }
             }
         }
 
@@ -334,7 +338,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
 
             var it = ItemOf(thisSet);
-            it.UserDefCompareKey = cap + SecondSortChar;
+            it.UserDefCompareKey = cap + SecondSortChar + thisSet.CompareKey;
 
             lstEventScripts.ItemAdd(it);
 
