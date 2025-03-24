@@ -708,7 +708,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
-            Develop.MonitorMessage?.Invoke($"{db.Caption}/{CellFirstString()}", "Skript", $"Datenüberprüfung Start: Extended {extendedAllowed} Grund: {reason})", 0);
+            Develop.MonitorMessage?.Invoke($"{db.Caption}\\{CellFirstString()}", "Skript", $"Datenüberprüfung Start: Extended {extendedAllowed} Grund: {reason})", 0);
             db.OnDropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
             OnDropMessage(ErrorType.Info, $"Aktualisiere ({reason})");
 

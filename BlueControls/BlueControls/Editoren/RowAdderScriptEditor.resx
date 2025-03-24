@@ -117,4 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="capScriptMenu.Text" xml:space="preserve">
+    <value>&lt;b&gt;Diese Skript wird ausgeführt, um die Menü-punkte zu generieren.&lt;/b&gt;&lt;br&gt;In die Variable MENU muss das Menu erstellt werden. Dieses muss folgendes Format haben:&lt;br&gt;&lt;i&gt;Backen&lt;br&gt;Backen\Zutaten&lt;br&gt;Backen\Zutaten\Mehl&lt;/i&gt;&lt;br&gt;&lt;br&gt;Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.&lt;br&gt;&lt;br&gt;Parallel dazu kann die Variable Infos erstellt werden - freie Wahl des Textes.</value>
+  </data>
 </root>

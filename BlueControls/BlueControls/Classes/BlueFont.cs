@@ -39,7 +39,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     #region Fields
 
-    public static readonly BlueFont DefaultFont = Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false, Color.Transparent);
+    public static readonly BlueFont DefaultFont = new();
     private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new();
     private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
     private static readonly ConcurrentDictionary<string, Font> _fontCache = new();

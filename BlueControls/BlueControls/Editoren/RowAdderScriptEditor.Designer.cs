@@ -22,14 +22,17 @@ namespace BlueControls.BlueDatabaseDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RowAdderScriptEditor));
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.btnDatenbankKopf = new BlueControls.Controls.Button();
             this.grpScripte = new BlueControls.Controls.GroupBox();
-            this.btnScriptBefore = new BlueControls.Controls.Button();
-            this.btnScriptMenu = new BlueControls.Controls.Button();
-            this.btnScriptAfter = new BlueControls.Controls.Button();
+            this.caption1 = new BlueControls.Controls.Caption();
             this.capScriptMenu = new BlueControls.Controls.Caption();
+            this.btnScriptAfter = new BlueControls.Controls.Button();
+            this.btnScriptMenu = new BlueControls.Controls.Button();
+            this.btnScriptBefore = new BlueControls.Controls.Button();
+            this.caption2 = new BlueControls.Controls.Caption();
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
@@ -58,8 +61,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tbcScriptEigenschaften
             // 
-            this.tbcScriptEigenschaften.Location = new System.Drawing.Point(248, 110);
-            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(536, 427);
+            this.tbcScriptEigenschaften.Location = new System.Drawing.Point(290, 110);
+            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(494, 427);
             // 
             // txbTestZeile
             // 
@@ -92,6 +95,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpScripte
             // 
             this.grpScripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpScripte.Controls.Add(this.caption2);
+            this.grpScripte.Controls.Add(this.caption1);
             this.grpScripte.Controls.Add(this.capScriptMenu);
             this.grpScripte.Controls.Add(this.btnScriptAfter);
             this.grpScripte.Controls.Add(this.btnScriptMenu);
@@ -99,10 +104,58 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpScripte.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpScripte.Location = new System.Drawing.Point(0, 110);
             this.grpScripte.Name = "grpScripte";
-            this.grpScripte.Size = new System.Drawing.Size(248, 427);
+            this.grpScripte.Size = new System.Drawing.Size(290, 427);
             this.grpScripte.TabIndex = 99;
             this.grpScripte.TabStop = false;
             this.grpScripte.Text = "Scripte";
+            // 
+            // caption1
+            // 
+            this.caption1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.caption1.CausesValidation = false;
+            this.caption1.Location = new System.Drawing.Point(8, 48);
+            this.caption1.Name = "caption1";
+            this.caption1.Size = new System.Drawing.Size(274, 50);
+            this.caption1.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - BEVOR die Ze" +
+    "ile(n) angelegt werden.";
+            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capScriptMenu
+            // 
+            this.capScriptMenu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.capScriptMenu.CausesValidation = false;
+            this.capScriptMenu.Location = new System.Drawing.Point(8, 136);
+            this.capScriptMenu.Name = "capScriptMenu";
+            this.capScriptMenu.Size = new System.Drawing.Size(274, 220);
+            this.capScriptMenu.Text = resources.GetString("capScriptMenu.Text");
+            this.capScriptMenu.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // btnScriptAfter
+            // 
+            this.btnScriptAfter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnScriptAfter.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox;
+            this.btnScriptAfter.Location = new System.Drawing.Point(8, 360);
+            this.btnScriptAfter.Name = "btnScriptAfter";
+            this.btnScriptAfter.Size = new System.Drawing.Size(274, 32);
+            this.btnScriptAfter.TabIndex = 2;
+            this.btnScriptAfter.Text = "After";
+            this.btnScriptAfter.Click += new System.EventHandler(this.btnScriptAfter_Click);
+            // 
+            // btnScriptMenu
+            // 
+            this.btnScriptMenu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnScriptMenu.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox;
+            this.btnScriptMenu.Checked = true;
+            this.btnScriptMenu.Location = new System.Drawing.Point(8, 104);
+            this.btnScriptMenu.Name = "btnScriptMenu";
+            this.btnScriptMenu.Size = new System.Drawing.Size(274, 32);
+            this.btnScriptMenu.TabIndex = 1;
+            this.btnScriptMenu.Text = "Menu Generation";
+            this.btnScriptMenu.Click += new System.EventHandler(this.btnScriptMenu_Click);
             // 
             // btnScriptBefore
             // 
@@ -111,38 +164,22 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnScriptBefore.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox;
             this.btnScriptBefore.Location = new System.Drawing.Point(8, 16);
             this.btnScriptBefore.Name = "btnScriptBefore";
-            this.btnScriptBefore.Size = new System.Drawing.Size(232, 32);
+            this.btnScriptBefore.Size = new System.Drawing.Size(274, 32);
             this.btnScriptBefore.TabIndex = 0;
             this.btnScriptBefore.Text = "Before";
+            this.btnScriptBefore.Click += new System.EventHandler(this.btnScriptBefore_Click);
             // 
-            // btnScriptMenu
+            // caption2
             // 
-            this.btnScriptMenu.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.caption2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnScriptMenu.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox;
-            this.btnScriptMenu.Location = new System.Drawing.Point(8, 104);
-            this.btnScriptMenu.Name = "btnScriptMenu";
-            this.btnScriptMenu.Size = new System.Drawing.Size(232, 32);
-            this.btnScriptMenu.TabIndex = 1;
-            this.btnScriptMenu.Text = "Menu Generation";
-            // 
-            // btnScriptAfter
-            // 
-            this.btnScriptAfter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnScriptAfter.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox;
-            this.btnScriptAfter.Location = new System.Drawing.Point(8, 232);
-            this.btnScriptAfter.Name = "btnScriptAfter";
-            this.btnScriptAfter.Size = new System.Drawing.Size(232, 32);
-            this.btnScriptAfter.TabIndex = 2;
-            this.btnScriptAfter.Text = "After";
-            // 
-            // capScriptMenu
-            // 
-            this.capScriptMenu.CausesValidation = false;
-            this.capScriptMenu.Location = new System.Drawing.Point(16, 144);
-            this.capScriptMenu.Name = "capScriptMenu";
-            this.capScriptMenu.Size = new System.Drawing.Size(216, 56);
+            this.caption2.CausesValidation = false;
+            this.caption2.Location = new System.Drawing.Point(8, 392);
+            this.caption2.Name = "caption2";
+            this.caption2.Size = new System.Drawing.Size(274, 50);
+            this.caption2.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - NACHDEM  die" +
+    " Zeile(n) angelegt wurden.";
+            this.caption2.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // RowAdderScriptEditor
             // 
@@ -171,5 +208,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnScriptAfter;
         private Button btnScriptMenu;
         private Caption capScriptMenu;
+        private Caption caption1;
+        private Caption caption2;
     }
 }

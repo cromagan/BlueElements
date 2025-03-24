@@ -119,12 +119,15 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
             new VariableString("Usergroup", Generic.UserGroup, true,
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
-            new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."),
-            new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."),
             //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
             new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."),
             new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden.")
         ];
+
+        if (isMenuGeneration) {
+            vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
+            vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
+        }
 
         var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
 
@@ -133,7 +136,34 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(0, "Main", null);
+        var scf = sc.Parse(0, "Main", null);
+
+
+
+        if (!scf.AllOk) {
+            if (Generic.UserGroup == Constants.Administrator) {
+                List<string> l =
+                [
+                    "### ACHTUNG - EINMALIGE ANZEIGE ###",
+                    info,
+                    generatedentityID,
+                    //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
+                    //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
+                    //"Datenbank: " + Database.Caption,
+                    " ",
+                    " ",
+                    //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
+                    " ",
+                    scf.ProtocolText
+                ];
+                _ = l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
+            }
+        }
+
+
+
+        return scf;
+
     }
 
     /// <summary>
@@ -228,7 +258,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
         selected = RepairMenu(selected);
 
-        var msg = GenerateMenuItems(rowIn, nowGeneratedId.newid);
+        var msg = GenerateMenuItems(rowIn);
 
         if (!string.IsNullOrEmpty(msg)) { Fehler(msg, ImageCode.Kritisch); return; }
 
@@ -375,6 +405,20 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
     private void F_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
 
+
+        if (RowSingleOrNull() is not { } rowIn) { return; }
+
+        //        var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
+
+        var scf = ExecuteScript(Script_Before, Mode, EntityID, rowIn, false, "Before");
+        if (!scf.AllOk) {
+
+            Fehler("Interner Fehler: Skript BEFORE fehlerhaft", ImageCode.Kritisch);
+            return;
+        }
+
+
+
         if (e.Item is ReadableListItem { Item: AdderItem ai } rli) {
             if (f.Checked.Contains(rli.KeyName)) {
                 AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
@@ -394,6 +438,15 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             dropDownMenu.Cancel += DropDownMenu_Cancel;
             dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         }
+
+        scf = ExecuteScript(Script_After, Mode, EntityID, rowIn, false, "After");
+        if (!scf.AllOk) {
+            Fehler("Interner Fehler: Skript AFTER fehlerhaft", ImageCode.Kritisch);
+            return;
+        }
+
+
+
     }
 
     private (string msg, string newid) GenerateEntityID(RowItem rowIn) {
@@ -413,7 +466,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         return (string.Empty, generatedentityID);
     }
 
-    private string GenerateMenuItems(RowItem rowIn, string generatedentityID) {
+    private string GenerateMenuItems(RowItem rowIn) {
         if (_menu != null) { return string.Empty; }
 
         _infos = [];
@@ -421,24 +474,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
 
         if (!scf.AllOk) {
-            if (Generic.UserGroup == Constants.Administrator) {
-                List<string> l =
-                [
-                    "### ACHTUNG - EINMALIGE ANZEIGE ###",
-                    generatedentityID,
-                    //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
-                    //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
-                    //"Datenbank: " + Database.Caption,
-                    " ",
-                    " ",
-                    //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
-                    " ",
-                    scf.ProtocolText
-                ];
-                _ = l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
-            }
-
-            return "Interner Fehler: Skript fehlerhaft; " + scf.ProtocolText;
+            return "Interner Fehler: Skript Menu Gerneration fehlerhaft; " + scf.ProtocolText;
         }
 
         var menu = scf.Variables?.GetList("Menu");

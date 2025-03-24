@@ -25,6 +25,7 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.Structures;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
@@ -54,21 +55,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
     public RowAdderScriptEditor() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-
-        List<string> l =
-        [
-            "In die Variable MENU muss das Menu erstellt werden.",
-            "Dies muss folgendes Format sein:",
-            "Backen",
-            "Backen\\Zutaten",
-            "Backen\\Zutaten\\Mehl",
-            " ",
-            "Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.",
-            " ",
-            "Parallel dazu kann die Variable Infos erstellt werden.",
-            "Freie Texte."
-        ];
-        _ = l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
     }
 
     #endregion
@@ -100,35 +86,11 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
 
             WriteInfosBack();
 
-            _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
+            _item = null;
 
-            if (value is RowAdderPadItem cpi) {
-                tbcScriptEigenschaften.Enabled = true;
+            if (value is RowAdderPadItem cpi) { _item = cpi; }
 
-                switch (scriptNo) {
-                    case 1:
-                        Script = cpi.Script_Before;
-                        break;
-
-                    case 2:
-                        Script = cpi.Script_MenuGeneration;
-                        break;
-
-                    case 3:
-                        Script = cpi.Script_After;
-                        break;
-
-                    default:
-                        tbcScriptEigenschaften.Enabled = false;
-                        Script = string.Empty;
-                        break;
-                }
-
-                _item = cpi;
-            } else {
-                tbcScriptEigenschaften.Enabled = false;
-                Script = string.Empty;
-            }
+            ShowScript();
         }
     }
 
@@ -175,13 +137,13 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
 
         switch (scriptNo) {
             case 1:
-                return RowAdder.ExecuteScript(_item.Script_Before, "Testmodus", _item.EntityID, r, true, "Before");
+                return RowAdder.ExecuteScript(_item.Script_Before, "Testmodus", _item.EntityID, r, false, "Before");
 
             case 3:
                 return RowAdder.ExecuteScript(_item.Script_After, "Testmodus", _item.EntityID, r, true, "After");
 
             default:
-                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, "Testmodus", _item.EntityID, r, true, "Menu");
+                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, "Testmodus", _item.EntityID, r, false, "Menu");
         }
     }
 
@@ -219,6 +181,52 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
     }
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
+
+    private void btnScriptAfter_Click(object sender, System.EventArgs e) {
+        WriteInfosBack();
+        scriptNo = 3;
+        ShowScript();
+    }
+
+    private void btnScriptBefore_Click(object sender, System.EventArgs e) {
+        WriteInfosBack();
+        scriptNo = 1;
+        ShowScript();
+    }
+
+    private void btnScriptMenu_Click(object sender, System.EventArgs e) {
+        WriteInfosBack();
+        scriptNo = 2;
+        ShowScript();
+    }
+
+    private void ShowScript() {
+        if (_item is RowAdderPadItem cpi) {
+            tbcScriptEigenschaften.Enabled = true;
+
+            switch (scriptNo) {
+                case 1:
+                    Script = cpi.Script_Before;
+                    break;
+
+                case 2:
+                    Script = cpi.Script_MenuGeneration;
+                    break;
+
+                case 3:
+                    Script = cpi.Script_After;
+                    break;
+
+                default:
+                    tbcScriptEigenschaften.Enabled = false;
+                    Script = string.Empty;
+                    break;
+            }
+        } else {
+            tbcScriptEigenschaften.Enabled = false;
+            Script = string.Empty;
+        }
+    }
 
     #endregion
 }
