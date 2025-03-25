@@ -172,11 +172,10 @@ public class Chunk : IHasKeyName {
     }
 
     public bool Save(string filename, int minBytes) {
-        if(LoadFailed) { return false; }
-        if (minBytes < _bytes.Count) { return false; }
+        if (LoadFailed) { return false; }
+        if (_bytes.Count < minBytes) { return false; }
 
-
-        if(_lastcheck.Year < 2000) { return false; }
+        if (_lastcheck.Year < 2000) { return false; }
 
         try {
             Develop.SetUserDidSomething();

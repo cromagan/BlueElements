@@ -261,8 +261,8 @@ public class DatabaseChunk : Database {
         //    return IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, EditableErrorReasonType.EditCurrently);
 
         if (Column?.SplitColumn is { }) {
-            var value = GetChunkValue(row);
-            return string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, string.Empty, value, EditableErrorReasonType.EditCurrently));
+            var chunkValue = GetChunkValue(row);
+            return string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, chunkValue, EditableErrorReasonType.EditCurrently));
         }
 
         return false;
@@ -405,18 +405,21 @@ public class DatabaseChunk : Database {
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName).ToList();
 
-    internal override string IsValueEditable(DatabaseDataType type, string columnName, string ofValue, EditableErrorReasonType reason) {
-        var f = base.IsValueEditable(type, columnName, ofValue, reason);
+    internal override string IsValueEditable(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) {
+        var f = base.IsValueEditable(type, chunkValue, reason);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC or
                     DatabaseDataType.TemporaryDatabaseMasterUser) { return "MasterUser in diesen Datenbanktyp nicht möglich"; }
 
-        var chunkId = GetChunkId(this, type, ofValue);
+        var chunkId = GetChunkId(this, type, chunkValue);
 
         var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, true);
 
-        return !ok ? "Chunk Lade-Fehler" : !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.IsEditable(reason);
+        if (!ok) { return "Chunk Lade-Fehler"; }
+
+        return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.IsEditable(reason);
+
     }
 
     protected override bool BeSureToBeUpDoDate() {
