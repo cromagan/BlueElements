@@ -88,7 +88,9 @@ public class DatabaseFragments : Database {
     /// <returns></returns>
     public override bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) {
         if (!base.AmITemporaryMaster(ranges, rangee, row)) { return false; }
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) {
+            if (!BeSureAllDataLoaded(0)) { return false; }
+        }
         if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
 
         var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);

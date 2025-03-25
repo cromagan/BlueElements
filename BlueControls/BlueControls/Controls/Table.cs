@@ -2570,14 +2570,18 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                 if (isAdmin) {
                     if (rowScript) {
-                        if (cellInThisDatabaseRow.NeedsRowUpdate(true, true)) {
+                        if (cellInThisDatabaseRow.NeedsRowUpdate(true, true, true)) {
                             gr.FillRectangle(BrushRedTransparent, cellrectangle);
                             if (RowCollection.FailedRows.ContainsKey(cellInThisDatabaseRow)) {
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                             } else {
-                                RowCollection.WaitDelay = 0;
+
+                                if (db.AmITemporaryMaster(5, 55, cellInThisDatabaseRow)) {
+                                    RowCollection.WaitDelay = 0;
+                                }
+
                             }
                         }
                     }

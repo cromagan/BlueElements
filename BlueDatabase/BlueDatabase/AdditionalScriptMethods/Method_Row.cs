@@ -35,8 +35,6 @@ namespace BlueDatabase.AdditionalScriptMethods;
 // ReSharper disable once UnusedMember.Global
 public class Method_Row : Method_Database, IUseableForButton {
 
-    public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
-
     #region Properties
 
     public override List<List<string>> Args => [FloatVal, FilterVar];
@@ -71,11 +69,16 @@ public class Method_Row : Method_Database, IUseableForButton {
     public override string Returns => VariableRowItem.ShortName_Variable;
 
     public override string StartSequence => "(";
+
     public override string Syntax => "Row(AgeInDays, Filter, ...)";
 
     #endregion
 
     #region Methods
+
+    public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
+
+    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
     public static DoItFeedback UniqueRow(VariableCollection varCol, LogData ld, FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp) {
         RowItem? newrow;
@@ -110,6 +113,8 @@ public class Method_Row : Method_Database, IUseableForButton {
 
         var t = Stopwatch.StartNew();
 
+        Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
+
         do {
             (newrow, message, var stoptrying) = RowCollection.UniqueRow(fic, coment);
 
@@ -138,12 +143,13 @@ public class Method_Row : Method_Database, IUseableForButton {
                     return RowToObjectFeedback(null);
                 }
                 r.InvalidateRowState(coment);
+            } else {
+                Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Kein Zeilenupdate, da Zeile aktuell ist.", scp.Stufe);
             }
         }
 
         return RowToObjectFeedback(newrow);
     }
-    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var mydb = MyDatabase(scp);

@@ -563,7 +563,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdateAfterChange());
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false, oldestTo));
+        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false, oldestTo, false));
         if (rowToCheck != null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
@@ -870,6 +870,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 item.CellSet(thisColum, val, "Initialwert neuer Zeile");
             }
         }
+
+        Develop.MonitorMessage?.Invoke(db.Caption, "PlusZeichen", $"Neue Zeile erstellt: {db.Caption}\\{item.CellFirstString()}",0);
+
 
         _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
 

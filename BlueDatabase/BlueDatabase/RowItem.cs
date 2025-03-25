@@ -123,13 +123,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         get {
             if (NeedsRowInitialization()) { return 0; }
             if (NeedsRowUpdateAfterChange()) { return 1; }
-            if (NeedsRowUpdate(false, true)) { return 2; }
+            if (NeedsRowUpdate(false, true, true)) { return 2; }
 
             if (Database?.Column.SysRowState is not { IsDisposed: false } srs) { return long.MaxValue; }
 
             return CellGetDateTime(srs).Ticks;
         }
     }
+
     #endregion
 
     #region Methods
@@ -465,14 +466,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public void InvalidateRowState(string comment) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (db.Column.SysRowState is { IsDisposed: false } srs) {
-            CellSet(srs, string.Empty, comment);
+        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return; }
+        if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return; }
+
+        if (CellIsNullOrEmpty(srs) && string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) {
+            Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} ist bereits invalidiert", 0);
+            return;
         }
+
+        CellSet(srs, string.Empty, comment);
+
 
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd) {
             CellSet(scd, DateTime.UtcNow, comment);
         }
+
         _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
+
+        Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} invalidiert", 0);
     }
 
     public bool IsNullOrEmpty() => IsDisposed || Database is not { IsDisposed: false } db
@@ -498,6 +509,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         return MatchesTo(fi.Column, fi.FilterType, fi.SearchValue);
     }
+
     public bool MatchesTo(params FilterItem[]? filter) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return false; }
 
@@ -540,6 +552,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
 
+
+
+        if (db.AmITemporaryMaster(5, 55, this)) { return true; }
+
+
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
@@ -548,10 +565,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     /// <summary>
     /// Gibt true zurück, wenn eine Zeile aktualisiert werden muss.
-    /// Benutzer und Alter egal.
     /// </summary>
     /// <returns></returns>
-    public bool NeedsRowUpdate(bool ignoreFailed, bool extendedAllowed) {
+    public bool NeedsRowUpdate(bool ignoreFailed, bool extendedAllowed, bool ignoreMaster) {
         if (Database is not { IsDisposed: false } db) { return false; }
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
 
@@ -559,6 +575,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (CellGetDateTime(srs) >= Database.EventScriptVersion) { return false; }
         if (!ignoreFailed && RowCollection.FailedRows.ContainsKey(this)) { return false; }
+
+
+        if (ignoreMaster) { return true; }
+
+        //if(NeedsRowUpdateAfterChange() || NeedsRowInitialization()) { return true; }
 
         return db.AmITemporaryMaster(5, 55, this);
     }
@@ -579,11 +600,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        return NeedsRowUpdate(false, false) && t is { TotalMinutes: < 20, TotalSeconds: > 3 };
+        return NeedsRowUpdate(false, false, true) && t is { TotalMinutes: < 20, TotalSeconds: > 3 };
     }
 
     public void OnDropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
+        if (Database is not { IsDisposed: false } db) { return; }
+
+        Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeilennachricht von {CellFirstString()}: {message}", 0);
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 
