@@ -305,7 +305,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 newContentWidth = Math.Max(newContentWidth, wx);
             }
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return CalculateContentWith(column, renderer);
         }
 

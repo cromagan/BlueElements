@@ -1492,7 +1492,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             return scf;
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             _ = ExecutingScript.Remove(scriptId);
             _ = ExecutingScriptAnyDatabase.Remove(scriptId);
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, ignoreError);
@@ -1539,7 +1539,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 ? new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname)
                 : ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, false);
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, dbVariables, extended);
         }
     }
@@ -2343,7 +2343,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunkValue));
     }
 
-    protected virtual bool BeSureToBeUpDoDate() => !IsDisposed;
+    protected virtual bool BeSureToBeUpDoDate() {
+        if (IsInCache.Year < 2000) { return false; }
+        return IsDisposed;
+    }
 
     protected void CreateWatcher() {
         if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {

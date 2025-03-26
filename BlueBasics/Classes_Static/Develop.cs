@@ -101,7 +101,7 @@ public static class Develop {
         return "Programm von Christian Peter";
     }
 
-    public static void CheckStackForOverflow() {
+    public static void CheckStackOverflow() {
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 100) {
             DebugPrint(ErrorType.Error, "Stack-Overflow abgefangen!");

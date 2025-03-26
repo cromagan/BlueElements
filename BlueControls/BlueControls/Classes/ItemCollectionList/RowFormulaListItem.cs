@@ -80,6 +80,7 @@ public class RowFormulaListItem : AbstractListItem {
                 : _row.CellFirstString().CreateHtmlCodes(true);
         }
     }
+
     public RowItem? Row {
         get => _row;
         set {
@@ -109,7 +110,7 @@ public class RowFormulaListItem : AbstractListItem {
             if (_tmpBmp == null) { GeneratePic(); }
             return _tmpBmp?.Size ?? new Size(200, 200);
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return ComputeSizeUntouchedForListBox(itemdesign);
         }
     }

@@ -201,7 +201,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 }
             });
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return CalculateFilteredRows(db, filter);
         }
 

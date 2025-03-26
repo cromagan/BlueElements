@@ -89,7 +89,7 @@ public class DatabaseFragments : Database {
     public override bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) {
         if (!base.AmITemporaryMaster(ranges, rangee, row)) { return false; }
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) {
-            if (!BeSureAllDataLoaded(0)) { return false; }
+            if (!BeSureToBeUpDoDate()) { return false; }
         }
         if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
 
@@ -144,6 +144,8 @@ public class DatabaseFragments : Database {
 
     protected override bool BeSureToBeUpDoDate() {
         if (!base.BeSureToBeUpDoDate()) { return false; }
+
+        if (string.IsNullOrEmpty(Filename)) { return true; }
 
         if (_isInFragmentLoader) { return false; }
         _isInFragmentLoader = true;
@@ -425,7 +427,7 @@ public class DatabaseFragments : Database {
             DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, startTimeUtc, endTimeUtc);
             OnInvalidateView();
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc);
         }
     }
@@ -447,7 +449,7 @@ public class DatabaseFragments : Database {
             _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), Encoding.UTF8);
         } catch {
             Pause(3, false);
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             StartWriter();
             return;
         }

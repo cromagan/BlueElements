@@ -133,7 +133,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 }
                 return col;
             } catch {
-                Develop.CheckStackForOverflow();
+                Develop.CheckStackOverflow();
                 return this[columnName];
             }
         }

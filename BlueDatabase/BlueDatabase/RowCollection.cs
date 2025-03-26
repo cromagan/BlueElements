@@ -647,7 +647,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             return r;
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return SearchByKey(key);
         }
     }

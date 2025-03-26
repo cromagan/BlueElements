@@ -229,7 +229,7 @@ public static class IO {
             return file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
         } catch {
             // Objekt wird an anderer stelle benutzt?!?
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return FileExists(file);
         }
     }
@@ -331,7 +331,7 @@ public static class IO {
             return f.LastWriteTimeUtc.ToString1() + "-" + f.Length;
         } catch {
             if (!mustDo) { return string.Empty; }
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             Pause(0.5, false);
             return GetFileInfo(filename, mustDo);
         }

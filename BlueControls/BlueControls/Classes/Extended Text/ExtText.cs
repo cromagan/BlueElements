@@ -373,7 +373,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
             return T.ToString().Replace("\n", string.Empty);
         } catch {
             // Wenn Chars geändert wird (und dann der Count nimmer stimmt)
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return ConvertCharToPlainText(first, last);
         }
     }

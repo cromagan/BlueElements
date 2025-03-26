@@ -187,7 +187,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         } catch {
             // Invoke: auf das verworfene Ojekt blah blah
             if (!IsDisposed) {
-                Develop.CheckStackForOverflow();
+                Develop.CheckStackOverflow();
                 DatabaseInput_CellValueChanged(sender, e);
             }
         }
@@ -208,7 +208,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
-                Develop.CheckStackForOverflow();
+                Develop.CheckStackOverflow();
                 DatabaseInput_Loaded(sender, e); // am Anfang der Routine wird auf disposed geprüft
                 return;
             }
@@ -399,10 +399,9 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private ColumnItem? GetTmpColumn() {
         try {
             return DatabaseInput is { IsDisposed: false } db ? db.Column[_columnName] : null;
-   
         } catch {
             // Multitasking sei dank kann _database trotzem null sein...
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return GetTmpColumn();
         }
     }

@@ -205,7 +205,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             result.ParseableAdd("Origin", Origin);
             return result;
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return ParseableItems();
         }
     }

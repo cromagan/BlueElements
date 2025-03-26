@@ -1196,7 +1196,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return RowsFilteredAndPinned(); // Rekursiver Aufruf. Manchmal funktiniert OnRowsSorted nicht ...
         } catch {
             // Komisch, manchmal wird die Variable _sortedRowDatax verworfen.
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             Invalidate_SortedRowData();
             return RowsFilteredAndPinned();
         }
@@ -1219,7 +1219,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 }
             });
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return RowsVisibleUnique();
         }
 
@@ -2577,11 +2577,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                             } else {
-
                                 if (db.AmITemporaryMaster(5, 55, cellInThisDatabaseRow)) {
                                     RowCollection.WaitDelay = 0;
                                 }
-
                             }
                         }
                     }

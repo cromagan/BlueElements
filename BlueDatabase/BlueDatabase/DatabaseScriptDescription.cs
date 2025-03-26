@@ -45,7 +45,7 @@ public static class EventScriptExtension {
 
             return l;
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return scripts.Get(type);
         }
     }
@@ -223,7 +223,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
             result.ParseableAdd("Events", EventTypes);
             return result;
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return ParseableItems();
         }
     }

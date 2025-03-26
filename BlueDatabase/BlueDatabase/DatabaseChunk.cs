@@ -191,7 +191,7 @@ public class DatabaseChunk : Database {
 
             return x != db.LastChange ? null : chunks; // Stand stimmt nicht mehr
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return GenerateNewChunks(db, minLen, fileStateUtcDateToSave, chunksAllowed);
         }
     }
@@ -419,7 +419,6 @@ public class DatabaseChunk : Database {
         if (!ok) { return "Chunk Lade-Fehler"; }
 
         return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.IsEditable(reason);
-
     }
 
     protected override bool BeSureToBeUpDoDate() {

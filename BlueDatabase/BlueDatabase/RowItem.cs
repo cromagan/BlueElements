@@ -1081,7 +1081,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         } catch (Exception ex) {
             Develop.DebugPrint("Unerwarteter Filter-Fehler", ex);
             Generic.Pause(0.1, true);
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return MatchesTo(column, filtertyp, searchvalue);
         }
     }

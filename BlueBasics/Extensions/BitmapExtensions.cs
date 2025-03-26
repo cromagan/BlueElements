@@ -38,7 +38,7 @@ public static partial class Extensions {
             gr.DrawImage(bmp, new Rectangle(0, 0, bmp.Width, bmp.Height));
             return bitmap;
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return bmp.CloneFromBitmap();
         }
     }
@@ -182,7 +182,7 @@ public static partial class Extensions {
             }
         } catch { }
 
-        Develop.CheckStackForOverflow();
+        Develop.CheckStackOverflow();
         // Mit den modifizierten Werten nochmal probieren...
         return tmp.Resize(maxheight, maxheight, sizeMode, interpolationMode, true);
     }

@@ -122,16 +122,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public override bool Focused => base.Focused || (_sliderY != null && _sliderY.Focused());
 
-    [DefaultValue(false)]
-    public bool TextFormatingAllowed {
-        get => _formatierungErlaubt;
-        set {
-            if (value == _formatierungErlaubt) { return; }
-            _formatierungErlaubt = value;
-            GenerateEtxt(false);
-        }
-    }
-
     [DefaultValue(4000)]
     public int MaxTextLenght {
         get => _maxTextLenght;
@@ -229,6 +219,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
             Invalidate();
             RaiseEventIfTextChanged(true);  // Wichtig, z.B: für ComboBox
+        }
+    }
+
+    [DefaultValue(false)]
+    public bool TextFormatingAllowed {
+        get => _formatierungErlaubt;
+        set {
+            if (value == _formatierungErlaubt) { return; }
+            _formatierungErlaubt = value;
+            GenerateEtxt(false);
         }
     }
 
@@ -500,7 +500,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
             return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
         } catch {
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return WordStarts(word, position);
         }
     }

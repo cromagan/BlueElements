@@ -139,7 +139,7 @@ public class BitmapListItem : AbstractListItem {
             return new Size(300, (int)(sc * 300));
         } catch {
             //... wird an anderer Stelle verwendet...
-            Develop.CheckStackForOverflow();
+            Develop.CheckStackOverflow();
             return ComputeSizeUntouchedForListBox(itemdesign);
         }
     }
