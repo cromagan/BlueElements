@@ -1066,7 +1066,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public virtual bool BeSureAllDataLoaded(int anzahl) => !IsDisposed && BeSureToBeUpDoDate();
 
-    public virtual (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) => (false, true);
+    public virtual bool BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) => true;
 
     public bool CanDoValueChangedScript() => IsRowScriptPossible(true) && EventScript.Get(ScriptEventTypes.value_changed).Count == 1;
 

@@ -38,11 +38,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Fields
 
-    private readonly List<FilterItem> _internal = [];
-
     //TODO: Kommentar wieder entfernen
     private readonly string _coment;
 
+    private readonly List<FilterItem> _internal = [];
     private Database? _database;
 
     private List<RowItem>? _rows;
@@ -183,7 +182,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (db.Column.SplitColumn is { } spc) {
             if (InitValue(spc, true, filter) is { } i) {
-                var (_, ok) = db.BeSureRowIsLoaded(i, null);
+                var ok = db.BeSureRowIsLoaded(i, null);
                 if (!ok) { return []; }
             }
         }

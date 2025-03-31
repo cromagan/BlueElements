@@ -114,7 +114,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         get {
             if (Database?.Column.First() is { IsDisposed: false } c) {
                 if (Database.Column.SplitColumn == c) {
-                    var (_, ok) = Database.BeSureRowIsLoaded(primärSchlüssel, null);
+                    var ok = Database.BeSureRowIsLoaded(primärSchlüssel, null);
                     if (!ok) { return null; }
                 }
 
@@ -528,6 +528,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).newrow;
     }
+
     //    List<Database> done = new();
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
@@ -858,7 +859,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         item = SearchByKey(key);
         if (item == null) {
-            Develop.DebugPrint(ErrorType.Error, "Erstellung fehlgeschlagen, ID Fehler");
+            Develop.DebugPrint(ErrorType.Error, $"Erstellung fehlgeschlagen, ID Fehler {key}");
             throw new Exception();
         }
 
@@ -871,8 +872,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        Develop.MonitorMessage?.Invoke(db.Caption, "PlusZeichen", $"Neue Zeile erstellt: {db.Caption}\\{item.CellFirstString()}",0);
-
+        Develop.MonitorMessage?.Invoke(db.Caption, "PlusZeichen", $"Neue Zeile erstellt: {db.Caption}\\{item.CellFirstString()}", 0);
 
         _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
 

@@ -97,9 +97,15 @@ public partial class FloatingForm : Form {
 
     public new void Close() {
         try {
+            if (InvokeRequired) {
+                _ = Invoke(new Action(Close));
+                return;
+            }
+
             if (AllBoxes.Contains(this)) { _ = AllBoxes.Remove(this); }
             base.Close();
         } catch {
+            Develop.CheckStackOverflow();
             Close();
         }
     }

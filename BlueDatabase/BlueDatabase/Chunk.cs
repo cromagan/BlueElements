@@ -150,6 +150,9 @@ public class Chunk : IHasKeyName {
 
         _lastcheck = DateTime.UtcNow;
         (_bytes, _fileinfo, LoadFailed) = LoadBytesFromDisk(c);
+
+        if (LoadFailed) { return; }
+
         ParseLockData();
     }
 
@@ -180,8 +183,11 @@ public class Chunk : IHasKeyName {
         try {
             Develop.SetUserDidSomething();
 
+            // Header-Daten aus _bytes entfernen
+            var contentBytes = RemoveHeaderDataTypes(_bytes);
+
             var head = GetHead();
-            var datacompressed = head.Concat(_bytes).ToArray().ZipIt();
+            var datacompressed = head.Concat(contentBytes).ToArray().ZipIt();
             if (datacompressed is not { }) { return false; }
 
             Develop.SetUserDidSomething();
@@ -363,13 +369,18 @@ public class Chunk : IHasKeyName {
 
     internal bool DoExtendedSave(int minbytes) {
         var filename = ChunkFileName;
+        Develop.MonitorMessage?.Invoke(MainFileName.FileNameWithoutSuffix(), "Diskette", $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
         var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
         if (!Save(tempfile, minbytes)) { return false; }
         if (FileExists(backup)) {
-            if (!DeleteFile(backup, false)) { return false; }
+            if (!DeleteFile(backup, false)) {
+                DeleteFile(tempfile, false);
+                Develop.SetUserDidSomething();
+                return false;
+            }
         }
         Develop.SetUserDidSomething();
         // Haupt-Datei wird zum Backup umbenannt
@@ -409,17 +420,23 @@ public class Chunk : IHasKeyName {
     }
 
     internal string IsEditable(EditableErrorReasonType reason) {
-        if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
+        var important = reason is EditableErrorReasonType.EditCurrently or EditableErrorReasonType.EditAcut or EditableErrorReasonType.Save;
+
+        if (NeedsReload(important)) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2) {
-            return LastEditUser != UserName
-                ? $"Aktueller Bearbeiter: {LastEditUser}"
-                : LastEditApp != Develop.AppExe()
-                ? $"Anderes Programm bearbeitet: {LastEditApp}"
-                : LastEditMachineName != Environment.MachineName ? $"Anderes Computer bearbeitet: {LastEditMachineName}" : string.Empty;
+            if (LastEditUser != UserName) {
+                return $"Aktueller Bearbeiter: {LastEditUser}";
+            } else {
+                if (LastEditApp != Develop.AppExe()) {
+                    return $"Anderes Programm bearbeitet: {LastEditApp}";
+                } else {
+                    return LastEditMachineName != Environment.MachineName ? $"Anderes Computer bearbeitet: {LastEditMachineName}" : string.Empty;
+                }
+            }
         }
 
-        if (reason is not EditableErrorReasonType.EditAcut and not EditableErrorReasonType.EditCurrently) { return string.Empty; }
+        if (!important) { return string.Empty; }
 
         if (!DoExtendedSave(0)) {
             LastEditTimeUtc = DateTime.MinValue;
@@ -495,6 +512,30 @@ public class Chunk : IHasKeyName {
                     return;
             }
         }
+    }
+
+    private List<byte> RemoveHeaderDataTypes(List<byte> bytes) {
+        var data = bytes.ToArray();
+        var result = new List<byte>();
+        var pointer = 0;
+        var filename = ChunkFileName;
+
+        // Durch alle Bytes gehen und nur Nicht-Header-Daten behalten
+        while (pointer < data.Length) {
+            int startPointer = pointer;
+            var (newPointer, type, _, _, _) = Database.Parse(data, pointer, filename);
+
+            if (!type.IsHeaderType() && !type.IsObsolete() && startPointer < newPointer) {
+                // Alle Bytes dieses Nicht-Header-Elements zum Ergebnis hinzufügen
+                for (int i = startPointer; i < newPointer; i++) {
+                    result.Add(data[i]);
+                }
+            }
+
+            pointer = newPointer;
+        }
+
+        return result;
     }
 
     #endregion

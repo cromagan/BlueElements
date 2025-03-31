@@ -289,7 +289,7 @@ public class DatabaseChunk : Database {
         foreach (var file in fileQuery) {
             var chunkId = file.FileNameWithoutSuffix();
 
-            var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, false);
+            var ok = LoadChunkWithChunkId(chunkId, true, null, false);
             if (!ok) { return false; }
         }
 
@@ -302,10 +302,10 @@ public class DatabaseChunk : Database {
     /// <param name="chunkValue"></param>
     /// <param name="important">Steuert, ob es dringend nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public override (bool loaded, bool ok) BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) {
+    public override bool BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) {
         var chunkId = GetChunkId(this, DatabaseDataType.UTF8Value_withoutSizeData, chunkValue);
 
-        return string.IsNullOrEmpty(chunkId) ? ((bool loaded, bool ok))(false, false) : LoadChunkWithChunkId(chunkId, false, needPassword, false);
+        return LoadChunkWithChunkId(chunkId, false, needPassword, false);
     }
 
     /// <summary>
@@ -315,10 +315,10 @@ public class DatabaseChunk : Database {
     /// <param name="chunkId"></param>
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public (bool loaded, bool ok) LoadChunkWithChunkId(string chunkId, bool important, NeedPassword? needPassword, bool mustExist) {
-        if (string.IsNullOrEmpty(Filename)) { return (true, true); } // Temporäre Datenbanken
+    public bool LoadChunkWithChunkId(string chunkId, bool important, NeedPassword? needPassword, bool mustExist) {
+        if (string.IsNullOrEmpty(Filename)) { return true; } // Temporäre Datenbanken
 
-        if (string.IsNullOrEmpty(chunkId)) { return (false, false); }
+        if (string.IsNullOrEmpty(chunkId)) { return false; }
 
         var t = Stopwatch.StartNew();
         var lastMessageTime = 0L;
@@ -328,15 +328,15 @@ public class DatabaseChunk : Database {
         do {
             if (_chunks.TryGetValue(chunkId, out var chk)) {
                 chk.WaitInitialDone();
-                if (chk.LoadFailed) { return (false, false); }
-                if (!chk.NeedsReload(important)) { return (false, true); }
+                if (chk.LoadFailed) { return false; }
+                if (!chk.NeedsReload(important)) { return true; }
             }
 
             if (chunksBeingSaved.Count == 0) { break; }
 
             if (t.ElapsedMilliseconds > 150 * 1000) {
                 Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Abbruch, {chunksBeingSaved.Count} Chunks wurden noch nicht gespeichert.", 0);
-                return (false, false);
+                return false;
             }
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
@@ -354,7 +354,7 @@ public class DatabaseChunk : Database {
 
         if (chunk.LoadFailed) {
             Freeze($"Chunk {chunk.KeyName} Laden fehlgeschlagen");
-            return (false, false);
+            return false;
         }
         OnLoading();
         var ok = Parse(chunk, needPassword);
@@ -366,7 +366,7 @@ public class DatabaseChunk : Database {
             chunk.SaveRequired = true;
         }
 
-        return (!chunk.LoadFailed, ok);
+        return ok;
     }
 
     public override void ReorganizeChunks() {
@@ -414,7 +414,9 @@ public class DatabaseChunk : Database {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var (_, ok) = LoadChunkWithChunkId(chunkId, true, null, true);
+        var important = reason is EditableErrorReasonType.EditCurrently or EditableErrorReasonType.EditAcut or EditableErrorReasonType.Save;
+
+        var ok = LoadChunkWithChunkId(chunkId, important, null, true);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
@@ -426,14 +428,14 @@ public class DatabaseChunk : Database {
 
         OnDropMessage(ErrorType.Info, "Lade Chunks von '" + TableName + "'");
 
-        if (!LoadChunkWithChunkId(Chunk_MainData, false, null, true).ok) { return false; }
+        if (!LoadChunkWithChunkId(Chunk_MainData, true, null, true)) { return false; }
 
         Column.GetSystems();
 
         if (Column.SplitColumn != null) {
-            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, null, true).ok) { return false; }
-            //if (!LoadChunkWithChunkId(Chunk_Master, false, null, true).ok) { return false; }
-            if (!LoadChunkWithChunkId(Chunk_Variables, false, null, true).ok) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, null, true)) { return false; }
+            //if (!LoadChunkWithChunkId(Chunk_Master, true, null, true)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Variables, true, null, true)) { return false; }
         }
         IsInCache = DateTime.UtcNow;
 
@@ -543,7 +545,6 @@ public class DatabaseChunk : Database {
         return rowchunk;
     }
 
-    [Obsolete]
     private bool Parse(Chunk chunk, NeedPassword? needPassword) {
         if (chunk.LoadFailed) { return false; }
 

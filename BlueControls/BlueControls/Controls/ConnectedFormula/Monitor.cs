@@ -70,6 +70,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
             if (_lastRow != null) {
                 capInfo.Text = "Überwache: " + _lastRow.CellFirstString();
                 _lastRow.DropMessage += _lastRow_DropMessage;
+                _lastRow_DropMessage(this, new MessageEventArgs(BlueBasics.Enums.ErrorType.Info, "Überwachung gestartet"));
             }
         }
     }
