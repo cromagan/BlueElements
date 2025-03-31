@@ -183,10 +183,13 @@ public class Chunk : IHasKeyName {
         try {
             Develop.SetUserDidSomething();
 
-            // Header-Daten aus _bytes entfernen
+            // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
             var contentBytes = RemoveHeaderDataTypes(_bytes);
 
+            // Neuen Header erstellen
             var head = GetHead();
+
+            // Header und Datensätze zusammenführen und komprimieren
             var datacompressed = head.Concat(contentBytes).ToArray().ZipIt();
             if (datacompressed is not { }) { return false; }
 
@@ -472,7 +475,7 @@ public class Chunk : IHasKeyName {
 
         // Dann die Werte zur ByteList hinzufügen
         SaveToByteList(headBytes, DatabaseDataType.Version, Database.DatabaseVersion);
-        SaveToByteList(DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
+        SaveToByteList(headBytes, DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        ");
 
         SaveToByteList(headBytes, DatabaseDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
         SaveToByteList(headBytes, DatabaseDataType.LastEditUser, LastEditUser);
@@ -508,28 +511,38 @@ public class Chunk : IHasKeyName {
                     LastEditMachineName = value;
                     break;
 
-                case DatabaseDataType.Werbung:
-                    return;
+                //case DatabaseDataType.Werbung:
+                //    return;
             }
         }
     }
 
-    private List<byte> RemoveHeaderDataTypes(List<byte> bytes) {
+    /// <summary>
+    /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <returns></returns>
+    private List<byte>? RemoveHeaderDataTypes(List<byte> bytes) {
         var data = bytes.ToArray();
         var result = new List<byte>();
         var pointer = 0;
         var filename = ChunkFileName;
 
-        // Durch alle Bytes gehen und nur Nicht-Header-Daten behalten
+        // Durch alle Datensätze gehen
         while (pointer < data.Length) {
             int startPointer = pointer;
             var (newPointer, type, _, _, _) = Database.Parse(data, pointer, filename);
 
-            if (!type.IsHeaderType() && !type.IsObsolete() && startPointer < newPointer) {
-                // Alle Bytes dieses Nicht-Header-Elements zum Ergebnis hinzufügen
-                for (int i = startPointer; i < newPointer; i++) {
-                    result.Add(data[i]);
-                }
+            // Wenn Parse keine Fortschritte macht, abbrechen um Endlosschleife zu vermeiden
+            if (newPointer <= startPointer) {
+                return null;
+            }
+
+
+            // Nur Nicht-Header-Datensätze zum Ergebnis hinzufügen
+            if (!type.IsHeaderType() && !type.IsObsolete()) {
+                // Kompletten Datensatz hinzufügen (effizient mit AddRange)
+                result.AddRange(data.Skip(startPointer).Take(newPointer - startPointer));
             }
 
             pointer = newPointer;
