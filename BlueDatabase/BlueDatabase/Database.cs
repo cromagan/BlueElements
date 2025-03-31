@@ -2345,7 +2345,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected virtual bool BeSureToBeUpDoDate() {
         if (IsInCache.Year < 2000) { return false; }
-        return IsDisposed;
+        return !IsDisposed;
     }
 
     protected void CreateWatcher() {
