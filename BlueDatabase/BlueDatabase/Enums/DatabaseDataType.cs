@@ -38,7 +38,8 @@ public static class DatabaseDataTypeExtension {
                                                                            DatabaseDataType.LastEditTimeUTC or
                                                                            DatabaseDataType.LastEditUser or
                                                                            DatabaseDataType.LastEditApp or
-                                                                           DatabaseDataType.LastEditMachineName;
+                                                                           DatabaseDataType.LastEditMachineName or
+                                                                           DatabaseDataType.LastEditID;
 
 
     #endregion
@@ -150,6 +151,7 @@ public enum DatabaseDataType : byte {
     LastEditMachineName = 77,
     LastEditTimeUTC = 78,
     EventScriptEdited = 79,
+    LastEditID = 80,
 
     //Info_ColumDataSart = 100,
     //Info_ColumnDataEnd = 199,

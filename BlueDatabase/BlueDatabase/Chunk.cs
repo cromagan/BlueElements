@@ -85,7 +85,7 @@ public class Chunk : IHasKeyName {
     }
 
     public string LastEditApp { get; private set; } = string.Empty;
-
+    public string LastEditID { get; private set; } = string.Empty;
     public string LastEditMachineName { get; private set; } = string.Empty;
 
     public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
@@ -187,7 +187,7 @@ public class Chunk : IHasKeyName {
             var contentBytes = RemoveHeaderDataTypes(_bytes);
 
             // Neuen Header erstellen
-            var head = GetHead();
+            var head = GetHeadAndSetEditor();
 
             // Header und Datensätze zusammenführen und komprimieren
             var datacompressed = head.Concat(contentBytes).ToArray().ZipIt();
@@ -434,16 +434,20 @@ public class Chunk : IHasKeyName {
                 if (LastEditApp != Develop.AppExe()) {
                     return $"Anderes Programm bearbeitet: {LastEditApp}";
                 } else {
-                    return LastEditMachineName != Environment.MachineName ? $"Anderes Computer bearbeitet: {LastEditMachineName}" : string.Empty;
+                    if (LastEditMachineName != Environment.MachineName || LastEditID != Generic.MyId) {
+                        return $"Anderes Computer bearbeitet: {LastEditMachineName} - {LastEditID}";
+                    }
                 }
             }
         }
 
         if (!important) { return string.Empty; }
 
-        if (!DoExtendedSave(0)) {
-            LastEditTimeUtc = DateTime.MinValue;
-            return "Bearbeitung konnte nicht gesetzt werden.";
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
+            if (!DoExtendedSave(0)) {
+                LastEditTimeUtc = DateTime.MinValue;
+                return "Bearbeitung konnte nicht gesetzt werden.";
+            }
         }
 
         return string.Empty;
@@ -462,7 +466,7 @@ public class Chunk : IHasKeyName {
 
     internal void SaveToByteListEOF() => SaveToByteList(DatabaseDataType.EOF, "END");
 
-    private List<byte> GetHead() {
+    private List<byte> GetHeadAndSetEditor() {
         if (LoadFailed) { return []; }
 
         var headBytes = new List<byte>();
@@ -472,6 +476,7 @@ public class Chunk : IHasKeyName {
         LastEditUser = UserName;
         LastEditApp = Develop.AppExe();
         LastEditMachineName = Environment.MachineName;
+        LastEditID = Generic.MyId;
 
         // Dann die Werte zur ByteList hinzufügen
         SaveToByteList(headBytes, DatabaseDataType.Version, Database.DatabaseVersion);
@@ -481,6 +486,7 @@ public class Chunk : IHasKeyName {
         SaveToByteList(headBytes, DatabaseDataType.LastEditUser, LastEditUser);
         SaveToByteList(headBytes, DatabaseDataType.LastEditApp, LastEditApp);
         SaveToByteList(headBytes, DatabaseDataType.LastEditMachineName, LastEditMachineName);
+        SaveToByteList(headBytes, DatabaseDataType.LastEditID, Generic.MyId);
 
         return headBytes;
     }
@@ -511,8 +517,12 @@ public class Chunk : IHasKeyName {
                     LastEditMachineName = value;
                     break;
 
-                //case DatabaseDataType.Werbung:
-                //    return;
+                case DatabaseDataType.LastEditID:
+                    LastEditID = value;
+                    break;
+
+                    //case DatabaseDataType.Werbung:
+                    //    return;
             }
         }
     }
@@ -537,7 +547,6 @@ public class Chunk : IHasKeyName {
             if (newPointer <= startPointer) {
                 return null;
             }
-
 
             // Nur Nicht-Header-Datensätze zum Ergebnis hinzufügen
             if (!type.IsHeaderType() && !type.IsObsolete()) {

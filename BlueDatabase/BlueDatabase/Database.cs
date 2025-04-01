@@ -2553,6 +2553,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             case DatabaseDataType.LastEditUser:
                 break;
 
+            case DatabaseDataType.LastEditID:
+                break;
+
             case DatabaseDataType.LastEditApp:
                 break;
 

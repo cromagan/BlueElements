@@ -55,6 +55,8 @@ public static class Generic {
 
     #region Properties
 
+    public static string MyId { get; } = Guid.NewGuid().ToString();
+
     public static string UserName {
         get {
             if (!string.IsNullOrEmpty(_gotUserName)) { return _gotUserName; }
