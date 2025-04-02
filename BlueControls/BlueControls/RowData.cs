@@ -107,7 +107,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
 
     #region Methods
 
-    public void CalculateDrawHeight(ColumnViewCollection ca, int columnHeadSize, Rectangle displayRectangleWoSlider, string style) {
+    public void CalculateDrawHeight(ColumnViewCollection ca, Rectangle displayRectangleWoSlider, string style) {
         if (IsDisposed || Row.IsDisposed) { DrawHeight = 16; return; }
 
         DrawHeight = 18;
@@ -115,12 +115,11 @@ public sealed class RowData : IComparable, IDisposableExtended {
         foreach (var thisViewItem in ca) {
             if (thisViewItem.Column is { IsDisposed: false } tmpc && !Row.CellIsNullOrEmpty(tmpc)) {
                 var renderer = thisViewItem.GetRenderer(style);
-
                 DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation).Height);
             }
         }
 
-        DrawHeight = Math.Min(DrawHeight, (int)(displayRectangleWoSlider.Height * 0.4) - columnHeadSize);
+        DrawHeight = Math.Min(DrawHeight, (int)(displayRectangleWoSlider.Height * 0.4));
         DrawHeight = Math.Max(DrawHeight, 18);
     }
 

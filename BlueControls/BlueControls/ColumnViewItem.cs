@@ -312,14 +312,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return newContentWidth;
     }
 
-    public Rectangle AutoFilterLocation(float scale, float sliderx) {
+    public Rectangle AutoFilterLocation(float scale, float sliderx, int add) {
         // Manchmal sind filter da, auch ohne Autofilter-Button
         //if (!AutoFilterSymbolPossible) { return Rectangle.Empty; }
 
-        var r = RealHead(scale, sliderx);
+        var realHead = RealHead(scale, sliderx);
         var size = (int)(AutoFilterSize * scale);
 
-        return new Rectangle(r.Right - size, r.Bottom - size, size, size);
+        return new Rectangle(realHead.Right - size, realHead.Bottom - size + add, size, size);
     }
 
     public SizeF ColumnCaptionText_Size() {
@@ -527,11 +527,20 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return new Rectangle((int)(((int)X * scale) - sliderx), 0, (int)(DrawWidth() * scale), (int)(_parent.HeadSize() * scale));
     }
 
-    public Rectangle ReduceButtonLocation(float scale, float sliderx) {
+    public Rectangle ReduceButtonLocation(float scale, float sliderx, int moveDown) {
         var r = RealHead(scale, sliderx);
         var size = (int)(18 * scale);
 
-        return new Rectangle(r.Right - size, r.Top, size, size);
+        if (!string.IsNullOrEmpty(CaptionGroup3)) {
+            moveDown += (int)(18 * scale * 3);
+        } else if (!string.IsNullOrEmpty(CaptionGroup2)) {
+            moveDown += (int)(18 * scale * 2);
+        } else if (!string.IsNullOrEmpty(CaptionGroup1)) {
+            moveDown += (int)(18 * scale);
+        }
+
+
+        return new Rectangle(r.Right - size, r.Top + moveDown, size, size);
     }
 
     public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();

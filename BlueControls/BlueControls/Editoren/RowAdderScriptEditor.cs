@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Forms;
@@ -25,11 +24,7 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.Structures;
-using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.IO;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

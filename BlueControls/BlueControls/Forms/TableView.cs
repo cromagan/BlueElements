@@ -512,7 +512,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
 
         btnSuchenUndErsetzen.Enabled = datenbankDa;
-        FilterLeiste.Enabled = datenbankDa;
     }
 
     protected virtual void DatabaseSet(Database? db, string toParse) {
@@ -525,7 +524,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             CFO.Page = null;
         }
 
-        FilterLeiste.Table = Table;
         var did = false;
 
         if (!string.IsNullOrEmpty(toParse)) {
@@ -993,7 +991,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             tbcSidebar.Visible = true;
             grpHilfen.Visible = true;
             grpAnsicht.Visible = true;
-            FilterLeiste.Visible = true;
             SplitContainer1.Panel2Collapsed = false;
             return;
         }
@@ -1003,7 +1000,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         tbcSidebar.Visible = true;
         grpHilfen.Visible = true;
         grpAnsicht.Visible = true;
-        FilterLeiste.Visible = true;
         SplitContainer1.IsSplitterFixed = false;
         SplitContainer1.Panel2Collapsed = false;
         SplitContainer1.SplitterDistance = Math.Max(SplitContainer1.SplitterDistance, SplitContainer1.Width / 2);

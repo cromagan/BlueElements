@@ -33,6 +33,7 @@ public partial class VariableEditor : EditorEasy {
 
     public VariableEditor() : base() => InitializeComponent();
 
+
     #endregion
 
     #region Methods
@@ -49,7 +50,7 @@ public partial class VariableEditor : EditorEasy {
         }
         var list = new VariableCollection();
 
-        if (filterVariablen?.Table?.Database is not { IsDisposed: false } db) { return list; }
+        if (tableVariablen.Database is not { IsDisposed: false } db) { return list; }
 
         foreach (var thisr in db.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
@@ -119,7 +120,7 @@ public partial class VariableEditor : EditorEasy {
         db.SortDefinition = new RowSortDefinition(db, na, true);
 
         tableVariablen.DatabaseSet(db, string.Empty);
-        filterVariablen.Table = tableVariablen;
+
 
         db.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }

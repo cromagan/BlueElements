@@ -66,6 +66,7 @@ namespace BlueControls.Forms {
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
+            this.btnMonitoring = new BlueControls.Controls.Button();
             this.btnUserInfo = new BlueControls.Controls.Button();
             this.btnSaveLoad = new BlueControls.Controls.Button();
             this.btnPowerBearbeitung = new BlueControls.Controls.Button();
@@ -87,8 +88,6 @@ namespace BlueControls.Forms {
             this.btnClipboardImport = new BlueControls.Controls.Button();
             this.pnlDatabaseSelect = new System.Windows.Forms.Panel();
             this.tbcDatabaseSelector = new BlueControls.Controls.TabControl();
-            this.pnlSerachBar = new System.Windows.Forms.Panel();
-            this.FilterLeiste = new BlueControls.BlueDatabaseDialogs.Filterleiste();
             this.Table = new BlueControls.Controls.Table();
             this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tbcSidebar = new BlueControls.Controls.TabControl();
@@ -98,7 +97,6 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.grpAufräumen = new BlueControls.Controls.Button();
-            this.btnMonitoring = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -116,7 +114,6 @@ namespace BlueControls.Forms {
             this.grpExport.SuspendLayout();
             this.grpImport.SuspendLayout();
             this.pnlDatabaseSelect.SuspendLayout();
-            this.pnlSerachBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
             this.SplitContainer1.Panel2.SuspendLayout();
@@ -559,6 +556,18 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.TabStop = false;
             this.grpAdminAllgemein.Text = "Allgemein";
             // 
+            // btnMonitoring
+            // 
+            this.btnMonitoring.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnMonitoring.ImageCode = "Monitor|16";
+            this.btnMonitoring.Location = new System.Drawing.Point(264, 2);
+            this.btnMonitoring.Name = "btnMonitoring";
+            this.btnMonitoring.QuickInfo = "A";
+            this.btnMonitoring.Size = new System.Drawing.Size(72, 66);
+            this.btnMonitoring.TabIndex = 45;
+            this.btnMonitoring.Text = "Monitoring starten";
+            this.btnMonitoring.Click += new System.EventHandler(this.btnMonitoring_Click);
+            // 
             // btnUserInfo
             // 
             this.btnUserInfo.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
@@ -817,36 +826,14 @@ namespace BlueControls.Forms {
             this.tbcDatabaseSelector.Selected += new System.Windows.Forms.TabControlEventHandler(this.tbcDatabaseSelector_Selected);
             this.tbcDatabaseSelector.Deselecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tbcDatabaseSelector_Deselecting);
             // 
-            // pnlSerachBar
-            // 
-            this.pnlSerachBar.Controls.Add(this.FilterLeiste);
-            this.pnlSerachBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlSerachBar.Location = new System.Drawing.Point(0, 24);
-            this.pnlSerachBar.Name = "pnlSerachBar";
-            this.pnlSerachBar.Size = new System.Drawing.Size(972, 40);
-            this.pnlSerachBar.TabIndex = 24;
-            // 
-            // FilterLeiste
-            // 
-            this.FilterLeiste.ÄhnlicheAnsichtName = "Filterleiste Ähnlich";
-            this.FilterLeiste.AnsichtName = "Filterleiste Waagerecht";
-            this.FilterLeiste.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.FilterLeiste.CausesValidation = false;
-            this.FilterLeiste.Dock = System.Windows.Forms.DockStyle.Top;
-            this.FilterLeiste.Filtertypes = BlueControls.Enums.FilterTypesToShow.AktuelleAnsicht_AktiveFilter;
-            this.FilterLeiste.Location = new System.Drawing.Point(0, 0);
-            this.FilterLeiste.Name = "FilterLeiste";
-            this.FilterLeiste.Size = new System.Drawing.Size(972, 40);
-            this.FilterLeiste.TabIndex = 22;
-            this.FilterLeiste.TabStop = false;
-            // 
             // Table
             // 
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Table.Location = new System.Drawing.Point(0, 64);
+            this.Table.FilterleisteZeilen = 1;
+            this.Table.Location = new System.Drawing.Point(0, 24);
             this.Table.Name = "Table";
             this.Table.SheetStyle = "Windows 11";
-            this.Table.Size = new System.Drawing.Size(972, 531);
+            this.Table.Size = new System.Drawing.Size(972, 571);
             this.Table.TabIndex = 0;
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
             this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Table_ContextMenuItemClicked);
@@ -867,7 +854,6 @@ namespace BlueControls.Forms {
             // SplitContainer1.Panel1
             // 
             this.SplitContainer1.Panel1.Controls.Add(this.Table);
-            this.SplitContainer1.Panel1.Controls.Add(this.pnlSerachBar);
             this.SplitContainer1.Panel1.Controls.Add(this.pnlDatabaseSelect);
             // 
             // SplitContainer1.Panel2
@@ -946,18 +932,6 @@ namespace BlueControls.Forms {
             this.grpAufräumen.TabIndex = 45;
             this.grpAufräumen.Text = "Zeilen löschen";
             // 
-            // btnMonitoring
-            // 
-            this.btnMonitoring.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnMonitoring.ImageCode = "Monitor|16";
-            this.btnMonitoring.Location = new System.Drawing.Point(264, 2);
-            this.btnMonitoring.Name = "btnMonitoring";
-            this.btnMonitoring.QuickInfo = "A";
-            this.btnMonitoring.Size = new System.Drawing.Size(72, 66);
-            this.btnMonitoring.TabIndex = 45;
-            this.btnMonitoring.Text = "Monitoring starten";
-            this.btnMonitoring.Click += new System.EventHandler(this.btnMonitoring_Click);
-            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -989,7 +963,6 @@ namespace BlueControls.Forms {
             this.grpExport.ResumeLayout(false);
             this.grpImport.ResumeLayout(false);
             this.pnlDatabaseSelect.ResumeLayout(false);
-            this.pnlSerachBar.ResumeLayout(false);
             this.SplitContainer1.Panel1.ResumeLayout(false);
             this.SplitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).EndInit();
@@ -1005,8 +978,6 @@ namespace BlueControls.Forms {
         protected RibbonBar ribMain;
         protected Panel pnlDatabaseSelect;
         protected TabControl tbcDatabaseSelector;
-        protected Panel pnlSerachBar;
-        protected Filterleiste FilterLeiste;
         protected Table Table;
         protected SplitContainer SplitContainer1;
         protected TabPage tabAdmin;
