@@ -530,13 +530,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public Rectangle ReduceButtonLocation(float scale, float sliderx, int moveDown) {
         var r = RealHead(scale, sliderx);
         var size = (int)(18 * scale);
+        var pcch = (int)(ColumnCaptionSizeY * scale);
 
         if (!string.IsNullOrEmpty(CaptionGroup3)) {
-            moveDown += (int)(18 * scale * 3);
+            moveDown += pcch * 3;
         } else if (!string.IsNullOrEmpty(CaptionGroup2)) {
-            moveDown += (int)(18 * scale * 2);
+            moveDown += pcch * 2;
         } else if (!string.IsNullOrEmpty(CaptionGroup1)) {
-            moveDown += (int)(18 * scale);
+            moveDown += pcch;
         }
 
 

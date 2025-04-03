@@ -22,10 +22,8 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,7 +43,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     #region Fields
 
     private string _defaultArrangement = string.Empty;
-    private Filterausgabe _filterOutputType = Filterausgabe.Gewähle_Zeile;
 
     #endregion
 
@@ -68,16 +65,6 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     public override bool DatabaseInputMustMatchOutputDatabase => true;
 
     public override string Description => "Darstellung einer Datenbank als bearbeitbare und filterbare Tabelle.";
-
-    public Filterausgabe FilterOutputType {
-        get => _filterOutputType;
-        set {
-            if (IsDisposed) { return; }
-            if (_filterOutputType == value) { return; }
-            _filterOutputType = value;
-            OnPropertyChanged("FilterOutputType");
-        }
-    }
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
@@ -119,11 +106,11 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
             result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, AllAvailableColumArrangemengts(db)));
         }
 
-        if (DatabaseOutput is { IsDisposed: false }) {
-            var u = new List<AbstractListItem>();
-            u.AddRange(ItemsOf(typeof(Filterausgabe)));
-            result.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
-        }
+        //if (DatabaseOutput is { IsDisposed: false }) {
+        //    var u = new List<AbstractListItem>();
+        //    u.AddRange(ItemsOf(typeof(Filterausgabe)));
+        //    result.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
+        //}
         return result;
     }
 

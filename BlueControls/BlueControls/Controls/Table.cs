@@ -92,7 +92,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private RowData? _mouseOverRow;
     private Progressbar? _pg;
-    private FilterCollection? _prevFilter;
 
     private List<RowData>? _rowsFilteredAndPinned;
 
@@ -269,11 +268,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             Invalidate();
         }
     }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Filterausgabe FilterOutputType { get; } = Filterausgabe.Gewähle_Zeile;
 
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
     public FilterTypesToShow FilterTypesToShow { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
@@ -871,14 +865,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (!sameRow) {
             OnSelectedRowChanged(new RowNullableEventArgs(row?.Row));
 
-            if (FilterOutputType == Filterausgabe.Gewähle_Zeile) {
-                if (row?.Row is { IsDisposed: false } setedrow) {
-                    using var nfc = new FilterCollection(setedrow, "TableOutput");
-                    FilterOutput.ChangeTo(nfc);
-                } else {
-                    FilterOutput.ChangeTo(new FilterItem(db, "Dummy"));
-                }
-            }
+            DoFilterOutput();
         }
     }
 
@@ -1111,6 +1098,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public void ImportCsv(string csvtxt) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         ImportCsv(db, csvtxt);
+    }
+
+    public bool IsInHead(int y) {
+        // Anpassen der Kopfbereichsprüfung unter Berücksichtigung der Filterleiste
+        return CurrentArrangement is { IsDisposed: false } ca &&
+               y <= GetPix(ca.HeadSize()) + FilterleisteHeight &&
+               y >= FilterleisteHeight;
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
@@ -1398,7 +1392,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (_isFilling) { return; }
         _isFilling = true;
 
-
         btnPinZurück.Enabled = Database is not null && PinnedRows.Count > 0;
 
         #region ZeilenFilter befüllen
@@ -1496,14 +1489,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                             _ = flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            var r = Table.RendererOf(thisColumn, Constants.Win11);
-                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld, r);
+                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld);
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
                             ChildIsBorn(flx);
-                            flx.FilterOutput.PropertyChanging += FlexSingeFilter_FilterOutput_PropertyChanging;
-                            flx.FilterOutput.PropertyChanged += FlexSingeFilter_FilterOutput_PropertyChanged;
+                            flx.FilterOutputPropertyChanged += FlexSingeFilter_FilterOutputPropertyChanged;
                             Controls.Add(flx);
                         }
 
@@ -1538,8 +1529,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         #region Unnötige Flexis löschen
 
         foreach (var thisFlexi in flexsToDelete) {
-            thisFlexi.FilterOutput.PropertyChanging -= FlexSingeFilter_FilterOutput_PropertyChanging;
-            thisFlexi.FilterOutput.PropertyChanged -= FlexSingeFilter_FilterOutput_PropertyChanged;
+            thisFlexi.FilterOutputPropertyChanged -= FlexSingeFilter_FilterOutputPropertyChanged;
             thisFlexi.Visible = false;
             Controls.Remove(thisFlexi);
             thisFlexi.Dispose();
@@ -1641,13 +1631,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-
-        if(RowsFilteredAndPinned()?.Clone() is not { } sortedRowData) {
+        if (RowsFilteredAndPinned()?.Clone() is not { } sortedRowData) {
             DrawWaitScreen(gr, "Fehler der angezeigten Zeilen", ca);
             return;
         }
-
-     
 
         if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
@@ -1710,19 +1697,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         DoInputFilter(FilterOutput.Database, false);
 
-        const string t = "Übergeordnetes Element";
-
-        Filter.RemoveRange(t);
-
-        if (FilterOutputType == Filterausgabe.Im_Element_Gewählte_Filter) {
-            FilterOutput.ChangeTo(Filter);
-        }
-
-        Filter.RemoveOtherAndAdd(FilterInput, t);
-
-        if (FilterOutputType == Filterausgabe.Alle_Filter) {
-            FilterOutput.ChangeTo(Filter);
-        }
+        DoFilterOutput();
     }
 
     protected override bool IsInputKey(Keys keyData) {
@@ -1800,15 +1775,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     protected override void OnHandleCreated(System.EventArgs e) {
         base.OnHandleCreated(e);
 
+        DoFilterOutput();
+
         // Anfängliche Positionierung der Steuerelemente
         UpdateFilterleisteVisibility();
         RepositionControls();
 
-        // Wenn wir bereits eine Datenbank haben, Filterleiste initialisieren
-        if (Database != null && FilterleisteZeilen > 0) {
-            GetÄhnlich();
-            FillFilters();
-        }
+        GetÄhnlich();
+        FillFilters();
     }
 
     protected override void OnKeyDown(KeyEventArgs e) {
@@ -2146,9 +2120,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             Invalidate_SortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
                                         //CurrentArrangement?.Invalidate_DrawWithOfAllItems();
             RepositionControls();
-            if (FilterleisteZeilen > 0) {
-                FillFilters();
-            }
+
+            FillFilters();
+
             _isinSizeChanged = false;
         }
     }
@@ -2296,13 +2270,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
         CheckView();
 
-        // Aktualisiere die Filterleiste, wenn sie aktiviert ist
-        if (FilterleisteZeilen > 0) {
-            GetÄhnlich();
-            FillFilters();
-            UpdateFilterleisteVisibility();
-            RepositionControls();
-        }
+        GetÄhnlich();
+        FillFilters();
+        UpdateFilterleisteVisibility();
+        RepositionControls();
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
@@ -2336,10 +2307,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Invalidate_CurrentArrangement();
         CursorPos_Set(CursorPosColumn, CursorPosRow, true);
 
-        // Aktualisiere die Filterleiste, wenn sie aktiviert ist
-        if (FilterleisteZeilen > 0) {
-            FillFilters();
-        }
+        FillFilters();
     }
 
     private void AutoFilter_Close() {
@@ -2818,7 +2786,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private Rectangle DisplayRectangleWithoutSlider() => new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top + FilterleisteHeight, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height - FilterleisteHeight);
 
-
     private void DoÄhnlich() {
         if (IsDisposed || Database is not { IsDisposed: false } db || db.Column.Count == 0) { return; }
 
@@ -2846,6 +2813,27 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     _lastLooked = r[0].CellFirstString();
                 }
             }
+        }
+    }
+
+    private void DoFilterOutput() {
+        if (!FilterInputChangedHandled) {
+            HandleChangesNow();
+            return;
+        }
+
+        if (CursorPosRow?.Row is { } setedrow) {
+            using var nfc = new FilterCollection(setedrow, "TableOutput");
+            nfc.RemoveOtherAndAdd(Filter, string.Empty);
+            nfc.RemoveOtherAndAdd(FilterInput, string.Empty);
+
+            FilterOutput.ChangeTo(nfc);
+        } else {
+            using var nfc = new FilterCollection(Database, "TableOutput");
+            nfc.RemoveOtherAndAdd(Filter, string.Empty);
+            nfc.RemoveOtherAndAdd(FilterInput, string.Empty);
+
+            FilterOutput.ChangeTo(nfc);
         }
     }
 
@@ -2899,10 +2887,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWoSlider, Rectangle realHead) {
         if (IsDisposed) { return; }
 
-
         gr.SmoothingMode = SmoothingMode.None;
         gr.FillRectangle(new SolidBrush(cellInThisDatabaseColumn.BackColor_ColumnCell), realHead.Left, realHead.Bottom, realHead.Width, displayRectangleWoSlider.Height - realHead.Bottom + FilterleisteHeight);
-
 
         Draw_Border(gr, cellInThisDatabaseColumn, realHead, displayRectangleWoSlider.Bottom);
     }
@@ -2942,8 +2928,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
 
             if (!string.IsNullOrEmpty(txt)) {
-                var pos = new Rectangle(realHead.Left + plus, (int)(-SliderY.Value + realHead.Bottom + p1 ), realHead.Width - plus, p16);
-                gr.DrawImage(qi, new Point(realHead.Left + p1, (int)(-SliderY.Value + realHead.Bottom + p1 )));
+                var pos = new Rectangle(realHead.Left + plus, (int)(-SliderY.Value + realHead.Bottom + p1), realHead.Width - plus, p16);
+                gr.DrawImage(qi, new Point(realHead.Left + p1, (int)(-SliderY.Value + realHead.Bottom + p1)));
                 viewItem.GetRenderer(SheetStyle).Draw(gr, txt, pos, cellInThisDatabaseColumn.DoOpticalTranslation, (Alignment)cellInThisDatabaseColumn.Align, _zoom);
             }
         }
@@ -3036,7 +3022,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!IsOnScreen(realHead, displayRectangleWoSlider)) { return; }
 
-
         // Hintergrund und Rahmen des Spaltenheaders zeichnen
         gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnHead), realHead);
         Draw_Border(gr, viewItem, realHead, displayRectangleWoSlider.Bottom);
@@ -3101,7 +3086,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         QuickImage? trichterIcon = null;
 
         // Anpassen der Autofilter-Position
-        Rectangle origAutoFilterLocation = viewItem.AutoFilterLocation(_zoom, SliderX.Value,FilterleisteHeight);
+        Rectangle origAutoFilterLocation = viewItem.AutoFilterLocation(_zoom, SliderX.Value, FilterleisteHeight);
 
         var p2 = GetPix(2);
         var p4 = GetPix(4);
@@ -3206,7 +3191,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var prevCaptionGroup = string.Empty;
 
         var pcch = GetPix(ColumnCaptionSizeY);
-        var pccy = GetPix(columnno * ColumnCaptionSizeY);
+        var pccy = GetPix(columnno * ColumnCaptionSizeY) + FilterleisteHeight;
 
         foreach (var thisViewItem in ca) {
             var realHead = thisViewItem.RealHead(_zoom, SliderX.Value);
@@ -3454,8 +3439,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         int rowY = DrawY(ca, rowdata);
 
         // Wenn die Zeile über dem sichtbaren Bereich liegt
-        if (rowY < GetPix(ca.HeadSize())+ FilterleisteHeight) {
-            SliderY.Value = SliderY.Value + rowY - GetPix(ca.HeadSize() ) - FilterleisteHeight;
+        if (rowY < GetPix(ca.HeadSize()) + FilterleisteHeight) {
+            SliderY.Value = SliderY.Value + rowY - GetPix(ca.HeadSize()) - FilterleisteHeight;
         }
         // Wenn die Zeile unter dem sichtbaren Bereich liegt
         else if (rowY + rowdata.DrawHeight > dispR.Height + FilterleisteHeight) {
@@ -3496,11 +3481,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         Invalidate_SortedRowData();
         OnFilterChanged();
-
-        // Filterleiste aktualisieren, wenn sie sichtbar ist
-        if (FilterleisteZeilen > 0) {
-            FillFilters();
-        }
+        DoFilterOutput();
+        FillFilters();
     }
 
     private void Filter_ZeilenFilterSetzen() {
@@ -3530,36 +3512,25 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return null;
     }
 
-    private void FlexSingeFilter_FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
-        if (sender is not FilterCollection fo) { return; }
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+    private void FlexSingeFilter_FilterOutputPropertyChanged(object sender, System.EventArgs e) {
+        if (sender is not FlexiFilterControl ffc) { return; }
 
-        if (fo.Count == 0) {
-            if (_prevFilter is { Count: 1 }) {
-                if (_prevFilter[0] is { } fi) {
-                    Filter.Remove(fi.Column);
-                }
-            }
+        if (ffc.FilterOutput is not FilterCollection fc) { return; }
+
+        var fi = fc[ffc.FilterSingleColumn];
+
+        if (fi == null) {
+            Filter.Remove(ffc.FilterSingleColumn);
         } else {
-            if (fo[0] is { } fi) {
-                Filter.RemoveOtherAndAdd(fi);
-            }
+            Filter.RemoveOtherAndAdd(fi);
         }
 
-        _prevFilter?.Dispose();
-        _prevFilter = null;
+        DoFilterOutput();
     }
 
-    private void FlexSingeFilter_FilterOutput_PropertyChanging(object sender, System.EventArgs e) {
-        _prevFilter?.Dispose();
-        _prevFilter = null;
-
-        if (sender is not FilterCollection fo) { return; }
-
-        _prevFilter = (FilterCollection?)fo.Clone("FlexSingeFilter_FilterOutput_PropertyChanging");
-    }
 
     private void GetÄhnlich() {
+        if (IsDisposed || FilterleisteZeilen <= 0) { return; }
         if (Database is not { } db) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(db);
@@ -3579,6 +3550,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         _rowsFilteredAndPinned = null;
         Invalidate();
     }
+
+    private bool IsInRedcueButton(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.ReduceButtonLocation(_zoom, SliderX.Value, FilterleisteHeight).Contains(e.Location);
 
     private bool IsOnScreen(Rectangle realHead, Rectangle displayRectangleWoSlider) => !IsDisposed && realHead.Right > 0 && realHead.Left <= displayRectangleWoSlider.Width;
 
@@ -3604,15 +3577,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(_zoom, SliderX.Value, FilterleisteHeight).Contains(e.Location);
-
-    public bool IsInHead(int y) {
-        // Anpassen der Kopfbereichsprüfung unter Berücksichtigung der Filterleiste
-        return CurrentArrangement is { IsDisposed: false } ca &&
-               y <= GetPix( ca.HeadSize()) + FilterleisteHeight &&
-               y >= FilterleisteHeight;
-    }
-
-    private bool IsInRedcueButton(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.ReduceButtonLocation(_zoom, SliderX.Value, FilterleisteHeight).Contains(e.Location);
 
     private void Neighbour(ColumnViewItem? column, RowData? row, Direction direction, out ColumnViewItem? newColumn, out RowData? newRow) {
         if (CurrentArrangement is not { IsDisposed: false } ca) {
@@ -3659,10 +3623,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         // Bestehenden Code belassen
         FilterChanged?.Invoke(this, System.EventArgs.Empty);
 
-        // Filterleiste aktualisieren, wenn sie sichtbar ist
-        if (FilterleisteZeilen > 0) {
-            FillFilters();
-        }
+        FillFilters();
     }
 
     private void OnPinnedChanged() {
@@ -3762,9 +3723,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         CheckView();
     }
 
-    private void Row_RowRemoved(object sender, RowEventArgs e) => Invalidate_CurrentArrangement();
-
-
     /// <summary>
     /// Positioniert die Steuerelemente in der Table neu, um Platz für die Filterleiste zu schaffen.
     /// </summary>
@@ -3800,15 +3758,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         // Bei kompletter Neupositionierung auch die FlexiFilterControls anpassen
-        if (FilterleisteZeilen > 0) {
-            FillFilters();
-        }
+        FillFilters();
 
         // Neu zeichnen anfordern
         Invalidate();
     }
 
- 
+    private void Row_RowRemoved(object sender, RowEventArgs e) => Invalidate_CurrentArrangement();
+
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (IsDisposed) { return; }
         if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }

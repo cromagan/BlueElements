@@ -366,8 +366,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return fc;
     }
 
-    public bool Contains(FilterItem filter) => _internal.Contains(filter);
-
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
@@ -386,6 +384,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
 
         return string.Empty;
+    }
+
+    public bool Exists(FilterItem filter) {
+        foreach (var thisFilter in _internal) {
+            if (filter.Equals(thisFilter)) { return true; }
+        }
+
+        return false;
     }
 
     IEnumerator IEnumerable.GetEnumerator() => _internal.GetEnumerator();
@@ -416,7 +422,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (_database != fc.Database) { return true; }
 
         foreach (var thisf in this) {
-            if (!fc.Contains(thisf)) { return true; }
+            if (!fc.Exists(thisf)) { return true; }
         }
 
         // Zweite Schleife obosolet, wenn alle vorhanden sind und Count gleich.
@@ -501,14 +507,19 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         RemoveRange(toDel);
     }
 
-    public void Remove(FilterItem fi) {
+    public void Remove(FilterItem filter) {
         if (IsDisposed) { return; }
-        if (!_internal.Contains(fi)) { return; }
 
-        OnChanging();
-        _ = _internal.Remove(fi);
-        Invalidate_FilteredRows();
-        OnPropertyChanged("FilterItems");
+        var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Equals(filter)).ToList();
+
+        if (existingColumnFilter.Any()) {
+            OnChanging();
+            foreach (var thisItem in existingColumnFilter) {
+                _ = _internal.Remove(thisItem);
+            }
+            Invalidate_FilteredRows();
+            OnPropertyChanged("FilterItems");
+        }
     }
 
     public void Remove_RowFilter() => Remove(null as ColumnItem);
@@ -528,7 +539,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void RemoveOtherAndAdd(FilterItem? fi) {
         if (fi == null) { return; }
         if (IsDisposed) { return; }
-        if (Exists(fi)) { return; }
         if (!fi.IsOk()) {
             Develop.DebugPrint(ErrorType.Error, "Filter Fehler!");
             return;
@@ -574,12 +584,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         var did = false;
         foreach (var thisItem in fi) {
-            if (_internal.Contains(thisItem)) {
+            if (Exists(thisItem)) {
                 if (!did) {
                     OnChanging();
                     did = true;
                 }
-                _ = _internal.Remove(thisItem);
+                Remove(thisItem);
             }
         }
 
@@ -672,14 +682,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             _internal.Clear();
             IsDisposed = true;
         }
-    }
-
-    private bool Exists(FilterItem fi) {
-        foreach (var thisFilter in _internal) {
-            if (fi.Equals(thisFilter)) { return true; }
-        }
-
-        return false;
     }
 
     private void OnChanging() {

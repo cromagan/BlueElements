@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -31,6 +32,12 @@ public class GenericControlReciverSender : GenericControlReciver {
     #region Constructors
 
     public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) { }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? FilterOutputPropertyChanged;
 
     #endregion
 
@@ -109,6 +116,7 @@ public class GenericControlReciverSender : GenericControlReciver {
         foreach (var thisChild in Childs) {
             thisChild.Invalidate_FilterInput();
         }
+        OnFilterOutputPropertyChanged();
     }
 
     protected void Invalidate_FilterOutput() => FilterOutput.Clear();
@@ -118,6 +126,8 @@ public class GenericControlReciverSender : GenericControlReciver {
         FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
         base.OnCreateControl();
     }
+
+    protected virtual void OnFilterOutputPropertyChanged() => FilterOutputPropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }

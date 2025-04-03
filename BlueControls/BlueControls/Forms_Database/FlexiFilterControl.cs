@@ -54,19 +54,16 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     #region Constructors
 
-    public FlexiFilterControl(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, Renderer_Abstract renderer) : base(false, false, false) {
+    public FlexiFilterControl(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Size = new Size(204, 24);
-        //AlwaysInstantChange = true;
         FilterSingleColumn = filterColumn;
-        //Invalidate_FilterInput();
         f.ShowInfoWhenDisabled = true;
         _filterOrigin = string.Empty;
         _isFilterFromInput = false;
-        _renderer = renderer;
+        _renderer = Table.RendererOf(filterColumn, Constants.Win11);
         DefaultCaptionPosition = defaultCaptionPosition;
     }
 
@@ -75,8 +72,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     #region Properties
 
     /// <summary>
-    /// Da die CaptionPosition von dem Steuerelement bei bedarf geämndert wird,
-    /// muss ein default angegeben werden - wie es normalerweise auszusehen hat.
+    /// Da die CaptionPosition von dem Steuerelement bei Bedarf geändert wird,
+    /// muss ein Defaultwert angegeben werden - wie es normalerweise auszusehen hat.
     /// </summary>
     public CaptionPosition DefaultCaptionPosition { get; }
 
@@ -95,7 +92,11 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ColumnItem? FilterSingleColumn { get; }
 
+    /// <summary>
+    /// Bei True werden die zuletzt eingegebenen Werte auf Festplatte gespeichert und geladen.
+    /// </summary>
     public bool SavesSettings { get; internal set; } = false;
+
     public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;

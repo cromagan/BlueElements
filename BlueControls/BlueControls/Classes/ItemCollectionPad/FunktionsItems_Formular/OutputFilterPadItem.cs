@@ -127,9 +127,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var r = Table.RendererOf(Column, Constants.Win11);
-
-        var con = new FlexiFilterControl(Column, _captionPosition, r) {
+        var con = new FlexiFilterControl(Column, _captionPosition) {
             Standard_bei_keiner_Eingabe = _standard_Bei_Keiner_Eingabe,
             Filterart_Bei_Texteingabe = _filterart_Bei_Texteingabe,
             SavesSettings = true
