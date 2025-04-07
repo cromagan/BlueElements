@@ -71,8 +71,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
-    public event EventHandler<RowEventArgs>? RowGotData;
-
     public event EventHandler<RowEventArgs>? RowRemoved;
 
     public event EventHandler<RowEventArgs>? RowRemoving;
@@ -180,11 +178,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var tim = Stopwatch.StartNew();
 
-        while (NextRowToCeck(false) is { IsDisposed: false } row) {
+        while (NextRowToCeck() is { IsDisposed: false } row) {
             if (row.IsDisposed || row.Database is not { IsDisposed: false } db) { break; }
 
             if (row.Database != l[0]) {
-                if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 3 + WaitDelay) { break; }
+                if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 5 + WaitDelay) { break; }
             }
 
             if (Database.ExecutingScriptAnyDatabase.Count > 0) { break; }
@@ -203,6 +201,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.SetUserDidSomething();
             if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
         }
+
+        WaitDelay = Math.Min(WaitDelay + 5, 100);
 
         lock (Executingchangedrowslock) {
             _executingchangedrows = false;
@@ -240,7 +240,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
     /// </summary>
     /// <returns></returns>
-    public static RowItem? NextRowToCeck(bool oldestTo) {
+    public static RowItem? NextRowToCeck() {
         List<Database> l = [.. Database.AllFiles];
 
         if (Constants.GlobalRnd.Next(10) == 1) {
@@ -249,25 +249,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
         }
 
-        RowItem? oldrow = null;
-
         foreach (var thisDb in l) {
             if (thisDb is { IsDisposed: false } db) {
                 if (!db.CanDoValueChangedScript()) { continue; }
 
                 var rowToCheck = db.Row.NextRowToCheck(false);
                 if (rowToCheck != null) { return rowToCheck; }
-
-                if (oldestTo) {
-                    var tmpo = db.Row.NextRowToCheck(true);
-                    oldrow = OlderState(tmpo, oldrow);
-                }
             }
         }
 
-        if (oldrow != null) { return oldrow; }
-
-        WaitDelay = Math.Min(WaitDelay + 5, 100);
+   
         return null;
     }
 
@@ -558,13 +549,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (!db.CanDoValueChangedScript()) { return null; }
 
-        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization());
+        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization() && r.IsMyRow());
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdateAfterChange());
-        if (rowToCheck != null) { return rowToCheck; }
-
-        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate(false, oldestTo, false));
+        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate() && r.IsMyRow());
         if (rowToCheck != null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
@@ -575,7 +563,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisRow in db.Row) {
             var dateofmyrow = thisRow.CellGetDateTime(srs);
-            if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow)) {
+            if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow()) {
                 datefoundmax = dateofmyrow;
                 foundrow = thisRow;
             }
@@ -881,20 +869,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void OnRowAdded(RowEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
-        e.Row.RowGotData += OnRowGotData;
-
         RowAdded?.Invoke(this, e);
     }
 
     private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
 
-    private void OnRowGotData(object sender, RowEventArgs e) => RowGotData?.Invoke(this, e);
-
     private void OnRowRemoved(RowEventArgs e) => RowRemoved?.Invoke(this, e);
 
     private void OnRowRemoving(RowEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
-        e.Row.RowGotData -= OnRowGotData;
         RowRemoving?.Invoke(this, e);
     }
 

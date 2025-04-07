@@ -883,7 +883,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db1.SortParameterChanged -= _Database_SortParameterChanged;
             db1.Row.RowRemoving -= Row_RowRemoving;
             db1.Row.RowRemoved -= Row_RowRemoved;
-            db1.Row.RowGotData -= _Database_Row_RowGotData;
             db1.Column.ColumnRemoving -= Column_ItemRemoving;
             db1.Column.ColumnRemoved -= _Database_ViewChanged;
             db1.Column.ColumnAdded -= _Database_ViewChanged;
@@ -913,7 +912,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db2.SortParameterChanged += _Database_SortParameterChanged;
             db2.Row.RowRemoving += Row_RowRemoving;
             db2.Row.RowRemoved += Row_RowRemoved;
-            db2.Row.RowGotData += _Database_Row_RowGotData;
             db2.Column.ColumnAdded += _Database_ViewChanged;
             db2.Column.ColumnRemoving += Column_ItemRemoving;
             db2.Column.ColumnRemoved += _Database_ViewChanged;
@@ -2290,10 +2288,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         _pg?.Update(e.Current);
     }
 
-    private void _Database_Row_RowGotData(object sender, RowEventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate_SortedRowData();
-    }
+
 
     private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
 
@@ -2950,7 +2945,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                 if (isAdmin) {
                     if (rowScript) {
-                        if (cellInThisDatabaseRow.NeedsRowUpdate(true, true, true)) {
+                        if (cellInThisDatabaseRow.NeedsRowUpdate()) {
                             gr.FillRectangle(BrushRedTransparent, cellrectangle);
                             if (RowCollection.FailedRows.ContainsKey(cellInThisDatabaseRow)) {
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);

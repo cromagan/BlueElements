@@ -89,7 +89,7 @@ public class DatabaseFragments : Database {
     public override bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) {
         if (!base.AmITemporaryMaster(ranges, rangee, row)) { return false; }
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) {
-            if (!BeSureToBeUpDoDate()) { return false; }
+            if (!BeSureToBeUpToDate()) { return false; }
         }
         if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
 
@@ -103,6 +103,37 @@ public class DatabaseFragments : Database {
         // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
         // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
         return mins > ranges && mins < rangee;
+    }
+
+    public override bool BeSureToBeUpToDate() {
+        if (!base.BeSureToBeUpToDate()) { return false; }
+
+        if (string.IsNullOrEmpty(Filename)) { return true; }
+
+        if (_isInFragmentLoader) { return false; }
+        _isInFragmentLoader = true;
+
+        try {
+            OnDropMessage(ErrorType.Info, "Lade Fragmente von '" + TableName + "'");
+
+            var lastFragmentDate = DateTime.UtcNow;
+            var (changes, files) = GetLastChanges(lastFragmentDate);
+            if (changes == null) {
+                _isInFragmentLoader = false;
+                return false;
+            }
+
+            var start = DateTime.UtcNow;
+            Column.GetSystems();
+            InjectData(files, changes, start, lastFragmentDate);
+            TryToSetMeTemporaryMaster();
+        } catch {
+            _isInFragmentLoader = false;
+            return false;
+        }
+
+        _isInFragmentLoader = false;
+        return true;
     }
 
     public override string EditableErrorReason(EditableErrorReasonType mode) {
@@ -140,37 +171,6 @@ public class DatabaseFragments : Database {
             }
             return true;
         } catch { return false; }
-    }
-
-    protected override bool BeSureToBeUpDoDate() {
-        if (!base.BeSureToBeUpDoDate()) { return false; }
-
-        if (string.IsNullOrEmpty(Filename)) { return true; }
-
-        if (_isInFragmentLoader) { return false; }
-        _isInFragmentLoader = true;
-
-        try {
-            OnDropMessage(ErrorType.Info, "Lade Fragmente von '" + TableName + "'");
-
-            var lastFragmentDate = DateTime.UtcNow;
-            var (changes, files) = GetLastChanges(lastFragmentDate);
-            if (changes == null) {
-                _isInFragmentLoader = false;
-                return false;
-            }
-
-            var start = DateTime.UtcNow;
-            Column.GetSystems();
-            InjectData(files, changes, start, lastFragmentDate);
-            TryToSetMeTemporaryMaster();
-        } catch {
-            _isInFragmentLoader = false;
-            return false;
-        }
-
-        _isInFragmentLoader = false;
-        return true;
     }
 
     protected override void Dispose(bool disposing) {

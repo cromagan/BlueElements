@@ -78,15 +78,19 @@ public partial class FormWithStatusBar : Form {
             text = DateTime.Now.ToString("HH:mm:ss") + " " + text;
         }
 
+        List<FormWithStatusBar> l = [.. _formsWithStatusBar];
+
         var did = false;
-        try {
-            foreach (var thisf in _formsWithStatusBar) {
-                if (thisf is { Visible: true }) {
+
+        foreach (var thisf in l) {
+            if (thisf is { Visible: true, IsDisposed: false }) {
+                try {
                     var x = thisf.UpdateStatus(type, text, did);
                     if (x) { did = true; }
-                }
+                } catch { }
             }
-        } catch { }
+        }
+
     }
 
     public bool UpdateStatus(ErrorType type, string message, bool didAlreadyMessagebox) {

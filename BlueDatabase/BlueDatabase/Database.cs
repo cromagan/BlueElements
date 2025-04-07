@@ -449,7 +449,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public string TemporaryDatabaseMasterTimeUtc {
         get => _temporaryDatabaseMasterTimeUtc;
-        protected set {
+        set {
             if (_temporaryDatabaseMasterTimeUtc == value) { return; }
             _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, null, _temporaryDatabaseMasterTimeUtc, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
@@ -457,7 +457,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public string TemporaryDatabaseMasterUser {
         get => _temporaryDatabaseMasterUser;
-        protected set {
+        set {
             if (_temporaryDatabaseMasterUser == value) { return; }
             _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterUser, null, null, _temporaryDatabaseMasterUser, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
@@ -554,7 +554,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         List<Database> l = [.. ofDatabases];
 
         foreach (var db in l) {
-            _ = db.BeSureToBeUpDoDate();
+            _ = db.BeSureToBeUpToDate();
         }
     }
 
@@ -1064,9 +1064,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <returns></returns>
     public virtual bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) => string.IsNullOrEmpty(FreezedReason);
 
-    public virtual bool BeSureAllDataLoaded(int anzahl) => !IsDisposed && BeSureToBeUpDoDate();
+    public virtual bool BeSureAllDataLoaded(int anzahl) => !IsDisposed && BeSureToBeUpToDate();
 
     public virtual bool BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) => true;
+
+    public virtual bool BeSureToBeUpToDate() {
+        if (IsInCache.Year < 2000) { return false; }
+        return !IsDisposed;
+    }
 
     public bool CanDoValueChangedScript() => IsRowScriptPossible(true) && EventScript.Get(ScriptEventTypes.value_changed).Count == 1;
 
@@ -1359,7 +1364,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, name); }
         if (!script.NeedRow) { row = null; }
 
-        if (row != null && RowCollection.FailedRows.ContainsKey(row)) {
+        if (!ignoreError && row != null && RowCollection.FailedRows.ContainsKey(row)) {
             return new ScriptEndedFeedback("Das Skript konnte die Zeile nicht durchrechnen.", false, false, name);
         }
 
@@ -1968,7 +1973,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
 
-        _ = BeSureToBeUpDoDate();
+        _ = BeSureToBeUpToDate();
 
         RepairAfterParse();
 
@@ -2341,11 +2346,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type == DatabaseDataType.SystemValue) { return; }
 
         Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunkValue));
-    }
-
-    protected virtual bool BeSureToBeUpDoDate() {
-        if (IsInCache.Year < 2000) { return false; }
-        return !IsDisposed;
     }
 
     protected void CreateWatcher() {

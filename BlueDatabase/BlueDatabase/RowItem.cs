@@ -75,8 +75,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
-    public event EventHandler<RowEventArgs>? RowGotData;
-
     #endregion
 
     #region Properties
@@ -122,12 +120,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public long UrgencyUpdate {
         get {
             if (NeedsRowInitialization()) { return 0; }
-            if (NeedsRowUpdateAfterChange()) { return 1; }
-            if (NeedsRowUpdate(false, true, true)) { return 2; }
-
-            if (Database?.Column.SysRowState is not { IsDisposed: false } srs) { return long.MaxValue; }
-
-            return CellGetDateTime(srs).Ticks;
+            if (NeedsRowUpdate()) { return 1; }
+            if (Database?.Column.SysRowState is { IsDisposed: false } srs) { return CellGetDateTime(srs).Ticks; }
+            return long.MaxValue;
         }
     }
 
@@ -476,7 +471,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         CellSet(srs, string.Empty, comment);
 
-
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd) {
             CellSet(scd, DateTime.UtcNow, comment);
         }
@@ -538,69 +532,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Gibt True zurück, wenn eine eigene Zeile initialisiert werden muss.
-    /// Alter kleiner 5 Minuten.
+    /// Gibt true zurück, wenn eine Zeile initialisiert werden muss.
     /// </summary>
     /// <returns></returns>
     public bool NeedsRowInitialization() {
         if (Database is not { IsDisposed: false } db) { return false; }
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
-        if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
-        if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
-
-        if (RowCollection.FailedRows.ContainsKey(this)) { return false; }
-
-        if (!string.IsNullOrEmpty(CellGetString(srs))) { return false; }
-
-
-
-        if (db.AmITemporaryMaster(5, 55, this)) { return true; }
-
-
-        if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
-
-        var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        return t is { TotalSeconds: > 1, TotalMinutes: < 5 }; // 1 Sekunde deswegen, weil machne Routinen gleich die Prüfung machen und ansonsten die Routine reingrätscht
+        return string.IsNullOrEmpty(CellGetString(srs));
     }
 
     /// <summary>
-    /// Gibt true zurück, wenn eine Zeile aktualisiert werden muss.
+    /// Gibt true zurück, wenn eine Zeile aktualisiert oder initialisiert werden muss.
     /// </summary>
     /// <returns></returns>
-    public bool NeedsRowUpdate(bool ignoreFailed, bool extendedAllowed, bool ignoreMaster) {
+    public bool NeedsRowUpdate() {
         if (Database is not { IsDisposed: false } db) { return false; }
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
-
-        if (!extendedAllowed && string.IsNullOrEmpty(CellGetString(srs))) { return false; }
-
-        if (CellGetDateTime(srs) >= Database.EventScriptVersion) { return false; }
-        if (!ignoreFailed && RowCollection.FailedRows.ContainsKey(this)) { return false; }
-
-
-        if (ignoreMaster) { return true; }
-
-        //if(NeedsRowUpdateAfterChange() || NeedsRowInitialization()) { return true; }
-
-        return db.AmITemporaryMaster(5, 55, this);
-    }
-
-    /// <summary>
-    /// Gibt true zurück, wenn eine eigene Zeile aktualisiert werden muss.
-    /// Diese muss jünger als 20 Minuten sein und älter als 3 sekunden.
-    /// </summary>
-    /// <returns></returns>
-    public bool NeedsRowUpdateAfterChange() {
-        if (Database is not { IsDisposed: false } db) { return false; }
-        //if (db.Column.SysRowState is not ColumnItem srs) { return false; }
-        if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
-        if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
-
-        //if (string.IsNullOrEmpty(CellGetString(srs))) { return false; }  // Zu krass! Die muss komplett initialisiert werden! Wird vorher schon abgefragt
-
-        if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
-
-        var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        return NeedsRowUpdate(false, false, true) && t is { TotalMinutes: < 20, TotalSeconds: > 3 };
+        if (string.IsNullOrEmpty(CellGetString(srs))) { return true; }
+        return CellGetDateTime(srs) < Database.EventScriptVersion;
     }
 
     public void OnDropMessage(ErrorType type, string message) {
@@ -894,6 +843,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    internal bool IsMyRow() {
+        if (Database is not { IsDisposed: false } db) { return false; }
+        if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
+        if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
+
+        var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
+        if (db.AmITemporaryMaster(5, 55, this) && t.TotalMinutes > 30) { return true; }
+
+        if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
+
+        return t is { TotalSeconds: > 3, TotalMinutes: < 15 }; // 3 Sekunde deswegen, weil machne Routinen gleich die Prüfung machen und ansonsten die Routine reingrätscht
+    }
+
     internal void Repair() {
         if (Database is not { IsDisposed: false } db) { return; }
 
@@ -1087,8 +1049,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     private void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
-
-    private void OnRowGotData(RowEventArgs e) => RowGotData?.Invoke(this, e);
 
     private bool RowFilterMatch(string searchText) {
         if (string.IsNullOrEmpty(searchText)) { return true; }

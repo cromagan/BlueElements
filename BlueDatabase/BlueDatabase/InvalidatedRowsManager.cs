@@ -62,12 +62,8 @@ public class InvalidatedRowsManager {
     /// </summary>
     public int PendingRowsCount => _invalidatedRows.Count;
 
-    ///// <summary>
-    ///// Gibt die aktuelle Anzahl der bereits verarbeiteten Zeilen zurück.
-    ///// </summary>
-    //public int ProcessedRowsCount => _processedRowIds.Count;
-
     #endregion
+
 
     #region Methods
 
@@ -90,8 +86,7 @@ public class InvalidatedRowsManager {
             return false;
         }
 
-
-        rowItem.Database?.OnDropMessage(ErrorType.Info, $"Neuer Job: {rowItem.CellFirstString()}");
+        rowItem.Database?.OnDropMessage(ErrorType.Info, $"Neuer Job durch neue invalide Zeile: {rowItem.CellFirstString()}");
 
         // Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
         return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);
@@ -199,16 +194,22 @@ public class InvalidatedRowsManager {
     private void ProcessSingleRow(RowItem row, RowItem? masterRow, bool extendedAllowed, int currentIndex) {
         if (row.Database is not { IsDisposed: false } db) { return; }
 
-        if (row.NeedsRowUpdate(false, true, true)) {
-            masterRow?.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex}: Aktualisiere {db.Caption} / {row.CellFirstString()}");
+        if (!extendedAllowed && row.NeedsRowInitialization()) {
+            masterRow?.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung");
+            return;
+        }
 
-            if (masterRow?.Database != null) {
-                _ = row.UpdateRow(extendedAllowed, true, "Update von " + masterRow?.CellFirstString());
-            } else {
-                _ = row.UpdateRow(extendedAllowed, true, "Normales Update");
-            }
-        } else {
+        if (row.NeedsRowUpdate()) {
             masterRow?.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} bereits aktuell");
+            return;
+        }
+
+        masterRow?.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex}: Aktualisiere {db.Caption} / {row.CellFirstString()}");
+
+        if (masterRow?.Database != null) {
+            _ = row.UpdateRow(extendedAllowed, true, "Update von " + masterRow?.CellFirstString());
+        } else {
+            _ = row.UpdateRow(extendedAllowed, true, "Normales Update");
         }
     }
 

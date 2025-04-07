@@ -332,6 +332,17 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         _ = c.ShowDialog();
     }
 
+    private void btnUnMaster_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+
+        if (db.AmITemporaryMaster(0, 60, null)) {
+            db.TemporaryDatabaseMasterUser = "Unset: " + Generic.UserName;
+            db.TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
+            db.BeSureToBeUpToDate();
+            Close();
+        }
+    }
+
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 

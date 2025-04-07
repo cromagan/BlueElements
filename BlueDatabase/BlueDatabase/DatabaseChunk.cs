@@ -308,6 +308,26 @@ public class DatabaseChunk : Database {
         return LoadChunkWithChunkId(chunkId, false, needPassword, false);
     }
 
+    public override bool BeSureToBeUpToDate() {
+        if (!base.BeSureToBeUpToDate()) { return false; }
+
+        OnDropMessage(ErrorType.Info, "Lade Chunks von '" + TableName + "'");
+
+        if (!LoadChunkWithChunkId(Chunk_MainData, true, null, true)) { return false; }
+
+        Column.GetSystems();
+
+        if (Column.SplitColumn != null) {
+            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, null, true)) { return false; }
+            //if (!LoadChunkWithChunkId(Chunk_Master, true, null, true)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Variables, true, null, true)) { return false; }
+        }
+        IsInCache = DateTime.UtcNow;
+
+        TryToSetMeTemporaryMaster();
+        return true;
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -421,26 +441,6 @@ public class DatabaseChunk : Database {
         if (!ok) { return "Chunk Lade-Fehler"; }
 
         return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.IsEditable(reason);
-    }
-
-    protected override bool BeSureToBeUpDoDate() {
-        if (!base.BeSureToBeUpDoDate()) { return false; }
-
-        OnDropMessage(ErrorType.Info, "Lade Chunks von '" + TableName + "'");
-
-        if (!LoadChunkWithChunkId(Chunk_MainData, true, null, true)) { return false; }
-
-        Column.GetSystems();
-
-        if (Column.SplitColumn != null) {
-            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, null, true)) { return false; }
-            //if (!LoadChunkWithChunkId(Chunk_Master, true, null, true)) { return false; }
-            if (!LoadChunkWithChunkId(Chunk_Variables, true, null, true)) { return false; }
-        }
-        IsInCache = DateTime.UtcNow;
-
-        TryToSetMeTemporaryMaster();
-        return true;
     }
 
     protected override void Dispose(bool disposing) {
