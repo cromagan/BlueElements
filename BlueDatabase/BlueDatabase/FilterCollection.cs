@@ -386,6 +386,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return string.Empty;
     }
 
+    /// <summary>
+    /// Prüft, ob der Filter sinngemäß vorhanden ist.
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
     public bool Exists(FilterItem filter) {
         foreach (var thisFilter in _internal) {
             if (filter.Equals(thisFilter)) { return true; }
@@ -545,6 +550,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
 
         var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();
+
+        if (existingColumnFilter.Count == 1) {
+            if (Exists(fi)) { return; }
+        }
 
         OnChanging();
         foreach (var thisItem in existingColumnFilter) {
