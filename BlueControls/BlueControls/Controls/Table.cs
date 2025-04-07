@@ -2574,6 +2574,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, preverDropDown);
 
+        if (dia == EditTypeTable.None && (contentHolderCellColumn.Database?.PowerEdit ?? false)) {
+            dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn.Function, false, true, contentHolderCellColumn.MultiLine && contentHolderCellColumn.EditableWithDropdown);
+        }
+
         switch (dia) {
             case EditTypeTable.Textfeld:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
@@ -3527,7 +3531,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         DoFilterOutput();
     }
-
 
     private void GetÄhnlich() {
         if (IsDisposed || FilterleisteZeilen <= 0) { return; }

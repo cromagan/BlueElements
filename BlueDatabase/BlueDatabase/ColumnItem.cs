@@ -1938,10 +1938,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     internal static string MakeValidColumnName(string columnname) => columnname.Trim().ToUpperInvariant().Replace(" ", "_").Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
 
     internal string EditableErrorReason(EditableErrorReasonType mode, bool checkEditmode) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return "Die Datenbank wurde verworfen."; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Die Datenbank wurde verworfen."; }
         if (IsDisposed) { return "Die Spalte wurde verworfen."; }
 
-        var f = Database.EditableErrorReason(mode);
+        var f = db.EditableErrorReason(mode);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
@@ -1949,7 +1949,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //if (!SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
 
         if (checkEditmode) {
-            if (!EditableWithTextInput && !EditableWithDropdown) {
+            if (!EditableWithTextInput && !EditableWithDropdown && !db.PowerEdit) {
                 return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
             }
 
@@ -2249,7 +2249,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return string.Empty;
     }
 
-    private static EditTypeTable UserEditDialogTypeInTable(ColumnFunction function, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
+    public static EditTypeTable UserEditDialogTypeInTable(ColumnFunction function, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
         if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
 
         switch (function) {

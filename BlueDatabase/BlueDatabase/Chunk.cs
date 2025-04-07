@@ -534,7 +534,7 @@ public class Chunk : IHasKeyName {
     /// <returns></returns>
     private List<byte>? RemoveHeaderDataTypes(List<byte> bytes) {
         var data = bytes.ToArray();
-        var result = new List<byte>();
+        var result = new List<byte>(data.Length);
         var pointer = 0;
         var filename = ChunkFileName;
 
@@ -550,8 +550,10 @@ public class Chunk : IHasKeyName {
 
             // Nur Nicht-Header-Datensätze zum Ergebnis hinzufügen
             if (!type.IsHeaderType() && !type.IsObsolete()) {
-                // Kompletten Datensatz hinzufügen (effizient mit AddRange)
-                result.AddRange(data.Skip(startPointer).Take(newPointer - startPointer));
+                // Kompletten Datensatz hinzufügen
+                for (int i = startPointer; i < newPointer; i++) {
+                    result.Add(data[i]);
+                }
             }
 
             pointer = newPointer;
