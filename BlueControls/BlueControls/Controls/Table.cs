@@ -2001,7 +2001,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             (_mouseOverColumn, _mouseOverRow) = CellOnCoordinate(ca, e.X, e.Y);
 
-            Develop.SetUserDidSomething();
             if (_mouseOverColumn?.Column is not { } c) { _isinMouseMove = false; return; }
 
             if (e.Button != MouseButtons.None) {

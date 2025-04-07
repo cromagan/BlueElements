@@ -358,6 +358,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     protected override void OnKeyDown(KeyEventArgs e) {
         if (IsDisposed) { return; }
+        Develop.SetUserDidSomething();
         base.OnKeyDown(e);
     }
 
@@ -418,7 +419,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     protected override void OnMouseMove(MouseEventArgs e) {
         lock (this) {
             DoQuickInfo();
-
+            Develop.SetUserDidSomething();
             if (_pform == null) { CheckBack(); }
 
             if (!DoDrawings()) { return; }
@@ -484,6 +485,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
                 _bitmapOfControl = null;
             }
         }
+        Develop.SetUserDidSomething();
         Invalidate();
     }
 
