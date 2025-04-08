@@ -141,6 +141,8 @@ public partial class FloatingForm : Form {
     }
 
     public new void Show() {
+        if(IsDisposed || Disposing) { return; }
+
         try {
             _ = WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
         } catch (ObjectDisposedException) {

@@ -305,6 +305,15 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));
 
+    private void btnMasterMe_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+
+        db.TemporaryDatabaseMasterUser = Database.MyMasterCode;
+        db.TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
+        db.BeSureToBeUpToDate();
+        Close();
+    }
+
     private void btnOptimize_Click(object sender, System.EventArgs e) => Database?.Optimize();
 
     private void btnSkripte_Click(object sender, System.EventArgs e) {

@@ -74,7 +74,12 @@ public class InvalidatedRowsManager {
     /// <param name="rowItem">Das hinzuzufügende Row-Item</param>
     /// <returns>True wenn das Item hinzugefügt wurde, False wenn nicht</returns>
     public bool AddInvalidatedRow(RowItem? rowItem) {
-        if (rowItem == null) { return false; }
+        if (rowItem?.Database is not { } db) { return false; }
+
+
+        // Ansosten ist Endloschleife mit Monitor
+        if(!db.CanDoValueChangedScript()) {  return false; }
+
 
         //// Prüfe, ob die Zeile bereits als verarbeitet markiert ist
         //if (_processedRowIds.ContainsKey(rowItem.KeyName)) {
@@ -86,7 +91,7 @@ public class InvalidatedRowsManager {
             return false;
         }
 
-        rowItem.Database?.OnDropMessage(ErrorType.Info, $"Neuer Job durch neue invalide Zeile: {rowItem.CellFirstString()}");
+        rowItem.Database?.OnDropMessage(ErrorType.Info, $"Neuer Job durch neue invalide Zeile: {rowItem.CellFirstString()} der Datenbank {db.Caption}");
 
         // Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
         return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);

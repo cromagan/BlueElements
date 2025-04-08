@@ -549,10 +549,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (!db.CanDoValueChangedScript()) { return null; }
 
-        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization() && r.IsMyRow());
+        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization() && r.IsMyRow() && !FailedRows.ContainsKey(r));
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate() && r.IsMyRow());
+        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate() && r.IsMyRow() && !FailedRows.ContainsKey(r));
         if (rowToCheck != null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
@@ -780,9 +780,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (reason != Reason.NoUndo_NoInvalidate) {
             OnRowAdded(new RowEventArgs(row));
-            if (Database?.Column.SysRowState != null) {
-                _ = InvalidatedRowsManager.AddInvalidatedRow(row);
-            }
+            //if (Database?.Column.SysRowState != null) {
+            //    _ = InvalidatedRowsManager.AddInvalidatedRow(row);
+            //}
         }
 
         return string.Empty;
@@ -863,6 +863,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Develop.MonitorMessage?.Invoke(db.Caption, "PlusZeichen", $"Neue Zeile erstellt: {db.Caption}\\{item.CellFirstString()}", 0);
 
         _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
+
+        InvalidatedRowsManager.AddInvalidatedRow(item);
 
         return item;
     }

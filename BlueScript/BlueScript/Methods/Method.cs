@@ -230,6 +230,8 @@ public abstract class Method : IReadableTextWithKey {
         var s = varCol.Get("notsuccessfulreason");
 
         if (s is VariableString vs) { vs.ValueString = reason; }
+
+        Develop.MonitorMessage?.Invoke("Allgemein", "Kreuz", $"Nicht Erfolgreich gesetzt: {reason}", 0);
     }
 
     public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, int lastArgMinCount, LogData? ld, ScriptProperties? scp) {

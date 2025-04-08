@@ -90,12 +90,11 @@ public partial class FormWithStatusBar : Form {
                 } catch { }
             }
         }
-
     }
 
     public bool UpdateStatus(ErrorType type, string message, bool didAlreadyMessagebox) {
         try {
-            if (IsDisposed) { return false; }
+            if (IsDisposed || Disposing || !IsHandleCreated) { return false; }
             if (DesignMode) { return false; }
 
             if (InvokeRequired) {

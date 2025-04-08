@@ -361,7 +361,9 @@ public class DatabaseChunk : Database {
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen", 0);
+                //Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen", 0);
+                OnDropMessage(ErrorType.Info, $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
+                Develop.DoEvents();
             }
 
             System.Threading.Thread.Sleep(1000);

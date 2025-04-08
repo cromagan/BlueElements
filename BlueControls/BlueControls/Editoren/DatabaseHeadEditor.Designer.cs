@@ -47,6 +47,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capInfo = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.btnUnMaster = new BlueControls.Controls.Button();
             this.btnTabellenAnsicht = new BlueControls.Controls.Button();
             this.btnSkripte = new BlueControls.Controls.Button();
             this.btnSpaltenAnordnungen = new BlueControls.Controls.Button();
@@ -67,7 +68,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo = new BlueControls.Controls.Table();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
             this.btnClipboard = new BlueControls.Controls.Button();
-            this.btnUnMaster = new BlueControls.Controls.Button();
+            this.btnMasterMe = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -316,6 +317,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAllgemein.Controls.Add(this.btnMasterMe);
             this.tabAllgemein.Controls.Add(this.btnUnMaster);
             this.tabAllgemein.Controls.Add(this.btnTabellenAnsicht);
             this.tabAllgemein.Controls.Add(this.btnSkripte);
@@ -340,6 +342,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAllgemein.Size = new System.Drawing.Size(1178, 678);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
+            // 
+            // btnUnMaster
+            // 
+            this.btnUnMaster.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnUnMaster.ImageCode = "Stern|16|||||||||Kreuz";
+            this.btnUnMaster.Location = new System.Drawing.Point(424, 592);
+            this.btnUnMaster.Name = "btnUnMaster";
+            this.btnUnMaster.Size = new System.Drawing.Size(200, 32);
+            this.btnUnMaster.TabIndex = 54;
+            this.btnUnMaster.Text = "Unmaster me!";
+            this.btnUnMaster.Click += new System.EventHandler(this.btnUnMaster_Click);
             // 
             // btnTabellenAnsicht
             // 
@@ -474,7 +487,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabRechte.Location = new System.Drawing.Point(4, 25);
             this.tabRechte.Name = "tabRechte";
             this.tabRechte.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRechte.Size = new System.Drawing.Size(1233, 678);
+            this.tabRechte.Size = new System.Drawing.Size(1178, 678);
             this.tabRechte.TabIndex = 4;
             this.tabRechte.Text = "Rechte";
             // 
@@ -487,7 +500,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSortierung.Location = new System.Drawing.Point(4, 25);
             this.tabSortierung.Name = "tabSortierung";
             this.tabSortierung.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSortierung.Size = new System.Drawing.Size(1233, 678);
+            this.tabSortierung.Size = new System.Drawing.Size(1178, 678);
             this.tabSortierung.TabIndex = 2;
             this.tabSortierung.Text = "Sortierung";
             // 
@@ -498,7 +511,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabVariablen.Location = new System.Drawing.Point(4, 25);
             this.tabVariablen.Name = "tabVariablen";
             this.tabVariablen.Padding = new System.Windows.Forms.Padding(3);
-            this.tabVariablen.Size = new System.Drawing.Size(1233, 678);
+            this.tabVariablen.Size = new System.Drawing.Size(1178, 678);
             this.tabVariablen.TabIndex = 7;
             this.tabVariablen.Text = "Variablen";
             // 
@@ -508,7 +521,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.variableEditor.Editabe = true;
             this.variableEditor.Location = new System.Drawing.Point(3, 3);
             this.variableEditor.Name = "variableEditor";
-            this.variableEditor.Size = new System.Drawing.Size(1227, 672);
+            this.variableEditor.Size = new System.Drawing.Size(1172, 672);
             this.variableEditor.TabIndex = 1;
             this.variableEditor.ToEdit = null;
             // 
@@ -519,7 +532,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabUndo.Controls.Add(this.grpUndoActions);
             this.tabUndo.Location = new System.Drawing.Point(4, 25);
             this.tabUndo.Name = "tabUndo";
-            this.tabUndo.Size = new System.Drawing.Size(1233, 678);
+            this.tabUndo.Size = new System.Drawing.Size(1178, 678);
             this.tabUndo.TabIndex = 6;
             this.tabUndo.Text = "Undo";
             // 
@@ -529,7 +542,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.SheetStyle = "Windows 11";
-            this.tblUndo.Size = new System.Drawing.Size(1233, 608);
+            this.tblUndo.Size = new System.Drawing.Size(1178, 608);
             this.tblUndo.TabIndex = 0;
             this.tblUndo.Text = "UndoTab";
             this.tblUndo.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.tblUndo_ContextMenuInit);
@@ -542,7 +555,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpUndoActions.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.grpUndoActions.Location = new System.Drawing.Point(0, 608);
             this.grpUndoActions.Name = "grpUndoActions";
-            this.grpUndoActions.Size = new System.Drawing.Size(1233, 70);
+            this.grpUndoActions.Size = new System.Drawing.Size(1178, 70);
             this.grpUndoActions.TabIndex = 4;
             this.grpUndoActions.TabStop = false;
             this.grpUndoActions.Text = "Aktionen";
@@ -558,16 +571,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnClipboard.Text = "In die Zwischenablage";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
-            // btnUnMaster
+            // btnMasterMe
             // 
-            this.btnUnMaster.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnUnMaster.ImageCode = "Stern|16|||||||||Kreuz";
-            this.btnUnMaster.Location = new System.Drawing.Point(424, 552);
-            this.btnUnMaster.Name = "btnUnMaster";
-            this.btnUnMaster.Size = new System.Drawing.Size(200, 32);
-            this.btnUnMaster.TabIndex = 54;
-            this.btnUnMaster.Text = "Unmaster me!";
-            this.btnUnMaster.Click += new System.EventHandler(this.btnUnMaster_Click);
+            this.btnMasterMe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnMasterMe.ImageCode = "Stern|16|";
+            this.btnMasterMe.Location = new System.Drawing.Point(424, 552);
+            this.btnMasterMe.Name = "btnMasterMe";
+            this.btnMasterMe.Size = new System.Drawing.Size(200, 32);
+            this.btnMasterMe.TabIndex = 55;
+            this.btnMasterMe.Text = "Master me!";
+            this.btnMasterMe.Click += new System.EventHandler(this.btnMasterMe_Click);
             // 
             // DatabaseHeadEditor
             // 
@@ -637,5 +650,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnSkripte;
         private Button btnTabellenAnsicht;
         private Button btnUnMaster;
+        private Button btnMasterMe;
     }
 }

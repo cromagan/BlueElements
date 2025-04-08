@@ -2288,8 +2288,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         _pg?.Update(e.Current);
     }
 
-
-
     private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
 
     private void _Database_StoreView(object sender, System.EventArgs e) =>
@@ -3724,6 +3722,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     /// Positioniert die Steuerelemente in der Table neu, um Platz für die Filterleiste zu schaffen.
     /// </summary>
     private void RepositionControls() {
+        if (InvokeRequired) {
+            _ = Invoke(new Action(RepositionControls));
+            return;
+        }
+
         // Filterleistenelemente positionieren
         if (FilterleisteZeilen > 0) {
             int firstRowY = 8; // Standard Y-Position für erste Zeile
@@ -3845,6 +3848,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private void UpdateFilterleisteVisibility() {
+        if (InvokeRequired) {
+            _ = Invoke(new Action(UpdateFilterleisteVisibility));
+            return;
+        }
+
         bool visible = _filterleisteZeilen > 0;
 
         // Hauptsteuerelemente der Filterleiste
