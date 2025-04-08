@@ -129,7 +129,7 @@ internal sealed partial class SearchAndReplaceInCells : Form {
             sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
         }
         foreach (var thisRow in db.Row) {
-            if (!chkAktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToArray()) || _table.PinnedRows.Contains(thisRow)) {
+            if (!chkAktuelleFilterung.Checked || thisRow.MatchesTo(_table.FilterCombined.ToArray()) || _table.PinnedRows.Contains(thisRow)) {
                 if (db.Column.SysLocked is { IsDisposed: false } sl) {
                     if (!chkAbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
                 }

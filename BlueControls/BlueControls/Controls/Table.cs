@@ -63,6 +63,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     #region Fields
 
     public readonly FilterCollection Filter = new("DefaultTableFilter");
+    public readonly FilterCollection FilterCombined = new("TableFilterCombined");
+
     private readonly List<string> _collapsed = [];
     private readonly object _lockUserAction = new();
     private ColumnViewCollection? _ähnliche;
@@ -124,7 +126,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         Filter.PropertyChanged += Filter_PropertyChanged;
         Filter.RowsChanged += Filter_PropertyChanged;
-
         OnEnabledChanged(System.EventArgs.Empty);
     }
 
@@ -282,6 +283,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (IsDisposed || Database is not { IsDisposed: false }) { return; }
             Database.PowerEdit = value;
             Filter.Invalidate_FilteredRows(); // Split-Spalten-Filter
+            FilterCombined.Invalidate_FilteredRows();
             Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
         }
     }
@@ -289,7 +291,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<RowItem> RowsFiltered => IsDisposed || Database is not { IsDisposed: false } ? new List<RowItem>().AsReadOnly() : Filter.Rows;
+    public ReadOnlyCollection<RowItem> RowsFiltered {
+        get {
+            if (IsDisposed || Database is not { IsDisposed: false }) {
+                return new List<RowItem>().AsReadOnly();
+            } else {
+                return FilterCombined.Rows;
+            }
+        }
+    }
 
     public string SheetStyle {
         get => _sheetStyle;
@@ -898,6 +908,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Invalidate_CurrentArrangement();
         Invalidate_SortedRowData();
         Filter.Database = db;
+        FilterCombined.Database = db;
 
         _databaseDrawError = null;
         //InitializeSkin(); // Neue Schriftgrößen
@@ -1164,6 +1175,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public void ResetView() {
         Filter.Clear();
+        FilterCombined.Clear();
 
         PinnedRows.Clear();
         _collapsed.Clear();
@@ -1469,7 +1481,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 if (thisColumn.Database is { IsDisposed: false }) {
                     var viewItemOrder = orderArrangement?[thisColumn];
                     var viewItemCurrent = cu?[thisColumn];
-                    var filterItem = Filter[thisColumn];
+                    var filterItem = FilterCombined[thisColumn];
 
                     #region Sichtbarkeit des Filterelements bestimmen
 
@@ -1619,13 +1631,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        if (!Filter.IsOk()) {
-            DrawWaitScreen(gr, Filter.ErrorReason(), ca);
+        if (!FilterCombined.IsOk()) {
+            DrawWaitScreen(gr, FilterCombined.ErrorReason(), ca);
             return;
         }
 
-        if (Filter.Database != null && Database != Filter.Database) {
-            DrawWaitScreen(gr, "Filter fremder Datenbank: " + Filter.Database.Caption, ca);
+        if (FilterCombined.Database != null && Database != FilterCombined.Database) {
+            DrawWaitScreen(gr, "Filter fremder Datenbank: " + FilterCombined.Database.Caption, ca);
             return;
         }
 
@@ -1695,7 +1707,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         DoInputFilter(FilterOutput.Database, false);
 
-        DoFilterOutput();
+        DoFilterCombined();
     }
 
     protected override bool IsInputKey(Keys keyData) {
@@ -2138,7 +2150,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private static void NotEditableInfo(string reason) => Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
 
     private static void UserEdited(Table table, string newValue, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool formatWarnung) {
-        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true, table.Filter.ToArray());
+        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true, table.FilterCombined.ToArray());
         if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
 
         if (cellInThisDatabaseColumn?.Column is not { Function: not ColumnFunction.Virtuelle_Spalte }) { return; } // Dummy prüfung
@@ -2175,7 +2187,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (table?.Database?.Column.First() is not { } colfirst) { return; }
 
             var fc = new List<FilterItem>() { new FilterItem(colfirst, FilterType.Istgleich, newValue) };
-            foreach (var thisFilter in table.Filter) {
+            foreach (var thisFilter in table.FilterCombined) {
                 if (thisFilter.Column != null) {
                     fc.Add(thisFilter);
                 }
@@ -2419,8 +2431,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (!columnviewitem.AutoFilterSymbolPossible) { return; }
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (Filter.HasAlwaysFalse()) {
+        if (!FilterInputChangedHandled) { HandleChangesNow(); }
+
+        if (FilterCombined.HasAlwaysFalse()) {
             MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
+            return;
+        }
+
+        if (FilterInput?[columnviewitem.Column] is { }) {
+            MessageBox.Show("Ein Filter der eingeht,\r\nverhindert weitere Filterungen.", ImageCode.Information, "OK");
             return;
         }
 
@@ -2438,7 +2457,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var realHead = columnviewitem.RealHead(_zoom, SliderX.Value);
 
-        _autoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows, columnviewitem.DrawWidth(), columnviewitem.GetRenderer(SheetStyle));
+        _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.DrawWidth(), columnviewitem.GetRenderer(SheetStyle));
         _autoFilter.Position_LocateToPosition(new Point(screenx + realHead.Left, screeny + realHead.Bottom + FilterleisteHeight));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
@@ -2448,7 +2467,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private int Autofilter_Text(ColumnViewItem viewItem) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return 0; }
         if (viewItem.TmpIfFilterRemoved != null) { return (int)viewItem.TmpIfFilterRemoved; }
-        using var fc = (FilterCollection)Filter.Clone("Autofilter_Text");
+        using var fc = (FilterCollection)FilterCombined.Clone("Autofilter_Text");
         fc.Remove(viewItem.Column);
 
         var ro = fc.Rows;
@@ -2500,7 +2519,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         btnAlleFilterAus_Click(null, System.EventArgs.Empty);
         foreach (var thiscolumnitem in _ähnliche) {
-            if (thiscolumnitem?.Column != null && Filter != null) {
+            if (thiscolumnitem?.Column != null && FilterCombined != null) {
                 if (thiscolumnitem.AutoFilterSymbolPossible) {
                     if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
                         var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
@@ -2543,7 +2562,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown) {
-        var f = EditableErrorReason(viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true, Filter.ToArray());
+        var f = EditableErrorReason(viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true, FilterCombined.ToArray());
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
         if (viewItem?.Column == null) { return; }// Klick ins Leere
 
@@ -2812,6 +2831,21 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
+    private void DoFilterCombined() {
+        if (!FilterInputChangedHandled) {
+            HandleChangesNow();
+            return;
+        }
+
+        FilterCombined.Clear();
+        FilterCombined.RemoveOtherAndAdd(Filter, string.Empty);
+        FilterCombined.RemoveOtherAndAdd(FilterInput, string.Empty);
+        Invalidate_SortedRowData();
+        OnFilterChanged();
+        DoFilterOutput();
+        FillFilters();
+    }
+
     private void DoFilterOutput() {
         if (!FilterInputChangedHandled) {
             HandleChangesNow();
@@ -2820,16 +2854,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (CursorPosRow?.Row is { } setedrow) {
             using var nfc = new FilterCollection(setedrow, "TableOutput");
-            nfc.RemoveOtherAndAdd(Filter, string.Empty);
-            nfc.RemoveOtherAndAdd(FilterInput, string.Empty);
+            nfc.RemoveOtherAndAdd(FilterCombined, string.Empty);
 
             FilterOutput.ChangeTo(nfc);
         } else {
-            using var nfc = new FilterCollection(Database, "TableOutput");
-            nfc.RemoveOtherAndAdd(Filter, string.Empty);
-            nfc.RemoveOtherAndAdd(FilterInput, string.Empty);
-
-            FilterOutput.ChangeTo(nfc);
+            FilterOutput.ChangeTo(FilterCombined);
         }
     }
 
@@ -2919,7 +2948,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 plus = p16;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
             } else {
-                txt = FilterCollection.InitValue(cellInThisDatabaseColumn, false, Filter.ToArray()) ?? string.Empty;
+                txt = FilterCollection.InitValue(cellInThisDatabaseColumn, false, FilterCombined.ToArray()) ?? string.Empty;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
             }
 
@@ -3051,7 +3080,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var trichterText = string.Empty;
         var trichterState = States.Undefiniert;
-        var fi = Filter[viewItem.Column];
+        var fi = FilterCombined[viewItem.Column];
 
         if (viewItem.AutoFilterSymbolPossible) {
             if (fi != null) {
@@ -3093,11 +3122,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var pts = GetPix(ColumnViewItem.AutoFilterSize - 4);
 
-        if (Filter.HasAlwaysFalse() && viewItem.AutoFilterSymbolPossible) {
+        if (FilterCombined.HasAlwaysFalse() && viewItem.AutoFilterSymbolPossible) {
             trichterIcon = QuickImage.Get("Trichter|" + pts + "|||FF0000||170");
         } else if (fi != null) {
             trichterIcon = QuickImage.Get("Trichter|" + pts + "|||FF0000");
-        } else if (Filter.MayHaveRowFilter(viewItem.Column)) {
+        } else if (FilterCombined.MayHaveRowFilter(viewItem.Column)) {
             trichterIcon = QuickImage.Get("Trichter|" + pts + "|||227722");
         } else if (viewItem.AutoFilterSymbolPossible) {
             trichterIcon = QuickImage.Get("Trichter|" + pts);
@@ -3469,16 +3498,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private void Filter_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-        if (CurrentArrangement is not { } ca) { return; }
-
-        foreach (var thisColumn in ca) {
-            thisColumn.TmpIfFilterRemoved = null;
+        if (CurrentArrangement is { } ca) {
+            foreach (var thisColumn in ca) {
+                thisColumn.TmpIfFilterRemoved = null;
+            }
         }
 
-        Invalidate_SortedRowData();
-        OnFilterChanged();
-        DoFilterOutput();
-        FillFilters();
+        DoFilterCombined();
     }
 
     private void Filter_ZeilenFilterSetzen() {
@@ -3486,7 +3512,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             DoÄhnlich();
             return;
         }
-        var isF = Filter.RowFilterText;
+        var isF = FilterCombined.RowFilterText;
         var newF = txbZeilenFilter.Text;
         if (string.Equals(isF, newF, StringComparison.OrdinalIgnoreCase)) { return; }
         if (string.IsNullOrEmpty(newF)) {
@@ -3521,7 +3547,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             Filter.RemoveOtherAndAdd(fi);
         }
 
-        DoFilterOutput();
+        //DoFilterOutput();
     }
 
     private void GetÄhnlich() {
@@ -3904,7 +3930,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
 
-        return string.IsNullOrEmpty(EditableErrorReason(fcv, null, EditableErrorReasonType.EditNormaly, true, true, false, Filter.ToArray()));
+        return string.IsNullOrEmpty(EditableErrorReason(fcv, null, EditableErrorReasonType.EditNormaly, true, true, false, FilterCombined.ToArray()));
     }
 
     #endregion

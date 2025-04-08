@@ -250,7 +250,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             case "Summe":
                 if (!db.IsAdministrator() || tbl == null) { return; }
 
-                var summe = column?.Summe(tbl.Filter);
+                var summe = column?.Summe(tbl.FilterCombined);
                 if (!summe.HasValue) {
                     MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
                 } else {
@@ -262,7 +262,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             case "Voting":
                 if (!db.IsAdministrator() || tbl == null || column == null) { return; }
 
-                var v = new Voting(column, [.. tbl.Filter.Rows]);
+                var v = new Voting(column, [.. tbl.FilterCombined.Rows]);
                 _ = v.ShowDialog();
                 break;
 
@@ -956,7 +956,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        _ = RowCollection.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
+        _ = RowCollection.Remove(Table.FilterCombined, Table.PinnedRows, "Benutzer: Zeile löschen");
     }
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Table.Zoom = 1f;
