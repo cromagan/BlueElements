@@ -144,7 +144,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return "dummy" + _dummyCount;
     }
 
-    public static DoItFeedback GetVariableByParsing(string txt, LogData ld, VariableCollection varCol, ScriptProperties scp) {
+    public static DoItFeedback GetVariableByParsing(string txt, LogData? ld, VariableCollection? varCol, ScriptProperties scp) {
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(ld, "Kein Wert zum Parsen angekommen."); }
 
         if (txt.StartsWith("(")) {
@@ -187,7 +187,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             return GetVariableByParsing(txt.Substring(oo + 2), ld, varCol, scp);
         }
 
-        // Variabelen nur ersetzen, wenn Variablen auch vorhanden sind.
+        // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
         var t = Method.ReplaceVariable(txt, varCol, ld);
         if (!t.AllOk) { return new DoItFeedback(ld, "Variablen-Berechnungsfehler"); }
         if (t.Variable != null) { return new DoItFeedback(t.Variable); }

@@ -370,7 +370,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         lbxCellEditor.ItemAddRange(Table.Permission_AllUsed(true));
 
-        if (_table?.CurrentArrangement is { } car) {
+        if (_table?.CurrentArrangement is { IsDisposed: false } car) {
             butAktuellZurueck.Enabled = car[_column]?.PreviewsVisible() != null;
             butAktuellVor.Enabled = car[_column]?.NextVisible() != null;
         } else {

@@ -921,7 +921,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     internal string BestCaption() {
-        if (IsHead() && GetConnectedFormula() is { } cf) {
+        if (IsHead() && GetConnectedFormula() is { IsDisposed: false } cf) {
             return cf.Filename.FileNameWithoutSuffix();
         }
 

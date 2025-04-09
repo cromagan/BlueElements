@@ -92,10 +92,9 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// <param name="supportsCancel"></param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
     public static bool Show(IEditable? toEdit, Type? editortype, bool isDialog, bool supportsCancel) {
-        if (toEdit == null) { return false; }
         if (editortype == null) { return false; }
 
-        if (toEdit is IDisposableExtended { IsDisposed: true }) { return false; }
+        if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return false; }
 
         if (!isDialog) { supportsCancel = false; }
 

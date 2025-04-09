@@ -203,12 +203,15 @@ public abstract class Method : IReadableTextWithKey {
     /// <param name="varCol"></param>
     /// <param name="ld"></param>
     /// <returns></returns>
-    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection varCol, LogData? ld) {
+    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol, LogData? ld) {
+
+        if(varCol is not { }) { return new GetEndFeedback("Interner Variablen-Fehler", ld); }
+
         var posc = 0;
-        var v = varCol.AllStringableNames();
+        var allVarNames = varCol.AllStringableNames();
 
         do {
-            var (pos, which) = NextText(txt, posc, v, true, true, KlammernAlle);
+            var (pos, which) = NextText(txt, posc, allVarNames, true, true, KlammernAlle);
 
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 

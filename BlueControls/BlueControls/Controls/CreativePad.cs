@@ -623,7 +623,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         if (e == null || Items == null) { return null; }
 
         var tmp = Items.HotItem(e.Location, topLevel, Zoom, ShiftX, ShiftY);
-        if (LastClickedItem is { } bpi) {
+        if (LastClickedItem is { IsDisposed: false } bpi) {
             var p = CoordinatesUnscaled(e, Zoom, ShiftX, ShiftY);
 
             foreach (var thisPoint in bpi.JointPoints) {

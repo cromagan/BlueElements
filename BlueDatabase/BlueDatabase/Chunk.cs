@@ -455,7 +455,7 @@ public class Chunk : IHasKeyName {
 
     internal void SaveToByteList(RowItem thisRow) {
         if (LoadFailed) { return; }
-        if (thisRow.Database is not { } db) { return; }
+        if (thisRow.Database is not { IsDisposed: false } db) { return; }
 
         foreach (var thisColumn in db.Column) {
             if (thisColumn.Function != ColumnFunction.Virtuelle_Spalte) {

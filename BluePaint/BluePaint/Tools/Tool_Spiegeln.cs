@@ -49,8 +49,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
     public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
         if (!_ausricht) { return; }
-        var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (OnNeedCurrentPic() is not { } pic || e.Current == null || e.MouseDown == null) { return; }
 
         e.DrawLine(PenRedTransp, -1, e.Current.TrimmedY, pic.Width, e.Current.TrimmedY);
         e.DrawLine(PenRedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, pic.Height);

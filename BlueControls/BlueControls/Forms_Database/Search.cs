@@ -90,7 +90,7 @@ public sealed partial class Search : Form {
         do {
             found = ca.NextVisible(found) ?? ca.First();
 
-            if (found?.Column is not { } c) {
+            if (found?.Column is not { IsDisposed: false } c) {
                 MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
                 return;
             }

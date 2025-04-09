@@ -125,7 +125,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         Filter.PropertyChanged += Filter_PropertyChanged;
-        Filter.RowsChanged += Filter_PropertyChanged;
+        FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
+        FilterCombined.RowsChanged += FilterCombined_PropertyChanged;
         OnEnabledChanged(System.EventArgs.Empty);
     }
 
@@ -718,7 +719,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             //        }
             //    }
             //} else {
-            if (tmprow != null && column?.Column is { } c) {
+            if (tmprow != null && column?.Column is { IsDisposed: false } c) {
                 ist1 = tmprow.CellGetString(c);
                 if (renderer is { }) {
                     ist2 = renderer.ValueReadable(tmprow.CellGetString(c), ShortenStyle.Both, c.DoOpticalTranslation);
@@ -848,7 +849,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public void CursorPos_Set(ColumnViewItem? column, RowData? row, bool ensureVisible) {
         if (IsDisposed || Database is not { IsDisposed: false } || row == null || column == null ||
-            CurrentArrangement is not { } ca2 || !ca2.Contains(column) ||
+            CurrentArrangement is not { IsDisposed: false } ca2 || !ca2.Contains(column) ||
             RowsFilteredAndPinned() is not { } s || !s.Contains(row)) {
             column = null;
             row = null;
@@ -865,7 +866,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (ensureVisible && CurrentArrangement is { } ca) {
+        if (ensureVisible && CurrentArrangement is { IsDisposed: false } ca) {
             _ = EnsureVisible(ca, CursorPosColumn, CursorPosRow);
         }
         Invalidate();
@@ -893,6 +894,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db1.SortParameterChanged -= _Database_SortParameterChanged;
             db1.Row.RowRemoving -= Row_RowRemoving;
             db1.Row.RowRemoved -= Row_RowRemoved;
+            db1.Row.RowAdded -= Row_RowAdded;
             db1.Column.ColumnRemoving -= Column_ItemRemoving;
             db1.Column.ColumnRemoved -= _Database_ViewChanged;
             db1.Column.ColumnAdded -= _Database_ViewChanged;
@@ -923,6 +925,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db2.SortParameterChanged += _Database_SortParameterChanged;
             db2.Row.RowRemoving += Row_RowRemoving;
             db2.Row.RowRemoved += Row_RowRemoved;
+            db2.Row.RowAdded += Row_RowAdded;
             db2.Column.ColumnAdded += _Database_ViewChanged;
             db2.Column.ColumnRemoving += Column_ItemRemoving;
             db2.Column.ColumnRemoved += _Database_ViewChanged;
@@ -1447,7 +1450,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         #region Neue Flexis erstellen / updaten
 
-        if (Database is { } db) {
+        if (Database is { IsDisposed: false } db) {
             var tcvc = ColumnViewCollection.ParseAll(db);
             List<ColumnItem> columSort = [];
             var orderArrangement = tcvc.Get(FilterAnsichtName);
@@ -1562,7 +1565,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         try {
             if (disposing) {
                 Filter.PropertyChanged -= Filter_PropertyChanged;
-                Filter.RowsChanged -= Filter_PropertyChanged;
+                FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
+                FilterCombined.RowsChanged -= FilterCombined_PropertyChanged;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
             }
         } finally {
@@ -1801,7 +1805,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         _controlPressing = e.Modifiers == Keys.Control;
 
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-        if (CursorPosColumn?.Column is not { } c) { return; }
+        if (CursorPosColumn?.Column is not { IsDisposed: false } c) { return; }
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
@@ -2011,7 +2015,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             (_mouseOverColumn, _mouseOverRow) = CellOnCoordinate(ca, e.X, e.Y);
 
-            if (_mouseOverColumn?.Column is not { } c) { _isinMouseMove = false; return; }
+            if (_mouseOverColumn?.Column is not { IsDisposed: false } c) { _isinMouseMove = false; return; }
 
             if (e.Button != MouseButtons.None) {
                 //_database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
@@ -2067,7 +2071,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             // AutoFilter_Close() NICHT! Weil sonst nach dem Öffnen sofort wieder geschlossen wird
             FloatingForm.Close(this, Design.Form_KontextMenu);
 
-            if (_mouseOverColumn?.Column is not { } column) { return; }
+            if (_mouseOverColumn?.Column is not { IsDisposed: false } column) { return; }
 
             if (e.Button == MouseButtons.Left) {
                 if (Mouse_IsInAutofilter(_mouseOverColumn, e)) {
@@ -2184,7 +2188,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (cellInThisDatabaseRow == null) {
             if (string.IsNullOrEmpty(newValue)) { return; }
             if (cellInThisDatabaseColumn.Column?.Database is not { IsDisposed: false } db) { return; }
-            if (table?.Database?.Column.First() is not { } colfirst) { return; }
+            if (table?.Database?.Column.First() is not { IsDisposed: false } colfirst) { return; }
 
             var fc = new List<FilterItem>() { new FilterItem(colfirst, FilterType.Istgleich, newValue) };
             foreach (var thisFilter in table.FilterCombined) {
@@ -2852,7 +2856,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        if (CursorPosRow?.Row is { } setedrow) {
+        if (CursorPosRow?.Row is { IsDisposed: false } setedrow) {
             using var nfc = new FilterCollection(setedrow, "TableOutput");
             nfc.RemoveOtherAndAdd(FilterCombined, string.Empty);
 
@@ -3096,7 +3100,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         #region Roten Rand für Split-Spalten
 
-        if (viewItem.Column is { } c && c == viewItem.Column?.Database?.Column.SplitColumn) {
+        if (viewItem.Column is { IsDisposed: false } c && c == viewItem.Column?.Database?.Column.SplitColumn) {
             var t = realHead;
             t.Inflate(-3, -3);
             gr.DrawRectangle(new Pen(Color.Red, 6), t);
@@ -3229,7 +3233,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                     #region Ende einer Gruppierung gefunden
 
-                    if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { } && prevViewItemWithOtherCaption is { }) {
+                    if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is { }) {
                         Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, realHead, displayRectangleWoSlider, pccy, pcch, prevCaptionGroup);
                     }
 
@@ -3244,7 +3248,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         // Zeichen-Routine für das letzte Element aufrufen
-        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { } && prevViewItemWithOtherCaption is { }) {
+        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is { }) {
             Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, Rectangle.Empty, displayRectangleWoSlider, pccy, pcch, prevCaptionGroup);
         }
     }
@@ -3331,7 +3335,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, FilterleisteHeight + 12);
                 } else {
                     foreach (var thisColumnItem in db.Column) {
-                        if (thisColumnItem.LinkedDatabase is { } dbl && !string.IsNullOrEmpty(dbl.ScriptNeedFix)) {
+                        if (thisColumnItem.LinkedDatabase is { IsDisposed: false } dbl && !string.IsNullOrEmpty(dbl.ScriptNeedFix)) {
                             gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, FilterleisteHeight + 8);
                             ca.Font_RowChapter.DrawString(gr, $"Skripte von {dbl.Caption} müssen repariert werden", 90, FilterleisteHeight + 12);
                         }
@@ -3418,7 +3422,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         CellExtEventArgs? ck = null;
         if (e.HotItem is CellExtEventArgs tmp) { ck = tmp; }
 
-        if (ck?.ColumnView?.Column is not { } c) { return; }
+        if (ck?.ColumnView?.Column is not { IsDisposed: false } c) { return; }
 
         var toAdd = e.Item.KeyName;
         var toRemove = string.Empty;
@@ -3426,7 +3430,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             Cell_Edit(ca, ck.ColumnView, ck.RowData, false);
             return;
         }
-        if (ck.RowData?.Row is not { } r) {
+        if (ck.RowData?.Row is not { IsDisposed: false } r) {
             // Neue Zeile!
             UserEdited(this, toAdd, ck.ColumnView, null, false);
             return;
@@ -3497,13 +3501,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private void Filter_PropertyChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-        if (CurrentArrangement is { } ca) {
-            foreach (var thisColumn in ca) {
-                thisColumn.TmpIfFilterRemoved = null;
-            }
-        }
-
         DoFilterCombined();
     }
 
@@ -3523,6 +3520,17 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         Filter.RowFilterText = newF;
         DoÄhnlich();
+    }
+
+    private void FilterCombined_PropertyChanged(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+        if (CurrentArrangement is { IsDisposed: false } ca) {
+            foreach (var thisColumn in ca) {
+                thisColumn.TmpIfFilterRemoved = null;
+            }
+        }
+
+        Invalidate_SortedRowData();
     }
 
     private FlexiFilterControl? FlexiItemOf(ColumnItem column) {
@@ -3552,7 +3560,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private void GetÄhnlich() {
         if (IsDisposed || FilterleisteZeilen <= 0) { return; }
-        if (Database is not { } db) { return; }
+        if (Database is not { IsDisposed: false } db) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(db);
 
@@ -3687,14 +3695,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                     case "filters":
                         Filter.PropertyChanged -= Filter_PropertyChanged;
-                        Filter.RowsChanged -= Filter_PropertyChanged;
                         Filter.Database = Database;
                         var code = pair.Value.FromNonCritical();
                         Filter.Clear();
                         Filter.Parse(code);
                         Filter.ParseFinished(code);
                         Filter.PropertyChanged += Filter_PropertyChanged;
-                        Filter.RowsChanged += Filter_PropertyChanged;
                         Filter_PropertyChanged(this, System.EventArgs.Empty);
                         break;
 
@@ -3790,6 +3796,16 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Invalidate();
     }
 
+    private void Row_RowAdded(object sender, RowEventArgs e) {
+        if (IsDisposed) { return; }
+        if (!FilterCombined.RowsCalculated) { return; }
+
+        if (e.Row.MatchesTo(FilterCombined.ToArray())) {
+            FilterCombined.Invalidate_FilteredRows();
+            return;
+        }
+    }
+
     private void Row_RowRemoved(object sender, RowEventArgs e) => Invalidate_CurrentArrangement();
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
@@ -3799,6 +3815,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (PinnedRows.Contains(e.Row)) {
             _ = PinnedRows.Remove(e.Row);
             Invalidate_SortedRowData();
+        }
+
+        if (FilterCombined.RowsCalculated && FilterCombined.Rows.Contains(e.Row)) {
+            FilterCombined.Invalidate_FilteredRows();
         }
     }
 
@@ -3924,7 +3944,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private bool UserEdit_NewRowAllowed() {
         if (IsDisposed || Database is not { IsDisposed: false } db || db.Column.Count == 0 || db.Column.First() is not { IsDisposed: false } fc) { return false; }
         if (db.Column.Count == 0) { return false; }
-        if (CurrentArrangement?[fc] is not { } fcv) { return false; }
+        if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return false; }
 
         if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return false; }
 

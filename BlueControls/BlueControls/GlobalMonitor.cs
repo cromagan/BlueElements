@@ -231,7 +231,7 @@ public partial class GlobalMonitor : Form {
     }
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
-        if (tblLog.Database is { } db) {
+        if (tblLog.Database is { IsDisposed: false } db) {
             _ = db.Row.Clear("Monitoring-Log geleert");
         }
 

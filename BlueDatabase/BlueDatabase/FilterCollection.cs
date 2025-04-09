@@ -62,14 +62,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     public FilterCollection(RowItem r, string coment) {
         _coment = coment;
-        if (r.Database is not { } db) {
+        if (r.Database is not { IsDisposed: false } db) {
             Develop.DebugPrint(ErrorType.Error, "Fehler im Filter");
             return;
         }
 
         Database = db;
 
-        if (db.Column.SplitColumn is { } spc) {
+        if (db.Column.SplitColumn is { IsDisposed: false } spc) {
             Add(new FilterItem(spc, FilterType.Istgleich, r.CellGetString(spc)));
         }
 
@@ -155,6 +155,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
+    public bool RowsCalculated => _rows != null;
+
     public RowItem? RowSingleOrNull {
         get {
             if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
@@ -180,7 +182,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static List<RowItem> CalculateFilteredRows(Database? db, params FilterItem[] filter) {
         if (db == null || db.IsDisposed) { return []; }
 
-        if (db.Column.SplitColumn is { } spc) {
+        if (db.Column.SplitColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, filter) is { } i) {
                 var ok = db.BeSureRowIsLoaded(i, null);
                 if (!ok) { return []; }

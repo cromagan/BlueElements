@@ -170,7 +170,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
 
-            if (db.Column?.SplitColumn is { } spc) {
+            if (db.Column?.SplitColumn is { IsDisposed: false } spc) {
                 if (filter is not { }) {
                     return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
                 }

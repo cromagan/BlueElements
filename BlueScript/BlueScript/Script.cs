@@ -43,7 +43,7 @@ public class Script {
         //            var varname = "c_" + thisValue.ToUpper().Replace(".", "_").Replace(" ", "_").Replace(":", "_").Replace("/", "_").Replace("\\", "_");
 
         //            var comment = string.Empty;
-        //            if (Variables.Get(varname) is { } tmpvar) {
+        //            if (Variables.Get(varname) is { IsDisposed: false } tmpvar) {
         //                comment = tmpvar.Comment;
         //                Variables.Remove(tmpvar);
         //            }

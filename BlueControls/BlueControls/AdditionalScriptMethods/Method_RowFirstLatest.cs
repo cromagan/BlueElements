@@ -57,7 +57,7 @@ public class Method_RowFirstLatest : Method_Database {
         var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
 
-        if (allFi.Database is not { } db) { return DoItFeedback.InternerFehler(ld); }
+        if (allFi.Database is not { IsDisposed: false } db) { return DoItFeedback.InternerFehler(ld); }
 
         var r = allFi.Rows;
         allFi.Dispose();

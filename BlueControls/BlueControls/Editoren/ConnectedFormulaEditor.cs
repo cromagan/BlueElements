@@ -107,7 +107,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
                 _formula.Editing += _cFormula_Editing;
             }
 
-            if (_formula?.Pages is { } pg) {
+            if (_formula?.Pages is { IsDisposed: false } pg) {
                 foreach (var thisp in pg) {
                     if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
                         Pad.Items = icpi;
@@ -191,7 +191,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnArbeitsbereich_Click(object sender, System.EventArgs e) {
-        if (Pad?.Items is not { } pi) { return; }
+        if (Pad?.Items is not { IsDisposed: false } pi) { return; }
 
         var oldw = pi.UsedArea.Width / AutosizableExtension.GridSize;
 
@@ -453,7 +453,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //    Formula.NotAllowedChilds = l.AsReadOnly();
         //}
 
-        if (_formula?.Pages is { } pg) {
+        if (_formula?.Pages is { IsDisposed: false } pg) {
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
                     Pad.Items = icpi;
@@ -510,7 +510,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(toparse);
-        if (i is not { } api) { return; }
+        if (i is not { IsDisposed: false } api) { return; }
 
         api.GetNewIdsForEverything();
 
@@ -526,7 +526,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             s = tabSeiten.SelectedTab.Text;
         }
 
-        if (_formula?.Pages is { } pg) {
+        if (_formula?.Pages is { IsDisposed: false } pg) {
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem { IsDisposed: false } icp) {
                     if (s == icp.Caption) {

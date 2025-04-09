@@ -587,7 +587,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    [Obsolete]
     public static Database? Get(string fileOrTableName, bool readOnly, NeedPassword? needPassword) {
         if (fileOrTableName.Contains("|")) {
             var t = fileOrTableName.SplitBy("|");
@@ -1415,9 +1414,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                                       "Benutzer: " + UserName + "\r\n" +
                                       "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
                                       "Extended: " + extended + "\r\n";
-                    if (row is { } r) {
+                    if (row is { IsDisposed: false } r) {
                         t = t + "Zeile: " + r.CellFirstString() + "\r\n";
-                        if (Column.SplitColumn is { } spc) {
+                        if (Column.SplitColumn is { IsDisposed: false } spc) {
                             t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
                         }
                     }

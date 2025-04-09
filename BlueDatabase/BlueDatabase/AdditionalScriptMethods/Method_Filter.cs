@@ -63,7 +63,7 @@ public class Method_Filter : Method_Database {
 
             if (fi.FilterItem is not { } fii) { return (null, $"Attribut {z + 1} enthält keinen Filter,"); }
 
-            if (fii.Column?.Database is { } db) {
+            if (fii.Column?.Database is { IsDisposed: false } db) {
                 fii.Column.AddSystemInfo("Value Used in Script-Filter", sourcedatabase ?? db, user);
 
                 if (db.IsDisposed) { return (null, "Datenbankfehler!"); }

@@ -83,7 +83,11 @@ public class AdditionalDrawing : System.EventArgs {
         G.FillRectangle(brush, x);
     }
 
-    public Rectangle TrimmedRectangle() => new(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
+    public Rectangle TrimmedRectangle() {
+        if (MouseDown == null || Current == null) { return Rectangle.Empty; }
+
+        return new(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
+    }
 
     #endregion
 }

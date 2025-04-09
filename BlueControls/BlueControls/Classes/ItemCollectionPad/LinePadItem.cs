@@ -346,7 +346,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return false; }
 
         foreach (var thisBasicItem in icpi) {
-            if (thisBasicItem is { } and not LinePadItem) {
+            if (thisBasicItem is { IsDisposed: false } and not LinePadItem) {
                 var a = thisBasicItem.UsedArea;
                 if (a is { Width: > 0, Height: > 0 }) {
                     a.Inflate(2, 2);
@@ -441,7 +441,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         if (p1 >= _tempPoints.Count - 1) { return false; }
         //   If _TempPoints.Count > 4 Then Return False
         foreach (var thisItemBasic in icpi) {
-            if (thisItemBasic is { } and not LinePadItem)
+            if (thisItemBasic is { IsDisposed: false } and not LinePadItem)
             //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
             {
                 var a = thisItemBasic.UsedArea;

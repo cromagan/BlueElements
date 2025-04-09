@@ -82,7 +82,7 @@ internal class Method_LoadPadItem : Method {
 
             var i = ParsebleItem.NewByParsing<AbstractPadItem>(toparse);
 
-            if (i is not { } api) {
+            if (i is not { IsDisposed: false } api) {
                 return new DoItFeedback(ld, "Datei fehlerhaft: " + filen);
             }
 

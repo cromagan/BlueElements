@@ -436,17 +436,17 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", _column);
 
-        if (_column is not { } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
+        if (_column is not { IsDisposed: false } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
             result.ParseableAdd("Renderer", Renderer);
             result.ParseableAdd("RendererSettings", RendererSettings);
         }
 
-        if (_column is not { } c2 || c2.BackColor.ToArgb != _backColor_ColumnHead.ToArgb || !_backColor_ColumnCell.IsMagentaOrTransparent()) {
+        if (_column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != _backColor_ColumnHead.ToArgb || !_backColor_ColumnCell.IsMagentaOrTransparent()) {
             result.ParseableAdd("BackColorColumnHead", _backColor_ColumnHead);
             result.ParseableAdd("BackColorColumnCell", _backColor_ColumnCell);
         }
 
-        if (_column is not { } c3 || c3.ForeColor.ToArgb != _fontColor_Caption.ToArgb || !_fontColor_Caption.IsMagentaOrTransparent()) {
+        if (_column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != _fontColor_Caption.ToArgb || !_fontColor_Caption.IsMagentaOrTransparent()) {
             result.ParseableAdd("FontColorCaption", _fontColor_Caption);
         }
 
@@ -578,7 +578,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private void UnRegisterEvents() {
         if (_column != null) {
             _column.PropertyChanged -= _column_PropertyChanged;
-            if (_column.Database is { } db) {
+            if (_column.Database is { IsDisposed: false } db) {
                 db.Cell.CellValueChanged -= Cell_CellValueChanged;
             }
         }

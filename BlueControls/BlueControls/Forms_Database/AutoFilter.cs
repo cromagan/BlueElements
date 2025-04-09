@@ -51,7 +51,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Constructors
 
-    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, Renderer_Abstract? renderer) : base(Design.Form_AutoFilter) {
+    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, Renderer_Abstract renderer) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
 
@@ -147,7 +147,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                 nichtleereallowed = false;
             }
 
-            if (_column is { } && _column == _column.Database?.Column.SplitColumn) {
+            if (_column is { IsDisposed: false } && _column == _column.Database?.Column.SplitColumn) {
                 nichtleereallowed = false;
             }
 
@@ -365,12 +365,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             return;
         }
 
-        if (_column != null && _column.Database?.Column.SplitColumn == _column) {
+        if (_column.Database?.Column.SplitColumn == _column) {
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_GroßKleinEgal, txbEingabe.Text));
             return;
         }
 
-        if (_column != null && _column.SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
+        if (_column.SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
             if (txbEingabe.Text.Contains("-")) {
                 var tmp = txbEingabe.Text.Replace(" ", string.Empty);
                 var l = MathFormulaParser.LastMinusIndex(tmp);

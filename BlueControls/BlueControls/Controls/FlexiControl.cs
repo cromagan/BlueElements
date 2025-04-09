@@ -609,7 +609,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void _InfoCaption_Click(object sender, System.EventArgs e) {
-        if (GetControl<ComboBox>() is { } cbx) {
+        if (GetControl<ComboBox>() is { IsDisposed: false } cbx) {
             _ = cbx.Focus();
             cbx.ShowMenu(null, null);
         }

@@ -332,7 +332,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 _ = cols.AddIfNotExists(thiss);
                 var t = thiss.SplitBy("|");
 
-                if (Database?.Column[t[0]] is { } thisc) {
+                if (Database?.Column[t[0]] is { IsDisposed: false } thisc) {
                     m = m + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
                 }
             }
@@ -509,7 +509,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (filter is not { Length: not 0 }) { return Database.Column.SplitColumn == null || db.PowerEdit; }
 
-        if (Database.Column.SplitColumn is { } csp && !Database.PowerEdit) {
+        if (Database.Column.SplitColumn is { IsDisposed: false } csp && !Database.PowerEdit) {
             var found = false;
             foreach (var thisF in filter) {
                 if (thisF.Column == csp) { found = true; break; }

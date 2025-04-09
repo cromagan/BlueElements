@@ -131,7 +131,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         pad.Items.Clear();
         Generic.CollectGarbage();
 
-        if (rowsForExport is not { Count: >= 1 }) { return -1; }
+        if (rowsForExport is not { Count: > 0 }) { return -1; }
 
         var tmp = new ItemCollectionPadItem(layoutFileName);
         _ = tmp.ResetVariables();
@@ -235,6 +235,9 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
+
+        if(padSchachteln.Items is not {IsDisposed: false }) { return; }
+
         _ = FloatTryParse(flxBreite.Value, out var b);
         _ = FloatTryParse(flxHöhe.Value, out var h);
         _ = FloatTryParse(flxAbstand.Value, out var ab);

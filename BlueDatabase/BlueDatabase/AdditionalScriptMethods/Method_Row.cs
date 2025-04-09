@@ -128,9 +128,9 @@ public class Method_Row : Method_Database, IUseableForButton {
 
         if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(ld, message); }
 
-        if (newrow is { } r) {
+        if (newrow is { IsDisposed: false } r) {
             _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(r);
-            //if (scp.AdditionalInfo is RowItem masterRow && r.Database is { } db) {
+            //if (scp.AdditionalInfo is RowItem masterRow && r.Database is { IsDisposed: false } db) {
             //    masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Zugehöriger Eintrag: {r.CellFirstString()} ({db.Caption})");
             //}
 

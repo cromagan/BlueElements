@@ -201,7 +201,7 @@ public class DatabaseChunk : Database {
             : GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r));
 
     public static string GetChunkId(Database db, DatabaseDataType type, string chunkvalue) {
-        if (db.Column.SplitColumn is not { } spc) { return Chunk_MainData.ToLower(); }
+        if (db.Column.SplitColumn is not { IsDisposed: false } spc) { return Chunk_MainData.ToLower(); }
 
         if (type is DatabaseDataType.Command_RemoveColumn
                 or DatabaseDataType.Command_AddColumnByName) { return Chunk_MainData.ToLower(); }
@@ -237,7 +237,7 @@ public class DatabaseChunk : Database {
         return Chunk_MainData.ToLower();
     }
 
-    public static string GetChunkValue(RowItem r) => r.Database?.Column.SplitColumn is not { } spc ? string.Empty : r.Database.Cell.GetStringCore(spc, r);
+    public static string GetChunkValue(RowItem r) => r.Database?.Column.SplitColumn is not { IsDisposed: false } spc ? string.Empty : r.Database.Cell.GetStringCore(spc, r);
 
     /// <summary>
     /// row == null --> false
@@ -252,7 +252,7 @@ public class DatabaseChunk : Database {
 
         //var chk = GetChunkId(row);
 
-        //if (Column.SplitColumn is { } spc) {
+        //if (Column.SplitColumn is { IsDisposed: false } spc) {
         //    var value = FilterCollection.InitValue(filter, spc, false);
 
         //    if (string.IsNullOrEmpty(value)) {

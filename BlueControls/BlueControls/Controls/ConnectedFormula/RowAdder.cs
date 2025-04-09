@@ -277,7 +277,8 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             }
         }
 
-        var keyAndInfo = RepairMenu([.. _menu, .. selected], _infos);
+		var keyAndInfo = RepairMenu([.. _menu ?? [], .. selected], _infos);
+
 
         for (var z = 0; z < keyAndInfo.Count; z++) {
             var key = keyAndInfo[z].SplitBy("#")[0];
@@ -406,7 +407,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         if (_ignoreCheckedChanged) { return; }
 
 
-        if (RowSingleOrNull() is not { } rowIn) { return; }
+        if (RowSingleOrNull() is not { IsDisposed: false } rowIn) { return; }
 
         //        var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
 

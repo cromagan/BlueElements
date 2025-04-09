@@ -74,7 +74,7 @@ public class InvalidatedRowsManager {
     /// <param name="rowItem">Das hinzuzufügende Row-Item</param>
     /// <returns>True wenn das Item hinzugefügt wurde, False wenn nicht</returns>
     public bool AddInvalidatedRow(RowItem? rowItem) {
-        if (rowItem?.Database is not { } db) { return false; }
+        if (rowItem?.Database is not { IsDisposed: false } db) { return false; }
 
 
         // Ansosten ist Endloschleife mit Monitor

@@ -279,14 +279,19 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
         var ic = ItemsOf(db.Column, true);
 
         foreach (var thisColumnItem in db.Column) {
-            if (thisColumnItem != null && ca[thisColumnItem] != null) {
-                ic.Get(thisColumnItem.KeyName).Enabled = false;
+            if (thisColumnItem is { IsDisposed: false } &&
+                ca[thisColumnItem] is { IsDisposed: false } &&
+                ic.Get(thisColumnItem.KeyName) is { } ali) {
+                ali.Enabled = false;
             }
         }
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None);
         if (r is not { Count: not 0 }) { return; }
-        ca.Add(db.Column[r[0]]);
+
+        if (db.Column[r[0]] is not { IsDisposed: false } col) { return; }
+
+        ca.Add(col);
         ChangeCurrentArrangementto(ca);
         ShowOrder();
     }
@@ -357,7 +362,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
         do {
             var leftestItem = LeftestItem(itemsdone);
-            if (leftestItem?.CVI is not { } cvi) { break; }
+            if (leftestItem?.CVI is not { IsDisposed: false } cvi) { break; }
 
             var item = new ColumnViewItem(ca, cvi.ParseableItems().FinishParseable());
 
@@ -397,7 +402,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
     private ColumnPadItem? LeftestItem(IEnumerable<AbstractPadItem> ignore) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
-        if (Pad?.Items is not { } ic) { return null; }
+        if (Pad?.Items is not { IsDisposed: false } ic) { return null; }
 
         ColumnPadItem? found = null;
 

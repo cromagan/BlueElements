@@ -295,7 +295,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
 
-        if (Database is { } db) {
+        if (Database is { IsDisposed: false } db) {
             if (!db.IsEventScriptCheckeIn()) {
                 if (MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok", "Aktiv schalten") == 1) {
                     db.EventScript = db.EventScriptEdited;

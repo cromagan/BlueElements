@@ -99,7 +99,7 @@ internal sealed partial class SearchAndReplaceInCells : Form {
         }
 
         if (chkNurinAktuellerSpalte.Checked) {
-            if (_table.CursorPosColumn?.Column is not { } c) {
+            if (_table.CursorPosColumn?.Column is not { IsDisposed: false } c) {
                 canDo = false;
             } else {
                 if (!c.Function.CanBeCheckedByRules()) { canDo = false; }
@@ -124,7 +124,7 @@ internal sealed partial class SearchAndReplaceInCells : Form {
         List<ColumnItem> sp = [];
         List<RowItem> ro = [];
         if (chkNurinAktuellerSpalte.Checked) {
-            if (_table.CursorPosColumn?.Column is { } c) { sp.Add(c); }
+            if (_table.CursorPosColumn?.Column is { IsDisposed: false } c) { sp.Add(c); }
         } else {
             sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
         }

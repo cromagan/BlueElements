@@ -150,10 +150,10 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         foreach (var thisn in bez) {
             var ro = db.Row[thisn];
             if (ro != null) {
-                var it = ItemOfRow(ro);
-                if (it == null) {
-                    //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
-                    lastit = AddOne(thisn, 0, 0, lastit.Layout_Dateiname);
+        
+                if (ItemOfRow(ro) is { IsDisposed: false } it &&
+                    AddOne(thisn, 0, 0, lastit.Layout_Dateiname) is { } newit) {
+                    lastit = newit;
                 }
             }
         }

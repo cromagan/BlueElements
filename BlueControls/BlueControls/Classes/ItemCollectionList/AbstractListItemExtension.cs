@@ -322,7 +322,7 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem? columnStyle, Renderer_Abstract renderer) {
+    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem columnStyle, Renderer_Abstract renderer) {
         var l = new List<AbstractListItem>();
 
         if (values == null) { return l; }

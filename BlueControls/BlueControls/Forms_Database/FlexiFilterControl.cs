@@ -135,7 +135,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
 
-            if (FilterOutput is { Rows.Count: 1 } fio && FilterSingleColumn is { } c) {
+            if (FilterOutput is { Rows.Count: 1 } fio && FilterSingleColumn is { IsDisposed: false } c) {
                 if (FilterCollection.InitValue(c, true, fio.ToArray()) is { } vv) {
                     this.SettingsAdd($"{FilterHash()}|{vv}");
                 }
@@ -366,7 +366,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private void UpdateFilterData(FilterItem? filterSingle, bool showDelFilterButton) {
         if (IsDisposed || f is null) { return; }
 
-        if (FilterSingleColumn?.Database is { } db && filterSingle is { }) {
+        if (FilterSingleColumn?.Database is { IsDisposed: false } db && filterSingle is { }) {
             DoInputFilter(null, false);
             using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(db, "UpadteFilterData");
 
