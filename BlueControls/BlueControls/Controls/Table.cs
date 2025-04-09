@@ -65,6 +65,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public readonly FilterCollection Filter = new("DefaultTableFilter");
     public readonly FilterCollection FilterCombined = new("TableFilterCombined");
 
+    /// <summary>
+    ///  Abstand zwischen den Zeilen
+    /// </summary>
+    private const int rowSpacing = 4;
+
     private readonly List<string> _collapsed = [];
     private readonly object _lockUserAction = new();
     private ColumnViewCollection? _ähnliche;
@@ -379,7 +384,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     /// <summary>
     /// Berechnet die Höhe der Filterleiste in Pixeln.
     /// </summary>
-    private int FilterleisteHeight => _filterleisteZeilen * 38;
+    private int FilterleisteHeight {
+        get {
+            if (_filterleisteZeilen < 1) { return 0; }
+
+            return btnAlleFilterAus.Top * 2 + _filterleisteZeilen * btnAlleFilterAus.Height + (_filterleisteZeilen - 1) * rowSpacing;
+        }
+    }
 
     #endregion
 
@@ -894,7 +905,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db1.SortParameterChanged -= _Database_SortParameterChanged;
             db1.Row.RowRemoving -= Row_RowRemoving;
             db1.Row.RowRemoved -= Row_RowRemoved;
-            db1.Row.RowAdded -= Row_RowAdded;
             db1.Column.ColumnRemoving -= Column_ItemRemoving;
             db1.Column.ColumnRemoved -= _Database_ViewChanged;
             db1.Column.ColumnAdded -= _Database_ViewChanged;
@@ -925,7 +935,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db2.SortParameterChanged += _Database_SortParameterChanged;
             db2.Row.RowRemoving += Row_RowRemoving;
             db2.Row.RowRemoved += Row_RowRemoved;
-            db2.Row.RowAdded += Row_RowAdded;
             db2.Column.ColumnAdded += _Database_ViewChanged;
             db2.Column.ColumnRemoving += Column_ItemRemoving;
             db2.Column.ColumnRemoved += _Database_ViewChanged;
@@ -1409,8 +1418,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         #region ZeilenFilter befüllen
 
-        txbZeilenFilter.Text = Database != null &&
-                               Filter.IsRowFilterActiv()
+        txbZeilenFilter.Text = Database != null && Filter.IsRowFilterActiv()
                                 ? Filter.RowFilterText
                                 : string.Empty;
 
@@ -1430,9 +1438,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var constwi = (int)(txbZeilenFilter.Width * 1.5);
         var right = constwi + Skin.PaddingSmal;
         const AnchorStyles anchor = AnchorStyles.Top | AnchorStyles.Left;
-
-        // Abstand zwischen den Zeilen
-        const int rowSpacing = 4;
 
         #endregion
 
@@ -1491,6 +1496,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     if (thisColumn.AutoFilterSymbolPossible()) {
                         if (viewItemOrder != null && FilterTypesToShow.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
                         if (viewItemCurrent != null && FilterTypesToShow.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter) && filterItem != null) { showMe = true; }
+
+                        if (FilterInput?[thisColumn] is { }) { showMe = true; }
                     }
 
                     #endregion
@@ -1585,18 +1592,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         // Haupthintergrund der gesamten Tabelle zeichnen
         Skin.Draw_Back(gr, Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
-
-        // Filterleiste zeichnen, wenn aktiviert
-        if (FilterleisteZeilen > 0) {
-            // Bereich für die Filterleiste
-            Rectangle filterRect = new Rectangle(0, 0, Width, FilterleisteHeight);
-
-            // Hintergrund der Filterleiste zeichnen (falls nötig)
-            Skin.Draw_Back(gr, Design.Table_And_Pad, state, filterRect, this, true);
-
-            // Rahmen um Filterleiste zeichnen
-            Skin.Draw_Border(gr, Design.Table_And_Pad, state, filterRect);
-        }
 
         _tmpCursorRect = Rectangle.Empty;
 
@@ -1697,6 +1692,18 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         #endregion
 
         Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement);
+
+        // Filterleiste zeichnen, wenn aktiviert
+        if (FilterleisteZeilen > 0) {
+            // Bereich für die Filterleiste
+            Rectangle filterRect = new Rectangle(0, 0, Width, FilterleisteHeight);
+
+            // Hintergrund der Filterleiste zeichnen (falls nötig)
+            Skin.Draw_Back(gr, Design.GroupBox, state, filterRect, this, true);
+
+            //// Rahmen um Filterleiste zeichnen
+            //Skin.Draw_Border(gr, Design.Table_And_Pad, state, filterRect);
+        }
 
         // Rahmen um die gesamte Tabelle zeichnen
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
@@ -2442,20 +2449,20 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        if (FilterInput?[columnviewitem.Column] is { }) {
-            MessageBox.Show("Ein Filter der eingeht,\r\nverhindert weitere Filterungen.", ImageCode.Information, "OK");
-            return;
-        }
+        //if (FilterInput?[columnviewitem.Column] is { }) {
+        //    MessageBox.Show("Ein Filter der eingeht,\r\nverhindert weitere Filterungen.", ImageCode.Information, "OK");
+        //    return;
+        //}
 
         var t = string.Empty;
         foreach (var thisFilter in Filter) {
             if (thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Origin)) {
-                t += "\r\n" + thisFilter.ReadableText();
+                t += "\r\n" + thisFilter.Origin; // thisFilter.ReadableText();
             }
         }
 
         if (!string.IsNullOrEmpty(t)) {
-            MessageBox.Show("<b>Diese(r) Filter wurde(n) automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
+            MessageBox.Show("<b>Dieser Filter wurde automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
             return;
         }
 
@@ -2841,9 +2848,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
+        FilterCombined.Database = Filter.Database;
+
         FilterCombined.Clear();
-        FilterCombined.RemoveOtherAndAdd(Filter, string.Empty);
-        FilterCombined.RemoveOtherAndAdd(FilterInput, string.Empty);
+        FilterCombined.RemoveOtherAndAdd(Filter, null);
+        FilterCombined.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
         Invalidate_SortedRowData();
         OnFilterChanged();
         DoFilterOutput();
@@ -2858,8 +2867,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (CursorPosRow?.Row is { IsDisposed: false } setedrow) {
             using var nfc = new FilterCollection(setedrow, "TableOutput");
-            nfc.RemoveOtherAndAdd(FilterCombined, string.Empty);
-
+            nfc.RemoveOtherAndAdd(FilterCombined, null);
             FilterOutput.ChangeTo(nfc);
         } else {
             FilterOutput.ChangeTo(FilterCombined);
@@ -2899,7 +2907,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                 case ColumnLineStyle.ShadowRight:
                     var c = Skin.Color_Border(Design.Table_Lines_thick, States.Standard);
-                    gr.DrawLine(Skin.PenLinieKräftig, xPos, 0, xPos, yPos);
+                    gr.DrawLine(Skin.PenLinieKräftig, xPos, realHead.Top, xPos, yPos);
                     gr.DrawLine(new Pen(Color.FromArgb(80, c.R, c.G, c.B)), xPos + 1, realHead.Top, xPos + 1, yPos);
                     gr.DrawLine(new Pen(Color.FromArgb(60, c.R, c.G, c.B)), xPos + 2, realHead.Top, xPos + 2, yPos);
                     gr.DrawLine(new Pen(Color.FromArgb(40, c.R, c.G, c.B)), xPos + 3, realHead.Top, xPos + 3, yPos);
@@ -3500,16 +3508,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return true;
     }
 
-    private void Filter_PropertyChanged(object sender, System.EventArgs e) {
-        DoFilterCombined();
-    }
+    private void Filter_PropertyChanged(object sender, System.EventArgs e) => DoFilterCombined();
 
     private void Filter_ZeilenFilterSetzen() {
         if (IsDisposed || (Database?.IsDisposed ?? true)) {
             DoÄhnlich();
             return;
         }
-        var isF = FilterCombined.RowFilterText;
+        var isF = Filter.RowFilterText;
         var newF = txbZeilenFilter.Text;
         if (string.Equals(isF, newF, StringComparison.OrdinalIgnoreCase)) { return; }
         if (string.IsNullOrEmpty(newF)) {
@@ -3796,16 +3802,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Invalidate();
     }
 
-    private void Row_RowAdded(object sender, RowEventArgs e) {
-        if (IsDisposed) { return; }
-        if (!FilterCombined.RowsCalculated) { return; }
-
-        if (e.Row.MatchesTo(FilterCombined.ToArray())) {
-            FilterCombined.Invalidate_FilteredRows();
-            return;
-        }
-    }
-
     private void Row_RowRemoved(object sender, RowEventArgs e) => Invalidate_CurrentArrangement();
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
@@ -3815,10 +3811,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (PinnedRows.Contains(e.Row)) {
             _ = PinnedRows.Remove(e.Row);
             Invalidate_SortedRowData();
-        }
-
-        if (FilterCombined.RowsCalculated && FilterCombined.Rows.Contains(e.Row)) {
-            FilterCombined.Invalidate_FilteredRows();
         }
     }
 

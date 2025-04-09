@@ -366,12 +366,20 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private void UpdateFilterData(FilterItem? filterSingle, bool showDelFilterButton) {
         if (IsDisposed || f is null) { return; }
 
-        if (FilterSingleColumn?.Database is { IsDisposed: false } db && filterSingle is { }) {
+        if (FilterSingleColumn?.Database is { IsDisposed: false } db &&
+            filterSingle is { }) {
             DoInputFilter(null, false);
-            using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(db, "UpadteFilterData");
 
-            fic?.RemoveOtherAndAdd(filterSingle);
-            FilterOutput.ChangeTo(fic);
+            if (FilterInput is not { IsDisposed: false } fi) { return; }
+
+            if (fi.Contains(filterSingle)) {
+                FilterOutput.ChangeTo(fi);
+            } else {
+                using var fic = fi.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(db, "UpadteFilterData");
+
+                fic?.RemoveOtherAndAdd(filterSingle);
+                FilterOutput.ChangeTo(fic);
+            }
         } else {
             Invalidate_FilterOutput();
         }
@@ -399,7 +407,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         #endregion
 
-        f.DisabledReason = !string.IsNullOrEmpty(_filterOrigin) ? "Dieser Filter wurde<br>automatisch gesetzt." : string.Empty;
+        f.DisabledReason = !string.IsNullOrEmpty(_filterOrigin) ? $"<b>Dieser Filter wurde automatisch gesetzt:</b><br>{_filterOrigin}" : string.Empty;
 
         #region Wählen-Button - und keine weitere Berechnungen
 

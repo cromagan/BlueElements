@@ -155,8 +155,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
-    public bool RowsCalculated => _rows != null;
-
     public RowItem? RowSingleOrNull {
         get {
             if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
@@ -531,8 +529,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public void Remove_RowFilter() => Remove(null as ColumnItem);
 
-    public void RemoveOtherAndAdd(FilterItem fi, string newOrigin) {
+    public void RemoveOtherAndAdd(FilterItem fi, string? newOrigin) {
         var fin = fi;
+
+        newOrigin??= fi.Origin;
+
         if (fi.Origin != newOrigin) {
             fin = new FilterItem(fi.Database, fi.Column, fi.FilterType, fi.SearchValue, newOrigin);
         }
@@ -547,7 +548,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi == null) { return; }
         if (IsDisposed) { return; }
         if (!fi.IsOk()) {
-            Develop.DebugPrint(ErrorType.Error, "Filter Fehler!");
+            Develop.DebugPrint(ErrorType.Error, "Filter Fehler: " + fi.ErrorReason());
             return;
         }
 
@@ -569,7 +570,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <summary>
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
     /// </summary>
-    public void RemoveOtherAndAdd(FilterCollection? fc, string newOrigin) {
+    public void RemoveOtherAndAdd(FilterCollection? fc, string? newOrigin) {
         if (fc == null) { return; }
 
         foreach (var thisFi in fc) {
