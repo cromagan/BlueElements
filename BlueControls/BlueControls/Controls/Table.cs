@@ -1509,7 +1509,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                             _ = flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld);
+                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil);
                             flx.FilterOutput.Database = thisColumn.Database;
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
@@ -2848,11 +2848,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        FilterCombined.Database = Filter.Database;
+        using var nf = new FilterCollection(Filter.Database, "TmpFilterCombined");
 
-        FilterCombined.Clear();
-        FilterCombined.RemoveOtherAndAdd(Filter, null);
-        FilterCombined.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
+        nf.Database = Filter.Database;
+        nf.RemoveOtherAndAdd(Filter, null);
+        nf.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
+
+        if (!nf.IsDifferentTo(FilterCombined)) { return; }
+
+        FilterCombined.ChangeTo(nf);
         Invalidate_SortedRowData();
         OnFilterChanged();
         DoFilterOutput();

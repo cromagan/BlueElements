@@ -83,14 +83,14 @@ public class GenericControlReciverSender : GenericControlReciver {
         if (child.IsDisposed || IsDisposed) { return; }
 
         var isnew = !child.Parents.Contains(this);
-        var newFilters = FilterOutput.Count > 0;
+        //var newFilters = FilterOutput.Count > 0;
         //var doDatabaseAfter = DatabaseInput == null;
 
         if (isnew) { _ = child.Parents.AddIfNotExists(this); }
 
         _ = Childs.AddIfNotExists(child);
 
-        if (newFilters && isnew) { child.Invalidate_FilterInput(); }
+        //if (newFilters && isnew) { child.Invalidate_FilterInput(); }
 
         //if (doDatabaseAfter) { child.RegisterEvents(); }
     }

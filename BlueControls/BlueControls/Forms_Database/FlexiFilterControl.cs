@@ -41,17 +41,17 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     #region Fields
 
+    public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
+    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
     private const int MaxRecentFilterEntries = 20;
     private readonly Renderer_Abstract _renderer;
-    private FlexiFilterDefaultFilter _defaultTextInputFilter = FlexiFilterDefaultFilter.Textteil;
-    private FlexiFilterDefaultOutput _emptyInputBehavior = FlexiFilterDefaultOutput.Alles_Anzeigen;
     private bool _isDeleteButtonVisible;
 
     #endregion
 
     #region Constructors
 
-    public FlexiFilterControl(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition) : base(false, false, false) {
+    public FlexiFilterControl(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, FlexiFilterDefaultOutput emptyInputBehavior, FlexiFilterDefaultFilter defaultTextInputFilter) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
@@ -59,8 +59,10 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         FilterSingleColumn = filterColumn;
         f.ShowInfoWhenDisabled = true;
         _renderer = Table.RendererOf(filterColumn, Constants.Win11);
+        Standard_bei_keiner_Eingabe = emptyInputBehavior;
+        Filterart_Bei_Texteingabe = defaultTextInputFilter;
         DefaultCaptionPosition = defaultCaptionPosition;
-        Invalidate_FilterInput();
+        //Invalidate_FilterInput();
     }
 
     #endregion
@@ -72,16 +74,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     /// muss ein Defaultwert angegeben werden - wie es normalerweise auszusehen hat.
     /// </summary>
     public CaptionPosition DefaultCaptionPosition { get; }
-
-    public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe {
-        get => _defaultTextInputFilter;
-        set {
-            if (IsDisposed) { return; }
-            if (_defaultTextInputFilter == value) { return; }
-            _defaultTextInputFilter = value;
-            F_ValueChanged(null, System.EventArgs.Empty);
-        }
-    }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -96,17 +88,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;
-
-    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
-        get => _emptyInputBehavior;
-        set {
-            if (IsDisposed) { return; }
-            if (_emptyInputBehavior == value) { return; }
-            _emptyInputBehavior = value;
-            F_ValueChanged(null, System.EventArgs.Empty);
-        }
-    }
-
     public bool UsesSettings => true;
 
     #endregion
@@ -281,27 +262,27 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             return;
         }
 
-        var filterSingle = FilterInput?[FilterSingleColumn];
-        var _filterOrigin = filterSingle?.Origin ?? string.Empty;
+        var filterSingleo = FilterInput?[FilterSingleColumn];
+        FilterItem? filterSingle = filterSingleo;
+        var _filterOrigin = filterSingleo?.Origin ?? string.Empty;
 
         if (!_isDeleteButtonVisible) {
             if (string.IsNullOrEmpty(f.Value)) {
-                if (_emptyInputBehavior == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _filterOrigin);
-                } else {
-                    filterSingle = null;
-                }
+                filterSingle = null;
             } else {
                 if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
                     _isDeleteButtonVisible = true;
                     filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
                 } else {
-                    filterSingle = _defaultTextInputFilter == FlexiFilterDefaultFilter.Textteil
+                    filterSingle = Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Textteil
                         ? new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, f.Value, _filterOrigin)
                         : new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
                 }
             }
         }
+
+        if(filterSingle != null && filterSingleo != null &&  filterSingle.Equals(filterSingleo)) { return; }
+
         UpdateFilterData(filterSingle, _isDeleteButtonVisible);
     }
 
@@ -367,13 +348,30 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(db, "UpdateFilterData");
 
-        if (filterSingle == null) {
-            fic.Remove(FilterSingleColumn);
+        if (filterSingle == null ||
+            (string.IsNullOrEmpty(filterSingle.SearchValue.JoinWithCr()) && filterSingle.FilterType != FilterType.AlwaysFalse)) {
+            if (Standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+                fic.RemoveOtherAndAdd(new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, string.Empty));
+            } else {
+                fic.Remove(FilterSingleColumn);
+            }
         } else {
             fic.RemoveOtherAndAdd(filterSingle);
         }
 
         FilterOutput.ChangeTo(fic);
+
+        #endregion
+
+        #region Auf Festplatte speichern
+
+        if (SavesSettings) {
+            this.LoadSettingsFromDisk(false);
+            if (FilterOutput is { Count: 1, Rows.Count: 1 } fio && fio[0] is { } fi) {
+                var toAdd = $"{FilterHash()}|{fi.SearchValue.JoinWithCr()}";
+                this.SettingsAdd(toAdd);
+            }
+        }
 
         #endregion
 
@@ -415,16 +413,9 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         if (filterSingle != null) {
             if (filterSingle is { FilterType: FilterType.Instr_GroßKleinEgal, SearchValue.Count: 1 }) {
-                //texteingabe = true;
-                //showWählen = false;
                 nvalue = filterSingle.SearchValue[0];
-            } else if (_defaultTextInputFilter == FlexiFilterDefaultFilter.Ist) {
-                //texteingabe = true;
-                //showWählen = false;
+            } else if (Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Ist) {
                 nvalue = filterSingle.SearchValue[0];
-            } else if (filterSingle.FilterType is FilterType.Istgleich or FilterType.Istgleich_ODER_GroßKleinEgal) {
-                //texteingabe = false;
-                //showWählen = false;
             }
         }
 
@@ -440,13 +431,10 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         #region Text-Eingabefeld - und keine weitere Berechnungen
 
-        //if (texteingabe) {
         f.CaptionPosition = DefaultCaptionPosition;
         f.Caption = FilterSingleColumn.ReadableText() + ":";
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
         f.ValueSet(nvalue, true);
-        //return;
-        //}
 
         #endregion
     }
