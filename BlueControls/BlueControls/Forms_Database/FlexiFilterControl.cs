@@ -31,7 +31,6 @@ using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -46,9 +45,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private readonly Renderer_Abstract _renderer;
     private FlexiFilterDefaultFilter _defaultTextInputFilter = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _emptyInputBehavior = FlexiFilterDefaultOutput.Alles_Anzeigen;
-    private string _filterOrigin;
     private bool _isDeleteButtonVisible;
-    private bool _isFilterFromInput;
 
     #endregion
 
@@ -61,10 +58,9 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         Size = new Size(204, 24);
         FilterSingleColumn = filterColumn;
         f.ShowInfoWhenDisabled = true;
-        _filterOrigin = string.Empty;
-        _isFilterFromInput = false;
         _renderer = Table.RendererOf(filterColumn, Constants.Win11);
         DefaultCaptionPosition = defaultCaptionPosition;
+        Invalidate_FilterInput();
     }
 
     #endregion
@@ -131,20 +127,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         }
     }
 
-    protected override void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
-        if (SavesSettings) {
-            this.LoadSettingsFromDisk(false);
-
-            if (FilterOutput is { Rows.Count: 1 } fio && FilterSingleColumn is { IsDisposed: false } c) {
-                if (FilterCollection.InitValue(c, true, fio.ToArray()) is { } vv) {
-                    this.SettingsAdd($"{FilterHash()}|{vv}");
-                }
-            }
-        }
-
-        base.FilterOutput_PropertyChanged(this, System.EventArgs.Empty);
-    }
-
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
@@ -158,12 +140,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             _isDeleteButtonVisible = filterSingle.FilterType != FilterType.Instr_GroßKleinEgal ||
                                     filterSingle.SearchValue.Count > 1 ||
                                     (f.GetControl<ComboBox>() is { IsDisposed: false } cb && cb.WasThisValueClicked());
-            _isFilterFromInput = true;
-            _filterOrigin = filterSingle.Origin;
         } else {
-            _isFilterFromInput = false;
             _isDeleteButtonVisible = false;
-            _filterOrigin = string.Empty;
         }
 
         UpdateFilterData(filterSingle, _isDeleteButtonVisible);
@@ -298,26 +276,29 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     }
 
     private void F_ValueChanged(object? sender, System.EventArgs e) {
+        if (FilterSingleColumn?.Database is not { IsDisposed: false }) {
+            UpdateFilterData(null, false);
+            return;
+        }
+
         var filterSingle = FilterInput?[FilterSingleColumn];
+        var _filterOrigin = filterSingle?.Origin ?? string.Empty;
 
         if (!_isDeleteButtonVisible) {
-            if (filterSingle != null && f.Value != filterSingle.SearchValue.JoinWith("|")) { _isFilterFromInput = false; }
-            if (!_isFilterFromInput) { filterSingle = null; }
-
-            if (FilterSingleColumn != null && filterSingle == null) {
-                if (string.IsNullOrEmpty(f.Value)) {
-                    if (_emptyInputBehavior == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-                        filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _filterOrigin);
-                    }
+            if (string.IsNullOrEmpty(f.Value)) {
+                if (_emptyInputBehavior == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _filterOrigin);
                 } else {
-                    if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
-                        _isDeleteButtonVisible = true;
-                        filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
-                    } else {
-                        filterSingle = _defaultTextInputFilter == FlexiFilterDefaultFilter.Textteil
-                            ? new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, f.Value, _filterOrigin)
-                            : new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
-                    }
+                    filterSingle = null;
+                }
+            } else {
+                if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
+                    _isDeleteButtonVisible = true;
+                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
+                } else {
+                    filterSingle = _defaultTextInputFilter == FlexiFilterDefaultFilter.Textteil
+                        ? new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, f.Value, _filterOrigin)
+                        : new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
                 }
             }
         }
@@ -366,46 +347,46 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private void UpdateFilterData(FilterItem? filterSingle, bool showDelFilterButton) {
         if (IsDisposed || f is null) { return; }
 
-        if (FilterSingleColumn?.Database is { IsDisposed: false } db &&
-            filterSingle is { }) {
-            DoInputFilter(null, false);
+        #region Wenn keine Spalte vorhanden, Fehler machen
 
-            if (FilterInput is not { IsDisposed: false } fi) { return; }
-
-            if (fi.Contains(filterSingle)) {
-                FilterOutput.ChangeTo(fi);
-            } else {
-                using var fic = fi.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(db, "UpadteFilterData");
-
-                fic?.RemoveOtherAndAdd(filterSingle);
-                FilterOutput.ChangeTo(fic);
-            }
-        } else {
+        if (FilterSingleColumn?.Database is not { IsDisposed: false } db) {
+            f.DisabledReason = "Bezug zum Filter verloren.";
+            f.Caption = "?";
+            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            QuickInfo = string.Empty;
+            f.ValueSet(string.Empty, true);
             Invalidate_FilterOutput();
+            return;
         }
-        var nvalue = string.Empty;
-        if (filterSingle != null) {
-            nvalue = filterSingle.SearchValue.JoinWithCr();
+
+        #endregion
+
+        DoInputFilter(null, false);
+
+        #region Den FilterOutput erstellen
+
+        using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(db, "UpdateFilterData");
+
+        if (filterSingle == null) {
+            fic.Remove(FilterSingleColumn);
+        } else {
+            fic.RemoveOtherAndAdd(filterSingle);
         }
+
+        FilterOutput.ChangeTo(fic);
+
+        #endregion
+
+        var nf = FilterOutput[FilterSingleColumn];
+
+        var nvalue = nf?.SearchValue.JoinWithCr() ?? string.Empty;
+        var _filterOrigin = nf?.Origin ?? string.Empty;
 
         if (IsDisposed || f is null) { return; } // Kommt vor!
 
         f.ValueSet(nvalue, true);
 
         GenerateQickInfoText(filterSingle);
-
-        #region Wenn keine Spalte vorhanden, Fehler machen
-
-        if (FilterSingleColumn is not { IsDisposed: false }) {
-            f.DisabledReason = "Bezug zum Filter verloren.";
-            f.Caption = "?";
-            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
-            QuickInfo = string.Empty;
-            f.ValueSet(string.Empty, true);
-            return;
-        }
-
-        #endregion
 
         f.DisabledReason = !string.IsNullOrEmpty(_filterOrigin) ? $"<b>Dieser Filter wurde automatisch gesetzt:</b><br>{_filterOrigin}" : string.Empty;
 

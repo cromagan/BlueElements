@@ -110,15 +110,6 @@ public class GenericControlReciverSender : GenericControlReciver {
         }
     }
 
-    protected virtual void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-
-        foreach (var thisChild in Childs) {
-            thisChild.Invalidate_FilterInput();
-        }
-        OnFilterOutputPropertyChanged();
-    }
-
     protected void Invalidate_FilterOutput() => FilterOutput.Clear();
 
     protected override void OnCreateControl() {
@@ -126,8 +117,6 @@ public class GenericControlReciverSender : GenericControlReciver {
         FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
         base.OnCreateControl();
     }
-
-    protected virtual void OnFilterOutputPropertyChanged() => FilterOutputPropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
@@ -139,6 +128,17 @@ public class GenericControlReciverSender : GenericControlReciver {
             FilterOutput.Dispose();
         }
     }
+
+    private void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+
+        foreach (var thisChild in Childs) {
+            thisChild.Invalidate_FilterInput();
+        }
+        OnFilterOutputPropertyChanged();
+    }
+
+    private void OnFilterOutputPropertyChanged() => FilterOutputPropertyChanged?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

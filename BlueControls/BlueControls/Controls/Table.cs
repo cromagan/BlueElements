@@ -875,7 +875,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         //if (CursorPosColumn != column) { return; }
 
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
         if (ensureVisible && CurrentArrangement is { IsDisposed: false } ca) {
             _ = EnsureVisible(ca, CursorPosColumn, CursorPosRow);
