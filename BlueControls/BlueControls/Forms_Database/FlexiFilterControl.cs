@@ -45,7 +45,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
     private const int MaxRecentFilterEntries = 20;
     private readonly Renderer_Abstract _renderer;
-    private bool _isDeleteButtonVisible;
 
     #endregion
 
@@ -117,15 +116,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         var filterSingle = FilterInput?[FilterSingleColumn];
 
-        if (filterSingle != null) {
-            _isDeleteButtonVisible = filterSingle.FilterType != FilterType.Instr_GroßKleinEgal ||
-                                    filterSingle.SearchValue.Count > 1 ||
-                                    (f.GetControl<ComboBox>() is { IsDisposed: false } cb && cb.WasThisValueClicked());
-        } else {
-            _isDeleteButtonVisible = false;
-        }
-
-        UpdateFilterData(filterSingle, _isDeleteButtonVisible);
+        // Entferne die Berechnung von _isDeleteButtonVisible
+        UpdateFilterData(filterSingle);
     }
 
     protected override void OnCreateControl() {
@@ -140,16 +132,16 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
         if (e.Command != "Filter") {
-            UpdateFilterData(null, false);
+            UpdateFilterData(null);
         } else {
-            UpdateFilterData(e.Filter, false);
+            UpdateFilterData(e.Filter);
         }
     }
 
     private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
         var cbx = (ComboBox)sender;
         cbx.ItemClear();
-        var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null);
+        var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null, true);
         if (listFilterString.Count == 0) {
             cbx.ItemAdd(ItemOf("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 400) {
@@ -201,13 +193,13 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     private void F_ButtonClick(object sender, System.EventArgs e) {
         //base.CommandButton_Click(); // Nope, keine Ereignisse und auch nicht auf + setzen
-        _isDeleteButtonVisible = false;
 
         var filterSingle = FilterInput?[FilterSingleColumn];
 
         if (filterSingle == null) {
             Invalidate_FilterOutput();
             f.ValueSet(string.Empty, true);
+            UpdateFilterData(null);
             return;
         }
 
@@ -258,32 +250,37 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     private void F_ValueChanged(object? sender, System.EventArgs e) {
         if (FilterSingleColumn?.Database is not { IsDisposed: false }) {
-            UpdateFilterData(null, false);
+            UpdateFilterData(null);
             return;
         }
 
         var filterSingleo = FilterInput?[FilterSingleColumn];
-        FilterItem? filterSingle = filterSingleo;
+
+        var currentValue = filterSingleo?.SearchValue.JoinWithCr() ?? string.Empty;
+
+        // Wenn der aktuelle Wert bereits mit dem UI-Wert übereinstimmt, nichts tun
+        if (currentValue == f.Value) {
+            return;
+        }
+
         var _filterOrigin = filterSingleo?.Origin ?? string.Empty;
 
-        if (!_isDeleteButtonVisible) {
-            if (string.IsNullOrEmpty(f.Value)) {
-                filterSingle = null;
+        FilterItem? filterSingle;
+        if (string.IsNullOrEmpty(f.Value)) {
+            filterSingle = null;
+        } else {
+            if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
+                filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
             } else {
-                if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
-                    _isDeleteButtonVisible = true;
-                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
-                } else {
-                    filterSingle = Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Textteil
-                        ? new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, f.Value, _filterOrigin)
-                        : new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
-                }
+                filterSingle = Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Textteil
+                    ? new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, f.Value, _filterOrigin)
+                    : new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
             }
         }
 
-        if(filterSingle != null && filterSingleo != null &&  filterSingle.Equals(filterSingleo)) { return; }
+        if (filterSingle != null && filterSingleo != null && filterSingle.Equals(filterSingleo)) { return; }
 
-        UpdateFilterData(filterSingle, _isDeleteButtonVisible);
+        UpdateFilterData(filterSingle);
     }
 
     private void GenerateQickInfoText(FilterItem? filterSingle) {
@@ -325,7 +322,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         return FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
     }
 
-    private void UpdateFilterData(FilterItem? filterSingle, bool showDelFilterButton) {
+    private void UpdateFilterData(FilterItem? filterSingle) {
         if (IsDisposed || f is null) { return; }
 
         #region Wenn keine Spalte vorhanden, Fehler machen
@@ -401,6 +398,20 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         #endregion
 
         #region Löschen-Button - und keine weiteren Berechnungen
+
+        // Komplett neue Berechnung für showDelFilterButton
+        var showDelFilterButton = false;
+
+        // Fall 1: Eine ComboBox wurde angeklickt (nicht durch Texteingabe)
+        if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
+            showDelFilterButton = true;
+        }
+        // Fall 2: Es existiert ein Filter, der nicht vom Typ Instr_GroßKleinEgal ist oder mehr als einen Wert hat
+        if (filterSingle != null &&
+                 (filterSingle.FilterType != FilterType.Instr_GroßKleinEgal ||
+                  filterSingle.SearchValue.Count > 1)) {
+            showDelFilterButton = true;
+        }
 
         if (showDelFilterButton) {
             f.CaptionPosition = CaptionPosition.ohne;

@@ -310,35 +310,34 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="fc"></param>
     public void ChangeTo(FilterCollection? fc) {
-        if (!IsDifferentTo(fc)) { return; }
+        if (!IsDifferentTo(fc, false)) { return; }
 
         OnChanging();
 
-        UnRegisterDatabaseEvents();
-        _database = fc?.Database;
-        RegisterDatabaseEvents();
+        // Datenbankwechsel nur bei Unterschieden durchführen
+        if (_database != fc?.Database) {
+            UnRegisterDatabaseEvents();
+            _database = fc?.Database;
+            RegisterDatabaseEvents();
+        }
 
         _internal.Clear();
 
         if (fc != null) {
-            var reallydifferent = fc.ParseableItems().FinishParseable() != ParseableItems().FinishParseable();
-            foreach (var thisf in fc) {
-                if (!Exists(thisf) && thisf.IsOk()) { AddInternal(thisf); }
+            // Vorhandene Filterliste direkt übernehmen statt einzeln zu prüfen und hinzuzufügen
+            foreach (var thisf in fc.Where(f => f.IsOk())) {
+                AddInternal(thisf);
             }
 
-            if (reallydifferent) {
-                if (fc._rows != null) {
-                    _rows = [];
-                    _rows.AddRange(fc.Rows);
-                    OnRowsChanged();
-                } else {
-                    Invalidate_FilteredRows();
-                }
-            }
-        } else {
-            if (Count > 0) {
+            // Rows-Übernahme optimieren - bei null einfach ungültig machen
+            if (fc._rows != null) {
+                _rows = [.. fc.Rows];
+                OnRowsChanged();
+            } else {
                 Invalidate_FilteredRows();
             }
+        } else {
+            Invalidate_FilteredRows();
         }
 
         OnPropertyChanged("FilterItems");
@@ -416,7 +415,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnRowsChanged();
     }
 
-    public bool IsDifferentTo(FilterCollection? fc) {
+    public bool IsDifferentTo(FilterCollection? fc, bool ignoreDatabaseTag) {
         if (IsDisposed) { return false; }
         if (fc == this) { return false; }
 
@@ -424,7 +423,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (fc.Count != Count) { return true; }
 
-        if (_database != fc.Database) { return true; }
+        if (!ignoreDatabaseTag && _database != fc.Database) { return true; }
 
         foreach (var thisf in this) {
             if (!fc.Exists(thisf)) { return true; }
@@ -512,6 +511,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         RemoveRange(toDel);
     }
 
+
+    public void Remove(FilterType filterType) {
+        var toDel = _internal.Where(thisFilter => thisFilter.FilterType.HasFlag(filterType)).ToList();
+        if (toDel.Count == 0) { return; }
+        RemoveRange(toDel);
+    }
+
     public void Remove(FilterItem filter) {
         if (IsDisposed) { return; }
 
@@ -532,7 +538,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void RemoveOtherAndAdd(FilterItem fi, string? newOrigin) {
         var fin = fi;
 
-        newOrigin??= fi.Origin;
+        newOrigin ??= fi.Origin;
 
         if (fi.Origin != newOrigin) {
             fin = new FilterItem(fi.Database, fi.Column, fi.FilterType, fi.SearchValue, newOrigin);
@@ -567,27 +573,65 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnPropertyChanged("FilterItems");
     }
 
-    /// <summary>
-    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
-    /// </summary>
     public void RemoveOtherAndAdd(FilterCollection? fc, string? newOrigin) {
-        if (fc == null) { return; }
+        if (fc == null || IsDisposed || fc.Count == 0) { return; }
+
+        // Sammle alle Filter, die hinzugefügt werden sollen
+        var filtersToAdd = new List<FilterItem>();
 
         foreach (var thisFi in fc) {
-            RemoveOtherAndAdd(thisFi, newOrigin);
+            if (!thisFi.IsOk()) { continue; }
+
+            var fin = newOrigin != null && thisFi.Origin != newOrigin
+                ? new FilterItem(thisFi.Database, thisFi.Column, thisFi.FilterType, thisFi.SearchValue, newOrigin)
+                : thisFi;
+
+            filtersToAdd.Add(fin);
         }
-    }
 
-    public void RemoveRange(string origin) {
-        var l = new List<FilterItem>();
+        if (filtersToAdd.Count == 0) { return; }
 
-        foreach (var thisItem in _internal) {
-            if (thisItem.Origin.Equals(origin, StringComparison.OrdinalIgnoreCase)) {
-                l.Add(thisItem);
+        // Prüfe, ob tatsächlich Änderungen erforderlich sind und entferne bestehende Filter
+        bool needChanges = false;
+        List<FilterItem> toRemove = new List<FilterItem>();
+
+        foreach (var filterToAdd in filtersToAdd) {
+            var existingFilters = _internal.Where(f => f.Column == filterToAdd.Column).ToList();
+
+            if (existingFilters.Count != 1 || !Exists(filterToAdd)) {
+                needChanges = true;
+                toRemove.AddRange(existingFilters);
             }
         }
-        RemoveRange(l);
+
+        if (!needChanges) { return; }
+
+        OnChanging();
+
+        // Entferne die identifizierten Filter
+        foreach (var filter in toRemove) {
+            _ = _internal.Remove(filter);
+        }
+
+        // Füge neue Filter hinzu
+        foreach (var filter in filtersToAdd) {
+            AddInternal(filter);
+        }
+
+        Invalidate_FilteredRows();
+        OnPropertyChanged("FilterItems");
     }
+
+    //public void RemoveRange(string origin) {
+    //    var l = new List<FilterItem>();
+
+    //    foreach (var thisItem in _internal) {
+    //        if (thisItem.Origin.Equals(origin, StringComparison.OrdinalIgnoreCase)) {
+    //            l.Add(thisItem);
+    //        }
+    //    }
+    //    RemoveRange(l);
+    //}
 
     public void RemoveRange(List<FilterItem> fi) {
         if (IsDisposed) { return; }
@@ -601,7 +645,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                     OnChanging();
                     did = true;
                 }
-                Remove(thisItem);
+                _internal.Remove(thisItem);
             }
         }
 
@@ -728,7 +772,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private void UnRegisterDatabaseEvents() {
         if (_database != null) {
-            _database.Loaded += _database_Loaded;
+            _database.Loaded -= _database_Loaded;
             _database.DisposingEvent -= _database_Disposing;
             _database.Row.RowRemoved -= Row_RowRemoved;
             _database.Row.RowAdded -= Row_Added;

@@ -995,7 +995,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        Table.Filter.Clear();
+        //Table.Filter.Clear();
 
         tbcSidebar.Visible = true;
         grpHilfen.Visible = true;

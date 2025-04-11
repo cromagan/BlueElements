@@ -366,6 +366,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
+        if (!Visible) { return; }
+
         Invalidate_FilterInput();
     }
 

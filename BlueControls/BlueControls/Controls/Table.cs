@@ -1429,7 +1429,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         #region Variablen für Waagerecht / Senkrecht bestimmen
 
         // Verfügbare Zeilen berechnen
-        int availableRows = FilterleisteZeilen;
+        var availableRows = FilterleisteZeilen;
 
         // Startposition für die erste Zeile
         var toppos = btnAlleFilterAus.Top;
@@ -1696,7 +1696,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         // Filterleiste zeichnen, wenn aktiviert
         if (FilterleisteZeilen > 0) {
             // Bereich für die Filterleiste
-            Rectangle filterRect = new Rectangle(0, 0, Width, FilterleisteHeight);
+            var filterRect = new Rectangle(0, 0, Width, FilterleisteHeight);
 
             // Hintergrund der Filterleiste zeichnen (falls nötig)
             Skin.Draw_Back(gr, Design.GroupBox, state, filterRect, this, true);
@@ -2854,13 +2854,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         nf.RemoveOtherAndAdd(Filter, null);
         nf.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
 
-        if (!nf.IsDifferentTo(FilterCombined)) { return; }
-
         FilterCombined.ChangeTo(nf);
-        Invalidate_SortedRowData();
-        OnFilterChanged();
-        DoFilterOutput();
-        FillFilters();
     }
 
     private void DoFilterOutput() {
@@ -3080,7 +3074,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (viewItem.DrawWidth() > 70 || viewItem.Reduced) {
             // Anpassen der Reduce-Button-Position
-            Rectangle origReduceButtonLocation = viewItem.ReduceButtonLocation(_zoom, SliderX.Value, FilterleisteHeight);
+            var origReduceButtonLocation = viewItem.ReduceButtonLocation(_zoom, SliderX.Value, FilterleisteHeight);
 
             gr.DrawImage(
                 viewItem.Reduced ? QuickImage.Get("Pfeil_Rechts|" + origReduceButtonLocation.Width + "|||FF0000|||||20")
@@ -3127,7 +3121,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         QuickImage? trichterIcon = null;
 
         // Anpassen der Autofilter-Position
-        Rectangle origAutoFilterLocation = viewItem.AutoFilterLocation(_zoom, SliderX.Value, FilterleisteHeight);
+        var origAutoFilterLocation = viewItem.AutoFilterLocation(_zoom, SliderX.Value, FilterleisteHeight);
 
         var p2 = GetPix(2);
         var p4 = GetPix(4);
@@ -3477,7 +3471,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         // Stellen sicher, dass die Zeile im sichtbaren Bereich ist
         // Berücksichtigen der Filterleistenhöhe
-        int rowY = DrawY(ca, rowdata);
+        var rowY = DrawY(ca, rowdata);
 
         // Wenn die Zeile über dem sichtbaren Bereich liegt
         if (rowY < GetPix(ca.HeadSize()) + FilterleisteHeight) {
@@ -3541,6 +3535,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         Invalidate_SortedRowData();
+        OnFilterChanged();
+        DoFilterOutput();
     }
 
     private FlexiFilterControl? FlexiItemOf(ColumnItem column) {
@@ -3608,7 +3604,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         // Berechne die Y-Position der Zeile
-        int rowY = DrawY(ca, vrow);
+        var rowY = DrawY(ca, vrow);
 
         // Vergleiche mit dem sichtbaren Bereich unter Berücksichtigung der Filterleiste
         return rowY + vrow.DrawHeight >= (GetPix(ca.HeadSize()) + FilterleisteHeight) &&
@@ -3771,7 +3767,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         // Filterleistenelemente positionieren
         if (FilterleisteZeilen > 0) {
-            int firstRowY = 8; // Standard Y-Position für erste Zeile
+            var firstRowY = 8; // Standard Y-Position für erste Zeile
 
             // Hauptelemente (erste Zeile)
             txbZeilenFilter.Top = firstRowY;
@@ -3895,7 +3891,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        bool visible = _filterleisteZeilen > 0;
+        var visible = _filterleisteZeilen > 0;
 
         // Hauptsteuerelemente der Filterleiste
         btnTextLöschen.Visible = visible;

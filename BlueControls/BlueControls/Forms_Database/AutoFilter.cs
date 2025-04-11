@@ -70,12 +70,13 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Methods
 
-    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned) {
+    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned, bool removeKeyFilter) {
         if (column is not { IsDisposed: false }) { return []; }
 
         if (fc is not { Count: >= 0 }) { return column.Contents(); }
         var fc2 = (FilterCollection)fc.Clone("autofilter");
         fc2.Remove(column);
+        if (removeKeyFilter) { fc2.Remove(FilterType.RowKey); }
 
         //foreach (var thisFilter in filter) {
         //    if (thisFilter != null && column != thisFilter.Column) {
@@ -88,7 +89,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth, Renderer_Abstract renderer) {
         var nochOk = true;
-        var listFilterString = Autofilter_ItemList(_column, fc, pinned);
+        var listFilterString = Autofilter_ItemList(_column, fc, pinned, false);
         //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
         //ACHUNG:
