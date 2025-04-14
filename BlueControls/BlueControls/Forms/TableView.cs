@@ -208,7 +208,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                     if (t is { Successful: true, AllOk: true }) {
                         MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
                     } else {
-                        MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.NotSuccessfulReason}<br><br>{t.Protocol.JoinWithCr()}", ImageCode.Kreuz, "Ok");
+                        MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.NotSuccesfulReason}<br><br>{t.Protocol.JoinWithCr()}", ImageCode.Kreuz, "Ok");
                     }
                 }
 

@@ -100,8 +100,8 @@ public class Method_If : Method {
 
         if (attvar.ValueBoolGet(0)) {
             var scx = Method_CallByFilename.CallSub(varCol, scp, infos.LogData, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If");
-            if (!scx.AllOk) { return scx; }
-            return new DoItFeedback(scx.BreakFired, scx.EndScript); // If muss die Breaks und Endsripts erhalten!
+            if (!scx.AllOk || !scx.Succesful) { return scx; }
+            return new DoItFeedback(scx.BreakFired, scx.EndScript, scx.NotSuccesfulReason); // If muss die Breaks und Endsripts erhalten!
         }
 
         return DoItFeedback.Null();

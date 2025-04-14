@@ -38,7 +38,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
 	#region Fields
 
-	public static readonly ConcurrentDictionary<RowItem, byte> FailedRows = [];
+	public static readonly ConcurrentDictionary<RowItem, string> FailedRows = [];
 	public static readonly InvalidatedRowsManager InvalidatedRowsManager = new InvalidatedRowsManager();
 	public static int WaitDelay;
 	private static readonly object Executingchangedrowslock = new();

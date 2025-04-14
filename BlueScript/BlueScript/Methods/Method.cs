@@ -225,17 +225,7 @@ public abstract class Method : IReadableTextWithKey {
         } while (true);
     }
 
-    public static void SetNotSuccesful(VariableCollection varCol, string reason) {
-        var b = varCol.Get("successful");
 
-        if (b is VariableBool vb) { vb.ValueBool = false; }
-
-        var s = varCol.Get("notsuccessfulreason");
-
-        if (s is VariableString vs) { vs.ValueString = reason; }
-
-        Develop.MonitorMessage?.Invoke("Allgemein", "Kreuz", $"Nicht Erfolgreich gesetzt: {reason}", 0);
-    }
 
     public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, int lastArgMinCount, LogData? ld, ScriptProperties? scp) {
         if (types.Count == 0) {

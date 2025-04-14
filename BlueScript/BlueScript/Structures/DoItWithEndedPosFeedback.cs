@@ -27,6 +27,7 @@ public readonly struct DoItWithEndedPosFeedback {
 
     internal readonly bool AllOk;
 
+    internal readonly string NotSuccesfulReason = string.Empty;
     internal readonly bool BreakFired = false;
     internal readonly bool EndSkript = false;
     internal readonly int Position;
@@ -36,12 +37,13 @@ public readonly struct DoItWithEndedPosFeedback {
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(bool allOk, Variable? variable, int endpos, bool breakFired, bool endskript) {
+    public DoItWithEndedPosFeedback(bool allOk, Variable? variable, int endpos, bool breakFired, bool endskript, string notSuccesfulReason) {
         AllOk = allOk;
         Variable = variable;
         Position = endpos;
         EndSkript = endskript;
         BreakFired = breakFired;
+        NotSuccesfulReason = notSuccesfulReason;
     }
 
     public DoItWithEndedPosFeedback(string errormessage, LogData ld) {

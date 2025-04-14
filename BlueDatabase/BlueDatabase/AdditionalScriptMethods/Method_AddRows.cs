@@ -69,7 +69,7 @@ public class Method_AddRows : Method_Database {
         if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { SetNotSuccesful(varCol, "Datenbanksperre: " + m); return new DoItFeedback(ld, "Datenbank-Meldung: " + m); }
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(false, false, $"Datenbanksperre: {m}"); }
 
         var keys = attvar.ValueListStringGet(2);
         keys = keys.SortedDistinctList();

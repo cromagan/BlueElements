@@ -70,7 +70,7 @@ internal class Method_ForEachRow : Method_Database {
         var r = allFi.Rows;
         allFi.Dispose();
 
-        var scx = new DoItFeedback(false, false);
+        var scx = new DoItFeedback(false, false, string.Empty);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
         foreach (var thisl in r) {
@@ -79,10 +79,10 @@ internal class Method_ForEachRow : Method_Database {
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEachRow-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow");
             if (!scx.AllOk) { return scx; }
 
-            if (scx.BreakFired || scx.EndScript) { break; }
+            if (scx.BreakFired || scx.EndScript || !scx.Succesful) { break; }
         }
 
-        return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        return new DoItFeedback(false, scx.EndScript, scx.NotSuccesfulReason); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

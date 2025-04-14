@@ -1204,8 +1204,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
 
-        _ = vars.Add(new VariableBool("Successful", true, false, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
-        _ = vars.Add(new VariableString("NotSuccessfulReason", string.Empty, false, "Die letzte Meldung, warum es nicht erfolgreich war."));
+        //_ = vars.Add(new VariableBool("Successful", true, true, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
+        //_ = vars.Add(new VariableString("NotSuccessfulReason", string.Empty, true, "Die letzte Meldung, warum es nicht erfolgreich war."));
         _ = vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
         _ = vars.Add(new VariableListString("ErrorColumns", [], false, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
@@ -1363,8 +1363,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, name); }
         if (!script.NeedRow) { row = null; }
 
-        if (!ignoreError && row != null && RowCollection.FailedRows.ContainsKey(row)) {
-            return new ScriptEndedFeedback("Das Skript konnte die Zeile nicht durchrechnen.", false, false, name);
+        if (!ignoreError && row != null && RowCollection.FailedRows.ContainsKey(row) && RowCollection.FailedRows.TryGetValue(row, out var reason)) {
+            return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, name);
         }
 
         var n = row?.CellFirstString() ?? "ohne Zeile";
@@ -1431,6 +1431,17 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 _ = ExecutingScript.Remove(scriptId);
                 _ = ExecutingScriptAnyDatabase.Remove(scriptId);
                 OnDropMessage(ErrorType.Info, "Das Skript '" + script.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
+                return scf;
+            }
+
+            if (!scf.Successful) {
+                _ = ExecutingScript.Remove(scriptId);
+                _ = ExecutingScriptAnyDatabase.Remove(scriptId);
+                if (row != null) {
+                    _ = RowCollection.FailedRows.TryAdd(row, scf.NotSuccesfulReason);
+                }
+
+                OnDropMessage(ErrorType.Info, "Das Skript konnte nicht durchgerechnet werden:\r\n" + scf.NotSuccesfulReason);
                 return scf;
             }
 

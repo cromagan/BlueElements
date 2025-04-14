@@ -78,7 +78,7 @@ public class Script {
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
         if (scriptText.Length > pos && scriptText.Substring(pos, 1) == ";") {
-            return new DoItWithEndedPosFeedback(true, null, pos + 1, false, false);
+            return new DoItWithEndedPosFeedback(true, null, pos + 1, false, false, string.Empty);
         }
 
         #endregion
@@ -91,7 +91,7 @@ public class Script {
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 var fn = thisC.DoIt(varCol, f, scp);
-                return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript);
+                return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.NotSuccesfulReason);
             }
         }
 
@@ -113,7 +113,7 @@ public class Script {
                         }
 
                         var fn = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.AttributeText + ";", false);
-                        return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript);
+                        return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript, fn.NotSuccesfulReason);
                     }
                 }
             }
@@ -183,7 +183,7 @@ public class Script {
             if (pos >= redScriptText.Length || endScript) {
                 Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
-                return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, endScript);
+                return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, endScript, string.Empty);
             }
 
             if (redScriptText.Substring(pos, 1) == "¶") {
@@ -193,7 +193,12 @@ public class Script {
                 var f = CommandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
                 if (!f.AllOk) {
                     Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE wegen Fehler {ld.Protocol.Last()}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, false);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, false, string.Empty);
+                }
+
+                if (!string.IsNullOrWhiteSpace(f.NotSuccesfulReason)) {
+                    Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {f.NotSuccesfulReason}", scp.Stufe);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, false, f.NotSuccesfulReason);
                 }
 
                 endScript = f.EndSkript;
@@ -202,8 +207,7 @@ public class Script {
                 ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
                 if (f.BreakFired) {
                     Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
-
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, true, false);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, true, false, string.Empty);
                 }
             }
         } while (true);

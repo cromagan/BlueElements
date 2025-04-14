@@ -129,8 +129,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             return;
         }
 
-        if (!string.IsNullOrEmpty(f.NotSuccessfulReason)) {
-            Message("NICHT erfolgreich, aber kein Skript Fehler: " + f.NotSuccessfulReason);
+        if (!string.IsNullOrEmpty(f.NotSuccesfulReason)) {
+            Message("NICHT erfolgreich, aber kein Skript Fehler: " + f.NotSuccesfulReason);
             return;
         }
 

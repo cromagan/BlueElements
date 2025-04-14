@@ -27,7 +27,7 @@ public class ScriptEndedFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool scriptNeedFix, bool breakFired, bool endscript) {
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool scriptNeedFix, bool breakFired, bool endscript, string notSuccesfulReason) {
         Variables = variables;
         GiveItAnotherTry = false;
         Protocol = protocol;
@@ -36,8 +36,7 @@ public class ScriptEndedFeedback {
         BreakFired = breakFired;
         EndScript = endscript;
 
-        NotSuccessfulReason = variables.GetString("NotSuccessfulReason") ?? "Variablenfehler";
-        Successful = string.IsNullOrEmpty(NotSuccessfulReason);
+        NotSuccesfulReason = notSuccesfulReason;
         ScriptNeedFix = scriptNeedFix;
     }
 
@@ -58,15 +57,14 @@ public class ScriptEndedFeedback {
         ProtocolText = GenNiceProtokoll(Protocol);
 
         AllOk = false;
-        NotSuccessfulReason = "Start abgebrochen: " + errormessage;
-        Successful = false;
+        NotSuccesfulReason = "Start abgebrochen: " + errormessage;
         ScriptNeedFix = scriptNeedFix;
     }
 
     /// <summary>
     /// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
     /// </summary>
-    public ScriptEndedFeedback(VariableCollection variables, string successful) {
+    public ScriptEndedFeedback(VariableCollection variables, string notSuccesfulReason) {
         GiveItAnotherTry = false;
 
         Protocol = [];
@@ -74,8 +72,7 @@ public class ScriptEndedFeedback {
 
         AllOk = true;
         ScriptNeedFix = false;
-        NotSuccessfulReason = successful;
-        Successful = string.IsNullOrEmpty(NotSuccessfulReason);
+        NotSuccesfulReason = notSuccesfulReason;
         Variables = variables;
     }
 
@@ -88,12 +85,12 @@ public class ScriptEndedFeedback {
     public bool EndScript { get; }
 
     public bool GiveItAnotherTry { get; }
-    public string NotSuccessfulReason { get; }
+    public string NotSuccesfulReason { get; }
     public List<string> Protocol { get; }
     public string ProtocolText { get; }
     public bool ScriptNeedFix { get; }
 
-    public bool Successful { get; }
+    public bool Successful => string.IsNullOrWhiteSpace(NotSuccesfulReason);
     public VariableCollection? Variables { get; }
 
     #endregion

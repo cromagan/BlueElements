@@ -318,9 +318,20 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         if (!sef.Successful) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, "Das Skript konnte die Zeile nicht durchrechnen: " + sef.NotSuccessfulReason);
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Das Skript konnte die Zeile nicht durchrechnen: { sef.NotSuccesfulReason}");
             return _lastCheckedEventArgs;
         }
+
+
+        if (RowCollection.FailedRows.TryGetValue(this, out var reason)) {
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Zeilenstatus unbekannt, da temporäre Fehler aufgetreten sind: {reason}");
+            return _lastCheckedEventArgs;
+        }
+
+
+
+
+        
 
         List<string> cols = [];
 
@@ -432,7 +443,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var t = DateTime.UtcNow;
         do {
             var erg = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
-            if (erg.AllOk) { return erg; }
+            if (erg.AllOk || !erg.Successful) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
     }
@@ -464,6 +475,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return; }
         if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return; }
 
+        InvalidateCheckData();
+
+
         if (CellIsNullOrEmpty(srs) && string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) {
             Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} ist bereits invalidiert", 0);
             return;
@@ -474,6 +488,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd) {
             CellSet(scd, DateTime.UtcNow, comment);
         }
+
 
         _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
@@ -690,16 +705,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
 
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
-            if (!ok.Successful) {
-                db.OnDropMessage(ErrorType.Info, $"Fehlgeschlagen: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
-                OnDropMessage(ErrorType.Info, $"Fehlgeschlagen ({reason})");
-                //LastCheckedMessagex = "Konnte intern nicht berechnet werden. Administrator verständigen." + ok.NotSuccessfulReason;
 
-                _ = RowCollection.FailedRows.TryAdd(this, 0);
-                return ok;
-            }
 
-            if (!ok.AllOk) {
+            if (!ok.AllOk || !ok.Successful) {
                 //LastCheckedMessage = "Das Skript ist fehlerhaft. Administrator verständigen.\r\n\r\n" + ok.ProtocolText;
                 return ok;
             }

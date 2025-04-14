@@ -63,7 +63,7 @@ internal class Method_ForEach : Method {
             return new DoItFeedback(infos.LogData, "Variable " + varnam + " ist bereits vorhanden.");
         }
 
-        var scx = new DoItFeedback(false, false);
+        var scx = new DoItFeedback(false, false, string.Empty);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
         foreach (var thisl in l) {
@@ -72,10 +72,10 @@ internal class Method_ForEach : Method {
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEach");
             if (!scx.AllOk) { return scx; }
 
-            if (scx.BreakFired || scx.EndScript) { break; }
+            if (scx.BreakFired || scx.EndScript || !scx.Succesful) { break; }
         }
 
-        return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        return new DoItFeedback(false, scx.EndScript, scx.NotSuccesfulReason); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
