@@ -60,12 +60,12 @@ internal class Method_Do : Method {
             if (du > 100000) { return new DoItFeedback(infos.LogData, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "Do-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "Do");
-            if (!scx.AllOk) { return scx; }
+            if (!scx.AllOk || scx.Failed) { return scx; }
 
-            if (scx.BreakFired || scx.EndScript || !scx.Succesful) { break; }
+            if (scx.BreakFired || scx.EndScript) { break; }
         } while (true);
 
-        return new DoItFeedback(false, scx.EndScript, scx.NotSuccesfulReason); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        return new DoItFeedback(false, scx.EndScript, scx.FailedReason); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

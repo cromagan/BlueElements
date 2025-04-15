@@ -91,7 +91,7 @@ public class Script {
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 var fn = thisC.DoIt(varCol, f, scp);
-                return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.NotSuccesfulReason);
+                return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
             }
         }
 
@@ -113,7 +113,7 @@ public class Script {
                         }
 
                         var fn = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.AttributeText + ";", false);
-                        return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript, fn.NotSuccesfulReason);
+                        return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
                     }
                 }
             }

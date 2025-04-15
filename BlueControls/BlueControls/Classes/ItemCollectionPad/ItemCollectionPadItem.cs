@@ -956,7 +956,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         var t = sc.Parse(0, "Main", null);
 
-        if (!t.Successful || !t.AllOk) {
+        if (t.Failed || !t.AllOk) {
             var ep = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));
 
             Add(ep);

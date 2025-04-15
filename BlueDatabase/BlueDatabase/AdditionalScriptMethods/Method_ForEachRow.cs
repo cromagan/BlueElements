@@ -77,12 +77,12 @@ internal class Method_ForEachRow : Method_Database {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEachRow-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow");
-            if (!scx.AllOk) { return scx; }
+            if (!scx.AllOk || scx.Failed) { return scx; }
 
-            if (scx.BreakFired || scx.EndScript || !scx.Succesful) { break; }
+            if (scx.BreakFired || scx.EndScript) { break; }
         }
 
-        return new DoItFeedback(false, scx.EndScript, scx.NotSuccesfulReason); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        return new DoItFeedback(false, scx.EndScript, scx.FailedReason); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

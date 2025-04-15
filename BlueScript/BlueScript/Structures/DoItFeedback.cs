@@ -31,67 +31,67 @@ public readonly struct DoItFeedback {
     public DoItFeedback(Variable variable) {
         AllOk = true;
         Variable = variable;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
     }
 
     public DoItFeedback(LogData? ld, string errormessage) {
         AllOk = false;
         Variable = null;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         ld?.AddMessage(errormessage);
     }
 
     public DoItFeedback(string valueString) {
         AllOk = true;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         Variable = new VariableString(Variable.DummyName(), valueString);
     }
 
     public DoItFeedback(List<string>? list) {
         AllOk = true;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         Variable = new VariableListString(list);
     }
 
     public DoItFeedback(Bitmap? bmp) {
         AllOk = true;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         Variable = new VariableBitmap(bmp);
     }
 
     public DoItFeedback(bool value) {
         AllOk = true;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         Variable = new VariableBool(value);
     }
 
     public DoItFeedback(double value) {
         AllOk = true;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         Variable = new VariableFloat((float)value);
     }
 
     public DoItFeedback(float value) {
         AllOk = true;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         Variable = new VariableFloat(value);
     }
 
-    public DoItFeedback(bool breakFired, bool endScript, string notsuccesfulreason) : this() {
+    public DoItFeedback(bool breakFired, bool endScript, string failedReason) : this() {
         BreakFired = breakFired;
         EndScript = endScript;
-        NotSuccesfulReason = notsuccesfulreason;
+        FailedReason = failedReason;
     }
 
     public DoItFeedback(IEnumerable<string> list) {
         AllOk = true;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         Variable = new VariableListString(list);
     }
 
     public DoItFeedback() {
         AllOk = true;
-        NotSuccesfulReason = string.Empty;
+        FailedReason = string.Empty;
         Variable = null;
     }
 
@@ -99,13 +99,13 @@ public readonly struct DoItFeedback {
 
     #region Properties
 
-    public string NotSuccesfulReason { get; }
+    public string FailedReason { get; }
 
     public bool AllOk { get; }
     public bool BreakFired { get; } = false;
     public bool EndScript { get; } = false;
     public Variable? Variable { get; }
-    public bool Succesful => string.IsNullOrWhiteSpace(NotSuccesfulReason);
+    public bool Failed => !string.IsNullOrWhiteSpace(FailedReason);
 
     #endregion
 

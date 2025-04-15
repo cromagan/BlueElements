@@ -36,7 +36,7 @@ public class ScriptEndedFeedback {
         BreakFired = breakFired;
         EndScript = endscript;
 
-        NotSuccesfulReason = notSuccesfulReason;
+        FailedReason = notSuccesfulReason;
         ScriptNeedFix = scriptNeedFix;
     }
 
@@ -57,14 +57,14 @@ public class ScriptEndedFeedback {
         ProtocolText = GenNiceProtokoll(Protocol);
 
         AllOk = false;
-        NotSuccesfulReason = "Start abgebrochen: " + errormessage;
+        FailedReason = "Start abgebrochen: " + errormessage;
         ScriptNeedFix = scriptNeedFix;
     }
 
     /// <summary>
     /// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
     /// </summary>
-    public ScriptEndedFeedback(VariableCollection variables, string notSuccesfulReason) {
+    public ScriptEndedFeedback(VariableCollection variables, string failedReason) {
         GiveItAnotherTry = false;
 
         Protocol = [];
@@ -72,7 +72,7 @@ public class ScriptEndedFeedback {
 
         AllOk = true;
         ScriptNeedFix = false;
-        NotSuccesfulReason = notSuccesfulReason;
+        FailedReason = failedReason;
         Variables = variables;
     }
 
@@ -85,12 +85,12 @@ public class ScriptEndedFeedback {
     public bool EndScript { get; }
 
     public bool GiveItAnotherTry { get; }
-    public string NotSuccesfulReason { get; }
+    public string FailedReason { get; }
     public List<string> Protocol { get; }
     public string ProtocolText { get; }
     public bool ScriptNeedFix { get; }
 
-    public bool Successful => string.IsNullOrWhiteSpace(NotSuccesfulReason);
+    public bool Failed => !string.IsNullOrWhiteSpace(FailedReason);
     public VariableCollection? Variables { get; }
 
     #endregion

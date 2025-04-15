@@ -1434,14 +1434,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 return scf;
             }
 
-            if (!scf.Successful) {
+            if (scf.Failed) {
                 _ = ExecutingScript.Remove(scriptId);
                 _ = ExecutingScriptAnyDatabase.Remove(scriptId);
                 if (row != null) {
-                    _ = RowCollection.FailedRows.TryAdd(row, scf.NotSuccesfulReason);
+                    _ = RowCollection.FailedRows.TryAdd(row, scf.FailedReason);
                 }
 
-                OnDropMessage(ErrorType.Info, "Das Skript konnte nicht durchgerechnet werden:\r\n" + scf.NotSuccesfulReason);
+                OnDropMessage(ErrorType.Info, "Das Skript konnte nicht durchgerechnet werden:\r\n" + scf.FailedReason);
                 return scf;
             }
 

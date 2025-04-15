@@ -25,13 +25,13 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_SetNotSuccesful : Method {
+public class Method_SetFailed : Method {
 
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
-    public override string Command => "setnotsuccesful";
+    public override string Command => "SetFailed";
     public override List<string> Constants => [];
 
     public override string Description => "Markiert die Zeile als gescheitert, ohne sie als Fehlerhaft zu setzen.\r\n" +
@@ -46,7 +46,7 @@ public class Method_SetNotSuccesful : Method {
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 
-    public override string Syntax => "SetNotSuccesful(Nachricht);";
+    public override string Syntax => "SetFailed(Nachricht);";
 
     #endregion
 
@@ -55,7 +55,7 @@ public class Method_SetNotSuccesful : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
 
-        //SetNotSuccesful(varCol, attvar.ValueStringGet(0));
+        //SetFailed(varCol, attvar.ValueStringGet(0));
 
         //return DoItFeedback.Null();
         //if (string.IsNullOrEmpty(reason)) { reason = "Allgemeiner Fehler."; }

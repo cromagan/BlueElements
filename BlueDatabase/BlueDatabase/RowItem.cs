@@ -317,8 +317,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return _lastCheckedEventArgs;
         }
 
-        if (!sef.Successful) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Das Skript konnte die Zeile nicht durchrechnen: { sef.NotSuccesfulReason}");
+        if (sef.Failed) {
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Das Skript konnte die Zeile nicht durchrechnen: { sef.FailedReason}");
             return _lastCheckedEventArgs;
         }
 
@@ -443,7 +443,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var t = DateTime.UtcNow;
         do {
             var erg = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
-            if (erg.AllOk || !erg.Successful) { return erg; }
+            if (erg.AllOk || erg.Failed) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
     }
@@ -707,7 +707,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
 
 
-            if (!ok.AllOk || !ok.Successful) {
+            if (!ok.AllOk || ok.Failed) {
                 //LastCheckedMessage = "Das Skript ist fehlerhaft. Administrator verständigen.\r\n\r\n" + ok.ProtocolText;
                 return ok;
             }
