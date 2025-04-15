@@ -19,6 +19,8 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueDatabase.EventArgs;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
@@ -32,14 +34,19 @@ public class InvalidatedRowsManager {
     // ConcurrentDictionary für threadsichere Sammlung der ungültigen Zeilen (Key = KeyName, Value = RowItem)
     private readonly ConcurrentDictionary<string, RowItem> _invalidatedRows = new ConcurrentDictionary<string, RowItem>();
 
-    //// ConcurrentDictionary für threadsichere Nachverfolgung verarbeiteter Einträge
-    //private readonly ConcurrentDictionary<string, bool> _processedRowIds = new ConcurrentDictionary<string, bool>();
-
     // Lock-Objekt nur für den Verarbeitungsstatus
     private readonly object _processingLock = new object();
 
+    //// ConcurrentDictionary für threadsichere Nachverfolgung verarbeiteter Einträge
+    //private readonly ConcurrentDictionary<string, bool> _processedRowIds = new ConcurrentDictionary<string, bool>();
     // Flag für laufende Verarbeitung
     private volatile bool _isProcessing = false;
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<RowEventArgs>? RowChecked;
 
     #endregion
 
@@ -64,7 +71,6 @@ public class InvalidatedRowsManager {
 
     #endregion
 
-
     #region Methods
 
     /// <summary>
@@ -76,10 +82,8 @@ public class InvalidatedRowsManager {
     public bool AddInvalidatedRow(RowItem? rowItem) {
         if (rowItem?.Database is not { IsDisposed: false } db) { return false; }
 
-
         // Ansosten ist Endloschleife mit Monitor
-        if(!db.CanDoValueChangedScript()) {  return false; }
-
+        if (!db.CanDoValueChangedScript()) { return false; }
 
         //// Prüfe, ob die Zeile bereits als verarbeitet markiert ist
         //if (_processedRowIds.ContainsKey(rowItem.KeyName)) {
@@ -146,6 +150,7 @@ public class InvalidatedRowsManager {
                         //_processedRowIds[key] = true;
 
                         totalProcessedCount++;
+                        OnRowChecked(new RowEventArgs(row));
                     } else {
                         masterRow?.OnDropMessage(ErrorType.Warning, $"Fehler beim Abarbeiten.");
                         Thread.Sleep(1000);
@@ -187,6 +192,10 @@ public class InvalidatedRowsManager {
 
         //// Markiere die Zeile als verarbeitet
         //return _processedRowIds.TryAdd(rowItem.KeyName, true);
+    }
+
+    private void OnRowChecked(RowEventArgs e) {
+        RowChecked?.Invoke(this, e);
     }
 
     /// <summary>

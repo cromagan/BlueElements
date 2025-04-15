@@ -402,22 +402,34 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         // Komplett neue Berechnung für showDelFilterButton
         var showDelFilterButton = false;
 
-        // Fall 1: Eine ComboBox wurde angeklickt (nicht durch Texteingabe)
-        if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
-            showDelFilterButton = true;
-        }
-        // Fall 2: Es existiert ein Filter, der nicht vom Typ Instr_GroßKleinEgal ist oder mehr als einen Wert hat
-        if (filterSingle != null &&
-                 (filterSingle.FilterType != FilterType.Instr_GroßKleinEgal ||
-                  filterSingle.SearchValue.Count > 1)) {
-            showDelFilterButton = true;
-        }
+        if (filterSingle != null) {
+            // Fall 1: Eine ComboBox wurde angeklickt (nicht durch Texteingabe)
+            if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) { showDelFilterButton = true; }
 
-        if (showDelFilterButton) {
-            f.CaptionPosition = CaptionPosition.ohne;
-            f.EditType = EditTypeFormula.Button;
-            if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
-            return;
+            // Fall 2: Es existiert ein Filter, der mehr als einen Wert hat
+            if (filterSingle.SearchValue.Count > 1) { showDelFilterButton = true; }
+
+
+            // Fall 3: Leere
+            if (filterSingle.FilterType == FilterType.Istgleich_MultiRowIgnorieren) { showDelFilterButton = true; }
+
+            // Fall 4: Nicht-Leere
+            if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
+
+
+            // Fall 5: Aufwendige Berechnung, wenn der Filter ein Ergebnis zurückliefert
+            if (!showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { } c) {
+                if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
+                using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
+                showDelFilterButton = fc.Rows.Count > 0;
+            }
+
+            if (showDelFilterButton) {
+                f.CaptionPosition = CaptionPosition.ohne;
+                f.EditType = EditTypeFormula.Button;
+                if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
+                return;
+            }
         }
 
         #endregion
