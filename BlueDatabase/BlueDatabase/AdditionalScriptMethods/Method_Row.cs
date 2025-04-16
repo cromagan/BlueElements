@@ -138,13 +138,13 @@ public class Method_Row : Method_Database, IUseableForButton {
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 var m = CellCollection.EditableErrorReason(srs, r, EditableErrorReasonType.EditAcut, false, false, true, false, null);
-                if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, false); }
+                if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {
                 Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Kein Zeilenupdate, da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
-            return new DoItFeedback("Zeile konnte nicht angelegt werden", false, false);
+            return new DoItFeedback("Zeile konnte nicht angelegt werden", false, ld);
         }
 
         return RowToObjectFeedback(newrow);

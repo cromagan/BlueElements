@@ -116,7 +116,7 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", true, ld);
         }
 
-        return new DoItFeedback(scx.FailedReason, scx.BreakFired, scx.EndScript);
+        return new DoItFeedback(scx.BreakFired, scx.EndScript);
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

@@ -48,10 +48,9 @@ public class DoItFeedback {
         }
     }
 
-    public DoItFeedback(string failedReason, bool breakFired, bool endScript) : this() {
+    public DoItFeedback(bool breakFired, bool endScript) : this() {
         BreakFired = breakFired;
         EndScript = endScript;
-        FailedReason = failedReason;
     }
 
     // Value type constructors

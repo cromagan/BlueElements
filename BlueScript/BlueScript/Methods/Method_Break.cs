@@ -53,7 +53,7 @@ public class Method_Break : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) =>
-        new(string.Empty, true, false);
+        new(true, false);
 
     #endregion
 }

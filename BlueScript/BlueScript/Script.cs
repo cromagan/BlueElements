@@ -78,7 +78,7 @@ public class Script {
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
         if (scriptText.Length > pos && scriptText.Substring(pos, 1) == ";") {
-            return new DoItWithEndedPosFeedback(true, null, pos + 1, false, false, string.Empty);
+            return new DoItWithEndedPosFeedback(true, null, pos + 1, false, false, string.Empty, ld);
         }
 
         #endregion
@@ -91,7 +91,7 @@ public class Script {
 
             if (string.IsNullOrEmpty(f.Message)) {
                 var fn = thisC.DoIt(varCol, f, scp);
-                return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
+                return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.FailedReason, ld);
             }
         }
 
@@ -113,7 +113,7 @@ public class Script {
                         }
 
                         var fn = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.AttributeText + ";", false);
-                        return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
+                        return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript, fn.FailedReason, ld);
                     }
                 }
             }

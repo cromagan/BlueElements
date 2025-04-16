@@ -63,7 +63,7 @@ internal class Method_ForEach : Method {
             return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }
 
-        var scx = new DoItFeedback(string.Empty, false, false);
+        var scx = new DoItFeedback(false, false);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
         foreach (var thisl in l) {
@@ -75,7 +75,7 @@ internal class Method_ForEach : Method {
             if (scx.BreakFired || scx.EndScript) { break; }
         }
 
-        return new DoItFeedback(scx.FailedReason, false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
