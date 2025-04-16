@@ -58,7 +58,7 @@ public class Method_ResizeImage : Method {
 
             return new DoItFeedback(bmp2);
         } catch {
-            return new DoItFeedback(ld, "Bildgröße konnte nicht verändert werden.");
+            return new DoItFeedback("Bildgröße konnte nicht verändert werden.", true, ld);
         }
     }
 

@@ -449,7 +449,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
 			var scx = rows[0].ExecuteScript(eventname, scriptname, true, 0, null, true, true);
 
-			if (!scx.AllOk) {
+			if (scx.Failed) {
 				var w = rows[0].CellFirstString();
 				rows.Clear();
 				Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));

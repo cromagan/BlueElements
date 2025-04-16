@@ -56,33 +56,33 @@ internal class Method_ForEachRow : Method_Database {
 
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.LogData, varnam + " ist kein gültiger Variablen-Name"); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
 
         var vari = varCol.Get(varnam);
         if (vari != null) {
-            return new DoItFeedback(infos.LogData, "Variable " + varnam + " ist bereits vorhanden.");
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }
 
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName, true);
+        var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName, true);
 
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(infos.LogData, $"Filter-Fehler: {errorreason}"); }
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, infos.LogData); }
 
         var r = allFi.Rows;
         allFi.Dispose();
 
-        var scx = new DoItFeedback(false, false, string.Empty);
+        var scx = new DoItFeedback(string.Empty, false, false);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
         foreach (var thisl in r) {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEachRow-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow");
-            if (!scx.AllOk || scx.Failed) { return scx; }
+            if (scx.Failed) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }
         }
 
-        return new DoItFeedback(false, scx.EndScript, scx.FailedReason); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        return new DoItFeedback(scx.FailedReason, false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

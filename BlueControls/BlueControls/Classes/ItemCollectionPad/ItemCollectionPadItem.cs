@@ -838,7 +838,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (row is not { IsDisposed: false }) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
         var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
-        if (!script.AllOk) { return script; }
+        if (script.Failed) { return script; }
 
         this.ParseVariables(script.Variables);
 
@@ -956,7 +956,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         var t = sc.Parse(0, "Main", null);
 
-        if (t.Failed || !t.AllOk) {
+        if (t.Failed ) {
             var ep = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));
 
             Add(ep);

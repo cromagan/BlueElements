@@ -54,16 +54,16 @@ internal class Method_SaveText : Method {
         #region  Dateinamen ermitteln (filn)
 
         var filn = attvar.ValueStringGet(0);
-        if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
+        if (string.IsNullOrEmpty(filn)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
-        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
+        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         var pf = filn.PathParent();
-        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
-        if (!Directory.Exists(pf)) { return new DoItFeedback(ld, "Verzeichniss existiert nicht"); }
-        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback(ld, "Keine Schreibrechte im Zielverzeichniss."); }
+        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
+        if (!Directory.Exists(pf)) { return new DoItFeedback("Verzeichniss existiert nicht", true, ld); }
+        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback("Keine Schreibrechte im Zielverzeichniss.", true, ld); }
 
-        if (File.Exists(filn)) { return new DoItFeedback(ld, "Datei existiert bereits."); }
+        if (File.Exists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 
         #endregion
 
@@ -72,19 +72,19 @@ internal class Method_SaveText : Method {
         switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
             case "UTF8":
                 if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), Encoding.UTF8, false)) {
-                    return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei.");
+                    return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld);
                 }
 
                 break;
 
             case "WIN1252":
                 if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), BlueBasics.Constants.Win1252, false)) {
-                    return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei.");
+                    return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld);
                 }
                 break;
 
             default:
-                return new DoItFeedback(ld, "Export-Format unbekannt.");
+                return new DoItFeedback("Export-Format unbekannt.", true, ld);
         }
 
         return DoItFeedback.Null();

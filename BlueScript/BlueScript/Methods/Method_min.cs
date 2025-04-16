@@ -75,7 +75,7 @@ internal class Method_Min : Method {
             }
         }
 
-        return l.Count > 0 ? new DoItFeedback(l.Min()) : new DoItFeedback(ld, "Keine gültigen Werte angekommen");
+        return l.Count > 0 ? new DoItFeedback(l.Min()) : new DoItFeedback("Keine gültigen Werte angekommen", true, ld);
     }
 
     #endregion

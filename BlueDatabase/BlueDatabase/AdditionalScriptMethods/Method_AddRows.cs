@@ -65,25 +65,25 @@ public class Method_AddRows : Method_Database {
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
-        if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
-        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
+        if (db == null) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
+        if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, false); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(false, false, $"Datenbanksperre: {m}"); }
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, false); }
 
         var keys = attvar.ValueListStringGet(2);
         keys = keys.SortedDistinctList();
 
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) {
-            return new DoItFeedback(ld, "Stapelspeicherüberlauf");
+            return new DoItFeedback("Stapelspeicherüberlauf", true, ld);
         }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         var c = db.Column.First();
 
-        if (c == null) { return new DoItFeedback(ld, "Erste Spalte nicht vorhanden"); }
+        if (c == null) { return new DoItFeedback("Erste Spalte nicht vorhanden", true, ld); }
 
         var d = attvar.ValueNumGet(1);
 
@@ -91,8 +91,8 @@ public class Method_AddRows : Method_Database {
 
             #region  Filter ermitteln (allfi)
 
-            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, mydb, scp.ScriptName, false);
-            if (!string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+            var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, mydb, scp.ScriptName, false);
+            if (!string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
             allFi ??= new FilterCollection(db, "AddRows");
 
@@ -100,14 +100,14 @@ public class Method_AddRows : Method_Database {
 
             if (allFi[c] is { }) {
                 allFi.Dispose();
-                return new DoItFeedback(ld, "Initialwert doppelt belegt");
+                return new DoItFeedback("Initialwert doppelt belegt", true, ld);
             }
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
             var fb = Method_Row.UniqueRow(varCol, ld, allFi, d, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
             allFi.Dispose();
-            if (!fb.AllOk) { return fb; }
+            if (fb.Failed) { return fb; }
         }
 
         return DoItFeedback.Null();

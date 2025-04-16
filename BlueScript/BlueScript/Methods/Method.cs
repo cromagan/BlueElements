@@ -183,7 +183,7 @@ public abstract class Method : IReadableTextWithKey {
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
             var f = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
-            if (!f.AllOk) { return new GetEndFeedback("Durch Befehl abgebrochen: " + txt, ld); }
+            if (f.Failed) { return new GetEndFeedback($"Durch Befehl abgebrochen: {txt} -> {f.FailedReason}", ld); }
 
             if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
             if (f.Variable == null) { return new GetEndFeedback("Variablenfehler", ld); }
@@ -295,18 +295,18 @@ public abstract class Method : IReadableTextWithKey {
     public static DoItFeedback VariablenBerechnung(VariableCollection varCol, LogData ld, ScriptProperties scp, string newcommand, bool generateVariable) {
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
 
-        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(ld, "Fehler mit = - Zeichen"); }
+        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen", true, ld); }
 
         var varnam = newcommand.Substring(0, pos);
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(ld, varnam + " ist kein gültiger Variablen-Name"); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, ld); }
 
         var vari = varCol.Get(varnam);
         if (generateVariable && vari != null) {
-            return new DoItFeedback(ld, "Variable " + varnam + " ist bereits vorhanden.");
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, ld);
         }
         if (!generateVariable && vari == null) {
-            return new DoItFeedback(ld, "Variable " + varnam + " nicht vorhanden.");
+            return new DoItFeedback("Variable " + varnam + " nicht vorhanden.", true, ld);
         }
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
@@ -315,9 +315,9 @@ public abstract class Method : IReadableTextWithKey {
 
         var attvar = SplitAttributeToVars(varCol, value, sargs, 0, ld, scp);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(ld, "Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.ErrorMessage); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback("Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.ErrorMessage, true, ld); }
 
-        if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback(ld, "Variable unbekannt"); }
+        if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback("Variable unbekannt", true, ld); }
 
         if (attvar.Attributes[0] is { } v) {
             if (generateVariable) {
@@ -352,7 +352,7 @@ public abstract class Method : IReadableTextWithKey {
         if (pos + l < maxl) {
             if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
                 var f = GetEnd(scriptText, pos + Command.Length, StartSequence.Length, EndSequence, ld);
-                if (!f.AllOk) {
+                if (f.Failed) {
                     return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + commandtext, true, ld);
                 }
                 var cont = f.ContinuePosition;

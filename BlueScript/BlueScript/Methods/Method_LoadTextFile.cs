@@ -53,11 +53,11 @@ internal class Method_LoadTextFile : Method {
         var filen = attvar.ValueStringGet(0);
 
         if (filen.FileType() is not FileFormat.Textdocument and not FileFormat.CSV) {
-            return new DoItFeedback(ld, "Datei ist kein Textformat: " + filen);
+            return new DoItFeedback("Datei ist kein Textformat: " + filen, true, ld);
         }
 
         if (!IO.FileExists(filen)) {
-            return new DoItFeedback(ld, "Datei nicht gefunden: " + filen);
+            return new DoItFeedback("Datei nicht gefunden: " + filen, true, ld);
         }
 
         try {
@@ -72,12 +72,12 @@ internal class Method_LoadTextFile : Method {
                     break;
 
                 default:
-                    return new DoItFeedback(ld, "Import-Format unbekannt.");
+                    return new DoItFeedback("Import-Format unbekannt.", true, ld);
             }
 
             return new DoItFeedback(importText);
         } catch {
-            return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " + filen);
+            return new DoItFeedback("Datei konnte nicht geladen werden: " + filen, true, ld);
         }
     }
 

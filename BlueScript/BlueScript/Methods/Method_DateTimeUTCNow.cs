@@ -51,7 +51,7 @@ internal class Method_DateTimeNowUTC : Method {
         try {
             return new DoItFeedback(DateTime.UtcNow.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback(ld, "Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.");
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.", true, ld);
         }
     }
 

@@ -312,26 +312,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, 0, null, true, false);
 
-        if (!sef.AllOk) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, "Das Skript enthält Fehler und muss repariert werden.");
-            return _lastCheckedEventArgs;
-        }
-
         if (sef.Failed) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Das Skript konnte die Zeile nicht durchrechnen: { sef.FailedReason}");
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}");
             return _lastCheckedEventArgs;
         }
-
 
         if (RowCollection.FailedRows.TryGetValue(this, out var reason)) {
             _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Zeilenstatus unbekannt, da temporäre Fehler aufgetreten sind: {reason}");
             return _lastCheckedEventArgs;
         }
-
-
-
-
-        
 
         List<string> cols = [];
 
@@ -357,8 +346,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                 var erg2 = ExecuteScript(ScriptEventTypes.correct_changed, string.Empty, true, 3, null, true, false);
 
-                if (!erg2.AllOk) {
-                    m += "Das Skripte enthalten Fehler und müssen repariert werden.";
+                if (erg2.Failed) {
+                    m += $"Berechnung fehlgeschlagen: {erg2.FailedReason}";
                 }
             }
         }
@@ -443,7 +432,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var t = DateTime.UtcNow;
         do {
             var erg = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
-            if (erg.AllOk || erg.Failed) { return erg; }
+            if (!erg.Failed) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
     }
@@ -477,7 +466,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         InvalidateCheckData();
 
-
         if (CellIsNullOrEmpty(srs) && string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) {
             Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} ist bereits invalidiert", 0);
             return;
@@ -488,7 +476,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd) {
             CellSet(scd, DateTime.UtcNow, comment);
         }
-
 
         _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
@@ -578,7 +565,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <summary>
     ///
     /// </summary>
-    /// <returns>True wenn alles in Ordnung ist</returns>
+    /// <returns>Empty, wenn alles in Ordung ist. Ansonten ein Grund.</returns>
     public string RepairAllLinks() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
 
@@ -706,11 +693,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
 
-
-            if (!ok.AllOk || ok.Failed) {
-                //LastCheckedMessage = "Das Skript ist fehlerhaft. Administrator verständigen.\r\n\r\n" + ok.ProtocolText;
-                return ok;
-            }
+            if (ok.Failed) { return ok; }
 
             var reas = RepairAllLinks();
 

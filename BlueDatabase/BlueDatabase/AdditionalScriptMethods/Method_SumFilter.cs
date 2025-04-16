@@ -48,25 +48,25 @@ public class Method_SumFilter : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+        var (allFi, errorreason, needsScriptFix  ) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
         if (allFi.Database is not { IsDisposed: false } db) {
             allFi.Dispose();
-            return new DoItFeedback(ld, "Datenbankfehler!");
+            return new DoItFeedback("Datenbankfehler!", true, ld);
         }
 
         var r = allFi.Rows;
         allFi.Dispose();
 
         var returncolumn = db.Column[attvar.ReadableText(0)];
-        if (returncolumn == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ReadableText(0)); }
+        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ReadableText(0), true, ld); }
 
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
         var x = returncolumn.Summe(r);
 
-        return x is not double xd ? new DoItFeedback(ld, "Summe konnte nicht berechnet werden.") : new DoItFeedback(xd);
+        return x is not double xd ? new DoItFeedback("Summe konnte nicht berechnet werden.", true, ld) : new DoItFeedback(xd);
     }
 
     #endregion

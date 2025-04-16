@@ -53,7 +53,7 @@ public class Method_GenerateLayoutImage : Method_Database {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(scp);
-        if (r?.Database is not { IsDisposed: false }) { return new DoItFeedback(ld, "Zeilenfehler!"); }
+        if (r?.Database is not { IsDisposed: false }) { return new DoItFeedback("Zeilenfehler!", true, ld); }
 
         #endregion
 
@@ -61,32 +61,32 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         var ind = attvar.ValueStringGet(0);
 
-        if (string.IsNullOrEmpty(ind)) { return new DoItFeedback(ld, "Layout nicht gefunden."); }
+        if (string.IsNullOrEmpty(ind)) { return new DoItFeedback("Layout nicht gefunden.", true, ld); }
 
         #endregion
 
         #region  scale  ermitteln (sc)
 
         var sc = attvar.ValueNumGet(1);
-        if (sc is < 0.1 or > 10) { return new DoItFeedback(ld, "Skalierung nur von 0.1 bis 10 erlaubt."); }
+        if (sc is < 0.1 or > 10) { return new DoItFeedback("Skalierung nur von 0.1 bis 10 erlaubt.", true, ld); }
 
         #endregion
 
         var l = new ItemCollectionPadItem(ind);
 
-        if (!l.Any()) { return new DoItFeedback(ld, "Layout nicht gefunden oder fehlerhaft."); }
+        if (!l.Any()) { return new DoItFeedback("Layout nicht gefunden oder fehlerhaft.", true, ld); }
 
         _ = l.ResetVariables();
         var scx = l.ReplaceVariables(r);
 
-        if (!scx.AllOk) {
+        if (scx.Failed) {
             ld.Protocol.AddRange(scx.Protocol);
-            return new DoItFeedback(ld, "Generierung fehlgeschlagen");
+            return new DoItFeedback("Generierung fehlgeschlagen", true, ld);
         }
 
         var bmp = l.ToBitmap((float)sc);
 
-        if (bmp == null) { return new DoItFeedback(ld, "Generierung fehlgeschlagen"); }
+        if (bmp == null) { return new DoItFeedback("Generierung fehlgeschlagen", true, ld); }
 
         return new DoItFeedback(bmp);
     }

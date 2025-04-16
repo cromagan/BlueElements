@@ -46,7 +46,7 @@ internal class Method_StringHTMLToAscii : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(ld, attvar.ValueStringGet(0).HtmlSpecialToNormalChar(attvar.ValueBoolGet(1)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).HtmlSpecialToNormalChar(attvar.ValueBoolGet(1)), true, ld);
 
     #endregion
 }

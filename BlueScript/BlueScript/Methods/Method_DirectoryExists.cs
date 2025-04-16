@@ -51,7 +51,7 @@ internal class Method_DirectoryExists : Method {
         var pf = attvar.ValueStringGet(0);
 
         if (!pf.IsFormat(FormatHolder.Filepath)) {
-            return new DoItFeedback(ld, "Dateipfad ungültig: " + pf);
+            return new DoItFeedback("Dateipfad ungültig: " + pf, true, ld);
         }
         //if(pf.IsFormat(FormatHolder.FilepathAndName))
 

@@ -64,8 +64,8 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+        var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}",  needsScriptFix, ld); }
 
         var r = allFi.Rows;
         allFi.Dispose();
@@ -78,9 +78,9 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
             if (thisR is { IsDisposed: false }) {
                 //s.Sub++;
                 var s2 = thisR.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
-                if (!s2.AllOk) {
+                if (s2.Failed) {
                     ld.Protocol.AddRange(s2.Protocol);
-                    return new DoItFeedback(ld, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");
+                    return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen", true, ld);
                 }
             }
         }

@@ -124,7 +124,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         grpVariablen.ToEdit = f.Variables;
         WriteCommandsToList();
 
-        if (!f.AllOk) {
+        if (f.Failed) {
             Message(f.ProtocolText);
             return;
         }

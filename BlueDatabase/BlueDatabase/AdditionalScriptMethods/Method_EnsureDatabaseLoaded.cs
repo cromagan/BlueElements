@@ -51,12 +51,12 @@ internal class Method_EnsureDatabaseLoaded : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
-        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
+        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
 
         if (Database.Get(filn, false, null) is { IsDisposed: false } db) {
-            if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
+            if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, false); }
             return DoItFeedback.Wahr();
         }
 

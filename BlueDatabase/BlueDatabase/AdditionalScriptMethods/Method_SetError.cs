@@ -71,7 +71,7 @@ public class Method_SetError : Method_Database {
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(scp, attvar, z);
-            if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(z)); }
+            if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Name(z), true, ld); }
             l.Add(column.KeyName.ToUpperInvariant() + "|" + attvar.ValueStringGet(0));
         }
 

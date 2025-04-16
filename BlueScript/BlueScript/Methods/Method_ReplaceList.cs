@@ -53,14 +53,14 @@ internal class Method_ReplaceList : Method {
 
         var tmpList = attvar.ValueListStringGet(0);
 
-        if (attvar.ValueStringGet(3) == attvar.ValueStringGet(4)) { return new DoItFeedback(ld, "Suchtext und Ersetzungstext sind identisch."); }
-        if (!attvar.ValueBoolGet(1) && string.Equals(attvar.ValueStringGet(3), attvar.ValueStringGet(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(ld, "Suchtext und Ersetzungstext sind identisch."); }
+        if (attvar.ValueStringGet(3) == attvar.ValueStringGet(4)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", true, ld); }
+        if (!attvar.ValueBoolGet(1) && string.Equals(attvar.ValueStringGet(3), attvar.ValueStringGet(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch.", true, ld); }
 
         var ct = 0;
         bool again;
         do {
             ct++;
-            if (ct > 10000) { return new DoItFeedback(ld, "Überlauf bei ReplaceList."); }
+            if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList.", true, ld); }
             again = false;
             for (var z = 0; z < tmpList.Count; z++) {
                 if (attvar.ValueBoolGet(2)) {

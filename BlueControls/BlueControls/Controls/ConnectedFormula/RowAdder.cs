@@ -140,7 +140,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
 
 
-        if (!scf.AllOk) {
+        if (scf.Failed) {
             if (Generic.UserGroup == Constants.Administrator) {
                 List<string> l =
                 [
@@ -412,7 +412,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         //        var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
 
         var scf = ExecuteScript(Script_Before, Mode, EntityID, rowIn, false, "Before");
-        if (!scf.AllOk) {
+        if (scf.Failed) {
 
             Fehler("Interner Fehler: Skript BEFORE fehlerhaft", ImageCode.Kritisch);
             return;
@@ -441,7 +441,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         }
 
         scf = ExecuteScript(Script_After, Mode, EntityID, rowIn, false, "After");
-        if (!scf.AllOk) {
+        if (scf.Failed) {
             Fehler("Interner Fehler: Skript AFTER fehlerhaft", ImageCode.Kritisch);
             return;
         }
@@ -474,8 +474,8 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
         var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
 
-        if (!scf.AllOk) {
-            return "Interner Fehler: Skript Menu Gerneration fehlerhaft; " + scf.ProtocolText;
+        if (scf.Failed) {
+            return "Interner Fehler: Skript Menu Generation fehlerhaft; " + scf.ProtocolText;
         }
 
         var menu = scf.Variables?.GetList("Menu");

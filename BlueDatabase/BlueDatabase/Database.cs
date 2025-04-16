@@ -110,7 +110,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private DateTime _powerEditTime = DateTime.MinValue;
     private bool _readOnly;
     private bool _saveRequired = false;
-    private string _scriptNeedFix = string.Empty;
+    private string _needsScriptFix = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -403,11 +403,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public RowCollection Row { get; }
 
-    public string ScriptNeedFix {
-        get => _scriptNeedFix;
+    public string NeedsScriptFix {
+        get => _needsScriptFix;
         set {
-            if (_scriptNeedFix == value) { return; }
-            _ = ChangeData(DatabaseDataType.ScriptNeedFix, null, null, _scriptNeedFix, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            if (_needsScriptFix == value) { return; }
+            _ = ChangeData(DatabaseDataType.NeedsScriptFix, null, null, _needsScriptFix, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
         }
     }
 
@@ -1234,7 +1234,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     //    StandardFormulaFile = sourceDatabase.StandardFormulaFile;
     //    EventScriptVersion = sourceDatabase.EventScriptVersion;
-    //    ScriptNeedFix = sourceDatabase.ScriptNeedFix;
+    //    NeedsScriptFix = sourceDatabase.NeedsScriptFix;
     //    ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
     //    if (tagsToo) {
     //        Tags = new(sourceDatabase.Tags.Clone());
@@ -1345,7 +1345,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         var name = script?.KeyName ?? "Allgemein";
 
-        if (!ignoreError && !string.IsNullOrEmpty(ScriptNeedFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
+        if (!ignoreError && !string.IsNullOrEmpty(NeedsScriptFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
 
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
@@ -1408,8 +1408,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Fehlerprüfungen
 
-            if (string.IsNullOrEmpty(ScriptNeedFix)) {
-                if (scf is { AllOk: false, ScriptNeedFix: true }) {
+            if (string.IsNullOrEmpty(NeedsScriptFix)) {
+                if (scf is { NeedsScriptFix: true }) {
                     var t = "Datenbank: " + Caption + "\r\n" +
                                       "Benutzer: " + UserName + "\r\n" +
                                       "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
@@ -1422,12 +1422,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     }
 
                     if (produktivphase && !ignoreError) {
-                        ScriptNeedFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
+                        NeedsScriptFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
                     }
                 }
             }
 
-            if (!scf.AllOk) {
+            if (scf.Failed) {
                 _ = ExecutingScript.Remove(scriptId);
                 _ = ExecutingScriptAnyDatabase.Remove(scriptId);
                 OnDropMessage(ErrorType.Info, "Das Skript '" + script.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
@@ -1926,7 +1926,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; } // Nicht ReadOnly!
-        if (checkMessageTo && !string.IsNullOrEmpty(_scriptNeedFix)) { return false; }
+        if (checkMessageTo && !string.IsNullOrEmpty(_needsScriptFix)) { return false; }
         return true;
     }
 
@@ -2256,7 +2256,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
 
-        if (string.IsNullOrEmpty(_scriptNeedFix)) { ScriptNeedFix = CheckScriptError(); }
+        if (string.IsNullOrEmpty(_needsScriptFix)) { NeedsScriptFix = CheckScriptError(); }
 
         OnAdditionalRepair();
     }
@@ -2678,8 +2678,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 _eventScriptVersion = DateTimeParse(value);
                 break;
 
-            case DatabaseDataType.ScriptNeedFix:
-                _scriptNeedFix = value;
+            case DatabaseDataType.NeedsScriptFix:
+                _needsScriptFix = value;
                 Row.InvalidateAllCheckData();
                 break;
 

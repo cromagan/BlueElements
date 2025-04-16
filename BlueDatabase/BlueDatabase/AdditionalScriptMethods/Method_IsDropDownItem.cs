@@ -49,7 +49,7 @@ internal class Method_IsDropDownItem : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 1);
-        if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte in Datenbank nicht gefunden"); }
+        if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte in Datenbank nicht gefunden", true, ld); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }

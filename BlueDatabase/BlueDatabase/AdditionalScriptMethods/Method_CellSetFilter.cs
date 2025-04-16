@@ -51,18 +51,18 @@ public class Method_CellSetFilter : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+        var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
         var db = allFi.Database;
         if (db is not { IsDisposed: false }) {
             allFi.Dispose();
-            return new DoItFeedback(ld, "Datenbank verworfen.");
+            return new DoItFeedback("Datenbank verworfen.", true, ld);
         }
 
-        if (db.Column[attvar.ValueStringGet(1)] is not { IsDisposed: false } columnToSet) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(4)); }
+        if (db.Column[attvar.ValueStringGet(1)] is not { IsDisposed: false } columnToSet) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(4), true, ld); }
 
-        if (!columnToSet.Function.CanBeChangedByRules()) { return new DoItFeedback(ld, "Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(4)); }
+        if (!columnToSet.Function.CanBeChangedByRules()) { return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(4), true, ld); }
 
         var r = allFi.Rows;
         allFi.Dispose();
@@ -71,7 +71,7 @@ public class Method_CellSetFilter : Method_Database {
         }
 
         if (r[0] == MyRow(scp)) {
-            return new DoItFeedback(ld, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
+            return new DoItFeedback("Die eigene Zelle kann nur über die Variabeln geändert werden.", true, ld);
         }
 
         var value = string.Empty;

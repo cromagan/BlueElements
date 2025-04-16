@@ -75,7 +75,7 @@ internal class Method_Max : Method {
             }
         }
 
-        return l.Count > 0 ? new DoItFeedback(l.Max()) : new DoItFeedback(ld, "Keine gültigen Werte angekommen");
+        return l.Count > 0 ? new DoItFeedback(l.Max()) : new DoItFeedback("Keine gültigen Werte angekommen", true, ld);
     }
 
     #endregion

@@ -205,7 +205,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 if (row is { IsDisposed: false }) {
                     var t = row.ExecuteScript(null, ev[1], true, 10, null, true, true);
 
-                    if (t is { Failed: false, AllOk: true }) {
+                    if (t is { Failed: false }) {
                         MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
                     } else {
                         MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.FailedReason}<br><br>{t.Protocol.JoinWithCr()}", ImageCode.Kreuz, "Ok");
@@ -1177,7 +1177,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             }
         }
 
-        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) {
+        if (!string.IsNullOrEmpty(db.NeedsScriptFix)) {
             var d = ItemOf("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.ItemAdd(d);

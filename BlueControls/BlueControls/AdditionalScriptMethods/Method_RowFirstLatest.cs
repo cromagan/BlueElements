@@ -54,8 +54,8 @@ public class Method_RowFirstLatest : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+        var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
         if (allFi.Database is not { IsDisposed: false } db) { return DoItFeedback.InternerFehler(ld); }
 
@@ -63,7 +63,7 @@ public class Method_RowFirstLatest : Method_Database {
         allFi.Dispose();
 
         var column = db.Column[attvar.ValueStringGet(0)];
-        if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Name(0), true, ld); }
 
         if (r.Count < 1) { return Method_Row.RowToObjectFeedback(null); }
 

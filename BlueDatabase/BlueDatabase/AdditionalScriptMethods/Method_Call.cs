@@ -69,22 +69,22 @@ internal class Method_Call : Method_Database, IUseableForButton {
         var vs = attvar.ValueStringGet(0);
 
         var db = MyDatabase(scp);
-        if (db == null) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback("Datenbankfehler!", true, ld); }
 
         var sc = db.EventScript.Get(vs);
-        if (sc == null) { return new DoItFeedback(ld, "Skript nicht vorhanden: " + vs); }
+        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
 
         var newat = sc.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {
             if (!newat.Contains(thisAt)) {
-                return new DoItFeedback(ld, "Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.");
+                return new DoItFeedback("Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.", true, ld);
             }
         }
 
         var (f, error) = Script.ReduceText(sc.Script);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback(ld, "Fehler in Unter-Skript " + vs + ": " + error);
+            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true, ld);
         }
 
         #region Attributliste erzeugen
@@ -97,7 +97,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
         #endregion
 
         var scx = Method_CallByFilename.CallSub(varCol, scp, ld, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null, a, vs);
-        if (!scx.AllOk) { return scx; }
+        if (scx.Failed) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }
 

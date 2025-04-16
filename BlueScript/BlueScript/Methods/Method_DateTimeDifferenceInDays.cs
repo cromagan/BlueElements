@@ -49,13 +49,13 @@ internal class Method_DateTimeDifferenceInDays : Method {
         var d1 = attvar.ValueDateGet(0);
 
         if (d1 == null) {
-            return new DoItFeedback(ld, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
+            return new DoItFeedback("Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.", true, ld);
         }
 
         var d2 = attvar.ValueDateGet(1);
 
         return d2 == null
-            ? new DoItFeedback(ld, "Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.")
+            ? new DoItFeedback("Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.", true, ld)
             : new DoItFeedback(d1.Value.Subtract(d2.Value).TotalDays);
     }
 

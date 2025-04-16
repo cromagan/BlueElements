@@ -58,7 +58,7 @@ public class Method_RowNext : Method_Database {
         if (mr is not { IsDisposed: false }) { return DoItFeedback.InternerFehler(ld); }
 
         var column = Column(scp, attvar, 0);
-        if (column is not { IsDisposed: false }) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.Name(0)); }
+        if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Name(0), true, ld); }
 
         if (mr.Database is not { IsDisposed: false } db) { return DoItFeedback.InternerFehler(ld); }
 
@@ -66,8 +66,8 @@ public class Method_RowNext : Method_Database {
 
         List<RowItem> r = [];
         if (attvar.Attributes.Count > 2) {
-            var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, db, scp.ScriptName, true);
-            if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+            var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, db, scp.ScriptName, true);
+            if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
             r.AddRange(allFi.Rows);
             allFi.Dispose();
         } else {
@@ -76,7 +76,7 @@ public class Method_RowNext : Method_Database {
 
         if (r.Count < 2) { return Method_Row.RowToObjectFeedback(null); }
 
-        if (mr.Database != r[0].Database) { return new DoItFeedback(ld, "Filterfehler, falsche Datenbank"); }
+        if (mr.Database != r[0].Database) { return new DoItFeedback("Filterfehler, falsche Datenbank", true, ld); }
 
         if (!r.Contains(mr)) { return Method_Row.RowToObjectFeedback(null); }
 

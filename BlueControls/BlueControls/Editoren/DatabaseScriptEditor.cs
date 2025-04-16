@@ -86,7 +86,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 _database.DisposingEvent += _database_Disposing;
                 _database.CanDoScript += Database_CanDoScript;
 
-                txbNeedFix.Text = _database.ScriptNeedFix;
+                txbNeedFix.Text = _database.NeedsScriptFix;
 
                 tbcScriptEigenschaften.Enabled = true;
             } else {
@@ -302,9 +302,9 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 }
             }
 
-            if (!string.IsNullOrEmpty(db.ScriptNeedFix)) {
+            if (!string.IsNullOrEmpty(db.NeedsScriptFix)) {
                 if (MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok", "Leeren") == 1) {
-                    db.ScriptNeedFix = db.CheckScriptError();
+                    db.NeedsScriptFix = db.CheckScriptError();
                 }
             }
         }
@@ -355,12 +355,12 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
 
-    private void btnDeleteScriptNeedFix_Click(object sender, System.EventArgs e) {
+    private void btnDeleteNeedsScriptFix_Click(object sender, System.EventArgs e) {
         if (_database == null) { return; }
 
-        _database.ScriptNeedFix = _database.CheckScriptError();
+        _database.NeedsScriptFix = _database.CheckScriptError();
 
-        txbNeedFix.Text = _database.ScriptNeedFix;
+        txbNeedFix.Text = _database.NeedsScriptFix;
         MultiUserFile.SaveAll(false);
     }
 

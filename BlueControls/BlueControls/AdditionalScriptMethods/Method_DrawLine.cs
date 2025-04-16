@@ -55,7 +55,7 @@ public class Method_DrawLine : Method {
             using var gr = Graphics.FromImage(bmp);
             gr.DrawLine(Pens.Black, attvar.ValueIntGet(1), attvar.ValueIntGet(2), attvar.ValueIntGet(3), attvar.ValueIntGet(4));
         } catch {
-            return new DoItFeedback(ld, "Linie konnte nicht gezeichnet werden.");
+            return new DoItFeedback("Linie konnte nicht gezeichnet werden.", true, ld);
         }
 
         return DoItFeedback.Null();

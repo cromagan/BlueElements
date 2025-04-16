@@ -56,26 +56,26 @@ internal class Method_ForEach : Method {
 
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.LogData, varnam + " ist kein gültiger Variablen-Name"); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
 
         var vari = varCol.Get(varnam);
         if (vari != null) {
-            return new DoItFeedback(infos.LogData, "Variable " + varnam + " ist bereits vorhanden.");
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }
 
-        var scx = new DoItFeedback(false, false, string.Empty);
+        var scx = new DoItFeedback(string.Empty, false, false);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
         foreach (var thisl in l) {
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEach");
-            if (!scx.AllOk || scx.Failed) { return scx; }
+            if (scx.Failed) { return scx; }
 
-            if (scx.BreakFired || scx.EndScript ) { break; }
+            if (scx.BreakFired || scx.EndScript) { break; }
         }
 
-        return new DoItFeedback(false, scx.EndScript, scx.FailedReason); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        return new DoItFeedback(scx.FailedReason, false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

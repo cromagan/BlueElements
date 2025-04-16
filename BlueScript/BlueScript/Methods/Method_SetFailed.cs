@@ -80,9 +80,9 @@ public class Method_SetFailed : Method {
 
         var r = attvar.ValueStringGet(0);
 
-        if(string.IsNullOrEmpty(r)) { return new DoItFeedback(ld, "Keine Fehlermeldung angegeben."); }
+        if(string.IsNullOrEmpty(r)) { return new DoItFeedback("Keine Fehlermeldung angegeben.", true, ld); }
 
-        return new DoItFeedback(false, false, r);
+        return new DoItFeedback(r, false, false);
 
 
 

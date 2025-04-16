@@ -53,15 +53,15 @@ public class Method_CellSetRow : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
-        if (row is not { IsDisposed: false }) { return new DoItFeedback(ld, "Zeile nicht gefunden"); }
-        if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
-        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, $"In der Datenbank '{db.Caption}' sind die Skripte defekt"); }
+        if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
+        if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
+        if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, false); }
 
         var columnToSet = db.Column[attvar.ValueStringGet(1)];
-        if (columnToSet == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(1)); }
+        if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true, ld); }
 
         if (!columnToSet.Function.CanBeChangedByRules()) {
-            return new DoItFeedback(ld, "Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1));
+            return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1), true, ld);
         }
 
         var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false, null);
@@ -69,7 +69,7 @@ public class Method_CellSetRow : Method_Database {
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (row == MyRow(scp)) {
-            return new DoItFeedback(ld, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
+            return new DoItFeedback("Die eigene Zelle kann nur über die Variabeln geändert werden.", true, ld);
         }
 
         var value = string.Empty;

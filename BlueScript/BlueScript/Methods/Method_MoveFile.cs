@@ -57,8 +57,8 @@ internal class Method_MoveFile : Method {
         var sop = attvar.ValueStringGet(0);
         var dep = attvar.ValueStringGet(1);
 
-        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(ld, "Ziel-Verzeichnis existiert nicht:" + dep.FilePath()); }
-        if (!FileExists(sop)) { return new DoItFeedback(ld, "Quelldatei existiert nicht."); }
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht:" + dep.FilePath(), true, ld); }
+        if (!FileExists(sop)) { return new DoItFeedback("Quelldatei existiert nicht.", true, ld); }
 
         if (FileExists(dep)) { return DoItFeedback.Falsch(); }
 

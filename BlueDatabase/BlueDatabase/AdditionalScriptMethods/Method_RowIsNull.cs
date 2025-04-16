@@ -49,7 +49,7 @@ public class Method_RowIsNull : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(ld, "Kein Zeilenobjekt übergeben."); }
+        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben.", true, ld); }
 
         return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

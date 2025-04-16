@@ -68,14 +68,14 @@ internal class Method_DeleteFile : Method {
 
         foreach (var filn in files) {
             if (!filn.IsFormat(FormatHolder.FilepathAndName)) {
-                return new DoItFeedback(ld, "Dateinamen-Fehler!");
+                return new DoItFeedback("Dateinamen-Fehler!", true, ld);
             }
 
             if (IO.FileExists(filn)) {
                 try {
-                    if (!IO.DeleteFile(filn, false)) { return new DoItFeedback(ld, "Fehler beim Löschen: " + filn); }
+                    if (!IO.DeleteFile(filn, false)) { return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld); }
                 } catch {
-                    return new DoItFeedback(ld, "Fehler beim Löschen: " + filn);
+                    return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld);
                 }
             }
         }

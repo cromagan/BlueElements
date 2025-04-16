@@ -502,7 +502,7 @@ public static class Export {
                 _ = thisRow.CheckRow(); // Virtuelle Spalten
                 var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
 
-                if (!script.AllOk) {
+                if (script.Failed) {
                     f = f + thisRow.CellFirstString() + "\r\n";
                     onemled = script.ProtocolText;
                 }

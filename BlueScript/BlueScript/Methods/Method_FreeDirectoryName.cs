@@ -50,7 +50,7 @@ internal class Method_FreeDirectoryName : Method {
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback(ld, "Verzeichnis existiert nicht");
+            return new DoItFeedback("Verzeichnis existiert nicht", true, ld);
         }
 
         var zeichen = BlueBasics.Constants.Char_AZ.ToLowerInvariant() + BlueBasics.Constants.Char_Numerals + BlueBasics.Constants.Char_AZ.ToUpperInvariant();

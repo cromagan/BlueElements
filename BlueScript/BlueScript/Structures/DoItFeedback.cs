@@ -29,111 +29,104 @@ public readonly struct DoItFeedback {
     #region Constructors
 
     public DoItFeedback(Variable variable) {
-        AllOk = true;
+        NeedsScriptFix = false;
         Variable = variable;
         FailedReason = string.Empty;
     }
 
-    public DoItFeedback(LogData? ld, string errormessage) {
-        AllOk = false;
+    public DoItFeedback(string message, bool needsScriptFix, LogData? ld) {
+        NeedsScriptFix = needsScriptFix;
+        FailedReason = message;
         Variable = null;
-        FailedReason = string.Empty;
-        ld?.AddMessage(errormessage);
+        ld?.AddMessage(message);
     }
 
     public DoItFeedback(string valueString) {
-        AllOk = true;
+        NeedsScriptFix = false;
         FailedReason = string.Empty;
         Variable = new VariableString(Variable.DummyName(), valueString);
     }
 
     public DoItFeedback(List<string>? list) {
-        AllOk = true;
+        NeedsScriptFix = false;
         FailedReason = string.Empty;
         Variable = new VariableListString(list);
     }
 
     public DoItFeedback(Bitmap? bmp) {
-        AllOk = true;
+        NeedsScriptFix = false;
         FailedReason = string.Empty;
         Variable = new VariableBitmap(bmp);
     }
 
     public DoItFeedback(bool value) {
-        AllOk = true;
+        NeedsScriptFix = false;
         FailedReason = string.Empty;
         Variable = new VariableBool(value);
     }
 
     public DoItFeedback(double value) {
-        AllOk = true;
+        NeedsScriptFix = false;
         FailedReason = string.Empty;
         Variable = new VariableFloat((float)value);
     }
 
     public DoItFeedback(float value) {
-        AllOk = true;
+        NeedsScriptFix = false;
         FailedReason = string.Empty;
         Variable = new VariableFloat(value);
     }
 
-    public DoItFeedback(bool breakFired, bool endScript, string failedReason) : this() {
+    public DoItFeedback(string failedReason, bool breakFired, bool endScript) : this() {
         BreakFired = breakFired;
         EndScript = endScript;
         FailedReason = failedReason;
     }
 
     public DoItFeedback(IEnumerable<string> list) {
-        AllOk = true;
-        FailedReason = string.Empty;
         Variable = new VariableListString(list);
     }
 
-    public DoItFeedback() {
-        AllOk = true;
-        FailedReason = string.Empty;
-        Variable = null;
-    }
+    public DoItFeedback() { }
 
     #endregion
 
     #region Properties
 
-    public string FailedReason { get; }
-
-    public bool AllOk { get; }
     public bool BreakFired { get; } = false;
     public bool EndScript { get; } = false;
+    public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
+    public string FailedReason { get; } = string.Empty;
+    public bool NeedsScriptFix { get; } = false;
     public Variable? Variable { get; }
-    public bool Failed => !string.IsNullOrWhiteSpace(FailedReason);
 
     #endregion
 
     #region Methods
 
     public static DoItFeedback AttributFehler(LogData ld, Method method, SplittedAttributesFeedback f) =>
-        new(ld, "Befehl: " + method.Syntax + "\r\n" + f.ErrorMessage);
+        new("Befehl: " + method.Syntax + "\r\n" + f.ErrorMessage, true, ld);
 
     public static DoItFeedback Falsch() => new(false);
 
-    public static DoItFeedback FalscherDatentyp(LogData ld) => new(ld, "Falscher Datentyp.");
+    public static DoItFeedback FalscherDatentyp(LogData ld) => new("Falscher Datentyp.", true, ld);
 
-    public static DoItFeedback InternerFehler(LogData? ld) => new(ld, "Interner Programmierfehler. Admin verständigen.");
+    public static DoItFeedback InternerFehler(LogData? ld) => new("Interner Programmierfehler. Admin verständigen.", true, ld);
 
-    public static DoItFeedback KlammerFehler(LogData ld) => new(ld, "Fehler bei der Klammersetzung.");
-
-    public static DoItFeedback TestModusInaktiv(LogData ld) => new(ld, "Im Testmodus deaktiviert.");
+    public static DoItFeedback KlammerFehler(LogData ld) => new("Fehler bei der Klammersetzung.", true, ld);
 
     public static DoItFeedback Null() => new();
 
-    public static DoItFeedback Schreibgschützt(LogData ld) => new(ld, "Variable ist schreibgeschützt.");
+    public static DoItFeedback Schreibgschützt(LogData ld) => new("Variable ist schreibgeschützt.", true, ld);
+
+    public static DoItFeedback TestModusInaktiv(LogData ld) => new("Im Testmodus deaktiviert.", true, ld);
 
     public static DoItFeedback VerschiedeneTypen(LogData ld, Variable var1, Variable var2) =>
-        new(ld, $"Variable '{var1.KeyName}' ist nicht der erwartete Typ {var2.MyClassId}, sondern {var1.MyClassId}");
+        new($"Variable '{var1.KeyName}' ist nicht der erwartete Typ {var2.MyClassId}, sondern {var1.MyClassId}", true, ld);
 
     public static DoItFeedback Wahr() => new(true);
 
-    public static DoItFeedback WertKonnteNichtGesetztWerden(LogData ld, int atno) => new(ld, $"Der Wert das Attributes {atno + 1} konnte nicht gesetzt werden.");
+    public static DoItFeedback WertKonnteNichtGesetztWerden(LogData ld, int atno) => new($"Der Wert das Attributes {atno + 1} konnte nicht gesetzt werden.", true, ld);
 
     #endregion
 }

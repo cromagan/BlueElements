@@ -136,7 +136,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         var tmp = new ItemCollectionPadItem(layoutFileName);
         _ = tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
-        if (!scx.AllOk) { return -1; }
+        if (scx.Failed) { return -1; }
 
         var oneItem = tmp.UsedArea;
         pad.Items.SheetStyle = tmp.SheetStyle;

@@ -77,7 +77,7 @@ public class Method_CallByFilename : Method {
         ScriptEndedFeedback scx;
 
         if (scp.Stufe > 10) {
-            return new DoItFeedback(ld, "'" + subname + "' wird zu verschachtelt aufgerufen.");
+            return new DoItFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", true, ld);
         }
 
         var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");
@@ -104,19 +104,19 @@ public class Method_CallByFilename : Method {
 
             #endregion
 
-            if (!scx.AllOk) {
+            if (scx.Failed) {
                 // Beim Abbruch sollen die aktuellen Variabeln angezeigt werden
                 varCol.Clear();
                 _ = varCol.AddRange(tmpv);
             }
         }
 
-        if (!scx.AllOk) {
+        if (scx.Failed) {
             ld.Protocol.AddRange(scx.Protocol);
-            return new DoItFeedback(ld, "'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen");
+            return new DoItFeedback("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", true, ld);
         }
 
-        return new DoItFeedback(scx.BreakFired, scx.EndScript, scx.FailedReason);
+        return new DoItFeedback(scx.FailedReason, scx.BreakFired, scx.EndScript);
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
@@ -131,16 +131,16 @@ public class Method_CallByFilename : Method {
             } else if (FileExists(addp + vs)) {
                 f = File.ReadAllText(addp + vs, Encoding.UTF8);
             } else {
-                return new DoItFeedback(ld, "Datei nicht gefunden: " + vs);
+                return new DoItFeedback("Datei nicht gefunden: " + vs, true, ld);
             }
         } catch {
-            return new DoItFeedback(ld, "Fehler beim Lesen der Datei: " + vs);
+            return new DoItFeedback("Fehler beim Lesen der Datei: " + vs, true, ld);
         }
 
         (f, var error) = Script.ReduceText(f);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback(ld, "Fehler in Datei " + vs + ": " + error);
+            return new DoItFeedback("Fehler in Datei " + vs + ": " + error, true, ld);
         }
 
         #region Attributliste erzeugen
@@ -153,7 +153,7 @@ public class Method_CallByFilename : Method {
         #endregion
 
         var scx = CallSub(varCol, scp, ld, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null, a, vs);
-        if (!scx.AllOk) { return scx; }
+        if (scx.Failed) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }
 

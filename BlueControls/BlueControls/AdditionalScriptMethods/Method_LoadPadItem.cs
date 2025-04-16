@@ -68,7 +68,7 @@ internal class Method_LoadPadItem : Method {
         var filen = attvar.ValueStringGet(0);
 
         if (filen.FileType() is not FileFormat.BlueCreativeSymbol) {
-            return new DoItFeedback(ld, "Datei ist kein Symbol: " + filen);
+            return new DoItFeedback("Datei ist kein Symbol: " + filen, true, ld);
         }
 
         if (!IO.FileExists(filen)) {
@@ -83,7 +83,7 @@ internal class Method_LoadPadItem : Method {
             var i = ParsebleItem.NewByParsing<AbstractPadItem>(toparse);
 
             if (i is not { IsDisposed: false } api) {
-                return new DoItFeedback(ld, "Datei fehlerhaft: " + filen);
+                return new DoItFeedback("Datei fehlerhaft: " + filen, true, ld);
             }
 
             api.GetNewIdsForEverything();

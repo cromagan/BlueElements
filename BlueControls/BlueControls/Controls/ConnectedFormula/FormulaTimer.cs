@@ -95,9 +95,9 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
         var t = TimerPadItem.ExecuteScript(Script, Mode, _value0, _value1, _value2);
 
-        if (t.Failed || !t.AllOk) {
+        if (t.Failed) {
             _wasok = false;
-            capMessage.Text = "Skript fehlerhaft. " + t.ProtocolText;
+            capMessage.Text = "Skript fehlerhaft: " + t.FailedReason;
             return;
         }
 

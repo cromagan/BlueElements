@@ -57,7 +57,7 @@ internal class Method_DeleteDirectory : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
-        if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
+        if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         if (!IO.DirectoryExists(filn)) {
             return DoItFeedback.Wahr();
@@ -68,7 +68,7 @@ internal class Method_DeleteDirectory : Method {
         try {
             return new DoItFeedback(IO.DeleteDir(filn, false));
         } catch {
-            return new DoItFeedback(ld, "Fehler beim Löschen: " + filn);
+            return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld);
         }
     }
 

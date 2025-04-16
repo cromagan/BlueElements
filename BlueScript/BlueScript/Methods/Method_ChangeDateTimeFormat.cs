@@ -50,13 +50,13 @@ internal class Method_ChangeDateTimeFormat : Method {
         var d = attvar.ValueDateGet(0);
 
         if (d == null) {
-            return new DoItFeedback(ld, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
+            return new DoItFeedback("Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.", true, ld);
         }
 
         try {
             return new DoItFeedback(d.Value.ToString(attvar.ReadableText(1), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback(ld, "Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.");
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.", true, ld);
         }
     }
 

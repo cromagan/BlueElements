@@ -46,18 +46,18 @@ public class Method_LookupFilterFirstValue : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+        var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyDatabase(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
         if (allFi.Database is not { IsDisposed: false } db) {
             allFi.Dispose();
-            return new DoItFeedback(ld, "Datenbankfehler!");
+            return new DoItFeedback("Datenbankfehler!", true, ld);
         }
 
         var r = allFi.Rows;
         allFi.Dispose();
 
         var returncolumn = db.Column[attvar.ValueStringGet(0)];
-        if (returncolumn == null) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
+        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
 
         var l = new List<string>();
 
@@ -67,7 +67,7 @@ public class Method_LookupFilterFirstValue : Method_Database {
         }
 
         var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
-        if (v == null) { return new DoItFeedback(ld, $"Wert der Variable konnte nicht gelesen werden - ist die Spalte {returncolumn.KeyName} 'im Skript vorhanden'?"); }
+        if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte {returncolumn.KeyName} 'im Skript vorhanden'?", true, ld); }
         if (v is VariableListString vl) {
             l.AddRange(vl.ValueList);
         } else if (v is VariableString vs) {
@@ -77,7 +77,7 @@ public class Method_LookupFilterFirstValue : Method_Database {
             var w = vf.ValueForReplace;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {
-            return new DoItFeedback(ld, "Spaltentyp nicht unterstützt.");
+            return new DoItFeedback("Spaltentyp nicht unterstützt.", true, ld);
         }
 
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);

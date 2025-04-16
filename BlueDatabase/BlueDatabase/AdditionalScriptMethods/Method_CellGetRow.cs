@@ -49,14 +49,14 @@ public class Method_CellGetRow : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
-        if (row is not { IsDisposed: false }) { return new DoItFeedback(ld, "Zeile nicht gefunden"); }
-        if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Zeile"); }
-        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, $"In der Datenbank '{db.Caption}' sind die Skripte defekt"); }
+        if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
+        if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
+        if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, false); }
 
-        if (db.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
+        if (db.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
 
         var v = RowItem.CellToVariable(c, row, true, false);
-        if (v == null) { return new DoItFeedback(ld, $"Wert der Variable konnte nicht gelesen werden - ist die Spalte {c.KeyName} 'im Skript vorhanden'?"); }
+        if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte {c.KeyName} 'im Skript vorhanden'?", true, ld); }
 
         var l = new List<string>();
 
@@ -69,7 +69,7 @@ public class Method_CellGetRow : Method {
             var w = vf.ValueForReplace;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {
-            return new DoItFeedback(ld, "Spaltentyp nicht unterstützt.");
+            return new DoItFeedback("Spaltentyp nicht unterstützt.", true, ld);
         }
 
         return new DoItFeedback(l);

@@ -63,7 +63,7 @@ internal class Method_MaxDate : Method {
                 var ok = DateTimeTryParse(thisw, out var da);
 
                 if (!ok) {
-                    return new DoItFeedback(ld, "Wert kann nicht als Datum interpretiert werden: " + thisw);
+                    return new DoItFeedback("Wert kann nicht als Datum interpretiert werden: " + thisw, true, ld);
                 }
 
                 if (da.Subtract(d).TotalDays > 0) {
@@ -75,7 +75,7 @@ internal class Method_MaxDate : Method {
         try {
             return new DoItFeedback(d.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback(ld, "Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.");
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.", true, ld);
         }
     }
 

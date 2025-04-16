@@ -56,7 +56,7 @@ internal class Method_ConnectPoints : Method {
         if (attvar.Attributes[0] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
         if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (iciv.Parent is not ItemCollectionPadItem { IsDisposed: false }) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+        if (iciv.Parent is not ItemCollectionPadItem { IsDisposed: false }) { return new DoItFeedback("Das Item gehört keiner Collection an", true, ld); }
 
         if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null(); }
 

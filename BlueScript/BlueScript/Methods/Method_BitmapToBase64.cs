@@ -65,7 +65,7 @@ internal class Method_BitmapToBase64 : Method {
                 break;
 
             default:
-                return new DoItFeedback(ld, "Es wir als zweites Attribut ein String mit dem Inhalt bmp, jpg oder png erwartet.");
+                return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt bmp, jpg oder png erwartet.", true, ld);
         }
 
         return new DoItFeedback(x);

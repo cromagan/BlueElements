@@ -51,16 +51,16 @@ internal class Method_ImportCsv : Method_Database {
         var sep = attvar.ValueStringGet(1);
 
         var db = MyDatabase(scp);
-        if (db == null) { return new DoItFeedback(ld, "Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback("Datenbankfehler!", true, ld); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(false, false, $"Datenbanksperre: {m}"); }
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, false); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         var sx = db.ImportCsv(txt, true, true, sep, false, false);
 
-        return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(ld, sx);
+        return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(sx, true, ld);
     }
 
     #endregion

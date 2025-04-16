@@ -26,9 +26,9 @@ public readonly struct GetEndFeedback {
 
     #region Fields
 
-    internal readonly bool AllOk;
     internal readonly string AttributeText;
     internal readonly int ContinuePosition;
+    internal readonly string FailedReason = string.Empty;
     internal readonly Variable? Variable;
 
     #endregion
@@ -37,26 +37,30 @@ public readonly struct GetEndFeedback {
 
     public GetEndFeedback(Variable? variable) {
         ContinuePosition = 0;
-        AllOk = true;
         AttributeText = string.Empty;
         Variable = variable;
     }
 
-    public GetEndFeedback(string erromessage, LogData? ld) {
+    public GetEndFeedback(string failedReason, LogData? ld) {
         ContinuePosition = 0;
-        AllOk = false;
+        FailedReason = failedReason;
         AttributeText = string.Empty;
         Variable = null;
-        ld?.AddMessage(erromessage);
+        ld?.AddMessage(FailedReason);
     }
 
     public GetEndFeedback(int continuePosition, string attributetext) {
         ContinuePosition = continuePosition;
-        AllOk = true;
         AttributeText = attributetext;
         Variable = null;
         if (ContinuePosition == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
     }
+
+    #endregion
+
+    #region Properties
+
+    internal bool Failed => !string.IsNullOrWhiteSpace(FailedReason);
 
     #endregion
 }

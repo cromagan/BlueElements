@@ -57,7 +57,7 @@ internal class Method_MirrorPadItem : Method {
 
         if (attvar.Attributes[0] is VariablePadItem ici) {
             if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
-            if (iciv.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return new DoItFeedback(ld, "Das Item gehört keiner Collection an"); }
+            if (iciv.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return new DoItFeedback("Das Item gehört keiner Collection an", true, ld); }
             var p1 = icpi.GetJointPoint(attvar.ValueStringGet(1), null);
 
             if (iciv is IMirrorable m) {

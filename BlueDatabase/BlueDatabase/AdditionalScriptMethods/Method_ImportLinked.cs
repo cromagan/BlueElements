@@ -56,7 +56,7 @@ public class Method_ImportLinked : Method_Database {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(scp);
-        if (r?.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Zeilenfehler!"); }
+        if (r?.Database is not { IsDisposed: false } db) { return new DoItFeedback("Zeilenfehler!", true, ld); }
 
         #endregion
 
@@ -66,18 +66,18 @@ public class Method_ImportLinked : Method_Database {
             if (thisColumn.Function != ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { continue; }
 
             var linkedDatabase = thisColumn.LinkedDatabase;
-            if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback(ld, "Verlinkte Datenbank nicht vorhanden"); }
+            if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback("Verlinkte Datenbank nicht vorhanden", true, ld); }
 
-            if (!string.IsNullOrEmpty(linkedDatabase.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + linkedDatabase.Caption + "' sind die Skripte defekt"); }
+            if (!string.IsNullOrEmpty(linkedDatabase.NeedsScriptFix)) { return new DoItFeedback("In der Datenbank '" + linkedDatabase.Caption + "' sind die Skripte defekt", false, false); }
 
             var targetColumn = linkedDatabase.Column[thisColumn.ColumnNameOfLinkedDatabase];
-            if (targetColumn == null) { return new DoItFeedback(ld, "Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
+            if (targetColumn == null) { return new DoItFeedback("Die Spalte ist in der Zieldatenbank nicht vorhanden.", true, ld); }
 
             var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedDatabase, thisColumn, r, varCol);
-            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback(ld, "Berechnungsfehler: " + info); }
+            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback("Berechnungsfehler: " + info, true, ld); }
 
             var rows = fc.Rows;
-            if (rows.Count > 1) { return new DoItFeedback(ld, "Suchergebnis liefert mehrere Ergebnisse."); }
+            if (rows.Count > 1) { return new DoItFeedback("Suchergebnis liefert mehrere Ergebnisse.", true, ld); }
 
             var v = RowItem.CellToVariable(targetColumn, null, true, false);
 

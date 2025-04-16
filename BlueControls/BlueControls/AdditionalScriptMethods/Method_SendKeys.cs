@@ -44,7 +44,7 @@ internal class Method_SendKeys : Method {
         var keySequence = attvar.ValueStringGet(0);
 
         if (string.IsNullOrEmpty(keySequence)) {
-            return new DoItFeedback(ld, "Keine Tastatureingabe angegeben");
+            return new DoItFeedback("Keine Tastatureingabe angegeben", true, ld);
         }
 
         for (var i = 0; i < keySequence.Length; i++) {
@@ -53,12 +53,12 @@ internal class Method_SendKeys : Method {
             if (c == '{') {
                 var endBrace = keySequence.IndexOf('}', i);
                 if (endBrace == -1) {
-                    return new DoItFeedback(ld, "Fehlende schließende geschweifte Klammer");
+                    return new DoItFeedback("Fehlende schließende geschweifte Klammer", true, ld);
                 }
 
                 var specialKey = keySequence.Substring(i + 1, endBrace - i - 1).ToUpper();
                 if (!SendSpecialKey(specialKey)) {
-                    return new DoItFeedback(ld, "Unbekannte Spezialtaste: " + specialKey);
+                    return new DoItFeedback("Unbekannte Spezialtaste: " + specialKey, true, ld);
                 }
 
                 i = endBrace;

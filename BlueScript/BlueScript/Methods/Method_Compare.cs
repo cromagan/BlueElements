@@ -55,7 +55,7 @@ internal class Method_Compare : Method {
         string? firstval = null;
 
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.MyClassId(z) != attvar.MyClassId(2)) { return new DoItFeedback(ld, "Variablentypen unterschiedlich."); }
+            if (attvar.MyClassId(z) != attvar.MyClassId(2)) { return new DoItFeedback("Variablentypen unterschiedlich.", true, ld); }
 
             var hasval = !ignorenull;
             var val = string.Empty;

@@ -56,7 +56,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnTest = new BlueControls.Controls.Button();
             this.tabLastError = new System.Windows.Forms.TabPage();
             this.txbNeedFix = new BlueControls.Controls.TextBox();
-            this.btnDeleteScriptNeedFix = new BlueControls.Controls.Button();
+            this.btnDeleteNeedsScriptFix = new BlueControls.Controls.Button();
             this.btnSkriptÄnderungVerwerfen = new BlueControls.Controls.Button();
             this.btnScriptÜbertragen = new BlueControls.Controls.Button();
             this.grpInfos.SuspendLayout();
@@ -100,12 +100,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.grpAktionen.Controls.Add(this.btnScriptÜbertragen);
             this.grpAktionen.Controls.Add(this.btnSkriptÄnderungVerwerfen);
-            this.grpAktionen.Controls.Add(this.btnDeleteScriptNeedFix);
+            this.grpAktionen.Controls.Add(this.btnDeleteNeedsScriptFix);
             this.grpAktionen.Controls.Add(this.btnVersionErhöhen);
             this.grpAktionen.Location = new System.Drawing.Point(803, 3);
             this.grpAktionen.Size = new System.Drawing.Size(350, 75);
             this.grpAktionen.Controls.SetChildIndex(this.btnVersionErhöhen, 0);
-            this.grpAktionen.Controls.SetChildIndex(this.btnDeleteScriptNeedFix, 0);
+            this.grpAktionen.Controls.SetChildIndex(this.btnDeleteNeedsScriptFix, 0);
             this.grpAktionen.Controls.SetChildIndex(this.btnSkriptÄnderungVerwerfen, 0);
             this.grpAktionen.Controls.SetChildIndex(this.btnScriptÜbertragen, 0);
             // 
@@ -528,17 +528,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbNeedFix.Size = new System.Drawing.Size(770, 392);
             this.txbNeedFix.TabIndex = 0;
             // 
-            // btnDeleteScriptNeedFix
+            // btnDeleteNeedsScriptFix
             // 
-            this.btnDeleteScriptNeedFix.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnDeleteScriptNeedFix.ImageCode = "Warnung|16||1";
-            this.btnDeleteScriptNeedFix.Location = new System.Drawing.Point(168, 2);
-            this.btnDeleteScriptNeedFix.Name = "btnDeleteScriptNeedFix";
-            this.btnDeleteScriptNeedFix.QuickInfo = "Löscht den Fehlerspeicher";
-            this.btnDeleteScriptNeedFix.Size = new System.Drawing.Size(56, 66);
-            this.btnDeleteScriptNeedFix.TabIndex = 46;
-            this.btnDeleteScriptNeedFix.Text = "Fehler-speicher";
-            this.btnDeleteScriptNeedFix.Click += new System.EventHandler(this.btnDeleteScriptNeedFix_Click);
+            this.btnDeleteNeedsScriptFix.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnDeleteNeedsScriptFix.ImageCode = "Warnung|16||1";
+            this.btnDeleteNeedsScriptFix.Location = new System.Drawing.Point(168, 2);
+            this.btnDeleteNeedsScriptFix.Name = "btnDeleteNeedsScriptFix";
+            this.btnDeleteNeedsScriptFix.QuickInfo = "Löscht den Fehlerspeicher";
+            this.btnDeleteNeedsScriptFix.Size = new System.Drawing.Size(56, 66);
+            this.btnDeleteNeedsScriptFix.TabIndex = 46;
+            this.btnDeleteNeedsScriptFix.Text = "Fehler-speicher";
+            this.btnDeleteNeedsScriptFix.Click += new System.EventHandler(this.btnDeleteNeedsScriptFix_Click);
             // 
             // btnSkriptÄnderungVerwerfen
             // 
@@ -623,7 +623,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button chkAuslöser_Fehlerfrei;
         private TabPage tabLastError;
         private TextBox txbNeedFix;
-        private Button btnDeleteScriptNeedFix;
+        private Button btnDeleteNeedsScriptFix;
         private Button btnSkriptÄnderungVerwerfen;
         private Button btnScriptÜbertragen;
     }

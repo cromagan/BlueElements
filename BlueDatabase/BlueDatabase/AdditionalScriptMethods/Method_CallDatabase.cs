@@ -59,17 +59,17 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
-        if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
 
-        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
+        if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, false); }
 
-        if (db == MyDatabase(scp)) { return new DoItFeedback(ld, "Befehl Call benutzen!"); }
+        if (db == MyDatabase(scp)) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(false, false, $"Datenbanksperre: {m}"); }
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, false); }
 
         StackTrace stackTrace = new();
-        if (stackTrace.FrameCount > 400) { return new DoItFeedback(ld, "Stapelspeicherüberlauf"); }
+        if (stackTrace.FrameCount > 400) { return new DoItFeedback("Stapelspeicherüberlauf", true, ld); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
@@ -84,7 +84,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         var f = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
 
-        return !f.AllOk ? new DoItFeedback(ld, f.ProtocolText) : DoItFeedback.Null();
+        return f.Failed ? new DoItFeedback(f.ProtocolText, true, ld) : DoItFeedback.Null();
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1] + "," + args[2];

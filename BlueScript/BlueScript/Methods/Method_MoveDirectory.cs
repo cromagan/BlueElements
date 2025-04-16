@@ -56,7 +56,7 @@ internal class Method_MoveDirectory : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var sop = attvar.ValueStringGet(0);
-        if (!DirectoryExists(sop)) { return new DoItFeedback(ld, "Quell-Verzeichnis existiert nicht."); }
+        if (!DirectoryExists(sop)) { return new DoItFeedback("Quell-Verzeichnis existiert nicht.", true, ld); }
         var dep = attvar.ValueStringGet(1);
 
         if (DirectoryExists(dep)) { return DoItFeedback.Falsch(); }

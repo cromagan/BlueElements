@@ -25,11 +25,10 @@ public readonly struct DoItWithEndedPosFeedback {
 
     #region Fields
 
-    internal readonly bool AllOk;
-
-    internal readonly string NotSuccesfulReason = string.Empty;
     internal readonly bool BreakFired = false;
-    internal readonly bool EndSkript = false;
+    internal readonly bool EndScript = false;
+    internal readonly string FailedReason = string.Empty;
+    internal readonly bool NeedsScriptFix;
     internal readonly int Position;
     internal readonly Variable? Variable;
 
@@ -37,21 +36,28 @@ public readonly struct DoItWithEndedPosFeedback {
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(bool allOk, Variable? variable, int endpos, bool breakFired, bool endskript, string notSuccesfulReason) {
-        AllOk = allOk;
+    public DoItWithEndedPosFeedback(bool needsScriptFix, Variable? variable, int endpos, bool breakFired, bool endscript, string failedReason) {
+        NeedsScriptFix = needsScriptFix;
         Variable = variable;
         Position = endpos;
-        EndSkript = endskript;
+        EndScript = endscript;
         BreakFired = breakFired;
-        NotSuccesfulReason = notSuccesfulReason;
+        FailedReason = failedReason;
     }
 
-    public DoItWithEndedPosFeedback(string errormessage, LogData ld) {
+    public DoItWithEndedPosFeedback(bool needsScriptFix, string failedReason, LogData ld) {
         Position = -1;
-        AllOk = false;
+        NeedsScriptFix = needsScriptFix;
         Variable = null;
-        ld.AddMessage(errormessage);
+        FailedReason = failedReason;
+        ld.AddMessage(failedReason);
     }
+
+    #endregion
+
+    #region Properties
+
+    internal bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
 
     #endregion
 }

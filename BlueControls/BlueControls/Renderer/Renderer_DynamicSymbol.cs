@@ -54,7 +54,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
             var ok = DynamicSymbolPadItem.ExecuteScript(content, string.Empty, bmp);
 
-            if (!ok.AllOk) {
+            if (ok.Failed) {
                 using var gr2 = Graphics.FromImage(bmp);
                 gr2.DrawImage(QuickImage.Get(ImageCode.Warnung, 16), 0, 0);
             }

@@ -129,7 +129,7 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
                 }
                 db.EventScriptEdited = updatedScripts.AsReadOnly();
                 db.EventScript = db.EventScriptEdited;
-                db.ScriptNeedFix = string.Empty;
+                db.NeedsScriptFix = string.Empty;
             }
         }
 

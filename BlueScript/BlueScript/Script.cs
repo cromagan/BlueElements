@@ -87,11 +87,11 @@ public class Script {
 
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-            if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
+            if (f.MustAbort) { return new DoItWithEndedPosFeedback(true, f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 var fn = thisC.DoIt(varCol, f, scp);
-                return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
+                return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
             }
         }
 
@@ -108,12 +108,12 @@ public class Script {
                 if (pos + l < maxl) {
                     if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
                         var f = Method.GetEnd(scriptText, pos + l - 1, 1, ";", ld);
-                        if (!f.AllOk) {
-                            return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", ld);
+                        if (f.Failed) {
+                            return new DoItWithEndedPosFeedback(true, "Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", ld);
                         }
 
                         var fn = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.AttributeText + ";", false);
-                        return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
+                        return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
                     }
                 }
             }
@@ -126,16 +126,16 @@ public class Script {
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
             if (f.MustAbort) {
-                return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
+                return new DoItWithEndedPosFeedback(true,   f.ErrorMessage, ld);
             }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 if (expectedvariablefeedback) {
-                    return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld);
+                    return new DoItWithEndedPosFeedback(true, "Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld);
                 }
 
                 //if (thisC.MustUseReturnValue) {
-                return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
+                return new DoItWithEndedPosFeedback(true, "Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
                 //}
             }
         }
@@ -149,7 +149,7 @@ public class Script {
             //if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                return new DoItWithEndedPosFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", ld);
+                return new DoItWithEndedPosFeedback(true, "Dieser Befehl kann in diesen Skript nicht verwendet werden.", ld);
             }
         }
 
@@ -157,7 +157,7 @@ public class Script {
 
         var bef = (scriptText.Substring(pos) + "¶").SplitBy("¶");
 
-        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], ld);
+        return new DoItWithEndedPosFeedback(true, "Kann nicht geparsed werden: " + bef[0], ld);
     }
 
     public static int Line(string? txt, int? pos) => pos == null || txt == null ? 0 : txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
@@ -183,7 +183,7 @@ public class Script {
             if (pos >= redScriptText.Length || endScript) {
                 Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
-                return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, endScript, string.Empty);
+                return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, endScript, string.Empty);
             }
 
             if (redScriptText.Substring(pos, 1) == "¶") {
@@ -191,23 +191,23 @@ public class Script {
                 ld.LineAdd(1);
             } else {
                 var f = CommandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
-                if (!f.AllOk) {
+                if (f.Failed) {
                     Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE wegen Fehler {ld.Protocol.Last()}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, false, string.Empty);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, string.Empty);
                 }
 
-                if (!string.IsNullOrWhiteSpace(f.NotSuccesfulReason)) {
-                    Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {f.NotSuccesfulReason}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, false, f.NotSuccesfulReason);
+                if (!string.IsNullOrWhiteSpace(f.FailedReason)) {
+                    Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {f.FailedReason}", scp.Stufe);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, f.FailedReason);
                 }
 
-                endScript = f.EndSkript;
+                endScript = f.EndScript;
 
                 pos = f.Position;
                 ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
                 if (f.BreakFired) {
                     Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, true, false, string.Empty);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty);
                 }
             }
         } while (true);

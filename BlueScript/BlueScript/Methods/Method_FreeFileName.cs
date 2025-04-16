@@ -52,7 +52,7 @@ internal class Method_FreeFileName : Method {
         var suf = attvar.ValueStringGet(2);
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback(ld, "Verzeichnis existiert nicht");
+            return new DoItFeedback("Verzeichnis existiert nicht", true, ld);
         }
 
         if (!string.IsNullOrEmpty(nam)) {

@@ -55,7 +55,7 @@ internal class Method_AddPadItem : Method {
         if (attvar.Attributes[1] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
         if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (iciv.Parent != null) { return new DoItFeedback(ld, "Das Item gehört breits einer Collection an"); }
+        if (iciv.Parent != null) { return new DoItFeedback("Das Item gehört breits einer Collection an", true, ld); }
 
         icpv.Add(iciv);
 

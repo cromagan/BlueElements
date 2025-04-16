@@ -51,7 +51,7 @@ internal class Method_GetFiles : Method {
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback(ld, "Verzeichnis existiert nicht");
+            return new DoItFeedback("Verzeichnis existiert nicht", true, ld);
         }
 
         try {

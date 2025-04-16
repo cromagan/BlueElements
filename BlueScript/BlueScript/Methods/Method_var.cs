@@ -47,11 +47,9 @@ internal class Method_Var : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.LogData, "Kein Text angekommen."); }
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen.", true, infos.LogData); }
 
-        var vbe = VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
-
-        return vbe.AllOk ? vbe : vbe;
+        return VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

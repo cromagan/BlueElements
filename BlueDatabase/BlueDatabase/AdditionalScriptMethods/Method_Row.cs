@@ -84,30 +84,30 @@ public class Method_Row : Method_Database, IUseableForButton {
         RowItem? newrow;
         string message;
 
-        if (invalidateinDays < 0.01) { return new DoItFeedback(ld, "Intervall zu kurz."); }
+        if (invalidateinDays < 0.01) { return new DoItFeedback("Intervall zu kurz.", true, ld); }
 
-        if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback(ld, "Fehler in der Filter"); }
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback(ld, "Zeilen-Status-Spalte nicht gefunden"); }
+        if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Filter", true, ld); }
+        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback("Zeilen-Status-Spalte nicht gefunden", true, ld); }
 
         foreach (var thisFi in fic) {
             if (thisFi.Column is not { IsDisposed: false } c) {
-                return new DoItFeedback(ld, "Fehler im Filter, Spalte ungültig");
+                return new DoItFeedback("Fehler im Filter, Spalte ungültig", true, ld);
             }
 
             if (thisFi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) {
-                return new DoItFeedback(ld, "Fehler im Filter, nur 'is' ist erlaubt");
+                return new DoItFeedback("Fehler im Filter, nur 'is' ist erlaubt", true, ld);
             }
 
             if (thisFi.SearchValue.Count != 1) {
-                return new DoItFeedback(ld, "Fehler im Filter, ein einzelner Suchwert wird benötigt");
+                return new DoItFeedback("Fehler im Filter, ein einzelner Suchwert wird benötigt", true, ld);
             }
 
             if (FilterCollection.InitValue(c, true, fic.ToArray()) is not { } l) {
-                return new DoItFeedback(ld, "Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.");
+                return new DoItFeedback("Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.", true, ld);
             }
 
             if (thisFi.SearchValue[0] != l) {
-                return new DoItFeedback(ld, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')");
+                return new DoItFeedback("Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')", true, ld);
             }
         }
 
@@ -126,7 +126,7 @@ public class Method_Row : Method_Database, IUseableForButton {
             Generic.Pause(5, false);
         } while (true);
 
-        if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(ld, message); }
+        if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(message, true, ld); }
 
         if (newrow is { IsDisposed: false } r) {
             _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(r);
@@ -138,13 +138,13 @@ public class Method_Row : Method_Database, IUseableForButton {
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 var m = CellCollection.EditableErrorReason(srs, r, EditableErrorReasonType.EditAcut, false, false, true, false, null);
-                if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(false, false, $"Datenbanksperre: {m}"); }
+                if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, false); }
                 r.InvalidateRowState(coment);
             } else {
                 Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Kein Zeilenupdate, da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
-            return new DoItFeedback(false, false, "Zeile konnte nicht angelegt werden");
+            return new DoItFeedback("Zeile konnte nicht angelegt werden", false, false);
         }
 
         return RowToObjectFeedback(newrow);
@@ -154,8 +154,8 @@ public class Method_Row : Method_Database, IUseableForButton {
         var mydb = MyDatabase(scp);
         if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
 
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, mydb, scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+        var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, mydb, scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
         var d = attvar.ValueNumGet(0);
 

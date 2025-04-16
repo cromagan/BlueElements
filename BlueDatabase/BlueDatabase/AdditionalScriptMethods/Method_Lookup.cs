@@ -48,17 +48,17 @@ public class Method_Lookup : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
-        if (db == null) { return new DoItFeedback(ld, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
 
-        if (!string.IsNullOrEmpty(db.ScriptNeedFix)) { return new DoItFeedback(ld, "In der Datenbank '" + attvar.ValueStringGet(0) + "' sind die Skripte defekt"); }
+        if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, false); }
 
         var c = db.Column[attvar.ValueStringGet(2)];
         if (c == null) {
-            return new DoItFeedback(ld, "Spalte nicht gefunden: " + attvar.ValueStringGet(2));
+            return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(2), true, ld);
         }
 
         if (db.Column.First() is not { IsDisposed: false } cf) {
-            return new DoItFeedback(ld, "Erste Spalte der Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
+            return new DoItFeedback("Erste Spalte der Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld);
         }
 
         var r = RowCollection.MatchesTo(new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));

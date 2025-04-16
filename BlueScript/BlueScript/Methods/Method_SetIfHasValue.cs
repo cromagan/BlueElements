@@ -50,7 +50,7 @@ internal class Method_SetIfHasValue : Method {
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableUnknown) { continue; }
-            if (attvar.MyClassId(z) != attvar.MyClassId(0)) { return new DoItFeedback(ld, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
+            if (attvar.MyClassId(z) != attvar.MyClassId(0)) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich.", true, ld); }
 
             switch (attvar.Attributes[z]) {
                 case VariableFloat vf:

@@ -71,8 +71,8 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         #region  Filter ermitteln (allfi)
 
-        var (allFi, errorreason) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myDb, scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback(ld, $"Filter-Fehler: {errorreason}"); }
+        var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myDb, scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
         #endregion
 
@@ -82,13 +82,13 @@ internal class Method_Export : Method_Database, IUseableForButton {
 
         if (myDb == null || allFi.Database != myDb) {
             allFi.Dispose();
-            return new DoItFeedback(ld, "Datenbankfehler!");
+            return new DoItFeedback("Datenbankfehler!", true, ld);
         }
 
         allFi.Dispose();
 
         if (!myDb.BeSureAllDataLoaded(-1)) {
-            return new DoItFeedback(ld, "Datenbank konnte nicht aktualisiert werden.");
+            return new DoItFeedback("Datenbank konnte nicht aktualisiert werden.", true, ld);
         }
 
         #endregion
@@ -102,22 +102,22 @@ internal class Method_Export : Method_Database, IUseableForButton {
             cu = tcvc[0];
         }
 
-        if (cu == null) { return new DoItFeedback(ld, "Ansicht-Fehler!"); }
+        if (cu == null) { return new DoItFeedback("Ansicht-Fehler!", true, ld); }
 
         #endregion
 
         #region  Dateinamen ermitteln (filn)
 
         var filn = attvar.ValueStringGet(0);
-        if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
-        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
+        if (string.IsNullOrEmpty(filn)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
+        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         var pf = filn.PathParent();
-        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback(ld, "Dateinamen-Fehler!"); }
-        if (!Directory.Exists(pf)) { return new DoItFeedback(ld, "Verzeichniss existiert nicht"); }
-        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback(ld, "Keine Schreibrechte im Zielverzeichniss."); }
+        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
+        if (!Directory.Exists(pf)) { return new DoItFeedback("Verzeichniss existiert nicht", true, ld); }
+        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback("Keine Schreibrechte im Zielverzeichniss.", true, ld); }
 
-        if (File.Exists(filn)) { return new DoItFeedback(ld, "Datei existiert bereits."); }
+        if (File.Exists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 
         #endregion
 
@@ -129,15 +129,15 @@ internal class Method_Export : Method_Database, IUseableForButton {
                 case "BDB": {
                         var chunks = DatabaseChunk.GenerateNewChunks(myDb, 100, myDb.FileStateUtcDate, false);
 
-                        if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
+                        if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
                         _ = mainchunk.Save(filn, 100);
                         break;
                     }
 
                 case "CSV":
                     var t = myDb.Export_CSV(FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
-                    if (string.IsNullOrEmpty(t)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Daten."); }
-                    if (!IO.WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback(ld, "Fehler beim Erzeugen der Datei."); }
+                    if (string.IsNullOrEmpty(t)) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
+                    if (!IO.WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld); }
                     break;
 
                 //case "HTML":
@@ -146,10 +146,10 @@ internal class Method_Export : Method_Database, IUseableForButton {
                 //    break;
 
                 default:
-                    return new DoItFeedback(ld, "Export-Format unbekannt.");
+                    return new DoItFeedback("Export-Format unbekannt.", true, ld);
             }
         } catch {
-            return new DoItFeedback(ld, "Allgemeiner Fehler beim Erzeugen der Daten.");
+            return new DoItFeedback("Allgemeiner Fehler beim Erzeugen der Daten.", true, ld);
         }
 
         return DoItFeedback.Null();

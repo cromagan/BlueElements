@@ -49,7 +49,7 @@ internal class Method_Element : Method {
         var i = attvar.ValueIntGet(1);
         var list = attvar.ValueListStringGet(0);
         return i < 0 || i >= list.Count
-            ? new DoItFeedback(ld, "Element '" + i + "' nicht in der Liste vorhanden")
+            ? new DoItFeedback("Element '" + i + "' nicht in der Liste vorhanden", true, ld)
             : new DoItFeedback(list[i]);
     }
 

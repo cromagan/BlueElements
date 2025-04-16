@@ -66,7 +66,7 @@ internal class Method_IsNullOrZero : Method {
             return DoItFeedback.Falsch();
         }
 
-        return new DoItFeedback(infos.LogData, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
+        return new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.", true, infos.LogData);
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

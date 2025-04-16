@@ -25,79 +25,77 @@ namespace BlueScript.Structures;
 
 public class ScriptEndedFeedback {
 
-    #region Constructors
+	#region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool scriptNeedFix, bool breakFired, bool endscript, string notSuccesfulReason) {
-        Variables = variables;
-        GiveItAnotherTry = false;
-        Protocol = protocol;
-        AllOk = allOk;
-        ProtocolText = GenNiceProtokoll(protocol);
-        BreakFired = breakFired;
-        EndScript = endscript;
+	public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool needsScriptFix, bool breakFired, bool endscript, string failedReason) {
+		Variables = variables;
+		GiveItAnotherTry = false;
+		Protocol = protocol;
 
-        FailedReason = notSuccesfulReason;
-        ScriptNeedFix = scriptNeedFix;
-    }
+		ProtocolText = GenNiceProtokoll(protocol);
+		BreakFired = breakFired;
+		EndScript = endscript;
 
-    /// <summary>
-    /// Wird ausschließlich verwendet, wenn eine Vorabprüfung scheitert,
-    /// und das Skript erst gar nicht gestartet wird.
-    /// </summary>
-    /// <param name="errormessage"></param>
-    /// <param name="giveitanothertry"></param>
-    /// <param name="scriptNeedFix"></param>
-    /// <param name="scriptname"></param>
-    public ScriptEndedFeedback(string errormessage, bool giveitanothertry, bool scriptNeedFix, string scriptname) {
-        Variables = null;
+		FailedReason = failedReason;
+		NeedsScriptFix = needsScriptFix;
+	}
 
-        GiveItAnotherTry = giveitanothertry;
+	/// <summary>
+	/// Wird ausschließlich verwendet, wenn eine Vorabprüfung scheitert,
+	/// und das Skript erst gar nicht gestartet wird.
+	/// </summary>
+	/// <param name="failedReason"></param>
+	/// <param name="giveitanothertry"></param>
+	/// <param name="needsScriptFix"></param>
+	/// <param name="scriptname"></param>
+	public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) {
+		Variables = null;
 
-        Protocol = ["[" + scriptname + ", Start abgebrochen]@" + errormessage];
-        ProtocolText = GenNiceProtokoll(Protocol);
+		GiveItAnotherTry = giveitanothertry;
 
-        AllOk = false;
-        FailedReason = "Start abgebrochen: " + errormessage;
-        ScriptNeedFix = scriptNeedFix;
-    }
+		Protocol = ["[" + scriptname + ", Start abgebrochen]@" + failedReason];
+		ProtocolText = GenNiceProtokoll(Protocol);
 
-    /// <summary>
-    /// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
-    /// </summary>
-    public ScriptEndedFeedback(VariableCollection variables, string failedReason) {
-        GiveItAnotherTry = false;
 
-        Protocol = [];
-        ProtocolText = string.Empty;
+		FailedReason = "Start abgebrochen: " + failedReason;
+		NeedsScriptFix = needsScriptFix;
+	}
 
-        AllOk = true;
-        ScriptNeedFix = false;
-        FailedReason = failedReason;
-        Variables = variables;
-    }
+	/// <summary>
+	/// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
+	/// </summary>
+	public ScriptEndedFeedback(VariableCollection variables, string failedReason) {
+		GiveItAnotherTry = false;
 
-    #endregion
+		Protocol = [];
+		ProtocolText = string.Empty;
 
-    #region Properties
+		NeedsScriptFix = false;
+		FailedReason = failedReason;
+		Variables = variables;
+	}
 
-    public bool AllOk { get; }
-    public bool BreakFired { get; }
-    public bool EndScript { get; }
+	#endregion
 
-    public bool GiveItAnotherTry { get; }
-    public string FailedReason { get; }
-    public List<string> Protocol { get; }
-    public string ProtocolText { get; }
-    public bool ScriptNeedFix { get; }
+	#region Properties
 
-    public bool Failed => !string.IsNullOrWhiteSpace(FailedReason);
-    public VariableCollection? Variables { get; }
+	public bool BreakFired { get; }
+	public bool EndScript { get; }
 
-    #endregion
+	public bool GiveItAnotherTry { get; }
+	public string FailedReason { get; }
+	public List<string> Protocol { get; }
+	public string ProtocolText { get; }
+	public bool NeedsScriptFix { get; }
 
-    #region Methods
+	public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
+	public VariableCollection? Variables { get; }
 
-    private static string GenNiceProtokoll(IEnumerable<string> protokoll) => "Skript-Protokoll:\r\n\r\n" + protokoll.JoinWith("\r\n\r\n").Replace("]@", "]\r\n");
+	#endregion
 
-    #endregion
+	#region Methods
+
+	private static string GenNiceProtokoll(IEnumerable<string> protokoll) => "Skript-Protokoll:\r\n\r\n" + protokoll.JoinWith("\r\n\r\n").Replace("]@", "]\r\n");
+
+	#endregion
 }

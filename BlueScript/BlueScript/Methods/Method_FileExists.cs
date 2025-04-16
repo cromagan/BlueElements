@@ -51,7 +51,7 @@ internal class Method_FileExists : Method {
         var filn = attvar.ValueStringGet(0);
 
         return !filn.IsFormat(FormatHolder.FilepathAndName)
-            ? new DoItFeedback(ld, "Dateinamen-Fehler!")
+            ? new DoItFeedback("Dateinamen-Fehler!", true, ld)
             : new DoItFeedback(IO.FileExists(filn));
     }
 
