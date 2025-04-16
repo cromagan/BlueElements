@@ -23,10 +23,10 @@ public readonly struct CanDoFeedback {
 
     #region Constructors
 
-    public CanDoFeedback(int errorposition, string errormessage, bool mustabort, LogData ld) {
+    public CanDoFeedback(int errorposition, string message, bool needsScriptFix, LogData ld) {
         ContinueOrErrorPosition = errorposition;
-        ErrorMessage = errormessage;
-        MustAbort = mustabort;
+        Message = message;
+        NeedsScriptFix = needsScriptFix;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
         LogData = ld;
@@ -34,8 +34,8 @@ public readonly struct CanDoFeedback {
 
     public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, LogData ld) {
         ContinueOrErrorPosition = continuePosition;
-        ErrorMessage = string.Empty;
-        MustAbort = false;
+        Message = string.Empty;
+        NeedsScriptFix = false;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
         LogData = ld;
@@ -65,14 +65,14 @@ public readonly struct CanDoFeedback {
     /// <summary>
     /// Gibt empty zurück, wenn der Befehl ausgeführt werden kann.
     /// Ansonsten den Grund, warum er nicht ausgeführt werden kann.
-    /// Nur in Zusammenhang mit MustAbort zu benutzen, weil hier auch einfach die Meldung sein kann, dass der Befehl nicht erkannt wurde - was an sich kein Fehler ist.
+    /// Nur in Zusammenhang mit NeedsScriptFix zu benutzen, weil hier auch einfach die Meldung sein kann, dass der Befehl nicht erkannt wurde - was an sich kein Fehler ist.
     /// </summary>
-    public string ErrorMessage { get; }
+    public string Message { get; }
 
     /// <summary>
     /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
     /// </summary>
-    public bool MustAbort { get; }
+    public bool NeedsScriptFix { get; }
 
     #endregion
 }

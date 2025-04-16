@@ -87,9 +87,9 @@ public class Script {
 
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-            if (f.MustAbort) { return new DoItWithEndedPosFeedback(true, f.ErrorMessage, ld); }
+            if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(true, f.Message, ld); }
 
-            if (string.IsNullOrEmpty(f.ErrorMessage)) {
+            if (string.IsNullOrEmpty(f.Message)) {
                 var fn = thisC.DoIt(varCol, f, scp);
                 return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.FailedReason);
             }
@@ -125,11 +125,11 @@ public class Script {
 
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
-            if (f.MustAbort) {
-                return new DoItWithEndedPosFeedback(true,   f.ErrorMessage, ld);
+            if (f.NeedsScriptFix) {
+                return new DoItWithEndedPosFeedback(true,   f.Message, ld);
             }
 
-            if (string.IsNullOrEmpty(f.ErrorMessage)) {
+            if (string.IsNullOrEmpty(f.Message)) {
                 if (expectedvariablefeedback) {
                     return new DoItWithEndedPosFeedback(true, "Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld);
                 }
@@ -146,9 +146,9 @@ public class Script {
 
         foreach (var thisC in Method.AllMethods) {
             var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-            //if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
+            //if (f.ScriptNeedFix) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
-            if (string.IsNullOrEmpty(f.ErrorMessage)) {
+            if (string.IsNullOrEmpty(f.Message)) {
                 return new DoItWithEndedPosFeedback(true, "Dieser Befehl kann in diesen Skript nicht verwendet werden.", ld);
             }
         }
