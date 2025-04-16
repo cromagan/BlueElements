@@ -74,7 +74,7 @@ public class Method_ImportLinked : Method_Database {
             if (targetColumn == null) { return new DoItFeedback("Die Spalte ist in der Zieldatenbank nicht vorhanden.", true, ld); }
 
             var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedDatabase, thisColumn, r, varCol);
-            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback("Berechnungsfehler: " + info, true, ld); }
+            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback("Berechnungsfehler im Datenbankkopf der verlinkten Zellen: " + info, true, ld); }
 
             var rows = fc.Rows;
             if (rows.Count > 1) { return new DoItFeedback("Suchergebnis liefert mehrere Ergebnisse.", true, ld); }

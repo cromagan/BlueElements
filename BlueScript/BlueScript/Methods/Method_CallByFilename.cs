@@ -113,7 +113,7 @@ public class Method_CallByFilename : Method {
 
         if (scx.Failed) {
             ld.Protocol.AddRange(scx.Protocol);
-            return new DoItFeedback("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", true, ld);
+            return new DoItFeedback("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", scx.NeedsScriptFix, ld);
         }
 
         return new DoItFeedback(scx.BreakFired, scx.EndScript);

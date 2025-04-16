@@ -1073,7 +1073,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (count > 9) { return false; }
             }
         }
-        return false;
+        return true;
     }
 
     public virtual bool BeSureAllDataLoaded(int anzahl) => !IsDisposed && BeSureToBeUpToDate();

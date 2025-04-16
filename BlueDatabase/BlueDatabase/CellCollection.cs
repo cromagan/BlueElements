@@ -217,7 +217,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             var x = thisFi.SplitBy("|");
             var c = linkedDatabase?.Column[x[0]];
-            if (c == null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
+            if (c == null) { return (null, $"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
 
             if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
 

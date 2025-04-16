@@ -78,7 +78,7 @@ public class Script {
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
         if (scriptText.Length > pos && scriptText.Substring(pos, 1) == ";") {
-            return new DoItWithEndedPosFeedback(true, null, pos + 1, false, false, string.Empty, ld);
+            return new DoItWithEndedPosFeedback(false, null, pos + 1, false, false, string.Empty, ld);
         }
 
         #endregion
@@ -192,13 +192,8 @@ public class Script {
             } else {
                 var f = CommandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
                 if (f.Failed) {
-                    Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE wegen Fehler {ld.Protocol.Last()}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, string.Empty);
-                }
-
-                if (!string.IsNullOrWhiteSpace(f.FailedReason)) {
                     Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {f.FailedReason}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, f.FailedReason);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, f.NeedsScriptFix, false, false, f.FailedReason);
                 }
 
                 endScript = f.EndScript;
