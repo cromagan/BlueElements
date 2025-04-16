@@ -107,10 +107,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _globalShowPass = string.Empty;
 
     private bool _isInSave;
+    private string _needsScriptFix = string.Empty;
     private DateTime _powerEditTime = DateTime.MinValue;
     private bool _readOnly;
     private bool _saveRequired = false;
-    private string _needsScriptFix = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -376,6 +376,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public virtual bool MasterNeeded => false;
 
+    public string NeedsScriptFix {
+        get => _needsScriptFix;
+        set {
+            if (_needsScriptFix == value) { return; }
+            _ = ChangeData(DatabaseDataType.NeedsScriptFix, null, null, _needsScriptFix, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+        }
+    }
+
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
         get => new(_permissionGroupsNewRow);
         set {
@@ -402,14 +410,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public RowCollection Row { get; }
-
-    public string NeedsScriptFix {
-        get => _needsScriptFix;
-        set {
-            if (_needsScriptFix == value) { return; }
-            _ = ChangeData(DatabaseDataType.NeedsScriptFix, null, null, _needsScriptFix, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
-        }
-    }
 
     public RowSortDefinition? SortDefinition {
         get => _sortDefinition;
@@ -1063,6 +1063,19 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <returns></returns>
     public virtual bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) => string.IsNullOrEmpty(FreezedReason);
 
+    public bool AreScriptsExecutable() {
+        if (!string.IsNullOrEmpty(_needsScriptFix)) { return false; }
+
+        int count = 0;
+        foreach (var key in RowCollection.FailedRows.Keys) {
+            if (key.Database == this) {
+                count++;
+                if (count > 9) { return false; }
+            }
+        }
+        return false;
+    }
+
     public virtual bool BeSureAllDataLoaded(int anzahl) => !IsDisposed && BeSureToBeUpToDate();
 
     public virtual bool BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) => true;
@@ -1345,7 +1358,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         var name = script?.KeyName ?? "Allgemein";
 
-        if (!ignoreError && !string.IsNullOrEmpty(NeedsScriptFix)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
+        if (!ignoreError && !AreScriptsExecutable()) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
 
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
@@ -1926,7 +1939,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; } // Nicht ReadOnly!
-        if (checkMessageTo && !string.IsNullOrEmpty(_needsScriptFix)) { return false; }
+        if (checkMessageTo && !AreScriptsExecutable()) { return false; }
         return true;
     }
 

@@ -910,7 +910,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db1.Column.ColumnAdded -= _Database_ViewChanged;
             db1.ProgressbarInfo -= _Database_ProgressbarInfo;
             db1.DisposingEvent -= _database_Disposing;
-            db1.InvalidateView -= Database_InvalidateView;
+            db1.InvalidateView -= Database_InvalidateView;            
             Database.ForceSaveAll();
             MultiUserFile.SaveAll(false);
         }
@@ -3336,12 +3336,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
 
             if (db.IsAdministrator() && !db.ReadOnly) {
-                if (!string.IsNullOrEmpty(db.NeedsScriptFix)) {
+                if (!db.AreScriptsExecutable()) {
                     gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, FilterleisteHeight + 8);
                     ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, FilterleisteHeight + 12);
                 } else {
                     foreach (var thisColumnItem in db.Column) {
-                        if (thisColumnItem.LinkedDatabase is { IsDisposed: false } dbl && !string.IsNullOrEmpty(dbl.NeedsScriptFix)) {
+                        if (thisColumnItem.LinkedDatabase is { IsDisposed: false } dbl && !dbl.AreScriptsExecutable()) {
                             gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, FilterleisteHeight + 8);
                             ca.Font_RowChapter.DrawString(gr, $"Skripte von {dbl.Caption} müssen repariert werden", 90, FilterleisteHeight + 12);
                         }
@@ -3938,7 +3938,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (db.Column.Count == 0) { return false; }
         if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return false; }
 
-        if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return false; }
+        if (!db.AreScriptsExecutable()) { return false; }
 
         if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
 

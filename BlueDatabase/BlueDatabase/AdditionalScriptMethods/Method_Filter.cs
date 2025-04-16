@@ -68,7 +68,7 @@ public class Method_Filter : Method_Database {
 
                 if (db.IsDisposed) { return (null, "Datenbankfehler!", false); }
 
-                if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", false); }
+                if (!db.AreScriptsExecutable()) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", false); }
             }
 
             if (!fii.IsOk()) { return (null, $"Der Filter des Attributes {z + 1} ist fehlerhaft.", true); }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
@@ -117,7 +117,7 @@ public class Method_Filter : Method_Database {
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
         if (db == null) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
 
-        if (!string.IsNullOrEmpty(db.NeedsScriptFix)) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        if (!db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
         #region Spalte ermitteln
 
