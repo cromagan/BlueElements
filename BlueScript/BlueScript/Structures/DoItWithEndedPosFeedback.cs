@@ -21,43 +21,27 @@ using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
-public readonly struct DoItWithEndedPosFeedback {
-
-    #region Fields
-
-    internal readonly bool BreakFired = false;
-    internal readonly bool EndScript = false;
-    internal readonly string FailedReason = string.Empty;
-    internal readonly bool NeedsScriptFix;
-    internal readonly int Position;
-    internal readonly Variable? Variable;
-
-    #endregion
+/// <summary>
+/// Extended feedback structure that includes position information
+/// </summary>
+public class DoItWithEndedPosFeedback : DoItFeedback {
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(bool needsScriptFix, Variable? variable, int endpos, bool breakFired, bool endscript, string failedReason) {
-        NeedsScriptFix = needsScriptFix;
+    public DoItWithEndedPosFeedback(bool needsScriptFix, Variable? variable, int endpos, bool breakFired, bool endscript, string failedReason, LogData? ld) : base(failedReason, needsScriptFix, ld) {
         Variable = variable;
         Position = endpos;
         EndScript = endscript;
         BreakFired = breakFired;
-        FailedReason = failedReason;
     }
 
-    public DoItWithEndedPosFeedback(bool needsScriptFix, string failedReason, LogData ld) {
-        Position = -1;
-        NeedsScriptFix = needsScriptFix;
-        Variable = null;
-        FailedReason = failedReason;
-        ld.AddMessage(failedReason);
-    }
+    public DoItWithEndedPosFeedback(string failedReason, bool needsScriptFix, LogData ld) : base(failedReason, needsScriptFix, ld) { }
 
     #endregion
 
     #region Properties
 
-    internal bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
+    public int Position { get; } = -1;
 
     #endregion
 }

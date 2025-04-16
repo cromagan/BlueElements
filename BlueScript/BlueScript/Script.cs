@@ -87,7 +87,7 @@ public class Script {
 
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-            if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(true, f.Message, ld); }
+            if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.Message, true, ld); }
 
             if (string.IsNullOrEmpty(f.Message)) {
                 var fn = thisC.DoIt(varCol, f, scp);
@@ -109,7 +109,7 @@ public class Script {
                     if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
                         var f = Method.GetEnd(scriptText, pos + l - 1, 1, ";", ld);
                         if (f.Failed) {
-                            return new DoItWithEndedPosFeedback(true, "Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", ld);
+                            return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, ld);
                         }
 
                         var fn = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.AttributeText + ";", false);
@@ -126,16 +126,16 @@ public class Script {
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
             if (f.NeedsScriptFix) {
-                return new DoItWithEndedPosFeedback(true,   f.Message, ld);
+                return new DoItWithEndedPosFeedback(f.Message, true, ld);
             }
 
             if (string.IsNullOrEmpty(f.Message)) {
                 if (expectedvariablefeedback) {
-                    return new DoItWithEndedPosFeedback(true, "Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld);
+                    return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), true, ld);
                 }
 
                 //if (thisC.MustUseReturnValue) {
-                return new DoItWithEndedPosFeedback(true, "Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
+                return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), true, ld);
                 //}
             }
         }
@@ -149,7 +149,7 @@ public class Script {
             //if (f.ScriptNeedFix) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.Message)) {
-                return new DoItWithEndedPosFeedback(true, "Dieser Befehl kann in diesen Skript nicht verwendet werden.", ld);
+                return new DoItWithEndedPosFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", true, ld);
             }
         }
 
@@ -157,7 +157,7 @@ public class Script {
 
         var bef = (scriptText.Substring(pos) + "¶").SplitBy("¶");
 
-        return new DoItWithEndedPosFeedback(true, "Kann nicht geparsed werden: " + bef[0], ld);
+        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], true, ld);
     }
 
     public static int Line(string? txt, int? pos) => pos == null || txt == null ? 0 : txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;

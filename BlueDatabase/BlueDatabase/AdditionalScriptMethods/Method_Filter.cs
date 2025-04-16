@@ -55,7 +55,7 @@ public class Method_Filter : Method_Database {
 
     #region Methods
 
-    public static (FilterCollection? allFi, string errorreason, bool needsScriptFix) ObjectToFilter(VariableCollection attributes, int ab, Database? sourcedatabase, string user, bool must) {
+    public static (FilterCollection? allFi, string failedReason, bool needsScriptFix) ObjectToFilter(VariableCollection attributes, int ab, Database? sourcedatabase, string user, bool must) {
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {

@@ -91,8 +91,8 @@ public class Method_AddRows : Method_Database {
 
             #region  Filter ermitteln (allfi)
 
-            var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, mydb, scp.ScriptName, false);
-            if (!string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
+            var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, mydb, scp.ScriptName, false);
+            if (!string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
             allFi ??= new FilterCollection(db, "AddRows");
 

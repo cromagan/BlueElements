@@ -24,57 +24,28 @@ using System.Drawing;
 
 namespace BlueScript.Structures;
 
-public readonly struct DoItFeedback {
+/// <summary>
+/// Base feedback structure that represents the result of a script operation
+/// </summary>
+public class DoItFeedback {
 
     #region Constructors
 
+    public DoItFeedback() { }
+
     public DoItFeedback(Variable variable) {
-        NeedsScriptFix = false;
         Variable = variable;
-        FailedReason = string.Empty;
     }
 
     public DoItFeedback(string message, bool needsScriptFix, LogData? ld) {
         NeedsScriptFix = needsScriptFix;
         FailedReason = message;
-        Variable = null;
-        ld?.AddMessage(message);
-    }
 
-    public DoItFeedback(string valueString) {
-        NeedsScriptFix = false;
-        FailedReason = string.Empty;
-        Variable = new VariableString(Variable.DummyName(), valueString);
-    }
 
-    public DoItFeedback(List<string>? list) {
-        NeedsScriptFix = false;
-        FailedReason = string.Empty;
-        Variable = new VariableListString(list);
-    }
-
-    public DoItFeedback(Bitmap? bmp) {
-        NeedsScriptFix = false;
-        FailedReason = string.Empty;
-        Variable = new VariableBitmap(bmp);
-    }
-
-    public DoItFeedback(bool value) {
-        NeedsScriptFix = false;
-        FailedReason = string.Empty;
-        Variable = new VariableBool(value);
-    }
-
-    public DoItFeedback(double value) {
-        NeedsScriptFix = false;
-        FailedReason = string.Empty;
-        Variable = new VariableFloat((float)value);
-    }
-
-    public DoItFeedback(float value) {
-        NeedsScriptFix = false;
-        FailedReason = string.Empty;
-        Variable = new VariableFloat(value);
+        if (Failed) {
+            Variable = null;
+            ld?.AddMessage(message);
+        }
     }
 
     public DoItFeedback(string failedReason, bool breakFired, bool endScript) : this() {
@@ -83,22 +54,31 @@ public readonly struct DoItFeedback {
         FailedReason = failedReason;
     }
 
-    public DoItFeedback(IEnumerable<string> list) {
-        Variable = new VariableListString(list);
-    }
+    // Value type constructors
+    public DoItFeedback(string valueString) : this(new VariableString(Variable.DummyName(), valueString)) { }
 
-    public DoItFeedback() { }
+    public DoItFeedback(List<string>? list) : this(new VariableListString(list)) { }
+
+    public DoItFeedback(Bitmap? bmp) : this(new VariableBitmap(bmp)) { }
+
+    public DoItFeedback(bool value) : this(new VariableBool(value)) { }
+
+    public DoItFeedback(double value) : this(new VariableFloat((float)value)) { }
+
+    public DoItFeedback(float value) : this(new VariableFloat(value)) { }
+
+    public DoItFeedback(IEnumerable<string> list) : this(new VariableListString(list)) { }
 
     #endregion
 
     #region Properties
 
-    public bool BreakFired { get; } = false;
-    public bool EndScript { get; } = false;
-    public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
-    public string FailedReason { get; } = string.Empty;
-    public bool NeedsScriptFix { get; } = false;
-    public Variable? Variable { get; }
+    public bool BreakFired { get; protected set; } = false;
+    public bool EndScript { get; protected set; } = false;
+    public virtual bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
+    public string FailedReason { get; protected set; } = string.Empty;
+    public bool NeedsScriptFix { get; protected set; } = false;
+    public Variable? Variable { get; protected set; }
 
     #endregion
 
