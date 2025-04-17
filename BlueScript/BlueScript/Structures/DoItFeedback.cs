@@ -84,7 +84,7 @@ public class DoItFeedback {
     #region Methods
 
     public static DoItFeedback AttributFehler(LogData ld, Method method, SplittedAttributesFeedback f) =>
-        new("Befehl: " + method.Syntax + "\r\n" + f.ErrorMessage, true, ld);
+        new("Befehl: " + method.Syntax + "\r\n" + f.FailedReason, f.NeedsScriptFix, ld);
 
     public static DoItFeedback Falsch() => new(false);
 

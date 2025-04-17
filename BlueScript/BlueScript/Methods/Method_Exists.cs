@@ -49,7 +49,7 @@ internal class Method_Exists : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
+        return attvar.Failed ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

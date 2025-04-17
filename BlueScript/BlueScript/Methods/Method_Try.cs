@@ -54,7 +54,7 @@ internal class Method_Try : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.FailedReason)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
         var scx = Method_CallByFilename.CallSub(varCol, scp, infos.LogData, "Try-Befehl", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "Try");
         return new DoItFeedback(scx.BreakFired, scx.EndScript);
     }

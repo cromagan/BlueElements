@@ -48,7 +48,7 @@ internal class Method_Do : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var du = 0;
 

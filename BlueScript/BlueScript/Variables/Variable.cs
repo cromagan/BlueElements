@@ -152,7 +152,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             if (pose < txt.Length - 1) {
                 // Wir haben so einen Fall: (true) || (true)
                 var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), ld, varCol, scp);
-                if (tmp.Failed) { return new DoItFeedback("Befehls-Berechnungsfehler in ()", true, ld); }
+                if (tmp.Failed) { return new DoItFeedback("Befehls-Berechnungsfehler in ()", tmp.NeedsScriptFix, ld); }
                 if (tmp.Variable == null) { return new DoItFeedback("Allgemeiner Befehls-Berechnungsfehler", true, ld); }
                 if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.MyClassId, true, ld); }
                 return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
@@ -165,7 +165,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         if (uu > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, uu), ld, varCol, scp);
             if (txt1.Failed || txt1.Variable is null or VariableUnknown) {
-                return new DoItFeedback("Befehls-Berechnungsfehler vor &&", true, ld);
+                return new DoItFeedback("Befehls-Berechnungsfehler vor &&", txt1.NeedsScriptFix, ld);
             }
 
             if (txt1.Variable.ValueForReplace == "false") {
@@ -178,7 +178,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, oo), ld, varCol, scp);
             if (txt1.Failed || txt1.Variable is null or VariableUnknown) {
-                return new DoItFeedback("Befehls-Berechnungsfehler vor ||", true, ld);
+                return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, ld);
             }
 
             if (txt1.Variable.ValueForReplace == "true") {
@@ -190,13 +190,13 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
         if (varCol is { }) {
             var t = Method.ReplaceVariable(txt, varCol, ld);
-            if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", true, ld); }
+            if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", t.NeedsScriptFix, ld); }
             if (t.Variable != null) { return new DoItFeedback(t.Variable); }
             if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, varCol, scp); }
 
 
             var t2 = Method.ReplaceCommandsAndVars(txt, varCol, ld, scp);
-            if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", true, ld); }
+            if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", t2.NeedsScriptFix, ld); }
             if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
             if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, varCol, scp); }
         }
@@ -210,7 +210,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
             if (!string.IsNullOrEmpty(tmptxt)) {
                 var tmp = GetVariableByParsing(tmptxt, ld, varCol, scp);
-                if (tmp.Failed) { return new DoItFeedback("Befehls-Berechnungsfehler in ()", true, ld); }
+                if (tmp.Failed) { return new DoItFeedback("Befehls-Berechnungsfehler in ()", tmp.NeedsScriptFix, ld); }
                 if (tmp.Variable == null) { return new DoItFeedback("Allgemeiner Berechnungsfehler in ()", true, ld); }
                 if (!tmp.Variable.ToStringPossible) { return new DoItFeedback("Falscher Variablentyp: " + tmp.Variable.MyClassId, true, ld); }
                 return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);

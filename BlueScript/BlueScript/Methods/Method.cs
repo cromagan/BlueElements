@@ -137,7 +137,7 @@ public abstract class Method : IReadableTextWithKey {
 
         var (pos, which) = NextText(scriptText, startpos, [endsequwence], false, false, KlammernAlle);
         if (pos < startpos) {
-            return new GetEndFeedback("Endpunkt '" + endsequwence + "' nicht gefunden.", ld);
+            return new GetEndFeedback("Endpunkt '" + endsequwence + "' nicht gefunden.", ld, true);
         }
 
         var txtBtw = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
@@ -183,11 +183,11 @@ public abstract class Method : IReadableTextWithKey {
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
             var f = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
-            if (f.Failed) { return new GetEndFeedback($"Durch Befehl abgebrochen: {txt}", ld); }
+            if (f.Failed) { return new GetEndFeedback($"Durch Befehl abgebrochen: {txt}", ld, f.NeedsScriptFix); }
 
             if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
-            if (f.Variable == null) { return new GetEndFeedback("Variablenfehler", ld); }
-            if (!f.Variable.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden", ld); }
+            if (f.Variable == null) { return new GetEndFeedback("Variablenfehler", ld, true); }
+            if (!f.Variable.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden", ld, true); }
 
             txt = txt.Substring(0, pos) + f.Variable.ValueForReplace + txt.Substring(f.Position);
             posc = pos;
@@ -204,8 +204,7 @@ public abstract class Method : IReadableTextWithKey {
     /// <param name="ld"></param>
     /// <returns></returns>
     public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol, LogData? ld) {
-
-        if(varCol is not { }) { return new GetEndFeedback("Interner Variablen-Fehler", ld); }
+        if (varCol is not { }) { return new GetEndFeedback("Interner Variablen-Fehler", ld, true); }
 
         var posc = 0;
         var allVarNames = varCol.AllStringableNames();
@@ -218,28 +217,26 @@ public abstract class Method : IReadableTextWithKey {
             var thisV = varCol.Get(which);
             var endz = pos + which.Length;
 
-            if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, ld); }
+            if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, ld, true); }
 
             txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(endz);
             posc = pos;
         } while (true);
     }
 
-
-
     public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, int lastArgMinCount, LogData? ld, ScriptProperties? scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback([])
-                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
+                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.", true);
         }
 
         var attributes = SplitAttributeToString(attributText);
-        if (attributes is not { Count: not 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen."); }
-        if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-        if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-        if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
-        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+        if (attributes is not { Count: not 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.", true); }
+        if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", true); }
+        if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", true); }
+        if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten.", true); }
+        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", true); }
 
         //  Variablen und Routinen ersetzen
         VariableCollection feedbackVariables = [];
@@ -256,13 +253,15 @@ public abstract class Method : IReadableTextWithKey {
 
             if (mustBeVar) {
                 var varn = attributes[n];
-                if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
+                if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1), true); }
 
                 v = varcol?.Get(varn);
-                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
+                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
             } else {
                 var tmp2 = Variable.GetVariableByParsing(attributes[n], ld, varcol, scp);
-                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
+                if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Berechnungsfehler bei Attribut {n + 1} {tmp2.FailedReason}", tmp2.NeedsScriptFix); }
+                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
+
                 v = tmp2.Variable;
             }
 
@@ -274,7 +273,7 @@ public abstract class Method : IReadableTextWithKey {
                 if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
             }
 
-            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
+            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId, true); }
 
             _ = feedbackVariables.Add(v);
 
@@ -315,7 +314,7 @@ public abstract class Method : IReadableTextWithKey {
 
         var attvar = SplitAttributeToVars(varCol, value, sargs, 0, ld, scp);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback("Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.ErrorMessage, true, ld); }
+        if (attvar.Failed) { return new DoItFeedback("Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.FailedReason, attvar.NeedsScriptFix, ld); }
 
         if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback("Variable unbekannt", true, ld); }
 
@@ -377,7 +376,7 @@ public abstract class Method : IReadableTextWithKey {
 
     public virtual DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage)
+        return attvar.Failed
             ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
             : DoIt(varCol, attvar, scp, infos.LogData);
     }

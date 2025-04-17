@@ -50,7 +50,7 @@ internal class Method_ForEachRow : Method_Database {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var varnam = "value";
 

@@ -32,24 +32,28 @@ public readonly struct SplittedAttributesFeedback {
 
     public SplittedAttributesFeedback(VariableCollection atts) {
         Attributes = atts;
-        ErrorMessage = string.Empty;
-        FehlerTyp = ScriptIssueType.ohne;
     }
 
-    public SplittedAttributesFeedback(ScriptIssueType type, string error) {
+    public SplittedAttributesFeedback(ScriptIssueType type, string failedReason, bool needsScriptFix) {
         Attributes = [];
-        ErrorMessage = error;
-        FehlerTyp = type;
+        FailedReason = failedReason;
+        ScriptIssueType = type;
+        NeedsScriptFix = needsScriptFix;
     }
 
     #endregion
 
+
+    public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason) || ScriptIssueType != ScriptIssueType.ohne;
+
     #region Properties
 
-    public VariableCollection Attributes { get; }
-    public string ErrorMessage { get; }
+    public bool NeedsScriptFix { get; } = false;
 
-    public ScriptIssueType FehlerTyp { get; }
+    public VariableCollection Attributes { get; }
+    public string FailedReason { get; }= string.Empty;
+
+    public ScriptIssueType ScriptIssueType { get; } = ScriptIssueType.ohne;
 
     #endregion
 

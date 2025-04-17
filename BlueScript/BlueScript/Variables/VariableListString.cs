@@ -143,7 +143,7 @@ public class VariableListString : Variable {
             if (string.IsNullOrEmpty(t)) { return (true, new List<string>()); } // Leere Liste
 
             var l = Method.SplitAttributeToVars(vs, t, [[VariableString.ShortName_Plain]], 1, null, scp);
-            if (!string.IsNullOrEmpty(l.ErrorMessage)) { return (false, null); }
+            if (l.Failed) { return (false, null); }
 
             return (true, l.Attributes.AllStringValues());
         }

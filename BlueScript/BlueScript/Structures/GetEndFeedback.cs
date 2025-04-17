@@ -41,11 +41,12 @@ public readonly struct GetEndFeedback {
         Variable = variable;
     }
 
-    public GetEndFeedback(string failedReason, LogData? ld) {
+    public GetEndFeedback(string failedReason, LogData? ld, bool needsScriptFix) {
         ContinuePosition = 0;
         FailedReason = failedReason;
         AttributeText = string.Empty;
         Variable = null;
+        NeedsScriptFix = needsScriptFix;
         ld?.AddMessage(FailedReason);
     }
 
@@ -60,7 +61,9 @@ public readonly struct GetEndFeedback {
 
     #region Properties
 
-    internal bool Failed => !string.IsNullOrWhiteSpace(FailedReason);
+    public bool NeedsScriptFix { get; } = false;
+
+    internal bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
 
     #endregion
 }

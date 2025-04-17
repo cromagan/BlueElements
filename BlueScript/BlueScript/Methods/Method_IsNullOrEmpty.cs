@@ -51,7 +51,7 @@ internal class Method_IsNullOrEmpty : Method {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
 
         if (attvar.Attributes.Count == 0) {
-            return attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden
+            return attvar.ScriptIssueType != ScriptIssueType.VariableNichtGefunden
                 ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
                 : DoItFeedback.Wahr();
         }

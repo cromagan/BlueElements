@@ -96,7 +96,7 @@ public class Method_If : Method {
         var scpt = new ScriptProperties(scp, m, scp.Stufe + 1, scp.Chain);
 
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, infos.LogData); }
+        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, infos.LogData); }
 
         if (attvar.ValueBoolGet(0)) {
             var scx = Method_CallByFilename.CallSub(varCol, scp, infos.LogData, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If");
