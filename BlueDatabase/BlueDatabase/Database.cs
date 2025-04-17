@@ -1421,40 +1421,32 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Fehlerprüfungen
 
-            if (string.IsNullOrEmpty(NeedsScriptFix)) {
-                if (scf is { NeedsScriptFix: true }) {
-                    var t = "Datenbank: " + Caption + "\r\n" +
-                                      "Benutzer: " + UserName + "\r\n" +
-                                      "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
-                                      "Extended: " + extended + "\r\n";
-                    if (row is { IsDisposed: false } r) {
-                        t = t + "Zeile: " + r.CellFirstString() + "\r\n";
-                        if (Column.SplitColumn is { IsDisposed: false } spc) {
-                            t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
-                        }
-                    }
+            if (scf.NeedsScriptFix && string.IsNullOrEmpty(NeedsScriptFix)) {
 
-                    if (produktivphase && !ignoreError) {
-                        NeedsScriptFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
+                var t = "Datenbank: " + Caption + "\r\n" +
+                                  "Benutzer: " + UserName + "\r\n" +
+                                  "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
+                                  "Extended: " + extended + "\r\n";
+
+                if (row is { IsDisposed: false } r) {
+                    t = t + "Zeile: " + r.CellFirstString() + "\r\n";
+                    if (Column.SplitColumn is { IsDisposed: false } spc) {
+                        t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
                     }
+                }
+
+                if (produktivphase && !ignoreError) {
+                    NeedsScriptFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
                 }
             }
 
-            if (scf.Failed) {
-                _ = ExecutingScript.Remove(scriptId);
-                _ = ExecutingScriptAnyDatabase.Remove(scriptId);
-                OnDropMessage(ErrorType.Info, "Das Skript '" + script.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
-                return scf;
-            }
 
             if (scf.Failed) {
+                if (row != null) { _ = RowCollection.FailedRows.TryAdd(row, scf.FailedReason); }
+
+                OnDropMessage(ErrorType.Info, $"Script-Fehler: {scf.FailedReason}");
                 _ = ExecutingScript.Remove(scriptId);
                 _ = ExecutingScriptAnyDatabase.Remove(scriptId);
-                if (row != null) {
-                    _ = RowCollection.FailedRows.TryAdd(row, scf.FailedReason);
-                }
-
-                OnDropMessage(ErrorType.Info, "Das Skript konnte nicht durchgerechnet werden:\r\n" + scf.FailedReason);
                 return scf;
             }
 

@@ -40,11 +40,9 @@ public class VariableBool : Variable {
 
     public VariableBool(string name, bool value, bool ronly, string comment) : base(name, ronly, comment) => _valuebool = value;
 
-    /// <summary>
-    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-    /// </summary>
-    /// <param name="name"></param>
     public VariableBool(string name) : this(name, false, true, string.Empty) { }
+
+    public VariableBool() : this(string.Empty, false, true, string.Empty) { }
 
     public VariableBool(bool value) : this(DummyName(), value, true, string.Empty) { }
 

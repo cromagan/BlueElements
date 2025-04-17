@@ -156,7 +156,7 @@ public abstract class Method : IReadableTextWithKey {
         return m;
     }
 
-    public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData ld, ScriptProperties scp) {
+    public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData? ld, ScriptProperties scp) {
         List<string> toSearch = [];
 
         #region Mögliche Methoden
@@ -338,7 +338,7 @@ public abstract class Method : IReadableTextWithKey {
         return DoItFeedback.InternerFehler(ld);
     }
 
-    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
+    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, LogData? ld) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns) && MustUseReturnValue) {
             return new CanDoFeedback(pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }

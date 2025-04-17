@@ -37,6 +37,8 @@ public class VariablePadItem : Variable {
 
     public VariablePadItem(string name) : this(name, null, true, string.Empty) { }
 
+    public VariablePadItem() : this(string.Empty, null, true, string.Empty) { }
+
     public VariablePadItem(AbstractPadItem? value) : this(DummyName(), value, true, string.Empty) { }
 
     #endregion

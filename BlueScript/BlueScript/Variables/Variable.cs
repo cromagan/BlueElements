@@ -188,15 +188,19 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
 
         // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
-        var t = Method.ReplaceVariable(txt, varCol, ld);
-        if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", true, ld); }
-        if (t.Variable != null) { return new DoItFeedback(t.Variable); }
-        if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, varCol, scp); }
+        if (varCol is { }) {
+            var t = Method.ReplaceVariable(txt, varCol, ld);
+            if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", true, ld); }
+            if (t.Variable != null) { return new DoItFeedback(t.Variable); }
+            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, varCol, scp); }
 
-        var t2 = Method.ReplaceCommandsAndVars(txt, varCol, ld, scp);
-        if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", true, ld); }
-        if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
-        if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, varCol, scp); }
+
+            var t2 = Method.ReplaceCommandsAndVars(txt, varCol, ld, scp);
+            if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", true, ld); }
+            if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
+            if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, varCol, scp); }
+        }
+
 
         var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
         if (posa > -1) {

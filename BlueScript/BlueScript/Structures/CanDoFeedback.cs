@@ -23,7 +23,7 @@ public readonly struct CanDoFeedback {
 
     #region Constructors
 
-    public CanDoFeedback(int errorposition, string message, bool needsScriptFix, LogData ld) {
+    public CanDoFeedback(int errorposition, string message, bool needsScriptFix, LogData? ld) {
         ContinueOrErrorPosition = errorposition;
         Message = message;
         NeedsScriptFix = needsScriptFix;
@@ -60,7 +60,7 @@ public readonly struct CanDoFeedback {
     /// </summary>
     public int ContinueOrErrorPosition { get; }
 
-    public LogData LogData { get; }
+    public LogData? LogData { get; }
 
     /// <summary>
     /// Gibt empty zurück, wenn der Befehl ausgeführt werden kann.

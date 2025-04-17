@@ -72,13 +72,13 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
+    public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData? ld) {
         //if (MethodsAll == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
         if (scriptText.Length > pos && scriptText.Substring(pos, 1) == ";") {
-            return new DoItWithEndedPosFeedback(false, null, pos + 1, false, false, string.Empty, ld);
+            return new DoItWithEndedPosFeedback(false, null, pos + 1, false, false, string.Empty, null);
         }
 
         #endregion
@@ -87,11 +87,11 @@ public class Script {
 
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-            if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.Message, true, ld); }
+            if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.Message, true, null); }
 
             if (string.IsNullOrEmpty(f.Message)) {
                 var fn = thisC.DoIt(varCol, f, scp);
-                return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.FailedReason, ld);
+                return new DoItWithEndedPosFeedback(fn.NeedsScriptFix, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript, fn.FailedReason, null);
             }
         }
 
@@ -126,7 +126,7 @@ public class Script {
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
             if (f.NeedsScriptFix) {
-                return new DoItWithEndedPosFeedback(f.Message, true, ld);
+                return new DoItWithEndedPosFeedback(f.Message, true, null);
             }
 
             if (string.IsNullOrEmpty(f.Message)) {

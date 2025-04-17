@@ -36,11 +36,9 @@ public class VariableString : Variable {
 
     public VariableString(string name, string value, bool ronly, string comment) : base(name, ronly, comment) => _valueString = value.RestoreCriticalVariableChars();
 
-    /// <summary>
-    /// Wichtig für: GetEnumerableOfType Variable ("NAME");
-    /// </summary>
-    /// <param name="name"></param>
     public VariableString(string name) : this(name, string.Empty, true, string.Empty) { }
+
+    public VariableString() : this(string.Empty, string.Empty, true, string.Empty) { }
 
     public VariableString(string name, string value) : this(name, value, true, string.Empty) { }
 

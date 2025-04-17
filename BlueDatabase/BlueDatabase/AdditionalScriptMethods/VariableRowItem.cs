@@ -42,6 +42,8 @@ public class VariableRowItem : Variable {
         GetText();
     }
 
+    public VariableRowItem() : this(string.Empty, null, true, string.Empty) { }
+
     public VariableRowItem(RowItem? value) : this(DummyName(), value, true, string.Empty) { }
 
     public VariableRowItem(string name) : this(name, null, true, string.Empty) { }

@@ -36,10 +36,8 @@ public class VariableUnknown : Variable {
 
     public VariableUnknown(string name, bool ronly, string comment) : base(name, ronly, comment) { }
 
-    /// <summary>
-    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-    /// </summary>
-    /// <param name="name"></param>
+    public VariableUnknown() : this(string.Empty, true, string.Empty) { }
+
     public VariableUnknown(string name) : this(name, true, string.Empty) { }
 
     public VariableUnknown(string name, string value) : this(name, true, string.Empty) { }

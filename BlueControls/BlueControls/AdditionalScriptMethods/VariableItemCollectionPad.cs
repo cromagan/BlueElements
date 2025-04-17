@@ -37,6 +37,8 @@ public class VariableItemCollectionPad : Variable {
 
     public VariableItemCollectionPad(string name) : this(name, null, true, string.Empty) { }
 
+    public VariableItemCollectionPad() : this(string.Empty, null, true, string.Empty) { }
+
     public VariableItemCollectionPad(ItemCollectionPadItem? value) : this(DummyName(), value, true, string.Empty) { }
 
     #endregion

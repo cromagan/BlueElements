@@ -227,7 +227,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                     return;
 
                 case "#export":
-                    if (item is IParseable ps) {
+                    if (item is IStringable ps) {
                         using SaveFileDialog f = new();
                         f.CheckFileExists = false;
                         f.CheckPathExists = true;
@@ -287,9 +287,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
                 LastClickedItem = bpi;
                 e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
                 e.ContextMenu.Add(ItemOf("Objekt duplizieren", "#Duplicate", ImageCode.Kopieren, e.HotItem is ICloneable));
-                e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IParseable));
-                //e.ContextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", "#Page", ImageCode.Datei, e.HotItem is IParseable));
-                e.ContextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", "#Connect", ImageCode.HäkchenDoppelt, e.HotItem is IParseable));
+                e.ContextMenu.Add(ItemOf("Objekt exportieren", "#Export", ImageCode.Diskette, e.HotItem is IStringable));
+                //e.ContextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", "#Page", ImageCode.Datei, e.HotItem is IStringable));
+                e.ContextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", "#Connect", ImageCode.HäkchenDoppelt, e.HotItem is IStringable));
                 e.ContextMenu.Add(Separator());
                 e.ContextMenu.Add(ItemOf("In den Vordergrund", "#Vordergrund", ImageCode.InDenVordergrund));
                 e.ContextMenu.Add(ItemOf("In den Hintergrund", "#Hintergrund", ImageCode.InDenHintergrund));

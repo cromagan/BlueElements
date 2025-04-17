@@ -39,10 +39,8 @@ public class VariableBitmap : Variable {
 
     public VariableBitmap(string name, Bitmap? value, bool ronly, string comment) : base(name, ronly, comment) => _bmp = value;
 
-    /// <summary>
-    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-    /// </summary>
-    /// <param name="name"></param>
+    public VariableBitmap() : this(string.Empty, null, true, string.Empty) { }
+
     public VariableBitmap(string name) : this(name, null, true, string.Empty) { }
 
     public VariableBitmap(Bitmap? value) : this(DummyName(), value, true, string.Empty) { }

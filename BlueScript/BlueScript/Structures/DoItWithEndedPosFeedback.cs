@@ -35,7 +35,7 @@ public class DoItWithEndedPosFeedback : DoItFeedback {
         BreakFired = breakFired;
     }
 
-    public DoItWithEndedPosFeedback(string failedReason, bool needsScriptFix, LogData ld) : base(failedReason, needsScriptFix, ld) { }
+    public DoItWithEndedPosFeedback(string failedReason, bool needsScriptFix, LogData? ld) : base(failedReason, needsScriptFix, ld) { }
 
     #endregion
 

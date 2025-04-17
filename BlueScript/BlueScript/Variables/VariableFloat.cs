@@ -42,10 +42,8 @@ public class VariableFloat : Variable {
 
     public VariableFloat(double value) : this(DummyName(), value, true, string.Empty) { }
 
-    /// <summary>
-    /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
-    /// </summary>
-    /// <param name="name"></param>
+    public VariableFloat() : this(string.Empty, 0f, true, string.Empty) { }
+
     public VariableFloat(string name) : this(name, 0f, true, string.Empty) { }
 
     #endregion

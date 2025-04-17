@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace BlueScript.Variables;
 
-public class VariableCollection : IEnumerable<Variable>, IEditable {
+public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     #region Fields
 
@@ -43,6 +43,10 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
     /// </summary>
     /// <param name="v"></param>
     public VariableCollection(List<Variable> v) : this(v, true) { }
+
+    public VariableCollection(string toParse) {
+        this.Parse(toParse);
+    }
 
     public VariableCollection(List<Variable> v, bool readOnly) {
         foreach (var thisV in v) {
@@ -69,10 +73,12 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
     #region Properties
 
     public string CaptionForEditor => "Variablen";
+
     public int Count => _internal.Count;
 
     public Type? Editor { get; set; }
-    public bool ReadOnly { get; }
+
+    public bool ReadOnly { get; private set; }
 
     #endregion
 
@@ -112,12 +118,15 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         return new VariableCollection(vaa);
     }
 
-    //public static VariableCollection Combine(VariableCollection existingVars, Variable thisvar) {
-    //    var vaa = new List<VariableString>();
-    //    vaa.AddRange(existingVars.ToListVariableString());
+    public bool Add(Variable? variable) {
+        if (ReadOnly) { return false; }
+        if (variable == null) { return false; }
 
-    //    foreach (var thisvar in vaa) {
-    //        var v = newVars.Get(newVarsPrefix + thisvar.KeyName);
+        if (_internal.Get(variable.KeyName) != null) { return false; }
+
+        _internal.Add(variable);
+        return true;
+    }
 
     //        if (v is VariableString vs) {
     //            thisvar.ReadOnly = false; // weil kein OnPropertyChanged vorhanden ist
@@ -129,17 +138,6 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
     //    }
     //    return new VariableCollection(vaa);
     //}
-
-    public bool Add(Variable? variable) {
-        if (ReadOnly) { return false; }
-        if (variable == null) { return false; }
-
-        if (_internal.Get(variable.KeyName) != null) { return false; }
-
-        _internal.Add(variable);
-        return true;
-    }
-
     /// <summary>
     /// True, wenn ALLE Variablen erfolgreich hinzugefügt wurden.
     /// </summary>
@@ -156,6 +154,8 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         return f;
     }
 
+    //    foreach (var thisvar in vaa) {
+    //        var v = newVars.Get(newVarsPrefix + thisvar.KeyName);
     public List<string> AllStringableNames() {
         var l = new List<string>();
 
@@ -166,6 +166,9 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         return l;
     }
 
+    //public static VariableCollection Combine(VariableCollection existingVars, Variable thisvar) {
+    //    var vaa = new List<VariableString>();
+    //    vaa.AddRange(existingVars.ToListVariableString());
     /// <summary>
     /// Gibt von allen Variablen, die ein String sind, den Inhalt ohne " am Anfang/Ende zurück.
     /// </summary>
@@ -179,8 +182,6 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
 
         return l;
     }
-
-    //public object Clone() => new VariableCollection(ToList(), ReadOnly);
 
     /// <summary>
     /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
@@ -198,6 +199,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         return vb.ValueBool;
     }
 
+    //public object Clone() => new VariableCollection(ToList(), ReadOnly);
     public IEnumerator<Variable> GetEnumerator() => _internal.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
@@ -232,6 +234,32 @@ public class VariableCollection : IEnumerable<Variable>, IEditable {
         }
 
         return vf.ValueString;
+    }
+
+    public List<string> ParseableItems() {
+        List<string> result = [];
+
+        result.ParseableAdd("Variable", _internal);
+        result.ParseableAdd("ReadOnly", ReadOnly);
+
+        return result;
+    }
+
+    public void ParseFinished(string parsed) { }
+
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "variable":
+                var v = ParsebleItem.NewByParsing<Variable>(value);
+                Add(v);
+                return true;
+
+            case "readonly":
+                ReadOnly = value.FromPlusMinus();
+                return true;
+        }
+
+        return false;
     }
 
     public bool Remove(Variable v) => !ReadOnly && _internal.Remove(v);

@@ -208,7 +208,7 @@ public static partial class Extensions {
         ParseableAdd(col, tagname, value.ToListOfString(), ignoreEmpty);
     }
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IParseable> value) {
+    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IStringable> value) {
         foreach (var thisi in value) {
             ParseableAdd(col, tagname, thisi);
         }

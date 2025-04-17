@@ -46,11 +46,10 @@ public class VariableListString : Variable {
         }
     }
 
+    public VariableListString() : this(string.Empty, null, true, string.Empty) { }
+
     public VariableListString(string name) : this(name, null, true, string.Empty) { }
 
-    /// <summary>
-    /// Wichtig für: GetEnumerableOfType Variable("NAME");
-    /// </summary>
     public VariableListString(IReadOnlyCollection<string>? value) : this(DummyName(), value, true, string.Empty) { }
 
     public VariableListString(IEnumerable<string> value) : this(value.ToList()) { }
