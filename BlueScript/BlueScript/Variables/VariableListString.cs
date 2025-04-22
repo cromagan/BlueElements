@@ -101,12 +101,6 @@ public class VariableListString : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableListString(KeyName);
-        v.Parse(ParseableItems().FinishParseable());
-        return v;
-    }
-
     public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -120,12 +114,6 @@ public class VariableListString : Variable {
 
         ValueList = v.ValueList;
         return DoItFeedback.Null();
-    }
-
-    protected override Variable NewWithThisValue(object? x) {
-        var v = new VariableListString(string.Empty);
-        v.SetValue(x);
-        return v;
     }
 
     protected override void SetValue(object? x) {

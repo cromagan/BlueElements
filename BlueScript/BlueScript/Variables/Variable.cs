@@ -30,7 +30,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 
-public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName {
+public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyName {
 
     #region Fields
 
@@ -194,13 +194,11 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             if (t.Variable != null) { return new DoItFeedback(t.Variable); }
             if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, varCol, scp); }
 
-
             var t2 = Method.ReplaceCommandsAndVars(txt, varCol, ld, scp);
             if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", t2.NeedsScriptFix, ld); }
             if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
             if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, varCol, scp); }
         }
-
 
         var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
         if (posa > -1) {
@@ -243,8 +241,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
         return true;
     }
-
-    public abstract object Clone();
 
     public int CompareTo(object obj) {
         if (obj is Variable v) {
@@ -307,21 +303,29 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             ? txt
             : txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
 
-    protected abstract Variable? NewWithThisValue(object? x);
-
     protected abstract void SetValue(object? x);
 
     protected abstract (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp);
 
-    protected bool TryParse(string txt, out Variable? succesVar, VariableCollection varCol, ScriptProperties scp) {
+    protected bool TryParse(string txt, out Variable? succesVar, VariableCollection? varCol, ScriptProperties scp) {
         var (cando, result) = TryParse(txt, varCol, scp);
         if (!cando) {
             succesVar = null;
             return false;
         }
 
-        succesVar = NewWithThisValue(result);
-        return succesVar != null;
+        // Neue Instanz des gleichen Typs mit NewByTypeName erstellen
+        var newVar = NewByTypeName<Variable>(MyClassId);
+        if (newVar == null) {
+            succesVar = null;
+            return false;
+        }
+
+        // Den Wert setzen
+        newVar.SetValue(result);
+        succesVar = newVar;
+
+        return true;
     }
 
     #endregion

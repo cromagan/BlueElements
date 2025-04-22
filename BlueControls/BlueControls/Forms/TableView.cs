@@ -526,8 +526,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         var did = false;
 
-        if (!string.IsNullOrEmpty(toParse)) {
-            foreach (var pair in toParse.GetAllTags()) {
+        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
+            foreach (var pair in x) {
                 switch (pair.Key) {
                     case "tableview":
                         Table.DatabaseSet(db, pair.Value.FromNonCritical());

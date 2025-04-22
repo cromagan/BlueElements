@@ -44,10 +44,6 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     /// <param name="v"></param>
     public VariableCollection(List<Variable> v) : this(v, true) { }
 
-    public VariableCollection(string toParse) {
-        this.Parse(toParse);
-    }
-
     public VariableCollection(List<Variable> v, bool readOnly) {
         foreach (var thisV in v) {
             _ = Add(thisV);

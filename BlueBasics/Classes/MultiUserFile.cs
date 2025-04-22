@@ -320,7 +320,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             var (data, tmpLastSaveCode) = LoadFromDisk();
             if (data.Length < 10) { return false; }
 
-            this.Parse(data);
+            if (!this.Parse(data)) { return false; }
 
             _lastSaveCode = tmpLastSaveCode; // initialize setzt zurück
 

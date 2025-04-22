@@ -84,12 +84,6 @@ public class VariableFloat : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableFloat(KeyName);
-        v.Parse(ParseableItems().FinishParseable());
-        return v;
-    }
-
     public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -97,12 +91,6 @@ public class VariableFloat : Variable {
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValueNum = v.ValueNum;
         return DoItFeedback.Null();
-    }
-
-    protected override Variable NewWithThisValue(object? x) {
-        var v = new VariableFloat(string.Empty);
-        v.SetValue(x);
-        return v;
     }
 
     protected override void SetValue(object? x) {

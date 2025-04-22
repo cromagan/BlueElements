@@ -81,24 +81,12 @@ public class VariableUnknown : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableUnknown(KeyName);
-        v.Parse(ParseableItems().FinishParseable());
-        return v;
-    }
-
     public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableUnknown) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         return DoItFeedback.Null();
-    }
-
-    protected override Variable NewWithThisValue(object? x) {
-        var v = new VariableUnknown(string.Empty);
-        v.SetValue(x);
-        return v;
     }
 
     protected override void SetValue(object? x) {

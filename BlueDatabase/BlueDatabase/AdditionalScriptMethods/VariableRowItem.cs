@@ -83,12 +83,6 @@ public class VariableRowItem : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableRowItem(KeyName);
-        v.Parse(ParseableItems().FinishParseable());
-        return v;
-    }
-
     public override void DisposeContent() => _row = null;
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -96,12 +90,6 @@ public class VariableRowItem : Variable {
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         RowItem = v.RowItem;
         return DoItFeedback.Null();
-    }
-
-    protected override Variable NewWithThisValue(object? x) {
-        var v = new VariableRowItem(string.Empty);
-        v.SetValue(x);
-        return v;
     }
 
     protected override void SetValue(object? x) {

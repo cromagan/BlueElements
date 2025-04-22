@@ -667,7 +667,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
         if (renderer == null) { return Renderer_Abstract.Default; }
 
-        renderer.Parse(column.RendererSettings);
+        if(!renderer.Parse(column.RendererSettings)) { return Renderer_Abstract.Default; }
         renderer.SheetStyle = style;
 
         return renderer;
@@ -3689,8 +3689,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (!string.IsNullOrEmpty(toParse)) {
-            foreach (var pair in toParse.GetAllTags()) {
+        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is  { }x) {
+            foreach (var pair in x ) {
                 switch (pair.Key) {
                     case "arrangement":
                         Arrangement = pair.Value.FromNonCritical();

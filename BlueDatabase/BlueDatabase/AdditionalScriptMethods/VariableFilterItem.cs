@@ -79,12 +79,6 @@ public class VariableFilterItem : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableFilterItem(KeyName);
-        v.Parse(ParseableItems().FinishParseable());
-        return v;
-    }
-
     public override void DisposeContent() => _filter = null;
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -93,8 +87,6 @@ public class VariableFilterItem : Variable {
         FilterItem = v.FilterItem;
         return DoItFeedback.Null();
     }
-
-    protected override Variable? NewWithThisValue(object? x) => null;
 
     protected override void SetValue(object? x) { }
 

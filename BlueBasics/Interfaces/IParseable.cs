@@ -25,8 +25,10 @@ public static class ParseableExtension {
 
     #region Methods
 
-    public static void Parse(this IParseable parsable, string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
+    public static bool Parse(this IParseable parsable, string toParse) {
+        if (toParse.GetAllTags() is not { } x) { return false; }
+
+        foreach (var pair in x) {
             var i = parsable.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
 
             if (!i) {
@@ -34,6 +36,7 @@ public static class ParseableExtension {
             }
         }
         parsable.ParseFinished(toParse);
+        return true;
     }
 
     #endregion

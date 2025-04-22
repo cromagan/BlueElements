@@ -25,7 +25,7 @@ using System.ComponentModel;
 
 namespace BlueBasics;
 
-public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
+public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback, ICloneable {
 
     #region Events
 
@@ -60,6 +60,8 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
 
         var x = toParse.GetAllTags();
 
+        if (x == null) { return null; }
+
         foreach (var thisIt in x) {
             switch (thisIt.Key) {
                 case "type":
@@ -70,7 +72,7 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
         }
 
         var ni = NewByTypeName<T>(typeName, args);
-        if (ni == null) { return default; }
+        if (ni == null) { return null; }
         ni.Parse(toParse);
         return ni;
     }
@@ -105,6 +107,14 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback {
             }
         }
         return default;
+    }
+
+    public object Clone() {
+        if (NewByParsing<ParsebleItem>(ParseableItems().FinishParseable()) is ParsebleItem clone) {
+            return clone;
+        }
+        Develop.DebugPrint(ErrorType.Error, "Clonen fehlgeschlagen");
+        throw new InvalidOperationException("Failed to clone object: parsing returned null");
     }
 
     public virtual void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));

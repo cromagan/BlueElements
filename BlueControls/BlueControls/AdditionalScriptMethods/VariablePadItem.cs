@@ -68,12 +68,6 @@ public class VariablePadItem : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariablePadItem(KeyName);
-        v.Parse(ToString());
-        return v;
-    }
-
     public override void DisposeContent() => _item = null;
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -82,8 +76,6 @@ public class VariablePadItem : Variable {
         ValuePadItem = v.ValuePadItem;
         return DoItFeedback.Null();
     }
-
-    protected override Variable? NewWithThisValue(object? x) => null;
 
     protected override void SetValue(object? x) { }
 

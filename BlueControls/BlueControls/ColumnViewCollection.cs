@@ -362,11 +362,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true;
 
             case "columns":
-
-                foreach (var pair2 in value.GetAllTags()) {
-                    _internal.Add(new ColumnViewItem(this, pair2.Value.FromNonCritical())); // BAse, um Events zu vermeiden
+                if (value.GetAllTags() is { } x) {
+                    foreach (var pair2 in x) {
+                        _internal.Add(new ColumnViewItem(this, pair2.Value.FromNonCritical())); // BAse, um Events zu vermeiden
+                    }
                 }
-
                 return true;
 
             case "permissiongroup":

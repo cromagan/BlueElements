@@ -70,12 +70,6 @@ public class VariableBitmap : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableBitmap(KeyName);
-        v.Parse(ParseableItems().FinishParseable());
-        return v;
-    }
-
     public override void DisposeContent() => _bmp?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -84,8 +78,6 @@ public class VariableBitmap : Variable {
         ValueBitmap = v.ValueBitmap;
         return DoItFeedback.Null();
     }
-
-    protected override Variable? NewWithThisValue(object? x) => null;
 
     protected override void SetValue(object? x) { }
 

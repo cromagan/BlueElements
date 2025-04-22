@@ -320,11 +320,13 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="value">Ein String, der mit { beginnt. Z.B. {Wert=100, Wert2=150}</param>
     /// <returns>Gibt immer eine List zurück.</returns>
-    public static List<KeyValuePair<string, string>> GetAllTags(this string value) {
-        List<KeyValuePair<string, string>> result = [];
-        if (string.IsNullOrEmpty(value) || value.Length < 3) { return result; }
-        if (value.Substring(0, 1) != "{") { return result; }
+    public static List<KeyValuePair<string, string>>? GetAllTags(this string value) {
 
+        if (string.IsNullOrEmpty(value) || value.Length < 3) { return null; }
+        if (value.Substring(0, 1) != "{") { return null; }
+        if (value.Substring(value.Length-1,1) != "}") { return null; }
+
+        List<KeyValuePair<string, string>> result = [];
         var start = 1;
         var noarunde = true;
         do {
@@ -335,7 +337,10 @@ public static partial class Extensions {
             tag = tag.Trim(" ");
             tag = tag.Trim(",");
             tag = tag.Trim(" ");
-            if (string.IsNullOrEmpty(tag)) { Develop.DebugPrint(ErrorType.Error, "Parsen nicht möglich:" + value); }
+            if (string.IsNullOrEmpty(tag)) {
+                Develop.DebugPrint(ErrorType.Warning, "Parsen nicht möglich:" + value); 
+                return null;
+            }
 
             var (kommapos, _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
 

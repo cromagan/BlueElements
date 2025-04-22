@@ -88,12 +88,6 @@ public class VariableString : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableString(KeyName);
-        v.Parse(ParseableItems().FinishParseable());
-        return v;
-    }
-
     public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -101,12 +95,6 @@ public class VariableString : Variable {
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValueString = v.ValueString;
         return DoItFeedback.Null();
-    }
-
-    protected override Variable NewWithThisValue(object? x) {
-        var v = new VariableString(string.Empty);
-        v.SetValue(x);
-        return v;
     }
 
     protected override void SetValue(object? x) {

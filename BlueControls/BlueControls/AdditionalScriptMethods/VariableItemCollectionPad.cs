@@ -68,12 +68,6 @@ public class VariableItemCollectionPad : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableItemCollectionPad(KeyName);
-        v.Parse(ToString());
-        return v;
-    }
-
     public override void DisposeContent() => _itemCol = null;
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -82,8 +76,6 @@ public class VariableItemCollectionPad : Variable {
         ValueItemCollection = v.ValueItemCollection;
         return DoItFeedback.Null();
     }
-
-    protected override Variable? NewWithThisValue(object? x) => null;
 
     protected override void SetValue(object? x) { }
 

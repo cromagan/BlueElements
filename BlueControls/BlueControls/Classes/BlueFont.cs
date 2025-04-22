@@ -166,7 +166,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         // GetOrAdd mit einer Factory, die bei Bedarf einen neuen Font erstellt
         return _blueFontCache.GetOrAdd(toParse.ToUpperInvariant(), _ => {
             var newFont = new BlueFont();
-            newFont.Parse(toParse);
+            if (!newFont.Parse(toParse)) { return DefaultFont; }
             return newFont;
         });
     }

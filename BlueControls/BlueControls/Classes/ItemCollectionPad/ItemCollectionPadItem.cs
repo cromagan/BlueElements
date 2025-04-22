@@ -769,8 +769,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "items":
-                CreateItems(value); // im ersten Step nur die items erzeugen....
-                ParseItems(value);// ...im zweiten können nun auch Beziehungen erstellt werden!
+                if (!CreateItems(value)) { return false; }  // im ersten Step nur die items erzeugen....
+                if (!ParseItems(value)) { return false; }// ...im zweiten können nun auch Beziehungen erstellt werden!
                 return true;
 
             case "item":
@@ -956,7 +956,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         var t = sc.Parse(0, "Main", null);
 
-        if (t.Failed ) {
+        if (t.Failed) {
             var ep = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));
 
             Add(ep);
@@ -1189,7 +1189,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private void CreateConnection(string toParse) {
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
 
-        var x = toParse.GetAllTags();
+        if (toParse.GetAllTags() is not { } x) { return; }
 
         AbstractPadItem? item1 = null;
         AbstractPadItem? item2 = null;
@@ -1234,8 +1234,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Connections.Add(new ItemConnection(item1, con1, arrow1, item2, con2, arrow2, pm));
     }
 
-    private void CreateItems(string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
+    private bool CreateItems(string toParse) {
+        if (toParse.GetAllTags() is not { } x) { return false; }
+
+        foreach (var pair in x) {
             switch (pair.Key.ToLowerInvariant()) {
                 case "dpi":
                 case "sheetstylescale":
@@ -1252,6 +1254,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     break;
             }
         }
+        return true;
     }
 
     private void Icpi_StyleChanged(object? sender, System.EventArgs e) {
@@ -1274,8 +1277,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         OnPropertyChanged("Items");
     }
 
-    private void ParseItems(string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
+    private bool ParseItems(string toParse) {
+        if (toParse.GetAllTags() is not { } xa) { return false; }
+
+        foreach (var pair in xa) {
             switch (pair.Key.ToLowerInvariant()) {
                 case "dpi":
                 case "sheetstyle":
@@ -1285,8 +1290,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 case "item":
                     var t = pair.Value;
                     if (t.StartsWith("[I]")) { t = t.FromNonCritical(); }
-                    var x = t.GetAllTags();
-                    foreach (var thisIt in x) {
+                    if (t.GetAllTags() is not { } xi) { return false; }
+
+                    foreach (var thisIt in xi) {
                         switch (thisIt.Key) {
                             case "internalname":
                             case "keyname":
@@ -1302,6 +1308,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     break;
             }
         }
+        return true;
     }
 
     private void UnRegisterEvents() {

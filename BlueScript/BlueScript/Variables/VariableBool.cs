@@ -85,12 +85,6 @@ public class VariableBool : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableBool(KeyName);
-        v.Parse(ParseableItems().FinishParseable());
-        return v;
-    }
-
     public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -98,12 +92,6 @@ public class VariableBool : Variable {
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValueBool = v.ValueBool;
         return DoItFeedback.Null();
-    }
-
-    protected override Variable NewWithThisValue(object? x) {
-        var v = new VariableBool(string.Empty);
-        v.SetValue(x);
-        return v;
     }
 
     protected override void SetValue(object? x) {
