@@ -555,10 +555,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (!db.CanDoValueChangedScript()) { return null; }
 
-        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization() && r.IsMyRow() && !FailedRows.ContainsKey(r));
+        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow());
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate() && r.IsMyRow() && !FailedRows.ContainsKey(r));
+        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow());
         if (rowToCheck != null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }

@@ -120,6 +120,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _additionalCheck;
         set {
             if (_additionalCheck == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => AdditionalFormatCheck = value));
+                return;
+            }
+
             _additionalCheck = value;
             UpdateControls();
         }
@@ -132,6 +138,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _allowedChars;
         set {
             if (_allowedChars == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => AllowedChars = value));
+                return;
+            }
+
             _allowedChars = value;
             UpdateControls();
         }
@@ -142,6 +154,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _caption;
         set {
             if (_caption == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => Caption = value));
+                return;
+            }
+
             RemoveAll(); // Controls and Events entfernen!
             _caption = value;
         }
@@ -152,6 +170,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _captionPosition;
         set {
             if (_captionPosition == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => CaptionPosition = value));
+                return;
+            }
+
             RemoveAll(); // Controls and Events entfernen!
             _captionPosition = value;
         }
@@ -165,6 +189,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _controlX;
         set {
             if (_controlX == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => ControlX = value));
+                return;
+            }
+
             RemoveAll(); // Controls and Events entfernen!
             _controlX = value;
         }
@@ -181,6 +211,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _disabledReason;
         set {
             if (_disabledReason == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => DisabledReason = value));
+                return;
+            }
+
             _disabledReason = value;
             foreach (Control thisControl in Controls) {
                 thisControl.Enabled = thisControl == _infoCaption || Enabled;
@@ -195,6 +231,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _editType;
         set {
             if (_editType == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => EditType = value));
+                return;
+            }
+
             RemoveAll(); // Controls and Events entfernen!
             _editType = value;
         }
@@ -218,22 +260,18 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    [DefaultValue(false)]
-    public bool TextFormatingAllowed {
-        get => _formatierungErlaubt;
-        set {
-            if (value == TextFormatingAllowed) { return; }
-            _formatierungErlaubt = value;
-            UpdateControls();
-        }
-    }
-
     [DefaultValue("")]
     [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
     public string InfoText {
         get => _infoText;
         set {
             if (_infoText == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => InfoText = value));
+                return;
+            }
+
             _infoText = value;
             Invalidate();
         }
@@ -246,6 +284,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _maxTextLenght;
         set {
             if (_maxTextLenght == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => MaxTextLenght = value));
+                return;
+            }
+
             _maxTextLenght = value;
             UpdateControls();
         }
@@ -259,6 +303,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _multiLine;
         set {
             if (_multiLine == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => MultiLine = value));
+                return;
+            }
+
             _multiLine = value;
             UpdateControls();
         }
@@ -269,6 +319,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _regexCheck;
         set {
             if (_regexCheck == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => RegexCheck = value));
+                return;
+            }
+
             _regexCheck = value;
             UpdateControls();
         }
@@ -279,6 +335,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _showInfoWhenDisabled;
         set {
             if (_showInfoWhenDisabled == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => ShowInfoWhenDisabled = value));
+                return;
+            }
+
             _showInfoWhenDisabled = value;
             Invalidate();
         }
@@ -289,6 +351,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _spellChecking;
         set {
             if (_spellChecking == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => SpellCheckingEnabled = value));
+                return;
+            }
+
             _spellChecking = value;
             UpdateControls();
         }
@@ -302,6 +370,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _suffix;
         set {
             if (_suffix == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => Suffix = value));
+                return;
+            }
+
             _suffix = value;
             UpdateControls();
         }
@@ -317,11 +391,33 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new string Text { get; set; } = string.Empty;
 
+    [DefaultValue(false)]
+    public bool TextFormatingAllowed {
+        get => _formatierungErlaubt;
+        set {
+            if (value == TextFormatingAllowed) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => TextFormatingAllowed = value));
+                return;
+            }
+
+            _formatierungErlaubt = value;
+            UpdateControls();
+        }
+    }
+
     [DefaultValue(true)]
     public bool Translate {
         get => _translateCaption;
         set {
             if (_translateCaption == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => Translate = value));
+                return;
+            }
+
             _translateCaption = value;
 
             UpdateControls();
@@ -346,6 +442,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
     public void CreateSubControls() {
+        if (InvokeRequired) {
+            _ = Invoke(new Action(CreateSubControls));
+            return;
+        }
+
         if (Allinitialized || Initializing) { return; }
 
         Initializing = true;
@@ -747,6 +848,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void DoInfoTextCaption(string disabledReason) {
+        if (InvokeRequired) {
+            _ = Invoke(new Action(() => DoInfoTextCaption(disabledReason)));
+            return;
+        }
+
         string txt;
         string symbol;
         if (string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_infoText)) {
@@ -896,7 +1002,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _captionObject.Text = _caption + " <i>" + Value;
     }
 
-    private void UpdateValueTo_Combobox(TextBox control) => control.Text = Value;
+    private void UpdateValueTo_Combobox(ComboBox control) => control.Text = Value;
 
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.

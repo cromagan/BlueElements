@@ -241,15 +241,21 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     public bool ContainsMouse() => DoDrawings() && ClientRectangle.Contains(PointToClient(Cursor.Position));
 
-    public bool DoDrawings() => !IsDisposed 
+    public bool DoDrawings() => !IsDisposed
                                 && !Disposing
                                 && (DesignMode || (_pform is { IsDisposed: false, Visible: true } and not Forms.Form { IsClosing: true } && Visible));
 
     public void DoQuickInfo() {
+        if (InvokeRequired) {
+            _ = Invoke(new Action(DoQuickInfo));
+            return;
+        }
+
         if (!string.IsNullOrEmpty(_quickInfo) && ContainsMouse()) {
             Forms.QuickInfo.Show(_quickInfo);
             return;
         }
+
         Forms.QuickInfo.Close();
     }
 
