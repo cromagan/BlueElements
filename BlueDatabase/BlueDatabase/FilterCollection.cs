@@ -239,7 +239,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var fi = filter.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.IsOk())
                               .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
-        return fi is not {
+        if (fi is not {
             FilterType: not (not FilterType.Istgleich
                 and not FilterType.Istgleich_GroﬂKleinEgal
                 and not FilterType.Istgleich_ODER_GroﬂKleinEgal
@@ -249,9 +249,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 and not FilterType.Instr_UND_GroﬂKleinEgal
                 and not FilterType.Istgleich_MultiRowIgnorieren
                 and not FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren)
-        }
-            ? null
-            : column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
+        }) { return null; }
+
+        if (!column.MultiLine && fi.SearchValue.Count > 1) { return null; }
+
+        return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
     }
 
     public void Add(FilterItem fi) {
@@ -510,7 +512,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (toDel.Count == 0) { return; }
         RemoveRange(toDel);
     }
-
 
     public void Remove(FilterType filterType) {
         var toDel = _internal.Where(thisFilter => thisFilter.FilterType.HasFlag(filterType)).ToList();

@@ -105,7 +105,7 @@ public class Method_AddRows : Method_Database {
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
-            var fb = Method_Row.UniqueRow(varCol, ld, allFi, d, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
+            var fb = Method_Row.UniqueRow(allFi, d, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp, ld);
             allFi.Dispose();
             if (fb.Failed) { return fb; }
         }

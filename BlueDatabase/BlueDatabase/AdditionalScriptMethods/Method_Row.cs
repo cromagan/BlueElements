@@ -80,10 +80,7 @@ public class Method_Row : Method_Database, IUseableForButton {
 
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
-    public static DoItFeedback UniqueRow(VariableCollection varCol, LogData ld, FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp) {
-        RowItem? newrow;
-        string message;
-
+    public static DoItFeedback UniqueRow(FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp, LogData ld) {
         if (invalidateinDays < 0.01) { return new DoItFeedback("Intervall zu kurz.", true, ld); }
 
         if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Filter", true, ld); }
@@ -94,13 +91,13 @@ public class Method_Row : Method_Database, IUseableForButton {
                 return new DoItFeedback("Fehler im Filter, Spalte ungültig", true, ld);
             }
 
-            if (thisFi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) {
-                return new DoItFeedback("Fehler im Filter, nur 'is' ist erlaubt", true, ld);
-            }
+            //if (thisFi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) {
+            //    return new DoItFeedback("Fehler im Filter, nur 'is' ist erlaubt", true, ld);
+            //}
 
-            if (thisFi.SearchValue.Count != 1) {
-                return new DoItFeedback("Fehler im Filter, ein einzelner Suchwert wird benötigt", true, ld);
-            }
+            //if (thisFi.SearchValue.Count != 1) {
+            //    return new DoItFeedback("Fehler im Filter, ein einzelner Suchwert wird benötigt", true, ld);
+            //}
 
             if (FilterCollection.InitValue(c, true, fic.ToArray()) is not { } l) {
                 return new DoItFeedback("Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.", true, ld);
@@ -111,29 +108,32 @@ public class Method_Row : Method_Database, IUseableForButton {
             }
         }
 
-        var t = Stopwatch.StartNew();
-
         Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
 
-        do {
-            (newrow, message, var stoptrying) = RowCollection.UniqueRow(fic, coment);
+        RowItem? newrow;
 
-            if (newrow != null && string.IsNullOrEmpty(message)) { break; }
-            if (stoptrying) { break; }
-            if (t.Elapsed.TotalMinutes > 5) { break; }
-            if (t.Elapsed.TotalSeconds > 10 && !scp.ProduktivPhase) { break; }
+        if (scp.ProduktivPhase) {
+            var t = Stopwatch.StartNew();
+            string message;
+            do {
+                (newrow, message, var stoptrying) = RowCollection.UniqueRow(fic, coment);
 
-            Generic.Pause(5, false);
-        } while (true);
+                if (newrow != null && string.IsNullOrEmpty(message)) { break; }
+                if (stoptrying) { break; }
+                if (t.Elapsed.TotalMinutes > 5) { break; }
+                if (t.Elapsed.TotalSeconds > 10 && !scp.ProduktivPhase) { break; }
 
-        if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(message, true, ld); }
+                Generic.Pause(5, false);
+            } while (true);
+
+            t.Stop();
+            if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(message, true, ld); }
+        } else {
+            if (fic.Rows.Count != 1) { return DoItFeedback.TestModusInaktiv(ld); }
+            newrow = fic.Rows[0];
+        }
 
         if (newrow is { IsDisposed: false } r) {
-            _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(r);
-            //if (scp.AdditionalInfo is RowItem masterRow && r.Database is { IsDisposed: false } db) {
-            //    masterRow.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, $"Zugehöriger Eintrag: {r.CellFirstString()} ({db.Caption})");
-            //}
-
             var v = r.CellGetDateTime(srs);
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
@@ -159,7 +159,7 @@ public class Method_Row : Method_Database, IUseableForButton {
 
         var d = attvar.ValueNumGet(0);
 
-        var fb = UniqueRow(varCol, ld, allFi, d, $"Script-Befehl: 'Row' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp);
+        var fb = UniqueRow(allFi, d, $"Script-Befehl: 'Row' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp, ld);
         allFi.Dispose();
 
         return fb;

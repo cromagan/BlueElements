@@ -419,7 +419,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
             // Fall 5: Aufwendige Berechnung, wenn der Filter ein Ergebnis zurückliefert
             if (!showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { } c) {
-                if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
+                //if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
                 using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
                 showDelFilterButton = fc.Rows.Count > 0;
             }

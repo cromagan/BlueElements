@@ -66,7 +66,6 @@ public class Method_CellSetRow : Method_Database {
 
         var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false, null);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (row == MyRow(scp)) {
             return new DoItFeedback("Die eigene Zelle kann nur über die Variabeln geändert werden.", true, ld);
@@ -78,6 +77,11 @@ public class Method_CellSetRow : Method_Database {
         if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
 
         value = columnToSet.AutoCorrect(value, true);
+
+        if (!scp.ProduktivPhase) {
+            if (row.CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }
+            return DoItFeedback.Wahr();
+        }
 
         row.CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + db.Caption + "'");
         columnToSet.AddSystemInfo("Edit with Script", db, scp.ScriptName);
