@@ -599,7 +599,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         #endregion
 
-        #region  Leeres Verzeichniss löschen
+        #region  Leeres Verzeichnis löschen
 
         if (DeleteDir && Enabled) {
             if (DirectoryExists(_todel)) {
@@ -617,7 +617,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         _todel = dir;
 
-        #region Verzeichniss erstellen oder raus hier
+        #region Verzeichnis erstellen oder raus hier
 
         if (!DirectoryExists(dir)) {
             if (CreateDir && Enabled && RowsInputChangedHandled && FilterInputChangedHandled &&
@@ -679,7 +679,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         #endregion
 
-        #region Verzeichniss objekte Flott erstellen
+        #region Verzeichnis objekte Flott erstellen
 
         var allD = System.IO.Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly);
         foreach (var thisString in allD) {

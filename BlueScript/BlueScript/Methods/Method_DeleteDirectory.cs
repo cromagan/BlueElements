@@ -34,7 +34,7 @@ internal class Method_DeleteDirectory : Method {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "deletedirectory";
     public override List<string> Constants => [];
-    public override string Description => "Löscht die Verzeichniss und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichniss nicht (mehr) existiert.";
+    public override string Description => "Löscht die Verzeichnis und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichnis nicht (mehr) existiert.";
 
     public override bool GetCodeBlockAfter => false;
 

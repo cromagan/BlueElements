@@ -47,18 +47,17 @@ internal class Method_ImportCsv : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
-        var db = MyDatabase(scp);
-        if (db == null) { return new DoItFeedback("Datenbankfehler!", true, ld); }
-
-        var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
+        var m = myDb.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        var sx = db.ImportCsv(txt, true, true, sep, false, false);
+        var sx = myDb.ImportCsv(txt, true, true, sep, false, false);
 
         return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(sx, true, ld);
     }

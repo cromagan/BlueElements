@@ -19,7 +19,6 @@
 
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Structures;
-using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 

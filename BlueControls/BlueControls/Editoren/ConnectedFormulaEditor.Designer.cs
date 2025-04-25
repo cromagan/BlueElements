@@ -246,7 +246,7 @@ namespace BlueControls.Forms {
             this.btnFileExplorer.Name = "btnFileExplorer";
             this.btnFileExplorer.Size = new System.Drawing.Size(104, 22);
             this.btnFileExplorer.TabIndex = 3;
-            this.btnFileExplorer.Text = "Verzeichniss";
+            this.btnFileExplorer.Text = "Verzeichnis";
             this.btnFileExplorer.Click += new System.EventHandler(this.grpFileExplorer_Click);
             // 
             // btnFeldHinzu

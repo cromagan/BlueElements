@@ -30,6 +30,11 @@ public readonly struct CanDoFeedback {
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
         LogData = ld;
+
+        if(needsScriptFix) {
+            ld?.AddMessage(message);
+        }
+
     }
 
     public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, LogData ld) {

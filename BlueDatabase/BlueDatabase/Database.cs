@@ -1422,7 +1422,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             #region Fehlerprüfungen
 
             if (scf.NeedsScriptFix && string.IsNullOrEmpty(NeedsScriptFix)) {
-
                 var t = "Datenbank: " + Caption + "\r\n" +
                                   "Benutzer: " + UserName + "\r\n" +
                                   "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
@@ -1440,11 +1439,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
             }
 
-
             if (scf.Failed) {
                 if (row != null) { _ = RowCollection.FailedRows.TryAdd(row, scf.FailedReason); }
 
-                OnDropMessage(ErrorType.Info, $"Script-Fehler: {scf.FailedReason}");
+                OnDropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
                 _ = ExecutingScript.Remove(scriptId);
                 _ = ExecutingScriptAnyDatabase.Remove(scriptId);
                 return scf;

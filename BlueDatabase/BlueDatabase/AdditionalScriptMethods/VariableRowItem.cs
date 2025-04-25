@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript;
 

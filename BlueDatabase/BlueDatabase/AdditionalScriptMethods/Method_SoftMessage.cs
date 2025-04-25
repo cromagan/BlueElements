@@ -63,11 +63,10 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var db = MyDatabase(scp);
-        if (db == null) { return new DoItFeedback("Datenbankfehler!", true, ld); }
+        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
-        db.OnDropMessage(ErrorType.Info, txt);
+        myDb.OnDropMessage(ErrorType.Info, txt);
 
         return DoItFeedback.Null();
     }

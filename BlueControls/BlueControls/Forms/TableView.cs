@@ -345,7 +345,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         var posError = false;
         switch (column.Function) {
             case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
-            case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
                 posError = true;
                 break;

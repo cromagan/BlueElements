@@ -324,7 +324,7 @@ public class DatabaseFragments : Database {
 
         try {
 
-            #region Alle Fragment-Dateien im Verzeichniss ermitteln und eigene Ausfiltern (frgma)
+            #region Alle Fragment-Dateien im Verzeichnis ermitteln und eigene Ausfiltern (frgma)
 
             var frgma = Directory.GetFiles(FragmengtsPath(), TableName.ToUpper() + "-*." + SuffixOfFragments(), SearchOption.TopDirectoryOnly).ToList();
             _ = frgma.Remove(_myFragmentsFilename);

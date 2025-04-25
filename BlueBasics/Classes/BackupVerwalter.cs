@@ -73,7 +73,7 @@ public class BackupVerwalter {
     /// <param name="search">Der Dateipattern, nach dem gesucht werden soll z.b. table_20*.bdb</param>
     /// <returns></returns>
     public string CleanUpDirectory(string path, string search) {
-        if (string.IsNullOrEmpty(path)) { return "Kein Verzeichniss angebeben."; }
+        if (string.IsNullOrEmpty(path)) { return "Kein Verzeichnis angebeben."; }
         if (string.IsNullOrEmpty(search)) { return "Kein Suchpattern angebeben."; }
 
         var fix = Directory.GetFiles(path, search, SearchOption.TopDirectoryOnly);

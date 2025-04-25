@@ -129,15 +129,15 @@ public abstract class Method : IReadableTextWithKey {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence, string endsequwence, LogData ld) {
+    public static GetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence, string endSequence, LogData? ld) {
         //z.B: beim Befehl DO
-        if (string.IsNullOrEmpty(endsequwence)) {
+        if (string.IsNullOrEmpty(endSequence)) {
             return new GetEndFeedback(startpos, string.Empty);
         }
 
-        var (pos, which) = NextText(scriptText, startpos, [endsequwence], false, false, KlammernAlle);
+        var (pos, which) = NextText(scriptText, startpos, [endSequence], false, false, KlammernAlle);
         if (pos < startpos) {
-            return new GetEndFeedback("Endpunkt '" + endsequwence + "' nicht gefunden.", ld, true);
+            return new GetEndFeedback("Endpunkt '" + endSequence + "' nicht gefunden.", ld, true);
         }
 
         var txtBtw = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);

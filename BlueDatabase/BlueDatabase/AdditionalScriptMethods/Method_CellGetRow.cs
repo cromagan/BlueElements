@@ -18,16 +18,14 @@
 #nullable enable
 
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_CellGetRow : Method {
+public class Method_CellGetRow : Method_Database {
 
     #region Properties
 
@@ -48,10 +46,17 @@ public class Method_CellGetRow : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
         if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
-        if (!db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, ld); }
+
+        if (row == MyRow(scp)) {
+            return new DoItFeedback("Zugriff der Werte der eigenen Zeile nur über Variabeln möglich.", true, ld);
+        }
+
+        if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, ld); }
 
         if (db.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
 

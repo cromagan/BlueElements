@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueScript.Structures;

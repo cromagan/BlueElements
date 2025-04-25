@@ -60,18 +60,18 @@ public class Method_RowNext : Method_Database {
         var column = Column(scp, attvar, 0);
         if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Name(0), true, ld); }
 
-        if (mr.Database is not { IsDisposed: false } db) { return DoItFeedback.InternerFehler(ld); }
+        if (mr.Database is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (db != column.Database) { return DoItFeedback.InternerFehler(ld); }
+        if (myDb != column.Database) { return DoItFeedback.InternerFehler(ld); }
 
         List<RowItem> r = [];
         if (attvar.Attributes.Count > 2) {
-            var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, db, scp.ScriptName, true);
+            var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, myDb, scp.ScriptName, true);
             if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
             r.AddRange(allFi.Rows);
             allFi.Dispose();
         } else {
-            r.AddRange(db.Row);
+            r.AddRange(myDb.Row);
         }
 
         if (r.Count < 2) { return Method_Row.RowToObjectFeedback(null); }
@@ -80,8 +80,8 @@ public class Method_RowNext : Method_Database {
 
         if (!r.Contains(mr)) { return Method_Row.RowToObjectFeedback(null); }
 
-        var rsd = new RowSortDefinition(db, column, attvar.ValueBoolGet(1));
-        var (rows, _) = Table.CalculateSortedRows(db, r, null, rsd);
+        var rsd = new RowSortDefinition(myDb, column, attvar.ValueBoolGet(1));
+        var (rows, _) = Table.CalculateSortedRows(myDb, r, null, rsd);
 
         var givebackrow = -1;
 

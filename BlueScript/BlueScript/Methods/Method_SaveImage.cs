@@ -67,9 +67,9 @@ internal class Method_SaveImage : Method {
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         var pf = filn.PathParent();
-        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
-        if (!Directory.Exists(pf)) { return new DoItFeedback("Verzeichniss existiert nicht", true, ld); }
-        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback("Keine Schreibrechte im Zielverzeichniss.", true, ld); }
+        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback($"Dateinamen-Fehler: '{pf}'", true, ld); }
+        if (!Directory.Exists(pf)) { return new DoItFeedback($"Verzeichnis '{pf}' existiert nicht.", true, ld); }
+        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback($"Keine Schreibrechte im ZielVerzeichnis '{pf}'.", true, ld); }
 
         if (File.Exists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 

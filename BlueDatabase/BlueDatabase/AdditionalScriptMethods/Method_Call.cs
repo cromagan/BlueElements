@@ -66,12 +66,11 @@ internal class Method_Call : Method_Database, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+
         var vs = attvar.ValueStringGet(0);
 
-        var db = MyDatabase(scp);
-        if (db == null) { return new DoItFeedback("Datenbankfehler!", true, ld); }
-
-        var sc = db.EventScript.Get(vs);
+        var sc = myDb.EventScript.Get(vs);
         if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
 
         var newat = sc.Attributes();

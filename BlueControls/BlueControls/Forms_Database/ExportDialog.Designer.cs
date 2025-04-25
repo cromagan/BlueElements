@@ -14,38 +14,30 @@ using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 using TabPage = System.Windows.Forms.TabPage;
 
-namespace BlueControls.Forms
-    {
-        public sealed partial class ExportDialog : Form
-		{
-			//Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-			[DebuggerNonUserCode()]
-			protected override void Dispose(bool disposing)
-			{
-				try
-				{
-					if (disposing )
-					{
-					}
-				}
-				finally
-				{
-					base.Dispose(disposing);
-				}
-			}
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-			[DebuggerStepThrough()]
-			private void InitializeComponent()
-			{
+namespace BlueControls.Forms {
+    public sealed partial class ExportDialog : Form {
+        //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+        [DebuggerNonUserCode()]
+        protected override void Dispose(bool disposing) {
+            try {
+                if (disposing) {
+                }
+            } finally {
+                base.Dispose(disposing);
+            }
+        }
+        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        [DebuggerStepThrough()]
+        private void InitializeComponent() {
             this.capAnzahlInfo = new Caption();
             this.cbxLayoutWahl = new ComboBox();
             this.c_Layoutx = new Caption();
             this.Caption3 = new Caption();
-            this.MachZu = new Button();
+            this.btnMachZu = new Button();
             this.btnLayoutEditorÖffnen = new Button();
-            this.FrmDrucken_ExportVerzeichniss = new Button();
+            this.btnDrucken_ExportVerzeichnis = new Button();
             this.capLayout = new Caption();
             this.padVorschau = new CreativePad();
             this.Tabs = new TabControl();
@@ -84,7 +76,7 @@ namespace BlueControls.Forms
             // 
             // capAnzahlInfo
             // 
-            this.capAnzahlInfo.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+            this.capAnzahlInfo.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
                                                          | AnchorStyles.Right)));
             this.capAnzahlInfo.CausesValidation = false;
             this.capAnzahlInfo.Location = new Point(8, 16);
@@ -93,7 +85,7 @@ namespace BlueControls.Forms
             // 
             // cbxLayoutWahl
             // 
-            this.cbxLayoutWahl.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+            this.cbxLayoutWahl.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
                                                          | AnchorStyles.Right)));
             this.cbxLayoutWahl.Cursor = Cursors.IBeam;
             this.cbxLayoutWahl.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -119,16 +111,16 @@ namespace BlueControls.Forms
             this.Caption3.Size = new Size(46, 20);
             this.Caption3.Text = "Layout:";
             // 
-            // MachZu
+            // btnMachZu
             // 
-            this.MachZu.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
-            this.MachZu.ImageCode = "Häkchen|16";
-            this.MachZu.Location = new Point(743, 641);
-            this.MachZu.Name = "MachZu";
-            this.MachZu.Size = new Size(112, 40);
-            this.MachZu.TabIndex = 85;
-            this.MachZu.Text = "Beenden";
-            this.MachZu.Click += new EventHandler(this.FrmDrucken_Drucken_Click);
+            this.btnMachZu.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
+            this.btnMachZu.ImageCode = "Häkchen|16";
+            this.btnMachZu.Location = new Point(743, 641);
+            this.btnMachZu.Name = "btnMachZu";
+            this.btnMachZu.Size = new Size(112, 40);
+            this.btnMachZu.TabIndex = 85;
+            this.btnMachZu.Text = "Beenden";
+            this.btnMachZu.Click += new EventHandler(this.FrmDrucken_Drucken_Click);
             // 
             // btnLayoutEditorÖffnen
             // 
@@ -141,15 +133,15 @@ namespace BlueControls.Forms
             this.btnLayoutEditorÖffnen.Text = "Layout bearbeiten";
             this.btnLayoutEditorÖffnen.Click += new EventHandler(this.LayoutEditor_Click);
             // 
-            // FrmDrucken_ExportVerzeichniss
+            // btnDrucken_ExportVerzeichnis
             // 
-            this.FrmDrucken_ExportVerzeichniss.ImageCode = "Ordner|16";
-            this.FrmDrucken_ExportVerzeichniss.Location = new Point(8, 448);
-            this.FrmDrucken_ExportVerzeichniss.Name = "FrmDrucken_ExportVerzeichniss";
-            this.FrmDrucken_ExportVerzeichniss.Size = new Size(208, 40);
-            this.FrmDrucken_ExportVerzeichniss.TabIndex = 87;
-            this.FrmDrucken_ExportVerzeichniss.Text = "Export Verzeichnis öffnen";
-            this.FrmDrucken_ExportVerzeichniss.Click += new EventHandler(this.Button1_Click);
+            this.btnDrucken_ExportVerzeichnis.ImageCode = "Ordner|16";
+            this.btnDrucken_ExportVerzeichnis.Location = new Point(8, 448);
+            this.btnDrucken_ExportVerzeichnis.Name = "btnDrucken_ExportVerzeichnis";
+            this.btnDrucken_ExportVerzeichnis.Size = new Size(208, 40);
+            this.btnDrucken_ExportVerzeichnis.TabIndex = 87;
+            this.btnDrucken_ExportVerzeichnis.Text = "Export Verzeichnis öffnen";
+            this.btnDrucken_ExportVerzeichnis.Click += new EventHandler(this.Button1_Click);
             // 
             // capLayout
             // 
@@ -161,8 +153,8 @@ namespace BlueControls.Forms
             // 
             // padVorschau
             // 
-            this.padVorschau.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                        | AnchorStyles.Left) 
+            this.padVorschau.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
+                                                        | AnchorStyles.Left)
                                                        | AnchorStyles.Right)));
             this.padVorschau.EditAllowed = false;
             this.padVorschau.Location = new Point(232, 80);
@@ -205,8 +197,8 @@ namespace BlueControls.Forms
             // 
             // grpArt
             // 
-            this.grpArt.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                   | AnchorStyles.Left) 
+            this.grpArt.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
+                                                   | AnchorStyles.Left)
                                                   | AnchorStyles.Right)));
             this.grpArt.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpArt.Controls.Add(this.padVorschau);
@@ -279,7 +271,7 @@ namespace BlueControls.Forms
             // 
             // grpEinträge
             // 
-            this.grpEinträge.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+            this.grpEinträge.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
                                                        | AnchorStyles.Right)));
             this.grpEinträge.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpEinträge.Controls.Add(this.capAnzahlInfo);
@@ -337,8 +329,8 @@ namespace BlueControls.Forms
             // 
             // padPrint
             // 
-            this.padPrint.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                     | AnchorStyles.Left) 
+            this.padPrint.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
+                                                     | AnchorStyles.Left)
                                                     | AnchorStyles.Right)));
             this.padPrint.EditAllowed = false;
             this.padPrint.Location = new Point(5, 60);
@@ -437,8 +429,8 @@ namespace BlueControls.Forms
             // 
             // padSchachteln
             // 
-            this.padSchachteln.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                          | AnchorStyles.Left) 
+            this.padSchachteln.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
+                                                          | AnchorStyles.Left)
                                                          | AnchorStyles.Right)));
             this.padSchachteln.EditAllowed = false;
             this.padSchachteln.Location = new Point(8, 40);
@@ -455,8 +447,8 @@ namespace BlueControls.Forms
             this.tabDateiExport.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabDateiExport.Controls.Add(this.Caption4);
             this.tabDateiExport.Controls.Add(this.lstExported);
-            this.tabDateiExport.Controls.Add(this.FrmDrucken_ExportVerzeichniss);
-            this.tabDateiExport.Controls.Add(this.MachZu);
+            this.tabDateiExport.Controls.Add(this.btnDrucken_ExportVerzeichnis);
+            this.tabDateiExport.Controls.Add(this.btnMachZu);
             this.tabDateiExport.Location = new Point(4, 25);
             this.tabDateiExport.Name = "tabDateiExport";
             this.tabDateiExport.Size = new Size(860, 687);
@@ -474,8 +466,8 @@ namespace BlueControls.Forms
             // lstExported
             // 
             this.lstExported.AddAllowed = AddType.None;
-            this.lstExported.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                        | AnchorStyles.Left) 
+            this.lstExported.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
+                                                        | AnchorStyles.Left)
                                                        | AnchorStyles.Right)));
             this.lstExported.CheckBehavior = CheckBehavior.NoSelection;
             this.lstExported.Location = new Point(8, 40);
@@ -508,34 +500,34 @@ namespace BlueControls.Forms
             this.tabDateiExport.ResumeLayout(false);
             this.ResumeLayout(false);
 
-			}
-			private ComboBox cbxLayoutWahl;
-			private Caption c_Layoutx;
-			private Caption capAnzahlInfo;
-			private Caption Caption3;
-			internal Button MachZu;
-			internal Button btnLayoutEditorÖffnen;
-			internal Button FrmDrucken_ExportVerzeichniss;
-			internal Caption capLayout;
-			internal CreativePad padVorschau;
-			internal  TabPage tabDateiExport;
-			internal  TabPage tabStart;
-			private Button optEinzelnSpeichern;
-			private Button optDrucken;
-			internal  TabPage tabDrucken;
-			internal Caption Caption4;
-			internal ListBox lstExported;
-			internal Button btnWeiter;
-			internal CreativePad padPrint;
-			internal Button Button_PageSetup;
-			private Button btnDrucken;
-			private Button Vorschau;
+        }
+        private ComboBox cbxLayoutWahl;
+        private Caption c_Layoutx;
+        private Caption capAnzahlInfo;
+        private Caption Caption3;
+        internal Button btnMachZu;
+        internal Button btnLayoutEditorÖffnen;
+        internal Button btnDrucken_ExportVerzeichnis;
+        internal Caption capLayout;
+        internal CreativePad padVorschau;
+        internal TabPage tabDateiExport;
+        internal TabPage tabStart;
+        private Button optEinzelnSpeichern;
+        private Button optDrucken;
+        internal TabPage tabDrucken;
+        internal Caption Caption4;
+        internal ListBox lstExported;
+        internal Button btnWeiter;
+        internal CreativePad padPrint;
+        internal Button Button_PageSetup;
+        private Button btnDrucken;
+        private Button Vorschau;
         internal TabControl Tabs;
         private GroupBox grpArt;
         private Button optBildSchateln;
         private GroupBox grpEinträge;
         private Button optSpezialFormat;
-        private  TabPage tabBildSchachteln;
+        private TabPage tabBildSchachteln;
         internal CreativePad padSchachteln;
         private Button btnSchachtelnSpeichern;
         private FlexiControl flxAbstand;
@@ -544,4 +536,4 @@ namespace BlueControls.Forms
         private Caption capDpi;
         private Button btnEinstellung;
     }
-	}
+}

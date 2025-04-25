@@ -61,12 +61,11 @@ public class Method_AddRows : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var mydb = MyDatabase(scp);
-        if (mydb == null) { return DoItFeedback.InternerFehler(ld); }
+        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
         if (db == null) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
-        if (!db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
@@ -91,7 +90,7 @@ public class Method_AddRows : Method_Database {
 
             #region  Filter ermitteln (allfi)
 
-            var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, mydb, scp.ScriptName, false);
+            var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myDb, scp.ScriptName, false);
             if (!string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
             allFi ??= new FilterCollection(db, "AddRows");
@@ -105,7 +104,7 @@ public class Method_AddRows : Method_Database {
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
-            var fb = Method_Row.UniqueRow(allFi, d, $"Script-Befehl: 'AddRows' der Tabelle {mydb.Caption}, Skript {scp.ScriptName}", scp, ld);
+            var fb = Method_Row.UniqueRow(allFi, d, $"Script-Befehl: 'AddRows' der Tabelle {myDb.Caption}, Skript {scp.ScriptName}", scp, ld);
             allFi.Dispose();
             if (fb.Failed) { return fb; }
         }

@@ -57,7 +57,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    [Description("Ob das Verzeichniss bei Bedarf erzeugt werden soll.")]
+    [Description("Ob das Verzeichnis bei Bedarf erzeugt werden soll.")]
     public bool Bei_Bedarf_erzeugen {
         get => _bei_Bedarf_Erzeugen;
 
