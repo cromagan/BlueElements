@@ -908,6 +908,51 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             ? EditTypeTable.None
             : UserEditDialogTypeInTable(column.Function, preverDropDown && column.EditableWithDropdown, column.EditableWithTextInput, column.MultiLine);
 
+    public static EditTypeTable UserEditDialogTypeInTable(ColumnFunction function, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
+        if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
+
+        switch (function) {
+            case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
+                return EditTypeTable.Dropdown_Single;
+
+            //case ColumnFunction.FarbeInteger:
+            //    if (doDropDown) { return EditTypeTable.Dropdown_Single; }
+            //    return EditTypeTable.Farb_Auswahl_Dialog;
+
+            //case ColumnFunction.Schrift:
+            //    if (doDropDown) { return EditTypeTable.Dropdown_Single; }
+            //    return EditTypeTable.Font_AuswahlDialog;
+
+            case ColumnFunction.Zeile:
+            case ColumnFunction.Split_Medium:
+            case ColumnFunction.Split_Large:
+            case ColumnFunction.Split_Name:
+            case ColumnFunction.First:
+            case ColumnFunction.Schlüsselspalte:
+                return EditTypeTable.None;
+
+            default:
+                if (function.TextboxEditPossible()) {
+                    if (!doDropDown) {
+                        return EditTypeTable.Textfeld;
+                    }
+
+                    if (isMultiline) {
+                        return EditTypeTable.Dropdown_Single;
+                    }
+
+                    if (keybordInputAllowed) {
+                        return EditTypeTable.Textfeld_mit_Auswahlknopf;
+                    }
+
+                    return EditTypeTable.Dropdown_Single;
+                }
+
+                Develop.DebugPrint(function);
+                return EditTypeTable.None;
+        }
+    }
+
     public void AddSystemInfo(string type, string user) {
         var t = ColumnSystemInfo.SplitAndCutByCrToList();
         t.Add(type + ": " + user);
@@ -919,9 +964,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public void AddSystemInfo(string type, Database sourcedatabase, string user) => AddSystemInfo(type, sourcedatabase.Caption + " -> " + user);
 
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return value; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return value; }
 
-        if (IsSystemColumn()) { return value; }
+        if (IsSystemColumn() && this != db.Column.SysChapter) { return value; }
         //if (Function == ColumnFunction.Virtelle_Spalte) { return value; }
 
         if (exitifLinkedFormat) {
@@ -1090,6 +1135,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         return true;
     }
+
     public List<string> Contents() => Contents(Database?.Row.ToList());
 
     public List<string> Contents(FilterCollection fc, List<RowItem>? pinned) {
@@ -2247,51 +2293,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
         }
         return string.Empty;
-    }
-
-    public static EditTypeTable UserEditDialogTypeInTable(ColumnFunction function, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
-        if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
-
-        switch (function) {
-            case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                return EditTypeTable.Dropdown_Single;
-
-            //case ColumnFunction.FarbeInteger:
-            //    if (doDropDown) { return EditTypeTable.Dropdown_Single; }
-            //    return EditTypeTable.Farb_Auswahl_Dialog;
-
-            //case ColumnFunction.Schrift:
-            //    if (doDropDown) { return EditTypeTable.Dropdown_Single; }
-            //    return EditTypeTable.Font_AuswahlDialog;
-
-            case ColumnFunction.Zeile:
-            case ColumnFunction.Split_Medium:
-            case ColumnFunction.Split_Large:
-            case ColumnFunction.Split_Name:
-            case ColumnFunction.First:
-            case ColumnFunction.Schlüsselspalte:
-                return EditTypeTable.None;
-
-            default:
-                if (function.TextboxEditPossible()) {
-                    if (!doDropDown) {
-                        return EditTypeTable.Textfeld;
-                    }
-
-                    if (isMultiline) {
-                        return EditTypeTable.Dropdown_Single;
-                    }
-
-                    if (keybordInputAllowed) {
-                        return EditTypeTable.Textfeld_mit_Auswahlknopf;
-                    }
-
-                    return EditTypeTable.Dropdown_Single;
-                }
-
-                Develop.DebugPrint(function);
-                return EditTypeTable.None;
-        }
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();

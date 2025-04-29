@@ -47,7 +47,8 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.SpecialVariables;
+    //public override MethodType MethodType => MethodType.Database | MethodType.SpecialVariables;
+    public override MethodType MethodType => MethodType.Special;
 
     public override bool MustUseReturnValue => false;
 
@@ -72,9 +73,9 @@ public class Method_CallRow : Method_Database, IUseableForButton {
         if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, ld); }
 
 
-        if (row == MyRow(scp)) {
-            return new DoItFeedback("Skripte der eigenen Zeile mit Call aufrufen.", true, ld);
-        }
+        //if (row == MyRow(scp)) {
+        //    return new DoItFeedback("Skripte der eigenen Zeile mit Call aufrufen.", true, ld);
+        //}
 
         #region Attributliste erzeugen
 

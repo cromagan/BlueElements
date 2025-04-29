@@ -454,6 +454,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         #region Text-Eingabefeld - und keine weitere Berechnungen
 
+        if (IsDisposed || f is null) { return; } // Kommt vor!
+
         f.CaptionPosition = DefaultCaptionPosition;
         f.Caption = FilterSingleColumn.ReadableText() + ":";
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
