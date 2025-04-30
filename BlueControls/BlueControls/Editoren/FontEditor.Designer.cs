@@ -148,7 +148,6 @@ namespace BlueControls.Forms
             this.chkOutline.Size = new System.Drawing.Size(120, 16);
             this.chkOutline.TabIndex = 5;
             this.chkOutline.Text = "Umrandet";
-            this.chkOutline.CheckedChanged += new System.EventHandler(this.style_CheckedChanged);
             // 
             // chkDurchgestrichen
             // 

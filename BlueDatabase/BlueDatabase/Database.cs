@@ -87,7 +87,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private readonly List<string> _permissionGroupsNewRow = [];
     private readonly List<string> _tags = [];
     private readonly List<Variable> _variables = [];
-    private string _additionalFilesPfad;
+    private string _additionalFilesPath;
     private string _cachePfad = string.Empty;
     private string _canWriteError = string.Empty;
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
@@ -110,6 +110,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _needsScriptFix = string.Empty;
     private DateTime _powerEditTime = DateTime.MinValue;
     private bool _readOnly;
+    private string _rowQuickInfo = string.Empty;
     private bool _saveRequired = false;
     private RowSortDefinition? _sortDefinition;
 
@@ -121,7 +122,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _temporaryDatabaseMasterTimeUtc = string.Empty;
     private string _temporaryDatabaseMasterUser = string.Empty;
     private string _variableTmp;
-    private string _zeilenQuickInfo = string.Empty;
 
     #endregion
 
@@ -160,8 +160,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //_caption = string.Empty;
         LoadedVersion = DatabaseVersion;
         //_globalScale = 1f;
-        _additionalFilesPfad = "AdditionalFiles";
-        //_zeilenQuickInfo = string.Empty;
+        _additionalFilesPath = "AdditionalFiles";
+        //_rowQuickInfo = string.Empty;
         //_sortDefinition = null;
         //EventScript_RemoveAll(true);
         //_variables.Clear();
@@ -229,12 +229,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
-    public string AdditionalFilesPfad {
-        get => _additionalFilesPfad;
+    public string AdditionalFilesPath {
+        get => _additionalFilesPath;
         set {
-            if (_additionalFilesPfad == value) { return; }
-            AdditionalFilesPfadtmp = null;
-            _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPfad, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            if (_additionalFilesPath == value) { return; }
+            _additionalFilesPathTemp = null;
+            _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPath, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
             Cell.InvalidateAllSizes();
         }
     }
@@ -411,6 +411,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public RowCollection Row { get; }
 
+    public string RowQuickInfo {
+        get => _rowQuickInfo;
+        set {
+            if (_rowQuickInfo == value) { return; }
+            _ = ChangeData(DatabaseDataType.RowQuickInfo, null, null, _rowQuickInfo, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+        }
+    }
+
     public RowSortDefinition? SortDefinition {
         get => _sortDefinition;
         set {
@@ -486,22 +494,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public string ZeilenQuickInfo {
-        get => _zeilenQuickInfo;
-        set {
-            if (_zeilenQuickInfo == value) { return; }
-            _ = ChangeData(DatabaseDataType.RowQuickInfo, null, null, _zeilenQuickInfo, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
-        }
-    }
-
-    protected string? AdditionalFilesPfadtmp { get; set; }
-
     /// <summary>
     /// Letzter Lade-Stand der Daten.
     /// </summary>
     protected DateTime IsInCache { get; set; } = new(0);
 
     protected string LoadedVersion { get; private set; }
+    private string? _additionalFilesPathTemp { get; set; }
 
     #endregion
 
@@ -1030,13 +1029,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Der komplette Pfad mit abschließenden \
     /// </summary>
     /// <returns></returns>
-    public string AdditionalFilesPfadWhole() {
-        if (AdditionalFilesPfadtmp != null) { return AdditionalFilesPfadtmp; }
+    public string AdditionalFilesPathWhole() {
+        if (_additionalFilesPathTemp != null) { return _additionalFilesPathTemp; }
 
-        if (!string.IsNullOrEmpty(_additionalFilesPfad)) {
-            var t = _additionalFilesPfad.CheckPath();
+        if (!string.IsNullOrEmpty(_additionalFilesPath)) {
+            var t = _additionalFilesPath.CheckPath();
             if (DirectoryExists(t)) {
-                AdditionalFilesPfadtmp = t;
+                _additionalFilesPathTemp = t;
                 return t;
             }
         }
@@ -1044,11 +1043,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(Filename)) {
             var t = (Filename.FilePath() + "AdditionalFiles\\").CheckPath();
             if (DirectoryExists(t)) {
-                AdditionalFilesPfadtmp = t;
+                _additionalFilesPathTemp = t;
                 return t;
             }
         }
-        AdditionalFilesPfadtmp = string.Empty;
+        _additionalFilesPathTemp = string.Empty;
         return string.Empty;
     }
 
@@ -1149,9 +1148,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return "Skript 'Zeile löschen' mehrfach vorhanden";
         }
 
-        if (l.Get(ScriptEventTypes.correct_changed).Count > 1) {
-            return "Skript 'Fehlerfrei verändert' mehrfach vorhanden";
-        }
+        //if (l.Get(ScriptEventTypes.correct_changed).Count > 1) {
+        //    return "Skript 'Fehlerfrei verändert' mehrfach vorhanden";
+        //}
 
         if (l.Get(ScriptEventTypes.loaded).Count > 1) {
             return "Skript 'Datenank geladen' mehrfach vorhanden";
@@ -1176,7 +1175,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable, bool addSysCorrect) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable) {
 
         #region Variablen für Skript erstellen
 
@@ -1205,8 +1204,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
         _ = vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
 
-        if (addSysCorrect) {
-            _ = vars.Add(new VariableBool("sys_correct", row?.CellGetBoolean(Column.SysCorrect) ?? true, true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler enthält."));
+        if (Column.SysCorrect is { IsDisposed: false } csc && row is { IsDisposed: false }) {
+            _ = vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));
         }
 
         if (Column.First() is { IsDisposed: false } fc) {
@@ -1216,6 +1215,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 _ = vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
             }
         }
+
+        _ = vars.Add(new VariableString("AdditionalFilesPath", (AdditionalFilesPathWhole().Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
 
         //_ = vars.Add(new VariableBool("Successful", true, true, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
         //_ = vars.Add(new VariableString("NotSuccessfulReason", string.Empty, true, "Die letzte Meldung, warum es nicht erfolgreich war."));
@@ -1232,7 +1233,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// AdditionalFiles/Datenbankpfad mit Layouts und abschließenden \
     /// </summary>
     public string DefaultLayoutPath() {
-        if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) { return AdditionalFilesPfadWhole() + "Layouts\\"; }
+        if (!string.IsNullOrEmpty(AdditionalFilesPathWhole())) { return AdditionalFilesPathWhole() + "Layouts\\"; }
         //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Layouts\\"; }
         return string.Empty;
     }
@@ -1248,7 +1249,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    StandardFormulaFile = sourceDatabase.StandardFormulaFile;
     //    EventScriptVersion = sourceDatabase.EventScriptVersion;
     //    NeedsScriptFix = sourceDatabase.NeedsScriptFix;
-    //    ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
+    //    RowQuickInfo = sourceDatabase.RowQuickInfo;
     //    if (tagsToo) {
     //        Tags = new(sourceDatabase.Tags.Clone());
     //    }
@@ -1325,7 +1326,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     //    //FirstColumn = sourceDatabase.FirstColumn;
-    //    AdditionalFilesPfad = sourceDatabase.AdditionalFilesPfad;
+    //    AdditionalFilesPath = sourceDatabase.AdditionalFilesPath;
     //    CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
     //    Caption = sourceDatabase.Caption;
     //    //TimeCode = sourceDatabase.TimeCode;
@@ -1369,7 +1370,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (script == null) {
             // Wenn keine DatabaseScriptDescription ankommt, hat die Vorroutine entschieden, dass alles ok ist
-            var vars = CreateVariableCollection(row, true, dbVariables, true, false, false);
+            var vars = CreateVariableCollection(row, true, dbVariables, true, false);
             return new ScriptEndedFeedback(vars, string.Empty);
         }
 
@@ -1395,7 +1396,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 addinfo = row;
             }
 
-            var vars = CreateVariableCollection(row, script.AllVariabelsReadOnly, dbVariables, script.VirtalColumns, extended, script.AddSysCorrect);
+            var vars = CreateVariableCollection(row, !script.ChangeValuesAllowed, dbVariables, script.VirtalColumns, extended);
 
             var meth = Method.GetMethods(script.AllowedMethods(row, extended));
 
@@ -1408,8 +1409,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (row is { IsDisposed: false }) { ki = ki + "\\" + row.CellFirstString(); }
 
             var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, script.KeyName, ki);
-
-            _ = vars.Add(new VariableString("AdditionalFilesPfad", (AdditionalFilesPfadWhole().Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
 
             var sc = new Script(vars, scp) {
                 ScriptText = script.Script
@@ -1478,7 +1477,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #region Variablen zurückschreiben
 
-            if (!script.AllVariabelsReadOnly && produktivphase) {
+            if (script.ChangeValuesAllowed && produktivphase) {
                 if (row is { IsDisposed: false }) {
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars, script.KeyName);
@@ -1621,7 +1620,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
-        if (FileExists(AdditionalFilesPfadWhole() + _standardFormulaFile)) { return AdditionalFilesPfadWhole() + _standardFormulaFile; }
+        if (FileExists(AdditionalFilesPathWhole() + _standardFormulaFile)) { return AdditionalFilesPathWhole() + _standardFormulaFile; }
         if (FileExists(DefaultFormulaPath() + _standardFormulaFile)) { return DefaultFormulaPath() + _standardFormulaFile; }
         return null;
     }
@@ -1647,7 +1646,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var r = new List<string>();
         if (!IsDisposed) {
             path.Add(DefaultLayoutPath());
-            if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) { path.Add(AdditionalFilesPfadWhole()); }
+            if (!string.IsNullOrEmpty(AdditionalFilesPathWhole())) { path.Add(AdditionalFilesPathWhole()); }
         }
 
         foreach (var thisP in path) {
@@ -2618,7 +2617,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             //    break;
 
             case DatabaseDataType.AdditionalFilesPath:
-                _additionalFilesPfad = value;
+                _additionalFilesPath = value;
                 break;
 
             case DatabaseDataType.StandardFormulaFile:
@@ -2626,7 +2625,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.RowQuickInfo:
-                _zeilenQuickInfo = value;
+                _rowQuickInfo = value;
                 break;
 
             case DatabaseDataType.Tags:
@@ -2823,7 +2822,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     /// <returns></returns>
     private string DefaultFormulaPath() {
-        if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) { return AdditionalFilesPfadWhole() + "Forms\\"; }
+        if (!string.IsNullOrEmpty(AdditionalFilesPathWhole())) { return AdditionalFilesPathWhole() + "Forms\\"; }
         //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Forms\\"; }
         return string.Empty;
     }
@@ -2889,7 +2888,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (e.Done) { return; }
             // Es werden alle Datenbanken abgefragt, also kann nach der ersten nicht schluss sein...
 
-            if (string.IsNullOrWhiteSpace(AdditionalFilesPfadWhole())) { return; }
+            if (string.IsNullOrWhiteSpace(AdditionalFilesPathWhole())) { return; }
 
             var name = e.Name.RemoveChars(Char_DateiSonderZeichen);
 

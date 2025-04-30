@@ -165,7 +165,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
         if (uu > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, uu), ld, varCol, scp);
             if (txt1.Failed || txt1.Variable is null or VariableUnknown) {
-                return new DoItFeedback("Befehls-Berechnungsfehler vor &&", txt1.NeedsScriptFix, ld);
+                return new DoItFeedback($"Befehls-Berechnungsfehler vor &&: {txt.Substring(0, uu)}", txt1.NeedsScriptFix, ld);
             }
 
             if (txt1.Variable.ValueForReplace == "false") {

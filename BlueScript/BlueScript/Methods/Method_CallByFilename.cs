@@ -123,7 +123,7 @@ public class Method_CallByFilename : Method {
         var vs = attvar.ValueStringGet(0);
         string f;
 
-        var addp = varCol.GetString("AdditionalFilesPfad");
+        var addp = varCol.GetString("AdditionalFilesPath");
 
         try {
             if (FileExists(vs)) {

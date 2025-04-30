@@ -75,7 +75,7 @@ public class RowFormulaListItem : AbstractListItem {
         get {
             if (_row?.Database is not { IsDisposed: false } db) { return string.Empty; }
 
-            return !string.IsNullOrEmpty(db.ZeilenQuickInfo)
+            return !string.IsNullOrEmpty(db.RowQuickInfo)
                 ? _row.QuickInfo.CreateHtmlCodes(true)
                 : _row.CellFirstString().CreateHtmlCodes(true);
         }

@@ -33,7 +33,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
             this.chkZeile = new BlueControls.Controls.Button();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
-            this.chkAuslöser_Fehlerfrei = new BlueControls.Controls.Button();
             this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
             this.chkAuslöser_databaseloaded = new BlueControls.Controls.Button();
             this.chkAuslöser_export = new BlueControls.Controls.Button();
@@ -249,7 +248,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpAuslöser
             // 
             this.grpAuslöser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_Fehlerfrei);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_deletingRow);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_databaseloaded);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_export);
@@ -263,17 +261,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAuslöser.TabIndex = 23;
             this.grpAuslöser.TabStop = false;
             this.grpAuslöser.Text = "Auslöser";
-            // 
-            // chkAuslöser_Fehlerfrei
-            // 
-            this.chkAuslöser_Fehlerfrei.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_Fehlerfrei.Location = new System.Drawing.Point(8, 136);
-            this.chkAuslöser_Fehlerfrei.Name = "chkAuslöser_Fehlerfrei";
-            this.chkAuslöser_Fehlerfrei.QuickInfo = "Das Skript wird ausgeführt, wenn sich der Fehlerfrei-Status\r\nverändert hat.";
-            this.chkAuslöser_Fehlerfrei.Size = new System.Drawing.Size(208, 16);
-            this.chkAuslöser_Fehlerfrei.TabIndex = 25;
-            this.chkAuslöser_Fehlerfrei.Text = "\'Fehlerfrei\' hat sich verändert";
-            this.chkAuslöser_Fehlerfrei.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_deletingRow
             // 
@@ -620,7 +607,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capFehler;
         private Button chkAuslöser_deletingRow;
         private Button chkExtendend;
-        private Button chkAuslöser_Fehlerfrei;
         private TabPage tabLastError;
         private TextBox txbNeedFix;
         private Button btnDeleteNeedsScriptFix;

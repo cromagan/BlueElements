@@ -281,9 +281,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbTags.Text = db.Tags.JoinWithCr();
 
         txbCaption.Text = db.Caption;
-        txbAdditionalFiles.Text = db.AdditionalFilesPfad;
+        txbAdditionalFiles.Text = db.AdditionalFilesPath;
         txbStandardFormulaFile.Text = db.StandardFormulaFile;
-        txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");
+        txbZeilenQuickInfo.Text = db.RowQuickInfo.Replace("<br>", "\r");
 
         DatenbankAdmin.Suggestions.Clear();
         DatenbankAdmin.ItemAddRange(Table.Permission_AllUsed(false));
@@ -431,9 +431,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         //    Database.GlobalScale = Math.Min(FloatParse(txbGlobalScale.Text), 5);
         //    Database.GlobalScale = Math.Max(0.5f, Database.GlobalScale);
         //}
-        Database.AdditionalFilesPfad = txbAdditionalFiles.Text;
+        Database.AdditionalFilesPath = txbAdditionalFiles.Text;
         Database.StandardFormulaFile = txbStandardFormulaFile.Text;
-        Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
+        Database.RowQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 
         Database.Tags = new(txbTags.Text.SplitAndCutByCrToList());
 

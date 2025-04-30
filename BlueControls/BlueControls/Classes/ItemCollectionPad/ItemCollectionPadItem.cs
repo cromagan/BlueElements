@@ -932,7 +932,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     internal ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
-        var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false, false) ?? [];
+        var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false) ?? [];
 
         //var vars = new VariableCollection();
         _ = vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));

@@ -1038,7 +1038,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                     : "Durch Benutzer abgebrochen";
             } else {
                 //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-                var s = db.ExecuteScript(sc, sc.ChangeValues, null, null, true, true, false);
+                var s = db.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
                 m = s.Protocol.JoinWithCr();
             }
 

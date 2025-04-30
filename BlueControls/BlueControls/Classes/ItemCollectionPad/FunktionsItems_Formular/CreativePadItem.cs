@@ -209,8 +209,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             #region Verfügbare Layouts ermitteln
 
-            if (Directory.Exists(db.AdditionalFilesPfadWhole())) {
-                var f = Directory.GetFiles(db.AdditionalFilesPfadWhole(), "*.bcr");
+            if (Directory.Exists(db.AdditionalFilesPathWhole())) {
+                var f = Directory.GetFiles(db.AdditionalFilesPathWhole(), "*.bcr");
 
                 layouts.AddRange(ItemsOf(f));
             }
@@ -220,13 +220,13 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             //#region Verfügbare Skripte ermitteln
 
             //foreach (var thise in db.EventScript) {
-            //    if (!thise.ChangeValues && thise.NeedRow) {
+            //    if (!thise.ChangeValuesAllowed && thise.NeedRow) {
             //        scripte.Add(ItemOf(thise));
             //    }
             //}
 
-            ////if (Directory.Exists(db.AdditionalFilesPfadWhole())) {
-            ////    var f = Directory.GetFiles(db.AdditionalFilesPfadWhole(), "*.bcr");
+            ////if (Directory.Exists(db.AdditionalFilesPathWhole())) {
+            ////    var f = Directory.GetFiles(db.AdditionalFilesPathWhole(), "*.bcr");
 
             ////    layouts.AddRange(ItemsOf(f));
             ////}

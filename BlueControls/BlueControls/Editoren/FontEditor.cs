@@ -121,7 +121,7 @@ public partial class FontEditor : EditorEasy {
         chkKursiv.Checked = bf.Italic;
         chkUnterstrichen.Checked = bf.Underline;
         chkDurchgestrichen.Checked = bf.StrikeOut;
-        chkOutline.Checked = bf.Outline;
+        chkOutline.Checked = bf.ColorOutline.A > 0;
         btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorMain).Code;
         btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorOutline).Code;
         chkKap.Checked = bf.Kapitälchen;
@@ -152,7 +152,6 @@ public partial class FontEditor : EditorEasy {
                               chkKursiv.Checked,
                               chkUnterstrichen.Checked,
                               chkDurchgestrichen.Checked,
-                              chkOutline.Checked,
                               QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo,
                               QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo,
                               chkKap.Checked,
