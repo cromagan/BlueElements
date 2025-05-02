@@ -171,6 +171,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                     parentFormula.ChildIsBorn(this);
                 }
             }
+        } else {
+            Develop.DebugPrint(ErrorType.Warning, "Source hat keinen Parent!");
         }
     }
 
@@ -212,7 +214,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             Develop.DebugPrint(ErrorType.Error, "Element wird von Parents gesteuert!");
         }
 
-        var doAtabaseAfter = _databaseInput == null;
+        var doDatabaseAfter = _databaseInput == null;
 
         if (!RowsInputManualSeted) {
             FilterInputChangedHandled = true;
@@ -233,7 +235,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             RowsInput.Add(row);
             _ = row.CheckRow();
 
-            if (doAtabaseAfter) { RegisterEvents(); }
+            if (doDatabaseAfter) { RegisterEvents(); }
         }
 
         Invalidate_RowsInput();
@@ -243,7 +245,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected virtual void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
 
-    protected void DatabaseInput_Disposed(object sender, System.EventArgs e) { }
+    protected void DatabaseInput_Disposed(object sender, System.EventArgs e) {
+        DatabaseInput = null;
+    }
 
     protected virtual void DatabaseInput_Loaded(object sender, System.EventArgs e) { }
 
@@ -284,7 +288,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter") {
                 new FilterItem(mustbeDatabase, string.Empty)
             };
-            //Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
+            //Develop.DebugPrint(ErrorType.Error, "Datenbank Fehler");
         }
         Invalidate_RowsInput();
 
@@ -371,7 +375,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate_FilterInput();
     }
 
-    private void FilterInput_DispodingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
+    private void FilterInput_DisposingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 
     private void FilterInput_RowsChanged(object sender, System.EventArgs e) => Invalidate_RowsInput();
 
@@ -414,15 +418,15 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     private void RegisterEvents() {
         if (FilterInput is not { IsDisposed: false }) { return; }
         FilterInput.RowsChanged += FilterInput_RowsChanged;
-        FilterInput.DisposingEvent += FilterInput_DispodingEvent;
+        FilterInput.DisposingEvent += FilterInput_DisposingEvent;
     }
 
     private void UnRegisterFilterInputAndDispose() {
         if (FilterInput is not { IsDisposed: false }) { return; }
         FilterInput.RowsChanged -= FilterInput_RowsChanged;
-        FilterInput.DisposingEvent -= FilterInput_DispodingEvent;
+        FilterInput.DisposingEvent -= FilterInput_DisposingEvent;
 
-        if (Parents.Count > 1 && FilterInput != null && FilterInputChangedHandled) {
+        if (Parents.Count > 1 && FilterInputChangedHandled) {
             FilterInput.Database = null;
             FilterInput.Dispose();
         }

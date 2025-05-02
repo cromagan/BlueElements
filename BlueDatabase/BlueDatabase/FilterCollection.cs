@@ -356,14 +356,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Klont die Filter Collection. Auch alle Filter werden ein Klon. Vorberechnete Zeilen werden weitergegeben.
+    /// Klont die Filter Collection. Vorberechnete Zeilen werden weitergegeben.
     /// </summary>
     /// <returns></returns>
     public object Clone(string c2) {
         var fc = new FilterCollection(Database, "Clone " + c2);
-
+        
         fc.ChangeTo(this);
-
+   
         return fc;
     }
 

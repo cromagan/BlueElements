@@ -60,7 +60,7 @@ public static class Converter {
     public static DateTime DateTimeParse(string s) {
         if (string.IsNullOrEmpty(s)) { return DateTime.UtcNow; }
         if (DateTimeTryParse(s, out var result)) { return result; }
-        //Develop.DebugPrint(FehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
+        //Develop.DebugPrint(ErrorType.Warning, "Datum kann nicht geparsed werden: " + s);
         return DateTime.UtcNow;
     }
 

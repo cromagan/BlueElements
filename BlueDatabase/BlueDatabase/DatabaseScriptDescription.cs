@@ -53,7 +53,7 @@ public static class EventScriptExtension {
     #endregion
 }
 
-public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, IHasDatabase {
+public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase {
 
     #region Fields
 
@@ -141,7 +141,6 @@ public sealed class DatabaseScriptDescription : ScriptDescription, ICloneable, I
         return s;
     }
 
-    public object Clone() => new DatabaseScriptDescription(Database, ParseableItems().FinishParseable());
 
     public override int CompareTo(object obj) {
         if (obj is DatabaseScriptDescription v) {

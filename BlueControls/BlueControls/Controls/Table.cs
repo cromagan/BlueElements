@@ -1386,7 +1386,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         //var i = db.Column.IndexOf(tcvc[0][0].Column.KeyName);
 
         //if(i!= 0) {
-        //    Develop.DebugPrint(FehlerArt.Warnung, "Spalte 0 nicht auf erster Position!");
+        //    Develop.DebugPrint(ErrorType.Warning, "Spalte 0 nicht auf erster Position!");
 
         //    db.Column.RemoveAt
 
@@ -2864,7 +2864,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         if (CursorPosRow?.Row is { IsDisposed: false } setedrow) {
-            using var nfc = new FilterCollection(setedrow, "TableOutput");
+            using var nfc = new FilterCollection(setedrow, "Temp TableOutput");
             nfc.RemoveOtherAndAdd(FilterCombined, null);
             FilterOutput.ChangeTo(nfc);
         } else {

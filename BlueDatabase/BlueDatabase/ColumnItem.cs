@@ -279,7 +279,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     //    var ex = database.Column.SearchByKey(columnkey);
     //    if (ex != null) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "_name existiert bereits");
+    //        Develop.DebugPrint(ErrorType.Error, "_name existiert bereits");
     //    }
     public bool AfterEditQuickSortRemoveDouble {
         get => _multiLine && _afterEditQuickSortRemoveDouble;
@@ -647,7 +647,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             }
 
             //if (!IsValidColumnName(value)) {
-            //    Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt!");
+            //    Develop.DebugPrint(ErrorType.Warning, "Spaltenname nicht erlaubt!");
             //    return;
             //}
 
@@ -1799,13 +1799,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     //        default:
-    //            Develop.DebugPrint(FehlerArt.Warnung);
+    //            Develop.DebugPrint(ErrorType.Warning);
     //            break;
     //    }
     //}
     //public string SimplyFile(string fullFileName) {
     //    if (_format != DataFormat.Link_To_Filesystem) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
+    //        Develop.DebugPrint(ErrorType.Error, "Nur bei Link_To_Filesystem erlaubt!");
     //    }
     //    var tmpfile = fullFileName.FileNameWithoutSuffix();
     //    if (string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }

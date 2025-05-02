@@ -88,8 +88,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     ///// <param name="column"></param>
     ///// <returns></returns>
     //public void AddFromParser(ColumnItem? column) {
-    //    if (column.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
-    //    if (Contains(column)) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte bereits vorhanden!"); }
+    //    if (column.Database != Database) { Develop.DebugPrint(ErrorType.Error, "Parent-Datenbanken unterschiedlich!"); }
+    //    if (Contains(column)) { Develop.DebugPrint(ErrorType.Error, "Spalte bereits vorhanden!"); }
     //    base.GenerateAndAdd(column);
     //}
     //    /// <summary>
@@ -187,7 +187,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         //var item = SearchByKey(key);
         //if (item != null) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
+        //    Develop.DebugPrint(ErrorType.Error, "Schlüssel belegt!");
         //    return null;
         //}
         _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, null, string.Empty, keyName, Generic.UserName, DateTime.UtcNow, string.Empty, string.Empty);
@@ -452,7 +452,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 }
 
                 //if (l.KeyName != thisColumn.KeyName) {
-                //    Develop.DebugPrint(FehlerArt.Fehler, "KeyName nicht korrekt!");
+                //    Develop.DebugPrint(ErrorType.Error, "KeyName nicht korrekt!");
                 //}
             } else {
                 Develop.DebugPrint(ErrorType.Error, "Spalte nicht erzeugt!");
@@ -566,7 +566,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    if (!originalString.Contains(o)) { return originalString; }
     //    var n = ParsableColumnKey(newKey);
     //    if (oldKey == newKey) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel gleich:  " + oldKey);
+    //        Develop.DebugPrint(ErrorType.Error, "Schlüssel gleich:  " + oldKey);
     //        return originalString;
     //    }
     //    originalString = originalString.Replace(o + "}", n + "}");
@@ -574,7 +574,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    originalString = originalString.Replace(o + " ", n + " ");
     //    if (originalString.EndsWith(o)) { originalString = originalString.TrimEnd(o) + n; }
     //    if (originalString.Contains(o)) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "String nicht ersetzt: " + originalString);
+    //        Develop.DebugPrint(ErrorType.Error, "String nicht ersetzt: " + originalString);
     //        return originalString;
     //    }
     //    return originalString;

@@ -726,7 +726,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     //    if (sourceDatabase.Row.Count != Count) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Clone Fehlgeschlagen");
+    //        Develop.DebugPrint(ErrorType.Error, "Clone Fehlgeschlagen");
     //    }
     //}
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
@@ -761,7 +761,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //    var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
     //    if (!string.IsNullOrEmpty(f)) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich: " + f);
+    //        Develop.DebugPrint(ErrorType.Error, "Neue Zeilen nicht möglich: " + f);
     //        throw new Exception();
     //    }
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {

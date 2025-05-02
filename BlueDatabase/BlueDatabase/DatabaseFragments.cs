@@ -412,7 +412,7 @@ public class DatabaseFragments : Database {
 
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
-                        //Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
+                        //Develop.DebugPrint(ErrorType.Error, "Fehler beim Nachladen: " + Error + " / " + TableName);
                         _doingChanges--;
                         return;
                     }

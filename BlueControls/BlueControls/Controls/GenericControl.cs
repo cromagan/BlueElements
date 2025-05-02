@@ -524,7 +524,9 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
             //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
             if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }
             base.WndProc(ref m);
-        } catch { }
+        } catch (Exception ex) {
+            Develop.DebugPrint(BlueBasics.Enums.ErrorType.Error, "Globaler Fehler", ex);
+        }
     }
 
     private void Control_GotFocus(object sender, System.EventArgs e) {

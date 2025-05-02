@@ -213,7 +213,7 @@ public class DatabaseChunk : Database {
         if (type == DatabaseDataType.DatabaseVariables) { return Chunk_Variables.ToLower(); }
         if (type is DatabaseDataType.TemporaryDatabaseMasterUser
                  or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) {
-            //Develop.DebugPrint(FehlerArt.Fehler, "Sollte nicht passieren!");
+            //Develop.DebugPrint(ErrorType.Error, "Sollte nicht passieren!");
             return Chunk_Master.ToLower(); // Alte Undos
         }
 

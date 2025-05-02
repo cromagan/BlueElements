@@ -267,6 +267,10 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             return "Immer FALSCH";
         }
 
+        if (FilterType == FilterType.RowKey) {
+            return SearchValue.Count == 0 ? "Row-Key: ?" : "Row-Key: " + SearchValue[0];
+        }
+
         if (Column == null) {
             return SearchValue.Count == 0 ? "Zeilen-Filter" : "Zeilen-Filter: " + SearchValue[0];
         }

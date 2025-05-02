@@ -32,7 +32,7 @@ public static class Export {
     //        return string.Empty;
     //    }
     //    if (LoadedFile.Contains("BlueBasics")) {
-    //        Develop.DebugPrint(enFehlerArt.Fehler, "Nur für externe Elemente erlaubt!");
+    //        Develop.DebugPrint(ErrorType.Error, "Nur für externe Elemente erlaubt!");
     //        return string.Empty;
     //    }
     //    var TMPList = new List<RowItem>

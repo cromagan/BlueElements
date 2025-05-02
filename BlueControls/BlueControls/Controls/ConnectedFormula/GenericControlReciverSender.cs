@@ -31,7 +31,9 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Constructors
 
-    public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) { }
+    public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) {
+        FilterOutput = new("FilterOutput " + this.GetType().Name);
+    }
 
     #endregion
 
@@ -51,7 +53,7 @@ public class GenericControlReciverSender : GenericControlReciver {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutput");
+    public FilterCollection FilterOutput { get; }
 
     #endregion
 
@@ -68,19 +70,20 @@ public class GenericControlReciverSender : GenericControlReciver {
 
         //    if (it is IItemToControl itc) {
         //        var parentCon = parentFormula.SearchOrGenerate(itc, true, mode);
-        //        if (parentCon is GenericControlReciver exitingChild) {
-        //            ChildIsBorn(exitingChild);
+        //        if (parentCon is GenericControlReciver existingChild) {
+        //            ChildIsBorn(existingChild);
         //        }
         //    }
         //}
     }
 
     internal void ChildIsBorn(GenericControlReciver child) {
+        if (child.IsDisposed || IsDisposed) { return; }
+
         if (child.RowsInputManualSeted) {
             Develop.DebugPrint(ErrorType.Error, "Manuelle Filterung kann keine Parents empfangen.");
+            return;
         }
-
-        if (child.IsDisposed || IsDisposed) { return; }
 
         var isnew = !child.Parents.Contains(this);
         //var newFilters = FilterOutput.Count > 0;
@@ -96,36 +99,38 @@ public class GenericControlReciverSender : GenericControlReciver {
     }
 
     protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-
-        if (Disposing) {
-            Parent.Controls.Remove(this);
-            FilterOutput.Dispose();
+        if (disposing) {
+            if (Parent != null) {
+                Parent.Controls.Remove(this);
+            }
 
             foreach (var thisChild in Childs) {
                 _ = thisChild.Parents.Remove(this);
             }
 
             Childs.Clear();
+            FilterOutput.Dispose();
         }
+
+        base.Dispose(disposing);
     }
 
     protected void Invalidate_FilterOutput() => FilterOutput.Clear();
 
     protected override void OnCreateControl() {
-        FilterOutput.PropertyChanged += FilterOutput_PropertyChanged;
-        FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
         base.OnCreateControl();
+        FilterOutput.PropertyChanged += FilterOutput_PropertyChanged;
+        FilterOutput.DisposingEvent += FilterOutput_DisposingEvent;
     }
 
-    private void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
+    private void FilterOutput_DisposingEvent(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        FilterOutput.PropertyChanged -= FilterOutput_PropertyChanged;
-        FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
 
         if (!FilterOutput.IsDisposed) {
+            FilterOutput.PropertyChanged -= FilterOutput_PropertyChanged;
+            FilterOutput.DisposingEvent -= FilterOutput_DisposingEvent;
             FilterOutput.Database = null;
-            FilterOutput.Dispose();
+            //FilterOutput.Dispose();
         }
     }
 

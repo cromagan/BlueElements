@@ -144,7 +144,7 @@ public static partial class Extensions {
     //    if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
 
     //    if (value is IStringable) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Stringable Collection nicht möglich!");
+    //        Develop.DebugPrint(ErrorType.Error, "Stringable Collection nicht möglich!");
     //    }
 
     //    if (value.Count < 1) { return; }

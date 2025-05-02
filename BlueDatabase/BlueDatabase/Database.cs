@@ -1810,7 +1810,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     dictNeu.Add(zeil[rowNo][0].ToUpperInvariant(), zeil[rowNo]);
                 }
                 //else {
-                //    OnDropMessage(FehlerArt.Warnung, "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.");
+                //    OnDropMessage(ErrorType.Warning, "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.");
                 //    return "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.";
                 //}
             } else {

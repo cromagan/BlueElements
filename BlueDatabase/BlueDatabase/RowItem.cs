@@ -958,7 +958,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         //Um genau zu sein C:  - - + -
         //                 D:  - - - +
         //Deswegen muss beim einem UND-Filter nur EINER der Zellenwerte zutreffen.
-        //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugPrint(enFehlerArt.Fehler, "Kein Filter angegeben: " + ToString()); }
+        //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugPrint(ErrorType.Error, "Kein Filter angegeben: " + ToString()); }
 
         try {
             var typ = filtertyp;
@@ -972,7 +972,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 oder = true;
                 und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
             }
-            //if (Und && Oder) { Develop.DebugPrint(enFehlerArt.Fehler, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
+            //if (Und && Oder) { Develop.DebugPrint(ErrorType.Error, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
             // Tatsächlichen String ermitteln --------------------------------------------
             string txt;
 

@@ -802,7 +802,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     //    var tmpState = enStates.Undefiniert;
     //    var tmpMarkState = enMarkState.None;
     //    if (Position > this.Count) { Position = this.Count; }
-    //    if ((int)_Design > 10000) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Art"); }
+    //    if ((int)_Design > 10000) { Develop.DebugPrint(ErrorType.Error, "Falsche Art"); }
     //    if (Position < this.Count) {
     //        tmpFont = this[Position].Font;
     //        tmpState = this[Position].State;

@@ -1679,14 +1679,14 @@ public static class Skin {
     //            }
     //            break;
     //    }
-    //    Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
+    //    Develop.DebugPrint(ErrorType.Error, "Stufe " + stufe + " nicht definiert.");
     //    return null;
     //}
 
     //internal static BlueFont GetBlueFont(Design design, States state, int stufe) {
     //    if (stufe != 4 && design != Enums.Design.TextBox) {
     //        if (design == Enums.Design.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
-    //        Develop.DebugPrint(FehlerArt.Warnung, "Design unbekannt: " + (int)design);
+    //        Develop.DebugPrint(ErrorType.Warning, "Design unbekannt: " + (int)design);
     //        return GetBlueFont(design, state);
     //    }
     //    switch (stufe) {
@@ -1706,7 +1706,7 @@ public static class Skin {
     //            return GetBlueFont(Enums.Design.TextBox_Bold, state);
     //    }
 
-    //    Develop.DebugPrint(FehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
+    //    Develop.DebugPrint(ErrorType.Error, "Stufe " + stufe + " nicht definiert.");
     //    return GetBlueFont(design, state);
     //}
     private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {

@@ -422,7 +422,7 @@ public static class IO {
             if (executeAfter) { _ = ExecuteFile(filename); }
             return true;
         } catch {
-            //  Develop.DebugPrint(FehlerArt.Info, "Fehler beim Speichern der Datei: " + filename, ex);
+            //  Develop.DebugPrint(ErrorType.Info, "Fehler beim Speichern der Datei: " + filename, ex);
             return false;
         }
     }
@@ -484,7 +484,7 @@ public static class IO {
         try {
             File.Copy(source, target);
         } catch {
-            //Develop.DebugPrint(enFehlerArt.Info, ex);
+            //Develop.DebugPrint(ErrorType.Info, ex);
             return false;
         }
         return true; // FileExists(target);
@@ -496,7 +496,7 @@ public static class IO {
         try {
             Directory.Delete(pfad, true);
         } catch {
-            //Develop.DebugPrint(enFehlerArt.Info, ex);
+            //Develop.DebugPrint(ErrorType.Info, ex);
             return false;
         }
         return true; // Kein PathExist - evtl. hat ein anderer just den Pfad neu erstellt
@@ -511,13 +511,13 @@ public static class IO {
                 File.SetAttributes(thisFile, FileAttributes.Normal);
             }
         } catch {
-            //Develop.DebugPrint(enFehlerArt.Info, ex);
+            //Develop.DebugPrint(ErrorType.Info, ex);
         }
         try {
             CanWrite(thisFile, 0.5);
             File.Delete(thisFile);
         } catch {
-            //Develop.DebugPrint(enFehlerArt.Info, ex);
+            //Develop.DebugPrint(ErrorType.Info, ex);
             return false;
         }
         return true;  // Kein Fileexists - evtl. hat ein anderer just den Pfad neu erstellt
@@ -530,7 +530,7 @@ public static class IO {
         try {
             Directory.Move(oldName, newName);
         } catch {
-            //Develop.DebugPrint(enFehlerArt.Info, ex);
+            //Develop.DebugPrint(ErrorType.Info, ex);
             return false;
         }
         return true; // FileExists(newName) && !FileExists(oldName);
@@ -543,7 +543,7 @@ public static class IO {
         try {
             File.Move(oldName, newName);
         } catch {
-            //Develop.DebugPrint(enFehlerArt.Info, ex);
+            //Develop.DebugPrint(ErrorType.Info, ex);
             return false;
         }
         return true; // FileExists(newName) && !FileExists(oldName);

@@ -828,7 +828,7 @@ public static partial class Extensions {
     //                            ExitDo = true;
     //                        }
     //                    } else {
-    //                        Develop.DebugPrint(enFehlerArt.Warnung, "Unerlaubtes Zeichen nach Komma: " + tXT);
+    //                        Develop.DebugPrint(ErrorType.Warning, "Unerlaubtes Zeichen nach Komma: " + tXT);
     //                    }
     //                }
     //                break;
@@ -851,7 +851,7 @@ public static partial class Extensions {
     //                break;
     //        }
     //    }
-    //    if (OpenBraketCount != 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Parse Fehler: " + tXT); }
+    //    if (OpenBraketCount != 0) { Develop.DebugPrint(ErrorType.Error, "Parse Fehler: " + tXT); }
     //    return tXT.Substring(FirstCharAfterEquals, CurrentChar - FirstCharAfterEquals + 1);
     //}
     /// <summary>
