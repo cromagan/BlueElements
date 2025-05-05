@@ -213,7 +213,7 @@ public class InvalidatedRowsManager {
             return;
         }
 
-        if (row.NeedsRowUpdate()) {
+        if (!row.NeedsRowUpdate()) {
             masterRow?.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} bereits aktuell");
             return;
         }

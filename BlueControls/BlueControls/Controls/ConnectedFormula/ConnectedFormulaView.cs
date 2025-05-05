@@ -87,10 +87,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    //        if (_connectedFormula != null) {
-    //            _connectedFormula.Loaded += _cf_Loaded;
-    //            _connectedFormula.PropertyChanged += _page_PropertyChanged;
-    //        }
     public override string Mode {
         get => base.Mode;
         set {
@@ -162,10 +158,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     #region Methods
 
-    //        if (_connectedFormula != null) {
-    //            _connectedFormula.Loaded -= _cf_Loaded;
-    //            _connectedFormula.PropertyChanged -= _page_PropertyChanged;
-    //        }
     public void GenerateView() {
         if (IsDisposed) { return; }
         if (_generated) { return; }

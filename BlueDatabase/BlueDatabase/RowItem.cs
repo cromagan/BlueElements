@@ -341,16 +341,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         if (Database?.Column.SysCorrect is { IsDisposed: false } sc) {
-            CellSet(sc, cols.Count == 0, "Fehlerprüfung");
-            //if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(sc)) {
-            //    CellSet(sc, cols.Count == 0, "Fehlerprüfung");
+            //CellSet(sc, cols.Count == 0, "Fehlerprüfung");
+            if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(sc)) {
+                CellSet(sc, cols.Count == 0, "Fehlerprüfung");
 
-            //    //var erg2 = ExecuteScript(ScriptEventTypes.correct_changed, string.Empty, true, 3, null, true, false);
+                //var erg2 = ExecuteScript(ScriptEventTypes.correct_changed, string.Empty, true, 3, null, true, false);
 
-            //    //if (erg2.Failed) {
-            //    //    m += $"Berechnung fehlgeschlagen: {erg2.FailedReason}";
-            //    //}
-            //}
+                //if (erg2.Failed) {
+                //    m += $"Berechnung fehlgeschlagen: {erg2.FailedReason}";
+                //}
+            }
         }
 
         _lastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef.Variables, m);

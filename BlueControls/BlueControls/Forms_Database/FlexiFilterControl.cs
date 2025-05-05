@@ -408,18 +408,23 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             // Fall 2: Es existiert ein Filter, der mehr als einen Wert hat
             if (filterSingle.SearchValue.Count > 1) { showDelFilterButton = true; }
 
-
             // Fall 3: Leere
             if (filterSingle.FilterType == FilterType.Istgleich_MultiRowIgnorieren) { showDelFilterButton = true; }
 
             // Fall 4: Nicht-Leere
             if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
 
-
             // Fall 5: Aufwendige Berechnung, wenn der Filter ein Ergebnis zurückliefert
             if (!showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { } c) {
                 //if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
                 using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
+
+                if (filterSingle.Database?.Column.SplitColumn is { } spc &&
+                    spc != FilterSingleColumn &&
+                    fic[spc] is { } fis) {
+                    fc.Add(fis);
+                }
+
                 showDelFilterButton = fc.Rows.Count > 0;
             }
 

@@ -113,10 +113,15 @@ public class GenericControlReciverSender : GenericControlReciver {
     private void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
-        foreach (var thisChild in Childs) {
-            thisChild.Invalidate_FilterInput();
+        try {
+            foreach (var thisChild in Childs) {
+                thisChild.Invalidate_FilterInput();
+            }
+            OnFilterOutputPropertyChanged();
+        } catch {
+            Develop.CheckStackOverflow();
+            FilterOutput_PropertyChanged(sender, e);
         }
-        OnFilterOutputPropertyChanged();
     }
 
     private void OnFilterOutputPropertyChanged() => FilterOutputPropertyChanged?.Invoke(this, System.EventArgs.Empty);

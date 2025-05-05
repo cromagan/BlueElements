@@ -276,7 +276,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         }
         var nam = Column.ReadableText();
 
-        if (SearchValue.Count > 1) {
+         if (SearchValue.Count > 1) {
             switch (FilterType) {
                 case FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroﬂKleinEgal
                     or FilterType.Istgleich_ODER_GroﬂKleinEgal:

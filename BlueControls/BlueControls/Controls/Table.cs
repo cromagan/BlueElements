@@ -130,8 +130,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         Filter.PropertyChanged += Filter_PropertyChanged;
-        FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
-        FilterCombined.RowsChanged += FilterCombined_PropertyChanged;
+        //FilterCombined.PropertyChangedx += FilterCombined_RowsChanged;
+        FilterCombined.RowsChanged += FilterCombined_RowsChanged;
         OnEnabledChanged(System.EventArgs.Empty);
     }
 
@@ -525,10 +525,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             t += "<br><br><b>Gesammelte Infos:</b><br>";
             t += column.ColumnSystemInfo;
         }
-        var l = column.Contents();
-        if (l.Count > 0) {
-            t += "<br><br><b>Zusatz-Info:</b><br>";
-            t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
+
+
+        if (column.Function != ColumnFunction.Virtuelle_Spalte) {
+            var l = column.Contents();
+            if (l.Count > 0) {
+                t += "<br><br><b>Zusatz-Info:</b><br>";
+                t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
+            }
         }
 
         return t;
@@ -1573,8 +1577,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         try {
             if (disposing) {
                 Filter.PropertyChanged -= Filter_PropertyChanged;
-                FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
-                FilterCombined.RowsChanged -= FilterCombined_PropertyChanged;
+                //FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
+                FilterCombined.RowsChanged -= FilterCombined_RowsChanged;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
             }
         } finally {
@@ -3527,7 +3531,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         DoÄhnlich();
     }
 
-    private void FilterCombined_PropertyChanged(object sender, System.EventArgs e) {
+    private void FilterCombined_RowsChanged(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (CurrentArrangement is { IsDisposed: false } ca) {
             foreach (var thisColumn in ca) {

@@ -260,7 +260,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return; }
 
         OnChanging();
-
         AddInternal(fi);
         Invalidate_FilteredRows();
         OnPropertyChanged("FilterItems");
@@ -306,7 +305,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnPropertyChanged("FilterItems");
     }
 
-    //public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
     /// <summary>
     /// Effizente Methode um wenige Events auszulösen
     /// </summary>
@@ -361,9 +359,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <returns></returns>
     public object Clone(string c2) {
         var fc = new FilterCollection(Database, "Clone " + c2);
-        
+
         fc.ChangeTo(this);
-   
+
         return fc;
     }
 
@@ -693,7 +691,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void _database_Loaded(object sender, System.EventArgs e) => Invalidate_FilteredRows();
 
     /// <summary>
-    /// Löst keine Ereignisse aus
+    /// Löst keine Ereignisse aus, rows werden NICHT invalidiert
     /// </summary>
     /// <param name="fi"></param>
     private void AddInternal(FilterItem fi) {
@@ -713,9 +711,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
 
         _internal.Add(fi);
-        Invalidate_FilteredRows();
     }
 
+    /// <summary>
+    /// Es werden keine Events ausgelöst und Zeilen nicht invalidiert
+    /// </summary>
+    /// <param name="fi"></param>
     private void AddInternal(List<FilterItem> fi) {
         foreach (var thisfio in fi) {
             AddInternal(thisfio);

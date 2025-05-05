@@ -132,6 +132,7 @@ public partial class MessageBox : Form {
 
                     case "verwerfen":
                     case "löschen":
+                    case "leeren":
                         b.ImageCode = "Papierkorb|16";
                         w = 4;
                         break;
