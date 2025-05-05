@@ -58,17 +58,21 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     public void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
     internal void Check(List<string> toCheck) {
+        bool didChange = false;
+
         foreach (var thisCheck in toCheck) {
-            MoveItemBetweenList(Suggest, Main, thisCheck, true);
+            didChange |= MoveItemBetweenList(Suggest, Main, thisCheck, true, false);
         }
 
         List<string> l = [.. Main.Checked];
 
         foreach (var thisl in l) {
             if (!toCheck.Contains(thisl, false)) {
-                MoveItemBetweenList(Main, Suggest, thisl, true);
+                didChange |= MoveItemBetweenList(Main, Suggest, thisl, true, false);
             }
         }
+
+        if (didChange) { OnItemCheckedChanged(); }
     }
 
     internal void SuggestionsAdd(List<AbstractListItem>? item) {
@@ -86,14 +90,18 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     internal void UnCheck() => UnCheck(Main.Checked);
 
     internal void UnCheck(IEnumerable<string> list) {
+        bool didChange = false;
+
         foreach (var thisIt in list) {
-            MoveItemBetweenList(Main, Suggest, thisIt, true);
+            didChange |= MoveItemBetweenList(Main, Suggest, thisIt, true, false);
         }
+
+        if (didChange) { OnItemCheckedChanged(); }
     }
 
     protected override void DrawControl(Graphics gr, States state) { }
 
-    protected void MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove) {
+    protected bool MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove, bool fireEvent = true) {
         var sourceItem = source[@internal];
         var targetItem = target[@internal];
 
@@ -109,7 +117,9 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
         if (sourceItem != null && doRemove) { source.UnCheck(sourceItem); }
 
-        if (did) { OnItemCheckedChanged(); }
+        if (did && fireEvent) { OnItemCheckedChanged(); }
+
+        return did;
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {
@@ -121,28 +131,6 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     }
 
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
-
-    //private void Main_ItemCheckedChanged(object sender, System.EventArgs e) {
-    //    foreach (var thisn in Main.Item) {
-    //        Suggest.UnCheck(thisn.KeyName);
-    //    }
-
-    //    //if (e.OldItems != null) {
-    //    //    foreach (var thisit in e.OldItems) {
-    //    //        if (thisit is AbstractListItem bli) {
-    //    //            if (Suggest.Item[bli.KeyName] == null) {
-    //    //                Suggest.ItemAdd(bli.Clone() as AbstractListItem);
-    //    //            }
-    //    //        }
-    //    //    }
-    //    //}
-
-    //    //if (e.Action == NotifyCollectionChangedAction.Reset) {
-    //    //    Develop.DebugPrint_NichtImplementiert();
-    //    //}
-
-    //    OnItemCheckedChanged();
-    //}
 
     private void Main_ItemAddedByClick(object sender, AbstractListItemEventArgs e) {
         MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);

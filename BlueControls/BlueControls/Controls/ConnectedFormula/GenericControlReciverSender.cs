@@ -62,19 +62,6 @@ public class GenericControlReciverSender : GenericControlReciver {
     public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverSenderControlPadItem source, string mode) {
         FilterOutput.Database = source.DatabaseOutput;
         base.DoDefaultSettings(parentFormula, source, mode);
-
-        //if (parentFormula == null) { return; }
-
-        //foreach (var thisKey in source.ChildIds) {
-        //    var it = source.Parent?[thisKey];
-
-        //    if (it is IItemToControl itc) {
-        //        var parentCon = parentFormula.SearchOrGenerate(itc, true, mode);
-        //        if (parentCon is GenericControlReciver existingChild) {
-        //            ChildIsBorn(existingChild);
-        //        }
-        //    }
-        //}
     }
 
     internal void ChildIsBorn(GenericControlReciver child) {
@@ -85,17 +72,9 @@ public class GenericControlReciverSender : GenericControlReciver {
             return;
         }
 
-        var isnew = !child.Parents.Contains(this);
-        //var newFilters = FilterOutput.Count > 0;
-        //var doDatabaseAfter = DatabaseInput == null;
-
-        if (isnew) { _ = child.Parents.AddIfNotExists(this); }
+        _ = child.Parents.AddIfNotExists(this);
 
         _ = Childs.AddIfNotExists(child);
-
-        //if (newFilters && isnew) { child.Invalidate_FilterInput(); }
-
-        //if (doDatabaseAfter) { child.RegisterEvents(); }
     }
 
     protected override void Dispose(bool disposing) {
@@ -126,12 +105,9 @@ public class GenericControlReciverSender : GenericControlReciver {
     private void FilterOutput_DisposingEvent(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
-        if (!FilterOutput.IsDisposed) {
-            FilterOutput.PropertyChanged -= FilterOutput_PropertyChanged;
-            FilterOutput.DisposingEvent -= FilterOutput_DisposingEvent;
-            FilterOutput.Database = null;
-            //FilterOutput.Dispose();
-        }
+        FilterOutput.PropertyChanged -= FilterOutput_PropertyChanged;
+        FilterOutput.DisposingEvent -= FilterOutput_DisposingEvent;
+        FilterOutput.Database = null;
     }
 
     private void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {

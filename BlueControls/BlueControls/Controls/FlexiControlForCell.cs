@@ -703,15 +703,12 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         if (_lastrow is not { IsDisposed: false } row) { return; }
 
         var oldVal = row.CellGetString(_column);
-        var newValue = f.Value;
+        var newValue = _column.AutoCorrect(f.Value, true);
 
         if (oldVal == newValue) { return; }
 
         row.CellSet(_column, newValue, "Über Formular bearbeitet (FlexiControl)");
-        //if (oldVal != row.CellGetString(column)) {
-        //    _ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, false, false, true, 1);
-        //    row.Database?.AddBackgroundWork(row);
-        //}
+
     }
 
     #endregion

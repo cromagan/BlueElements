@@ -667,7 +667,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
         if (renderer == null) { return Renderer_Abstract.Default; }
 
-        if(!renderer.Parse(column.RendererSettings)) { return Renderer_Abstract.Default; }
+        if (!renderer.Parse(column.RendererSettings)) { return Renderer_Abstract.Default; }
         renderer.SheetStyle = style;
 
         return renderer;
@@ -910,7 +910,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             db1.Column.ColumnAdded -= _Database_ViewChanged;
             db1.ProgressbarInfo -= _Database_ProgressbarInfo;
             db1.DisposingEvent -= _database_Disposing;
-            db1.InvalidateView -= Database_InvalidateView;            
+            db1.InvalidateView -= Database_InvalidateView;
             Database.ForceSaveAll();
             MultiUserFile.SaveAll(false);
         }
@@ -1527,6 +1527,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                             // Prüfen, ob wir noch in den verfügbaren Zeilen sind
                             if (currentRow >= availableRows) {
+                                _ = flexsToDelete.AddIfNotExists(flx);
                                 break;
                             }
                         }
@@ -3689,8 +3690,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is  { }x) {
-            foreach (var pair in x ) {
+        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
+            foreach (var pair in x) {
                 switch (pair.Key) {
                     case "arrangement":
                         Arrangement = pair.Value.FromNonCritical();
