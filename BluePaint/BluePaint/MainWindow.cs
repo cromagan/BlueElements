@@ -220,7 +220,17 @@ public partial class MainWindow {
 
     private void CurrentTool_OverridePic(object sender, ZoomBitmapEventArgs e) {
         CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
-        P.Bmp = e.Bmp?.Clone() as Bitmap;
+
+        P.Bmp = new Bitmap(e.Bmp.Width, e.Bmp.Height, PixelFormat.Format32bppArgb);
+
+        // Inhalt kopieren
+        using (Graphics g = Graphics.FromImage(P.Bmp)) {
+            g.Clear(Color.Transparent);
+            g.DrawImage(e.Bmp, 0, 0, e.Bmp.Width, e.Bmp.Height);
+        }
+
+
+        //P.Bmp = e.Bmp?.Clone() as Bitmap;
         if (e.DoZoomFit) { P.ZoomFit(); }
         P.Invalidate();
     }
