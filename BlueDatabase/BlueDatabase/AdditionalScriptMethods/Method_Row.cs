@@ -39,9 +39,9 @@ public class Method_Row : Method_Database, IUseableForButton {
 
     public override List<List<string>> Args => [FloatVal, FilterVar];
 
-    public List<List<string>> ArgsForButton => [];
+    public List<List<string>> ArgsForButton => [FloatVal];
 
-    public List<string> ArgsForButtonDescription => [];
+    public List<string> ArgsForButtonDescription => ["Invalidieren nach X Tagen"];
 
     public ButtonArgs ClickableWhen => ButtonArgs.Keine_Zeile;
 
@@ -164,7 +164,7 @@ public class Method_Row : Method_Database, IUseableForButton {
         return fb;
     }
 
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;
+    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + filterarg;
 
     #endregion
 }

@@ -1571,7 +1571,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                              and not ColumnFunction.Split_Medium
                              and not ColumnFunction.Split_Large
                              and not ColumnFunction.Split_Name
-                             and not ColumnFunction.First) {
+                             and not ColumnFunction.First 
+                             and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
                     _function = ColumnFunction.Normal;
                 }
 
