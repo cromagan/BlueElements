@@ -75,6 +75,8 @@ public class GenericControlReciverSender : GenericControlReciver {
         _ = child.Parents.AddIfNotExists(this);
 
         _ = Childs.AddIfNotExists(child);
+
+        child.Invalidate_FilterInput();
     }
 
     protected override void Dispose(bool disposing) {
