@@ -206,11 +206,17 @@ public partial class MainWindow {
             _picUndo = null;
             GC.Collect();
         }
-        if (P.Bmp?.Clone() is not Bitmap bmp) {
+
+        if (P.Bmp is not Bitmap bmp) {
             btnRückgänig.Enabled = false;
             return;
         }
-        _picUndo = bmp;
+
+        _picUndo = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppArgb);
+        using Graphics g = Graphics.FromImage(_picUndo);
+        g.Clear(Color.Transparent);
+        g.DrawImage(bmp, 0, 0, bmp.Width, bmp.Height);
+
         btnRückgänig.Enabled = true;
     }
 
@@ -221,15 +227,16 @@ public partial class MainWindow {
     private void CurrentTool_OverridePic(object sender, ZoomBitmapEventArgs e) {
         CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
 
-        P.Bmp = new Bitmap(e.Bmp.Width, e.Bmp.Height, PixelFormat.Format32bppArgb);
+        if (e.Bmp != null) {
+            P.Bmp = new Bitmap(e.Bmp.Width, e.Bmp.Height, PixelFormat.Format32bppArgb);
 
-        // Inhalt kopieren
-        using (Graphics g = Graphics.FromImage(P.Bmp)) {
+            // Inhalt kopieren
+            using Graphics g = Graphics.FromImage(P.Bmp);
             g.Clear(Color.Transparent);
             g.DrawImage(e.Bmp, 0, 0, e.Bmp.Width, e.Bmp.Height);
+        } else {
+            P.Bmp = null;
         }
-
-
         //P.Bmp = e.Bmp?.Clone() as Bitmap;
         if (e.DoZoomFit) { P.ZoomFit(); }
         P.Invalidate();
