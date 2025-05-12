@@ -130,8 +130,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         Filter.PropertyChanged += Filter_PropertyChanged;
-        //FilterCombined.PropertyChangedx += FilterCombined_RowsChanged;
         FilterCombined.RowsChanged += FilterCombined_RowsChanged;
+        FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
         OnEnabledChanged(System.EventArgs.Empty);
     }
 
@@ -153,7 +153,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public new event EventHandler<CellExtEventArgs>? DoubleClick;
 
-    public event EventHandler? FilterChanged;
+    public event EventHandler? FilterCombinedChanged;
 
     public event EventHandler? PinnedChanged;
 
@@ -525,7 +525,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             t += "<br><br><b>Gesammelte Infos:</b><br>";
             t += column.ColumnSystemInfo;
         }
-
 
         if (column.Function != ColumnFunction.Virtuelle_Spalte) {
             var l = column.Contents();
@@ -1577,7 +1576,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         try {
             if (disposing) {
                 Filter.PropertyChanged -= Filter_PropertyChanged;
-                //FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
+                FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
                 FilterCombined.RowsChanged -= FilterCombined_RowsChanged;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
             }
@@ -2482,14 +2481,23 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private int Autofilter_Text(ColumnViewItem viewItem) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return 0; }
+
+        // Cache nutzen für bessere Performance
         if (viewItem.TmpIfFilterRemoved != null) { return (int)viewItem.TmpIfFilterRemoved; }
+
+        // Optimierung: FilterCombined nur klonen, wenn notwendig
+        // Überprüfen, ob überhaupt ein Filter für die Spalte existiert
+        if (FilterCombined[viewItem.Column] is not { }) {
+            viewItem.TmpIfFilterRemoved = 0;
+            return 0;
+        }
+
         using var fc = (FilterCollection)FilterCombined.Clone("Autofilter_Text");
         fc.Remove(viewItem.Column);
 
-        var ro = fc.Rows;
-        var c = RowsFiltered.Count - ro.Count;
-        viewItem.TmpIfFilterRemoved = c;
-        return c;
+        int filterDifference = RowsFiltered.Count - fc.Rows.Count;
+        viewItem.TmpIfFilterRemoved = filterDifference;
+        return filterDifference;
     }
 
     /// <summary>
@@ -2853,6 +2861,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
+        if (Filter.Count == 0 && (FilterInput is not { IsDisposed: false } fi || fi.Count == 0)) {
+            FilterCombined.Clear();
+            return;
+        }
+
         using var nf = new FilterCollection(Filter.Database, "TmpFilterCombined");
 
         nf.Database = Filter.Database;
@@ -2875,6 +2888,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         } else {
             FilterOutput.ChangeTo(FilterCombined);
         }
+
+        FillFilters();
     }
 
     private void Draw_Border(Graphics gr, ColumnViewItem column, Rectangle realHead, int yPos) {
@@ -3292,73 +3307,70 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
+    private void Draw_DatabaseStatus(Graphics gr, Database db, ColumnViewCollection ca, int filterHeight) {
+        // Zeige Stifte-Symbol bei ausstehenden Änderungen
+        if (db.ReadOnly) {
+            gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, filterHeight + 8);
+            if (!string.IsNullOrEmpty(db.FreezedReason)) {
+                ca.Font_RowChapter.DrawString(gr, db.FreezedReason, 52, filterHeight + 12);
+            }
+        }
+
+        if (db.IsAdministrator() && !db.ReadOnly) {
+            // Skripte-Status anzeigen
+            if (!db.AreScriptsExecutable()) {
+                gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
+                ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, filterHeight + 12);
+            } else {
+                // Verknüpfte Datenbanken überprüfen
+                foreach (var thisColumn in db.Column) {
+                    if (thisColumn.LinkedDatabase is { IsDisposed: false } linkedDb && !linkedDb.AreScriptsExecutable()) {
+                        gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
+                        ca.Font_RowChapter.DrawString(gr, $"Skripte von {linkedDb.Caption} müssen repariert werden", 90, filterHeight + 12);
+                        break; // Nur die erste fehlerhafte Datenbank anzeigen
+                    }
+                }
+            }
+        }
+
+        // Master-Status anzeigen
+        if (db.AmITemporaryMaster(5, 55, null)) {
+            gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, filterHeight);
+        } else if (db.AmITemporaryMaster(0, 55, null)) {
+            gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, filterHeight);
+        }
+    }
+
     private void Draw_Table_Std(Graphics gr, List<RowData> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
         try {
-            if (IsDisposed || Database is not { IsDisposed: false } db || ca == null) { return; }   // Kommt vor, dass spontan doch geparsed wird...
+            if (IsDisposed || Database is not { IsDisposed: false } db || ca == null) { return; }
+
+            // Hintergrund zeichnen
             Skin.Draw_Back(gr, Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
 
-            //// Maximale Rechten Pixel der Permanenten Columns ermitteln
-            //var permaX = 0;
-            //foreach (var viewItem in ca) {
-            //    if (viewItem is { Column: not null, ViewType: ViewType.PermanentColumn }) {
-            //        //if (viewItem._drawWidth == null) {
-            //        //    // Veränderte Werte!
-            //        //    DrawControl(gr, state);
-            //        //    return;
-            //        //}
-
-            //        permaX = Math.Max(permaX, viewItem.X_WithSlider ?? 0 + viewItem.DrawWidth());
-            //    }
-            //}
-
+            // Hintergrund, Rahmen und Zellwerte für alle Spalten
             Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnBackBody, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
             Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.Cells, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
             Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnBackBody, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
             Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.Cells, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
-            // Den CursorLines zeichnen
+
+            // Cursor zeichnen
             Draw_Cursor(gr, displayRectangleWoSlider, true);
+
+            // Spaltenköpfe
             Draw_Table_What(gr, sr, TableDrawColumn.NonPermament, TableDrawType.ColumnHead, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
             Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
 
-            // Überschriften 1-3 Zeichnen
-            Draw_Column_Head_Captions(gr, ca, displayRectangleWoSlider, 0);
-            Draw_Column_Head_Captions(gr, ca, displayRectangleWoSlider, 1);
-            Draw_Column_Head_Captions(gr, ca, displayRectangleWoSlider, 2);
+            // Überschriften zeichnen (zusammengefasst anstatt dreimal einzeln)
+            for (int i = 0; i < 3; i++) {
+                Draw_Column_Head_Captions(gr, ca, displayRectangleWoSlider, i);
+            }
+
+            // Rahmen zeichnen
             Skin.Draw_Border(gr, Design.Table_And_Pad, state, displayRectangleWoSlider);
 
-            ////gr.Clear(Color.White);
-            //gr.DrawString("Test " + Constants.GlobalRND.Next().ToString(false), new Font("Arial", 20), Brushes.Black, new Point(0, 0));
-
-            //return;
-
-            //if (db.HasPendingChanges && !string.IsNullOrEmpty(db.Filename)) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
-
-            if (db.ReadOnly) {
-                gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, FilterleisteHeight + 8);
-                if (!string.IsNullOrEmpty(db.FreezedReason)) {
-                    ca.Font_RowChapter.DrawString(gr, db.FreezedReason, 52, FilterleisteHeight + 12);
-                }
-            }
-
-            if (db.IsAdministrator() && !db.ReadOnly) {
-                if (!db.AreScriptsExecutable()) {
-                    gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, FilterleisteHeight + 8);
-                    ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, FilterleisteHeight + 12);
-                } else {
-                    foreach (var thisColumnItem in db.Column) {
-                        if (thisColumnItem.LinkedDatabase is { IsDisposed: false } dbl && !dbl.AreScriptsExecutable()) {
-                            gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, FilterleisteHeight + 8);
-                            ca.Font_RowChapter.DrawString(gr, $"Skripte von {dbl.Caption} müssen repariert werden", 90, FilterleisteHeight + 12);
-                        }
-                    }
-                }
-            }
-
-            if (db.AmITemporaryMaster(5, 55, null)) {
-                gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, FilterleisteHeight);
-            } else if (db.AmITemporaryMaster(0, 55, null)) {
-                gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, FilterleisteHeight);
-            }
+            // Statusanzeigen
+            Draw_DatabaseStatus(gr, db, ca, FilterleisteHeight);
         } catch {
             Invalidate();
         }
@@ -3511,24 +3523,32 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return true;
     }
 
-    private void Filter_PropertyChanged(object sender, System.EventArgs e) => DoFilterCombined();
+    private void Filter_PropertyChanged(object sender, System.EventArgs e) { DoFilterCombined(); }
 
     private void Filter_ZeilenFilterSetzen() {
         if (IsDisposed || (Database?.IsDisposed ?? true)) {
             DoÄhnlich();
             return;
         }
-        var isF = Filter.RowFilterText;
-        var newF = txbZeilenFilter.Text;
-        if (string.Equals(isF, newF, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (string.IsNullOrEmpty(newF)) {
+
+        var currentFilter = Filter.RowFilterText;
+        var newFilter = txbZeilenFilter.Text;
+
+        if (string.Equals(currentFilter, newFilter, StringComparison.OrdinalIgnoreCase)) { return; }
+
+        if (string.IsNullOrEmpty(newFilter)) {
             Filter.Remove_RowFilter();
             DoÄhnlich();
             return;
         }
 
-        Filter.RowFilterText = newF;
+        Filter.RowFilterText = newFilter;
         DoÄhnlich();
+    }
+
+    private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+        OnFilterCombinedChanged();
+        DoFilterOutput();
     }
 
     private void FilterCombined_RowsChanged(object sender, System.EventArgs e) {
@@ -3540,7 +3560,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         Invalidate_SortedRowData();
-        //OnFilterChanged();
+        //OnFilterCombinedChanged();
         //DoFilterOutput();
     }
 
@@ -3659,11 +3679,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private void OnDatabaseChanged() => DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnFilterChanged() {
+    private void OnFilterCombinedChanged() {
         // Bestehenden Code belassen
-        FilterChanged?.Invoke(this, System.EventArgs.Empty);
+        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
-        FillFilters();
+        //FillFilters(); // Die Flexs reagiren nur auf FilterOutput der Database
     }
 
     private void OnPinnedChanged() {
