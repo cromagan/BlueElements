@@ -3540,8 +3540,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         Invalidate_SortedRowData();
-        OnFilterChanged();
-        DoFilterOutput();
+        //OnFilterChanged();
+        //DoFilterOutput();
     }
 
     private FlexiFilterControl? FlexiItemOf(ColumnItem column) {

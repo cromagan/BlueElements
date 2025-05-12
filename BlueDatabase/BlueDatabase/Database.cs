@@ -1114,7 +1114,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (!string.IsNullOrEmpty(f2)) { return f2; }
         }
 
-        var (error, _, _) = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
+        var error = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
         if (!string.IsNullOrEmpty(error)) { return error; }
 
         if (LogUndo) {
@@ -2158,10 +2158,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         break;
                     }
 
-                    var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
-                    if (!string.IsNullOrEmpty(fehler.Error)) {
+                    var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
+                    if (!string.IsNullOrEmpty(error)) {
                         Freeze("Datenbank-Ladefehler");
-                        Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + fehler);
+                        Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + error);
                         return false;
                     }
                 }
@@ -2420,8 +2420,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="columnsAdded"></param>
     /// <param name="rowsAdded"></param>
     /// <param name="starttimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
-    protected virtual void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime starttimeUtc, DateTime endTimeUtc) {
-    }
+    protected virtual void DoWorkAfterLastChanges(List<string>? files, DateTime starttimeUtc, DateTime endTimeUtc) { }
 
     protected void OnAdditionalRepair() {
         if (IsDisposed) { return; }
@@ -2477,10 +2476,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="reason"></param>
     /// <param name="user"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    protected (string Error, ColumnItem? Columnchanged, RowItem? Rowchanged) SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
-        if (IsDisposed) { return ("Datenbank verworfen!", null, null); }
-        if ((reason != Reason.NoUndo_NoInvalidate) && !string.IsNullOrEmpty(FreezedReason)) { return ("Datenbank eingefroren: " + FreezedReason, null, null); }
-        if (type.IsObsolete()) { return (string.Empty, null, null); }
+    protected string SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
+        if ((reason != Reason.NoUndo_NoInvalidate) && !string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
+        if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;
 
@@ -2488,60 +2487,60 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //    LoadChunkWithChunkId(chunk, true, null);
         //}
         if (type.IsCellValue()) {
-            if (column?.Database is not { IsDisposed: false } db) { return (string.Empty, column, row); }
-            if (row == null) { return (string.Empty, column, row); }
-            if (column.Function == ColumnFunction.Virtuelle_Spalte) { return (string.Empty, column, row); }
+            if (column?.Database is not { IsDisposed: false } db) { return string.Empty; }
+            if (row == null) { return string.Empty; }
+            if (column.Function == ColumnFunction.Virtuelle_Spalte) { return string.Empty; }
 
             //column.Invalidate_ContentWidth();
             //row.InvalidateCheckData();
 
             var f = row.SetValueInternal(column, value, reason);
 
-            if (!string.IsNullOrEmpty(f)) { return (f, null, null); }
+            if (!string.IsNullOrEmpty(f)) { return f; }
             row.DoSystemColumns(db, column, user, datetimeutc, reason);
 
-            return (string.Empty, column, row);
+            return string.Empty;
         }
 
         if (type.IsColumnTag()) {
             if (column is not { IsDisposed: false } || Column.IsDisposed) {
                 Develop.DebugPrint(ErrorType.Warning, "Spalte ist null! " + type);
                 //return ("Wert nicht gesetzt!", null, null);
-                return (string.Empty, null, null);
+                return string.Empty;
             }
 
-            return (column.SetValueInternal(type, value), column, null);
+            return column.SetValueInternal(type, value);
         }
 
         if (type.IsCommand()) {
             switch (type) {
                 case DatabaseDataType.Command_RemoveColumn:
                     var c = Column[value];
-                    if (c == null) { return (string.Empty, null, null); }
-                    return (Column.ExecuteCommand(type, c.KeyName, reason), c, null);
+                    if (c == null) { return string.Empty; }
+                    return Column.ExecuteCommand(type, c.KeyName, reason);
 
                 case DatabaseDataType.Command_AddColumnByName:
                     var f2 = Column.ExecuteCommand(type, value, reason);
-                    if (!string.IsNullOrEmpty(f2)) { return (f2, null, null); }
+                    if (!string.IsNullOrEmpty(f2)) { return f2; }
 
                     var thisColumn = Column[value];
-                    if (thisColumn == null) { return ("Hinzufügen fehlgeschlagen", null, null); }
+                    if (thisColumn == null) { return "Hinzufügen fehlgeschlagen"; }
 
-                    return (string.Empty, column, null);
+                    return string.Empty;
 
                 case DatabaseDataType.Command_RemoveRow:
                     var r = Row.SearchByKey(value);
-                    if (r == null) { return (string.Empty, null, null); }
-                    return (Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc), null, r);
+                    if (r == null) { return string.Empty; }
+                    return Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc);
 
                 case DatabaseDataType.Command_AddRow:
                     var f1 = Row.ExecuteCommand(type, value, reason, user, datetimeutc);
-                    if (!string.IsNullOrEmpty(f1)) { return (f1, null, null); }
-                    var thisRow = Row.SearchByKey(value);
-                    return (string.Empty, null, thisRow);
+                    if (!string.IsNullOrEmpty(f1)) { return f1; }
+                    //var thisRow = Row.SearchByKey(value);
+                    return string.Empty;
 
                 case DatabaseDataType.Command_NewStart:
-                    return (string.Empty, null, null);
+                    return string.Empty;
 
                 default:
                     if (LoadedVersion == DatabaseVersion) {
@@ -2550,7 +2549,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                             Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
                         }
                     }
-                    return ("Befehl unbekannt.", null, null);
+                    return "Befehl unbekannt.";
             }
         }
 
@@ -2699,7 +2698,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 break;
 
             case DatabaseDataType.EOF:
-                return (string.Empty, null, null);
+                return string.Empty;
 
             default:
                 // Variable type
@@ -2710,9 +2709,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     }
                 }
 
-                return ("Datentyp unbekannt.", null, null);
+                return "Datentyp unbekannt.";
         }
-        return (string.Empty, null, null);
+        return string.Empty;
     }
 
     protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {

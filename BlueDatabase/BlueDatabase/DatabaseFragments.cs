@@ -183,8 +183,8 @@ public class DatabaseFragments : Database {
         base.Dispose(disposing);
     }
 
-    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime startTimeUtc, DateTime endTimeUtc) {
-        base.DoWorkAfterLastChanges(files, columnsAdded, rowsAdded, startTimeUtc, endTimeUtc);
+    protected override void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc, DateTime endTimeUtc) {
+        base.DoWorkAfterLastChanges(files, startTimeUtc, endTimeUtc);
         if (ReadOnly) { return; }
         if (files is not { Count: >= 1 }) { return; }
 
@@ -385,9 +385,9 @@ public class DatabaseFragments : Database {
         data = data.OrderBy(obj => obj.DateTimeUtc).ToList();
 
         try {
-            List<ColumnItem> columnsAdded = [];
-            List<RowItem> rowsAdded = [];
-            List<string> cellschanged = [];
+            //List<ColumnItem> columnsAdded = [];
+            //List<RowItem> rowsAdded = [];
+            //List<string> cellschanged = [];
             List<string> myfiles = [];
 
             if (checkedDataFiles != null) {
@@ -408,7 +408,7 @@ public class DatabaseFragments : Database {
                     var r = Row.SearchByKey(thisWork.RowKey);
 
                     // HIER Wird der falsche Chunk übergeben!
-                    var (error, columnchanged, rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate);
+                    var error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate);
 
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
@@ -417,14 +417,14 @@ public class DatabaseFragments : Database {
                         return;
                     }
 
-                    if (c == null && columnchanged != null) { _ = columnsAdded.AddIfNotExists(columnchanged); }
-                    if (r == null && rowchanged != null) { _ = rowsAdded.AddIfNotExists(rowchanged); }
-                    if (rowchanged != null && columnchanged != null) { _ = cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
+                    //if (c == null && columnchanged != null) { _ = columnsAdded.AddIfNotExists(columnchanged); }
+                    //if (r == null && rowchanged != null) { _ = rowsAdded.AddIfNotExists(rowchanged); }
+                    //if (rowchanged != null && columnchanged != null) { _ = cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
                 }
             }
             _doingChanges--;
             IsInCache = endTimeUtc;
-            DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, startTimeUtc, endTimeUtc);
+            DoWorkAfterLastChanges(myfiles, startTimeUtc, endTimeUtc);
             OnInvalidateView();
         } catch {
             Develop.CheckStackOverflow();
