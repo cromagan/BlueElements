@@ -1491,7 +1491,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (script.VirtalColumns) {
                 if (row is { IsDisposed: false } r) {
                     foreach (var thisCol in Column) {
-                        if (thisCol.Function == ColumnFunction.Virtuelle_Spalte) {
+                        if (!thisCol.SaveContent) {
                             r.VariableToCell(thisCol, vars, script.KeyName);
                         }
                     }
@@ -2051,8 +2051,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             thisColumn.Optimize();
 
             if (thisColumn.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and
-                                      not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems and
-                                      not ColumnFunction.Virtuelle_Spalte) {
+                                      not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems &&
+                                      thisColumn.SaveContent) {
                 var x = thisColumn.Contents();
                 if (x.Count == 0) {
                     _ = Column.Remove(thisColumn, "Automatische Optimierung");
@@ -2489,7 +2489,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (type.IsCellValue()) {
             if (column?.Database is not { IsDisposed: false } db) { return string.Empty; }
             if (row == null) { return string.Empty; }
-            if (column.Function == ColumnFunction.Virtuelle_Spalte) { return string.Empty; }
+            if (!column.SaveContent) { return string.Empty; }
 
             //column.Invalidate_ContentWidth();
             //row.InvalidateCheckData();

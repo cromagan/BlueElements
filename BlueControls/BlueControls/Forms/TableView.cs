@@ -131,7 +131,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             e.ContextMenu.Add(ItemOf("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.Function.CanBeChangedByRules()));
             e.ContextMenu.Add(ItemOf("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.Function.CanBeChangedByRules()));
             e.ContextMenu.Add(ItemOf("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.Function.CanBeChangedByRules()));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Function.CanBeChangedByRules() && column.ShowUndo));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.Function.CanBeChangedByRules() && column.SaveContent));
             e.ContextMenu.Add(ItemOf(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator()));
             //_ = e.CurrentMenu.Add(AddSeparator());
             e.ContextMenu.Add(ItemOf("Spalte", true));

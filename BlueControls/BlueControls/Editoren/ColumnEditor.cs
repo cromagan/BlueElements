@@ -423,7 +423,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         txbUeberschift2.Text = _column.CaptionGroup2;
         txbUeberschift3.Text = _column.CaptionGroup3;
         txbSpaltenbild.Text = _column.CaptionBitmapCode;
-        btnLogUndo.Checked = _column.ShowUndo;
+        btnSaveContent.Checked = _column.SaveContent;
         btnFormatierungErlaubt.Checked = _column.TextFormatingAllowed;
         btnSpellChecking.Checked = _column.SpellCheckingEnabled;
         txbAuswaehlbareWerte.Text = _column.DropDownItems.JoinWithCr();
@@ -486,7 +486,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         _column.AfterEditDoUCase = btnAutoEditToUpper.Checked;
         _column.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
-        _column.ShowUndo = btnLogUndo.Checked;
+        _column.SaveContent = btnSaveContent.Checked;
         _column.TextFormatingAllowed = btnFormatierungErlaubt.Checked;
         _column.SpellCheckingEnabled = btnSpellChecking.Checked;
         var tmpf = FilterOptions.None;

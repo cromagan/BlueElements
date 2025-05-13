@@ -180,7 +180,13 @@ public class UndoItem : IParseable {
         return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + DateTimeUtc + ", " + User + ")</i>";
     }
 
-    internal bool LogsUndo(Database database) => Command != DatabaseDataType.Value_withoutSizeData || database.Column[ColName] is { IsDisposed: false, ShowUndo: true };
+    internal bool LogsUndo(Database database) {
+        if (Command != DatabaseDataType.Value_withoutSizeData) { return true; }
+
+        return database.Column[ColName] is { IsDisposed: false, SaveContent: true } c &&
+             c != database.Column.SysRowChanger &&
+             c != database.Column.SysRowChangeDate;
+    }
 
     #endregion
 }

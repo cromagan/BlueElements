@@ -486,7 +486,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (db != row.Database || db != column.Database) { return "Datenbank ungültig!"; }
 
-        if (column.Function == ColumnFunction.Virtuelle_Spalte) {
+        if (!column.SaveContent) {
             return row.SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
         }
 

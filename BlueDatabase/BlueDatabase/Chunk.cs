@@ -299,13 +299,13 @@ public class Chunk : IHasKeyName {
         SaveToByteList(DatabaseDataType.MaxCellLenght, c.MaxCellLenght.ToString(), name);
         SaveToByteList(DatabaseDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
         SaveToByteList(DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, name);
-        //SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
+        SaveToByteList(DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);
         SaveToByteList(DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, name);
         SaveToByteList(DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.EditableWithTextInput, c.EditableWithTextInput.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
-        SaveToByteList(DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
+        //SaveToByteList(DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.TextFormatingAllowed, c.TextFormatingAllowed.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), name);
         SaveToByteList(DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), name);
@@ -458,7 +458,7 @@ public class Chunk : IHasKeyName {
         if (thisRow.Database is not { IsDisposed: false } db) { return; }
 
         foreach (var thisColumn in db.Column) {
-            if (thisColumn.Function != ColumnFunction.Virtuelle_Spalte) {
+            if (thisColumn.SaveContent) {
                 SaveToByteList(thisColumn, thisRow);
             }
         }

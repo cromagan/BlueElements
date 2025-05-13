@@ -73,7 +73,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbAuswaehlbareWerte = new TextBox();
             this.capImmerWerte = new Caption();
             this.btnCanBeEmpty = new Button();
-            this.btnLogUndo = new Button();
+            this.btnSaveContent = new Button();
             this.btnIgnoreLock = new Button();
             this.lbxCellEditor = new ListBox();
             this.btnEditableStandard = new Button();
@@ -521,7 +521,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabBearbeitung.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabBearbeitung.Controls.Add(this.grpAuswahlmenuOptionen);
-            this.tabBearbeitung.Controls.Add(this.btnLogUndo);
+            this.tabBearbeitung.Controls.Add(this.btnSaveContent);
             this.tabBearbeitung.Controls.Add(this.btnIgnoreLock);
             this.tabBearbeitung.Controls.Add(this.lbxCellEditor);
             this.tabBearbeitung.Controls.Add(this.btnEditableStandard);
@@ -595,14 +595,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnCanBeEmpty.TabIndex = 6;
             this.btnCanBeEmpty.Text = "Alles abwählen erlaubt (leere Zelle möglich)";
             // 
-            // btnLogUndo
+            // btnSaveContent
             // 
-            this.btnLogUndo.ButtonStyle = ButtonStyle.Checkbox_Text;
-            this.btnLogUndo.Location = new Point(592, 376);
-            this.btnLogUndo.Name = "btnLogUndo";
-            this.btnLogUndo.Size = new Size(288, 16);
-            this.btnLogUndo.TabIndex = 32;
-            this.btnLogUndo.Text = "Undo der Spalte wird geloggt";
+            this.btnSaveContent.ButtonStyle = ButtonStyle.Checkbox_Text;
+            this.btnSaveContent.Location = new Point(592, 376);
+            this.btnSaveContent.Name = "btnSaveContent";
+            this.btnSaveContent.Size = new Size(288, 16);
+            this.btnSaveContent.TabIndex = 32;
+            this.btnSaveContent.Text = "Inhalt wird auf Festplatte gespeichert";
             // 
             // btnIgnoreLock
             // 
@@ -1546,7 +1546,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TabPage tabQuickInfo;
         private TabPage tabSonstiges;
         private Button btnIgnoreLock;
-        private Button btnLogUndo;
+        private Button btnSaveContent;
         private Button btnSpellChecking;
         private Caption capSpaltenbild;
         private TextBox txbJoker;

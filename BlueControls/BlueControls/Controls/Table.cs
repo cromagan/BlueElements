@@ -526,7 +526,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             t += column.ColumnSystemInfo;
         }
 
-        if (column.Function != ColumnFunction.Virtuelle_Spalte) {
+        if (column.SaveContent) {
             var l = column.Contents();
             if (l.Count > 0) {
                 t += "<br><br><b>Zusatz-Info:</b><br>";
@@ -572,7 +572,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column is not { IsDisposed: false }) { return; }
         if (row is not { IsDisposed: false }) { return; }
-        if (column.Function == ColumnFunction.Virtuelle_Spalte) { return; }
+        if (!column.SaveContent) { return; }
 
         if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, true, false);
@@ -2168,7 +2168,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true, table.FilterCombined.ToArray());
         if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
 
-        if (cellInThisDatabaseColumn?.Column is not { Function: not ColumnFunction.Virtuelle_Spalte }) { return; } // Dummy prüfung
+        if (cellInThisDatabaseColumn?.Column is not { SaveContent: true }) { return; } // Dummy prüfung
 
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
@@ -3030,7 +3030,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                 #region Draw_CellTransparent
 
-                if (cellInThisDatabaseColumn.Function == ColumnFunction.Virtuelle_Spalte) {
+                if (!cellInThisDatabaseColumn.SaveContent) {
                     _ = cellInThisDatabaseRow.CheckRow();
                 }
 

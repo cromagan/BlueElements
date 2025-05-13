@@ -86,15 +86,15 @@ public enum ColumnFunction {
     /// </summary>
     Verknüpfung_zu_anderer_Datenbank = 82,
 
-    /// <summary>
-    /// Werte werden in echtzeit - evtl. für jeden Benutzer anderes - berechnet. Wird nicht gespeichert.
-    /// </summary>
-    Virtuelle_Spalte = 83,
+    ///// <summary>
+    ///// Werte werden in echtzeit - evtl. für jeden Benutzer anderes - berechnet. Wird nicht gespeichert.
+    ///// </summary>
+    //Virtuelle_Spalte = 83,
 
-    /// <summary>
-    /// Hat den Wert einer anderen Spalte, für schnelle Zugriffe
-    /// </summary>
-    Zeile = 84,
+    ///// <summary>
+    ///// Hat den Wert einer anderen Spalte, für schnelle Zugriffe
+    ///// </summary>
+    //Zeile = 84,
 
     /// <summary>
     /// Dieser Wert ist er Hauptwert der Zeile. Nur einmal pro datenbank erlaubt
@@ -121,8 +121,6 @@ public static class ColumnFunctionExtensions {
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                     or ColumnFunction.RelationText
                                                                                     or ColumnFunction.Schlüsselspalte
-                                                                                    or ColumnFunction.Virtuelle_Spalte
-                                                                                    or ColumnFunction.Zeile
                                                                                     or ColumnFunction.Split_Medium
                                                                                     or ColumnFunction.Split_Large
                                                                                     or ColumnFunction.Split_Name
@@ -130,8 +128,6 @@ public static class ColumnFunctionExtensions {
 
     public static bool CanBeChangedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.RelationText
-                                                                                     or ColumnFunction.Virtuelle_Spalte
-                                                                                     or ColumnFunction.Zeile
                                                                                      or ColumnFunction.Schlüsselspalte
                                                                                      or ColumnFunction.First;
 
@@ -139,8 +135,6 @@ public static class ColumnFunctionExtensions {
                                                                                      or ColumnFunction.RelationText
                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                      or ColumnFunction.Schlüsselspalte
-                                                                                     or ColumnFunction.Virtuelle_Spalte
-                                                                                     or ColumnFunction.Zeile
                                                                                      or ColumnFunction.Split_Medium
                                                                                      or ColumnFunction.Split_Large
                                                                                      or ColumnFunction.Split_Name
@@ -150,8 +144,6 @@ public static class ColumnFunctionExtensions {
                                                                                  or ColumnFunction.RelationText
                                                                                  or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                  or ColumnFunction.Schlüsselspalte
-                                                                                 or ColumnFunction.Virtuelle_Spalte
-                                                                                 or ColumnFunction.Zeile
                                                                                  or ColumnFunction.Split_Medium
                                                                                  or ColumnFunction.Split_Large
                                                                                  or ColumnFunction.Split_Name
@@ -161,7 +153,6 @@ public static class ColumnFunctionExtensions {
     public static bool DropdownItemsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                       or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                                                                                       or ColumnFunction.RelationText
-                                                                                      or ColumnFunction.Virtuelle_Spalte
                                                                                       or ColumnFunction.First;
 
     public static bool DropdownItemsOfOtherCellsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
@@ -176,8 +167,7 @@ public static class ColumnFunctionExtensions {
     public static bool MultilinePossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                    or ColumnFunction.RelationText
                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                   or ColumnFunction.Schlüsselspalte
-                                                                                   or ColumnFunction.Virtuelle_Spalte;
+                                                                                   or ColumnFunction.Schlüsselspalte;
 
     public static bool NeedTargetDatabase(this ColumnFunction function) => function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems;
@@ -189,8 +179,7 @@ public static class ColumnFunctionExtensions {
 
     public static bool TextboxEditPossible(this ColumnFunction function) => function is ColumnFunction.Normal
                                                                                      or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                     or ColumnFunction.RelationText
-                                                                                     or ColumnFunction.Virtuelle_Spalte;
+                                                                                     or ColumnFunction.RelationText;
 
     #endregion
 }

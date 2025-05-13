@@ -133,7 +133,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public static Variable? CellToVariable(ColumnItem? column, RowItem? row, bool mustbeReadOnly, bool virtualcolumns) {
         if (column is not { ScriptType: not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert) }) { return null; }
 
-        if (column.Function == ColumnFunction.Virtuelle_Spalte) {
+        if (!column.SaveContent) {
             if (!virtualcolumns) { return null; }
             mustbeReadOnly = false;
         }
@@ -977,23 +977,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             // Tatsächlichen String ermitteln --------------------------------------------
             string txt;
 
-            switch (column.Function) {
-                //case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
-                //    var (columnItem, rowItem, _, _) = CellCollection.LinkedCellData(column, this, false, false);
-                //    if (columnItem != null && rowItem != null) {
-                //        txt = rowItem.CellGetString(columnItem);
-                //    }
-                //    break;
+            if (!column.SaveContent) { _ = CheckRow(); }
 
-                case ColumnFunction.Virtuelle_Spalte:
-                    _ = CheckRow();
-                    txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
-                    break;
-
-                default:
-                    txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
-                    break;
-            }
+            txt = _database?.Cell.GetStringCore(column, this) ?? string.Empty;
 
             if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, column.DoOpticalTranslation, null); }
             // Multiline-Typ ermitteln  --------------------------------------------
