@@ -138,12 +138,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             mustbeReadOnly = false;
         }
 
-        if (!column.Function.CanBeCheckedByRules()) { return null; }
+        if (!column.CanBeCheckedByRules()) { return null; }
         //if (!column.SaveContent) { return null; }
 
         #region ReadOnly bestimmen
 
-        var ro = mustbeReadOnly || !column.Function.CanBeChangedByRules();
+        var ro = mustbeReadOnly || !column.CanBeChangedByRules();
         //if (column == column.Database.Column.SysCorrect) { ro = true; }
         //if (column == column.Database.Column.SysRowChanger) { ro = true; }
         //if (column == column.Database.Column.SysRowChangeDate) { ro = true; }
@@ -720,7 +720,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var columnVar = vars.Get(column.KeyName);
         if (columnVar is not { ReadOnly: false }) { return; }
-        if (!column.Function.CanBeChangedByRules()) { return; }
+        if (!column.CanBeChangedByRules()) { return; }
 
         var comment = "Skript '" + scriptname + "'";
 
@@ -825,7 +825,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                 RowCollection.WaitDelay = 0;
 
-                if (column.Function is ColumnFunction.Schlüsselspalte or ColumnFunction.First) {
+                if (column.IsKeyColumn) {
                     _ = SetValueInternal(srs, string.Empty, reason);
                 } else {
                     if (!string.IsNullOrEmpty(CellGetString(srs))) {
@@ -900,7 +900,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (reason == Reason.SetCommand) {
                 if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                    if (column.Function is ColumnFunction.Schlüsselspalte or ColumnFunction.First) {
+                    if (column.IsKeyColumn) {
                         if (db.Column.SysRowState is { IsDisposed: false } srs) {
                             _ = SetValueInternal(srs, string.Empty, reason);
                         }

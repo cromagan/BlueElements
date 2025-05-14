@@ -62,7 +62,7 @@ internal class Method_AutoCorrect : Method_Database {
             var columnVar = attvar.Attributes[n];
 
             if (columnVar is not { ReadOnly: false }) { return new DoItFeedback("Variable Schreibgeschützt.", true, ld); }
-            if (!column.Function.CanBeChangedByRules()) { return new DoItFeedback("Spalte nicht veränderbar.", true, ld); }
+            if (!column.CanBeChangedByRules()) { return new DoItFeedback("Spalte nicht veränderbar.", true, ld); }
 
             var s = string.Empty;
             switch (columnVar) {

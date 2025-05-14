@@ -64,7 +64,7 @@ public class Method_CellSetFilter : Method_Database {
 
         if (db.Column[attvar.ValueStringGet(1)] is not { IsDisposed: false } columnToSet) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(4), true, ld); }
 
-        if (!columnToSet.Function.CanBeChangedByRules()) { return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(4), true, ld); }
+        if (!columnToSet.CanBeChangedByRules()) { return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(4), true, ld); }
 
         var r = allFi.Rows;
         allFi.Dispose();

@@ -102,7 +102,7 @@ internal sealed partial class SearchAndReplaceInCells : Form {
             if (_table.CursorPosColumn?.Column is not { IsDisposed: false } c) {
                 canDo = false;
             } else {
-                if (!c.Function.CanBeCheckedByRules()) { canDo = false; }
+                if (!c.CanBeCheckedByRules()) { canDo = false; }
             }
         }
         if (txbAlt.Text == txbNeu.Text) {
@@ -126,7 +126,7 @@ internal sealed partial class SearchAndReplaceInCells : Form {
         if (chkNurinAktuellerSpalte.Checked) {
             if (_table.CursorPosColumn?.Column is { IsDisposed: false } c) { sp.Add(c); }
         } else {
-            sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
+            sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.CanBeChangedByRules()));
         }
         foreach (var thisRow in db.Row) {
             if (!chkAktuelleFilterung.Checked || thisRow.MatchesTo(_table.FilterCombined.ToArray()) || _table.PinnedRows.Contains(thisRow)) {

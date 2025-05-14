@@ -153,8 +153,6 @@ public enum DatabaseDataType : byte {
     EventScriptEdited = 79,
     LastEditID = 80,
 
-    //Info_ColumDataSart = 100,
-    //Info_ColumnDataEnd = 199,
     ColumnName = 100,
 
     ColumnCaption = 101,
@@ -171,7 +169,7 @@ public enum DatabaseDataType : byte {
 
     LineStyleRight = 111,
 
-    //ColumnTimeCode = 112, // co_Ausrichtung = 112
+    IsKeyColumn = 112, //ColumnTimeCode = 112, // co_Ausrichtung = 112
     ColumnQuickInfo = 113,
 
     MaxTextLenght = 114, // co_FesteBreite = 114
@@ -179,7 +177,7 @@ public enum DatabaseDataType : byte {
     FixedColumnWidth = 116, // co_FilterOption = 116
     DropDownItems = 117,
 
-    // co_SteuerelementName = 119
+    IsFirst = 119, // co_SteuerelementName = 119
     // co_BezugsSpalte = 120
     DefaultRenderer = 121, // FREI = 121
 

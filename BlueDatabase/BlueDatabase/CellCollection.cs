@@ -162,7 +162,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (row == null) {
-            if (!column.IsFirst() || db.Column.First() is not { }) {
+            if ( db.Column.First() is not {IsDisposed: false }  c || c != column) {
                 return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
             }
 
@@ -730,7 +730,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
 
-        if (column.IsFirst()) {
+        if (db.Column.First() is { IsDisposed: false} c && c == column ) {
             foreach (var thisColumn in db.Column) {
                 if (column.Function == ColumnFunction.RelationText) {
                     RelationTextNameChanged(thisColumn, row.KeyName, previewsValue, currentValue);

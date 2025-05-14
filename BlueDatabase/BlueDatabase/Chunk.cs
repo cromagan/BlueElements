@@ -283,6 +283,8 @@ public class Chunk : IHasKeyName {
         var name = c.KeyName;
 
         SaveToByteList(DatabaseDataType.ColumnName, c.KeyName, name);
+        SaveToByteList(DatabaseDataType.IsFirst, c.IsFirst.ToPlusMinus(), name);
+        SaveToByteList(DatabaseDataType.IsKeyColumn, c.IsKeyColumn.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.ColumnCaption, c.Caption, name);
         SaveToByteList(DatabaseDataType.ColumnFunction, ((int)c.Function).ToString(), name);
         SaveToByteList(DatabaseDataType.DefaultRenderer, c.DefaultRenderer, name);

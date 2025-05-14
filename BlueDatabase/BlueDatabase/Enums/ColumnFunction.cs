@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using System;
+
 namespace BlueDatabase.Enums;
 
 public enum ColumnFunction {
@@ -79,6 +81,7 @@ public enum ColumnFunction {
     /// <summary>
     /// Besodere Spalte, löst eine extended Changed aus bei Wertänderung
     /// </summary>
+    [Obsolete]
     Schlüsselspalte = 81,
 
     /// <summary>
@@ -89,7 +92,8 @@ public enum ColumnFunction {
     ///// <summary>
     ///// Werte werden in echtzeit - evtl. für jeden Benutzer anderes - berechnet. Wird nicht gespeichert.
     ///// </summary>
-    //Virtuelle_Spalte = 83,
+    [Obsolete]
+    Virtuelle_Spalte = 83,
 
     ///// <summary>
     ///// Hat den Wert einer anderen Spalte, für schnelle Zugriffe
@@ -99,6 +103,7 @@ public enum ColumnFunction {
     /// <summary>
     /// Dieser Wert ist er Hauptwert der Zeile. Nur einmal pro datenbank erlaubt
     /// </summary>
+    [Obsolete]
     First = 85,
 
     /// <summary>
@@ -112,74 +117,3 @@ public enum ColumnFunction {
     // bis 999 wird geprüft
 }
 
-public static class ColumnFunctionExtensions {
-
-    #region Methods
-
-    public static bool Autofilter_möglich(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                    or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                    or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                                                                                    or ColumnFunction.RelationText
-                                                                                    or ColumnFunction.Schlüsselspalte
-                                                                                    or ColumnFunction.Split_Medium
-                                                                                    or ColumnFunction.Split_Large
-                                                                                    or ColumnFunction.Split_Name
-                                                                                    or ColumnFunction.First;
-
-    public static bool CanBeChangedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                     or ColumnFunction.RelationText
-                                                                                     or ColumnFunction.Schlüsselspalte
-                                                                                     or ColumnFunction.First;
-
-    public static bool CanBeCheckedByRules(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                     or ColumnFunction.RelationText
-                                                                                     or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                                                                                     or ColumnFunction.Schlüsselspalte
-                                                                                     or ColumnFunction.Split_Medium
-                                                                                     or ColumnFunction.Split_Large
-                                                                                     or ColumnFunction.Split_Name
-                                                                                     or ColumnFunction.First;
-
-    public static bool CopyAble(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                 or ColumnFunction.RelationText
-                                                                                 or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                                                                                 or ColumnFunction.Schlüsselspalte
-                                                                                 or ColumnFunction.Split_Medium
-                                                                                 or ColumnFunction.Split_Large
-                                                                                 or ColumnFunction.Split_Name
-                                                                                 or ColumnFunction.First
-                                                                                 or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
-
-    public static bool DropdownItemsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                      or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                                                                                      or ColumnFunction.RelationText
-                                                                                      or ColumnFunction.First;
-
-    public static bool DropdownItemsOfOtherCellsAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                                  or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                                  or ColumnFunction.RelationText
-                                                                                                  or ColumnFunction.First;
-
-    public static bool DropdownUnselectAllAllowed(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                            or ColumnFunction.RelationText
-                                                                                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
-
-    public static bool MultilinePossible(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                   or ColumnFunction.RelationText
-                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                   or ColumnFunction.Schlüsselspalte;
-
-    public static bool NeedTargetDatabase(this ColumnFunction function) => function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                    or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems;
-
-    public static bool SpellCheckingPossible(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                       or ColumnFunction.RelationText
-                                                                                       or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                       or ColumnFunction.Schlüsselspalte;
-
-    public static bool TextboxEditPossible(this ColumnFunction function) => function is ColumnFunction.Normal
-                                                                                     or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
-                                                                                     or ColumnFunction.RelationText;
-
-    #endregion
-}

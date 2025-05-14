@@ -296,7 +296,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                                             or ColumnFunction.Split_Name) {
                     SplitColumn = thisColumnItem;
                 }
-                if (thisColumnItem.Function == ColumnFunction.First) {
+                if (thisColumnItem.IsFirst) {
                     _firstColumn = thisColumnItem;
                 }
 

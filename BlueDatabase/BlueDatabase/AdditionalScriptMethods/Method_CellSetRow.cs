@@ -61,7 +61,7 @@ public class Method_CellSetRow : Method_Database {
         var columnToSet = db.Column[attvar.ValueStringGet(1)];
         if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true, ld); }
 
-        if (!columnToSet.Function.CanBeChangedByRules()) {
+        if (!columnToSet.CanBeChangedByRules()) {
             return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1), true, ld);
         }
 

@@ -218,13 +218,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (column.Database is not { IsDisposed: false } db) { return null; }
 
         if (column.Function is not ColumnFunction.Normal
-                           and not ColumnFunction.First
-                           and not ColumnFunction.Schlüsselspalte
                            and not ColumnFunction.RelationText
                            and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
                            and not ColumnFunction.Split_Medium
                            and not ColumnFunction.Split_Large
-                           and not ColumnFunction.Split_Name) { return null; }
+                           and not ColumnFunction.Split_Name &&
+                           !column.IsKeyColumn && 
+                           !column.IsFirst) { return null; }
 
         if (!firstToo && db.Column.First() == column) { return null; }
 

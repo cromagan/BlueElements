@@ -539,7 +539,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
-            if (row != null && column != null && column.Function.CopyAble()) {
+            if (row != null && column != null && column.CopyAble()) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
@@ -1935,7 +1935,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 case Keys.V:
                     if (e.Modifiers == Keys.Control) {
                         if (CursorPosColumn != null && CursorPosRow?.Row != null) {
-                            if (!c.Function.TextboxEditPossible() && c.Function != ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+                            if (!c.TextboxEditPossible() && c.Function != ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                                 NotEditableInfo("Die Zelle hat kein passendes Format.");
                                 _isinKeyDown = false;
                                 return;
@@ -2034,7 +2034,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 if (IsInHead(e.Y)) {
                     QuickInfo = QuickInfoText(c, string.Empty);
                 } else if (_mouseOverRow != null) {
-                    if (c.Function.NeedTargetDatabase()) {
+                    if (c.NeedTargetDatabase()) {
                         if (c.LinkedDatabase != null) {
                             switch (c.Function) {
                                 case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
@@ -2617,7 +2617,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, preverDropDown);
 
         if (dia == EditTypeTable.None && (contentHolderCellColumn.Database?.PowerEdit ?? false)) {
-            dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn.Function, false, true, contentHolderCellColumn.MultiLine && contentHolderCellColumn.EditableWithDropdown);
+            dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, false, true);
         }
 
         switch (dia) {

@@ -266,38 +266,6 @@ internal sealed partial class ColumnEditor : IIsEditor {
         Column_DatenAuslesen();
     }
 
-    private void ButtonCheck() {
-        var tmpFormat = (ColumnFunction)IntParse(cbxFunction.Text);
-        // Mehrzeilig
-        btnMultiline.Enabled = tmpFormat.MultilinePossible();
-        if (!tmpFormat.MultilinePossible()) { btnMultiline.Checked = false; }
-        // Rechtschreibprüfung
-        btnSpellChecking.Enabled = tmpFormat.SpellCheckingPossible();
-        if (!tmpFormat.SpellCheckingPossible()) { btnSpellChecking.Checked = false; }
-        //// Format: Bildcode
-        //grpBildCode.Enabled = tmpFormat == DataFormat.BildCode;
-        //if (tmpFormat != DataFormat.BildCode) {
-        //    txbBildCodeConstHeight.Text = string.Empty;
-        //    cbxBildTextVerhalten.Text = string.Empty;
-        //}
-        // Format: LinkToFileSystem
-        //grpLinkToFileSystem.Enabled = tmpFormat == DataFormat.Link_To_Filesystem;
-        //if (tmpFormat != DataFormat.BildCode) {
-        //    txbBestFileStandardFolder.Text = string.Empty;
-        //    txbBestFileStandardSuffix.Text = string.Empty;
-        //}
-        // LinkedDatabase - Verknüpfte Datenbank
-        //grpLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
-        //if (!tmpFormat.NeedTargetDatabase()) {
-        //    cbxLinkedDatabase.Text = string.Empty;
-        //}
-
-        //// Format: LinkedCell
-        //grpVerlinkteZellen.Enabled = tmpFormat is DataFormat.Verknüpfung_zu_anderer_Datenbank;
-    }
-
-    private void cbxFunction_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
-
     /// <summary>
     /// Kümmert sich um erlaubte Spalten für LinkedCell
     /// </summary>
@@ -313,7 +281,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         if (_column.LinkedDatabase != null) {
             //foreach (var ThisColumn in _Column.Database.Column) {
-            //    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
+            //    if (ThisColumn.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
             //        cbxRowKeyInColumn.ItemAdd(ThisColumn);
             //    }
             //    //if (ThisColumn.Format == DataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
@@ -321,7 +289,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             //    //}
             //}
             foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
-                if (thisLinkedColumn.Function.CanBeCheckedByRules() && !thisLinkedColumn.Function.NeedTargetDatabase()) {
+                if (thisLinkedColumn.CanBeCheckedByRules() && !thisLinkedColumn.NeedTargetDatabase()) {
                     cbxTargetColumn.ItemAdd(ItemOf(thisLinkedColumn));
                 }
             }
@@ -393,7 +361,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
         txbCaption.Text = _column.Caption;
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).Code;
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).Code;
-        btnMultiline.Checked = _column.MultiLine;
+        cbxMultiline.Checked = _column.MultiLine;
+        cbxIsFirst.Checked = _column.IsFirst;
+        cbxIsKeyColumn.Checked = _column.IsKeyColumn;
         cbxFunction.Text = ((int)_column.Function).ToString();
         cbxRandLinks.Text = ((int)_column.LineStyleLeft).ToString();
         cbxRandRechts.Text = ((int)_column.LineStyleRight).ToString();
@@ -467,7 +437,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _column.LineStyleLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
         _column.LineStyleRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
-        _column.MultiLine = btnMultiline.Checked;
+        _column.MultiLine = cbxMultiline.Checked;
+        _column.IsFirst = cbxIsFirst.Checked;
+        _column.IsKeyColumn = cbxIsKeyColumn.Checked;
         _column.AfterEditQuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
         if (txbRunden.Text.IsLong()) {
             var zahl = Math.Max(IntParse(txbRunden.Text), -1);
@@ -579,7 +551,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             var or = new List<string>();
 
             foreach (var thisColumn in db2.Column) {
-                if (thisColumn.Function.CanBeCheckedByRules() && !thisColumn.MultiLine) {
+                if (thisColumn.CanBeCheckedByRules() && !thisColumn.MultiLine) {
                     dd.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~");
                     or.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
                 }
@@ -624,7 +596,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
                 r.CellSet("SpalteName", col.KeyName, string.Empty);
 
-                if (col.Function.Autofilter_möglich() && col != spalteauDb && !col.Function.NeedTargetDatabase() && !col.IsSystemColumn()) {
+                if (col.IsAutofilterPossible() && col != spalteauDb && !col.NeedTargetDatabase() && !col.IsSystemColumn()) {
                     r.CellSet("visible", true, string.Empty);
                 } else {
                     r.CellSet("visible", false, string.Empty);

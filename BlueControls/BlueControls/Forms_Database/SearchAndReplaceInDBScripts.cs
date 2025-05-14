@@ -66,7 +66,7 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
         //if (chkNurinAktuellerSpalte.Checked) {
         //    if (_table.CursorPosColumn is ColumnItem c) { sp.Add(c); }
         //} else {
-        //    sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Function.CanBeChangedByRules()));
+        //    sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.CanBeChangedByRules()));
         //}
         //foreach (var thisRow in db.Row) {
         //    if (!chkAktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToArray()) || _table.PinnedRows.Contains(thisRow)) {

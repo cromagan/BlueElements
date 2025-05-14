@@ -43,26 +43,47 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     #region Fields
 
     internal List<string>? UcaseNamesSortedByLenght;
+
     private const string TmpNewDummy = "TMPNEWDUMMY";
+
     private readonly List<string> _afterEditAutoReplace = [];
+
     private readonly List<string> _columnTags = [];
+
     private readonly List<string> _dropDownItems = [];
+
     private readonly List<string> _linkedCellFilter = [];
+
     private readonly List<string> _permissionGroupsChangeCell = [];
+
     private AdditionalCheck _additionalFormatCheck;
+
     private string _adminInfo;
+
     private bool _afterEditAutoCorrect;
+
     private bool _afterEditDoUCase;
+
     private bool _afterEditQuickSortRemoveDouble;
+
     private AlignmentHorizontal _align;
+
     private string _allowedChars;
+
     private string _autoFilterJoker;
+
     private string _autoRemove;
+
     private Color _backColor;
+
     private string _caption;
+
     private string _captionBitmapCode;
+
     private string _captionGroup1;
+
     private string _captionGroup2;
+
     private string _captionGroup3;
 
     /// <summary>
@@ -78,18 +99,33 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private Database? _database;
 
     private string _defaultRenderer;
+
     private TranslationType _doOpticalTranslation;
+
     private bool _dropdownDeselectAllAllowed;
+
     private bool _editableWithDropdown;
+
     private bool _editableWithTextInput;
+
     private bool _editAllowedDespiteLock;
+
     private FilterOptions _filterOptions;
+
     private int _fixedColumnWidth;
+
     private Color _foreColor;
+
     private ColumnFunction _function;
+
     private bool _ignoreAtRowFilter;
+
+    private bool _isFirst = false;
+    private bool _isKeyColumn;
     private string _keyName;
+
     private ColumnLineStyle _lineStyleLeft;
+
     private ColumnLineStyle _lineStyleRight;
 
     /// <summary>
@@ -98,17 +134,28 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private Database? _linkedDatabase;
 
     private string _linkedDatabaseTableName;
+
     private int _maxCellLenght;
+
     private int _maxTextLenght;
     private bool _multiLine;
+
     private string _regexCheck = string.Empty;
+
     private string _rendererSettings;
+
     private int _roundAfterEdit;
+
     private bool _saveContent;
+
     private ScriptType _scriptType;
+
     private bool _showValuesOfOtherCellsInDropdown;
+
     private SortierTyp _sortType;
+
     private bool _spellCheckingEnabled;
+
     private bool _textFormatingAllowed;
 
     #endregion
@@ -136,6 +183,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _lineStyleLeft = ColumnLineStyle.Dünn;
         _lineStyleRight = ColumnLineStyle.Ohne;
         _multiLine = false;
+        _isKeyColumn = false;
+        _isFirst = false;
         _columnQuickInfo = string.Empty;
         _captionGroup1 = string.Empty;
         _captionGroup2 = string.Empty;
@@ -616,7 +665,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public bool IgnoreAtRowFilter {
-        get => !_function.Autofilter_möglich() || _ignoreAtRowFilter;
+        get => !IsAutofilterPossible() || _ignoreAtRowFilter;
         set {
             if (IsDisposed) { return; }
             if (_ignoreAtRowFilter == value) { return; }
@@ -627,6 +676,30 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public bool IsDisposed { get; private set; }
+
+    public bool IsFirst {
+        get => _isFirst;
+        set {
+            if (IsDisposed) { return; }
+
+            if (_isFirst == value) { return; }
+
+            _ = Database?.ChangeData(DatabaseDataType.IsFirst, this, null, _isFirst.ToPlusMinus(), value.ToPlusMinus(), Generic.UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            OnPropertyChanged("IsFirst");
+        }
+    }
+
+    public bool IsKeyColumn {
+        get => _isKeyColumn;
+        set {
+            if (IsDisposed) { return; }
+
+            if (_isKeyColumn == value) { return; }
+
+            _ = Database?.ChangeData(DatabaseDataType.IsKeyColumn, this, null, _isKeyColumn.ToPlusMinus(), value.ToPlusMinus(), Generic.UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            OnPropertyChanged("IsKeyColumn");
+        }
+    }
 
     public string KeyName {
         get => _keyName.ToUpperInvariant();
@@ -758,7 +831,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         get => _multiLine;
         set {
             if (IsDisposed) { return; }
-            if (!_function.MultilinePossible()) { value = false; }
+            if (!MultilinePossible()) { value = false; }
 
             if (_multiLine == value) { return; }
 
@@ -904,29 +977,28 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool preverDropDown) => column is not { IsDisposed: false }
             ? EditTypeTable.None
-            : UserEditDialogTypeInTable(column.Function, preverDropDown && column.EditableWithDropdown, column.EditableWithTextInput, column.MultiLine);
+            : UserEditDialogTypeInTable(column, preverDropDown && column.EditableWithDropdown, column.EditableWithTextInput);
 
-    public static EditTypeTable UserEditDialogTypeInTable(ColumnFunction function, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
+    public static EditTypeTable UserEditDialogTypeInTable(ColumnItem column, bool doDropDown, bool keybordInputAllowed) {
         if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
 
-        switch (function) {
+ 
+        switch (column.Function) {
             case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
                 return EditTypeTable.Dropdown_Single;
 
             case ColumnFunction.Split_Medium:
             case ColumnFunction.Split_Large:
             case ColumnFunction.Split_Name:
-            case ColumnFunction.First:
-            case ColumnFunction.Schlüsselspalte:
                 return EditTypeTable.None;
 
             default:
-                if (function.TextboxEditPossible()) {
+                if (column.TextboxEditPossible()) {
                     if (!doDropDown) {
                         return EditTypeTable.Textfeld;
                     }
 
-                    if (isMultiline) {
+                    if (column.MultiLine && column.EditableWithDropdown) {
                         return EditTypeTable.Dropdown_Single;
                     }
 
@@ -937,7 +1009,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                     return EditTypeTable.Dropdown_Single;
                 }
 
-                Develop.DebugPrint(function);
+                Develop.DebugPrint(column.Function);
                 return EditTypeTable.None;
         }
     }
@@ -1004,7 +1076,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return value.CutToUtf8Length(_maxCellLenght);
     }
 
-    public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Function.Autofilter_möglich();
+    public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && IsAutofilterPossible();
 
     public int CalculatePreveredMaxCellLenght(double prozentZuschlag) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return 0; }
@@ -1042,6 +1114,23 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return Math.Min((int)(m * prozentZuschlag) + 1, 1000);
     }
 
+    public bool CanBeChangedByRules() {
+        if (_isKeyColumn || _isFirst) { return true; }
+        return _function is ColumnFunction.Normal
+                                                                                     or ColumnFunction.RelationText;
+    }
+
+    public bool CanBeCheckedByRules() {
+        if (_isKeyColumn || _isFirst) { return true; }
+
+        return _function is ColumnFunction.Normal
+                                                                                 or ColumnFunction.RelationText
+                                                                                 or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
+                                                                                 or ColumnFunction.Split_Medium
+                                                                                 or ColumnFunction.Split_Large
+                                                                                 or ColumnFunction.Split_Name;
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -1072,6 +1161,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (nameAndKeyToo) { KeyName = source.KeyName; }
 
         Caption = source.Caption;
+        IsKeyColumn = source.IsKeyColumn;
+        IsFirst = source.IsFirst;
         CaptionBitmapCode = source.CaptionBitmapCode;
         Function = source.Function;
         LineStyleLeft = source.LineStyleLeft;
@@ -1160,11 +1251,44 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return list.SortedDistinctList();
     }
 
+    public bool CopyAble() {
+        if (_isKeyColumn || _isFirst) { return true; }
+
+        return _function is ColumnFunction.Normal
+                                                                             or ColumnFunction.RelationText
+                                                                             or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
+
+                                                                             or ColumnFunction.Split_Medium
+                                                                             or ColumnFunction.Split_Large
+                                                                             or ColumnFunction.Split_Name
+                                                                             or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
+    }
+
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+    public bool DropdownItemsAllowed() {
+        if (_isFirst) { return true; }
+
+        return _function is ColumnFunction.Normal
+                                                                                  or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
+                                                                                  or ColumnFunction.RelationText;
+    }
+
+    public bool DropdownItemsOfOtherCellsAllowed() {
+        if (_isFirst) { return true; }
+
+        return _function is ColumnFunction.Normal
+                                                                                                  or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                                  or ColumnFunction.RelationText;
+    }
+
+    public bool DropdownUnselectAllAllowed() => _function is ColumnFunction.Normal
+                                                                                            or ColumnFunction.RelationText
+                                                                                            or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
 
     public string ErrorReason() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
@@ -1185,7 +1309,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (((int)_function).ToString() == _function.ToString()) { return "Format fehlerhaft."; }
 
-        if (_function.NeedTargetDatabase()) {
+        if (NeedTargetDatabase()) {
             if (LinkedDatabase is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
             if (db == db2) { return "Zirkelbezug mit verknüpfter Datenbank."; }
             var c = db2.Column[_columnNameOfLinkedDatabase];
@@ -1199,7 +1323,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (!string.IsNullOrEmpty(_columnNameOfLinkedDatabase)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
         }
 
-        if (!_function.Autofilter_möglich()) {
+        if (!IsAutofilterPossible()) {
             if (_filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
             if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
         }
@@ -1218,13 +1342,26 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 return "Spalten ohne Inhaltsspeicherung müssen im Skript gesetzt werden und deswegen vorhanden sein.";
             }
             if (!_ignoreAtRowFilter) { return "Spalten ohne Inhaltsspeicherung müssen bei Zeilenfiltern ignoriert werden."; }
+
+            if (_isKeyColumn) {
+                return "Bei Schlüsselspalten muss der Inhalt gespeichert werden.";
+            }
+            if (_isFirst) {
+                return "Bei der ersten Spalte muss der Inhalt gespeichert werden.";
+            }
+        }
+
+        if (_isFirst) {
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
+                return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
+            }
         }
 
         switch (_function) {
             case ColumnFunction.RelationText:
                 if (!_multiLine) { return "Bei dieser Funktion muss mehrzeilig ausgewählt werden."; }
                 //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-                if (IsFirst()) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt. (Ansicht: Alle Spalten)"; }
+                if (db.Column.First() == this) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt."; }
                 //if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
                 //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                 break;
@@ -1241,13 +1378,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 if (!_ignoreAtRowFilter) { return "Diese Spalte muss bei Zeilenfiltern ignoriert werden."; }
 
                 if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Auto-Filter müssen bei dieser Spalte erlaubt sein."; }
-                break;
-
-            case ColumnFunction.First:
-            case ColumnFunction.Schlüsselspalte:
-                if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
-                    return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
-                }
                 break;
 
             case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
@@ -1267,15 +1397,15 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
 
         if (_multiLine) {
-            if (!_function.MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
+            if (!MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
             if (_roundAfterEdit != -1) { return "Runden nur bei einzeiligen Texten möglich"; }
         } else {
             if (_afterEditQuickSortRemoveDouble) { return "Sortierung kann nur bei mehrzeiligen Feldern erfolgen."; }
         }
 
-        if (_spellCheckingEnabled && !_function.SpellCheckingPossible()) { return "Rechtschreibprüfung bei diesem Format nicht möglich."; }
+        if (_spellCheckingEnabled && !SpellCheckingPossible()) { return "Rechtschreibprüfung bei diesem Format nicht möglich."; }
         if (_editAllowedDespiteLock && !_editableWithTextInput && !_editableWithDropdown) { return "Wenn die Zeilensperre ignoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
-        var tmpEditDialog = UserEditDialogTypeInTable(_function, false, true, _multiLine);
+        var tmpEditDialog = UserEditDialogTypeInTable(this, false, true);
         if (_editableWithTextInput) {
             if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
             if (tmpEditDialog == EditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
@@ -1302,9 +1432,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_dropdownDeselectAllAllowed) { return "Dropdownmenu nicht ausgewählt, 'alles abwählen' prüfen."; }
             if (_dropDownItems.Count > 0) { return "Dropdownmenu nicht ausgewählt, Dropdown-Items vorhanden."; }
         }
-        if (_showValuesOfOtherCellsInDropdown && !_function.DropdownItemsOfOtherCellsAllowed()) { return "'Dropdownmenu alles hinzufügen' bei diesem Format nicht erlaubt."; }
-        if (_dropdownDeselectAllAllowed && !_function.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
-        if (_dropDownItems.Count > 0 && !_function.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
+        if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return "'Dropdownmenu alles hinzufügen' bei diesem Format nicht erlaubt."; }
+        if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
+        if (_dropDownItems.Count > 0 && !DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
 
         if (_roundAfterEdit > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
         if (_filterOptions == FilterOptions.None) {
@@ -1334,6 +1464,18 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         Invalidate_LinkedDatabase();
         Database.OnViewChanged();
+    }
+
+    public bool IsAutofilterPossible() {
+        if (_isKeyColumn || _isFirst) { return true; }
+
+        return _function is ColumnFunction.Normal
+                                                                                                                                                                                                                                                or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
+                                                                                or ColumnFunction.RelationText
+                                                                                or ColumnFunction.Split_Medium
+                                                                                or ColumnFunction.Split_Large
+                                                                                or ColumnFunction.Split_Name;
     }
 
     //}
@@ -1370,7 +1512,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     /// <summary>
     /// Der Invalidate, der am meisten invalidiert: Alle temporären Variablen und auch jede Zell-Größe der Spalte.
     /// </summary>
-    public bool IsFirst() => Database?.Column.First() == this;
 
     public bool IsSystemColumn() =>
         _keyName.ToUpperInvariant() is "SYS_CORRECT" or
@@ -1381,6 +1522,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             "SYS_DATECHANGED" or
             "SYS_LOCKED" or
             "SYS_ROWSTATE";
+
+    public bool MultilinePossible() {
+        if (_isKeyColumn) { return true; }
+
+        return _function is ColumnFunction.Normal
+                                                                                                       or ColumnFunction.RelationText
+                                                                                   or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
+    }
+
+    public bool NeedTargetDatabase() => _function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  or ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems;
 
     public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
@@ -1445,48 +1597,71 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             ScriptType = ScriptType.String;
         }
 
-        if (_function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
 
-            #region Aus Dateinamen den Tablename extrahieren
+        switch (_function) {
 
-            if (!_linkedDatabaseTableName.Contains("|") && _linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
-                _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpperInvariant().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB").TrimEnd(".CBDB");
-                LinkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
-            }
+            case ColumnFunction.Virtuelle_Spalte:
+                SaveContent = false;
+                Function = ColumnFunction.Normal;
+                break;
 
-            #endregion
+            case ColumnFunction.First:
+                IsFirst = true;
+                Function = ColumnFunction.Normal;
+                break;
 
-            #region Aus Connection-info den Tablename extrahieren
+            case ColumnFunction.Schlüsselspalte:
+                IsKeyColumn = true;
+                Function = ColumnFunction.Normal;
+                break;
 
-            if (_linkedDatabaseTableName.Contains("|")) {
-                var l = _linkedDatabaseTableName.Split('|');
-                if (IsValidTableName(l[0])) { LinkedDatabaseTableName = l[0]; }
-            }
+            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
+                #region Aus Dateinamen den Tablename extrahieren
 
-            #endregion
-
-            var c = LinkedDatabase?.Column[_columnNameOfLinkedDatabase];
-            if (c is { IsDisposed: false }) {
-                this.GetStyleFrom((IInputFormat)c);
-                ScriptType = ScriptType.Nicht_vorhanden;
-                DoOpticalTranslation = c.DoOpticalTranslation;
-
-                //AfterEditQuickSortRemoveDouble = c.AfterEditQuickSortRemoveDouble;
-                //Align = c.Align;
-
-                //DropdownAllesAbwählenErlaubt = c.DropdownAllesAbwählenErlaubt;
-                //DropdownBearbeitungErlaubt = c.DropdownBearbeitungErlaubt;
-                //DropDownItems = c.DropDownItems;
-                //DropdownWerteAndererZellenAnzeigen = c.DropdownWerteAndererZellenAnzeigen;
-                //Function = c.Function;
-                //SortType = c.SortType;
-                //TextBearbeitungErlaubt = c.TextBearbeitungErlaubt;
-                if (Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
-                    MaxTextLenght = c.MaxTextLenght;
-                    MaxCellLenght = c.MaxCellLenght;
+                if (!_linkedDatabaseTableName.Contains("|") && _linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
+                    _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpperInvariant().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB").TrimEnd(".CBDB");
+                    LinkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
                 }
-            }
+
+                #endregion
+
+                #region Aus Connection-info den Tablename extrahieren
+
+                if (_linkedDatabaseTableName.Contains("|")) {
+                    var l = _linkedDatabaseTableName.Split('|');
+                    if (IsValidTableName(l[0])) { LinkedDatabaseTableName = l[0]; }
+                }
+
+                #endregion
+
+                var c = LinkedDatabase?.Column[_columnNameOfLinkedDatabase];
+                if (c is { IsDisposed: false }) {
+                    this.GetStyleFrom((IInputFormat)c);
+                    ScriptType = ScriptType.Nicht_vorhanden;
+                    DoOpticalTranslation = c.DoOpticalTranslation;
+
+                    //AfterEditQuickSortRemoveDouble = c.AfterEditQuickSortRemoveDouble;
+                    //Align = c.Align;
+
+                    //DropdownAllesAbwählenErlaubt = c.DropdownAllesAbwählenErlaubt;
+                    //DropdownBearbeitungErlaubt = c.DropdownBearbeitungErlaubt;
+                    //DropDownItems = c.DropDownItems;
+                    //DropdownWerteAndererZellenAnzeigen = c.DropdownWerteAndererZellenAnzeigen;
+                    //Function = c.Function;
+                    //SortType = c.SortType;
+                    //TextBearbeitungErlaubt = c.TextBearbeitungErlaubt;
+                    if (Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+                        MaxTextLenght = c.MaxTextLenght;
+                        MaxCellLenght = c.MaxCellLenght;
+                    }
+                }
+                break;
+
+
         }
+
+
+
 
         if (MaxCellLenght < MaxTextLenght) { MaxCellLenght = MaxTextLenght; }
 
@@ -1513,6 +1688,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         switch (_keyName.ToUpperInvariant()) {
             case "SYS_CREATOR":
                 _function = ColumnFunction.Normal;
+                _isFirst = false;
                 _maxTextLenght = 20;
                 _maxCellLenght = 20;
                 if (setOpticalToo) {
@@ -1527,6 +1703,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case "SYS_CHANGER":
                 _function = ColumnFunction.Normal;
+                _isKeyColumn = false;
+                _isFirst = false;
                 _ignoreAtRowFilter = true;
                 _spellCheckingEnabled = false;
                 _editableWithTextInput = false;
@@ -1544,11 +1722,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case "SYS_CHAPTER":
                 if (_function is not ColumnFunction.Normal
-                             and not ColumnFunction.Schlüsselspalte
                              and not ColumnFunction.Split_Medium
                              and not ColumnFunction.Split_Large
                              and not ColumnFunction.Split_Name
-                             and not ColumnFunction.First
                              and not ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
                     _function = ColumnFunction.Normal;
                 }
@@ -1585,6 +1761,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_ROWSTATE":
+                _isKeyColumn = false;
+                _isFirst = false;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
@@ -1600,6 +1778,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_DATECHANGED":
+                _isKeyColumn = false;
+                _isFirst = false;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
@@ -1621,6 +1801,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case "SYS_CORRECT":
                 _caption = "Fehlerfrei";
+                _isFirst = false;
                 _spellCheckingEnabled = false;
                 _function = ColumnFunction.Normal;
                 //_AutoFilterErweitertErlaubt = false;
@@ -1648,6 +1829,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_LOCKED":
+                _isFirst = false;
                 _spellCheckingEnabled = false;
                 _function = ColumnFunction.Normal;
                 _scriptType = ScriptType.Bool;
@@ -1698,6 +1880,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 Develop.DebugPrint("Unbekannte Kennung: " + _keyName);
                 break;
         }
+    }
+
+    public bool SpellCheckingPossible() {
+        if (_isKeyColumn) { return true; }
+
+        return _function is ColumnFunction.Normal
+                                                                                                           or ColumnFunction.RelationText
+                                                                                       or ColumnFunction.Verknüpfung_zu_anderer_Datenbank;
     }
 
     public void Statistik(List<RowItem> rows, bool ignoreMultiLine) {
@@ -1822,8 +2012,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (this == db.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
 
-        if (_function == ColumnFunction.First) { return QuickImage.Get(ImageCode.Stern, 16); }
-        if (_function == ColumnFunction.Schlüsselspalte) { return QuickImage.Get(ImageCode.Schlüssel, 16); }
+        if (_isFirst) { return QuickImage.Get(ImageCode.Stern, 16); }
+        if (_isKeyColumn) { return QuickImage.Get(ImageCode.Schlüssel, 16); }
 
         if (_function is ColumnFunction.Split_Medium or ColumnFunction.Split_Name or ColumnFunction.Split_Large) { return QuickImage.Get(ImageCode.Diskette, 16); }
 
@@ -1841,7 +2031,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             return QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0");
         }
 
-        if (_function.TextboxEditPossible()) {
+        if (TextboxEditPossible()) {
             return _multiLine ? QuickImage.Get(ImageCode.Textfeld, 16, Color.Red, Color.Transparent) :
                            QuickImage.Get(ImageCode.Textfeld);
         }
@@ -1854,6 +2044,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             ColumnSystemInfo = "Seit UTC: " + DateTime.UtcNow.ToString5();
         }
     }
+
+    public bool TextboxEditPossible() => _function is ColumnFunction.Normal
+                                                                                                         or ColumnFunction.Verknüpfung_zu_anderer_Datenbank
+                                                                                     or ColumnFunction.RelationText;
 
     //        case FormatHolder.Url:
     //            SetFormatForUrl();
@@ -1906,11 +2100,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 if (editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                 return false;
 
-            case ColumnFunction.First:
             case ColumnFunction.Split_Medium:
             case ColumnFunction.Split_Name:
             case ColumnFunction.Split_Large:
-            case ColumnFunction.Schlüsselspalte:
                 if (editTypeToCheck == EditTypeFormula.als_Überschrift_anzeigen) { return true; }
                 return false;
 
@@ -1938,7 +2130,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
             }
 
-            if (UserEditDialogTypeInTable(Function, false, true, MultiLine && EditableWithDropdown) == EditTypeTable.None) {
+            if (UserEditDialogTypeInTable(this, false, true) == EditTypeTable.None) {
                 return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für den Typ des Spalteninhalts '" + Function + "' definiert.";
             }
         }
@@ -2034,6 +2226,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case DatabaseDataType.MultiLine:
                 _multiLine = newvalue.FromPlusMinus();
+                break;
+
+            case DatabaseDataType.IsFirst:
+                _isFirst = newvalue.FromPlusMinus();
+                break;
+
+            case DatabaseDataType.IsKeyColumn:
+                _isKeyColumn = newvalue.FromPlusMinus();
                 break;
 
             case DatabaseDataType.DropDownItems:
