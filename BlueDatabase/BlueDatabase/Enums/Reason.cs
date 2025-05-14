@@ -25,7 +25,7 @@ public enum Reason {
     /// <summary>
     /// Es werden keine Werte invalidiert. Kein Undo geloggt. und auch keine Repairs oder Skripte ausgeführt.
     /// Allerdings wird der Freeze-State umgangen. Z.B. um eine Datenbank laden zu können
-    /// Wird benutzt beim Laden einer Datenbank, beim Systemspalten befüllen, oder virtuelle Spalten zu befüllen
+    /// Wird benutzt beim Laden einer Datenbank, beim Systemspalten befüllen, oder nichtspeicherbare Spalten zu befüllen
     /// </summary>
     NoUndo_NoInvalidate = 1,
 

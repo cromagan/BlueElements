@@ -71,12 +71,6 @@ public class VariableWebpage : Variable {
 
     #region Methods
 
-    public override object Clone() {
-        var v = new VariableWebpage(KeyName);
-        v.Parse(ToString());
-        return v;
-    }
-
     public override void DisposeContent() => _browser?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
@@ -85,8 +79,6 @@ public class VariableWebpage : Variable {
         ValueWebpage = v.ValueWebpage;
         return DoItFeedback.Null();
     }
-
-    protected override Variable? NewWithThisValue(object? x) => null;
 
     protected override void SetValue(object? x) { }
 

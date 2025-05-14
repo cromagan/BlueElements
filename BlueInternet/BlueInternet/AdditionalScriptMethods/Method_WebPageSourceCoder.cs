@@ -54,8 +54,8 @@ internal class Method_WebPageSourceCode : Method_WebPage {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
-        if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
+        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback("Keine Webseite geladen", false, ld); }
+        if (wb.IsLoading) { return new DoItFeedback("Ladeprozess aktiv", false, ld); }
 
         try {
             Generic.CollectGarbage();
@@ -65,7 +65,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
             var task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
-                return new DoItFeedback(ld, "Webseite konnte nicht neu geladen werden.");
+                return new DoItFeedback("Webseite konnte nicht neu geladen werden.", false, ld);
             }
 
             if (task is { IsFaulted: false, Result: { Success: true, Result: string result } }) {
@@ -91,9 +91,9 @@ internal class Method_WebPageSourceCode : Method_WebPage {
             //    Console.WriteLine(frameHtml.Result);
             //}
 
-            return new DoItFeedback(ld, "Quellcode konnte nicht gelesen werden.");
+            return new DoItFeedback("Quellcode konnte nicht gelesen werden.", false, ld);
         } catch (Exception ex) {
-            return new DoItFeedback(ld, "Quellcode konnte nicht gelesen werden: " + ex);
+            return new DoItFeedback("Quellcode konnte nicht gelesen werden: " + ex, false, ld);
         }
     }
 

@@ -499,7 +499,7 @@ public static class Export {
             if (thisRow is { IsDisposed: false }) {
                 var tmpBody = body;
 
-                _ = thisRow.CheckRow(); // Virtuelle Spalten
+                _ = thisRow.CheckRow(); // Nichtspeicherbare Spalten
                 var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
 
                 if (script.Failed) {

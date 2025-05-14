@@ -50,8 +50,8 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
-        if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
+        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback("Keine Webseite geladen", false, ld); }
+        if (wb.IsLoading) { return new DoItFeedback("Ladeprozess aktiv", false, ld); }
 
         try {
             const string script = @"var inputs = document.getElementsByTagName('a');
@@ -75,9 +75,9 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
             }
 
             // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
-            return new DoItFeedback(ld, "Fehler beim Extrahieren der Links: " + task.Exception?.Message);
+            return new DoItFeedback("Fehler beim Extrahieren der Links: " + task.Exception?.Message, false, ld);
         } catch {
-            return new DoItFeedback(ld, "Allgemeiner Fehler beim Auslesen der Links.");
+            return new DoItFeedback("Allgemeiner Fehler beim Auslesen der Links.", false, ld);
         }
     }
 

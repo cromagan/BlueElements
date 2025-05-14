@@ -2168,7 +2168,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true, table.FilterCombined.ToArray());
         if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
 
-        if (cellInThisDatabaseColumn?.Column is not { SaveContent: true }) { return; } // Dummy prüfung
+        if (cellInThisDatabaseColumn?.Column is not { IsDisposed: false }) { return; } // Dummy prüfung
 
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
@@ -2246,7 +2246,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
-            _ = contentHolderCellRow.UpdateRow(true, true, "Nach Benutzereingabe");
+
+            if(contentHolderCellColumn.SaveContent) {
+                _ = contentHolderCellRow.UpdateRow(true, true, "Nach Benutzereingabe");
+            } else {
+                // Variablen sind en nicht im Script enthalten, also nur die schnelle Berechnung
+                contentHolderCellRow.InvalidateCheckData();
+                _ = contentHolderCellRow.CheckRow();
+            }
 
             if (table.Database == cellInThisDatabaseColumn.Column?.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }

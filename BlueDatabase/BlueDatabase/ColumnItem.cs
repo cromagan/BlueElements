@@ -180,11 +180,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _scriptType = ScriptType.undefiniert;
         _autoRemove = string.Empty;
         _autoFilterJoker = string.Empty;
-        //_saveContent = true;
+        _saveContent = true;
         //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
         _spellCheckingEnabled = false;
         //_CompactView = true;
-        _saveContent = true;
         _doOpticalTranslation = TranslationType.Original_Anzeigen;
         _editAllowedDespiteLock = false;
         _linkedDatabaseTableName = string.Empty;
@@ -1508,6 +1507,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             ForeColor = Color.FromArgb(0, 0, 0);
             //CaptionBitmapCode = null;
         }
+
+        _saveContent = true;
+
         switch (_keyName.ToUpperInvariant()) {
             case "SYS_CREATOR":
                 _function = ColumnFunction.Normal;
@@ -1529,7 +1531,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _spellCheckingEnabled = false;
                 _editableWithTextInput = false;
                 _editableWithDropdown = false;
-                _saveContent = true;
                 _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
                 _maxTextLenght = 20;
@@ -1542,7 +1543,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_CHAPTER":
-                _saveContent = true;
                 if (_function is not ColumnFunction.Normal
                              and not ColumnFunction.Schlüsselspalte
                              and not ColumnFunction.Split_Medium
@@ -1570,7 +1570,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_DATECREATED":
-                _saveContent = true;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
@@ -1588,7 +1587,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             case "SYS_ROWSTATE":
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                _saveContent = true;
                 this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLenght = MaxTextLenght;
                 if (setOpticalToo) {
@@ -1604,7 +1602,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             case "SYS_DATECHANGED":
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                _saveContent = false;
 
                 this.GetStyleFrom(FormatHolder.DateTimeWithMilliSeconds); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLenght = MaxTextLenght;
@@ -1623,7 +1620,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_CORRECT":
-                _saveContent = true;
                 _caption = "Fehlerfrei";
                 _spellCheckingEnabled = false;
                 _function = ColumnFunction.Normal;
@@ -1652,7 +1648,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_LOCKED":
-                _saveContent = true;
                 _spellCheckingEnabled = false;
                 _function = ColumnFunction.Normal;
                 _scriptType = ScriptType.Bool;

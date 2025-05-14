@@ -814,7 +814,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChanger is { IsDisposed: false } src && src != column) { _ = SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { _ = SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 
-        if (db.Column.SysRowState is { IsDisposed: false } srs && srs != column) {
+        if (db.Column.SysRowState is { IsDisposed: false } srs && srs != column && column.SaveContent) {
             InvalidateCheckData();
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {

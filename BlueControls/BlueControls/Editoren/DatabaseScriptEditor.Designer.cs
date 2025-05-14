@@ -303,7 +303,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_newrow.Location = new System.Drawing.Point(8, 48);
             this.chkAuslöser_newrow.Name = "chkAuslöser_newrow";
             this.chkAuslöser_newrow.QuickInfo = "Das Skript wir nach dem Erstellen einer\r\nneuen Zeile ausgeführt.\r\nMit diesem Skri" +
-    "pt können Initialwerte einer Zeile ergänzt werden.";
+    "pt können Initialwerte\r\neiner Zeile ergänzt werden.";
             this.chkAuslöser_newrow.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_newrow.TabIndex = 17;
             this.chkAuslöser_newrow.Text = "Zeile initialisieren";
@@ -337,8 +337,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 160);
             this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
-            this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird zur Datenkonsitenzprüfung,\r\nfür Variablen für Formulare und virtu" +
-    "elle Spalten verwendet.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen " +
+            this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird zur Datenkonsitenzprüfung,\r\nfür Variablen für Formulare und nichtspeicherbare" +
+    " Spalten verwendet.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen " +
     "oder\r\nlange dauernde Prozesse anstoßen.";
             this.chkAuslöser_prepaireformula.Size = new System.Drawing.Size(175, 16);
             this.chkAuslöser_prepaireformula.TabIndex = 19;

@@ -126,7 +126,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
     public bool NeedRow { get; private set; }
 
     /// <summary>
-    /// Virtuelle Spalten werden bei FormularVorbereiten benötigt.
+    /// Nichtspeicherbare Spalten werden bei FormularVorbereiten benötigt.
     /// </summary>
     public bool VirtalColumns => EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
 

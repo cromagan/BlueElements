@@ -480,17 +480,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public string Set(ColumnItem? column, RowItem? row, string value, string comment) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank ungültig!"; }
 
+        if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Datenbank eingefroren!"; }
+
         if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
 
         if (row is not { IsDisposed: false }) { return "Zeile ungültig!"; }
 
         if (db != row.Database || db != column.Database) { return "Datenbank ungültig!"; }
-
-        if (!column.SaveContent) {
-            return row.SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
-        }
-
-        if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Datenbank eingefroren!"; }
 
         if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
@@ -505,6 +501,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (value == oldValue) { return string.Empty; }
 
         column.UcaseNamesSortedByLenght = null;
+
+        if (!column.SaveContent) {
+            return row.SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
+        }
 
         var chunkValue = DatabaseChunk.GetChunkValue(row);
 

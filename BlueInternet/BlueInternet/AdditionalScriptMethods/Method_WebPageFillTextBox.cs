@@ -52,8 +52,8 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
-        if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
+        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback("Keine Webseite geladen", false, ld); }
+        if (wb.IsLoading) { return new DoItFeedback("Ladeprozess aktiv", false, ld); }
 
         try {
             //     var script = @"
@@ -88,7 +88,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
             var task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
-                return new DoItFeedback(ld, "Webseite konnte nicht neu geladen werden.");
+                return new DoItFeedback("Webseite konnte nicht neu geladen werden.", false, ld);
             }
 
             if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(); }
@@ -110,7 +110,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
             task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
-                return new DoItFeedback(ld, "Webseite konnte nicht neu geladen werden.");
+                return new DoItFeedback("Webseite konnte nicht neu geladen werden.", false, ld);
             }
 
             if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(); }
@@ -135,9 +135,9 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
             //    return DoItFeedback.Null();
             //}
             //return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
-            return new DoItFeedback(ld, "Fehler beim Ausführen des TextBox-Befehles: " + task.Exception?.Message);
+            return new DoItFeedback("Fehler beim Ausführen des TextBox-Befehles: " + task.Exception?.Message, false, ld);
         } catch {
-            return new DoItFeedback(ld, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
+            return new DoItFeedback("Allgemeiner Fehler beim Ausführen des TextBox-Befehles.", false, ld);
         }
     }
 

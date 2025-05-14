@@ -2497,8 +2497,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var f = row.SetValueInternal(column, value, reason);
 
             if (!string.IsNullOrEmpty(f)) { return f; }
-            row.DoSystemColumns(db, column, user, datetimeutc, reason);
 
+            if (column.SaveContent) {
+                row.DoSystemColumns(db, column, user, datetimeutc, reason);
+            }
             return string.Empty;
         }
 

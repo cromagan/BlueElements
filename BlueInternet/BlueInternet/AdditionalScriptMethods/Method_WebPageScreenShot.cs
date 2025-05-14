@@ -60,8 +60,8 @@ internal class Method_WebPageScreenShot : Method_WebPage {
 
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback(ld, "Keine Webseite geladen"); }
-        if (wb.IsLoading) { return new DoItFeedback(ld, "Ladeprozess aktiv"); }
+        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback("Keine Webseite geladen", false, ld); }
+        if (wb.IsLoading) { return new DoItFeedback("Ladeprozess aktiv", false, ld); }
 
         try {
             Generic.CollectGarbage();

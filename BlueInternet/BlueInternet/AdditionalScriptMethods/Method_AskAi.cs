@@ -78,7 +78,7 @@ internal class Method_AskAi : Method {
                 Generic.Pause(10, false);
             }
         } while (tries < 10);
-        return new DoItFeedback(ld, "Allgemeiner Fehler bei der Übergabe an die KI.");
+        return new DoItFeedback("Allgemeiner Fehler bei der Übergabe an die KI.", false, ld);
     }
 
     #endregion

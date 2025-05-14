@@ -29,7 +29,7 @@ public enum ScriptEventTypes {
     value_changed = 2,
 
     /// <summary>
-    /// Berechnet die Fehler, Variablen für das Formular und Virtuelle Spalten
+    /// Berechnet die Fehler, Variablen für das Formular und Nichtspeicherbare Spalten
     /// </summary>
     prepare_formula = 4,
 
