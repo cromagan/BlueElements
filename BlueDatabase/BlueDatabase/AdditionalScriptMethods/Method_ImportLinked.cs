@@ -63,7 +63,7 @@ public class Method_ImportLinked : Method_Database {
         foreach (var thisColumn in db.Column) {
             if (thisColumn.IsDisposed) { continue; }
 
-            if (thisColumn.Function != ColumnFunction.Verknüpfung_zu_anderer_Datenbank) { continue; }
+            if (thisColumn.RelationType != RelationType.CellValues) { continue; }
 
             var linkedDatabase = thisColumn.LinkedDatabase;
             if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback("Verlinkte Datenbank nicht vorhanden", true, ld); }

@@ -415,11 +415,11 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
 
             // Fall 5: Aufwendige Berechnung, wenn der Filter ein Ergebnis zurückliefert
-            if (!showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { } c) {
+            if (!showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false } c) {
                 //if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
                 using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
 
-                if (filterSingle.Database?.Column.SplitColumn is { } spc &&
+                if (filterSingle.Database?.Column.ChunkValueColumn is { IsDisposed: false } spc &&
                     spc != FilterSingleColumn &&
                     fic[spc] is { } fis) {
                     fc.Add(fis);

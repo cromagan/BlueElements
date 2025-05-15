@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using Anthropic.SDK;
 using BlueScript.Structures;
-using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 

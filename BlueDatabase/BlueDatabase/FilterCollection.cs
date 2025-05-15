@@ -69,7 +69,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         Database = db;
 
-        if (db.Column.SplitColumn is { IsDisposed: false } spc) {
+        if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             Add(new FilterItem(spc, FilterType.Istgleich, r.CellGetString(spc)));
         }
 
@@ -180,7 +180,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static List<RowItem> CalculateFilteredRows(Database? db, params FilterItem[] filter) {
         if (db == null || db.IsDisposed) { return []; }
 
-        if (db.Column.SplitColumn is { IsDisposed: false } spc) {
+        if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, filter) is { } i) {
                 var ok = db.BeSureRowIsLoaded(i, null);
                 if (!ok) { return []; }
@@ -216,15 +216,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (filter == null || !filter.Any()) { return null; }
         if (column is not { IsDisposed: false }) { return null; }
         if (column.Database is not { IsDisposed: false } db) { return null; }
-
-        if (column.Function is not ColumnFunction.Normal
-                           and not ColumnFunction.RelationText
-                           and not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems
-                           and not ColumnFunction.Split_Medium
-                           and not ColumnFunction.Split_Large
-                           and not ColumnFunction.Split_Name &&
-                           !column.IsKeyColumn && 
-                           !column.IsFirst) { return null; }
 
         if (!firstToo && db.Column.First() == column) { return null; }
 
@@ -440,7 +431,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return fi is { FilterType: FilterType.Instr or FilterType.Instr_UND_GroßKleinEgal or FilterType.Instr_GroßKleinEgal };
     }
 
-    public bool MayHaveRowFilter(ColumnItem? column) => column is { IgnoreAtRowFilter: false } && IsRowFilterActiv();
+    public bool MayHaveRowFilter(ColumnItem? column) => column is { IsDisposed: false, IgnoreAtRowFilter: false } && IsRowFilterActiv();
 
     public FilterCollection Normalized() {
         var tmp = new List<FilterItem>();

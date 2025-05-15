@@ -61,24 +61,24 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capAlign = new BlueControls.Controls.Caption();
             this.cbxScriptType = new BlueControls.Controls.ComboBox();
             this.capScriptType = new BlueControls.Controls.Caption();
-            this.btnFormatierungErlaubt = new BlueControls.Controls.Button();
+            this.chkFormatierungErlaubt = new BlueControls.Controls.Button();
             this.cbxAdditionalCheck = new BlueControls.Controls.ComboBox();
             this.capcbxAdditionalCheck = new BlueControls.Controls.Caption();
-            this.cbxFunction = new BlueControls.Controls.ComboBox();
-            this.capFunction = new BlueControls.Controls.Caption();
-            this.cbxMultiline = new BlueControls.Controls.Button();
+            this.cbxChunk = new BlueControls.Controls.ComboBox();
+            this.capChunk = new BlueControls.Controls.Caption();
+            this.chkMultiline = new BlueControls.Controls.Button();
             this.tabBearbeitung = new System.Windows.Forms.TabPage();
             this.grpAuswahlmenuOptionen = new BlueControls.Controls.GroupBox();
             this.btnOtherValuesToo = new BlueControls.Controls.Button();
             this.txbAuswaehlbareWerte = new BlueControls.Controls.TextBox();
             this.capImmerWerte = new BlueControls.Controls.Caption();
             this.btnCanBeEmpty = new BlueControls.Controls.Button();
-            this.btnSaveContent = new BlueControls.Controls.Button();
             this.btnIgnoreLock = new BlueControls.Controls.Button();
             this.lbxCellEditor = new BlueControls.Controls.ListBox();
             this.btnEditableStandard = new BlueControls.Controls.Button();
             this.capUserGroupEdit = new BlueControls.Controls.Caption();
             this.btnEditableDropdown = new BlueControls.Controls.Button();
+            this.chkSaveContent = new BlueControls.Controls.Button();
             this.tabAutoKorrektur = new System.Windows.Forms.TabPage();
             this.btnCalculateMaxCellLenght = new BlueControls.Controls.Button();
             this.txbAutoReplace = new BlueControls.Controls.TextBox();
@@ -129,8 +129,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabDatenFormat = new System.Windows.Forms.TabPage();
-            this.cbxIsKeyColumn = new BlueControls.Controls.Button();
-            this.cbxIsFirst = new BlueControls.Controls.Button();
+            this.chkIsKeyColumn = new BlueControls.Controls.Button();
+            this.chkIsFirst = new BlueControls.Controls.Button();
             this.btnMaxTextLenght = new BlueControls.Controls.Button();
             this.txbMaxTextLenght = new BlueControls.Controls.TextBox();
             this.capMaxTextLenght = new BlueControls.Controls.Caption();
@@ -155,6 +155,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.capTabellenname = new BlueControls.Controls.Caption();
             this.btnSpaltenkopf = new BlueControls.Controls.Button();
+            this.chkRelation = new BlueControls.Controls.Button();
+            this.cbxRelationType = new BlueControls.Controls.ComboBox();
+            this.caption1 = new BlueControls.Controls.Caption();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -462,14 +465,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capScriptType.Size = new System.Drawing.Size(216, 24);
             this.capScriptType.Text = "Im Skript ist der Datentyp:";
             // 
-            // btnFormatierungErlaubt
+            // chkFormatierungErlaubt
             // 
-            this.btnFormatierungErlaubt.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.btnFormatierungErlaubt.Location = new System.Drawing.Point(760, 16);
-            this.btnFormatierungErlaubt.Name = "btnFormatierungErlaubt";
-            this.btnFormatierungErlaubt.Size = new System.Drawing.Size(296, 16);
-            this.btnFormatierungErlaubt.TabIndex = 41;
-            this.btnFormatierungErlaubt.Text = "Text-Formatierung erlaubt (Fett, Kursiv, etc.)";
+            this.chkFormatierungErlaubt.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkFormatierungErlaubt.Location = new System.Drawing.Point(312, 8);
+            this.chkFormatierungErlaubt.Name = "chkFormatierungErlaubt";
+            this.chkFormatierungErlaubt.Size = new System.Drawing.Size(296, 16);
+            this.chkFormatierungErlaubt.TabIndex = 41;
+            this.chkFormatierungErlaubt.Text = "Text-Formatierung erlaubt (Fett, Kursiv, etc.)";
             // 
             // cbxAdditionalCheck
             // 
@@ -490,39 +493,38 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capcbxAdditionalCheck.Text = "Zusätzliche Prüfung, ob der eingegeben Wert konsitent ist zu:";
             this.capcbxAdditionalCheck.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // cbxFunction
+            // cbxChunk
             // 
-            this.cbxFunction.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxFunction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxFunction.Location = new System.Drawing.Point(408, 32);
-            this.cbxFunction.Name = "cbxFunction";
-            this.cbxFunction.RegexCheck = null;
-            this.cbxFunction.Size = new System.Drawing.Size(312, 24);
-            this.cbxFunction.TabIndex = 27;
+            this.cbxChunk.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxChunk.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxChunk.Location = new System.Drawing.Point(840, 8);
+            this.cbxChunk.Name = "cbxChunk";
+            this.cbxChunk.RegexCheck = null;
+            this.cbxChunk.Size = new System.Drawing.Size(232, 24);
+            this.cbxChunk.TabIndex = 27;
             // 
-            // capFunction
+            // capChunk
             // 
-            this.capFunction.CausesValidation = false;
-            this.capFunction.Location = new System.Drawing.Point(408, 16);
-            this.capFunction.Name = "capFunction";
-            this.capFunction.Size = new System.Drawing.Size(136, 16);
-            this.capFunction.Text = "Funktion:";
-            this.capFunction.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capChunk.CausesValidation = false;
+            this.capChunk.Location = new System.Drawing.Point(656, 8);
+            this.capChunk.Name = "capChunk";
+            this.capChunk.Size = new System.Drawing.Size(184, 16);
+            this.capChunk.Text = "Werte zum Chunken benutzen:";
+            this.capChunk.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // cbxMultiline
+            // chkMultiline
             // 
-            this.cbxMultiline.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.cbxMultiline.Location = new System.Drawing.Point(760, 40);
-            this.cbxMultiline.Name = "cbxMultiline";
-            this.cbxMultiline.Size = new System.Drawing.Size(296, 16);
-            this.cbxMultiline.TabIndex = 7;
-            this.cbxMultiline.Text = "Mehrere Einträge pro Zelle erlaubt (mehrzeilig)";
+            this.chkMultiline.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkMultiline.Location = new System.Drawing.Point(312, 24);
+            this.chkMultiline.Name = "chkMultiline";
+            this.chkMultiline.Size = new System.Drawing.Size(296, 16);
+            this.chkMultiline.TabIndex = 7;
+            this.chkMultiline.Text = "Mehrere Einträge pro Zelle erlaubt (mehrzeilig)";
             // 
             // tabBearbeitung
             // 
             this.tabBearbeitung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabBearbeitung.Controls.Add(this.grpAuswahlmenuOptionen);
-            this.tabBearbeitung.Controls.Add(this.btnSaveContent);
             this.tabBearbeitung.Controls.Add(this.btnIgnoreLock);
             this.tabBearbeitung.Controls.Add(this.lbxCellEditor);
             this.tabBearbeitung.Controls.Add(this.btnEditableStandard);
@@ -596,15 +598,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnCanBeEmpty.TabIndex = 6;
             this.btnCanBeEmpty.Text = "Alles abwählen erlaubt (leere Zelle möglich)";
             // 
-            // btnSaveContent
-            // 
-            this.btnSaveContent.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.btnSaveContent.Location = new System.Drawing.Point(592, 376);
-            this.btnSaveContent.Name = "btnSaveContent";
-            this.btnSaveContent.Size = new System.Drawing.Size(288, 16);
-            this.btnSaveContent.TabIndex = 32;
-            this.btnSaveContent.Text = "Inhalt wird auf Festplatte gespeichert";
-            // 
             // btnIgnoreLock
             // 
             this.btnIgnoreLock.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
@@ -652,6 +645,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnEditableDropdown.Size = new System.Drawing.Size(544, 16);
             this.btnEditableDropdown.TabIndex = 5;
             this.btnEditableDropdown.Text = "Benutzer-Bearbeitung mit <b>Auswahl-Menü (Dropdown-Menü)</b> erlauben";
+            // 
+            // chkSaveContent
+            // 
+            this.chkSaveContent.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkSaveContent.Location = new System.Drawing.Point(8, 40);
+            this.chkSaveContent.Name = "chkSaveContent";
+            this.chkSaveContent.Size = new System.Drawing.Size(296, 16);
+            this.chkSaveContent.TabIndex = 32;
+            this.chkSaveContent.Text = "Inhalt wird auf Festplatte gespeichert";
             // 
             // tabAutoKorrektur
             // 
@@ -1056,17 +1058,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxLinkedDatabase.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxLinkedDatabase.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxLinkedDatabase.Location = new System.Drawing.Point(224, 16);
+            this.cbxLinkedDatabase.Location = new System.Drawing.Point(248, 48);
             this.cbxLinkedDatabase.Name = "cbxLinkedDatabase";
             this.cbxLinkedDatabase.RegexCheck = null;
-            this.cbxLinkedDatabase.Size = new System.Drawing.Size(857, 24);
+            this.cbxLinkedDatabase.Size = new System.Drawing.Size(833, 24);
             this.cbxLinkedDatabase.TabIndex = 38;
             this.cbxLinkedDatabase.TextChanged += new System.EventHandler(this.cbxLinkedDatabase_TextChanged);
             // 
             // capLinkedDatabase
             // 
             this.capLinkedDatabase.CausesValidation = false;
-            this.capLinkedDatabase.Location = new System.Drawing.Point(8, 16);
+            this.capLinkedDatabase.Location = new System.Drawing.Point(8, 48);
             this.capLinkedDatabase.Name = "capLinkedDatabase";
             this.capLinkedDatabase.Size = new System.Drawing.Size(152, 16);
             this.capLinkedDatabase.Text = "Vernküpfte Datenbank:";
@@ -1195,8 +1197,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabDatenFormat
             // 
             this.tabDatenFormat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabDatenFormat.Controls.Add(this.cbxIsKeyColumn);
-            this.tabDatenFormat.Controls.Add(this.cbxIsFirst);
+            this.tabDatenFormat.Controls.Add(this.chkRelation);
+            this.tabDatenFormat.Controls.Add(this.chkIsKeyColumn);
+            this.tabDatenFormat.Controls.Add(this.chkSaveContent);
+            this.tabDatenFormat.Controls.Add(this.chkIsFirst);
             this.tabDatenFormat.Controls.Add(this.btnMaxTextLenght);
             this.tabDatenFormat.Controls.Add(this.txbMaxTextLenght);
             this.tabDatenFormat.Controls.Add(this.capMaxTextLenght);
@@ -1207,39 +1211,39 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabDatenFormat.Controls.Add(this.txbRegex);
             this.tabDatenFormat.Controls.Add(this.capRegex);
             this.tabDatenFormat.Controls.Add(this.Caption13);
-            this.tabDatenFormat.Controls.Add(this.btnFormatierungErlaubt);
+            this.tabDatenFormat.Controls.Add(this.chkFormatierungErlaubt);
             this.tabDatenFormat.Controls.Add(this.cbxAdditionalCheck);
             this.tabDatenFormat.Controls.Add(this.capcbxAdditionalCheck);
             this.tabDatenFormat.Controls.Add(this.cbxScriptType);
             this.tabDatenFormat.Controls.Add(this.capScriptType);
-            this.tabDatenFormat.Controls.Add(this.cbxFunction);
-            this.tabDatenFormat.Controls.Add(this.capFunction);
-            this.tabDatenFormat.Controls.Add(this.cbxMultiline);
+            this.tabDatenFormat.Controls.Add(this.cbxChunk);
+            this.tabDatenFormat.Controls.Add(this.capChunk);
+            this.tabDatenFormat.Controls.Add(this.chkMultiline);
             this.tabDatenFormat.Location = new System.Drawing.Point(4, 25);
             this.tabDatenFormat.Name = "tabDatenFormat";
             this.tabDatenFormat.Size = new System.Drawing.Size(1098, 594);
             this.tabDatenFormat.TabIndex = 12;
             this.tabDatenFormat.Text = "Daten-Format";
             // 
-            // cbxIsKeyColumn
+            // chkIsKeyColumn
             // 
-            this.cbxIsKeyColumn.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.cbxIsKeyColumn.Location = new System.Drawing.Point(8, 24);
-            this.cbxIsKeyColumn.Name = "cbxIsKeyColumn";
-            this.cbxIsKeyColumn.QuickInfo = "Wenn der Imhalt dieser Spalte geändert wird,\r\nwird eine erweitertes Skript angest" +
+            this.chkIsKeyColumn.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkIsKeyColumn.Location = new System.Drawing.Point(8, 24);
+            this.chkIsKeyColumn.Name = "chkIsKeyColumn";
+            this.chkIsKeyColumn.QuickInfo = "Wenn der Imhalt dieser Spalte geändert wird,\r\nwird eine erweitertes Skript angest" +
     "oßen.";
-            this.cbxIsKeyColumn.Size = new System.Drawing.Size(296, 16);
-            this.cbxIsKeyColumn.TabIndex = 50;
-            this.cbxIsKeyColumn.Text = "Diese Spalte ist eine Schlüsselspalte";
+            this.chkIsKeyColumn.Size = new System.Drawing.Size(296, 16);
+            this.chkIsKeyColumn.TabIndex = 50;
+            this.chkIsKeyColumn.Text = "Diese Spalte ist eine Schlüsselspalte";
             // 
-            // cbxIsFirst
+            // chkIsFirst
             // 
-            this.cbxIsFirst.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.cbxIsFirst.Location = new System.Drawing.Point(8, 8);
-            this.cbxIsFirst.Name = "cbxIsFirst";
-            this.cbxIsFirst.Size = new System.Drawing.Size(296, 16);
-            this.cbxIsFirst.TabIndex = 49;
-            this.cbxIsFirst.Text = "Diese Spalte ist die funktionelle erste Spalte";
+            this.chkIsFirst.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkIsFirst.Location = new System.Drawing.Point(8, 8);
+            this.chkIsFirst.Name = "chkIsFirst";
+            this.chkIsFirst.Size = new System.Drawing.Size(296, 16);
+            this.chkIsFirst.TabIndex = 49;
+            this.chkIsFirst.Text = "Diese Spalte ist die funktionelle erste Spalte";
             // 
             // btnMaxTextLenght
             // 
@@ -1401,6 +1405,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabSpaltenVerlinkung
             // 
             this.tabSpaltenVerlinkung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSpaltenVerlinkung.Controls.Add(this.cbxRelationType);
+            this.tabSpaltenVerlinkung.Controls.Add(this.caption1);
             this.tabSpaltenVerlinkung.Controls.Add(this.tblFilterliste);
             this.tabSpaltenVerlinkung.Controls.Add(this.cbxTargetColumn);
             this.tabSpaltenVerlinkung.Controls.Add(this.capLinkedDatabase);
@@ -1417,10 +1423,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblFilterliste.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
+            this.tblFilterliste.Location = new System.Drawing.Point(8, 112);
             this.tblFilterliste.Name = "tblFilterliste";
             this.tblFilterliste.SheetStyle = "Windows 11";
-            this.tblFilterliste.Size = new System.Drawing.Size(1073, 504);
+            this.tblFilterliste.Size = new System.Drawing.Size(1073, 472);
             this.tblFilterliste.TabIndex = 39;
             // 
             // cbxTargetColumn
@@ -1429,17 +1435,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxTargetColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxTargetColumn.Location = new System.Drawing.Point(224, 48);
+            this.cbxTargetColumn.Location = new System.Drawing.Point(248, 80);
             this.cbxTargetColumn.Name = "cbxTargetColumn";
             this.cbxTargetColumn.RegexCheck = null;
-            this.cbxTargetColumn.Size = new System.Drawing.Size(857, 24);
+            this.cbxTargetColumn.Size = new System.Drawing.Size(833, 24);
             this.cbxTargetColumn.TabIndex = 5;
             this.cbxTargetColumn.TextChanged += new System.EventHandler(this.cbxTargetColumn_TextChanged);
             // 
             // capTargetColumn
             // 
             this.capTargetColumn.CausesValidation = false;
-            this.capTargetColumn.Location = new System.Drawing.Point(8, 48);
+            this.capTargetColumn.Location = new System.Drawing.Point(8, 80);
             this.capTargetColumn.Name = "capTargetColumn";
             this.capTargetColumn.Size = new System.Drawing.Size(200, 16);
             this.capTargetColumn.Text = "Aus dieser Spalte die Werte holen:";
@@ -1494,6 +1500,34 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSpaltenkopf.TabIndex = 49;
             this.btnSpaltenkopf.Click += new System.EventHandler(this.btnSpaltenkopf_Click);
             // 
+            // chkRelation
+            // 
+            this.chkRelation.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkRelation.Location = new System.Drawing.Point(312, 40);
+            this.chkRelation.Name = "chkRelation";
+            this.chkRelation.Size = new System.Drawing.Size(336, 16);
+            this.chkRelation.TabIndex = 51;
+            this.chkRelation.Text = "Beziehungen automatisch mit erster Spalte abgleichen";
+            // 
+            // cbxRelationType
+            // 
+            this.cbxRelationType.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxRelationType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxRelationType.Location = new System.Drawing.Point(248, 8);
+            this.cbxRelationType.Name = "cbxRelationType";
+            this.cbxRelationType.RegexCheck = null;
+            this.cbxRelationType.Size = new System.Drawing.Size(232, 24);
+            this.cbxRelationType.TabIndex = 41;
+            // 
+            // caption1
+            // 
+            this.caption1.CausesValidation = false;
+            this.caption1.Location = new System.Drawing.Point(8, 8);
+            this.caption1.Name = "caption1";
+            this.caption1.Size = new System.Drawing.Size(232, 16);
+            this.caption1.Text = "Werte aus anderer Datenbank benutzen:";
+            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
             // ColumnEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1535,7 +1569,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnAutoFilterTXTErlaubt;
         private Button btnAutoFilterMoeglich;
         private Caption capInfo;
-        private Button cbxMultiline;
+        private Button chkMultiline;
         private Caption capRechterRand;
         private Caption capLinkerRand;
         private Button btnTextColor;
@@ -1554,13 +1588,13 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption Caption13;
         private TextBox txbAllowedChars;
         private Caption capImmerWerte;
-        private Caption capFunction;
+        private Caption capChunk;
         private Caption Caption18;
         private TextBox txbAdminInfo;
         private Caption Caption17;
         private Button btnOtherValuesToo;
         private ListBox lbxCellEditor;
-        private ComboBox cbxFunction;
+        private ComboBox cbxChunk;
         private TextBox txbTags;
         private TabControl tabControl;
         private TabPage tabAnzeige;
@@ -1570,7 +1604,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TabPage tabQuickInfo;
         private TabPage tabSonstiges;
         private Button btnIgnoreLock;
-        private Button btnSaveContent;
+        private Button chkSaveContent;
         private Button btnSpellChecking;
         private Caption capSpaltenbild;
         private TextBox txbJoker;
@@ -1620,7 +1654,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private ComboBox cbxSort;
         private ComboBox cbxTranslate;
         private Caption capTranslate;
-        private Button btnFormatierungErlaubt;
+        private Button chkFormatierungErlaubt;
         private ComboBox cbxAdditionalCheck;
         private Caption capcbxAdditionalCheck;
         private Button btnSchnellBildCode;
@@ -1645,7 +1679,10 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capRenderer;
         private GroupBox RendererEditor;
         private Button btnSystemInfo;
-        private Button cbxIsKeyColumn;
-        private Button cbxIsFirst;
+        private Button chkIsKeyColumn;
+        private Button chkIsFirst;
+        private Button chkRelation;
+        private ComboBox cbxRelationType;
+        private Caption caption1;
     }
 }

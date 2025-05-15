@@ -54,7 +54,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         foreach (var thisColumnItem in db.Column) {
-            if (thisColumnItem is { Function: ColumnFunction.RelationText }) {
+            if (thisColumnItem is { IsDisposed: false, Relationship_to_First: true }) {
                 _column = thisColumnItem;
                 break;
             }
@@ -150,7 +150,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         foreach (var thisn in bez) {
             var ro = db.Row[thisn];
             if (ro != null) {
-        
+
                 if (ItemOfRow(ro) is { IsDisposed: false } it &&
                     AddOne(thisn, 0, 0, lastit.Layout_Dateiname) is { } newit) {
                     lastit = newit;

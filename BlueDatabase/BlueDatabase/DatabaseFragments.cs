@@ -372,7 +372,7 @@ public class DatabaseFragments : Database {
         if (IsDisposed) { return; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
-        if (Column.SplitColumn is { }) {
+        if (Column.ChunkValueColumn is { IsDisposed: false }) {
             // Split-Datenbanken und Fragmente gehen nicht, siehe kommentar weiter unten
             return;
         }

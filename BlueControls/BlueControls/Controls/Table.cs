@@ -562,7 +562,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         _ = RepairColumnArrangements(db);
     }
 
-    //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+    //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbankx) {
     //        var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
     //        return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
     //            : new Size(16, 16);
@@ -574,7 +574,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (row is not { IsDisposed: false }) { return; }
         if (!column.SaveContent) { return; }
 
-        if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        if (column.RelationType == RelationType.CellValues) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, true, false);
             if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
             return;
@@ -722,7 +722,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var ist2 = string.Empty;
 
             var tmprow = row?.Row;
-            //if (column?.Column is { Function: ColumnFunction.Verknüpfung_zu_anderer_Datenbank } cv) {
+            //if (column?.Column is { Function: ColumnFunction.Verknüpfung_zu_anderer_Datenbankx } cv) {
             //    var (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(cv, tmprow, false, false);
 
             //    if (contentHolderCellColumn != null && contentHolderCellRow != null) {
@@ -741,7 +741,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
             //}
 
-            if (column?.Column is { TextFormatingAllowed: true }) {
+            if (column?.Column is { IsDisposed: false, TextFormatingAllowed: true }) {
                 ExtText l = new(Design.TextBox, States.Standard) {
                     HtmlText = ist1
                 };
@@ -1066,7 +1066,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                         if (thisColumn.Column != null) {
                             var lcColumn = thisColumn.Column;
                             var lCrow = thisRow.Row;
-                            //if (thisColumn.Column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+                            //if (thisColumn.Column.Function is ColumnFunction.Verknüpfung_zu_anderer_Datenbankx) {
                             //    (lcColumn, lCrow, _, _) = CellCollection.LinkedCellData(thisColumn.Column, thisRow.Row, false, false);
                             //}
 
@@ -1935,7 +1935,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 case Keys.V:
                     if (e.Modifiers == Keys.Control) {
                         if (CursorPosColumn != null && CursorPosRow?.Row != null) {
-                            if (!c.TextboxEditPossible() && c.Function != ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+                            if (!c.TextboxEditPossible() && c.RelationType != RelationType.DropDownValues) {
                                 NotEditableInfo("Die Zelle hat kein passendes Format.");
                                 _isinKeyDown = false;
                                 return;
@@ -2034,28 +2034,16 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 if (IsInHead(e.Y)) {
                     QuickInfo = QuickInfoText(c, string.Empty);
                 } else if (_mouseOverRow != null) {
-                    if (c.NeedTargetDatabase()) {
+                    if (c.RelationType == RelationType.CellValues) {
                         if (c.LinkedDatabase != null) {
-                            switch (c.Function) {
-                                case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
+                            var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, true);
+                            if (lcolumn != null) { QuickInfo = QuickInfoText(lcolumn, c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
-                                    var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, true);
-                                    if (lcolumn != null) { QuickInfo = QuickInfoText(lcolumn, c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
-
-                                    if (!string.IsNullOrEmpty(info) && db.IsAdministrator()) {
-                                        if (string.IsNullOrEmpty(QuickInfo)) { QuickInfo += "\r\n"; }
-                                        QuickInfo = "Verlinkungs-Status: " + info;
-                                    }
-
-                                    break;
-
-                                case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                                    break;
-
-                                default:
-                                    Develop.DebugPrint(c.Function);
-                                    break;
+                            if (!string.IsNullOrEmpty(info) && db.IsAdministrator()) {
+                                if (string.IsNullOrEmpty(QuickInfo)) { QuickInfo += "\r\n"; }
+                                QuickInfo = "Verlinkungs-Status: " + info;
                             }
+
                         } else {
                             QuickInfo = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
                         }
@@ -2174,7 +2162,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var contentHolderCellColumn = cellInThisDatabaseColumn.Column;
         var contentHolderCellRow = cellInThisDatabaseRow?.Row;
-        if (contentHolderCellRow != null && contentHolderCellColumn.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        if (contentHolderCellRow != null && contentHolderCellColumn.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) { return; } // Dummy prüfung
         }
@@ -2247,7 +2235,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
 
-            if(contentHolderCellColumn.SaveContent) {
+            if (contentHolderCellColumn.SaveContent) {
                 _ = contentHolderCellRow.UpdateRow(true, true, "Nach Benutzereingabe");
             } else {
                 // Variablen sind en nicht im Script enthalten, also nur die schnelle Berechnung
@@ -2605,7 +2593,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             return;
         }
 
-        if (viewItem.Column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        if (viewItem.Column.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
         }
 
@@ -3133,7 +3121,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         #region Roten Rand für Split-Spalten
 
-        if (viewItem.Column is { IsDisposed: false } c && c == viewItem.Column?.Database?.Column.SplitColumn) {
+        if (viewItem.Column is { IsDisposed: false } c && c == viewItem.Column?.Database?.Column.ChunkValueColumn) {
             var t = realHead;
             t.Inflate(-3, -3);
             gr.DrawRectangle(new Pen(Color.Red, 6), t);

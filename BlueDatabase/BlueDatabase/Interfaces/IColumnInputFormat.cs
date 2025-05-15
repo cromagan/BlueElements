@@ -36,7 +36,6 @@ public interface IColumnInputFormat : IInputFormat {
     public ReadOnlyCollection<string> DropDownItems { get; set; }
     public bool EditableWithDropdown { get; set; }
     public bool EditableWithTextInput { get; set; }
-    public ColumnFunction Function { get; set; }
     public string RendererSettings { get; set; }
     public ScriptType ScriptType { get; set; }
     public bool ShowValuesOfOtherCellsInDropdown { get; set; }
@@ -61,7 +60,6 @@ public static class ColumnInputFormatExtensions {
         t.EditableWithDropdown = source.EditableWithDropdown;
         t.DropDownItems = source.DropDownItems;
         t.ShowValuesOfOtherCellsInDropdown = source.ShowValuesOfOtherCellsInDropdown;
-        t.Function = source.Function;
         t.ScriptType = source.ScriptType;
         t.SortType = source.SortType;
         t.EditableWithTextInput = source.EditableWithTextInput;

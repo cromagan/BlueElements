@@ -32,7 +32,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     #region Fields
 
     public static readonly ColumnFormatHolder BildCode = new(FormatHolder.Text) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -48,7 +47,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder Bit = new(FormatHolder.Bit) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Zentriert,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -64,7 +62,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder Date = new(FormatHolder.Date) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Datum_Uhrzeit,
         DoOpticalTranslation = TranslationType.Datum,
@@ -80,7 +77,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder DateTime = new(FormatHolder.DateTime) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Datum_Uhrzeit,
         DoOpticalTranslation = TranslationType.Datum,
@@ -96,7 +92,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder Email = new(FormatHolder.Email) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -112,7 +107,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder Float = new(FormatHolder.Float) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertFloat,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -129,7 +123,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     // ReSharper disable once UnusedMember.Global
     public static new readonly ColumnFormatHolder FloatPositive = new(FormatHolder.FloatPositive) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertFloat,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -145,7 +138,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder Long = new(FormatHolder.Long) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertInt,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -161,7 +153,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder LongPositive = new(FormatHolder.LongPositive) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertInt,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -177,7 +168,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder PhoneNumber = new(FormatHolder.PhoneNumber) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -193,7 +183,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder SystemName = new(FormatHolder.SystemName) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -209,7 +198,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder Text = new(FormatHolder.Text) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -226,7 +214,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     // ReSharper disable once UnusedMember.Global
     public static new readonly ColumnFormatHolder TextMitFormatierung = new(FormatHolder.TextMitFormatierung) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -242,7 +229,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static readonly ColumnFormatHolder TextOptions = new(FormatHolder.Text) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Übersetzen,
@@ -257,7 +243,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static new readonly ColumnFormatHolder Url = new(FormatHolder.Url) {
-        Function = ColumnFunction.Normal,
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -293,7 +278,6 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
     public bool EditableWithDropdown { get; set; }
     public bool EditableWithTextInput { get; set; }
-    public ColumnFunction Function { get; set; }
     public string RendererSettings { get; set; }
     public ScriptType ScriptType { get; set; }
     public bool ShowValuesOfOtherCellsInDropdown { get; set; }

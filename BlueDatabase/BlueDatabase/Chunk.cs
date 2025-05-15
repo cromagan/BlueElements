@@ -286,7 +286,7 @@ public class Chunk : IHasKeyName {
         SaveToByteList(DatabaseDataType.IsFirst, c.IsFirst.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.IsKeyColumn, c.IsKeyColumn.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.ColumnCaption, c.Caption, name);
-        SaveToByteList(DatabaseDataType.ColumnFunction, ((int)c.Function).ToString(), name);
+        //SaveToByteList(DatabaseDataType.ColumnFunction, ((int)c.Function).ToString(), name);
         SaveToByteList(DatabaseDataType.DefaultRenderer, c.DefaultRenderer, name);
         SaveToByteList(DatabaseDataType.RendererSettings, c.RendererSettings, name);
         SaveToByteList(DatabaseDataType.CaptionGroup1, c.CaptionGroup1, name);
@@ -307,12 +307,15 @@ public class Chunk : IHasKeyName {
         SaveToByteList(DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.EditableWithTextInput, c.EditableWithTextInput.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
+        SaveToByteList(DatabaseDataType.Relationship_to_First, c.Relationship_to_First.ToPlusMinus(), name);
         //SaveToByteList(DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.TextFormatingAllowed, c.TextFormatingAllowed.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), name);
         SaveToByteList(DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), name);
         SaveToByteList(DatabaseDataType.LineStyleLeft, ((int)c.LineStyleLeft).ToString(), name);
         SaveToByteList(DatabaseDataType.LineStyleRight, ((int)c.LineStyleRight).ToString(), name);
+        SaveToByteList(DatabaseDataType.RelationType, ((int)c.RelationType).ToString(), name);
+        SaveToByteList(DatabaseDataType.Value_for_Chunk, ((int)c.Value_for_Chunk).ToString(), name);
         SaveToByteList(DatabaseDataType.EditableWithDropdown, c.EditableWithDropdown.ToPlusMinus(), name);
         SaveToByteList(DatabaseDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
         SaveToByteList(DatabaseDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);

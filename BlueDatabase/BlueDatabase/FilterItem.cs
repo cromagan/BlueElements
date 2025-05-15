@@ -177,7 +177,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             }
         }
 
-        if (Column != null && Column == Column.Database?.Column.SplitColumn) {
+        if (Column?.Value_for_Chunk != null && Column.Value_for_Chunk != ChunkType.None) {
             if (SearchValue.Count != 1) { return "Split-Spalte mit ungültiger Suche"; }
             if (FilterType is not FilterType.Istgleich
                 and not FilterType.Istgleich_GroßKleinEgal

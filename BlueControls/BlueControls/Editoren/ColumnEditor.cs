@@ -60,7 +60,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _table = table;
         _column = column;
 
-        cbxFunction.ItemAddRange(ItemsOf(typeof(ColumnFunction)));
+        cbxChunk.ItemAddRange(ItemsOf(typeof(ChunkType)));
+        cbxRelationType.ItemAddRange(ItemsOf(typeof(RelationType)));
         cbxRandLinks.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
         cbxRandRechts.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
         cbxAlign.ItemAddRange(ItemsOf(typeof(AlignmentHorizontal)));
@@ -289,7 +290,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             //    //}
             //}
             foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
-                if (thisLinkedColumn.CanBeCheckedByRules() && !thisLinkedColumn.NeedTargetDatabase()) {
+                if (thisLinkedColumn.CanBeCheckedByRules() && thisLinkedColumn.RelationType == RelationType.None) {
                     cbxTargetColumn.ItemAdd(ItemOf(thisLinkedColumn));
                 }
             }
@@ -361,10 +362,12 @@ internal sealed partial class ColumnEditor : IIsEditor {
         txbCaption.Text = _column.Caption;
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).Code;
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).Code;
-        cbxMultiline.Checked = _column.MultiLine;
-        cbxIsFirst.Checked = _column.IsFirst;
-        cbxIsKeyColumn.Checked = _column.IsKeyColumn;
-        cbxFunction.Text = ((int)_column.Function).ToString();
+        chkMultiline.Checked = _column.MultiLine;
+        chkIsFirst.Checked = _column.IsFirst;
+        chkIsKeyColumn.Checked = _column.IsKeyColumn;
+        chkRelation.Checked = _column.Relationship_to_First;
+        cbxRelationType.Text = ((int)_column.RelationType).ToString();
+        cbxChunk.Text = ((int)_column.Value_for_Chunk).ToString();
         cbxRandLinks.Text = ((int)_column.LineStyleLeft).ToString();
         cbxRandRechts.Text = ((int)_column.LineStyleRight).ToString();
         cbxAlign.Text = ((int)_column.Align).ToString();
@@ -393,8 +396,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         txbUeberschift2.Text = _column.CaptionGroup2;
         txbUeberschift3.Text = _column.CaptionGroup3;
         txbSpaltenbild.Text = _column.CaptionBitmapCode;
-        btnSaveContent.Checked = _column.SaveContent;
-        btnFormatierungErlaubt.Checked = _column.TextFormatingAllowed;
+        chkSaveContent.Checked = _column.SaveContent;
+        chkFormatierungErlaubt.Checked = _column.TextFormatingAllowed;
         btnSpellChecking.Checked = _column.SpellCheckingEnabled;
         txbAuswaehlbareWerte.Text = _column.DropDownItems.JoinWithCr();
         txbAutoReplace.Text = _column.AfterEditAutoReplace.JoinWithCr();
@@ -430,16 +433,18 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
 
         _column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
-        _column.Function = (ColumnFunction)IntParse(cbxFunction.Text);
         _column.ColumnQuickInfo = txbQuickinfo.Text.Replace("\r", "<BR>");
         _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<BR>");
         _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _column.LineStyleLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
         _column.LineStyleRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
-        _column.MultiLine = cbxMultiline.Checked;
-        _column.IsFirst = cbxIsFirst.Checked;
-        _column.IsKeyColumn = cbxIsKeyColumn.Checked;
+        _column.RelationType = (RelationType)IntParse(cbxRelationType.Text);
+        _column.Value_for_Chunk = (ChunkType)IntParse(cbxChunk.Text);
+        _column.MultiLine = chkMultiline.Checked;
+        _column.IsFirst = chkIsFirst.Checked;
+        _column.IsKeyColumn = chkIsKeyColumn.Checked;
+        _column.Relationship_to_First = chkRelation.Checked;
         _column.AfterEditQuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
         if (txbRunden.Text.IsLong()) {
             var zahl = Math.Max(IntParse(txbRunden.Text), -1);
@@ -458,8 +463,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         _column.AfterEditDoUCase = btnAutoEditToUpper.Checked;
         _column.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
-        _column.SaveContent = btnSaveContent.Checked;
-        _column.TextFormatingAllowed = btnFormatierungErlaubt.Checked;
+        _column.SaveContent = chkSaveContent.Checked;
+        _column.TextFormatingAllowed = chkFormatierungErlaubt.Checked;
         _column.SpellCheckingEnabled = btnSpellChecking.Checked;
         var tmpf = FilterOptions.None;
         if (btnAutoFilterMoeglich.Checked) { tmpf |= FilterOptions.Enabled; }
@@ -596,7 +601,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
                 r.CellSet("SpalteName", col.KeyName, string.Empty);
 
-                if (col.IsAutofilterPossible() && col != spalteauDb && !col.NeedTargetDatabase() && !col.IsSystemColumn()) {
+                if (col.IsAutofilterPossible() && col != spalteauDb && col.RelationType == RelationType.None && !col.IsSystemColumn()) {
                     r.CellSet("visible", true, string.Empty);
                 } else {
                     r.CellSet("visible", false, string.Empty);

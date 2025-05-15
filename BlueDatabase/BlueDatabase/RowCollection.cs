@@ -111,7 +111,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? this[string primärSchlüssel] {
         get {
             if (Database?.Column.First() is { IsDisposed: false } c) {
-                if (Database.Column.SplitColumn == c) {
+                if (c.Value_for_Chunk != ChunkType.None) {
                     var ok = Database.BeSureRowIsLoaded(primärSchlüssel, null);
                     if (!ok) { return null; }
                 }
@@ -500,7 +500,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
 
         foreach (var thisColum in db2.Column) {
-            if (thisColum.IsFirst || thisColum == db2.Column.SplitColumn) {
+            if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
                 var inval = FilterCollection.InitValue(thisColum, true, filter);
                 if (inval is not { } || string.IsNullOrWhiteSpace(inval)) {
                     return (null, "Initalwert fehlt.", false);
@@ -836,7 +836,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Die Split-Colmn an den Anfang setzen
         var chunkvalue = string.Empty;
         List<ColumnItem> l = [.. db.Column];
-        if (db.Column.SplitColumn is { IsDisposed: false } spc) {
+        if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             _ = l.Remove(spc);
             l.Insert(0, spc);
             chunkvalue = FilterCollection.InitValue(spc, true, fc) ?? string.Empty;

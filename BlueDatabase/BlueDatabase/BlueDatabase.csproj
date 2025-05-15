@@ -113,6 +113,8 @@
     <Compile Include="DatabaseFragments.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Enums\ButtonArgs.cs" />
+    <Compile Include="Enums\RelationType.cs" />
+    <Compile Include="Enums\ChunkType.cs" />
     <Compile Include="Enums\ColumnFunction.cs" />
     <Compile Include="Enums\Reason.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />

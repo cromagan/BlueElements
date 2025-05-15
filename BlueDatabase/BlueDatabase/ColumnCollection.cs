@@ -98,7 +98,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// <returns></returns>
 
     public bool IsDisposed { get; private set; }
-    public ColumnItem? SplitColumn { get; private set; }
+    public ColumnItem? ChunkValueColumn { get; private set; }
     public ColumnItem? SysChapter { get; private set; }
     public ColumnItem? SysCorrect { get; private set; }
     public ColumnItem? SysLocked { get; private set; }
@@ -239,7 +239,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         da.CellAdd("Beschriftung");
         da.CellAdd("Überschriften");
         da.CellAdd("Datenformat");
-        da.CellAdd("Funktion");
         da.CellAdd("Quickinfo");
         da.CellAdd("Admin-Info");
         da.CellAdd("Tags");
@@ -254,12 +253,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd(thisColumnItem.KeyName);
                 da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
                 da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));
-                var name = "{" + thisColumnItem.Function + "}";
+                var name = string.Empty;
                 foreach (var thisFormat in FormatHolder.AllFormats) {
                     if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.Name; }
                 }
                 da.CellAdd(name + " (" + thisColumnItem.MaxCellLenght + " Char)");
-                da.CellAdd(thisColumnItem.Function.ToString());
                 da.CellAdd(thisColumnItem.ColumnQuickInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.ColumnTags.JoinWith("<br>"));
@@ -286,19 +284,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysRowChangeDate = null;
         SysChapter = null;
         SysRowState = null;
-        SplitColumn = null;
+        ChunkValueColumn = null;
         _firstColumn = null;
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null) {
-                if (thisColumnItem.Function is ColumnFunction.Split_Medium
-                                            or ColumnFunction.Split_Large
-                                            or ColumnFunction.Split_Name) {
-                    SplitColumn = thisColumnItem;
-                }
-                if (thisColumnItem.IsFirst) {
-                    _firstColumn = thisColumnItem;
-                }
+
+                if (thisColumnItem.Value_for_Chunk != ChunkType.None) { ChunkValueColumn = thisColumnItem; }
+                if (thisColumnItem.IsFirst) { _firstColumn = thisColumnItem; }
 
                 if (thisColumnItem.IsSystemColumn()) {
                     switch (thisColumnItem.KeyName.ToUpperInvariant()) {

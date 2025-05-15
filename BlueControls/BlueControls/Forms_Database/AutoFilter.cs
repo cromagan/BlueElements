@@ -148,7 +148,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                 nichtleereallowed = false;
             }
 
-            if (_column is { IsDisposed: false } && _column == _column.Database?.Column.SplitColumn) {
+            if (_column.Value_for_Chunk != ChunkType.None) {
                 nichtleereallowed = false;
             }
 
@@ -366,7 +366,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             return;
         }
 
-        if (_column.Database?.Column.SplitColumn == _column) {
+        if (_column.Value_for_Chunk != ChunkType.None) {
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_GroßKleinEgal, txbEingabe.Text));
             return;
         }

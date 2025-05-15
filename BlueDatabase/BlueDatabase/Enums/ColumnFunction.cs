@@ -21,6 +21,7 @@ using System;
 
 namespace BlueDatabase.Enums;
 
+[Obsolete]
 public enum ColumnFunction {
     // Unbekannt = -1,
     // Nothing = 0,
@@ -66,17 +67,19 @@ public enum ColumnFunction {
     /// Gibt die Werte einer anderen Spalte einer
     /// anderen Datenbank als Dropdown Items wieder
     /// </summary>
+    [Obsolete]
     Werte_aus_anderer_Datenbank_als_DropDownItems = 76,
 
     /// <summary>
     /// Legt automatisch Verknüpfungen zu anderen Zellen an / hält diese Gleich
     /// </summary>
+    [Obsolete]
     RelationText = 77,
 
     // KeyForSame = 78
     //Button = 79,
 
-    //Verknüpfung_zu_anderer_Datenbank = 80,
+    //Verknüpfung_zu_anderer_Datenbankx = 80,
 
     /// <summary>
     /// Besodere Spalte, löst eine extended Changed aus bei Wertänderung
@@ -87,6 +90,7 @@ public enum ColumnFunction {
     /// <summary>
     /// Zeigt eine Zelle einer anderen Datenbank an
     /// </summary>
+    [Obsolete]
     Verknüpfung_zu_anderer_Datenbank = 82,
 
     ///// <summary>
@@ -109,9 +113,11 @@ public enum ColumnFunction {
     /// <summary>
     /// Dieser Spalte kann zum Aufsplitten der Datenbank benutzt werden. Nur einmal pro Datenbank erlaubt
     /// </summary>
-
+    [Obsolete]
     Split_Name = 90,
+    [Obsolete]
     Split_Medium = 95,
+    [Obsolete]
     Split_Large = 96,
 
     // bis 999 wird geprüft

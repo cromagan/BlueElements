@@ -511,9 +511,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public bool MatchesTo(params FilterItem[]? filter) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return false; }
 
-        if (filter is not { Length: not 0 }) { return Database.Column.SplitColumn == null || db.PowerEdit; }
+        if (filter is not { Length: not 0 }) { return Database.Column.ChunkValueColumn == null || db.PowerEdit; }
 
-        if (Database.Column.SplitColumn is { IsDisposed: false } csp && !Database.PowerEdit) {
+        if (Database.Column.ChunkValueColumn is { IsDisposed: false } csp && !Database.PowerEdit) {
             var found = false;
             foreach (var thisF in filter) {
                 if (thisF.Column == csp) { found = true; break; }
@@ -572,7 +572,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
 
         foreach (var thisColumn in db.Column) {
-            if (thisColumn.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+            if (thisColumn.RelationType == RelationType.CellValues) {
                 _ = CellCollection.LinkedCellData(thisColumn, this, true, false);
 
                 //if (!string.IsNullOrEmpty(info) && !canrepair) { return false; }

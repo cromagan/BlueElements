@@ -343,11 +343,12 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         ColumnItem? columnLinked = null;
         var posError = false;
-        switch (column.Function) {
-            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
-                (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
-                posError = true;
-                break;
+
+
+        if (column.RelationType == RelationType.CellValues) {
+            (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
+            posError = true;
+
         }
 
         var bearbColumn = column;

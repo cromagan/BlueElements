@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using BlueScript.Structures;
 using CefSharp.OffScreen;
-using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 

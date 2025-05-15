@@ -1428,7 +1428,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                 if (row is { IsDisposed: false } r) {
                     t = t + "Zeile: " + r.CellFirstString() + "\r\n";
-                    if (Column.SplitColumn is { IsDisposed: false } spc) {
+                    if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
                         t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
                     }
                 }
@@ -1769,7 +1769,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     col = Column.GenerateAndAdd(zeil[0][spaltNo]);
                     if (col != null) {
                         col.Caption = zeil[0][spaltNo];
-                        col.Function = ColumnFunction.Normal;
                     }
                 }
 
@@ -1786,7 +1785,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 var newc = Column.GenerateAndAdd();
                 if (newc != null) {
                     newc.Caption = newc.KeyName;
-                    newc.Function = ColumnFunction.Normal;
                     newc.MultiLine = true;
                 }
 
@@ -2050,9 +2048,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         foreach (var thisColumn in Column) {
             thisColumn.Optimize();
 
-            if (thisColumn.Function is not ColumnFunction.Verknüpfung_zu_anderer_Datenbank and
-                                      not ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems &&
-                                      thisColumn.SaveContent) {
+            if (thisColumn.RelationType == RelationType.None) {
                 var x = thisColumn.Contents();
                 if (x.Count == 0) {
                     _ = Column.Remove(thisColumn, "Automatische Optimierung");
@@ -2796,7 +2792,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         // Bestimme ob gespeichert werden muss
         var mustSave = (_checkerTickCount > 20 && timeSinceLastAction > 20) ||
                          _checkerTickCount > 110 ||
-                         (Column.SplitColumn != null && _checkerTickCount > 50);
+                         (Column.ChunkValueColumn != null && _checkerTickCount > 50);
 
         // Speichern wenn nötig
         if (mustSave && Save()) {

@@ -69,7 +69,7 @@ public class DatabaseChunk : Database {
     public static List<Chunk>? GenerateNewChunks(Database db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
         var chunks = new List<Chunk>();
 
-        chunksAllowed = chunksAllowed && db.Column.SplitColumn != null;
+        chunksAllowed = chunksAllowed && db.Column.ChunkValueColumn != null;
 
         var mainChunk = new Chunk(db.Filename, Chunk_MainData);
         mainChunk.InitByteList();
@@ -196,12 +196,12 @@ public class DatabaseChunk : Database {
         }
     }
 
-    public static string GetChunkId(RowItem r) => r.Database?.Column.SplitColumn is not { }
+    public static string GetChunkId(RowItem r) => r.Database?.Column.ChunkValueColumn is not {IsDisposed: false }
             ? Chunk_MainData
             : GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r));
 
     public static string GetChunkId(Database db, DatabaseDataType type, string chunkvalue) {
-        if (db.Column.SplitColumn is not { IsDisposed: false } spc) { return Chunk_MainData.ToLower(); }
+        if (db.Column.ChunkValueColumn is not { IsDisposed: false } spc) { return Chunk_MainData.ToLower(); }
 
         if (type is DatabaseDataType.Command_RemoveColumn
                 or DatabaseDataType.Command_AddColumnByName) { return Chunk_MainData.ToLower(); }
@@ -218,14 +218,14 @@ public class DatabaseChunk : Database {
         }
 
         if (type.IsCellValue() || type is DatabaseDataType.Undo or DatabaseDataType.Command_AddRow or DatabaseDataType.Command_RemoveRow) {
-            switch (spc.Function) {
-                case ColumnFunction.Split_Medium:
+            switch (spc.Value_for_Chunk) {
+                case  ChunkType.ByHash_2Chars:
                     return chunkvalue.ToLower().GetHashString().Right(2).ToLower();
 
-                case ColumnFunction.Split_Large:
+                case  ChunkType.ByHash_3Chars:
                     return chunkvalue.ToLower().GetHashString().Right(3).ToLower();
 
-                case ColumnFunction.Split_Name:
+                case  ChunkType.ByName:
                     var t = ColumnItem.MakeValidColumnName(chunkvalue);
                     return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLower();
 
@@ -237,7 +237,7 @@ public class DatabaseChunk : Database {
         return Chunk_MainData.ToLower();
     }
 
-    public static string GetChunkValue(RowItem r) => r.Database?.Column.SplitColumn is not { IsDisposed: false } spc ? string.Empty : r.Database.Cell.GetStringCore(spc, r);
+    public static string GetChunkValue(RowItem r) => r.Database?.Column.ChunkValueColumn is not { IsDisposed: false } spc ? string.Empty : r.Database.Cell.GetStringCore(spc, r);
 
     /// <summary>
     /// row == null --> false
@@ -260,7 +260,7 @@ public class DatabaseChunk : Database {
         //    }
         //    return IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, EditableErrorReasonType.EditCurrently);
 
-        if (Column?.SplitColumn is { }) {
+        if (Column?.ChunkValueColumn is { IsDisposed: false }) {
             var chunkValue = GetChunkValue(row);
             return string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, chunkValue, EditableErrorReasonType.EditCurrently));
         }
@@ -317,7 +317,7 @@ public class DatabaseChunk : Database {
 
         Column.GetSystems();
 
-        if (Column.SplitColumn != null) {
+        if (Column.ChunkValueColumn != null) {
             if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, null, true)) { return false; }
             //if (!LoadChunkWithChunkId(Chunk_Master, true, null, true)) { return false; }
             if (!LoadChunkWithChunkId(Chunk_Variables, true, null, true)) { return false; }

@@ -248,32 +248,32 @@ public static class AbstractListItemExtension {
         l.AddRange(column.DropDownItems);
         if (column.ShowValuesOfOtherCellsInDropdown) { l.AddRange(column.Contents()); }
 
-        switch (column.Function) {
-            case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                var db2 = column.LinkedDatabase;
-                if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return []; }
 
-                // Spalte aus der Ziel-Datenbank ermitteln
-                var targetColumn = db2.Column[column.ColumnNameOfLinkedDatabase];
-                if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return []; }
+        if (column.RelationType == RelationType.DropDownValues) {
+            var db2 = column.LinkedDatabase;
+            if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return []; }
 
-                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow, null);
-                if (!string.IsNullOrEmpty(info)) {
-                    Notification.Show(info, ImageCode.Information);
-                    return [];
-                }
+            // Spalte aus der Ziel-Datenbank ermitteln
+            var targetColumn = db2.Column[column.ColumnNameOfLinkedDatabase];
+            if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return []; }
 
-                if (fc == null) {
-                    Notification.Show("Keine Filterung definiert.", ImageCode.Information);
-                    return [];
-                }
+            var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow, null);
+            if (!string.IsNullOrEmpty(info)) {
+                Notification.Show(info, ImageCode.Information);
+                return [];
+            }
 
-                l.AddRange(targetColumn.Contents(fc, null));
-                if (l.Count == 0) {
-                    Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
-                }
-                break;
+            if (fc == null) {
+                Notification.Show("Keine Filterung definiert.", ImageCode.Information);
+                return [];
+            }
+
+            l.AddRange(targetColumn.Contents(fc, null));
+            if (l.Count == 0) {
+                Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
+            }
         }
+
 
         if (checkedItemsAtRow?.Database is { IsDisposed: false }) {
             l.AddRange(checkedItemsAtRow.CellGetList(column));

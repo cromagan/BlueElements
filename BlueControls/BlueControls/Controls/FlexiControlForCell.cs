@@ -289,7 +289,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
         if (_column is not { IsDisposed: false }) { return; }
-        if (_column.Function != ColumnFunction.RelationText) { return; }
+        if (_column.Relationship_to_First) { return; }
         Marker.RunWorkerAsync();
     }
 
@@ -385,7 +385,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
         ColumnItem? gbColumn;
 
-        if (column?.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {
+        if (column?.RelationType == RelationType.CellValues) {
             (gbColumn, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
         } else {
             gbColumn = column;
@@ -542,16 +542,9 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
             return;
         }
 
-        switch (column.Function) {
-            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
-                _ = GetRealColumn(column, row);
-                f.ValueSet(row.CellGetString(column), true);
-                break;
+        if (column.RelationType == RelationType.CellValues) { _ = GetRealColumn(column, row); }
 
-            default:
-                f.ValueSet(row.CellGetString(column), true);
-                break;
-        }
+        f.ValueSet(row.CellGetString(column), true);
     }
 
     private void StyleControls(ColumnItem? column, RowItem? row) {
@@ -576,7 +569,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
                         item2.AddRange(ItemsOf(realColumn, null, 10000, r));
                     }
 
-                    if (realColumn is { EditableWithTextInput: true }) {
+                    if (realColumn is { IsDisposed: false, EditableWithTextInput: true }) {
                         f.StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
                     } else {
                         f.StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true);
@@ -708,7 +701,6 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         if (oldVal == newValue) { return; }
 
         row.CellSet(_column, newValue, "Über Formular bearbeitet (FlexiControl)");
-
     }
 
     #endregion
