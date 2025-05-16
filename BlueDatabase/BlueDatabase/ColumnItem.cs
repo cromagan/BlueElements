@@ -951,20 +951,16 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
 
-            if(Database is not DatabaseChunk) {  value = ChunkType.None; }
-
+            if (Database is not DatabaseChunk) { value = ChunkType.None; }
 
             if (_value_for_Chunk == value) { return; }
 
-            var wasSplit = _value_for_Chunk != ChunkType.None;
             var oldd = _value_for_Chunk;
 
             _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, ((int)_value_for_Chunk).ToString(), ((int)value).ToString(), Generic.UserName, DateTime.UtcNow, string.Empty, string.Empty);
             Invalidate_ColumAndContent();
 
-            var willBeSplit = _value_for_Chunk != ChunkType.None; ;
-
-            if ((wasSplit || willBeSplit) && oldd != _value_for_Chunk) {
+            if (oldd != _value_for_Chunk) {
                 Database?.Column.GetSystems();
                 Database?.ReorganizeChunks();
             }
@@ -1045,7 +1041,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //if (Function == ColumnFunction.Virtelle_Spalte) { return value; }
 
         if (exitifLinkedFormat && _relationType != RelationType.None) { return value; }
-        
 
         if (_afterEditDoUCase) { value = value.ToUpperInvariant(); }
 
@@ -1365,20 +1360,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_relationship_to_First || _relationType != RelationType.None) {
                 return "Beziehungen zu anderen Zeilen und Erstpalte nicht kombinierbar.";
             }
-
-
-
-
         }
-
-
 
         if (_isKeyColumn) {
             if (_relationship_to_First || _relationType != RelationType.None) {
                 return "Beziehungen zu anderen Zeilen und Schlüsselspalte nicht kombinierbar.";
             }
         }
-
 
         if (_value_for_Chunk != ChunkType.None) {
             if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
@@ -1402,8 +1390,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (db.Column.First() == this) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt."; }
             //if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
             //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
-
-
         }
 
         if (_relationType == RelationType.CellValues) {
@@ -1440,7 +1426,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return "'#Administrator' bei den Bearbeitern entfernen."; }
         }
         if (_editableWithDropdown || tmpEditDialog == EditTypeTable.Dropdown_Single) {
-            if (_relationType !=  RelationType.DropDownValues) {
+            if (_relationType != RelationType.DropDownValues) {
                 if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
             }
         } else {
@@ -1457,10 +1443,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
         }
 
-        if (_relationType == RelationType.DropDownValues || 
-            _scriptType == ScriptType.Row ||
-            _value_for_Chunk != ChunkType.None || 
-            _relationship_to_First) {
+        if (_relationType == RelationType.DropDownValues ||
+            _scriptType == ScriptType.Row) {
             if (_roundAfterEdit != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
                 return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben, Erlaubte Zeichen oder Sortierung.";
             }
@@ -1584,9 +1568,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             this.GetStyleFrom(ColumnFormatHolder.Text);
         }
 
-
-
-        if (!Enum.IsDefined(typeof(ScriptType), _scriptType)) {            ScriptType = ScriptType.Nicht_vorhanden;        }
+        if (!Enum.IsDefined(typeof(ScriptType), _scriptType)) { ScriptType = ScriptType.Nicht_vorhanden; }
 
         switch (_function) {
             case ColumnFunction.Virtuelle_Spalte:
@@ -1643,18 +1625,21 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case ColumnFunction.Split_Name:
-                Value_for_Chunk = ChunkType.ByName;
+                _value_for_Chunk = ChunkType.ByName;
                 _function = ColumnFunction.Normal;
+                _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
                 break;
 
             case ColumnFunction.Split_Medium:
-                Value_for_Chunk = ChunkType.ByHash_2Chars;
+                _value_for_Chunk = ChunkType.ByHash_2Chars;
                 _function = ColumnFunction.Normal;
+                _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
                 break;
 
             case ColumnFunction.Split_Large:
-                Value_for_Chunk = ChunkType.ByHash_3Chars;
+                _value_for_Chunk = ChunkType.ByHash_3Chars;
                 _function = ColumnFunction.Normal;
+                _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
                 break;
 
             case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
@@ -2446,7 +2431,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private void _TMP_Linked_database_Disposing(object sender, System.EventArgs e) => Invalidate_LinkedDatabase();
 
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e) {
-
         if (e.Column.KeyName != ColumnNameOfLinkedDatabase) { return; }
 
         if (_relationType == RelationType.CellValues && LinkedDatabase != null) {
