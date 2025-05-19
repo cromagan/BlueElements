@@ -40,7 +40,7 @@ public class DatabaseChunk : Database {
 
     public static readonly string Chunk_AdditionalUseCases = "_uses";
     public static readonly string Chunk_MainData = "MainData";
-    public static readonly string Chunk_Master = "_master";
+    //public static readonly string Chunk_Master = "_master";
     public static readonly string Chunk_Variables = "_vars";
 
     /// <summary>
@@ -88,8 +88,8 @@ public class DatabaseChunk : Database {
             varChunk.InitByteList();
             chunks.Add(varChunk);
 
-            masterUserChunk = new Chunk(db.Filename, Chunk_Master);
-            masterUserChunk.InitByteList();
+            //masterUserChunk = new Chunk(db.Filename, Chunk_Master);
+            //masterUserChunk.InitByteList();
             //chunks.Add(masterUserChunk); // Masterchunk wird nicht gespeichert. Weil es pro chunk einen Masteruser geben kann.
         }
 
@@ -102,8 +102,10 @@ public class DatabaseChunk : Database {
             mainChunk.SaveToByteList(DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString7());
             mainChunk.SaveToByteList(DatabaseDataType.Caption, db.Caption);
 
-            masterUserChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
-            masterUserChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
+            if (!chunksAllowed) {
+                mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
+                mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
+            }
 
             mainChunk.SaveToByteList(DatabaseDataType.Tags, db.Tags.JoinWithCr());
             mainChunk.SaveToByteList(DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
@@ -213,12 +215,15 @@ public class DatabaseChunk : Database {
         if (type == DatabaseDataType.DatabaseVariables) { return Chunk_Variables.ToLower(); }
         if (type is DatabaseDataType.TemporaryDatabaseMasterUser
                  or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) {
-            //Develop.DebugPrint(ErrorType.Error, "Sollte nicht passieren!");
-            return Chunk_Master.ToLower(); // Alte Undos
+            return string.Empty; // Jeder Chunk ist ein eigener Master
         }
 
         if (type.IsCellValue() || type is DatabaseDataType.Undo or DatabaseDataType.Command_AddRow or DatabaseDataType.Command_RemoveRow) {
             switch (spc.Value_for_Chunk) {
+
+                case ChunkType.ByHash_1Char:
+                    return chunkvalue.ToLower().GetHashString().Right(1).ToLower();
+
                 case  ChunkType.ByHash_2Chars:
                     return chunkvalue.ToLower().GetHashString().Right(2).ToLower();
 

@@ -115,7 +115,6 @@
     <Compile Include="Enums\ButtonArgs.cs" />
     <Compile Include="Enums\RelationType.cs" />
     <Compile Include="Enums\ChunkType.cs" />
-    <Compile Include="Enums\ColumnFunction.cs" />
     <Compile Include="Enums\Reason.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
     <Compile Include="EventArgs\CellNullableEventArgs.cs" />

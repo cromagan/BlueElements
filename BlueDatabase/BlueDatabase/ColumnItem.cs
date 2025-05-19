@@ -116,8 +116,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private Color _foreColor;
 
-    private ColumnFunction _function;
-
     private bool _ignoreAtRowFilter;
 
     private bool _isFirst;
@@ -169,8 +167,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         _keyName = name;
         _caption = string.Empty;
-        //_CaptionBitmapCode = null;
-        _function = ColumnFunction.Normal;
         _lineStyleLeft = ColumnLineStyle.Dünn;
         _lineStyleRight = ColumnLineStyle.Ohne;
         _multiLine = false;
@@ -1296,8 +1292,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (string.IsNullOrEmpty(_caption)) { return "Spalten Beschriftung fehlt."; }
 
-        if (((int)_function).ToString() == _function.ToString()) { return "Format fehlerhaft."; }
-
         if (_relationType != RelationType.None) {
             if (LinkedDatabase is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
             if (db == db2) { return "Zirkelbezug mit verknüpfter Datenbank."; }
@@ -1564,89 +1558,89 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (IsDisposed) { return; }
 
-        if (_function.ToString() == ((int)_function).ToString()) {
-            this.GetStyleFrom(ColumnFormatHolder.Text);
-        }
+        //if (_function.ToString() == ((int)_function).ToString()) {
+        //    this.GetStyleFrom(ColumnFormatHolder.Text);
+        //}
 
         if (!Enum.IsDefined(typeof(ScriptType), _scriptType)) { ScriptType = ScriptType.Nicht_vorhanden; }
 
-        switch (_function) {
-            case ColumnFunction.Virtuelle_Spalte:
-                SaveContent = false;
-                _function = ColumnFunction.Normal;
-                break;
+        //switch (_function) {
+        //    case ColumnFunction.Virtuelle_Spalte:
+        //        SaveContent = false;
+        //        _function = ColumnFunction.Normal;
+        //        break;
 
-            case ColumnFunction.First:
-                IsFirst = true;
-                _function = ColumnFunction.Normal;
-                break;
+        //    case ColumnFunction.First:
+        //        IsFirst = true;
+        //        _function = ColumnFunction.Normal;
+        //        break;
 
-            case ColumnFunction.Schlüsselspalte:
-                IsKeyColumn = true;
-                _function = ColumnFunction.Normal;
-                break;
+        //    case ColumnFunction.Schlüsselspalte:
+        //        IsKeyColumn = true;
+        //        _function = ColumnFunction.Normal;
+        //        break;
 
-            case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
-                RelationType = RelationType.CellValues;
-                _function = ColumnFunction.Normal;
+        //    case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
+        //        RelationType = RelationType.CellValues;
+        //        _function = ColumnFunction.Normal;
 
-                #region Aus Dateinamen den Tablename extrahieren
+        //        #region Aus Dateinamen den Tablename extrahieren
 
-                if (!_linkedDatabaseTableName.Contains("|") && _linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
-                    _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpperInvariant().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB").TrimEnd(".CBDB");
-                    LinkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
-                }
+        //        if (!_linkedDatabaseTableName.Contains("|") && _linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
+        //            _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpperInvariant().TrimEnd(".MDB").TrimEnd(".BDB").TrimEnd(".MBDB").TrimEnd(".CBDB");
+        //            LinkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
+        //        }
 
-                #endregion
+        //        #endregion
 
-                #region Aus Connection-info den Tablename extrahieren
+        //        #region Aus Connection-info den Tablename extrahieren
 
-                if (_linkedDatabaseTableName.Contains("|")) {
-                    var l = _linkedDatabaseTableName.Split('|');
-                    if (IsValidTableName(l[0])) { LinkedDatabaseTableName = l[0]; }
-                }
+        //        if (_linkedDatabaseTableName.Contains("|")) {
+        //            var l = _linkedDatabaseTableName.Split('|');
+        //            if (IsValidTableName(l[0])) { LinkedDatabaseTableName = l[0]; }
+        //        }
 
-                #endregion
+        //        #endregion
 
-                var c = LinkedDatabase?.Column[_columnNameOfLinkedDatabase];
-                if (c is { IsDisposed: false }) {
-                    this.GetStyleFrom((IInputFormat)c);
-                    ScriptType = ScriptType.Nicht_vorhanden;
-                    DoOpticalTranslation = c.DoOpticalTranslation;
+        //        var c = LinkedDatabase?.Column[_columnNameOfLinkedDatabase];
+        //        if (c is { IsDisposed: false }) {
+        //            this.GetStyleFrom((IInputFormat)c);
+        //            ScriptType = ScriptType.Nicht_vorhanden;
+        //            DoOpticalTranslation = c.DoOpticalTranslation;
 
-                    MaxTextLenght = c.MaxTextLenght;
-                    MaxCellLenght = c.MaxCellLenght;
-                }
-                break;
+        //            MaxTextLenght = c.MaxTextLenght;
+        //            MaxCellLenght = c.MaxCellLenght;
+        //        }
+        //        break;
 
-            case ColumnFunction.RelationText:
-                Relationship_to_First = true;
-                _function = ColumnFunction.Normal;
-                break;
+        //    case ColumnFunction.RelationText:
+        //        Relationship_to_First = true;
+        //        _function = ColumnFunction.Normal;
+        //        break;
 
-            case ColumnFunction.Split_Name:
-                _value_for_Chunk = ChunkType.ByName;
-                _function = ColumnFunction.Normal;
-                _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
-                break;
+        //    case ColumnFunction.Split_Name:
+        //        _value_for_Chunk = ChunkType.ByName;
+        //        _function = ColumnFunction.Normal;
+        //        _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
+        //        break;
 
-            case ColumnFunction.Split_Medium:
-                _value_for_Chunk = ChunkType.ByHash_2Chars;
-                _function = ColumnFunction.Normal;
-                _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
-                break;
+        //    case ColumnFunction.Split_Medium:
+        //        _value_for_Chunk = ChunkType.ByHash_2Chars;
+        //        _function = ColumnFunction.Normal;
+        //        _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
+        //        break;
 
-            case ColumnFunction.Split_Large:
-                _value_for_Chunk = ChunkType.ByHash_3Chars;
-                _function = ColumnFunction.Normal;
-                _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
-                break;
+        //    case ColumnFunction.Split_Large:
+        //        _value_for_Chunk = ChunkType.ByHash_3Chars;
+        //        _function = ColumnFunction.Normal;
+        //        _ = Database?.ChangeData(DatabaseDataType.Value_for_Chunk, this, null, "0", ((int)_value_for_Chunk).ToString(), Generic.UserName, DateTime.UtcNow, "Neue Spaltenfunktionen", string.Empty);
+        //        break;
 
-            case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                RelationType = RelationType.DropDownValues;
-                _function = ColumnFunction.Normal;
-                break;
-        }
+        //    case ColumnFunction.Werte_aus_anderer_Datenbank_als_DropDownItems:
+        //        RelationType = RelationType.DropDownValues;
+        //        _function = ColumnFunction.Normal;
+        //        break;
+        //}
 
         if (MaxCellLenght < MaxTextLenght) { MaxCellLenght = MaxTextLenght; }
 
@@ -1669,7 +1663,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
 
         _saveContent = true;
-        _function = ColumnFunction.Normal;
         _relationType = RelationType.None;
 
         switch (_keyName.ToUpperInvariant()) {
@@ -1785,7 +1778,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _caption = "Fehlerfrei";
                 _isFirst = false;
                 _spellCheckingEnabled = false;
-                _function = ColumnFunction.Normal;
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -1816,7 +1808,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             case "SYS_LOCKED":
                 _isFirst = false;
                 _spellCheckingEnabled = false;
-                _function = ColumnFunction.Normal;
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -2166,10 +2157,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case DatabaseDataType.ColumnCaption:
                 _caption = newvalue;
-                break;
-
-            case DatabaseDataType.ColumnFunction:
-                _function = (ColumnFunction)IntParse(newvalue);
                 break;
 
             case DatabaseDataType.ForeColor:

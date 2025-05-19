@@ -47,6 +47,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capInfo = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.btnMasterMe = new BlueControls.Controls.Button();
             this.btnUnMaster = new BlueControls.Controls.Button();
             this.btnTabellenAnsicht = new BlueControls.Controls.Button();
             this.btnSkripte = new BlueControls.Controls.Button();
@@ -68,7 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo = new BlueControls.Controls.Table();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
             this.btnClipboard = new BlueControls.Controls.Button();
-            this.btnMasterMe = new BlueControls.Controls.Button();
+            this.btnLoadAll = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -317,6 +318,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAllgemein.Controls.Add(this.btnLoadAll);
             this.tabAllgemein.Controls.Add(this.btnMasterMe);
             this.tabAllgemein.Controls.Add(this.btnUnMaster);
             this.tabAllgemein.Controls.Add(this.btnTabellenAnsicht);
@@ -342,6 +344,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAllgemein.Size = new System.Drawing.Size(1178, 678);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
+            // 
+            // btnMasterMe
+            // 
+            this.btnMasterMe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnMasterMe.ImageCode = "Stern|16|";
+            this.btnMasterMe.Location = new System.Drawing.Point(424, 552);
+            this.btnMasterMe.Name = "btnMasterMe";
+            this.btnMasterMe.Size = new System.Drawing.Size(200, 32);
+            this.btnMasterMe.TabIndex = 55;
+            this.btnMasterMe.Text = "Master me!";
+            this.btnMasterMe.Click += new System.EventHandler(this.btnMasterMe_Click);
             // 
             // btnUnMaster
             // 
@@ -571,16 +584,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnClipboard.Text = "In die Zwischenablage";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
-            // btnMasterMe
+            // btnLoadAll
             // 
-            this.btnMasterMe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnMasterMe.ImageCode = "Stern|16|";
-            this.btnMasterMe.Location = new System.Drawing.Point(424, 552);
-            this.btnMasterMe.Name = "btnMasterMe";
-            this.btnMasterMe.Size = new System.Drawing.Size(200, 32);
-            this.btnMasterMe.TabIndex = 55;
-            this.btnMasterMe.Text = "Master me!";
-            this.btnMasterMe.Click += new System.EventHandler(this.btnMasterMe_Click);
+            this.btnLoadAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnLoadAll.ImageCode = "Ordner|16";
+            this.btnLoadAll.Location = new System.Drawing.Point(424, 632);
+            this.btnLoadAll.Name = "btnLoadAll";
+            this.btnLoadAll.Size = new System.Drawing.Size(200, 32);
+            this.btnLoadAll.TabIndex = 56;
+            this.btnLoadAll.Text = "Alle Daten laden";
+            this.btnLoadAll.Click += new System.EventHandler(this.btnLoadAll_Click);
             // 
             // DatabaseHeadEditor
             // 
@@ -651,5 +664,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnTabellenAnsicht;
         private Button btnUnMaster;
         private Button btnMasterMe;
+        private Button btnLoadAll;
     }
 }

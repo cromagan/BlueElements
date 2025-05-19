@@ -367,7 +367,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         var t = "<b>Tabelle:</b> <tab>" + Database.TableName + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1) + "<br>";
         t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUtc + " " + Database.TemporaryDatabaseMasterUser + "<br>";
-        t += "<b>Letzte Komplettierung:</b> <tab>" + Database.FileStateUtcDate.ToString7() + "<br>";
+        t += "<b>Letzte Komplettierung:</b> <tab>" + Database.FileStateUtcDate.ToString7() + " UTC<br>";
         capInfo.Text = t.TrimEnd("<br>");
     }
 
@@ -469,4 +469,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     #endregion
+
+    private void btnLoadAll_Click(object sender, System.EventArgs e) {
+        if (Database is not { IsDisposed: false }) { return; }
+        Database.BeSureAllDataLoaded(-1);
+    }
 }
