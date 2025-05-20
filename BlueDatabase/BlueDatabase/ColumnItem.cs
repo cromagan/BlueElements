@@ -1360,6 +1360,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_relationship_to_First || _relationType != RelationType.None) {
                 return "Beziehungen zu anderen Zeilen und Schlüsselspalte nicht kombinierbar.";
             }
+
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly) {
+                return "Schlüsselspalten müssen im Script als Readonly vorhanden sein.";
+            }
         }
 
         if (_value_for_Chunk != ChunkType.None) {
@@ -1388,7 +1392,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (_relationType == RelationType.CellValues) {
             if (_scriptType is not ScriptType.Nicht_vorhanden) {
-                return "Spalten mit Relarions können im Skript nicht verwendet werden. ImportLinked im Skript benutzen.";
+                return "Spalten mit Verlinkungen zu anderen Datenbanken können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
             }
         }
 
