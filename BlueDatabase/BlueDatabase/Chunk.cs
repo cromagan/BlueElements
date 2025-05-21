@@ -122,6 +122,26 @@ public class Chunk : IHasKeyName {
         }
     }
 
+    public static void SaveToByteList(List<byte> bytes, DatabaseDataType databaseDataType, string content) {
+        var b = content.UTF8_ToByte();
+        bytes.Add((byte)Routinen.DatenAllgemeinUTF8);
+        bytes.Add((byte)databaseDataType);
+        SaveToByteList(bytes, b.Length, 3);
+        bytes.AddRange(b);
+    }
+
+    public static void SaveToByteList(List<byte> bytes, long numberToAdd, int byteCount) {
+        do {
+            byteCount--;
+            var te = (long)Math.Pow(255, byteCount);
+            // ReSharper disable once PossibleLossOfFraction
+            var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
+
+            bytes.Add(mu);
+            numberToAdd %= te;
+        } while (byteCount > 0);
+    }
+
     /// <summary>
     /// Initialisiert die Byteliste
     /// </summary>
@@ -166,6 +186,12 @@ public class Chunk : IHasKeyName {
         if (LoadFailed) { return true; }
         if (string.IsNullOrEmpty(MainFileName)) { return false; } // Temporäre Datenbanken
 
+        // Prüfe, ob die Datei überhaupt existiert
+        if (!FileExists(ChunkFileName)) {
+            return _bytes.Count > 0; // Nur neu laden, wenn wir Daten haben, die "verschwunden" sind
+        }
+
+
         if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
             var nf = GetFileInfo(ChunkFileName, false);
             return nf != _fileinfo;
@@ -177,7 +203,6 @@ public class Chunk : IHasKeyName {
     public bool Save(string filename, int minBytes) {
         if (LoadFailed) { return false; }
         if (_bytes.Count < minBytes) { return false; }
-
         if (_lastcheck.Year < 2000) { return false; }
 
         try {
@@ -185,13 +210,15 @@ public class Chunk : IHasKeyName {
 
             // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
             var contentBytes = RemoveHeaderDataTypes(_bytes);
+            if (contentBytes == null || contentBytes.Count == 0) { return false; }
 
             // Neuen Header erstellen
             var head = GetHeadAndSetEditor();
+            if (head == null || head.Count == 0) { return false; }
 
             // Header und Datensätze zusammenführen und komprimieren
             var datacompressed = head.Concat(contentBytes).ToArray().ZipIt();
-            if (datacompressed is not { }) { return false; }
+            if (datacompressed == null || datacompressed.Length == 0) { return false; }
 
             Develop.SetUserDidSomething();
 
@@ -201,7 +228,10 @@ public class Chunk : IHasKeyName {
             x.Close();
 
             Develop.SetUserDidSomething();
-        } catch { return false; }
+        } catch {
+            DeleteFile(filename, false);
+            return false;
+        }
 
         return true;
     }
@@ -242,15 +272,6 @@ public class Chunk : IHasKeyName {
         _bytes.AddRange(b);
     }
 
-    public void SaveToByteList(List<byte> bytes, DatabaseDataType databaseDataType, string content) {
-        if (LoadFailed) { return; }
-        var b = content.UTF8_ToByte();
-        bytes.Add((byte)Routinen.DatenAllgemeinUTF8);
-        bytes.Add((byte)databaseDataType);
-        SaveToByteList(bytes, b.Length, 3);
-        bytes.AddRange(b);
-    }
-
     public void SaveToByteList(DatabaseDataType databaseDataType, string content) {
         if (LoadFailed) { return; }
         var b = content.UTF8_ToByte();
@@ -258,19 +279,6 @@ public class Chunk : IHasKeyName {
         _bytes.Add((byte)databaseDataType);
         SaveToByteList(_bytes, b.Length, 3);
         _bytes.AddRange(b);
-    }
-
-    public void SaveToByteList(List<byte> bytes, long numberToAdd, int byteCount) {
-        if (LoadFailed) { return; }
-        do {
-            byteCount--;
-            var te = (long)Math.Pow(255, byteCount);
-            // ReSharper disable once PossibleLossOfFraction
-            var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
-
-            bytes.Add(mu);
-            numberToAdd %= te;
-        } while (byteCount > 0);
     }
 
     /// <summary>
@@ -349,29 +357,38 @@ public class Chunk : IHasKeyName {
     }
 
     /// <summary>
-    /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgeführt wurde
+    /// Wartet bis zu 120 Sekunden, bis die Initialladung ausgeführt wurde
     /// </summary>
-    public void WaitInitialDone() {
+    /// <returns>True, wenn die Initialisierung erfolgreich abgeschlossen wurde, sonst False</returns>
+    public bool WaitInitialDone() {
         var t = Stopwatch.StartNew();
-
         var lastMessageTime = 0L;
 
         while (_lastcheck.Year < 2000) {
-            Thread.Sleep(1);
+            Thread.Sleep(10); // Längere Pause zur Reduzierung der CPU-Last
+
             if (t.ElapsedMilliseconds > 120 * 1000) {
                 Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
-                return;
+                return false; // Explizit false zurückgeben, wenn die Initialisierung fehlschlägt
             }
+
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Warte auf Abschluss der Initialsierung des Chunks {KeyName}", 0);
+                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Warte auf Abschluss der Initialisierung des Chunks {KeyName}", 0);
             }
         }
+
+        return true; // Explizit true zurückgeben, wenn die Initialisierung erfolgreich ist
     }
 
     internal bool Delete() {
-        _bytes.Clear();
         var filename = ChunkFileName;
+
+        // Zuerst die Bytes leeren, um sicherzustellen, dass wir nicht versehentlich
+        // anschließend wieder speichern
+        _bytes.Clear();
+        _fileinfo = string.Empty;
+
         return DeleteFile(filename, false);
     }
 
@@ -383,6 +400,8 @@ public class Chunk : IHasKeyName {
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
         if (!Save(tempfile, minbytes)) { return false; }
+
+        // Backup erstellen, wenn nötig
         if (FileExists(backup)) {
             if (!DeleteFile(backup, false)) {
                 DeleteFile(tempfile, false);
@@ -390,9 +409,18 @@ public class Chunk : IHasKeyName {
                 return false;
             }
         }
+
         Develop.SetUserDidSomething();
-        // Haupt-Datei wird zum Backup umbenannt
-        _ = MoveFile(filename, backup, false); // Kein Abbruch hier, die Datei könnte ja nicht existieren
+
+        // Haupt-Datei wird zum Backup umbenannt, aber nur wenn sie existiert
+        if (FileExists(filename)) {
+            if (!MoveFile(filename, backup, false)) {
+                DeleteFile(tempfile, false);
+                Develop.SetUserDidSomething();
+                return false;
+            }
+        }
+
         Develop.SetUserDidSomething();
 
         // --- TmpFile wird zum Haupt ---
@@ -407,19 +435,29 @@ public class Chunk : IHasKeyName {
                 return true;
             }
 
-            // Paralleler Prozess hat gespeichert?!?
+            // Paralleler Prozess hat gespeichert?
             Develop.SetUserDidSomething();
             if (FileExists(filename)) {
-                _ = DeleteFile(tempfile, false);
+                DeleteFile(tempfile, false);
+
+                // Wenn die Datei existiert, sollten wir sie neu laden, um Konsistenz zu gewährleisten
+                try {
+                    LoadBytesFromDisk();
+                } catch {
+                    // Fehler beim Laden ignorieren, wir geben trotzdem false zurück
+                }
+
                 Develop.SetUserDidSomething();
                 return false;
             }
 
             if (attempt < maxRetries) {
-                Thread.Sleep(retryDelayMs);
+                Thread.Sleep(retryDelayMs * attempt); // Exponentielles Backoff
                 continue;
             }
 
+            // Aufräumen falls alles fehlschlägt
+            DeleteFile(tempfile, false);
             Develop.DebugPrint(ErrorType.Error, $"Chunk defekt nach {maxRetries} Versuchen:\r\n{filename}\r\n{tempfile}");
             return false;
         }
@@ -535,9 +573,11 @@ public class Chunk : IHasKeyName {
     /// <summary>
     /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position
     /// </summary>
-    /// <param name="bytes"></param>
-    /// <returns></returns>
+    /// <param name="bytes">Die zu verarbeitenden Bytes</param>
+    /// <returns>Eine Liste von Bytes ohne Header-Daten oder null bei Fehlern</returns>
     private List<byte>? RemoveHeaderDataTypes(List<byte> bytes) {
+        if (bytes == null || bytes.Count == 0) { return null; }
+
         var data = bytes.ToArray();
         var result = new List<byte>(data.Length);
         var pointer = 0;
