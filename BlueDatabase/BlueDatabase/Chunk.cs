@@ -365,7 +365,7 @@ public class Chunk : IHasKeyName {
         var lastMessageTime = 0L;
 
         while (_lastcheck.Year < 2000) {
-            Thread.Sleep(10); // Längere Pause zur Reduzierung der CPU-Last
+            Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
 
             if (t.ElapsedMilliseconds > 120 * 1000) {
                 Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);

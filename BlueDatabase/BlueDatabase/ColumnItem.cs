@@ -1790,7 +1790,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 //_AutofilterTextFilterErlaubt = false;
                 _ignoreAtRowFilter = true;
                 _filterOptions = FilterOptions.Enabled;
-                _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
+
+                if(_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly) {
+                    _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
+                }
+
                 _align = AlignmentHorizontal.Zentriert;
                 _dropDownItems.Clear();
                 _linkedCellFilter.Clear();
@@ -1815,7 +1819,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
-                _scriptType = ScriptType.Bool;
                 _filterOptions = FilterOptions.Enabled;
                 _autoFilterJoker = string.Empty;
                 _ignoreAtRowFilter = true;

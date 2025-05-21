@@ -19,9 +19,11 @@
 
 using BlueBasics.Enums;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -39,15 +41,8 @@ public static class IO {
     public static string LastFilePath = string.Empty;
     private const int _fileExistenceCheckRetryCount = 10;
     private const int _fileOperationRetryCount = 5;
+    private static readonly ConcurrentDictionary<string, (DateTime CheckTime, bool Result)> _canWriteCache = new();
     private static readonly object _fileOperationLock = new();
-
-    // ms
-    private static readonly List<string> _noWriteAccess = [];
-
-    private static readonly List<string> _writeAccess = [];
-    private static DateTime _canWriteLastCheck = DateTime.UtcNow.Subtract(new TimeSpan(10, 10, 10));
-    private static string _canWriteLastFile = string.Empty;
-    private static bool _canWriteLastResult;
 
     #endregion
 
@@ -80,27 +75,34 @@ public static class IO {
 
     public static bool CanWriteInDirectory(string directory) {
         if (string.IsNullOrEmpty(directory)) { return false; }
+
+        // Sicherstellen, dass Directory mit einem \ endet
+        if (!directory.EndsWith("\\")) {
+            directory += "\\";
+        }
+
         var dirUpper = directory.ToUpperInvariant();
 
-        // Ergebnisse cachen, um Performance zu verbessern
-        lock (_fileOperationLock) {
-            if (_writeAccess.Contains(dirUpper)) { return true; }
-            if (_noWriteAccess.Contains(dirUpper)) { return false; }
+        // Prüfen, ob Ergebnis bereits im Cache ist und noch gültig
+        if (_canWriteCache.TryGetValue(dirUpper, out var cacheEntry) &&
+            DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 300) {
+            return cacheEntry.Result;
         }
+
+        // Vor Zugriff auf Cache, diesen ggf. bereinigen
+        CleanupCanWriteCache();
 
         try {
             // Temporäre Testdatei mit zufälligem Namen erstellen
             var randomFileName = Path.Combine(directory, Path.GetRandomFileName());
             using (_ = File.Create(randomFileName, 1, FileOptions.DeleteOnClose)) { }
 
-            lock (_fileOperationLock) {
-                _writeAccess.Add(dirUpper);
-            }
+            // Erfolg im Cache speichern
+            _canWriteCache[dirUpper] = (DateTime.UtcNow, true);
             return true;
         } catch {
-            lock (_fileOperationLock) {
-                _noWriteAccess.Add(dirUpper);
-            }
+            // Fehler im Cache speichern
+            _canWriteCache[dirUpper] = (DateTime.UtcNow, false);
             return false;
         }
     }
@@ -450,26 +452,6 @@ public static class IO {
     }
 
     /// <summary>
-    /// Überprüft, ob eine Datei existiert, und wartet gegebenenfalls bis sie verfügbar ist
-    /// </summary>
-    /// <param name="file">Die zu prüfende Datei</param>
-    /// <param name="timeoutMs">Timeout in Millisekunden (0 = kein Warten)</param>
-    /// <returns>True, wenn die Datei existiert</returns>
-    private static bool WaitForFileExists(string file, int timeoutMs) {
-        if (FileExists(file)) { return true; }
-
-        if (timeoutMs <= 0) { return false; }
-
-        var stopwatch = Stopwatch.StartNew();
-        while (stopwatch.ElapsedMilliseconds < timeoutMs) {
-            if (FileExists(file)) { return true; }
-            Thread.Sleep(200);
-        }
-
-        return FileExists(file);
-    }
-
-    /// <summary>
     /// Speichert den Text in einer Datei.
     /// </summary>
     /// <param name="filename">Zieldatei</param>
@@ -497,15 +479,17 @@ public static class IO {
     private static bool CanWrite(string file) {
         // Private lassen, das andere CanWrite greift auf diese zu.
         // Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
-        // http://www.vbarchiv.net/tipps/tipp_1281.html
         lock (_fileOperationLock) {
             string fileUpper = file.ToUpperInvariant();
 
             // Prüfen, ob wir für diese Datei bereits ein Ergebnis haben und ob es noch gültig ist
-            bool isCached = _canWriteLastFile == fileUpper &&
-                            DateTime.UtcNow.Subtract(_canWriteLastCheck).TotalSeconds <= 10;
+            if (_canWriteCache.TryGetValue(fileUpper, out var cacheEntry) &&
+                DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 10) {
+                return cacheEntry.Result;
+            }
 
-            if (isCached) { return _canWriteLastResult; }
+            // Vor Zugriff auf Cache, diesen ggf. bereinigen
+            CleanupCanWriteCache();
 
             // Wenn kein gültiges Ergebnis vorliegt, führe die Prüfung durch
             var startTime = DateTime.UtcNow;
@@ -525,11 +509,54 @@ public static class IO {
             }
 
             // Ergebnis im Cache speichern
-            _canWriteLastFile = fileUpper;
-            _canWriteLastResult = result;
-            _canWriteLastCheck = DateTime.UtcNow;
+            _canWriteCache[fileUpper] = (DateTime.UtcNow, result);
 
             return result;
+        }
+    }
+
+    /// <summary>
+    /// Bereinigt den _canWriteCache wenn er zu viele Einträge enthält oder Einträge zu alt sind
+    /// </summary>
+    private static void CleanupCanWriteCache() {
+        // Wenn weniger als 1000 Einträge, nichts tun
+        if (_canWriteCache.Count < 1000) { return; }
+
+        // Lock verwenden, um Thread-Sicherheit zu gewährleisten
+        lock (_fileOperationLock) {
+            try {
+                // Wenn zwischenzeitlich aufgeräumt wurde, nichts tun
+                if (_canWriteCache.Count < 1000) {
+                    return;
+                }
+
+                // Aktuelle Zeit für Altersprüfung
+                var now = DateTime.UtcNow;
+
+                // Einträge identifizieren, die älter als 10 Minuten sind
+                var keysToRemove = _canWriteCache
+                    .Where(kvp => now.Subtract(kvp.Value.CheckTime).TotalMinutes > 10)
+                    .Select(kvp => kvp.Key)
+                    .ToList();
+
+                // Alte Einträge entfernen
+                foreach (var key in keysToRemove) {
+                    _canWriteCache.TryRemove(key, out _);
+                }
+
+                // Wenn noch immer mehr als 500 Einträge, die ältesten entfernen
+                if (_canWriteCache.Count > 500) {
+                    var oldestEntries = _canWriteCache
+                        .OrderBy(kvp => kvp.Value.CheckTime)
+                        .Take(_canWriteCache.Count - 500)
+                        .Select(kvp => kvp.Key)
+                        .ToList();
+
+                    foreach (var key in oldestEntries) {
+                        _canWriteCache.TryRemove(key, out _);
+                    }
+                }
+            } catch { }
         }
     }
 
@@ -695,6 +722,26 @@ public static class IO {
         }
 
         return FileExists(newName) && !FileExists(oldName);
+    }
+
+    /// <summary>
+    /// Überprüft, ob eine Datei existiert, und wartet gegebenenfalls bis sie verfügbar ist
+    /// </summary>
+    /// <param name="file">Die zu prüfende Datei</param>
+    /// <param name="timeoutMs">Timeout in Millisekunden (0 = kein Warten)</param>
+    /// <returns>True, wenn die Datei existiert</returns>
+    private static bool WaitForFileExists(string file, int timeoutMs) {
+        if (FileExists(file)) { return true; }
+
+        if (timeoutMs <= 0) { return false; }
+
+        var stopwatch = Stopwatch.StartNew();
+        while (stopwatch.ElapsedMilliseconds < timeoutMs) {
+            if (FileExists(file)) { return true; }
+            Thread.Sleep(200);
+        }
+
+        return FileExists(file);
     }
 
     #endregion

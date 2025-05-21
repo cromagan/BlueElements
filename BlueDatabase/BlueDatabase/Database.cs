@@ -1204,9 +1204,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
         _ = vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
 
-        if (Column.SysCorrect is { IsDisposed: false } csc && row is { IsDisposed: false }) {
-            _ = vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));
-        }
+        //if (Column.SysCorrect is { IsDisposed: false } csc && row is { IsDisposed: false }) {
+        //    _ = vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));
+        //}
 
         if (Column.First() is { IsDisposed: false } fc) {
             _ = vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
