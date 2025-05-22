@@ -38,7 +38,7 @@ internal class Method_Number : Method {
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string Returns => VariableDouble.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Number(string, NaNValue)";
 
@@ -47,7 +47,7 @@ internal class Method_Number : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is VariableFloat vf) { return new DoItFeedback(vf.ValueNum); }
+        if (attvar.Attributes[0] is VariableDouble vf) { return new DoItFeedback(vf.ValueNum); }
 
         if (attvar.Attributes[0] is VariableString vs) {
             if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {

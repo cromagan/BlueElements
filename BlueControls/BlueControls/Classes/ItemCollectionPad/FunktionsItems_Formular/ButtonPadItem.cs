@@ -266,7 +266,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
         //    if (thisarg.Count != 1) { return false; }
 
-        //    if (thisarg[0] != VariableFloat.ShortName_Plain &&
+        //    if (thisarg[0] != VariableDouble.ShortName_Plain &&
         //        thisarg[0] != VariableString.ShortName_Plain &&
         //        thisarg[0] != VariableBool.ShortName_Plain &&
         //        thisarg[0] != VariableFilterItem.ShortName_Variable &&

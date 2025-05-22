@@ -202,7 +202,7 @@ public static class IO {
         var p = pfad.CheckPath();
 
         // Mehrere Versuche mit exponentieller Verzögerung
-        for (int attempt = 0; attempt < _fileOperationRetryCount; attempt++) {
+        for (var attempt = 0; attempt < _fileOperationRetryCount; attempt++) {
             try {
                 return Directory.Exists(p);
             } catch (Exception) {
@@ -367,7 +367,7 @@ public static class IO {
     /// <param name="toBeSure">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <returns>True bei Erfolg</returns>
     public static bool MoveFile(string oldName, string newName, bool toBeSure) {
-        bool result = ProcessFile(TryMoveFile, oldName, newName, _fileOperationRetryCount, toBeSure);
+        var result = ProcessFile(TryMoveFile, oldName, newName, _fileOperationRetryCount, toBeSure);
 
         // Nach erfolgreichem Verschieben warten, bis die Datei tatsächlich am Zielort existiert
         if (result) {
@@ -378,7 +378,7 @@ public static class IO {
     }
 
     public static bool MoveFile(string oldName, string newName, int tries, bool toBeSure) {
-        bool result = ProcessFile(TryMoveFile, oldName, newName, tries, toBeSure);
+        var result = ProcessFile(TryMoveFile, oldName, newName, tries, toBeSure);
 
         // Nach erfolgreichem Verschieben warten, bis die Datei tatsächlich am Zielort existiert
         if (result) {
@@ -480,7 +480,7 @@ public static class IO {
         // Private lassen, das andere CanWrite greift auf diese zu.
         // Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
         lock (_fileOperationLock) {
-            string fileUpper = file.ToUpperInvariant();
+            var fileUpper = file.ToUpperInvariant();
 
             // Prüfen, ob wir für diese Datei bereits ein Ergebnis haben und ob es noch gültig ist
             if (_canWriteCache.TryGetValue(fileUpper, out var cacheEntry) &&
@@ -493,7 +493,7 @@ public static class IO {
 
             // Wenn kein gültiges Ergebnis vorliegt, führe die Prüfung durch
             var startTime = DateTime.UtcNow;
-            bool result = false;
+            var result = false;
 
             if (FileExists(file)) {
                 try {
@@ -609,10 +609,10 @@ public static class IO {
             File.Copy(source, target);
 
             // Warten, bis die Datei tatsächlich am Zielort existiert
-            for (int i = 0; i < _fileExistenceCheckRetryCount; i++) {
+            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
                 if (FileExists(target)) {
                     // Zusätzlich prüfen, ob die Zieldatei die gleiche Größe hat wie die Quelldatei
-                    FileInfo targetInfo = new FileInfo(target);
+                    var targetInfo = new FileInfo(target);
                     if (targetInfo.Length == sourceInfo.Length) {
                         return true; // Datei existiert und hat die richtige Größe
                     }
@@ -634,7 +634,7 @@ public static class IO {
             Directory.Delete(pfad, true);
 
             // Warten, bis das Verzeichnis wirklich gelöscht ist
-            for (int i = 0; i < _fileExistenceCheckRetryCount; i++) {
+            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
                 if (!DirectoryExists(pfad)) { return true; }
                 Thread.Sleep(200);
             }
@@ -665,7 +665,7 @@ public static class IO {
             File.Delete(thisFile);
 
             // Warten, bis die Datei wirklich gelöscht ist
-            for (int i = 0; i < _fileExistenceCheckRetryCount; i++) {
+            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
                 if (!FileExists(thisFile)) {
                     return true;
                 }
@@ -687,7 +687,7 @@ public static class IO {
             Directory.Move(oldName, newName);
 
             // Warten, bis das Verzeichnis am neuen Ort existiert
-            for (int i = 0; i < _fileExistenceCheckRetryCount; i++) {
+            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
                 if (DirectoryExists(newName) && !DirectoryExists(oldName)) { return true; }
                 Thread.Sleep(200);
             }
@@ -713,7 +713,7 @@ public static class IO {
             File.Move(oldName, newName);
 
             // Warten, bis die Datei am neuen Ort existiert und an der alten Position verschwunden ist
-            for (int i = 0; i < _fileExistenceCheckRetryCount; i++) {
+            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
                 if (FileExists(newName) && !FileExists(oldName)) { return true; }
                 Thread.Sleep(200);
             }

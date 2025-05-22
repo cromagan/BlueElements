@@ -213,7 +213,7 @@ public partial class MainWindow {
         }
 
         _picUndo = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppArgb);
-        using Graphics g = Graphics.FromImage(_picUndo);
+        using var g = Graphics.FromImage(_picUndo);
         g.Clear(Color.Transparent);
         g.DrawImage(bmp, 0, 0, bmp.Width, bmp.Height);
 
@@ -231,7 +231,7 @@ public partial class MainWindow {
             P.Bmp = new Bitmap(e.Bmp.Width, e.Bmp.Height, PixelFormat.Format32bppArgb);
 
             // Inhalt kopieren
-            using Graphics g = Graphics.FromImage(P.Bmp);
+            using var g = Graphics.FromImage(P.Bmp);
             g.Clear(Color.Transparent);
             g.DrawImage(e.Bmp, 0, 0, e.Bmp.Width, e.Bmp.Height);
         } else {

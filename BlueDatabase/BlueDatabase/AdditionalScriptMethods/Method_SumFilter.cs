@@ -37,7 +37,7 @@ public class Method_SumFilter : Method_Database {
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Database;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string Returns => VariableDouble.ShortName_Plain;
 
     public override string StartSequence => "(";
 

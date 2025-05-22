@@ -582,8 +582,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (filtersToAdd.Count == 0) { return; }
 
         // Prüfe, ob tatsächlich Änderungen erforderlich sind und entferne bestehende Filter
-        bool needChanges = false;
-        List<FilterItem> toRemove = new List<FilterItem>();
+        var needChanges = false;
+        var toRemove = new List<FilterItem>();
 
         foreach (var filterToAdd in filtersToAdd) {
             var existingFilters = _internal.Where(f => f.Column == filterToAdd.Column).ToList();

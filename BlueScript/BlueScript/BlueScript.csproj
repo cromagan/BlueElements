@@ -159,7 +159,7 @@
     <Compile Include="Variables\VariableBitmap.cs" />
     <Compile Include="Variables\VariableBool.cs" />
     <Compile Include="Variables\VariableListString.cs" />
-    <Compile Include="Variables\VariableFloat.cs" />
+    <Compile Include="Variables\VariableDouble.cs" />
     <Compile Include="Variables\VariableUnknown.cs" />
     <Compile Include="Variables\VariableString.cs" />
     <Compile Include="Variables\Variable.cs" />

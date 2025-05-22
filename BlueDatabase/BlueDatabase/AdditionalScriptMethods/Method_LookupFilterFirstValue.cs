@@ -75,7 +75,7 @@ public class Method_LookupFilterFirstValue : Method_Database {
         } else if (v is VariableString vs) {
             var w = vs.ValueString;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else if (v is VariableFloat vf) {
+        } else if (v is VariableDouble vf) {
             var w = vf.ValueForReplace;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {

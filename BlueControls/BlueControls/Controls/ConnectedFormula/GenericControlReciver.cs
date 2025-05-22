@@ -187,7 +187,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     public virtual void Invalidate_FilterInput() {
         if (IsDisposed) { return; }
 
-        bool filterNeedsInvalidation = false;
+        var filterNeedsInvalidation = false;
 
         lock (_filterInputLock) {
             if (FilterInputChangedHandled) {
@@ -230,7 +230,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         // Prüfen, ob wir nach der Zuweisung Events registrieren müssen
-        bool needRegisterEvents = _databaseInput == null;
+        var needRegisterEvents = _databaseInput == null;
 
         // Sicherstellen, dass die manuellen Flags gesetzt sind
         if (!RowsInputManualSeted) {
@@ -331,7 +331,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected void DoRows() {
         if (RowsInputChangedHandled) { return; }
 
-        bool needsProcessing = false;
+        var needsProcessing = false;
         List<RowItem>? rowsToProcess;
 
         lock (_rowsInputLock) {
@@ -414,7 +414,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         if (!RowsInputChangedHandled) { return; } // Früher Return wenn nichts zu tun ist
 
-        bool lockTaken = false;
+        var lockTaken = false;
         try {
             // Versuche den Lock zu erhalten mit Timeout
             lockTaken = System.Threading.Monitor.TryEnter(_rowsInputLock, _waitTimeoutMs);

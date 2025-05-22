@@ -29,7 +29,7 @@ internal class Method_Compare : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [BoolVal, BoolVal, [VariableString.ShortName_Plain, VariableFloat.ShortName_Plain, VariableBool.ShortName_Plain]];
+    public override List<List<string>> Args => [BoolVal, BoolVal, [VariableString.ShortName_Plain, VariableDouble.ShortName_Plain, VariableBool.ShortName_Plain]];
     public override string Command => "compare";
     public override List<string> Constants => [];
 
@@ -61,7 +61,7 @@ internal class Method_Compare : Method {
             var val = string.Empty;
 
             switch (attvar.Attributes[z]) {
-                case VariableFloat vf:
+                case VariableDouble vf:
                     if (!hasval && vf.ValueNum != 0) { hasval = true; }
                     val = vf.ValueForReplace;
                     break;

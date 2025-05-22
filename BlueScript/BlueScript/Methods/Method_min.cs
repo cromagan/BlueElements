@@ -31,7 +31,7 @@ internal class Method_Min : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableFloat.ShortName_Variable, VariableString.ShortName_Variable, VariableListString.ShortName_Variable]];
+    public override List<List<string>> Args => [[VariableDouble.ShortName_Variable, VariableString.ShortName_Variable, VariableListString.ShortName_Variable]];
     public override string Command => "min";
     public override List<string> Constants => [];
 
@@ -43,7 +43,7 @@ internal class Method_Min : Method {
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Math;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string Returns => VariableDouble.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Min(Value1, Value2, ...)";
 
@@ -55,7 +55,7 @@ internal class Method_Min : Method {
         var l = new List<double>();
         foreach (var thisvar in attvar.Attributes) {
             switch (thisvar) {
-                case VariableFloat vf:
+                case VariableDouble vf:
                     l.Add(vf.ValueNum);
                     break;
 

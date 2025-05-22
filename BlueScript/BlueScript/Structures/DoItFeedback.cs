@@ -62,9 +62,9 @@ public class DoItFeedback {
 
     public DoItFeedback(bool value) : this(new VariableBool(value)) { }
 
-    public DoItFeedback(double value) : this(new VariableFloat((float)value)) { }
+    public DoItFeedback(double value) : this(new VariableDouble(value)) { }
 
-    public DoItFeedback(float value) : this(new VariableFloat(value)) { }
+    public DoItFeedback(float value) : this(new VariableDouble(value)) { }
 
     public DoItFeedback(IEnumerable<string> list) : this(new VariableListString(list)) { }
 

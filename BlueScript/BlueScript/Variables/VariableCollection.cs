@@ -320,11 +320,11 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
         var v = _internal.Get(name);
         if (v == null) {
-            v = new VariableFloat(name);
+            v = new VariableDouble(name);
             _internal.Add(v);
         }
 
-        if (v is not VariableFloat vf) {
+        if (v is not VariableDouble vf) {
             Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
             return false;
         }

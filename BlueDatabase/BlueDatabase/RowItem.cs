@@ -163,7 +163,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             case ScriptType.Numeral:
                 _ = FloatTryParse(wert, out var f);
-                return new VariableFloat(column.KeyName, f, ro, qi);
+                return new VariableDouble(column.KeyName, f, ro, qi);
 
             case ScriptType.String:
                 return new VariableString(column.KeyName, wert, ro, qi);
@@ -725,7 +725,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var comment = "Skript '" + scriptname + "'";
 
         switch (columnVar) {
-            case VariableFloat vf:
+            case VariableDouble vf:
                 CellSet(column, vf.ValueNum, comment);
                 break;
 

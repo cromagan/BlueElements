@@ -585,7 +585,7 @@ public class Chunk : IHasKeyName {
 
         // Durch alle Datensätze gehen
         while (pointer < data.Length) {
-            int startPointer = pointer;
+            var startPointer = pointer;
             var (newPointer, type, _, _, _) = Database.Parse(data, pointer, filename);
 
             // Wenn Parse keine Fortschritte macht, abbrechen um Endlosschleife zu vermeiden
@@ -596,7 +596,7 @@ public class Chunk : IHasKeyName {
             // Nur Nicht-Header-Datensätze zum Ergebnis hinzufügen
             if (!type.IsHeaderType() && !type.IsObsolete()) {
                 // Kompletten Datensatz hinzufügen
-                for (int i = startPointer; i < newPointer; i++) {
+                for (var i = startPointer; i < newPointer; i++) {
                     result.Add(data[i]);
                 }
             }

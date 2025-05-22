@@ -997,7 +997,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem column, bool doDropDown, bool keybordInputAllowed) {
         if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
 
-        if (column.Value_for_Chunk != ChunkType.None) { return EditTypeTable.None; }
+     
 
         if (column.RelationType == RelationType.DropDownValues) { return EditTypeTable.Dropdown_Single; }
 
@@ -2031,9 +2031,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public bool TextboxEditPossible() {
-        if (_value_for_Chunk != ChunkType.None) { return false; }
+        //if (_value_for_Chunk != ChunkType.None) { return false; }
         if (_relationType == RelationType.DropDownValues) { return false; }
-
         return true;
     }
 

@@ -214,10 +214,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (_currentArrangement == null && tcvc.Count > 1) { _currentArrangement = tcvc[1]; }
             if (_currentArrangement == null && tcvc.Count > 0) { _currentArrangement = tcvc[0]; }
 
-            if (_currentArrangement is { }) {
-                _currentArrangement.SheetStyle = _sheetStyle;
-                _currentArrangement.ClientWidth = (int)(DisplayRectangleWithoutSlider().Width / _zoom);
-                _currentArrangement.ComputeAllColumnPositions();
+            if (_currentArrangement is { } cu) {
+                cu.SheetStyle = _sheetStyle;
+                cu.ClientWidth = (int)(DisplayRectangleWithoutSlider().Width / _zoom);
+                cu.ComputeAllColumnPositions();
             }
 
             return _currentArrangement;
@@ -2490,7 +2490,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         using var fc = (FilterCollection)FilterCombined.Clone("Autofilter_Text");
         fc.Remove(viewItem.Column);
 
-        int filterDifference = RowsFiltered.Count - fc.Rows.Count;
+        var filterDifference = RowsFiltered.Count - fc.Rows.Count;
         viewItem.TmpIfFilterRemoved = filterDifference;
         return filterDifference;
     }
@@ -3357,7 +3357,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, ca);
 
             // Überschriften zeichnen (zusammengefasst anstatt dreimal einzeln)
-            for (int i = 0; i < 3; i++) {
+            for (var i = 0; i < 3; i++) {
                 Draw_Column_Head_Captions(gr, ca, displayRectangleWoSlider, i);
             }
 

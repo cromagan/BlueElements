@@ -43,7 +43,7 @@ internal class Method_mm : Method {
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Math;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableFloat.ShortName_Plain;
+    public override string Returns => VariableDouble.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "mm(Number)";
 

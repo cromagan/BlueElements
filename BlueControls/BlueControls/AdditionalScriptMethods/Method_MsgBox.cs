@@ -41,7 +41,7 @@ public class Method_MsgBox : Method {
     public override int LastArgMinCount => 0;
     public override MethodType MethodType => MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
-    public override string Returns => VariableFloat.ShortName_Variable;
+    public override string Returns => VariableDouble.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "MsgBox(Text, Bild, Schaltflächenbeschriftung, ...);";
 

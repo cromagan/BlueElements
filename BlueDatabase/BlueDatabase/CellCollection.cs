@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Concurrent;
@@ -171,6 +172,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.ChunkValueColumn is { IsDisposed: false } spc) {
+
+                if(spc == c ) { return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, string.Empty, mode); }
+
+
                 if (filter is not { }) {
                     return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
                 }

@@ -39,7 +39,7 @@ public class Method_ShowForm : Method {
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
-    public override string Returns => VariableFloat.ShortName_Variable;
+    public override string Returns => VariableDouble.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "ShowForm(Inhalt);";
 

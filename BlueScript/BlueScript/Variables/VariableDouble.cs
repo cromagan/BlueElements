@@ -27,7 +27,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 
-public class VariableFloat : Variable {
+public class VariableDouble : Variable {
 
     #region Fields
 
@@ -37,13 +37,13 @@ public class VariableFloat : Variable {
 
     #region Constructors
 
-    public VariableFloat(string name, double value, bool ronly, string comment) : base(name, ronly, comment) => _double = value;
+    public VariableDouble(string name, double value, bool ronly, string comment) : base(name, ronly, comment) => _double = value;
 
-    public VariableFloat(double value) : this(DummyName(), value, true, string.Empty) { }
+    public VariableDouble(double value) : this(DummyName(), value, true, string.Empty) { }
 
-    public VariableFloat() : this(string.Empty, 0f, true, string.Empty) { }
+    public VariableDouble() : this(string.Empty, 0f, true, string.Empty) { }
 
-    public VariableFloat(string name) : this(name, 0f, true, string.Empty) { }
+    public VariableDouble(string name) : this(name, 0f, true, string.Empty) { }
 
     #endregion
 
@@ -86,7 +86,7 @@ public class VariableFloat : Variable {
     public override void DisposeContent() { }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
+        if (variable is not VariableDouble v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
         if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValueNum = v.ValueNum;
         return DoItFeedback.Null();

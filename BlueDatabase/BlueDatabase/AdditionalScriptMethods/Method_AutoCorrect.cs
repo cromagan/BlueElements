@@ -65,7 +65,7 @@ internal class Method_AutoCorrect : Method_Database {
 
             var s = string.Empty;
             switch (columnVar) {
-                case VariableFloat vf:
+                case VariableDouble vf:
                     s = vf.ValueNum.ToStringFloat5();
                     break;
 
@@ -89,7 +89,7 @@ internal class Method_AutoCorrect : Method_Database {
             s = column.AutoCorrect(s, false);
 
             switch (columnVar) {
-                case VariableFloat vf:
+                case VariableDouble vf:
                     vf.ValueNum = DoubleParse(s);
                     break;
 

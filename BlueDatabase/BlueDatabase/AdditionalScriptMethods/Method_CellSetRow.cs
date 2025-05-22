@@ -31,7 +31,7 @@ public class Method_CellSetRow : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableFloat.ShortName_Plain], StringVal, RowVar];
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, RowVar];
     public override string Command => "cellsetrow";
     public override List<string> Constants => [];
     public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
@@ -74,7 +74,7 @@ public class Method_CellSetRow : Method_Database {
         var value = string.Empty;
         if (attvar.Attributes[0] is VariableString vs) { value = vs.ValueString; }
         if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
-        if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
+        if (attvar.Attributes[0] is VariableDouble vf) { value = vf.ValueForReplace; }
 
         value = columnToSet.AutoCorrect(value, true);
 

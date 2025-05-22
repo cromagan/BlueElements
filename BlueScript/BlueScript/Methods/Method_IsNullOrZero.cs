@@ -61,7 +61,7 @@ internal class Method_IsNullOrZero : Method {
         if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(); }
         if (v is VariableUnknown) { return DoItFeedback.Wahr(); }
 
-        if (v is VariableFloat f) {
+        if (v is VariableDouble f) {
             if (f.ValueNum == 0) { return DoItFeedback.Wahr(); }
             return DoItFeedback.Falsch();
         }

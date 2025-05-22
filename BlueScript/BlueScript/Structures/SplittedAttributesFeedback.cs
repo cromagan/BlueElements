@@ -107,7 +107,7 @@ public readonly struct SplittedAttributesFeedback {
     public int ValueIntGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return 0; }
 
-        return Attributes[varno] is VariableFloat vs ? vs.ValueInt : 0;
+        return Attributes[varno] is VariableDouble vs ? vs.ValueInt : 0;
     }
 
     public List<string> ValueListStringGet(int varno) {
@@ -129,7 +129,7 @@ public readonly struct SplittedAttributesFeedback {
     public double ValueNumGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return 0; }
 
-        return Attributes[varno] is VariableFloat vs ? vs.ValueNum : 0;
+        return Attributes[varno] is VariableDouble vs ? vs.ValueNum : 0;
     }
 
     public string ValueStringGet(int varno) {
@@ -151,7 +151,7 @@ public readonly struct SplittedAttributesFeedback {
     internal DoItFeedback? ValueNumSet(int varno, double value, LogData ld) {
         if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
 
-        if (Attributes[varno] is VariableFloat vs) {
+        if (Attributes[varno] is VariableDouble vs) {
             vs.ValueNum = value;
             return null;
         }

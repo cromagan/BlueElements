@@ -58,7 +58,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     public void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
     internal void Check(List<string> toCheck) {
-        bool didChange = false;
+        var didChange = false;
 
         foreach (var thisCheck in toCheck) {
             didChange |= MoveItemBetweenList(Suggest, Main, thisCheck, true, false);
@@ -90,7 +90,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     internal void UnCheck() => UnCheck(Main.Checked);
 
     internal void UnCheck(IEnumerable<string> list) {
-        bool didChange = false;
+        var didChange = false;
 
         foreach (var thisIt in list) {
             didChange |= MoveItemBetweenList(Main, Suggest, thisIt, true, false);

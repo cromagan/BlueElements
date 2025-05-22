@@ -1065,7 +1065,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public bool AreScriptsExecutable() {
         if (!string.IsNullOrEmpty(_needsScriptFix)) { return false; }
 
-        int count = 0;
+        var count = 0;
         foreach (var key in RowCollection.FailedRows.Keys) {
             if (key.Database == this) {
                 count++;
@@ -1202,7 +1202,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _ = vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
         _ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
         _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
-        _ = vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
+        _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
 
         //if (Column.SysCorrect is { IsDisposed: false } csc && row is { IsDisposed: false }) {
         //    _ = vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));
