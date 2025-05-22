@@ -138,7 +138,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var f = column.EditableErrorReason(mode, checkEditmode);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (column.RelationType ==  RelationType.CellValues) {
+        if (column.RelationType == RelationType.CellValues) {
             if (ignoreLinked) { return string.Empty; }
             //repairallowed = repairallowed && mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditCurrently;
 
@@ -163,7 +163,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (row == null) {
-            if ( db.Column.First() is not {IsDisposed: false }  c || c != column) {
+            if (db.Column.First() is not { IsDisposed: false } c || c != column) {
                 return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
             }
 
@@ -172,15 +172,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column?.ChunkValueColumn is { IsDisposed: false } spc) {
-
-                if(spc == c ) { return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, string.Empty, mode); }
-
-
                 if (filter is not { }) {
                     return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
                 }
 
-                var chunkValue = FilterCollection.InitValue(spc, false, filter);
+                var chunkValue = FilterCollection.InitValue(spc, true, filter);
+                if (spc == c) {
+                    if (chunkValue == null) { return string.Empty; }
+                    return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, chunkValue, mode);
+                }
 
                 return chunkValue is not { } || string.IsNullOrEmpty(chunkValue)
                     ? "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein."
@@ -735,7 +735,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
 
-        if (db.Column.First() is { IsDisposed: false} c && c == column ) {
+        if (db.Column.First() is { IsDisposed: false } c && c == column) {
             foreach (var thisColumn in db.Column) {
                 if (column.Relationship_to_First) {
                     RelationTextNameChanged(thisColumn, row.KeyName, previewsValue, currentValue);

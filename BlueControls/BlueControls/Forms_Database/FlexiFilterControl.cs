@@ -141,31 +141,37 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
         var cbx = (ComboBox)sender;
         cbx.ItemClear();
-        var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null, true);
-        if (listFilterString.Count == 0) {
-            cbx.ItemAdd(ItemOf("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false));
-        } else if (listFilterString.Count < 400) {
-            if (FilterSingleColumn != null) { cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer)); }
-            //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
-        } else {
-            if (SavesSettings) {
-                this.LoadSettingsFromDisk(false);
-                var nr = -1;
-                var f2 = FilterHash();
 
-                for (var z = Settings.Count - 1; z >= 0; z--) {
-                    var x = Settings[z].SplitAndCutBy("|");
-                    if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f2 == x[0]) {
-                        nr++;
-                        if (nr < MaxRecentFilterEntries) {
-                            var show = (nr + 1).ToStringInt3() + ": " + x[1];
-                            TextListItem it = new(show, x[1], null, false, true, nr.ToStringInt3());
-                            cbx.ItemAdd(it);
-                        }
+        if (SavesSettings) {
+            this.LoadSettingsFromDisk(false);
+            var nr = -1;
+            var f2 = FilterHash();
+
+            for (var z = Settings.Count - 1; z >= 0; z--) {
+                var x = Settings[z].SplitAndCutBy("|");
+                if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f2 == x[0]) {
+                    nr++;
+                    if (nr < MaxRecentFilterEntries) {
+                        var show = (nr + 1).ToStringInt3() + ": " + x[1];
+                        TextListItem it = new(show, x[1], null, false, true, nr.ToStringInt3());
+                        cbx.ItemAdd(it);
                     }
                 }
             }
+            return;
+        }
 
+        if (FilterSingleColumn == null) {
+            cbx.ItemAdd(ItemOf("Keine Spalte angegeben.", "|~", ImageCode.Kreuz, false));
+            return;
+        }
+
+        var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null, true);
+        if (listFilterString.Count == 0) {
+            cbx.ItemAdd(ItemOf("Keine (weiteren) Einträge vorhanden", "|~", ImageCode.Kreuz, false));
+        } else if (listFilterString.Count < 400) {
+            cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer));
+        } else {
             cbx.ItemAdd(ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
         }
     }
