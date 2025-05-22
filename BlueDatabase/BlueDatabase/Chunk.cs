@@ -478,7 +478,7 @@ public class Chunk : IHasKeyName {
                     return $"Anderes Programm bearbeitet: {LastEditApp}";
                 } else {
                     if (LastEditMachineName != Environment.MachineName || LastEditID != Generic.MyId) {
-                        return $"Anderes Computer bearbeitet: {LastEditMachineName} - {LastEditID}";
+                        return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditID}";
                     }
                 }
             }

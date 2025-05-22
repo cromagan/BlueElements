@@ -505,6 +505,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (inval is not { } || string.IsNullOrWhiteSpace(inval)) {
                     return (null, "Initalwert fehlt.", false);
                 }
+
+                if (thisColum.Value_for_Chunk != ChunkType.None) {
+                    if (!db2.BeSureRowIsLoaded(inval, null)) {
+                        return (null, "Chunk konnte nicht geladen werden.", false);
+                    }
+                }
             }
         }
 
