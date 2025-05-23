@@ -465,6 +465,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     protected override void OnParentChanged(System.EventArgs e) {
         base.OnParentChanged(e);
+        _myParentType = ParentType.Unbekannt; // Cache invalidieren
         CheckBack();
     }
 

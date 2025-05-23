@@ -384,12 +384,15 @@ public class Chunk : IHasKeyName {
     internal bool Delete() {
         var filename = ChunkFileName;
 
-        // Zuerst die Bytes leeren, um sicherzustellen, dass wir nicht versehentlich
-        // anschließend wieder speichern
-        _bytes.Clear();
-        _fileinfo = string.Empty;
 
-        return DeleteFile(filename, false);
+        if( DeleteFile(filename, true)) {
+            // Zuerst die Bytes leeren, um sicherzustellen, dass wir nicht versehentlich
+            // anschließend wieder speichern
+            _bytes.Clear();
+            _fileinfo = string.Empty;
+            return true;
+        }
+        return false;
     }
 
     internal bool DoExtendedSave(int minbytes) {

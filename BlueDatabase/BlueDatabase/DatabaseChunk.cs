@@ -77,7 +77,7 @@ public class DatabaseChunk : Database {
 
         var usesChunk = mainChunk;
         var varChunk = mainChunk;
-        var masterUserChunk = mainChunk; // Masterchunk wird nicht gespeichert. Weil es pro chunk einen Masteruser geben kann.
+        //var masterUserChunk = mainChunk; // Masterchunk wird nicht gespeichert. Weil es pro chunk einen Masteruser geben kann.
 
         if (chunksAllowed) {
             usesChunk = new Chunk(db.Filename, Chunk_AdditionalUseCases);
@@ -198,7 +198,7 @@ public class DatabaseChunk : Database {
         }
     }
 
-    public static string GetChunkId(RowItem r) => r.Database?.Column.ChunkValueColumn is not {IsDisposed: false }
+    public static string GetChunkId(RowItem r) => r.Database?.Column.ChunkValueColumn is not { IsDisposed: false }
             ? Chunk_MainData
             : GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r));
 
@@ -224,13 +224,13 @@ public class DatabaseChunk : Database {
                 case ChunkType.ByHash_1Char:
                     return chunkvalue.ToLower().GetHashString().Right(1).ToLower();
 
-                case  ChunkType.ByHash_2Chars:
+                case ChunkType.ByHash_2Chars:
                     return chunkvalue.ToLower().GetHashString().Right(2).ToLower();
 
-                case  ChunkType.ByHash_3Chars:
+                case ChunkType.ByHash_3Chars:
                     return chunkvalue.ToLower().GetHashString().Right(3).ToLower();
 
-                case  ChunkType.ByName:
+                case ChunkType.ByName:
                     var t = ColumnItem.MakeValidColumnName(chunkvalue);
                     return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLower();
 
@@ -522,10 +522,11 @@ public class DatabaseChunk : Database {
 
     protected override bool SaveRequired() => _chunks.Values.Any(chunk => chunk.SaveRequired);
 
-    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
-        chunkId = chunkId.ToLower();
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string oldChunkId, string newChunkId) {
+        newChunkId = newChunkId.ToLower();
+        oldChunkId = oldChunkId.ToLower();
 
-        var f = base.WriteValueToDiscOrServer(type, comment, column, row, user, datetimeutc, comment, chunkId);
+        var f = base.WriteValueToDiscOrServer(type, comment, column, row, user, datetimeutc, comment, oldChunkId, newChunkId);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -533,9 +534,8 @@ public class DatabaseChunk : Database {
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
-        if (_chunks.TryGetValue(chunkId, out var chk)) {
-            chk.SaveRequired = true;
-        }
+        if (_chunks.TryGetValue(newChunkId, out var chkn)) { chkn.SaveRequired = true; }
+        if (_chunks.TryGetValue(oldChunkId, out var chko)) { chko.SaveRequired = true; }
 
         return string.Empty;
     }

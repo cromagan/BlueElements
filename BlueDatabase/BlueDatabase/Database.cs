@@ -234,7 +234,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         set {
             if (_additionalFilesPath == value) { return; }
             _additionalFilesPathTemp = null;
-            _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPath, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, _additionalFilesPath, value);
             Cell.InvalidateAllSizes();
         }
     }
@@ -253,7 +253,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _caption;
         set {
             if (_caption == value) { return; }
-            _ = ChangeData(DatabaseDataType.Caption, null, null, _caption, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.Caption, null, _caption, value);
         }
     }
 
@@ -267,7 +267,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _columnArrangements;
         set {
             if (_columnArrangements == value) { return; }
-            _ = ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.ColumnArrangement, null, _columnArrangements, value);
             OnViewChanged();
         }
     }
@@ -276,7 +276,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _createDate;
         private set {
             if (_createDate == value) { return; }
-            _ = ChangeData(DatabaseDataType.CreateDateUTC, null, null, _createDate, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.CreateDateUTC, null, _createDate, value);
         }
     }
 
@@ -284,7 +284,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _creator.Trim();
         private set {
             if (_creator == value) { return; }
-            _ = ChangeData(DatabaseDataType.Creator, null, null, _creator, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.Creator, null, _creator, value);
         }
     }
 
@@ -292,7 +292,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => new(_datenbankAdmin);
         set {
             if (!_datenbankAdmin.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -312,7 +312,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var eventScriptNew = l.ToString(false);
 
             if (eventScriptOld == eventScriptNew) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, eventScriptOld, eventScriptNew, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.EventScript, null, eventScriptOld, eventScriptNew);
         }
     }
 
@@ -327,7 +327,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var eventScriptEditedNew = l.ToString(false);
 
             if (eventScriptEditedOld == eventScriptEditedNew) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptEdited, null, null, eventScriptEditedOld, eventScriptEditedNew, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.EventScriptEdited, null, eventScriptEditedOld, eventScriptEditedNew);
         }
     }
 
@@ -335,7 +335,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _eventScriptVersion;
         set {
             if (_eventScriptVersion == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion.ToString5(), value.ToString5(), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, _eventScriptVersion.ToString5(), value.ToString5());
         }
     }
 
@@ -362,7 +362,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _globalShowPass;
         set {
             if (_globalShowPass == value) { return; }
-            _ = ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.GlobalShowPass, null, _globalShowPass, value);
         }
     }
 
@@ -380,7 +380,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _needsScriptFix;
         set {
             if (_needsScriptFix == value) { return; }
-            _ = ChangeData(DatabaseDataType.NeedsScriptFix, null, null, _needsScriptFix, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.NeedsScriptFix, null, _needsScriptFix, value);
         }
     }
 
@@ -388,7 +388,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => new(_permissionGroupsNewRow);
         set {
             if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr(), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -415,7 +415,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _rowQuickInfo;
         set {
             if (_rowQuickInfo == value) { return; }
-            _ = ChangeData(DatabaseDataType.RowQuickInfo, null, null, _rowQuickInfo, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.RowQuickInfo, null, _rowQuickInfo, value);
         }
     }
 
@@ -427,7 +427,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (_sortDefinition != null) { alt = _sortDefinition.ParseableItems().FinishParseable(); }
             if (value != null) { neu = value.ParseableItems().FinishParseable(); }
             if (alt == neu) { return; }
-            _ = ChangeData(DatabaseDataType.SortDefinition, null, null, alt, neu, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.SortDefinition, null, alt, neu);
 
             OnSortParameterChanged();
         }
@@ -441,7 +441,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _standardFormulaFile;
         set {
             if (_standardFormulaFile == value) { return; }
-            _ = ChangeData(DatabaseDataType.StandardFormulaFile, null, null, _standardFormulaFile, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.StandardFormulaFile, null, _standardFormulaFile, value);
         }
     }
 
@@ -451,7 +451,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => new(_tags);
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr(), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.Tags, null, _tags.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -459,7 +459,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _temporaryDatabaseMasterTimeUtc;
         set {
             if (_temporaryDatabaseMasterTimeUtc == value) { return; }
-            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, null, _temporaryDatabaseMasterTimeUtc, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, _temporaryDatabaseMasterTimeUtc, value);
         }
     }
 
@@ -467,7 +467,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         get => _temporaryDatabaseMasterUser;
         set {
             if (_temporaryDatabaseMasterUser == value) { return; }
-            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterUser, null, null, _temporaryDatabaseMasterUser, value, UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterUser, null, _temporaryDatabaseMasterUser, value);
         }
     }
 
@@ -490,7 +490,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             #endregion
 
-            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty, string.Empty);
+            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, _variableTmp, l.ToString(true));
         }
     }
 
@@ -1086,8 +1086,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public bool CanDoValueChangedScript() => IsRowScriptPossible(true) && EventScript.Get(ScriptEventTypes.value_changed).Count == 1;
 
+    public string ChangeData(DatabaseDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, string.Empty, string.Empty);
+
     //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
     //    if (ci.AdditionalData.FileSuffix().ToUpperInvariant() is not "BDB" or "MDB") { return null; }
+
     //    if (!FileExists(ci.AdditionalData)) { return null; }
     /// <summary>
     /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
@@ -1101,7 +1104,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="user"></param>
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
-    public string ChangeData(DatabaseDataType command, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, string chunkvalue) {
+    public string ChangeData(DatabaseDataType command, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, string oldchunkvalue, string newchunkvalue) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
@@ -1109,8 +1112,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _saveRequired = true;
 
         if (!ReadOnly) {
-            var chunkId = DatabaseChunk.GetChunkId(this, command, chunkvalue);
-            var f2 = WriteValueToDiscOrServer(command, changedTo, column, row, user, datetimeutc, comment, chunkId);
+            var newChunkId = DatabaseChunk.GetChunkId(this, command, newchunkvalue);
+            var oldChunkId = newChunkId;
+
+            if (string.IsNullOrEmpty(oldChunkId) || newchunkvalue == oldchunkvalue) {
+                oldChunkId = newChunkId;
+            } else {
+                oldChunkId = DatabaseChunk.GetChunkId(this, command, oldchunkvalue);
+            }
+
+            var f2 = WriteValueToDiscOrServer(command, changedTo, column, row, user, datetimeutc, comment, oldChunkId, newChunkId);
             if (!string.IsNullOrEmpty(f2)) { return f2; }
         }
 
@@ -1118,7 +1129,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (!string.IsNullOrEmpty(error)) { return error; }
 
         if (LogUndo) {
-            AddUndo(command, column, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", chunkvalue);
+            AddUndo(command, column, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", newchunkvalue);
         }
 
         return string.Empty;
@@ -1562,7 +1573,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public string Export_CSV(FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
-
         BeSureAllDataLoaded(-1);
 
         var columnListtmp = columnList?.ToList();
@@ -1986,6 +1996,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
 
+
+        Lädet den Chunk nochmal!!!!
         _ = BeSureToBeUpToDate();
 
         RepairAfterParse();
@@ -2116,22 +2128,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
                     if (!string.IsNullOrEmpty(columname)) {
                         column = Column[columname];
-                        if (column is not { IsDisposed: false }) {
-                            if (command != DatabaseDataType.ColumnName) {
-                                Develop.DebugPrint(command + " an erster Stelle!");
+                        if (command == DatabaseDataType.ColumnName) {
+                            if (column is not { IsDisposed: false }) {
+
+                                _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
+                                column = Column[columname];
+                                if (column is not { IsDisposed: false }) {
+                                    Develop.DebugPrint(ErrorType.Error, "Spalte hinzufügen Fehler");
+                                    Freeze("Spalte hinzufügen Fehler");
+                                    return false;
+                                }
+
                             }
-
-                            _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
-                            column = Column[columname];
+                            columnUsed.Add(column);
                         }
-
-                        if (column is not { IsDisposed: false }) {
-                            Develop.DebugPrint(ErrorType.Error, "Spalte hinzufügen Fehler");
-                            Freeze("Spalte hinzufügen Fehler");
-                            return false;
-                        }
-
-                        columnUsed.Add(column);
                     }
 
                     #endregion
@@ -2505,7 +2515,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (type.IsColumnTag()) {
             if (column is not { IsDisposed: false } || Column.IsDisposed) {
-                Develop.DebugPrint(ErrorType.Warning, "Spalte ist null! " + type);
+                //Develop.DebugPrint(ErrorType.Warning, "Spalte ist null! " + type);
                 //return ("Wert nicht gesetzt!", null, null);
                 return string.Empty;
             }
@@ -2715,7 +2725,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
+    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string oldChunkId, string newChunkId) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }

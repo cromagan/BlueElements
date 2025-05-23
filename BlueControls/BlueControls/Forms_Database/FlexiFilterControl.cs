@@ -108,8 +108,10 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     }
 
     protected override void HandleChangesNow() {
+        if (IsDisposed || f is null) { return; }
+
         base.HandleChangesNow();
-        if (IsDisposed) { return; }
+
         if (FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
@@ -126,6 +128,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     }
 
     protected override void OnQuickInfoChanged() {
+        if (IsDisposed || f is null) { return; }
         base.OnQuickInfoChanged();
         f.QuickInfo = QuickInfo;
     }
@@ -255,6 +258,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     }
 
     private void F_ValueChanged(object? sender, System.EventArgs e) {
+        if (IsDisposed || f is null) { return; }
+
         if (FilterSingleColumn?.Database is not { IsDisposed: false }) {
             UpdateFilterData(null);
             return;
@@ -387,7 +392,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         f.ValueSet(nvalue, true);
 
         GenerateQickInfoText(filterSingle);
-
+        if (IsDisposed || f is null) { return; } // Kommt vor!
         f.DisabledReason = !string.IsNullOrEmpty(_filterOrigin) ? $"<b>Dieser Filter wurde automatisch gesetzt:</b><br>{_filterOrigin}" : string.Empty;
 
         #region Wählen-Button - und keine weitere Berechnungen
@@ -435,6 +440,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             }
 
             if (showDelFilterButton) {
+                if (IsDisposed || f is null) { return; } // Kommt vor!
                 f.CaptionPosition = CaptionPosition.ohne;
                 f.EditType = EditTypeFormula.Button;
                 if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }

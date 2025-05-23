@@ -136,7 +136,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         var neu = work.ChangedTo;
 
         switch (work.Command) {
-            case DatabaseDataType.Value_withoutSizeData:
+            case DatabaseDataType.UTF8Value_withoutSizeData:
                 symb = ImageCode.Stift;
                 break;
 

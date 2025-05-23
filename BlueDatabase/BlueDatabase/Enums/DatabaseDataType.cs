@@ -283,7 +283,7 @@ public enum DatabaseDataType : byte {
     DoOpticalTranslation = 198,
     TextFormatingAllowed = 199,
 
-    Value_withoutSizeData = 200,
+    //Value_withoutSizeData = 200,
 
     //Value_withSizeData = 201,
     UTF8Value_withoutSizeData = 202,

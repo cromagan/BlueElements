@@ -50,6 +50,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private int _waitTimeoutMs = 5000;
 
+    private string? _cachedFilterHash = null;
+
     #endregion
 
     #region Constructors
@@ -121,6 +123,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             if (_filterInput == value) { return; }
             UnRegisterFilterInputAndDispose();
             _filterInput = value;
+            _cachedFilterHash = null; // Cache invalidieren
             RegisterEvents();
         }
     }
@@ -202,6 +205,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         if (filterNeedsInvalidation) {
+            _cachedFilterHash = null; // Cache invalidieren
             Invalidate_RowsInput();
         }
 
@@ -209,8 +213,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     public RowItem? RowSingleOrNull() {
-        if (IsDisposed) { return null; }
-        if (DesignMode) { return null; }
+        if (IsDisposed || DesignMode) { return null; }
 
         if (!RowsInputManualSeted) {
             if (!FilterInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "FilterInput nicht gehandelt"); }
@@ -329,14 +332,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected void DoRows() {
-        if (RowsInputChangedHandled) { return; }
+        if (RowsInputChangedHandled || IsDisposed) { return; }
 
         var needsProcessing = false;
-        List<RowItem>? rowsToProcess;
 
         lock (_rowsInputLock) {
             // Doppelte Prüfung im Lock (Verhindert Race Conditions)
-            if (RowsInputChangedHandled) { return; }
+            if (RowsInputChangedHandled || _rowsInputChangedHandling) { return; }
 
             RowsInputChangedHandled = true;
 
@@ -360,8 +362,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 }
 
                 // Erstelle eine Kopie der Rows außerhalb des Locks
-                rowsToProcess = [.. FilterInput.Rows];
-
+                List<RowItem> rowsToProcess = [..FilterInput.Rows];
                 // Verarbeitung außerhalb des Locks
                 if (RowSingleOrNull() is { IsDisposed: false } r) {
                     _ = r.CheckRow();
@@ -387,14 +388,26 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected string FilterHash() {
-        if (FilterInput is not { IsDisposed: false, Count: not 0 } fc) { return ("NoFilter|" + Mode).GetHashString(); }
+        if (_cachedFilterHash != null) { return _cachedFilterHash; }
 
-        if (!fc.IsOk()) { return string.Empty; }
+        if (FilterInput is not { IsDisposed: false, Count: not 0 } fc) {
+            _cachedFilterHash = ("NoFilter|" + Mode).GetHashString();
+            return _cachedFilterHash;
+        }
 
-        if (fc.HasAlwaysFalse()) { return ("FALSE|" + Mode).GetHashString(); }
+        if (!fc.IsOk()) {
+            _cachedFilterHash = string.Empty;
+            return _cachedFilterHash;
+        }
+
+        if (fc.HasAlwaysFalse()) {
+            _cachedFilterHash = ("FALSE|" + Mode).GetHashString();
+            return _cachedFilterHash;
+        }
+
         using var fn = fc.Normalized();
-        var n = ("F" + fn.ParseableItems().FinishParseable() + Mode).GetHashString();
-        return n;
+        _cachedFilterHash = ("F" + fn.ParseableItems().FinishParseable() + Mode).GetHashString();
+        return _cachedFilterHash;
     }
 
     protected virtual void HandleChangesNow() {
@@ -410,9 +423,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected void Invalidate_RowsInput() {
-        if (IsDisposed) { return; }
-
-        if (!RowsInputChangedHandled) { return; } // Früher Return wenn nichts zu tun ist
+        if (IsDisposed || !RowsInputChangedHandled) { return; }
 
         var lockTaken = false;
         try {

@@ -403,7 +403,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
                 if (repairallowed && oldvalue != newvalue) {
-                    fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", DatabaseChunk.GetChunkValue(row));
+                    fehler = db.ChangeData(DatabaseDataType.UTF8Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, DatabaseChunk.GetChunkValue(row));
                 }
 
                 if (targetColumn?.Database != null) {
@@ -511,13 +511,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return row.SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
         }
 
-        var chunkValue = DatabaseChunk.GetChunkValue(row);
+        var newChunkValue = DatabaseChunk.GetChunkValue(row);
+        var oldChunkValue = newChunkValue;
 
         if (column == db.Column.ChunkValueColumn) {
-            chunkValue = value;
+            newChunkValue = value;
         }
 
-        var message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment, chunkValue);
+        var message = db.ChangeData(DatabaseDataType.UTF8Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue);
 
         if (!string.IsNullOrEmpty(message)) { return message; }
 

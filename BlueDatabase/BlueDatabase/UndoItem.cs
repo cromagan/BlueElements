@@ -181,7 +181,7 @@ public class UndoItem : IParseable {
     }
 
     internal bool LogsUndo(Database database) {
-        if (Command != DatabaseDataType.Value_withoutSizeData) { return true; }
+        if (Command != DatabaseDataType.UTF8Value_withoutSizeData) { return true; }
 
         return database.Column[ColName] is { IsDisposed: false, SaveContent: true } c &&
              c != database.Column.SysRowChanger &&

@@ -265,8 +265,8 @@ public class DatabaseFragments : Database {
 
     protected override bool SaveRequired() => true;
 
-    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string chunkId) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment, chunkId);
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string oldChunkId, string newChunkId) {
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment, oldChunkId, newChunkId);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
@@ -276,7 +276,7 @@ public class DatabaseFragments : Database {
         if (_writer == null) { StartWriter(); }
         if (_writer == null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", chunkId);
+        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", newChunkId);
 
         try {
             lock (_writer) {

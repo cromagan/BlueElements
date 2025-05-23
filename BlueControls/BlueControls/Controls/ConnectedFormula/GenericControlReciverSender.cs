@@ -29,6 +29,13 @@ namespace BlueControls.Controls;
 
 public class GenericControlReciverSender : GenericControlReciver {
 
+    #region Fields
+
+    private const int MaxRecursionDepth = 10;
+    private int _recursionDepth = 0;
+
+    #endregion
+
     #region Constructors
 
     public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) {
@@ -115,14 +122,23 @@ public class GenericControlReciverSender : GenericControlReciver {
     private void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
+        if (_recursionDepth >= MaxRecursionDepth) {
+            Develop.DebugPrint(ErrorType.Error, "Maximale Rekursionstiefe erreicht");
+            return;
+        }
+
+        _recursionDepth++;
         try {
             foreach (var thisChild in Childs) {
                 thisChild.Invalidate_FilterInput();
             }
             OnFilterOutputPropertyChanged();
         } catch {
+            //Develop.DebugPrint(ErrorType.Error, "Fehler in FilterOutput_PropertyChanged", ex);
             Develop.CheckStackOverflow();
             FilterOutput_PropertyChanged(sender, e);
+        } finally {
+            _recursionDepth--;
         }
     }
 

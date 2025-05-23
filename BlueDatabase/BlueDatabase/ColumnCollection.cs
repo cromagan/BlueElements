@@ -190,7 +190,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    Develop.DebugPrint(ErrorType.Error, "Schlüssel belegt!");
         //    return null;
         //}
-        _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, null, string.Empty, keyName, Generic.UserName, DateTime.UtcNow, string.Empty, string.Empty);
+
+
+        _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, string.Empty, keyName);
         var item = this[keyName];
         if (item == null) {
             Develop.DebugPrint(ErrorType.Error, "Erstellung fehlgeschlagen.");
@@ -338,7 +340,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
-&& string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty));
+                                                            && string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty, string.Empty));
 
     //    Database.DevelopWarnung("Spalten-Index nicht gefunden: " + column.Caption);
     //    return -1;
