@@ -24,7 +24,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -48,20 +47,11 @@ public static class IO {
 
     #region Delegates
 
-    private delegate (object? returnValue, bool retry) DoThis(string file1, string file2);
+    private delegate (object? returnValue, bool retry) DoThis(string arg1, string arg2);
 
     #endregion
 
     #region Methods
-
-    public static string CalculateMd5(string filename) {
-        //TODO: Unused
-        if (TryFileExists(filename, string.Empty).returnValue is not true) { return string.Empty; }
-        using var md5 = MD5.Create();
-        using var stream = File.OpenRead(filename);
-        var hash = md5.ComputeHash(stream);
-        return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
-    }
 
     public static bool CanWrite(string filename) => ProcessFile(TryCanWrite, filename, string.Empty, false) is true;
 
@@ -133,22 +123,6 @@ public static class IO {
         return CheckPath(pfad);
     }
 
-    public static string ChecksumFileName(string name) {
-        //Used: Only BZL
-        name = name.Replace("\\", "}");
-        name = name.Replace("/", "}");
-        name = name.Replace(":", "}");
-        name = name.Replace("?", "}");
-        name = name.Replace("\r", string.Empty);
-        if (name.Length < 100) { return name; }
-        var nn = string.Empty;
-        for (var z = 0; z <= name.Length - 21; z++) {
-            nn += name.Substring(z, 1);
-        }
-        nn += name.Substring(name.Length - 20);
-        return nn;
-    }
-
     public static bool CopyFile(string source, string target, bool toBeSure) => ProcessFile(TryCopyFile, source, target, toBeSure) is true;
 
     public static bool DeleteDir(string directory, bool toBeSure) => ProcessFile(TryDeleteDir, directory, string.Empty, toBeSure) is true;
@@ -158,7 +132,9 @@ public static class IO {
     /// </summary>
     /// <param name="filelist">Liste der zu löschenden Dateien</param>
     /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
-    public static bool DeleteFile(IEnumerable<string> filelist) {
+    public static bool DeleteFile(IEnumerable<string>? filelist) {
+        if (filelist is not { }) { return false; }
+
         var lockMe = new object();
         var did = false;
 
@@ -335,8 +311,9 @@ public static class IO {
     /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
     /// </summary>
     /// <param name="pfad"></param>
-    public static string PathParent(this string pfad) {
-        //pfad = pfad.CheckPath();
+    public static string PathParent(this string? pfad) {
+        if (pfad is not { }) { return string.Empty; }
+
         var z = pfad.Length;
 
         while (true) {
@@ -455,20 +432,20 @@ public static class IO {
     /// Führt einen Datei-Befehl mit erweiterter Fehlerbehandlung und Wiederholungsversuchen aus
     /// </summary>
     /// <param name="processMethod">Die auszuführende Methode</param>
-    /// <param name="file1">Erster Dateipfad (Quelle)</param>
-    /// <param name="file2">Zweiter Dateipfad (Ziel)</param>
+    /// <param name="arg1">Erster Parameter</param>
+    /// <param name="arg2">Zweiter Parameter</param>
     /// <param name="toBeSure">True für garantierte Ausführung (sonst Programmabbruch)</param>
-    private static object? ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
-        if (Develop.AllReadOnly) { return (true, true); }
+    private static object? ProcessFile(DoThis processMethod, string arg1, string arg2, bool toBeSure) {
+        if (Develop.AllReadOnly) { return true; }
 
         // Bei gleichen Dateinamen direkt true zurückgeben
-        if (file1 == file2) { return (true, true); }
+        if (arg1 == arg2) { return true; }
 
         var mytry = 0;
         var startTime = DateTime.UtcNow;
 
         while (true) {
-            var (returnValue, retry) = processMethod(file1, file2);
+            var (returnValue, retry) = processMethod(arg1, arg2);
             if (!retry) { return returnValue; }
 
             mytry++;
@@ -479,7 +456,7 @@ public static class IO {
 
                 // Bei toBeSure=true weiter versuchen, aber nach 60 Sekunden eine Fehlermeldung ausgeben
                 if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60) {
-                    Develop.DebugPrint(ErrorType.Error, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2);
+                    Develop.DebugPrint(ErrorType.Error, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + arg1 + "\r\n" + arg2);
                     return returnValue;
                 }
             }
@@ -541,12 +518,14 @@ public static class IO {
                     // Bei Fehler ist die Datei in Benutzung
                     result = false;
                 }
+            } else {
+                result = true;
             }
 
             // Ergebnis im Cache speichern
             _canWriteCache[fileUpper] = (DateTime.UtcNow, result);
 
-            return (result, true);
+            return (result, false);
         }
     }
 
@@ -559,22 +538,11 @@ public static class IO {
             var sourceInfo = new FileInfo(source);
             File.Copy(source, target);
 
-            // Warten, bis die Datei tatsächlich am Zielort existiert
-            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
-                if (TryFileExists(target, string.Empty).returnValue is true) {
-                    // Zusätzlich prüfen, ob die Zieldatei die gleiche Größe hat wie die Quelldatei
-                    var targetInfo = new FileInfo(target);
-                    if (targetInfo.Length == sourceInfo.Length) {
-                        return (true, false); // Datei existiert und hat die richtige Größe
-                    }
-                }
-                Thread.Sleep(200);
-            }
+            // Warten bis die Datei mit korrekter Größe existiert - verwende ProcessFile
+            return (ProcessFile(TryWaitForCopiedFile, target, sourceInfo.Length.ToString(), false) is true, false);
         } catch {
             return (false, true);
         }
-
-        return (false, true);
     }
 
     private static (object? returnValue, bool retry) TryDeleteDir(string directory, string _) {
@@ -585,12 +553,8 @@ public static class IO {
             Directory.Delete(directory, true);
             RemoveFromCanWriteCache(directory);
 
-            // Warten, bis das Verzeichnis wirklich gelöscht ist
-            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
-                if (TryDirectoryExists(directory, string.Empty).returnValue is not true) { return (true, false); }
-                Thread.Sleep(200);
-            }
-            return (TryDirectoryExists(directory, string.Empty).returnValue is not true, false);
+            // Warten bis das Verzeichnis gelöscht ist - verwende TryDirectoryExists negiert
+            return (ProcessFile(TryDirectoryExists, directory, string.Empty, false) is not true, false);
         } catch {
             return (false, true);
         }
@@ -632,19 +596,27 @@ public static class IO {
         var p = pfad.CheckPath();
 
         try {
-            return (Directory.Exists(p), true);
+            return (Directory.Exists(p), false);
+        } catch (IOException) {
+            return (false, true);  // Netzwerk-IO-Fehler
+        } catch (UnauthorizedAccessException) {
+            return (false, true);  // Berechtigungsfehler
         } catch {
-            return (false, true);
+            return (false, false); // Andere Fehler
         }
     }
 
     private static (object? returnValue, bool retry) TryFileExists(string file, string _) {
-        if (string.IsNullOrEmpty(file) || !file.ContainsChars(Constants.Char_PfadSonderZeichen)) return (false, false);
+        if (string.IsNullOrEmpty(file) || file.ContainsChars(Constants.Char_PfadSonderZeichen)) { return (false, false); }
 
         try {
-            return (File.Exists(file), true);
-        } catch {
+            return (File.Exists(file), false);
+        } catch (IOException) {
             return (false, true);
+        } catch (UnauthorizedAccessException) {
+            return (false, true);
+        } catch {
+            return (false, false);
         }
     }
 
@@ -704,6 +676,20 @@ public static class IO {
         } catch {
             return (false, true);
         }
+    }
+
+    private static (object? returnValue, bool retry) TryWaitForCopiedFile(string targetFile, string expectedSizeStr) {
+        if (TryFileExists(targetFile, string.Empty).returnValue is true) {
+            try {
+                var targetInfo = new FileInfo(targetFile);
+                if (long.TryParse(expectedSizeStr, out var expectedSize) && targetInfo.Length == expectedSize) {
+                    return (true, false);
+                }
+            } catch {
+                // Bei Fehler beim Dateizugriff retry
+            }
+        }
+        return (false, true);
     }
 
     #endregion

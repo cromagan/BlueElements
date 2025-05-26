@@ -24,7 +24,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -322,7 +321,7 @@ public static class Develop {
     public static void TraceLogging_Start(string traceFileName) {
         TraceLogging_End();
         _deleteTraceLog = true;
-        if (FileExists(_currentTraceLogFile)) { File.Delete(_currentTraceLogFile); }
+        if (FileExists(_currentTraceLogFile)) { DeleteFile(_currentTraceLogFile, false); }
         _currentTraceLogFile = TempFile(traceFileName);
         _traceListener = new TextWriterTraceListener(_currentTraceLogFile);
         _ = Trace.Listeners.Add(_traceListener);
