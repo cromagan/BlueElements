@@ -23,7 +23,6 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Concurrent;

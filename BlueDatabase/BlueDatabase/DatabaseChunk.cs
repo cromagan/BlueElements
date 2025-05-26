@@ -294,7 +294,7 @@ public class DatabaseChunk : Database {
         foreach (var file in fileQuery) {
             var chunkId = file.FileNameWithoutSuffix();
 
-            var ok = LoadChunkWithChunkId(chunkId, true, null, false);
+            var ok = LoadChunkWithChunkId(chunkId, true, false);
             if (!ok) { return false; }
         }
 
@@ -307,25 +307,34 @@ public class DatabaseChunk : Database {
     /// <param name="chunkValue"></param>
     /// <param name="important">Steuert, ob es dringend nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public override bool BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) {
+    public override bool BeSureRowIsLoaded(string chunkValue) {
         var chunkId = GetChunkId(this, DatabaseDataType.UTF8Value_withoutSizeData, chunkValue);
 
-        return LoadChunkWithChunkId(chunkId, false, needPassword, false);
+        return LoadChunkWithChunkId(chunkId, false, false);
     }
+
+
+    protected override bool LoadMainData() {
+
+        return LoadChunkWithChunkId(Chunk_MainData, true, true);
+
+
+    }
+
 
     public override bool BeSureToBeUpToDate() {
         if (!base.BeSureToBeUpToDate()) { return false; }
 
         OnDropMessage(ErrorType.Info, "Lade Chunks von '" + TableName + "'");
 
-        if (!LoadChunkWithChunkId(Chunk_MainData, true, null, true)) { return false; }
+        if (!LoadChunkWithChunkId(Chunk_MainData, true, true)) { return false; }
 
         Column.GetSystems();
 
         if (Column.ChunkValueColumn != null) {
-            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, null, true)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, true)) { return false; }
             //if (!LoadChunkWithChunkId(Chunk_Master, true, null, true)) { return false; }
-            if (!LoadChunkWithChunkId(Chunk_Variables, true, null, true)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Variables, true, true)) { return false; }
         }
         IsInCache = DateTime.UtcNow;
 
@@ -340,7 +349,7 @@ public class DatabaseChunk : Database {
     /// <param name="chunkId"></param>
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public bool LoadChunkWithChunkId(string chunkId, bool important, NeedPassword? needPassword, bool mustExist) {
+    public bool LoadChunkWithChunkId(string chunkId, bool important, bool mustExist) {
         if (string.IsNullOrEmpty(Filename)) { return true; } // Temporäre Datenbanken
 
         if (string.IsNullOrEmpty(chunkId)) { return false; }
@@ -384,7 +393,7 @@ public class DatabaseChunk : Database {
             return false;
         }
         OnLoading();
-        var ok = Parse(chunk, needPassword);
+        var ok = Parse(chunk);
 
         OnLoaded();
 
@@ -443,7 +452,7 @@ public class DatabaseChunk : Database {
 
         var important = reason is EditableErrorReasonType.EditCurrently or EditableErrorReasonType.EditAcut or EditableErrorReasonType.Save;
 
-        var ok = LoadChunkWithChunkId(chunkId, important, null, true);
+        var ok = LoadChunkWithChunkId(chunkId, important, true);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
@@ -552,7 +561,7 @@ public class DatabaseChunk : Database {
         return rowchunk;
     }
 
-    private bool Parse(Chunk chunk, NeedPassword? needPassword) {
+    private bool Parse(Chunk chunk) {
         if (chunk.LoadFailed) { return false; }
 
         var rowsToRemove = RowsOfChunk(chunk);
@@ -581,7 +590,7 @@ public class DatabaseChunk : Database {
         }
 
         // Zuerst parsen, bevor der Chunk in die Dictionary kommt
-        var parseSuccessful = Parse(chunk.Bytes, chunk.IsMain, needPassword, chunk.ChunkFileName);
+        var parseSuccessful = Parse(chunk.Bytes, chunk.IsMain, chunk.ChunkFileName);
 
         if (!parseSuccessful) {
             chunk.LoadFailed = true;

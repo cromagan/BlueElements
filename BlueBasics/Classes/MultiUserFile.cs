@@ -253,7 +253,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (mode.HasFlag(EditableErrorReasonType.Save)) {
             if (_isLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-            if (!CanWrite(Filename, 0.5)) {
+            if (!CanWrite(Filename)) {
                 _canWriteError = "Windows blockiert die Datei.";
                 return _canWriteError;
             }

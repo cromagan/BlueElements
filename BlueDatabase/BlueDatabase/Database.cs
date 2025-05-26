@@ -82,7 +82,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private static Timer? _databaseUpdateTimer;
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
-
     private readonly List<string> _datenbankAdmin = [];
     private readonly List<string> _permissionGroupsNewRow = [];
     private readonly List<string> _tags = [];
@@ -107,6 +106,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _globalShowPass = string.Empty;
 
     private bool _isInSave;
+    protected NeedPassword? _needPassword;
     private string _needsScriptFix = string.Empty;
     private DateTime _powerEditTime = DateTime.MinValue;
     private bool _readOnly;
@@ -1077,7 +1077,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public virtual bool BeSureAllDataLoaded(int anzahl) => !IsDisposed && BeSureToBeUpToDate();
 
-    public virtual bool BeSureRowIsLoaded(string chunkValue, NeedPassword? needPassword) => true;
+    public virtual bool BeSureRowIsLoaded(string chunkValue) => true;
 
     public virtual bool BeSureToBeUpToDate() {
         if (IsInCache.Year < 2000) { return false; }
@@ -1320,7 +1320,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 _canWriteError = "Dateizugriffsfehler.";
                 return _canWriteError;
             }
-            if (!CanWrite(Filename, 0.5)) {
+            if (!CanWrite(Filename)) {
                 _canWriteError = "Windows blockiert die Datei.";
                 return _canWriteError;
             }
@@ -1943,7 +1943,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
-    public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
+    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         //Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Lade Datenbank von Dateisystem {fileNameToLoad.FileNameWithSuffix()}", 0);
 
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -1968,6 +1968,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
         }
 
+        _needPassword = needPassword;
         Filename = fileNameToLoad;
         //ReCreateWatcher();
         // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
@@ -1975,18 +1976,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         OnLoading();
 
-        var (bytes, _, failed) = Chunk.LoadBytesFromDisk(Filename);
-
-        if (failed) {
-            Freeze("Laden fehlgeschlagen!");
-            return;
-        }
-
-        var ok = Parse(bytes.ToArray(), true, needPassword, Filename);
-
-        if (!ok) {
-            Freeze("Parsen fehlgeschlagen!");
-        }
+        LoadMainData();
 
         if (FileStateUtcDate.Year < 2000) {
             FileStateUtcDate = new DateTime(2000, 1, 1);
@@ -1996,8 +1986,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
 
-
-        Lädet den Chunk nochmal!!!!
         _ = BeSureToBeUpToDate();
 
         RepairAfterParse();
@@ -2023,7 +2011,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt() ?? bLoaded; }
 
         OnLoading();
-        _ = Parse(bLoaded, true, null, "Stream");
+        _ = Parse(bLoaded, true, "Stream");
         RepairAfterParse();
         Freeze("Stream-Datenbank");
         _saveRequired = false;
@@ -2083,7 +2071,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public bool Parse(byte[] data, bool isMain, NeedPassword? needPassword, string filename) {
+    public bool Parse(byte[] data, bool isMain, string filename) {
         var pointer = 0;
         var columnUsed = new List<ColumnItem>();
 
@@ -2130,7 +2118,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                         column = Column[columname];
                         if (command == DatabaseDataType.ColumnName) {
                             if (column is not { IsDisposed: false }) {
-
                                 _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
                                 column = Column[columname];
                                 if (column is not { IsDisposed: false }) {
@@ -2138,7 +2125,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                                     Freeze("Spalte hinzufügen Fehler");
                                     return false;
                                 }
-
                             }
                             columnUsed.Add(column);
                         }
@@ -2151,8 +2137,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     if (command == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
                         var pwd = string.Empty;
 
-                        if (needPassword != null) {
-                            pwd = needPassword();
+                        if (_needPassword != null) {
+                            pwd = _needPassword();
                         }
 
                         if (pwd != value) {
@@ -2430,6 +2416,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="rowsAdded"></param>
     /// <param name="starttimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     protected virtual void DoWorkAfterLastChanges(List<string>? files, DateTime starttimeUtc, DateTime endTimeUtc) { }
+
+    protected virtual bool LoadMainData() {
+        var (bytes, _, failed) = Chunk.LoadBytesFromDisk(Filename);
+
+        if (failed) {
+            Freeze("Laden fehlgeschlagen!");
+            return false;
+        }
+
+        var ok = Parse(bytes.ToArray(), true, Filename);
+
+        if (!ok) {
+            Freeze("Parsen fehlgeschlagen!");
+            return false;
+        }
+
+        return true;
+    }
 
     protected void OnAdditionalRepair() {
         if (IsDisposed) { return; }

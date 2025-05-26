@@ -182,7 +182,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, filter) is { } i) {
-                var ok = db.BeSureRowIsLoaded(i, null);
+                var ok = db.BeSureRowIsLoaded(i);
                 if (!ok) { return []; }
             }
         }

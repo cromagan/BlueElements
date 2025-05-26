@@ -112,7 +112,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         get {
             if (Database?.Column.First() is { IsDisposed: false } c) {
                 if (c.Value_for_Chunk != ChunkType.None) {
-                    var ok = Database.BeSureRowIsLoaded(primärSchlüssel, null);
+                    var ok = Database.BeSureRowIsLoaded(primärSchlüssel);
                     if (!ok) { return null; }
                 }
 
@@ -507,7 +507,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {
-                    if (!db2.BeSureRowIsLoaded(inval, null)) {
+                    if (!db2.BeSureRowIsLoaded(inval)) {
                         return (null, "Chunk konnte nicht geladen werden.", false);
                     }
                 }

@@ -150,18 +150,6 @@ public class DatabaseFragments : Database {
         base.Freeze(reason);
     }
 
-    [Obsolete]
-    public override void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
-        if (FileExists(fileNameToLoad)) {
-            Filename = fileNameToLoad;
-            _ = Directory.CreateDirectory(FragmengtsPath());
-            //Directory.CreateDirectory(OldFragmengtsPath());
-            Filename = string.Empty;
-        }
-
-        base.LoadFromFile(fileNameToLoad, createWhenNotExisting, needPassword, freeze, ronly);
-    }
-
     public override bool Save() {
         if (_writer == null) { return true; }
 
@@ -261,6 +249,15 @@ public class DatabaseFragments : Database {
                 if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { break; }
             }
         }
+    }
+
+    protected override bool LoadMainData() {
+        if (FileExists(Filename)) {
+            _ = Directory.CreateDirectory(FragmengtsPath());
+            if (!DirectoryExists(FragmengtsPath())) { return false; }
+        }
+
+        return base.LoadMainData();
     }
 
     protected override bool SaveRequired() => true;

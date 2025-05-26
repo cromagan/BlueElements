@@ -24,7 +24,6 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
