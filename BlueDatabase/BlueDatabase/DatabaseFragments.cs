@@ -244,7 +244,7 @@ public class DatabaseFragments : Database {
 
             if (del) {
                 OnDropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-                _ = DeleteFile(thisf, 1, false);
+                _ = DeleteFile(thisf, false);
                 //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
                 if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { break; }
             }
