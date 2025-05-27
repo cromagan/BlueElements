@@ -980,8 +980,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Zoom = nz;
     }
 
-    public string EditableErrorReason(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview, FilterItem[]? filter) {
-        var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false, filter);
+    public string EditableErrorReason(string oldChunkVal, string newChunkVal, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
+        var f = CellCollection.EditableErrorReason(oldChunkVal, newChunkVal, cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (checkEditmode) {
@@ -1817,6 +1817,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (CursorPosColumn?.Column is not { IsDisposed: false } c) { return; }
+        if (CursorPosRow?.Row is not { IsDisposed: false } r) { return; }
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
@@ -1828,19 +1829,21 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             //_database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
+            var chunkval = r.ChunkValue;
+
             switch (e.KeyCode) {
-                case Keys.Oemcomma: // normales ,
-                    if (e.Modifiers == Keys.Control) {
-                        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, null);
-                        Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
-                        if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
-                        if (string.IsNullOrEmpty(lp) && newRow?.Row != null) {
-                            UserEdited(this, newRow.Row.CellGetString(c), CursorPosColumn, CursorPosRow, true);
-                        } else {
-                            NotEditableInfo(lp);
-                        }
-                    }
-                    break;
+                //case Keys.Oemcomma: // normales ,
+                //    if (e.Modifiers == Keys.Control) {
+                //        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, chunkval);
+                //        Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
+                //        if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
+                //        if (string.IsNullOrEmpty(lp) && newRow?.Row != null) {
+                //            UserEdited(this, newRow.Row.CellGetString(c), CursorPosColumn, CursorPosRow, true, oldval);
+                //        } else {
+                //            NotEditableInfo(lp);
+                //        }
+                //    }
+                //    break;
 
                 case Keys.X:
                     if (e.Modifiers == Keys.Control) {
@@ -1849,12 +1852,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                             _isinKeyDown = false;
                             return;
                         }
-                        var l2 = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, null);
-                        if (string.IsNullOrEmpty(l2)) {
-                            UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true);
-                        } else {
-                            NotEditableInfo(l2);
-                        }
+                        NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
                     }
                     break;
 
@@ -1863,12 +1861,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                         _isinKeyDown = false;
                         return;
                     }
-                    var l = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, null);
-                    if (string.IsNullOrEmpty(l)) {
-                        UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true);
-                    } else {
-                        NotEditableInfo(l);
-                    }
+                    NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
+
                     break;
 
                 case Keys.Left:
@@ -1950,12 +1944,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                 _isinKeyDown = false;
                                 return;
                             }
-                            var l2 = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditAcut, true, false, true, null);
-                            if (string.IsNullOrEmpty(l2)) {
-                                UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true);
-                            } else {
-                                NotEditableInfo(l2);
-                            }
+                            NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
                         }
                     }
                     break;
@@ -2043,7 +2032,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                 if (string.IsNullOrEmpty(QuickInfo)) { QuickInfo += "\r\n"; }
                                 QuickInfo = "Verlinkungs-Status: " + info;
                             }
-
                         } else {
                             QuickInfo = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
                         }
@@ -2152,19 +2140,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private static void NotEditableInfo(string reason) => Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
 
-    private static void UserEdited(Table table, string newValue, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool formatWarnung) {
-        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true, table.FilterCombined.ToArray());
-        if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
-
-        if (cellInThisDatabaseColumn?.Column is not { IsDisposed: false }) { return; } // Dummy prüfung
+    private static string UserEdited(Table table, string newValue, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool formatWarnung) {
+        if (cellInThisDatabaseColumn?.Column is not { IsDisposed: false } contentHolderCellColumn) { return "Spalte nicht vorhanden"; } // Dummy prüfung
 
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
-        var contentHolderCellColumn = cellInThisDatabaseColumn.Column;
         var contentHolderCellRow = cellInThisDatabaseRow?.Row;
         if (contentHolderCellRow != null && contentHolderCellColumn.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
-            if (contentHolderCellColumn == null || contentHolderCellRow == null) { return; } // Dummy prüfung
+            if (contentHolderCellColumn == null || contentHolderCellRow == null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
         }
 
         #endregion
@@ -2174,35 +2158,31 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (formatWarnung && !string.IsNullOrEmpty(newValue)) {
             if (!newValue.IsFormat(contentHolderCellColumn)) {
                 if (MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
-                    NotEditableInfo("Abbruch, da das erwartete Format nicht eingehalten wurde.");
-                    return;
+                    return "Abbruch, da das erwartete Format nicht eingehalten wurde.";
                 }
             }
         }
 
         #endregion
 
+        newValue = contentHolderCellColumn.AutoCorrect(newValue, false);
+
         #region neue Zeile anlegen? (Das ist niemals in der ein LinkedCell-Datenbank)
 
         if (cellInThisDatabaseRow == null) {
-            if (string.IsNullOrEmpty(newValue)) { return; }
-            if (cellInThisDatabaseColumn.Column?.Database is not { IsDisposed: false } db) { return; }
-            if (table?.Database?.Column.First() is not { IsDisposed: false } colfirst) { return; }
+            if (string.IsNullOrEmpty(newValue)) { return string.Empty; }
+            if (cellInThisDatabaseColumn.Column?.Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+            if (table?.Database?.Column.First() is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
 
-            var fc = new List<FilterItem>() { new FilterItem(colfirst, FilterType.Istgleich, newValue) };
-            foreach (var thisFilter in table.FilterCombined) {
-                if (thisFilter.Column != null) {
-                    fc.Add(thisFilter);
-                }
-            }
+            using var filterColNewRow = new FilterCollection(table.Database, "Edit-Filter");
+            filterColNewRow.AddIfNotExists(table.FilterCombined.ToList());
+            filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
-            var fe = table.EditableErrorReason(cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true, fc.ToArray());
-            if (!string.IsNullOrEmpty(fe)) {
-                NotEditableInfo(fe);
-                return;
-            }
+            var newChunkVal = filterColNewRow.ChunkVal;
+            var fe = table.EditableErrorReason(newChunkVal, newChunkVal, cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true);
+            if (!string.IsNullOrEmpty(fe)) { return fe; }
 
-            var (newrow, message, _) = db.Row.GenerateAndAdd(fc.ToArray(), "Neue Zeile über Tabellen-Ansicht");
+            var (newrow, message, _) = db.Row.GenerateAndAdd(filterColNewRow.ToArray(), "Neue Zeile über Tabellen-Ansicht");
 
             if (!string.IsNullOrEmpty(message)) {
                 NotEditableInfo(message);
@@ -2221,19 +2201,38 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
             }
 
-            return;
+            return string.Empty;
         }
 
         #endregion
 
-        newValue = contentHolderCellColumn.AutoCorrect(newValue, false);
+        //using var filterColNewChunk = new FilterCollection(table.Database, "Edit-Filter");
+        //filterColNewChunk.AddIfNotExists(table.FilterCombined.ToList());
+        //if (contentHolderCellRow == cellInThisDatabaseRow.Row) {
+        //    if (cellInThisDatabaseColumn.Column == cellInThisDatabaseColumn.Column.Database?.Column.ChunkValueColumn) {
+        //        filterColNewChunk.RemoveOtherAndAdd(new FilterItem(cellInThisDatabaseColumn.Column, FilterType.Istgleich_GroßKleinEgal, newValue));
+        //    }
+        //}
+
         if (contentHolderCellRow != null) {
-            if (newValue == contentHolderCellRow.CellGetString(contentHolderCellColumn)) { return; }
+            var oldval = contentHolderCellRow.CellGetString(contentHolderCellColumn);
 
-            var f = CellCollection.EditableErrorReason(contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false, true, false, null);
-            if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
+            if (newValue == oldval) { return string.Empty; }
+
+            var newChunkVal = cellInThisDatabaseRow.Row.ChunkValue;
+            var oldChunkVal = newChunkVal;
+
+            if (cellInThisDatabaseColumn.Column == cellInThisDatabaseColumn.Column.Database?.Column.ChunkValueColumn) {
+                newChunkVal = newValue;
+            }
+
+            var check1 = table.EditableErrorReason(oldChunkVal, newChunkVal, cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true);
+            if (!string.IsNullOrEmpty(check1)) { return check1; }
+
+            //var check2 = CellCollection.EditableErrorReason(newChunkVal, contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false, true, false);
+            //if (!string.IsNullOrEmpty(check2)) { return check2; }
+
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
-
 
             if (contentHolderCellColumn.SaveContent) {
                 _ = contentHolderCellRow.UpdateRow(true, true, "Nach Benutzereingabe");
@@ -2245,6 +2244,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             if (table.Database == cellInThisDatabaseColumn.Column?.Database) { table.CursorPos_Set(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
         }
+
+        return string.Empty;
     }
 
     private void _Database_CellValueChanged(object sender, CellEventArgs e) {
@@ -2581,7 +2582,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown) {
-        var f = EditableErrorReason(viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true, FilterCombined.ToArray());
+        var chunkval = cellInThisDatabaseRow?.Row?.ChunkValue ?? string.Empty;
+
+        var f = EditableErrorReason(chunkval, chunkval, viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
         if (viewItem?.Column == null) { return; }// Klick ins Leere
 
@@ -3962,7 +3965,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
 
-        return string.IsNullOrEmpty(EditableErrorReason(fcv, null, EditableErrorReasonType.EditNormaly, true, true, false, FilterCombined.ToArray()));
+        return string.IsNullOrEmpty(EditableErrorReason(string.Empty, string.Empty, fcv, null, EditableErrorReasonType.EditNormaly, true, true, false));
     }
 
     #endregion

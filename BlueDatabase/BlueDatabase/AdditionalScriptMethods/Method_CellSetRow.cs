@@ -60,15 +60,12 @@ public class Method_CellSetRow : Method_Database {
         var columnToSet = db.Column[attvar.ValueStringGet(1)];
         if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true, ld); }
 
-        if (!columnToSet.CanBeChangedByRules()) {
-            return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1), true, ld);
-        }
-
-        var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false, null);
-        if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
-
         if (row == MyRow(scp)) {
             return new DoItFeedback("Die eigene Zelle kann nur über die Variabeln geändert werden.", true, ld);
+        }
+
+        if (!columnToSet.CanBeChangedByRules()) {
+            return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(1), true, ld);
         }
 
         var value = string.Empty;
@@ -77,6 +74,14 @@ public class Method_CellSetRow : Method_Database {
         if (attvar.Attributes[0] is VariableDouble vf) { value = vf.ValueForReplace; }
 
         value = columnToSet.AutoCorrect(value, true);
+
+        var oldchunk = row.ChunkValue;
+        var newchunkval = oldchunk;
+
+        if (columnToSet == db.Column.ChunkValueColumn) { newchunkval = value; }
+
+        var m = CellCollection.EditableErrorReason(oldchunk, newchunkval, columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
+        if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {
             if (row.CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }

@@ -40,6 +40,7 @@ public class DatabaseChunk : Database {
 
     public static readonly string Chunk_AdditionalUseCases = "_uses";
     public static readonly string Chunk_MainData = "MainData";
+
     //public static readonly string Chunk_Master = "_master";
     public static readonly string Chunk_Variables = "_vars";
 
@@ -200,7 +201,7 @@ public class DatabaseChunk : Database {
 
     public static string GetChunkId(RowItem r) => r.Database?.Column.ChunkValueColumn is not { IsDisposed: false }
             ? Chunk_MainData
-            : GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, GetChunkValue(r));
+            : GetChunkId(r.Database, DatabaseDataType.UTF8Value_withoutSizeData, r.ChunkValue);
 
     public static string GetChunkId(Database db, DatabaseDataType type, string chunkvalue) {
         if (db.Column.ChunkValueColumn is not { IsDisposed: false } spc) { return Chunk_MainData.ToLower(); }
@@ -220,7 +221,6 @@ public class DatabaseChunk : Database {
 
         if (type.IsCellValue() || type is DatabaseDataType.Undo or DatabaseDataType.Command_AddRow or DatabaseDataType.Command_RemoveRow) {
             switch (spc.Value_for_Chunk) {
-
                 case ChunkType.ByHash_1Char:
                     return chunkvalue.ToLower().GetHashString().Right(1).ToLower();
 
@@ -241,8 +241,6 @@ public class DatabaseChunk : Database {
 
         return Chunk_MainData.ToLower();
     }
-
-    public static string GetChunkValue(RowItem r) => r.Database?.Column.ChunkValueColumn is not { IsDisposed: false } spc ? string.Empty : r.Database.Cell.GetStringCore(spc, r);
 
     /// <summary>
     /// row == null --> false
@@ -266,7 +264,7 @@ public class DatabaseChunk : Database {
         //    return IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, EditableErrorReasonType.EditCurrently);
 
         if (Column?.ChunkValueColumn is { IsDisposed: false }) {
-            var chunkValue = GetChunkValue(row);
+            var chunkValue = row.ChunkValue;
             return string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, chunkValue, EditableErrorReasonType.EditCurrently));
         }
 
@@ -312,15 +310,6 @@ public class DatabaseChunk : Database {
 
         return LoadChunkWithChunkId(chunkId, false, false);
     }
-
-
-    protected override bool LoadMainData() {
-
-        return LoadChunkWithChunkId(Chunk_MainData, true, true);
-
-
-    }
-
 
     public override bool BeSureToBeUpToDate() {
         if (!base.BeSureToBeUpToDate()) { return false; }
@@ -448,6 +437,8 @@ public class DatabaseChunk : Database {
         if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC or
                     DatabaseDataType.TemporaryDatabaseMasterUser) { return "MasterUser in diesen Datenbanktyp nicht möglich"; }
 
+        if (reason == EditableErrorReasonType.EditNormaly) { return string.Empty; }
+
         var chunkId = GetChunkId(this, type, chunkValue);
 
         var important = reason is EditableErrorReasonType.EditCurrently or EditableErrorReasonType.EditAcut or EditableErrorReasonType.Save;
@@ -462,6 +453,10 @@ public class DatabaseChunk : Database {
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         _chunks.Clear();
+    }
+
+    protected override bool LoadMainData() {
+        return LoadChunkWithChunkId(Chunk_MainData, true, true);
     }
 
     protected override bool SaveInternal(DateTime setfileStateUtcDateTo) {

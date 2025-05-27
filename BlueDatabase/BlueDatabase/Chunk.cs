@@ -191,7 +191,6 @@ public class Chunk : IHasKeyName {
             return _bytes.Count > 0; // Nur neu laden, wenn wir Daten haben, die "verschwunden" sind
         }
 
-
         if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
             var nf = GetFileInfo(ChunkFileName, false);
             return nf != _fileinfo;
@@ -210,15 +209,15 @@ public class Chunk : IHasKeyName {
 
             // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
             var contentBytes = RemoveHeaderDataTypes(_bytes);
-            if (contentBytes == null || contentBytes.Count == 0) { return false; }
+            if (contentBytes == null || contentBytes.Count < minBytes) { return false; }
 
             // Neuen Header erstellen
             var head = GetHeadAndSetEditor();
-            if (head == null || head.Count == 0) { return false; }
+            if (head == null || head.Count < 100) { return false; }
 
             // Header und Datensätze zusammenführen und komprimieren
             var datacompressed = head.Concat(contentBytes).ToArray().ZipIt();
-            if (datacompressed == null || datacompressed.Length == 0) { return false; }
+            if (datacompressed == null || datacompressed.Length < 100) { return false; }
 
             Develop.SetUserDidSomething();
 
@@ -384,8 +383,7 @@ public class Chunk : IHasKeyName {
     internal bool Delete() {
         var filename = ChunkFileName;
 
-
-        if( DeleteFile(filename, true)) {
+        if (DeleteFile(filename, true)) {
             // Zuerst die Bytes leeren, um sicherzustellen, dass wir nicht versehentlich
             // anschließend wieder speichern
             _bytes.Clear();
@@ -578,8 +576,9 @@ public class Chunk : IHasKeyName {
     /// </summary>
     /// <param name="bytes">Die zu verarbeitenden Bytes</param>
     /// <returns>Eine Liste von Bytes ohne Header-Daten oder null bei Fehlern</returns>
-    private List<byte>? RemoveHeaderDataTypes(List<byte> bytes) {
-        if (bytes == null || bytes.Count == 0) { return null; }
+    private List<byte>? RemoveHeaderDataTypes(List<byte>? bytes) {
+        if (bytes == null) { return null; }
+        if (bytes.Count == 0) { return []; }
 
         var data = bytes.ToArray();
         var result = new List<byte>(data.Length);

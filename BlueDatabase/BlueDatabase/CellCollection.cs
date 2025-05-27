@@ -123,7 +123,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="repairallowed"></param>
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
-    public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked, FilterItem[]? filter) {
+    public static string EditableErrorReason(string oldChunkValue, string newChunkValue, ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked) {
         if (mode == EditableErrorReasonType.OnlyRead) {
             if (column == null || row == null) { return string.Empty; }
         }
@@ -131,8 +131,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (column?.Database is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
 
         if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
-
-        //if (column.Function == ColumnFunction.Virtuelle_Spalte) { return "Virtuelle Spalten können nicht bearbeitet werden."; }
 
         var f = column.EditableErrorReason(mode, checkEditmode);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -150,7 +148,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             db2.PowerEdit = db.PowerEdit;
 
             if (lrow != null) {
-                var tmp = EditableErrorReason(lcolumn, lrow, mode, checkUserRights, checkEditmode, false, false, null);
+                var chunkval = lrow.ChunkValue;
+                var tmp = EditableErrorReason(chunkval, chunkval, lcolumn, lrow, mode, checkUserRights, checkEditmode, false, false);
                 return string.IsNullOrEmpty(tmp)
                     ? string.Empty
                     : "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp;
@@ -161,8 +160,22 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Allgemeiner Fehler.";
         }
 
+        if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
+            //if (string.IsNullOrEmpty(newChunkValue)) {
+            //    return "Bei Split-Datenbanken muss ein Chunk-Wert in der Split-Spalte sein.";
+            //}
+
+            if (column == spc) {
+                var f1 = db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, oldChunkValue, mode);
+                if (!string.IsNullOrEmpty(f1)) { return f1; }
+            }
+
+            var f2 = db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue, mode);
+            if (!string.IsNullOrEmpty(f2)) { return f2; }
+        }
+
         if (row == null) {
-            if (db.Column.First() is not { IsDisposed: false } c || c != column) {
+            if (db.Column.First() is not { IsDisposed: false } firstcol || firstcol != column) {
                 return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
             }
 
@@ -170,39 +183,27 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
 
-            if (db.Column?.ChunkValueColumn is { IsDisposed: false } spc) {
-                if (filter is not { }) {
-                    return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
-                }
-
-                var chunkValue = FilterCollection.InitValue(spc, true, filter);
-                if (spc == c) {
-                    if (chunkValue == null) { return string.Empty; }
-                    return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, chunkValue, mode);
-                }
-
-                return chunkValue is not { } || string.IsNullOrEmpty(chunkValue)
-                    ? "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein."
-                    : db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, chunkValue, mode);
-            }
-        } else {
-            if (db.Column.SysLocked != null) {
-                if (!db.PowerEdit) {
-                    if (column != db.Column.SysLocked && row.CellGetBoolean(db.Column.SysLocked) && !column.EditAllowedDespiteLock) {
-                        return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
-                    }
+            if (db.Column.ChunkValueColumn is { IsDisposed: false }) {
+                if (string.IsNullOrEmpty(newChunkValue) && mode != EditableErrorReasonType.EditNormaly) {
+                    return "Bei Split-Datenbanken muss ein Chunk-Wert in der Split-Spalte sein.";
                 }
             }
 
-            if (db.Column?.ChunkValueColumn is { IsDisposed: false }) {
-                var chunkValue = DatabaseChunk.GetChunkValue(row);
-                return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, chunkValue, mode);
+            return string.Empty;
+        }
+
+        if (db.Column.SysLocked != null) {
+            if (!db.PowerEdit) {
+                if (column != db.Column.SysLocked && row.CellGetBoolean(db.Column.SysLocked) && !column.EditAllowedDespiteLock) {
+                    return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
+                }
             }
         }
 
-        return checkUserRights && !db.PermissionCheck(column.PermissionGroupsChangeCell, row)
-            ? "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern."
-            : string.Empty;
+        if (checkUserRights && !db.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
+            return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
+        }
+        return string.Empty;
     }
 
     /// <summary>
@@ -210,17 +211,17 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// </summary>
     /// <param name="varcol">Wird eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
     /// <returns></returns>
-    public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(Database? linkedDatabase, ColumnItem column, RowItem? row, VariableCollection? varcol) {
+    public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(Database? linkedDatabase, ColumnItem inputColumn, RowItem? inputRow, VariableCollection? varcol) {
         if (linkedDatabase is not { IsDisposed: false }) { return (null, "Verlinkte Datenbank verworfen."); }
-        if (column.Database is not { IsDisposed: false } || column.IsDisposed) { return (null, "Datenbank verworfen."); }
+        if (inputColumn.Database is not { IsDisposed: false } || inputColumn.IsDisposed) { return (null, "Datenbank verworfen."); }
 
         var fi = new List<FilterItem>();
 
-        foreach (var thisFi in column.LinkedCellFilter) {
+        foreach (var thisFi in inputColumn.LinkedCellFilter) {
             if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
 
             var x = thisFi.SplitBy("|");
-            var c = linkedDatabase?.Column[x[0]];
+            var c = linkedDatabase.Column[x[0]];
             if (c == null) { return (null, $"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
 
             if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
@@ -228,10 +229,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var value = x[2].FromNonCritical();
             if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
 
-            if (row is { IsDisposed: false }) {
+            if (inputRow is { IsDisposed: false }) {
                 // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
                 // und auch diese abgefragt werden
-                value = row.ReplaceVariables(value, true, varcol);
+                value = inputRow.ReplaceVariables(value, true, varcol);
             }
 
             if (value != c.AutoCorrect(value, true)) { return (null, "Wert kann nicht gesetzt werden."); }
@@ -239,7 +240,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }
 
-        if (fi.Count == 0 && column.RelationType != RelationType.DropDownValues) { return (null, "Keine gültigen Suchkriterien definiert."); }
+        if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return (null, "Keine gültigen Suchkriterien definiert."); }
+
+        if (linkedDatabase.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
+            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, fi.ToArray()))) return (null, "Filter des Chunk-Wertes fehlt.");
+        }
 
         var fc = new FilterCollection(linkedDatabase, "cell get filter");
         fc.AddIfNotExists(fi);
@@ -338,36 +343,25 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem column, RowItem? row, bool repairallowed, bool addRowIfNotExists) {
+    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem inputColumn, RowItem? inputRow, bool repairallowed, bool addRowIfNotExists) {
+        if (inputColumn.Database is not { IsDisposed: false } db) { return (null, null, "Eigene Datenbank verworfen.", false); }
+        if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
+        if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine Split-Spalte sein.", false); }
+        if (inputColumn.LinkedDatabase is not { IsDisposed: false } linkedDatabase) { return (null, null, "Verknüpfte Datenbank verworfen.", false); }
+        if (inputRow is not { IsDisposed: false }) { return (null, null, "Keine Zeile zum finden des Zeilenschlüssels angegeben.", false); }
+
+        if (linkedDatabase.Column[inputColumn.ColumnNameOfLinkedDatabase] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieldatenbank nicht vorhanden.", false); }
+        if (targetColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkungen auf Chunk-Spalten nicht möglich.", false); }
+
+        var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, inputColumn, inputRow, null);
+        if (!string.IsNullOrEmpty(info)) { return (targetColumn, null, info, false); }
+        if (fc is not { Count: not 0 }) { return (targetColumn, null, "Filter konnten nicht generiert werden", false); }
+
         RowItem? targetRow = null;
-        ColumnItem? targetColumn = null;
-        var cr = false;
-
-        if (column.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
-
-        var db = column.Database;
-        if (db is not { IsDisposed: false }) { return Ergebnis("Eigene Datenbank verworfen."); }
-
-        var linkedDatabase = column.LinkedDatabase;
-        if (linkedDatabase is not { IsDisposed: false }) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
-
-        // Repair nicht mehr erlauben, ergibt rekursive Schleife, wir sind hier ja schon im repair
-        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true, null);
-        if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
-
-        if (row is not { IsDisposed: false }) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
-
-        targetColumn = linkedDatabase.Column[column.ColumnNameOfLinkedDatabase];
-        if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
-
-        var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row, null);
-        if (!string.IsNullOrEmpty(info)) { return Ergebnis(info); }
-        if (fc is not { Count: not 0 }) { return Ergebnis("Filter konnten nicht generiert werden"); }
-
         var rows = fc.Rows;
         switch (rows.Count) {
             case > 1:
-                return Ergebnis("Suchergebnis liefert mehrere Ergebnisse.");
+                return (targetColumn, null, "Suchergebnis liefert mehrere Ergebnisse.", false);
 
             case 1:
                 targetRow = rows[0];
@@ -375,46 +369,39 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             default: {
                     if (addRowIfNotExists) {
-                        targetRow = db.Row.GenerateAndAdd(fc.ToArray(), "LinkedCell aus " + db.TableName).newrow;
-                    } else {
-                        cr = true;
+                        var (newrow, message, _) = db.Row.GenerateAndAdd(fc.ToArray(), "LinkedCell aus " + db.TableName);
+                        if (!string.IsNullOrEmpty(message)) { return (targetColumn, null, message, false); }
+                        targetRow = newrow;
                     }
                     break;
                 }
         }
 
-        return targetRow == null ? Ergebnis("Die Zeile ist in der Zieldatenbank nicht vorhanden.") : Ergebnis(string.Empty);
+        if (targetRow != null) {
+            if (targetColumn != null && inputColumn != null) {
+                if (inputRow != null && repairallowed && inputColumn.RelationType == RelationType.CellValues) {
+                    var oldvalue = db.Cell.GetStringCore(inputColumn, inputRow);
+                    var newvalue = targetRow.CellGetString(targetColumn);
 
-        #region Subroutine Ergebnis
+                    if (oldvalue != newvalue) {
+                        var chunkValue = inputRow.ChunkValue;
 
-        (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
-            if (db != null && row != null) {
-                var oldvalue = db.Cell.GetStringCore(column, row);
+                        var editableError = EditableErrorReason(chunkValue, chunkValue, inputColumn, inputRow, EditableErrorReasonType.EditAcut, false, false, false, true);
 
-                var newvalue = string.Empty;
+                        if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
+                        //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
+                        //row.CellSet(column, targetRow.KeyName);
+                        //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
-                if (targetRow != null && targetColumn != null && string.IsNullOrEmpty(fehler)) {
-                    if (column.RelationType == RelationType.CellValues) { newvalue = targetRow.CellGetString(targetColumn); }
+                        var fehler = db.ChangeData(DatabaseDataType.UTF8Value_withoutSizeData, inputColumn, inputRow, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, chunkValue);
+                        if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
+                    }
                 }
-
-                //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
-                //row.CellSet(column, targetRow.KeyName);
-                //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
-
-                if (repairallowed && oldvalue != newvalue) {
-                    fehler = db.ChangeData(DatabaseDataType.UTF8Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, DatabaseChunk.GetChunkValue(row));
-                }
-
-                if (targetColumn?.Database != null) {
-                    targetColumn.AddSystemInfo("Links to me", db, column.KeyName);
-                }
-            } else {
-                if (string.IsNullOrEmpty(fehler)) { fehler = "Datenbankfehler"; }
+                targetColumn.AddSystemInfo("Links to me", db, inputColumn.KeyName);
             }
-            return (targetColumn, targetRow, fehler, cr);
         }
 
-        #endregion
+        return (targetColumn, targetRow, string.Empty, true);
     }
 
     public void DataOfCellKey(string cellKey, out ColumnItem? column, out RowItem? row) {
@@ -510,7 +497,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return row.SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
         }
 
-        var newChunkValue = DatabaseChunk.GetChunkValue(row);
+        var newChunkValue = row.ChunkValue;
         var oldChunkValue = newChunkValue;
 
         if (column == db.Column.ChunkValueColumn) {

@@ -104,6 +104,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public string CaptionForEditor => "Filter-Sammlung";
 
+    public string ChunkVal {
+        get {
+            if (Database?.Column.ChunkValueColumn is not { IsDisposed: false } cvc) { return string.Empty; }
+            return InitValue(cvc, true, this.ToArray()) ?? string.Empty;
+        }
+    }
+
     public int Count => IsDisposed ? 0 : _internal.Count;
 
     public Database? Database {
@@ -126,7 +133,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public Type? Editor { get; set; }
-
     public bool IsDisposed { get; private set; }
 
     public string RowFilterText {

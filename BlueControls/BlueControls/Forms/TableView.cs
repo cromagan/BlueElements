@@ -108,7 +108,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         var db = tbl?.Database ?? column?.Database ?? row?.Database;
         if (db == null) { return; }
 
-        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false, null));
+        var chunkval = row?.ChunkValue ?? string.Empty;
+        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(chunkval, chunkval, column, row, EditableErrorReasonType.EditNormaly, true, false, true, false));
 
         if (tbl != null && row != null) {
             e.ContextMenu.Add(ItemOf("Anheften", true));
@@ -344,11 +345,9 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         ColumnItem? columnLinked = null;
         var posError = false;
 
-
         if (column.RelationType == RelationType.CellValues) {
             (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
             posError = true;
-
         }
 
         var bearbColumn = column;

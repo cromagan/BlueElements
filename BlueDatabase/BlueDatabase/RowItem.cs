@@ -81,6 +81,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string CaptionForEditor => "Zeile";
 
+    public string ChunkValue => Database?.Column.ChunkValueColumn is not { IsDisposed: false } spc ? string.Empty : Database.Cell.GetStringCore(spc, this);
+
     public Database? Database {
         get => _database;
         private set {
