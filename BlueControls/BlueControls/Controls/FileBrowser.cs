@@ -733,6 +733,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             case "add":
                 var ob = (BitmapListItem)gb[1];
                 if (_workinDir != CheckCode()) { return; }
+
+                lsbFiles.Remove(ob.KeyName);
+
                 lsbFiles.ItemAdd(ob);
                 return;
 

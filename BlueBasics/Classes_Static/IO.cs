@@ -438,9 +438,6 @@ public static class IO {
     private static object? ProcessFile(DoThis processMethod, string arg1, string arg2, bool toBeSure) {
         if (Develop.AllReadOnly) { return true; }
 
-        // Bei gleichen Dateinamen direkt true zurückgeben
-        if (arg1 == arg2) { return true; }
-
         var mytry = 0;
         var startTime = DateTime.UtcNow;
 
