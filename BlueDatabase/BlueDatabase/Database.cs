@@ -1984,7 +1984,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _saveRequired = false;
         IsInCache = FileStateUtcDate;
 
-        Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
+        //Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
 
         _ = BeSureToBeUpToDate();
 
@@ -1998,6 +1998,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         CreateWatcher();
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
+
+        OnDropMessage(ErrorType.Info, $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen");
+
     }
 
     public void LoadFromStream(Stream stream) {

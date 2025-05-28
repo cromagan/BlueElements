@@ -1770,7 +1770,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 var rc = RowCaptionOnCoordinate(MousePos().X, MousePos().Y);
 
                 if (string.IsNullOrEmpty(rc)) {
-                    Cell_Edit(ca, _mouseOverColumn, _mouseOverRow, true);
+                    Cell_Edit(ca, _mouseOverColumn, _mouseOverRow, true, _mouseOverRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
                 }
 
                 //if (_mouseOverRow != null || MousePos().Y <= ca.HeadSize() + 18) {
@@ -1923,7 +1923,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     break;
 
                 case Keys.F2:
-                    Cell_Edit(ca, CursorPosColumn, CursorPosRow, true);
+                    Cell_Edit(ca, CursorPosColumn, CursorPosRow, true, CursorPosRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
                     break;
 
                 case Keys.V:
@@ -2581,8 +2581,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
-    private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown) {
-        var chunkval = cellInThisDatabaseRow?.Row?.ChunkValue ?? string.Empty;
+    private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown, string chunkval) {
+
 
         var f = EditableErrorReason(chunkval, chunkval, viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
@@ -2705,7 +2705,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r));
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
-            if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(ca, viewItem, cellInThisDatabaseRow, false); } else {
+            if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(ca, viewItem, cellInThisDatabaseRow, false, cellInThisDatabaseRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal); } else {
                 NotEditableInfo("Keine Items zum Auswählen vorhanden.");
             }
             return;
@@ -2714,7 +2714,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (contentHolderCellColumn.EditableWithTextInput) {
             if (t.Count == 0 && (cellInThisDatabaseRow?.Row.CellIsNullOrEmpty(viewItem.Column) ?? true)) {
                 // Bei nur einem Wert, wenn Texteingabe erlaubt, Dropdown öffnen
-                Cell_Edit(ca, viewItem, cellInThisDatabaseRow, false);
+                Cell_Edit(ca, viewItem, cellInThisDatabaseRow, false, cellInThisDatabaseRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
                 return;
             }
             t.Add(ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1"));
@@ -3448,7 +3448,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var toAdd = e.Item.KeyName;
         var toRemove = string.Empty;
         if (toAdd == "#Erweitert") {
-            Cell_Edit(ca, ck.ColumnView, ck.RowData, false);
+            Cell_Edit(ca, ck.ColumnView, ck.RowData, false, ck.RowData?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
             return;
         }
         if (ck.RowData?.Row is not { IsDisposed: false } r) {
