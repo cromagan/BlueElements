@@ -343,8 +343,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem inputColumn, RowItem? inputRow, bool repairallowed, bool addRowIfNotExists) {
-        if (inputColumn.Database is not { IsDisposed: false } db) { return (null, null, "Eigene Datenbank verworfen.", false); }
+    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, RowItem? inputRow, bool repairallowed, bool addRowIfNotExists) {
+        if (inputColumn?.Database is not { IsDisposed: false } db) { return (null, null, "Eigene Datenbank verworfen.", false); }
         if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
         if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine Split-Spalte sein.", false); }
         if (inputColumn.LinkedDatabase is not { IsDisposed: false } linkedDatabase) { return (null, null, "Verknüpfte Datenbank verworfen.", false); }

@@ -2582,25 +2582,21 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown, string chunkval) {
-
-
-        var f = EditableErrorReason(chunkval, chunkval, viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true);
+        var f = EditableErrorReason(chunkval, chunkval, viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditNormaly, true, true, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
-        if (viewItem?.Column == null) { return; }// Klick ins Leere
 
-        var contentHolderCellColumn = viewItem.Column;
-        var contentHolderCellRow = cellInThisDatabaseRow?.Row;
-
-        if (contentHolderCellColumn == null) {
+        if (viewItem?.Column is not { IsDisposed: true } contentHolderCellColumn) {
             NotEditableInfo("Keine Spalte angeklickt.");
             return;
         }
 
+        var contentHolderCellRow = cellInThisDatabaseRow?.Row;
+
         if (viewItem.Column.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
         }
-
-        if (contentHolderCellColumn == null) {
+        
+        if (contentHolderCellColumn is not { IsDisposed: true }) {
             NotEditableInfo("Keine Spalte angeklickt.");
             return;
         }

@@ -121,13 +121,13 @@ public class Method_Row : Method_Database, IUseableForButton {
                 if (newrow != null && string.IsNullOrEmpty(message)) { break; }
                 if (stoptrying) { break; }
                 if (t.Elapsed.TotalMinutes > 5) { break; }
-                if (t.Elapsed.TotalSeconds > 10 && !scp.ProduktivPhase) { break; }
+                if (t.Elapsed.TotalSeconds > 12 && !scp.ProduktivPhase) { break; }
 
                 Generic.Pause(5, false);
             } while (true);
 
             t.Stop();
-            if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(message, true, ld); }
+            if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(message, false, ld); }
         } else {
             if (fic.Rows.Count != 1) { return DoItFeedback.TestModusInaktiv(ld); }
             newrow = fic.Rows[0];
