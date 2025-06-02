@@ -395,12 +395,21 @@ public class Chunk : IHasKeyName {
 
     internal bool DoExtendedSave() {
         var filename = ChunkFileName;
-        Develop.MonitorMessage?.Invoke(MainFileName.FileNameWithoutSuffix(), "Diskette", $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
+        Develop.MonitorMessage?.Invoke(MainFileName.FileNameWithSuffix(), "Diskette", $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
         var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
+        var updateTime = DateTime.UtcNow;
         if (!Save(tempfile, 10)) { return false; }
+
+        // KRITISCHE ÄNDERUNG: FileInfo der temporären Datei VOR dem Move ermitteln
+        // So wissen wir exakt, was wir schreiben und vermeiden Race Conditions
+        var tempFileInfo = GetFileInfo(tempfile, true);
+        if (string.IsNullOrEmpty(tempFileInfo)) {
+            DeleteFile(tempfile, false);
+            return false;
+        }
 
         if (FileExists(backup) && !DeleteFile(backup, false)) {
             DeleteFile(tempfile, false);
@@ -418,8 +427,12 @@ public class Chunk : IHasKeyName {
 
         for (var attempt = 1; attempt <= maxRetries; attempt++) {
             if (MoveFile(tempfile, filename, false)) {
-                _lastcheck = DateTime.UtcNow;
-                _fileinfo = GetFileInfo(ChunkFileName, true);
+                // Thread-sichere Aktualisierung in einer logischen Einheit
+                lock (this) {
+                    _lastcheck = updateTime;
+                    _fileinfo = tempFileInfo;
+                }
+
                 return true;
             }
 
@@ -432,7 +445,7 @@ public class Chunk : IHasKeyName {
 
             Thread.Sleep(retryDelayMs * attempt);
 
-            if (FileExists(tempfile)) { return false; }
+            if (!FileExists(tempfile)) { return false; }
         }
 
         // Aufräumen falls alles fehlschlägt

@@ -1111,6 +1111,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         _saveRequired = true;
 
+        // ERST Speicher setzen
+        var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
+        if (!string.IsNullOrEmpty(error)) { return error; }
+
+        // DANN Festplatte schreiben (nur bei nicht ReadOnly)
         if (!ReadOnly) {
             var newChunkId = DatabaseChunk.GetChunkId(this, type, newchunkvalue);
             var oldChunkId = newChunkId;
@@ -1122,11 +1127,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             var f2 = WriteValueToDiscOrServer(type, changedTo, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
-            if (!string.IsNullOrEmpty(f2)) { return f2; }
+            if (!string.IsNullOrEmpty(f2)) {
+                // Rollback: Vorherigen Wert im Speicher wiederherstellen
+                _ = SetValueInternal(type, column, row, previousValue, user, datetimeutc, Reason.NoUndo_NoInvalidate);
+                return f2;
+            }
         }
-
-        var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
-        if (!string.IsNullOrEmpty(error)) { return error; }
 
         if (LogUndo) {
             AddUndo(type, column, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", newchunkvalue);

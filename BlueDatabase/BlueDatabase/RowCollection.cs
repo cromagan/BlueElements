@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 
 namespace BlueDatabase;
 
@@ -41,9 +42,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static readonly ConcurrentDictionary<RowItem, string> FailedRows = [];
     public static readonly InvalidatedRowsManager InvalidatedRowsManager = new InvalidatedRowsManager();
     public static int WaitDelay;
-    private static readonly object Executingchangedrowslock = new();
     private static readonly List<BackgroundWorker> Pendingworker = [];
-    private static bool _executingchangedrows;
+    private static int _executingchangedrows;
+
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
     private Database? _database;
 
@@ -165,47 +166,48 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static void ExecuteValueChangedEvent() {
-        List<Database> l = [.. Database.AllFiles];
-        if (l.Count == 0) { return; }
-        try {
-            l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
-        } catch { return; }
-
-        lock (Executingchangedrowslock) {
-            if (_executingchangedrows) { return; }
-            _executingchangedrows = true;
+        // Lock-freie Implementierung mit Interlocked für bessere Performance und Deadlock-Vermeidung
+        if (Interlocked.CompareExchange(ref _executingchangedrows, 1, 0) != 0) {
+            return; // Bereits in Ausführung
         }
 
-        var tim = Stopwatch.StartNew();
+        try {
+            List<Database> l = [.. Database.AllFiles];
+            if (l.Count == 0) { return; }
+            try {
+                l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
+            } catch { return; }
 
-        while (NextRowToCeck() is { IsDisposed: false } row) {
-            if (row.IsDisposed || row.Database is not { IsDisposed: false } db) { break; }
+            var tim = Stopwatch.StartNew();
 
-            if (row.Database != l[0]) {
-                if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 5 + WaitDelay) { break; }
+            while (NextRowToCeck() is { IsDisposed: false } row) {
+                if (row.IsDisposed || row.Database is not { IsDisposed: false } db) { break; }
+
+                if (row.Database != l[0]) {
+                    if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 5 + WaitDelay) { break; }
+                }
+
+                if (Database.ExecutingScriptAnyDatabase.Count > 0) { break; }
+
+                WaitDelay = Pendingworker.Count * 5;
+                if (Pendingworker.Count > 2) { break; }
+
+                if (!db.CanDoValueChangedScript()) { break; }
+
+                var e = new CancelReasonEventArgs();
+                db.OnCanDoScript(e);
+                if (e.Cancel) { break; }
+
+                Develop.SetUserDidSomething();
+                _ = row.UpdateRow(true, false, "Allgemeines Update (User Idle)");
+                Develop.SetUserDidSomething();
+                if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
             }
 
-            if (Database.ExecutingScriptAnyDatabase.Count > 0) { break; }
-
-            WaitDelay = Pendingworker.Count * 5;
-            if (Pendingworker.Count > 2) { break; }
-
-            if (!db.CanDoValueChangedScript()) { break; }
-
-            var e = new CancelReasonEventArgs();
-            db.OnCanDoScript(e);
-            if (e.Cancel) { break; }
-
-            Develop.SetUserDidSomething();
-            _ = row.UpdateRow(true, false, "Allgemeines Update (User Idle)");
-            Develop.SetUserDidSomething();
-            if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
-        }
-
-        WaitDelay = Math.Min(WaitDelay + 5, 100);
-
-        lock (Executingchangedrowslock) {
-            _executingchangedrows = false;
+            WaitDelay = Math.Min(WaitDelay + 5, 100);
+        } finally {
+            // Garantierte Freigabe des Flags auch bei Exceptions
+            Interlocked.Exchange(ref _executingchangedrows, 0);
         }
     }
 
@@ -346,8 +348,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (r.Count > 1) {
-            r[0].Database?.Row.Combine(r);
-            r[0].Database?.Row.RemoveYoungest(r, true);
+            db.Row.Combine(r);
+            db.Row.RemoveYoungest(r, true);
+
             r = filter.Rows;
             if (r.Count != 1) {
                 return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText(), false);
@@ -367,7 +370,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             myRow = r[0];
         }
 
-        return (myRow, string.Empty, false);
+        // REPARIERT: Finale Validierung dass die Zeile auch wirklich den Filtern entspricht
+        if (!myRow.MatchesTo(filter.ToArray())) {
+            return (myRow, "RowUnique mit falschen Werten initialisiert", true);
+        }
+
+        return (myRow, string.Empty, true);
     }
 
     public bool Clear(string comment) {
@@ -475,8 +483,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
     /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
     /// Am Schluss wird noch das Skript ausgeführt.
+    /// REPARIERT: Exception-Handling und sichere Initialwert-Setzung
     /// </summary>
-    /// <param name="fc"></param>
+    /// <param name="filter"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
     public (RowItem? newrow, string message, bool stoptrying) GenerateAndAdd(FilterItem[] filter, string comment) {
@@ -514,7 +523,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        return (db2.Row.GenerateAndAddInternal(s, filter, comment), string.Empty, false);
+        return GenerateAndAddInternal(s, filter, comment);
     }
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
@@ -535,18 +544,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public bool HasPendingWorker() => Pendingworker.Count > 0;
 
-    //public string DoLinkedDatabase(List<RowItem> rowsToExpand) {
-    //    if (rowsToExpand.Count == 0) { return string.Empty; }
     public void InvalidateAllCheckData() {
         foreach (var thisRow in this) {
             thisRow.InvalidateCheckData();
         }
 
-        var keysToRemove = FailedRows.Keys.Where(rowItem => rowItem.Database == Database).ToList();
-
-        // Entferne jeden identifizierten Schlüssel aus dem Dictionary
-        foreach (var key in keysToRemove) {
-            FailedRows.TryRemove(key, out _);
+        // Thread-sicherer Ansatz: Snapshot erstellen und dann versuchen zu entfernen
+        // ToArray() erstellt eine Kopie zum Zeitpunkt des Aufrufs
+        // TryRemove ist atomar und gibt einfach false zurück wenn Key nicht mehr existiert
+        foreach (var kvp in FailedRows.ToArray()) {
+            if (kvp.Key.Database == Database) {
+                FailedRows.TryRemove(kvp.Key, out _);
+            }
         }
     }
 
@@ -814,71 +823,80 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    ///
+    /// REPARIERT: Interne Methode gibt jetzt Tupel zurück statt Exceptions zu werfen
     /// </summary>
     /// <param name="key"></param>
     /// <param name="fc"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    private RowItem GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
-        if (Database is not { IsDisposed: false } db) {
-            Develop.DebugPrint(ErrorType.Error, "Datenbank verworfen!");
-            throw new Exception();
-        }
+    private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
+        if (Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen!", true); }
 
         var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
-
-        if (!string.IsNullOrEmpty(f)) {
-            Develop.DebugPrint(ErrorType.Error, "Neue Zeilen nicht möglich: " + f);
-            throw new Exception();
-        }
+        if (!string.IsNullOrEmpty(f)) { return (null, "Neue Zeilen nicht möglich: " + f, true); }
 
         var item = SearchByKey(key);
-        if (item != null) {
-            Develop.DebugPrint(ErrorType.Error, "Schlüssel belegt!");
-            throw new Exception();
-        }
+        if (item != null) { return (null, "Schlüssel bereits belegt!", true); }
 
-        // Die Split-Colmn an den Anfang setzen
+        // REPARIERT: Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
         var chunkvalue = string.Empty;
-        List<ColumnItem> l = [.. db.Column];
+        List<ColumnItem> orderedColumns = [.. db.Column];
+
         if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
-            _ = l.Remove(spc);
-            l.Insert(0, spc);
+            _ = orderedColumns.Remove(spc);
+            orderedColumns.Insert(0, spc);
             chunkvalue = FilterCollection.InitValue(spc, true, fc) ?? string.Empty;
+
+            // Chunk-Wert validieren bevor wir fortfahren
+            if (string.IsNullOrEmpty(chunkvalue)) { return (null, "Chunk-Wert konnte nicht ermittelt werden", true); }
         }
 
         var u = Generic.UserName;
         var d = DateTime.UtcNow;
 
-        var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
-        if (!string.IsNullOrEmpty(s)) {
-            Develop.DebugPrint(ErrorType.Error, "Erstellung fehlgeschlagen: " + s);
-            throw new Exception();
-        }
+        // REPARIERT: Fehlerbehandlung für Zeilen-Erstellung
+        var createResult = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
+        if (!string.IsNullOrEmpty(createResult)) { return (null, $"Erstellung fehlgeschlagen: {createResult}", false); }
 
         item = SearchByKey(key);
-        if (item == null) {
-            Develop.DebugPrint(ErrorType.Error, $"Erstellung fehlgeschlagen, ID Fehler {key}");
-            throw new Exception();
+        if (item == null) { return (null, $"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}", false); }
+
+        // REPARIERT: Sichere Setzung der Initial-Werte mit Fehlerbehandlung
+        var initErrors = new List<string>();
+
+        foreach (var thisColumn in orderedColumns) {
+            var val = FilterCollection.InitValue(thisColumn, true, fc);
+            if (val is { } && !string.IsNullOrWhiteSpace(val)) {
+                try {
+                    var cellResult = item.Database?.Cell.Set(thisColumn, item, val, "Initialwert neuer Zeile");
+                    if (!string.IsNullOrEmpty(cellResult)) {
+                        initErrors.Add($"Spalte {thisColumn.KeyName}: {cellResult}");
+                    }
+                } catch (Exception ex) {
+                    initErrors.Add($"Spalte {thisColumn.KeyName}: Exception - {ex.Message}");
+                }
+            }
         }
 
-        // Dann die Inital-Werte reinschreiben
-
-        foreach (var thisColum in l) {
-            var val = FilterCollection.InitValue(thisColum, true, fc);
-            if (val is { } && !string.IsNullOrWhiteSpace(val)) {
-                item.CellSet(thisColum, val, "Initialwert neuer Zeile");
-            }
+        // REPARIERT: Bei kritischen Initialwert-Fehlern Zeile wieder löschen
+        if (initErrors.Count > 0) {
+            // Kritische Fehler - Zeile wieder entfernen
+            _ = Remove(item, "Cleanup nach Initialwert-Fehler");
+            return (null, $"Initialwert-Fehler: {string.Join("; ", initErrors)}", false);
         }
 
         Develop.MonitorMessage?.Invoke(db.Caption, "PlusZeichen", $"Neue Zeile erstellt: {db.Caption}\\{item.CellFirstString()}", 0);
 
-        _ = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
+        var scriptResult = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
 
         InvalidatedRowsManager.AddInvalidatedRow(item);
 
-        return item;
+        if (scriptResult.Failed) {
+            // Script-Fehler sind nicht kritisch, aber loggen
+            return (item, $"InitialValues-Skript fehlgeschlagen für Zeile {key}: {scriptResult.FailedReason}", true);
+        }
+
+        return (item, string.Empty, true);
     }
 
     private void OnRowAdded(RowEventArgs e) {

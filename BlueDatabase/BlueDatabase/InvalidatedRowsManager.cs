@@ -112,10 +112,9 @@ public class InvalidatedRowsManager {
             if (_isProcessing) { return; }
             _isProcessing = true;
         }
-        var fehlercount = 0;
 
         try {
-            Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "Taschenrechner", $"Arbeite {_invalidatedRows.Keys.ToList().Count()} invalide Zeilen ab", 0);
+            Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "Taschenrechner", $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
             var totalProcessedCount = 0;
             var entriesBeforeProcessing = 0;
 
@@ -145,24 +144,12 @@ public class InvalidatedRowsManager {
                     if (_invalidatedRows.TryRemove(key, out var row) && row != null) {
                         // Verarbeite die Zeile
                         ProcessSingleRow(row, masterRow, extendedAllowed, totalProcessedCount + 1);
-
-                        //// Markiere als verarbeitet
-                        //_processedRowIds[key] = true;
-
                         totalProcessedCount++;
                         OnRowChecked(new RowEventArgs(row));
-                    } else {
-                        masterRow?.OnDropMessage(ErrorType.Warning, $"Fehler beim Abarbeiten.");
-                        Thread.Sleep(1000);
-                        fehlercount++;
-                        if (fehlercount > 20) {
-                            masterRow?.OnDropMessage(ErrorType.Warning, $"Abbruch wegen zu vieler Fehler.");
-                            break;
-                        }
                     }
+                    // KEIN else-Zweig mehr: TryRemove() Fehlschlag ist normal bei Concurrency
+                    // Andere Threads können das Item bereits verarbeitet haben
                 }
-
-                if (fehlercount > 20) { break; }
 
                 Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
             } while (true);

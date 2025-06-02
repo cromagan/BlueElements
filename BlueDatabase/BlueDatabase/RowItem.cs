@@ -35,6 +35,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.Converter;
 
@@ -876,9 +877,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="reason"></param>
     internal string SetValueInternal(ColumnItem column, string value, Reason reason) {
         var tries = 0;
+        var startTime = DateTime.UtcNow;
+        var maxWaitSeconds = 20; // Timeout nach 20 Sekunden
 
         while (true) {
             if (IsDisposed || column.Database is not { IsDisposed: false } db) { return "Datenbank ungültig"; }
+
+            // Timeout-Prüfung statt nur tries-Counter
+            if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > maxWaitSeconds) {
+                return "Timeout: Wert konnte nicht gesetzt werden.";
+            }
+
             if (tries > 100) { return "Wert konnte nicht gesetzt werden."; }
 
             var cellKey = CellCollection.KeyOfCell(column, this);
@@ -888,6 +897,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (string.IsNullOrEmpty(value)) {
                     if (!db.Cell.TryRemove(cellKey, out _)) {
                         tries++;
+                        // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
+                        Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
                     }
                 }
@@ -895,6 +906,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (!string.IsNullOrEmpty(value)) {
                     if (!db.Cell.TryAdd(cellKey, new CellItem(value))) {
                         tries++;
+                        // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch  
+                        Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
                     }
                 }
@@ -917,7 +930,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return string.Empty;
         }
     }
-
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {

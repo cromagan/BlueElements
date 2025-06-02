@@ -445,6 +445,10 @@ public class DatabaseFragments : Database {
         try {
             _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), Encoding.UTF8);
         } catch {
+            // File Handle Leak verhindern: Eventuell teilweise erstellte Writer disposed
+            _writer?.Dispose();
+            _writer = null;
+
             Pause(3, false);
             Develop.CheckStackOverflow();
             StartWriter();

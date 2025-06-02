@@ -349,13 +349,21 @@ public class DatabaseChunk : Database {
         chunkId = chunkId.ToLower();
 
         do {
-            if (_chunks.TryGetValue(chunkId, out var chk)) {
-                chk.WaitInitialDone();
-                if (chk.LoadFailed) { return false; }
-                if (!chk.NeedsReload(important)) { return true; }
+            Chunk? chkToWait = null;
+
+            // Kurzer Lock nur für die kritischen Prüfungen - Race Condition vermeiden
+            lock (chunksBeingSaved) {
+                _chunks.TryGetValue(chunkId, out chkToWait);
+
+                if (chkToWait == null && chunksBeingSaved.Count == 0) { break; }
             }
 
-            if (chunksBeingSaved.Count == 0) { break; }
+            // WaitInitialDone außerhalb des Locks um Deadlock zu vermeiden
+            if (chkToWait != null) {
+                chkToWait.WaitInitialDone();
+                if (chkToWait.LoadFailed) { return false; }
+                if (!chkToWait.NeedsReload(important)) { return true; }
+            }
 
             if (t.ElapsedMilliseconds > 150 * 1000) {
                 Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Abbruch, {chunksBeingSaved.Count} Chunks wurden noch nicht gespeichert.", 0);
@@ -364,7 +372,6 @@ public class DatabaseChunk : Database {
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                //Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen", 0);
                 OnDropMessage(ErrorType.Info, $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
                 Develop.DoEvents();
             }
@@ -387,8 +394,11 @@ public class DatabaseChunk : Database {
         OnLoaded();
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
-        if (ok && mustExist && chunk.Bytes.Length == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
-            chunk.SaveRequired = true;
+        // Kurzer Lock um Race Condition zu vermeiden
+        lock (chunksBeingSaved) {
+            if (ok && mustExist && chunk.Bytes.Length == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
+                chunk.SaveRequired = true;
+            }
         }
 
         return ok;
@@ -477,27 +487,35 @@ public class DatabaseChunk : Database {
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
         if (chunksnew == null || chunksnew.Count == 0) { return false; }
 
+        // Chunks für Speicherung vormerken
+        var chunksToSave = new List<string>();
         foreach (var thisChunk in chunksnew) {
             _ = _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
             if (existingChunk == null || existingChunk.SaveRequired) {
-                _ = chunksBeingSaved.TryAdd(thisChunk.KeyName, 0);
+                if (chunksBeingSaved.TryAdd(thisChunk.KeyName, 0)) {
+                    chunksToSave.Add(thisChunk.KeyName);
+                }
             }
         }
 
         var allok = true;
 
-        foreach (var thisChunk in chunksnew) {
-            if (chunksBeingSaved.ContainsKey(thisChunk.KeyName)) {
-                OnDropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
+        try {
+            foreach (var thisChunk in chunksnew) {
+                if (chunksBeingSaved.ContainsKey(thisChunk.KeyName)) {
+                    OnDropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
 
-                if (thisChunk.DoExtendedSave()) {
-                    _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
-                    // Chunk-ID aus dem Set entfernen
-                    _ = chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
-                } else {
-                    allok = false;
+                    if (thisChunk.DoExtendedSave()) {
+                        _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
+                    } else {
+                        allok = false;
+                    }
                 }
-
+            }
+        } finally {
+            // Sicherstellen, dass alle vorgemerkten Chunks aus chunksBeingSaved entfernt werden
+            foreach (var chunkKey in chunksToSave) {
+                _ = chunksBeingSaved.TryRemove(chunkKey, out _);
             }
         }
 
