@@ -2585,7 +2585,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var f = EditableErrorReason(chunkval, chunkval, viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditNormaly, true, true, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
-        if (viewItem?.Column is not { IsDisposed: true } contentHolderCellColumn) {
+        if (viewItem?.Column is not { IsDisposed: false } contentHolderCellColumn) {
             NotEditableInfo("Keine Spalte angeklickt.");
             return;
         }
@@ -2595,8 +2595,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (viewItem.Column.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
         }
-        
-        if (contentHolderCellColumn is not { IsDisposed: true }) {
+
+        if (contentHolderCellColumn is not { IsDisposed: false }) {
             NotEditableInfo("Keine Spalte angeklickt.");
             return;
         }

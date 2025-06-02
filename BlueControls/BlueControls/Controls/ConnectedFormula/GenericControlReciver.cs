@@ -41,7 +41,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     public readonly List<GenericControlReciverSender> Parents = [];
     private readonly object _filterInputLock = new object();
+
+    // Ein privates Objekt zum Sperren für die Thread-Sicherheit
+    private readonly object _lockObject = new object();
+
     private readonly object _rowsInputLock = new object();
+    private string? _cachedFilterHash = null;
     private Database? _databaseInput;
 
     private FilterCollection? _filterInput;
@@ -49,8 +54,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     private bool _rowsInputChangedHandling;
 
     private int _waitTimeoutMs = 5000;
-
-    private string? _cachedFilterHash = null;
 
     #endregion
 
@@ -71,29 +74,32 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         get => _databaseInput;
 
         private set {
-            // Wichtig! Darf nur von HandelChangesNow befültg werden!
+            // Wichtig! Darf nur von HandelChangesNow befüllt werden!
             // Grund: Es wird hier nichts invalidiert!
 
             if (value is { IsDisposed: true }) { value = null; }
 
             if (value == _databaseInput) { return; }
 
-            if (_databaseInput != null) {
-                _databaseInput.Cell.CellValueChanged -= DatabaseInput_CellValueChanged;
-                _databaseInput.Column.ColumnPropertyChanged -= DatabaseInput_ColumnPropertyChanged;
-                _databaseInput.Row.RowChecked -= DatabaseInput_RowChecked;
-                _databaseInput.Loaded -= DatabaseInput_Loaded;
-                _databaseInput.Disposed -= DatabaseInput_Disposed;
-            }
+            // Thread-Sicherheit: Sperren Sie den Zugriff auf _databaseInput
+            lock (_lockObject) {
+                if (_databaseInput is { }) {
+                    _databaseInput.Cell.CellValueChanged -= DatabaseInput_CellValueChanged;
+                    _databaseInput.Column.ColumnPropertyChanged -= DatabaseInput_ColumnPropertyChanged;
+                    _databaseInput.Row.RowChecked -= DatabaseInput_RowChecked;
+                    _databaseInput.Loaded -= DatabaseInput_Loaded;
+                    _databaseInput.Disposed -= DatabaseInput_Disposed;
+                }
 
-            _databaseInput = value;
+                _databaseInput = value;
 
-            if (_databaseInput is { IsDisposed: false }) {
-                _databaseInput.Cell.CellValueChanged += DatabaseInput_CellValueChanged;
-                _databaseInput.Column.ColumnPropertyChanged += DatabaseInput_ColumnPropertyChanged;
-                _databaseInput.Row.RowChecked += DatabaseInput_RowChecked;
-                _databaseInput.Loaded += DatabaseInput_Loaded;
-                _databaseInput.Disposed += DatabaseInput_Disposed;
+                if (_databaseInput is { IsDisposed: false }) {
+                    _databaseInput.Cell.CellValueChanged += DatabaseInput_CellValueChanged;
+                    _databaseInput.Column.ColumnPropertyChanged += DatabaseInput_ColumnPropertyChanged;
+                    _databaseInput.Row.RowChecked += DatabaseInput_RowChecked;
+                    _databaseInput.Loaded += DatabaseInput_Loaded;
+                    _databaseInput.Disposed += DatabaseInput_Disposed;
+                }
             }
         }
     }
@@ -362,7 +368,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 }
 
                 // Erstelle eine Kopie der Rows außerhalb des Locks
-                List<RowItem> rowsToProcess = [..FilterInput.Rows];
+                List<RowItem> rowsToProcess = [.. FilterInput.Rows];
                 // Verarbeitung außerhalb des Locks
                 if (RowSingleOrNull() is { IsDisposed: false } r) {
                     _ = r.CheckRow();

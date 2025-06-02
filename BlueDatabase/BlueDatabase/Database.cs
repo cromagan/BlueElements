@@ -1096,7 +1096,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
     /// Der Wert wird intern fest verankert - bei ReadOnly werden aber weitere Schritte ignoriert.
     /// </summary>
-    /// <param name="command"></param>
+    /// <param name="type"></param>
     /// <param name="column"></param>
     /// <param name="row"></param>
     /// <param name="previousValue"></param>
@@ -1104,32 +1104,32 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <param name="user"></param>
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
-    public string ChangeData(DatabaseDataType command, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, string oldchunkvalue, string newchunkvalue) {
+    public string ChangeData(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, string oldchunkvalue, string newchunkvalue) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
-        if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
+        if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
         _saveRequired = true;
 
         if (!ReadOnly) {
-            var newChunkId = DatabaseChunk.GetChunkId(this, command, newchunkvalue);
+            var newChunkId = DatabaseChunk.GetChunkId(this, type, newchunkvalue);
             var oldChunkId = newChunkId;
 
             if (string.IsNullOrEmpty(oldChunkId) || newchunkvalue == oldchunkvalue) {
                 oldChunkId = newChunkId;
             } else {
-                oldChunkId = DatabaseChunk.GetChunkId(this, command, oldchunkvalue);
+                oldChunkId = DatabaseChunk.GetChunkId(this, type, oldchunkvalue);
             }
 
-            var f2 = WriteValueToDiscOrServer(command, changedTo, column, row, user, datetimeutc, comment, oldChunkId, newChunkId);
+            var f2 = WriteValueToDiscOrServer(type, changedTo, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
             if (!string.IsNullOrEmpty(f2)) { return f2; }
         }
 
-        var error = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
+        var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
         if (!string.IsNullOrEmpty(error)) { return error; }
 
         if (LogUndo) {
-            AddUndo(command, column, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", newchunkvalue);
+            AddUndo(type, column, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", newchunkvalue);
         }
 
         return string.Empty;
@@ -2469,7 +2469,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var chunksnew = DatabaseChunk.GenerateNewChunks(this, 1200, setfileStateUtcDateTo, false);
         if (chunksnew == null || chunksnew.Count != 1) { return false; }
 
-        if (!chunksnew[0].DoExtendedSave(5)) { return false; }
+        if (!chunksnew[0].DoExtendedSave()) { return false; }
 
         _saveRequired = false;
         FileStateUtcDate = setfileStateUtcDateTo;
@@ -2732,7 +2732,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string oldChunkId, string newChunkId) {
+    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }

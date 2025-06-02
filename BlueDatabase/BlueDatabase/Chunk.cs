@@ -393,36 +393,24 @@ public class Chunk : IHasKeyName {
         return false;
     }
 
-    internal bool DoExtendedSave(int minbytes) {
+    internal bool DoExtendedSave() {
         var filename = ChunkFileName;
         Develop.MonitorMessage?.Invoke(MainFileName.FileNameWithoutSuffix(), "Diskette", $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
         var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
-        if (!Save(tempfile, minbytes)) { return false; }
+        if (!Save(tempfile, 10)) { return false; }
 
-        // Backup erstellen, wenn nötig
-        if (FileExists(backup)) {
-            if (!DeleteFile(backup, false)) {
-                DeleteFile(tempfile, false);
-                Develop.SetUserDidSomething();
-                return false;
-            }
+        if (FileExists(backup) && !DeleteFile(backup, false)) {
+            DeleteFile(tempfile, false);
+            return false;
         }
 
-        Develop.SetUserDidSomething();
-
-        // Haupt-Datei wird zum Backup umbenannt, aber nur wenn sie existiert
-        if (FileExists(filename)) {
-            if (!MoveFile(filename, backup, false)) {
-                DeleteFile(tempfile, false);
-                Develop.SetUserDidSomething();
-                return false;
-            }
+        if (FileExists(filename) && !MoveFile(filename, backup, false)) {
+            DeleteFile(tempfile, false);
+            return false;
         }
-
-        Develop.SetUserDidSomething();
 
         // --- TmpFile wird zum Haupt ---
         const int maxRetries = 5;
@@ -430,39 +418,25 @@ public class Chunk : IHasKeyName {
 
         for (var attempt = 1; attempt <= maxRetries; attempt++) {
             if (MoveFile(tempfile, filename, false)) {
-                Develop.SetUserDidSomething();
                 _lastcheck = DateTime.UtcNow;
                 _fileinfo = GetFileInfo(ChunkFileName, true);
                 return true;
             }
 
             // Paralleler Prozess hat gespeichert?
-            Develop.SetUserDidSomething();
             if (FileExists(filename)) {
                 DeleteFile(tempfile, false);
-
-                // Wenn die Datei existiert, sollten wir sie neu laden, um Konsistenz zu gewährleisten
-                try {
-                    LoadBytesFromDisk();
-                } catch {
-                    // Fehler beim Laden ignorieren, wir geben trotzdem false zurück
-                }
-
-                Develop.SetUserDidSomething();
+                LoadBytesFromDisk();
                 return false;
             }
 
-            if (attempt < maxRetries) {
-                Thread.Sleep(retryDelayMs * attempt); // Exponentielles Backoff
-                continue;
-            }
+            Thread.Sleep(retryDelayMs * attempt);
 
-            // Aufräumen falls alles fehlschlägt
-            DeleteFile(tempfile, false);
-            Develop.DebugPrint(ErrorType.Error, $"Chunk defekt nach {maxRetries} Versuchen:\r\n{filename}\r\n{tempfile}");
-            return false;
+            if (FileExists(tempfile)) { return false; }
         }
 
+        // Aufräumen falls alles fehlschlägt
+        DeleteFile(tempfile, false);
         return false;
     }
 
@@ -488,7 +462,7 @@ public class Chunk : IHasKeyName {
         if (!important) { return string.Empty; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
-            if (!DoExtendedSave(0)) {
+            if (!DoExtendedSave()) {
                 LastEditTimeUtc = DateTime.MinValue;
                 return "Bearbeitung konnte nicht gesetzt werden.";
             }

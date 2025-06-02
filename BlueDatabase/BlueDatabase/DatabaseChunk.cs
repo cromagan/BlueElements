@@ -490,14 +490,14 @@ public class DatabaseChunk : Database {
             if (chunksBeingSaved.ContainsKey(thisChunk.KeyName)) {
                 OnDropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
 
-                if (!thisChunk.DoExtendedSave(5)) {
-                    allok = false;
-                } else {
+                if (thisChunk.DoExtendedSave()) {
                     _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
+                    // Chunk-ID aus dem Set entfernen
+                    _ = chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
+                } else {
+                    allok = false;
                 }
 
-                // Chunk-ID aus dem Set entfernen
-                _ = chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
             }
         }
 
@@ -526,11 +526,11 @@ public class DatabaseChunk : Database {
 
     protected override bool SaveRequired() => _chunks.Values.Any(chunk => chunk.SaveRequired);
 
-    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string oldChunkId, string newChunkId) {
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         newChunkId = newChunkId.ToLower();
         oldChunkId = oldChunkId.ToLower();
 
-        var f = base.WriteValueToDiscOrServer(type, comment, column, row, user, datetimeutc, comment, oldChunkId, newChunkId);
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 

@@ -262,8 +262,8 @@ public class DatabaseFragments : Database {
 
     protected override bool SaveRequired() => true;
 
-    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment, string oldChunkId, string newChunkId) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment, oldChunkId, newChunkId);
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!

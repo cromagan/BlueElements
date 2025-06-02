@@ -534,7 +534,7 @@ public sealed class ExtText : List<ExtChar>, IPropertyChangedFeedback, IDisposab
     private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles style) {
         var endpos = htmlText.IndexOf('>', start + 1);
         if (endpos <= start) {
-            Develop.DebugPrint("String-Fehler, > erwartet. " + htmlText);
+            //Develop.DebugPrint("String-Fehler, > erwartet. " + htmlText);
             return;
         }
         var oricode = htmlText.Substring(start + 1, endpos - start - 1);
