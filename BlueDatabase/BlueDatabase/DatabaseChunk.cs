@@ -331,6 +331,8 @@ public class DatabaseChunk : Database {
                 chkToWait.WaitInitialDone();
                 if (chkToWait.LoadFailed) { return false; }
                 if (!chkToWait.NeedsReload(important)) { return true; }
+                Develop.CheckStackOverflow();
+                chkToWait.LoadBytesFromDisk();
             }
 
             if (t.ElapsedMilliseconds > 150 * 1000) {
