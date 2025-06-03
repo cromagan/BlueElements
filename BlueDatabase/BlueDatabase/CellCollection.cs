@@ -369,7 +369,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             default: {
                     if (addRowIfNotExists) {
-                        var (newrow, message, _) = db.Row.GenerateAndAdd(fc.ToArray(), "LinkedCell aus " + db.TableName);
+                        var (newrow, message, _) = linkedDatabase.Row.GenerateAndAdd(fc.ToArray(), "LinkedCell aus " + db.TableName);
                         if (!string.IsNullOrEmpty(message)) { return (targetColumn, null, message, false); }
                         targetRow = newrow;
                     }

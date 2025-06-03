@@ -498,6 +498,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisfi.Column?.Database != db2) { return (null, "Datenbanken der Spalten im Filter unterschiedlich", true); }
         }
 
+        if (db2 != Database && db2 != null) { return (null, "Filter-Datenbank ist nicht die aktuelle Datenbank", true); }
+
         if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }
 
         if (db2.Column.First() is not { }) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler", false); }
