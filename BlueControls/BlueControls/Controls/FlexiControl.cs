@@ -516,13 +516,23 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public T? GetControl<T>() where T : Control {
-        CreateSubControls();
-        foreach (var control in Controls) {
-            if (control is T typedControl) {
-                return typedControl;
+        try {
+            if (InvokeRequired) {
+                return (T?)Invoke(new Func<T?>(GetControl<T>));
             }
+
+            if (IsDisposed) { return null; }
+
+            CreateSubControls();
+            foreach (var control in Controls) {
+                if (control is T typedControl) {
+                    return typedControl;
+                }
+            }
+            return null;
+        } catch {
+            return null;
         }
-        return null;
     }
 
     public void StyleComboBox(ComboBox? control, List<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {

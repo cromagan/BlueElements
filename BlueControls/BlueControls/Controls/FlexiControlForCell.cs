@@ -35,7 +35,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -52,6 +55,8 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private string _columnName;
 
     private RowItem? _lastrow;
+
+    private CancellationTokenSource? _markerCancellation;
 
     #endregion
 
@@ -243,6 +248,8 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
         if (disposing) {
+            _markerCancellation?.Cancel();
+            _markerCancellation?.Dispose();
             f.Dispose();
             components?.Dispose();
             RestartMarker(); // Restart beendet den Marker und starten ihn bei Bedarf
@@ -284,13 +291,24 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         }
     }
 
-    private void ActivateMarker() {
+    private async Task ActivateMarker() {
         if (IsDisposed || !Visible || !Enabled) { return; }
-
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
         if (_column is not { IsDisposed: false }) { return; }
-        if (_column.Relationship_to_First) { return; }
-        Marker.RunWorkerAsync();
+        if (!_column.Relationship_to_First) { return; }
+
+        // Alten Task abbrechen
+        _markerCancellation?.Cancel();
+        _markerCancellation?.Dispose();
+        _markerCancellation = new CancellationTokenSource();
+
+        try {
+            await RunMarkerAsync(_markerCancellation.Token);
+        } catch (OperationCanceledException) {
+            // Normal bei Cancel
+        } catch (Exception ex) {
+            Develop.DebugPrint("Marker Fehler: " + ex.Message);
+        }
     }
 
     private void CheckEnabledState(ColumnItem? column, RowItem? row) {
@@ -429,110 +447,93 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         }
     }
 
-    private void Marker_DoWork(object sender, DoWorkEventArgs e) {
+    private void RestartMarker() {
+        // Fire-and-forget Pattern für Event-Handler
+        _ = Task.Run(async () => {
+            try {
+                await ActivateMarker();
+            } catch (Exception ex) {
+                Develop.DebugPrint("RestartMarker Fehler: " + ex.Message);
+            }
+        });
+    }
+
+    private async Task RunMarkerAsync(CancellationToken cancellationToken) {
         if (IsDisposed || DatabaseInput is not { IsDisposed: false } db) { return; }
 
-        #region  in Frage kommende Textbox ermitteln txb
-
-        TextBox? txb = null;
-        foreach (var control in f.Controls) {
-            if (control is TextBox t) { txb = t; }
-        }
-
+        // Thread-sichere TextBox ermitteln
+        var txb = f.GetControl<TextBox>();
         if (txb == null) { return; }
 
-        #endregion
+        // Thread-sicherer Text-Zugriff
+        var initT = await Develop.GetSafePropertyValueAsync(() => txb.Text);
+        if (string.IsNullOrEmpty(initT)) { return; }
 
-        if (Marker.CancellationPending) { return; }
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
-
         if (_lastrow is not { IsDisposed: false } row) { return; }
-        if (Marker.CancellationPending) { return; }
 
         var col = db.Column.First();
         if (col == null) { return; }
 
-        List<string> names = [.. col.GetUcaseNamesSortedByLenght()];
+        // Background-Thread für schwere Berechnungen
+        await Task.Run(async () => {
+            var names = col.GetUcaseNamesSortedByLenght().ToList();
+            cancellationToken.ThrowIfCancellationRequested();
 
-        if (Marker.CancellationPending) { return; }
+            var myname = row.CellFirstString().ToUpperInvariant();
 
-        var myname = row.CellFirstString().ToUpperInvariant();
-        var initT = txb.Text;
-        bool ok;
+            bool processSuccessful;
+            do {
+                processSuccessful = true;
 
-        do {
-            ok = true;
-            Marker.ReportProgress(0, new List<object?> { txb, "Unmark1" });
-            Develop.DoEvents();
-            if (Marker.CancellationPending || initT != txb.Text) { return; }
-            Marker.ReportProgress(0, new List<object?> { txb, "Unmark2" });
-            Develop.DoEvents();
-            if (Marker.CancellationPending || initT != txb.Text) { return; }
-            try {
-                foreach (var thisWord in names) {
-                    var cap = 0;
-                    do {
-                        Develop.DoEvents();
-                        if (Marker.CancellationPending || initT != txb.Text) { return; }
-                        var fo = initT.IndexOfWord(thisWord, cap, RegexOptions.IgnoreCase);
-                        if (fo < 0) { break; }
-                        if (thisWord == myname) {
-                            Marker.ReportProgress(0, new List<object?> { txb, "Mark1", fo, fo + thisWord.Length - 1 });
-                        } else {
-                            Marker.ReportProgress(0, new List<object?> { txb, "Mark2", fo, fo + thisWord.Length - 1 });
+                try {
+                    // UI-Thread: Textbox zurücksetzen
+                    await Develop.InvokeAsync(() => {
+                        if (!txb.IsDisposed && !IsDisposed) {
+                            txb.Unmark(MarkState.MyOwn);
+                            txb.Unmark(MarkState.Other);
+                            txb.Invalidate();
                         }
-                        cap = fo + thisWord.Length;
-                    } while (true);
+                    });
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    // Verarbeitung der Wörter
+                    foreach (var thisWord in names) {
+                        var cap = 0;
+                        do {
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            // Thread-sicherer Text-Check
+                            var currentText = await Develop.GetSafePropertyValueAsync(() => txb.Text);
+                            if (currentText != initT) { return; }
+
+                            var fo = initT.IndexOfWord(thisWord, cap, RegexOptions.IgnoreCase);
+                            if (fo < 0) { break; }
+
+                            // UI-Thread: Markierung setzen
+                            await Develop.InvokeAsync(() => {
+                                if (!txb.IsDisposed && !IsDisposed) {
+                                    if (thisWord == myname) {
+                                        txb.Mark(MarkState.MyOwn, fo, fo + thisWord.Length - 1);
+                                    } else {
+                                        txb.Mark(MarkState.Other, fo, fo + thisWord.Length - 1);
+                                    }
+                                    txb.Invalidate();
+                                }
+                            });
+
+                            cap = fo + thisWord.Length;
+                        } while (true);
+                    }
+                } catch (Exception) {
+                    processSuccessful = false;
+                    await Task.Delay(100, cancellationToken); // Kurz warten vor Retry
                 }
-            } catch {
-                ok = false;
-            }
-        } while (!ok);
-    }
-
-    private void Marker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-        //Ja, Multithreading ist kompliziert...
-        if (Marker.CancellationPending) { return; }
-        var x = (List<object>)e.UserState;
-        var txb = (TextBox)x[0];
-        switch ((string)x[1]) {
-            case "Unmark1":
-                txb.Unmark(MarkState.MyOwn);
-                txb.Invalidate();
-                break;
-
-            case "Unmark2":
-                txb.Unmark(MarkState.Other);
-                txb.Invalidate();
-                break;
-
-            case "Mark1":
-                txb.Mark(MarkState.MyOwn, (int)x[2], (int)x[3]);
-                txb.Invalidate();
-                break;
-
-            case "Mark2":
-                txb.Mark(MarkState.Other, (int)x[2], (int)x[3]);
-                txb.Invalidate();
-                break;
-
-            default:
-                Develop.DebugPrint((string)x[1]);
-                break;
-        }
-    }
-
-    private void Marker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-        //ActivateMarker();
-    }
-
-    private void RestartMarker() {
-        if (Marker is { IsBusy: true, CancellationPending: false }) {
-            Marker.CancelAsync();
-        } else {
-            ActivateMarker();
-        }
+            } while (!processSuccessful && !cancellationToken.IsCancellationRequested);
+        }, cancellationToken);
     }
 
     private void SetValueFromCell(ColumnItem? column, RowItem? row) {

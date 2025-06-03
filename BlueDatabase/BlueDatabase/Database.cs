@@ -74,6 +74,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     protected readonly List<UndoItem> ChangesNotIncluded = [];
 
+    protected NeedPassword? _needPassword;
     private static List<string> _allavailableTables = [];
 
     /// <summary>
@@ -106,7 +107,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _globalShowPass = string.Empty;
 
     private bool _isInSave;
-    protected NeedPassword? _needPassword;
     private string _needsScriptFix = string.Empty;
     private DateTime _powerEditTime = DateTime.MinValue;
     private bool _readOnly;
@@ -1060,7 +1060,24 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
     /// </param>
     /// <returns></returns>
-    public virtual bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) => string.IsNullOrEmpty(FreezedReason);
+    public bool AmITemporaryMaster(int ranges, int rangee) {
+        if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) {
+            if (!BeSureToBeUpToDate()) { return false; }
+        }
+        if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
+
+        var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
+        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
+
+        ranges = Math.Max(ranges, 0);
+        //rangee = Math.Min(rangee, 55);
+
+        // Info:
+        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
+        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
+        return mins > ranges && mins < rangee;
+    }
 
     public bool AreScriptsExecutable() {
         if (!string.IsNullOrEmpty(_needsScriptFix)) { return false; }
@@ -2006,7 +2023,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
 
         OnDropMessage(ErrorType.Info, $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen");
-
     }
 
     public void LoadFromStream(Stream stream) {
@@ -2291,7 +2307,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return; }
 
-        _ = mainchunk.Save(newFileName, 100);
+        _ = mainchunk.Save(newFileName);
     }
 
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + TableName;
@@ -2302,7 +2318,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public void TryToSetMeTemporaryMaster() {
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
 
-        if (AmITemporaryMaster(0, 60, null)) { return; }
+        if (AmITemporaryMaster(0, 60)) { return; }
 
         if (!NewMasterPossible()) { return; }
 
@@ -2888,7 +2904,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         var masters = 0;
         foreach (var thisDb in AllFiles) {
-            if (thisDb is DatabaseFragments && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45, null)) {
+            if (thisDb is DatabaseFragments && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+                masters++;
+                if (masters >= MaxMasterCount) { return false; }
+            }
+            if (thisDb is DatabaseChunk && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
                 masters++;
                 if (masters >= MaxMasterCount) { return false; }
             }

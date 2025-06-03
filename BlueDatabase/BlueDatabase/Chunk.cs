@@ -49,6 +49,8 @@ public class Chunk : IHasKeyName {
     private string _keyname = string.Empty;
     private DateTime _lastcheck = DateTime.MinValue;
 
+    private int _minBytes = 0;
+
     #endregion
 
     #region Constructors
@@ -153,23 +155,18 @@ public class Chunk : IHasKeyName {
         _bytes.Clear();
     }
 
-    /// <summary>
-    /// Diese Routine lädt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
-    /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
-    /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
-    /// </summary>
-    /// <param name="checkmode"></param>
-    /// <returns></returns>
     public void LoadBytesFromDisk() {
         var c = ChunkFileName;
 
         if (!FileExists(c)) {
+            _minBytes = 0;
             InitByteList();
             return;
         }
 
         _lastcheck = DateTime.UtcNow;
         (_bytes, _fileinfo, LoadFailed) = LoadBytesFromDisk(c);
+        _minBytes = (int)(_bytes.Count * 0.1);
 
         if (LoadFailed) { return; }
 
@@ -199,9 +196,9 @@ public class Chunk : IHasKeyName {
         return false;
     }
 
-    public bool Save(string filename, int minBytes) {
+    public bool Save(string filename) {
         if (LoadFailed) { return false; }
-        if (_bytes.Count < minBytes) { return false; }
+        if (_bytes.Count < _minBytes) { return false; }
         if (_lastcheck.Year < 2000) { return false; }
 
         try {
@@ -209,7 +206,7 @@ public class Chunk : IHasKeyName {
 
             // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
             var contentBytes = RemoveHeaderDataTypes(_bytes);
-            if (contentBytes == null || contentBytes.Count < minBytes) { return false; }
+            if (contentBytes == null || contentBytes.Count < _minBytes) { return false; }
 
             // Neuen Header erstellen
             var head = GetHeadAndSetEditor();
@@ -225,6 +222,8 @@ public class Chunk : IHasKeyName {
             x.Write(datacompressed, 0, datacompressed.Length);
             x.Flush();
             x.Close();
+
+            _minBytes = (int)(contentBytes.Count * 0.1);
 
             Develop.SetUserDidSomething();
         } catch {
@@ -401,7 +400,7 @@ public class Chunk : IHasKeyName {
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
         var updateTime = DateTime.UtcNow;
-        if (!Save(tempfile, 10)) { return false; }
+        if (!Save(tempfile)) { return false; }
 
         // KRITISCHE ÄNDERUNG: FileInfo der temporären Datei VOR dem Move ermitteln
         // So wissen wir exakt, was wir schreiben und vermeiden Race Conditions

@@ -28,6 +28,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.IO;
 using Timer = System.Windows.Forms.Timer;
@@ -250,6 +251,83 @@ public static class Develop {
     public static void DebugPrint_RoutineMussUeberschriebenWerden(bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
 
     public static void DoEvents() => Application.DoEvents();
+
+    public static async Task<T?> GetSafePropertyValueAsync<T>(Func<T> propertyFunc) {
+        if (propertyFunc == null) {
+            DebugPrint(ErrorType.Error, "Die Eigenschaft darf nicht null sein.");
+            return default;
+        }
+
+        try {
+            var context = SynchronizationContext.Current;
+
+            // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
+            if (context != null && context.GetType().Name == "WindowsFormsSynchronizationContext") {
+                return propertyFunc();
+            }
+
+            // Nicht auf UI-Thread - zum UI-Thread marshallen
+            if (context != null) {
+                var tcs = new TaskCompletionSource<T?>();
+
+                context.Post(_ => {
+                    try {
+                        var result = propertyFunc();
+                        tcs.SetResult(result);
+                    } catch (Exception ex) {
+                        tcs.SetException(ex);
+                    }
+                }, null);
+
+                return await tcs.Task;
+            }
+
+            // Fallback: Kein SynchronizationContext - in Background Thread ausführen
+            return await Task.Run(propertyFunc);
+        } catch (Exception ex) {
+            DebugPrint(ErrorType.Error, $"Fehler beim Abrufen der Eigenschaft: {ex.Message}");
+            return default;
+        }
+    }
+
+    public static async Task InvokeAsync(Action action) {
+        if (action == null) {
+            DebugPrint(ErrorType.Error, "Die Action darf nicht null sein.");
+            return;
+        }
+
+        try {
+            var context = SynchronizationContext.Current;
+
+            // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
+            if (context != null && context.GetType().Name == "WindowsFormsSynchronizationContext") {
+                action();
+                return;
+            }
+
+            // Nicht auf UI-Thread - zum UI-Thread marshallen
+            if (context != null) {
+                var tcs = new TaskCompletionSource<bool>();
+
+                context.Post(_ => {
+                    try {
+                        action();
+                        tcs.SetResult(true);
+                    } catch (Exception ex) {
+                        tcs.SetException(ex);
+                    }
+                }, null);
+
+                await tcs.Task;
+                return;
+            }
+
+            // Fallback: Kein SynchronizationContext - in Background Thread ausführen
+            await Task.Run(action);
+        } catch (Exception ex) {
+            DebugPrint(ErrorType.Error, $"Fehler beim Ausführen der Action: {ex.Message}");
+        }
+    }
 
     public static bool IsAllreadyRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
 

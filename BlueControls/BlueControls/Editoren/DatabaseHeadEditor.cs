@@ -176,6 +176,10 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 symb = ImageCode.Abspielen;
                 break;
 
+            case DatabaseDataType.ColumnSystemInfo:
+                symb = ImageCode.Information;
+                break;
+
             case DatabaseDataType.TemporaryDatabaseMasterTimeUTC:
                 symb = ImageCode.Uhr;
                 break;
@@ -305,6 +309,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));
 
+    private void btnLoadAll_Click(object sender, System.EventArgs e) {
+        if (Database is not { IsDisposed: false }) { return; }
+        Database.BeSureAllDataLoaded(-1);
+    }
+
     private void btnMasterMe_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
@@ -344,7 +353,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnUnMaster_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (db.AmITemporaryMaster(0, 60, null)) {
+        if (db.AmITemporaryMaster(0, 60)) {
             db.TemporaryDatabaseMasterUser = "Unset: " + Generic.UserName;
             db.TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
             db.BeSureToBeUpToDate();
@@ -469,9 +478,4 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     #endregion
-
-    private void btnLoadAll_Click(object sender, System.EventArgs e) {
-        if (Database is not { IsDisposed: false }) { return; }
-        Database.BeSureAllDataLoaded(-1);
-    }
 }

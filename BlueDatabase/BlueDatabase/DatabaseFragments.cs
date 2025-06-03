@@ -77,34 +77,6 @@ public class DatabaseFragments : Database {
 
     #region Methods
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="ranges">Unter 5 Minuten wird auch geprüft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
-    /// <param name="rangee">Bis 55 Minuten ist sicher, dass es der Master ist.
-    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
-    /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
-    /// </param>
-    /// <returns></returns>
-    public override bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) {
-        if (!base.AmITemporaryMaster(ranges, rangee, row)) { return false; }
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) {
-            if (!BeSureToBeUpToDate()) { return false; }
-        }
-        if (TemporaryDatabaseMasterUser != MyMasterCode) { return false; }
-
-        var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
-        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
-
-        ranges = Math.Max(ranges, 0);
-        //rangee = Math.Min(rangee, 55);
-
-        // Info:
-        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
-        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
-        return mins > ranges && mins < rangee;
-    }
-
     public override bool BeSureToBeUpToDate() {
         if (!base.BeSureToBeUpToDate()) { return false; }
 
@@ -192,12 +164,10 @@ public class DatabaseFragments : Database {
 
         #region Bei Bedarf neue Komplett-Datenbank erstellen
 
-        if (!Develop.AllReadOnly && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55, null)) {
+        if (!Develop.AllReadOnly && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
             if (ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
                 OnDropMessage(ErrorType.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
-                if (!SaveInternal(IsInCache)) {
-                    return;
-                }
+                if (!SaveInternal(IsInCache)) { return; }
 
                 OnInvalidateView();
                 ChangesNotIncluded.Clear();

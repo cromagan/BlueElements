@@ -3003,7 +3003,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                             } else {
-                                if (db.AmITemporaryMaster(5, 55, cellInThisDatabaseRow)) {
+                                if (db.AmITemporaryMaster(5, 55)) {
                                     RowCollection.WaitDelay = 0;
                                 }
                             }
@@ -3328,9 +3328,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         // Master-Status anzeigen
-        if (db.AmITemporaryMaster(5, 55, null)) {
+        if (db.AmITemporaryMaster(5, 55)) {
             gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, filterHeight);
-        } else if (db.AmITemporaryMaster(0, 55, null)) {
+        } else if (db.AmITemporaryMaster(0, 55)) {
             gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, filterHeight);
         }
     }

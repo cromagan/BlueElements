@@ -130,7 +130,7 @@ internal class Method_Export : Method_Database, IUseableForButton {
                         var chunks = DatabaseChunk.GenerateNewChunks(myDb, 100, myDb.FileStateUtcDate, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
-                        _ = mainchunk.Save(filn, 100);
+                        _ = mainchunk.Save(filn);
                         break;
                     }
 

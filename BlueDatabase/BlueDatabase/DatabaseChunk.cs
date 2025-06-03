@@ -41,7 +41,7 @@ public class DatabaseChunk : Database {
     public static readonly string Chunk_AdditionalUseCases = "_uses";
     public static readonly string Chunk_MainData = "MainData";
 
-    //public static readonly string Chunk_Master = "_master";
+    public static readonly string Chunk_Master = "_master";
     public static readonly string Chunk_Variables = "_vars";
 
     /// <summary>
@@ -78,7 +78,7 @@ public class DatabaseChunk : Database {
 
         var usesChunk = mainChunk;
         var varChunk = mainChunk;
-        //var masterUserChunk = mainChunk; // Masterchunk wird nicht gespeichert. Weil es pro chunk einen Masteruser geben kann.
+        var masterUserChunk = mainChunk;
 
         if (chunksAllowed) {
             usesChunk = new Chunk(db.Filename, Chunk_AdditionalUseCases);
@@ -89,9 +89,9 @@ public class DatabaseChunk : Database {
             varChunk.InitByteList();
             chunks.Add(varChunk);
 
-            //masterUserChunk = new Chunk(db.Filename, Chunk_Master);
-            //masterUserChunk.InitByteList();
-            //chunks.Add(masterUserChunk); // Masterchunk wird nicht gespeichert. Weil es pro chunk einen Masteruser geben kann.
+            masterUserChunk = new Chunk(db.Filename, Chunk_Master);
+            masterUserChunk.InitByteList();
+            chunks.Add(masterUserChunk);
         }
 
         try {
@@ -103,10 +103,8 @@ public class DatabaseChunk : Database {
             mainChunk.SaveToByteList(DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString7());
             mainChunk.SaveToByteList(DatabaseDataType.Caption, db.Caption);
 
-            if (!chunksAllowed) {
-                mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
-                mainChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
-            }
+            masterUserChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
+            masterUserChunk.SaveToByteList(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
 
             mainChunk.SaveToByteList(DatabaseDataType.Tags, db.Tags.JoinWithCr());
             mainChunk.SaveToByteList(DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
@@ -159,7 +157,9 @@ public class DatabaseChunk : Database {
             var undoCount = 0;
             List<string> works2 = [];
 
-            foreach (var thisWorkItem in db.Undo) {
+            var sortedUndoItems = db.Undo.Where(item => item != null && item.LogsUndo(db)).OrderByDescending(item => item.DateTimeUtc);
+
+            foreach (var thisWorkItem in sortedUndoItems) {
                 if (thisWorkItem != null && thisWorkItem.LogsUndo(db)) {
                     if (undoCount < 1000 || (thisWorkItem.Command == DatabaseDataType.EventScript && important < 10)) {
                         undoCount++;
@@ -214,10 +214,7 @@ public class DatabaseChunk : Database {
         if (type.IsObsolete()) { return string.Empty; }
         if (type == DatabaseDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases.ToLower(); }
         if (type == DatabaseDataType.DatabaseVariables) { return Chunk_Variables.ToLower(); }
-        if (type is DatabaseDataType.TemporaryDatabaseMasterUser
-                 or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) {
-            return string.Empty; // Jeder Chunk ist ein eigener Master
-        }
+        if (type is DatabaseDataType.TemporaryDatabaseMasterUser or DatabaseDataType.TemporaryDatabaseMasterTimeUTC) { return Chunk_Master.ToLower(); }
 
         if (type.IsCellValue() || type is DatabaseDataType.Undo or DatabaseDataType.Command_AddRow or DatabaseDataType.Command_RemoveRow) {
             switch (spc.Value_for_Chunk) {
@@ -240,35 +237,6 @@ public class DatabaseChunk : Database {
         }
 
         return Chunk_MainData.ToLower();
-    }
-
-    /// <summary>
-    /// row == null --> false
-    /// </summary>
-    /// <param name="ranges"></param>
-    /// <param name="rangee"></param>
-    /// <param name="row"></param>
-    /// <returns></returns>
-    public override bool AmITemporaryMaster(int ranges, int rangee, RowItem? row) {
-        if (row == null) { return false; }
-        if (!base.AmITemporaryMaster(ranges, rangee, row)) { return false; }
-
-        //var chk = GetChunkId(row);
-
-        //if (Column.SplitColumn is { IsDisposed: false } spc) {
-        //    var value = FilterCollection.InitValue(filter, spc, false);
-
-        //    if (string.IsNullOrEmpty(value)) {
-        //        return "Bei Split-Datenbanken muss ein Filter in der Split-Spalte sein.";
-        //    }
-        //    return IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, first.KeyName, value, EditableErrorReasonType.EditCurrently);
-
-        if (Column?.ChunkValueColumn is { IsDisposed: false }) {
-            var chunkValue = row.ChunkValue;
-            return string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, chunkValue, EditableErrorReasonType.EditCurrently));
-        }
-
-        return false;
     }
 
     public override bool BeSureAllDataLoaded(int anzahl) {
@@ -322,7 +290,7 @@ public class DatabaseChunk : Database {
 
         if (Column.ChunkValueColumn != null) {
             if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, true)) { return false; }
-            //if (!LoadChunkWithChunkId(Chunk_Master, true, null, true)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Master, true, true)) { return false; }
             if (!LoadChunkWithChunkId(Chunk_Variables, true, true)) { return false; }
         }
         IsInCache = DateTime.UtcNow;
@@ -443,9 +411,6 @@ public class DatabaseChunk : Database {
     internal override string IsValueEditable(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) {
         var f = base.IsValueEditable(type, chunkValue, reason);
         if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (type is DatabaseDataType.TemporaryDatabaseMasterTimeUTC or
-                    DatabaseDataType.TemporaryDatabaseMasterUser) { return "MasterUser in diesen Datenbanktyp nicht möglich"; }
 
         if (reason == EditableErrorReasonType.EditNormaly) { return string.Empty; }
 

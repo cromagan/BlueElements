@@ -845,7 +845,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        if (db.AmITemporaryMaster(5, 55, this) && t.TotalMinutes > 30) { return true; }
+        if (db.AmITemporaryMaster(5, 55) && t.TotalMinutes > 30) { return true; }
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
@@ -906,7 +906,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (!string.IsNullOrEmpty(value)) {
                     if (!db.Cell.TryAdd(cellKey, new CellItem(value))) {
                         tries++;
-                        // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch  
+                        // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
                     }
@@ -930,6 +930,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return string.Empty;
         }
     }
+
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
