@@ -2184,9 +2184,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             var (newrow, message, _) = db.Row.GenerateAndAdd(filterColNewRow.ToArray(), "Neue Zeile über Tabellen-Ansicht");
 
-            if (!string.IsNullOrEmpty(message)) {
-                NotEditableInfo(message);
-            }
+            if (!string.IsNullOrEmpty(message)) { return message; }
 
             var l = table.RowsFiltered;
             if (newrow != null && !l.Contains(newrow)) {
@@ -2679,7 +2677,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         _ = colDia.ShowDialog();
         colDia.Dispose();
 
-        UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToString(), viewItem, cellInThisDatabaseRow, false);
+        NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToString(), viewItem, cellInThisDatabaseRow, false));
     }
 
     private void Cell_Edit_Dropdown(ColumnViewCollection ca, ColumnViewItem viewItem, RowData? cellInThisDatabaseRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
@@ -3449,7 +3447,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
         if (ck.RowData?.Row is not { IsDisposed: false } r) {
             // Neue Zeile!
-            UserEdited(this, toAdd, ck.ColumnView, null, false);
+            NotEditableInfo(UserEdited(this, toAdd, ck.ColumnView, null, false));
             return;
         }
 
@@ -3464,15 +3462,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
             if (!string.IsNullOrEmpty(toRemove)) { li.RemoveString(toRemove, false); }
             if (!string.IsNullOrEmpty(toAdd)) { li.Add(toAdd); }
-            UserEdited(this, li.JoinWithCr(), ck.ColumnView, ck.RowData, false);
+            NotEditableInfo(UserEdited(this, li.JoinWithCr(), ck.ColumnView, ck.RowData, false));
         } else {
             if (c.DropdownDeselectAllAllowed) {
                 if (toAdd == ck.RowData.Row.CellGetString(c)) {
-                    UserEdited(this, string.Empty, ck.ColumnView, ck.RowData, false);
+                    NotEditableInfo(UserEdited(this, string.Empty, ck.ColumnView, ck.RowData, false));
                     return;
                 }
             }
-            UserEdited(this, toAdd, ck.ColumnView, ck.RowData, false);
+            NotEditableInfo(UserEdited(this, toAdd, ck.ColumnView, ck.RowData, false));
         }
     }
 
@@ -3900,7 +3898,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         textbox.Tag = null;
         textbox.Visible = false;
-        UserEdited(this, w, column, row, true);
+        NotEditableInfo(UserEdited(this, w, column, row, true));
+
         Focus();
     }
 

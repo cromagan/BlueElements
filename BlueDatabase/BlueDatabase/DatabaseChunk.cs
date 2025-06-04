@@ -478,7 +478,7 @@ public class DatabaseChunk : Database {
                 if (chunksBeingSaved.ContainsKey(thisChunk.KeyName)) {
                     OnDropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
 
-                    if (thisChunk.DoExtendedSave()) {
+                    if (string.IsNullOrEmpty(thisChunk.DoExtendedSave())) {
                         _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
                     } else {
                         allok = false;

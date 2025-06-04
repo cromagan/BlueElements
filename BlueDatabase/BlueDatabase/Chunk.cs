@@ -157,16 +157,19 @@ public class Chunk : IHasKeyName {
 
     public void LoadBytesFromDisk() {
         var c = ChunkFileName;
+        _minBytes = 0;
 
         if (!FileExists(c)) {
-            _minBytes = 0;
             InitByteList();
             return;
         }
 
         _lastcheck = DateTime.UtcNow;
         (_bytes, _fileinfo, LoadFailed) = LoadBytesFromDisk(c);
-        _minBytes = (int)(_bytes.Count * 0.1);
+
+        if (RemoveHeaderDataTypes(_bytes) is { } b) {
+            _minBytes = (int)(b.Count * 0.1);
+        }
 
         if (LoadFailed) { return; }
 
@@ -196,25 +199,25 @@ public class Chunk : IHasKeyName {
         return false;
     }
 
-    public bool Save(string filename) {
-        if (LoadFailed) { return false; }
-        if (_bytes.Count < _minBytes) { return false; }
-        if (_lastcheck.Year < 2000) { return false; }
+    public string Save(string filename) {
+        if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
+        if (_bytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
+        if (_lastcheck.Year < 2000) { return "Chonk noch nicht geladen"; }
 
         try {
             Develop.SetUserDidSomething();
 
             // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
             var contentBytes = RemoveHeaderDataTypes(_bytes);
-            if (contentBytes == null || contentBytes.Count < _minBytes) { return false; }
+            if (contentBytes == null || contentBytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
 
             // Neuen Header erstellen
             var head = GetHeadAndSetEditor();
-            if (head == null || head.Count < 100) { return false; }
+            if (head == null || head.Count < 100) { return "Chunk-Kopf konnte nicht erstellt werden"; }
 
             // Header und Datensätze zusammenführen und komprimieren
             var datacompressed = head.Concat(contentBytes).ToArray().ZipIt();
-            if (datacompressed == null || datacompressed.Length < 100) { return false; }
+            if (datacompressed == null || datacompressed.Length < 100) { return "Komprimierug der Daten fehlgeschlagen"; }
 
             Develop.SetUserDidSomething();
 
@@ -228,10 +231,10 @@ public class Chunk : IHasKeyName {
             Develop.SetUserDidSomething();
         } catch {
             DeleteFile(filename, false);
-            return false;
+            return "Allgemeiner Fehler";
         }
 
-        return true;
+        return string.Empty;
     }
 
     public void SaveToByteList(ColumnItem column, RowItem row) {
@@ -392,7 +395,7 @@ public class Chunk : IHasKeyName {
         return false;
     }
 
-    internal bool DoExtendedSave() {
+    internal string DoExtendedSave() {
         var filename = ChunkFileName;
         Develop.MonitorMessage?.Invoke(MainFileName.FileNameWithSuffix(), "Diskette", $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
@@ -400,24 +403,27 @@ public class Chunk : IHasKeyName {
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
         var updateTime = DateTime.UtcNow;
-        if (!Save(tempfile)) { return false; }
+
+        var f = Save(tempfile);
+
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         // KRITISCHE ÄNDERUNG: FileInfo der temporären Datei VOR dem Move ermitteln
         // So wissen wir exakt, was wir schreiben und vermeiden Race Conditions
         var tempFileInfo = GetFileInfo(tempfile, true);
         if (string.IsNullOrEmpty(tempFileInfo)) {
             DeleteFile(tempfile, false);
-            return false;
+            return "Dateiinfo konnte nicht gelesen werden";
         }
 
         if (FileExists(backup) && !DeleteFile(backup, false)) {
             DeleteFile(tempfile, false);
-            return false;
+            return "Backup konnte nicht gelöscht werden";
         }
 
         if (FileExists(filename) && !MoveFile(filename, backup, false)) {
             DeleteFile(tempfile, false);
-            return false;
+            return "Hauptdatei konnte nicht verschoben werden";
         }
 
         // --- TmpFile wird zum Haupt ---
@@ -432,24 +438,24 @@ public class Chunk : IHasKeyName {
                     _fileinfo = tempFileInfo;
                 }
 
-                return true;
+                return string.Empty;
             }
 
             // Paralleler Prozess hat gespeichert?
             if (FileExists(filename)) {
                 DeleteFile(tempfile, false);
                 LoadBytesFromDisk();
-                return false;
+                return "Dateien wurden zwischenzeitlich verändert";
             }
 
             Thread.Sleep(retryDelayMs * attempt);
 
-            if (!FileExists(tempfile)) { return false; }
+            if (!FileExists(tempfile)) { return "Temp-Datei Zugriffsfehler"; }
         }
 
         // Aufräumen falls alles fehlschlägt
         DeleteFile(tempfile, false);
-        return false;
+        return "speichervorgang unerwartet abgebrochen";
     }
 
     internal string IsEditable(EditableErrorReasonType reason) {
@@ -474,9 +480,11 @@ public class Chunk : IHasKeyName {
         if (!important) { return string.Empty; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
-            if (!DoExtendedSave()) {
+            var f = DoExtendedSave();
+
+            if (!string.IsNullOrEmpty(f)) {
                 LastEditTimeUtc = DateTime.MinValue;
-                return "Bearbeitung konnte nicht gesetzt werden.";
+                return $"Bearbeitung konnte nicht gesetzt werden ({f})";
             }
         }
 
