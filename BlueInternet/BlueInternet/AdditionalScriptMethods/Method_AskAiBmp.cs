@@ -67,8 +67,7 @@ internal class Method_AskAiBmp : Method {
             try {
                 Generic.CollectGarbage();
                 // Convert the byte array to a base64 string
-                string base64String =
-                    Converter.BitmapToBase64(bmp, ImageFormat.Jpeg); // Convert.ToBase64String(imageBytes);
+                var base64String = Converter.BitmapToBase64(bmp, ImageFormat.Jpeg); // Convert.ToBase64String(imageBytes);
 
                 var messages = new List<Message>();
                 messages.Add(new Message {

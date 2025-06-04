@@ -2095,9 +2095,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Die Datenbank wurde verworfen."; }
         if (IsDisposed) { return "Die Spalte wurde verworfen."; }
 
-        var f = db.EditableErrorReason(mode);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
         if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
         //if (!SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
@@ -2110,6 +2107,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (UserEditDialogTypeInTable(this, false, true) == EditTypeTable.None) {
                 return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für sie Spalte definiert.";
             }
+        } else {
+            var f = db.EditableErrorReason(mode);
+            if (!string.IsNullOrEmpty(f)) { return f; }
+
+
         }
 
         return string.Empty;

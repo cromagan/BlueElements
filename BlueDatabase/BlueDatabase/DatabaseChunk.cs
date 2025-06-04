@@ -316,7 +316,7 @@ public class DatabaseChunk : Database {
         if (!_chunks.TryGetValue(Chunk_Variables.ToLower(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler"; }
         if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLower(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler"; }
 
-        return chkmain.EditableErrorReason(mode);
+        return chkmain.EditableErrorReason(mode); // Änderungen am Kopf kann alles durcheinander bringen.
     }
 
     /// <summary>
@@ -457,7 +457,7 @@ public class DatabaseChunk : Database {
     protected override bool SaveInternal(DateTime setfileStateUtcDateTo) {
         if (Develop.AllReadOnly) { return true; }
 
-        var m = EditableErrorReason(EditableErrorReasonType.Save);
+        var m = EditableErrorReason(EditableErrorReasonType.EditNormaly);
 
         if (!string.IsNullOrEmpty(m)) { return false; }
 
