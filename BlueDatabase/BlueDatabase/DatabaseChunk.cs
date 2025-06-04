@@ -65,6 +65,12 @@ public class DatabaseChunk : Database {
 
     #endregion
 
+    #region Properties
+
+    public override bool MultiUserPossible => true;
+
+    #endregion
+
     #region Methods
 
     public static List<Chunk>? GenerateNewChunks(Database db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
@@ -358,10 +364,10 @@ public class DatabaseChunk : Database {
             Freeze($"Chunk {chunk.KeyName} Laden fehlgeschlagen");
             return false;
         }
-        OnLoading();
+        //OnLoading();
         var ok = Parse(chunk);
 
-        OnLoaded();
+        //OnLoaded();
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
         // Kurzer Lock um Race Condition zu vermeiden

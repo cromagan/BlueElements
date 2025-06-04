@@ -376,6 +376,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public virtual bool MasterNeeded => false;
 
+    public virtual bool MultiUserPossible => false;
+
     public string NeedsScriptFix {
         get => _needsScriptFix;
         set {
@@ -1062,6 +1064,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <returns></returns>
     public bool AmITemporaryMaster(int ranges, int rangee) {
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
+        if (!MultiUserPossible) { return true; }
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) {
             if (!BeSureToBeUpToDate()) { return false; }
         }
@@ -2900,15 +2903,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (RowCollection.WaitDelay > 90) { return true; }
 
         if (MasterNeeded) { return true; }
-        if (DateTime.UtcNow.Subtract(FileStateUtcDate).TotalDays > 3) { return true; } // Letze Komplettierung, aber _masterneeded prüft das auch schon
 
         var masters = 0;
         foreach (var thisDb in AllFiles) {
-            if (thisDb is DatabaseFragments && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
-                masters++;
-                if (masters >= MaxMasterCount) { return false; }
-            }
-            if (thisDb is DatabaseChunk && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+            if (MultiUserPossible && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
                 masters++;
                 if (masters >= MaxMasterCount) { return false; }
             }

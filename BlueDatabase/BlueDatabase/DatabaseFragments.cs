@@ -73,6 +73,8 @@ public class DatabaseFragments : Database {
     /// </summary>
     public override bool MasterNeeded => _masterNeeded;
 
+    public override bool MultiUserPossible => true;
+
     #endregion
 
     #region Methods
