@@ -1142,7 +1142,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     public void OpenSearchAndReplaceInCells() {
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditCurrently) || Database == null) { return; }
+        if (TableView.EditabelErrorMessage(Database) || Database == null) { return; }
 
         if (!Database.IsAdministrator()) { return; }
 

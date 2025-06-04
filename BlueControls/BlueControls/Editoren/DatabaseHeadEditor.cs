@@ -430,7 +430,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void WriteInfosBack() {
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditAcut) || Database is not { IsDisposed: false }) { return; }
+        if (TableView.EditabelErrorMessage(Database) || Database is not { IsDisposed: false }) { return; }
 
         //eventScriptEditor.WriteScriptBack();
         Database.GlobalShowPass = txbKennwort.Text;

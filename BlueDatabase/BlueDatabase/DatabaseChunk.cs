@@ -245,6 +245,18 @@ public class DatabaseChunk : Database {
         return Chunk_MainData.ToLower();
     }
 
+    public override string AreAllDataCorrect() {
+        var f = base.AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler"; }
+        if (!_chunks.TryGetValue(Chunk_Master.ToLower(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler"; }
+        if (!_chunks.TryGetValue(Chunk_Variables.ToLower(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler"; }
+        if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLower(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler"; }
+
+        return string.Empty;
+    }
+
     public override bool BeSureAllDataLoaded(int anzahl) {
         if (!base.BeSureAllDataLoaded(anzahl)) { return false; }
 
@@ -303,20 +315,6 @@ public class DatabaseChunk : Database {
 
         TryToSetMeTemporaryMaster();
         return true;
-    }
-
-    public override string EditableErrorReason(EditableErrorReasonType mode) {
-        var f = base.EditableErrorReason(mode);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.EditNormaly) { return string.Empty; }
-
-        if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler"; }
-        if (!_chunks.TryGetValue(Chunk_Master.ToLower(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler"; }
-        if (!_chunks.TryGetValue(Chunk_Variables.ToLower(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler"; }
-        if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLower(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler"; }
-
-        return chkmain.EditableErrorReason(mode); // Änderungen am Kopf kann alles durcheinander bringen.
     }
 
     /// <summary>
@@ -428,6 +426,13 @@ public class DatabaseChunk : Database {
         _ = SaveInternal(FileStateUtcDate);
     }
 
+    public override void RepairAfterParse() {
+        base.RepairAfterParse();
+        if (!string.IsNullOrEmpty(CanWriteMainFile())) { return; }
+
+        FileStateUtcDate = new DateTime(2000, 1, 1);
+    }
+
     public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName).ToList();
 
     internal override string EditableErrorReason(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) {
@@ -457,11 +462,8 @@ public class DatabaseChunk : Database {
     protected override bool SaveInternal(DateTime setfileStateUtcDateTo) {
         if (Develop.AllReadOnly) { return true; }
 
-        var m = EditableErrorReason(EditableErrorReasonType.EditNormaly);
-
+        var m = CanWriteMainFile();
         if (!string.IsNullOrEmpty(m)) { return false; }
-
-        if (string.IsNullOrEmpty(Filename)) { return false; }
 
         Develop.SetUserDidSomething();
 
@@ -601,14 +603,6 @@ public class DatabaseChunk : Database {
         _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
 
         return true;
-    }
-
-    public override void RepairAfterParse() {
-        base.RepairAfterParse();
-        if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditNormaly))) { return; }
-
-        FileStateUtcDate = new DateTime(2000, 1, 1);
-
     }
 
     #endregion

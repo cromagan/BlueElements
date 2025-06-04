@@ -581,11 +581,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
     }
 
-    public static string EditableErrorReason(Database? database, EditableErrorReasonType mode) {
-        if (database is null) { return "Keine Datenbank zum Bearbeiten."; }
-        return database.EditableErrorReason(mode);
-    }
-
     public static void ForceSaveAll() {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
@@ -1104,6 +1099,19 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return mins > ranges && mins < rangee;
     }
 
+    //    StandardFormulaFile = sourceDatabase.StandardFormulaFile;
+    //    EventScriptVersion = sourceDatabase.EventScriptVersion;
+    //    NeedsScriptFix = sourceDatabase.NeedsScriptFix;
+    //    RowQuickInfo = sourceDatabase.RowQuickInfo;
+    //    if (tagsToo) {
+    //        Tags = new(sourceDatabase.Tags.Clone());
+    //    }
+    public virtual string AreAllDataCorrect() {
+        if (IsDisposed) { return "Datenbank verworfen."; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
+        return string.Empty;
+    }
+
     public bool AreScriptsExecutable() {
         if (!string.IsNullOrEmpty(_needsScriptFix)) { return false; }
 
@@ -1127,6 +1135,44 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public bool CanDoValueChangedScript() => IsRowScriptPossible(true) && EventScript.Get(ScriptEventTypes.value_changed).Count == 1;
+
+    /// <summary>
+    /// Konkrete Prüfung, ob jetzt gespeichert werden kann
+    /// </summary>
+    /// <returns></returns>
+    public string CanSaveMainChunk() {
+        var f = CanWriteMainFile();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
+
+        if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
+        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+
+        var fileSaveResult = IO.CanSaveFile(Filename, 5);
+        return fileSaveResult;
+    }
+
+    /// <summary>
+    /// Allgemeine Prüfung, ob es generell möglich ist, eine Bearbeitung auszuführen.
+    /// </summary>
+    /// <returns></returns>
+    public string CanWriteMainFile() {
+        var f = AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
+
+        if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) {
+            return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern.";
+        }
+
+        if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben"; }
+
+        if (!CanWrite(Filename)) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
+        return string.Empty;
+    }
 
     public string ChangeData(DatabaseDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, string.Empty, string.Empty);
 
@@ -1302,57 +1348,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         GC.SuppressFinalize(this);
     }
 
-    //    StandardFormulaFile = sourceDatabase.StandardFormulaFile;
-    //    EventScriptVersion = sourceDatabase.EventScriptVersion;
-    //    NeedsScriptFix = sourceDatabase.NeedsScriptFix;
-    //    RowQuickInfo = sourceDatabase.RowQuickInfo;
-    //    if (tagsToo) {
-    //        Tags = new(sourceDatabase.Tags.Clone());
-    //    }
-    public virtual string EditableErrorReason(EditableErrorReasonType mode) {
-        if (IsDisposed) { return "Datenbank verworfen."; }
-
-        if (mode is EditableErrorReasonType.OnlyRead) { return string.Empty; }
-
-        //if (!string.IsNullOrEmpty(Filename) && IsInCache.Year < 2000) { return "Datenbank wird noch geladen"; }
-
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
-
-        if (ReadOnly && mode.HasFlag(EditableErrorReasonType.Save)) { return "Datenbank schreibgeschützt!"; }
-
-        if (mode.HasFlag(EditableErrorReasonType.EditCurrently) || mode.HasFlag(EditableErrorReasonType.Save)) {
-            if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
-        }
-
-        if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) {
-            return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern.";
-        }
-
-        ////----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
-        //if (mode.HasFlag(EditableErrorReasonType.Load) || mode.HasFlag(EditableErrorReasonType.LoadForCheckingOnly)) {
-        //    if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
-        //}
-
-        //----------Alle Edits und Save ------------------------------------------------------------------------
-        //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
-        //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
-
-        if (!string.IsNullOrEmpty(Filename)) {
-            if (!CanWrite(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
-        }
-
-        //---------- Save ------------------------------------------------------------------------------------------
-        if (mode.HasFlag(EditableErrorReasonType.Save)) {
-            if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
-            if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
-            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-
-            var fileSaveResult = IO.CanSaveFile(Filename, 5);
-            if (!string.IsNullOrEmpty(fileSaveResult)) { return fileSaveResult; }
-        }
-        return string.Empty;
-    }
-
     public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE");
 
     /// <summary>
@@ -1374,7 +1369,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         OnCanDoScript(e);
         if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, name); }
 
-        var m = EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        var m = CanWriteMainFile();
         if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, name); }
 
         if (script == null) {
@@ -1720,7 +1715,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public string ImportCsv(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
-        var f = EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        var f = CanWriteMainFile();
 
         if (!string.IsNullOrEmpty(f)) {
             OnDropMessage(ErrorType.Warning, "Abbruch, " + f);
@@ -1933,7 +1928,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return eventScriptEditedOld == eventScriptOld;
     }
 
-    public bool IsNowEditable() => string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.EditAcut));
+    public bool IsNowEditable() => string.IsNullOrEmpty(CanWriteMainFile());
 
     public bool IsRowScriptPossible(bool checkMessageTo) {
         if (Column.SysRowChangeDate == null) { return false; }
@@ -2238,7 +2233,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public virtual void RepairAfterParse() {
         // Nicht IsInCache setzen, weil ansonsten DatabaseFragments nicht mehr funktioniert
 
-        if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditNormaly))) { return; }
+        if (!string.IsNullOrEmpty(CanWriteMainFile())) { return; }
 
         Column.Repair();
 
@@ -2358,7 +2353,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected void CreateWatcher() {
-        if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.EditNormaly))) {
+        if (string.IsNullOrEmpty(CanWriteMainFile())) {
             _checker?.Dispose();
 
             _checker = new Timer(Checker_Tick);
@@ -2457,11 +2452,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected virtual bool SaveInternal(DateTime setfileStateUtcDateTo) {
         if (Develop.AllReadOnly) { return true; }
 
-        var m = EditableErrorReason(EditableErrorReasonType.Save);
-
+        var m = CanWriteMainFile();
         if (!string.IsNullOrEmpty(m)) { return false; }
-
-        if (string.IsNullOrEmpty(Filename)) { return false; }
 
         Develop.SetUserDidSomething();
 

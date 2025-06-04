@@ -344,9 +344,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    return -1;
     //}
     public void Repair() {
-        GetSystems();
-        if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditNormaly)) || Database is null) { return; }
+        if (Database is not { IsDisposed: false } db || !string.IsNullOrEmpty(db.CanWriteMainFile())) { return; }
 
+        GetSystems();
         //for (var s1 = 0; s1 < Count; s1++) {
         //    if (this[s1] != null) {
         //        for (var s2 = s1 + 1; s2 < Count; s2++) {

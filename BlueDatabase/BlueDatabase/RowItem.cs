@@ -479,7 +479,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} invalidiert", 0);
     }
 
-    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditNormaly));
+    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.CanWriteMainFile());
 
     public bool IsNullOrEmpty() => IsDisposed || Database is not { IsDisposed: false } db
 || db.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
@@ -712,7 +712,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
+        var m = Database?.CanSaveMainChunk() ?? "Keine Datenbank angekommen";
         if (!string.IsNullOrEmpty(m) || Database is not { IsDisposed: false } || column == null) { return; }
 
         var columnVar = vars.Get(column.KeyName);

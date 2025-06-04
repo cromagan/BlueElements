@@ -216,7 +216,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 break;
 
             case "ZeileLöschen":
-                if (ErrorMessage(db, EditableErrorReasonType.EditCurrently)) { return; }
+                if (EditabelErrorMessage(db)) { return; }
                 if (!db.IsAdministrator()) { return; }
                 if (row is not { IsDisposed: false }) { return; }
 
@@ -227,7 +227,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 break;
 
             case "ContentDelete":
-                if (ErrorMessage(db, EditableErrorReasonType.EditCurrently)) { return; }
+                if (EditabelErrorMessage(db)) { return; }
 
                 row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
                 //tbl.Database.Cell.Delete(column, row?.KeyName);
@@ -279,7 +279,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 break;
 
             case "VorherigenInhaltWiederherstellen":
-                if (ErrorMessage(db, EditableErrorReasonType.EditCurrently)) { return; }
+                if (EditabelErrorMessage(db)) { return; }
 
                 Table.DoUndo(column, row);
                 break;
@@ -324,10 +324,12 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// Gibt TRUE zuück, wenn eine Fehlernachricht angezeigt wurde.
     /// </summary>
     /// <param name="database"></param>
-    /// <param name="mode"></param>
+    ///
     /// <returns></returns>
-    public static bool ErrorMessage(Database? database, EditableErrorReasonType mode) {
-        var m = Database.EditableErrorReason(database, mode);
+    public static bool EditabelErrorMessage(Database? database) {
+        if (database == null) { return false; }
+
+        var m = database.CanSaveMainChunk();
         if (string.IsNullOrEmpty(m)) { return false; }
 
         MessageBox.Show("Aktion nicht möglich:<br>" + m);
@@ -379,7 +381,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     public static void OpenLayoutEditor(Database db, string layoutToOpen) {
-        var x = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        var x = db.CanWriteMainFile();
         if (!string.IsNullOrEmpty(x)) {
             MessageBox.Show(x);
             return;
@@ -978,7 +980,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
         }
 
-        var m = Database.EditableErrorReason(db, EditableErrorReasonType.EditNormaly);
+        var m = db.CanWriteMainFile();
 
         grpAdminAllgemein.Enabled = string.IsNullOrEmpty(m);
         grpImport.Enabled = string.IsNullOrEmpty(m);

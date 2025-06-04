@@ -214,7 +214,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false } db || TableView.ErrorMessage(db, EditableErrorReasonType.EditAcut)) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db || TableView.EditabelErrorMessage(db)) { return; }
 
         ColumnItem? vorlage = null;
         if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.CVI?.Column?.Database == db) {

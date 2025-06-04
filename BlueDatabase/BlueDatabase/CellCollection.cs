@@ -132,7 +132,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
 
-        var f = column.EditableErrorReason(mode, checkEditmode);
+        var f = column.AreCellsEditable();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (!string.IsNullOrEmpty(newChunkValue) && row is not { }) {
@@ -165,7 +165,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     : "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp;
             }
 
-            if (canrepair) { return lcolumn.EditableErrorReason(mode, checkEditmode); }
+            if (canrepair) { return lcolumn.AreCellsEditable(); }
 
             return "Allgemeiner Fehler.";
         }
@@ -251,7 +251,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
         if (linkedDatabase.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
-            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, fi.ToArray()))) return (null, "Filter des Chunk-Wertes fehlt.");
+            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, fi.ToArray())))
+                return (null, "Filter des Chunk-Wertes fehlt.");
         }
 
         var fc = new FilterCollection(linkedDatabase, "cell get filter");

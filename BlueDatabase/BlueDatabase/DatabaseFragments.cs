@@ -79,6 +79,15 @@ public class DatabaseFragments : Database {
 
     #region Methods
 
+    public override string AreAllDataCorrect() {
+        var f = base.AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (_doingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
+
+        return string.Empty;
+    }
+
     public override bool BeSureToBeUpToDate() {
         if (!base.BeSureToBeUpToDate()) { return false; }
 
@@ -108,15 +117,6 @@ public class DatabaseFragments : Database {
 
         _isInFragmentLoader = false;
         return true;
-    }
-
-    public override string EditableErrorReason(EditableErrorReasonType mode) {
-        var f = base.EditableErrorReason(mode);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (_doingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
-
-        return string.Empty;
     }
 
     public override void Freeze(string reason) {
@@ -169,7 +169,9 @@ public class DatabaseFragments : Database {
         if (!Develop.AllReadOnly && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
             if (ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
                 OnDropMessage(ErrorType.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
-                if (!SaveInternal(IsInCache)) { return; }
+                if (!SaveInternal(IsInCache)) {
+                    return;
+                }
 
                 OnInvalidateView();
                 ChangesNotIncluded.Clear();

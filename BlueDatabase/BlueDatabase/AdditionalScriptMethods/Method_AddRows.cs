@@ -67,7 +67,7 @@ public class Method_AddRows : Method_Database {
         if (db == null) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
         if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
-        var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
+        var m = db.CanWriteMainFile();
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
 
         var keys = attvar.ValueListStringGet(2);

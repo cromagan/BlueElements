@@ -321,7 +321,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditAcut));
+    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.CanSaveMainChunk());
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
 

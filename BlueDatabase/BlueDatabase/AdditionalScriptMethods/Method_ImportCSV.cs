@@ -52,7 +52,7 @@ internal class Method_ImportCsv : Method_Database {
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
-        var m = myDb.EditableErrorReason(EditableErrorReasonType.EditAcut);
+        var m = myDb.CanWriteMainFile();
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }

@@ -423,7 +423,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// </summary>
 
     private void Column_DatenZurückschreiben() {
-        if (TableView.ErrorMessage(_column?.Database, EditableErrorReasonType.EditAcut)) { return; }
+        if (TableView.EditabelErrorMessage(_column?.Database)) { return; }
 
         if (_column is not { IsDisposed: false }) { return; }
         if (IsClosed) { return; }

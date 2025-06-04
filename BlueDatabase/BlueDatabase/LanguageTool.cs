@@ -64,7 +64,7 @@ public static class LanguageTool {
             txt = txt.Replace("\r\n", "\r");
             var r = Translation.Row[txt];
             if (r is not { IsDisposed: false }) {
-                var m = Translation.EditableErrorReason(EditableErrorReasonType.EditAcut);
+                var m = Translation.CanWriteMainFile();
                 if (!string.IsNullOrEmpty(m)) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 r = Translation.Row.GenerateAndAdd(txt, "Missing translation");

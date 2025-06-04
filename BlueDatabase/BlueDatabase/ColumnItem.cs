@@ -1148,7 +1148,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
-        if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut))) { return; }
+        if (Database is not { IsDisposed: false } db) { return; }
+        if (!string.IsNullOrEmpty(db.CanSaveMainChunk())) { return; }
 
         if (source.Database != null) { source.Repair(); }
 
@@ -1469,7 +1470,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return true;
     }
 
-    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditAcut));
+    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.CanSaveMainChunk());
 
     //}
     ///// <summary>
@@ -1557,7 +1558,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public void Repair() {
-        if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditNormaly))) { return; }
+        if (Database is not { IsDisposed: false } db) { return; }
+        if (!string.IsNullOrEmpty(db.CanWriteMainFile())) { return; }
 
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (IsDisposed) { return; }
@@ -2091,30 +2093,19 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     internal static string MakeValidColumnName(string columnname) => columnname.Trim().ToUpperInvariant().Replace(" ", "_").Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
 
-    internal string EditableErrorReason(EditableErrorReasonType mode, bool checkEditmode) {
+    internal string AreCellsEditable() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return "Die Datenbank wurde verworfen."; }
         if (IsDisposed) { return "Die Spalte wurde verworfen."; }
 
-        if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
-
-        //if (!SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
-
-        if (checkEditmode) {
-            if (!EditableWithTextInput && !EditableWithDropdown && !db.PowerEdit) {
-                return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
-            }
-
-            if (UserEditDialogTypeInTable(this, false, true) == EditTypeTable.None) {
-                return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für sie Spalte definiert.";
-            }
-        } else {
-            var f = db.EditableErrorReason(mode);
-            if (!string.IsNullOrEmpty(f)) { return f; }
-
-
+        if (!EditableWithTextInput && !EditableWithDropdown && !db.PowerEdit) {
+            return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
         }
 
-        return string.Empty;
+        if (UserEditDialogTypeInTable(this, false, true) == EditTypeTable.None) {
+            return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für sie Spalte definiert.";
+        }
+
+        return db.CanWriteMainFile();
     }
 
     internal void Optimize() {

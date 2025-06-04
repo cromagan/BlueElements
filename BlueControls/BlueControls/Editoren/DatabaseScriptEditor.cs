@@ -271,7 +271,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     //                TableView.OpenColumnEditor(c, null, null);
     //            }
     public override void WriteInfosBack() {
-        if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database is not
+        if (IsDisposed || TableView.EditabelErrorMessage(Database) || Database is not
             {
                 IsDisposed: false
             }) { return; }
@@ -398,7 +398,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         // Überprüfen, ob die Datenbank oder die Instanz selbst verworfen wurde
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         // Überprüfen, ob die Tabelle bearbeitet werden kann
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
+        if (TableView.EditabelErrorMessage(Database)) {
             Item = null;
             btnVerlauf.Enabled = false;
             return;
@@ -518,7 +518,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
         DatabaseScriptDescription? newItem = null;
         if (lstEventScripts.Checked.Count == 1 &&
-            !TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
+            !TableView.EditabelErrorMessage(Database)) {
             if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem selectedlstEventScripts) {
                 newItem = selectedlstEventScripts.Item as DatabaseScriptDescription;
             }

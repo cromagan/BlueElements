@@ -67,7 +67,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         if (!db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
-        var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
+        var m = db.CanWriteMainFile();
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
 
         StackTrace stackTrace = new();

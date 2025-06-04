@@ -439,8 +439,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
-        var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditCurrently);
-        if (!string.IsNullOrEmpty(m) || Database is not { IsDisposed: false } db) { return m; }
+        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+
+        var m = db.CanWriteMainFile();
+        if (!string.IsNullOrEmpty(m)) { return m; }
 
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
@@ -498,13 +500,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisfi.Column?.Database != db2) { return (null, "Datenbanken der Spalten im Filter unterschiedlich", true); }
         }
 
-        if (db2 != Database && db2 != null) { return (null, "Filter-Datenbank ist nicht die aktuelle Datenbank", true); }
-
         if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }
 
         if (db2.Column.First() is not { }) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler", false); }
 
-        var f = db2.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        var f = db2.CanWriteMainFile();
         if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f, true); }
 
         var s = db2.NextRowKey();
@@ -834,7 +834,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen!", true); }
 
-        var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+        var f = db.CanWriteMainFile();
         if (!string.IsNullOrEmpty(f)) { return (null, "Neue Zeilen nicht möglich: " + f, true); }
 
         var item = SearchByKey(key);
