@@ -46,6 +46,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     #region Fields
 
     private Database? _database;
+
     private RowCheckedEventArgs? _lastCheckedEventArgs;
 
     private string? _tmpQuickInfo;
@@ -363,23 +364,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return _lastCheckedEventArgs;
     }
 
-    //public void CloneFrom(RowItem source, bool nameAndKeyToo) {
-    //    if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-
-    //    var sdb = source.Database;
-    //    if (sdb is null || sdb.IsDisposed) { return; }
-
-    //    if (nameAndKeyToo) { KeyName = source.KeyName; }
-
-    //    foreach (var thisColumn in db.Column) {
-    //        var value = sdb.Cell.GetStringCore(sdb.Column[thisColumn.KeyName], source);
-
-    //        _ = db.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, Generic.UserName, DateTime.UtcNow, "Zeilen-Klonung", );
-
-    //        //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source), false);
-    //    }
-    //}
-
     public string CompareKey(List<ColumnItem> columns) {
         StringBuilder r = new();
 
@@ -417,6 +401,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         GC.SuppressFinalize(this);
     }
 
+    public string EditableErrorReason(EditableErrorReasonType mode) {
+        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+
+        return db.EditableErrorReason(DatabaseDataType.UTF8Value_withoutSizeData, ChunkValue, mode);
+    }
+
     /// <summary>
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
     /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
@@ -428,7 +418,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
-        var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
+        var m = EditableErrorReason(EditableErrorReasonType.EditNormaly);
         if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
@@ -457,6 +447,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return thisss.GetHashString();
     }
 
+    //public void CloneFrom(RowItem source, bool nameAndKeyToo) {
+    //    if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
     public void InvalidateCheckData() {
         _ = RowCollection.FailedRows.TryRemove(this, out _);
         _lastCheckedEventArgs = null;
@@ -486,6 +478,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} invalidiert", 0);
     }
+
+    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditNormaly));
 
     public bool IsNullOrEmpty() => IsDisposed || Database is not { IsDisposed: false } db
 || db.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));

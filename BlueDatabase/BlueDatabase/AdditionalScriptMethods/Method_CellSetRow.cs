@@ -75,12 +75,11 @@ public class Method_CellSetRow : Method_Database {
 
         value = columnToSet.AutoCorrect(value, true);
 
-        var oldchunk = row.ChunkValue;
-        var newchunkval = oldchunk;
+        var newchunkval = row.ChunkValue;
 
         if (columnToSet == db.Column.ChunkValueColumn) { newchunkval = value; }
 
-        var m = CellCollection.EditableErrorReason(oldchunk, newchunkval, columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
+        var m = CellCollection.EditableErrorReason(newchunkval, columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {

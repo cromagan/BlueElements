@@ -63,6 +63,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Properties
 
+    public ColumnItem? ChunkValueColumn { get; private set; }
     public int Count => _internal.Count;
 
     public Database? Database {
@@ -98,7 +99,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// <returns></returns>
 
     public bool IsDisposed { get; private set; }
-    public ColumnItem? ChunkValueColumn { get; private set; }
     public ColumnItem? SysChapter { get; private set; }
     public ColumnItem? SysCorrect { get; private set; }
     public ColumnItem? SysLocked { get; private set; }
@@ -190,7 +190,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    Develop.DebugPrint(ErrorType.Error, "Schlüssel belegt!");
         //    return null;
         //}
-
 
         _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, string.Empty, keyName);
         var item = this[keyName];
@@ -291,7 +290,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null) {
-
                 if (thisColumnItem.Value_for_Chunk != ChunkType.None) { ChunkValueColumn = thisColumnItem; }
                 if (thisColumnItem.IsFirst) { _firstColumn = thisColumnItem; }
 
@@ -347,7 +345,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //}
     public void Repair() {
         GetSystems();
-        if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut)) || Database is null) { return; }
+        if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditNormaly)) || Database is null) { return; }
 
         //for (var s1 = 0; s1 < Count; s1++) {
         //    if (this[s1] != null) {

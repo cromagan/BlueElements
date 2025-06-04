@@ -96,6 +96,8 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
         if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return false; }
 
+        if (!toEdit.IsNowEditable()) { return false; }
+
         if (!isDialog) { supportsCancel = false; }
 
         toEdit.Editor = editortype;

@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls;
 using BlueControls.BlueDatabaseDialogs;
@@ -39,11 +40,17 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     #region Fields
 
     public bool ShowHead = true;
+
     private readonly List<ColumnViewItem> _internal = [];
+
     private readonly List<string> _permissionGroups_Show = [];
+
     private int _clientWidth = 16;
+
     private Database? _database;
+
     private int? _headSize;
+
     private string _sheetStyle = Win11;
 
     #endregion
@@ -81,6 +88,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string ColumnQuickInfo => string.Empty;
+
     public int Count => _internal.Count;
 
     public Database? Database {
@@ -101,8 +109,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public Type? Editor { get; set; }
+
     public BlueFont Font_RowChapter { get; internal set; } = BlueFont.DefaultFont;
+
     public bool IsDisposed { get; private set; }
+
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
@@ -309,6 +320,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             thisViewItem?.Invalidate_X();
         }
     }
+
+    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditAcut));
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
 

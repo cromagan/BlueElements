@@ -339,7 +339,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
         var chunk = row.ChunkValue;
 
-        f.DisabledReason = CellCollection.EditableErrorReason(chunk, chunk, column, row, EditableErrorReasonType.EditNormaly, true, false, true, false); // Rechteverwaltung einfliesen lassen.
+        f.DisabledReason = CellCollection.EditableErrorReason(chunk, column, row, EditableErrorReasonType.EditNormaly, true, false, true, false); // Rechteverwaltung einfliesen lassen.
     }
 
     private void F_ControlAdded(object sender, ControlEventArgs e) {

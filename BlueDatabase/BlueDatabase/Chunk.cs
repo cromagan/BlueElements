@@ -458,12 +458,14 @@ public class Chunk : IHasKeyName {
         return "speichervorgang unerwartet abgebrochen";
     }
 
-    internal string IsEditable(EditableErrorReasonType reason) {
+    internal string EditableErrorReason(EditableErrorReasonType reason) {
         var important = reason is EditableErrorReasonType.EditCurrently or EditableErrorReasonType.EditAcut or EditableErrorReasonType.Save;
+
+        if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
 
         if (NeedsReload(important)) { return "Daten müssen neu geladen werden."; }
 
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2) {
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2 || reason == EditableErrorReasonType.Save) {
             if (LastEditUser != UserName) {
                 return $"Aktueller Bearbeiter: {LastEditUser}";
             } else {
@@ -478,6 +480,10 @@ public class Chunk : IHasKeyName {
         }
 
         if (!important) { return string.Empty; }
+
+        if (reason == EditableErrorReasonType.Save) {
+            return IO.CanSaveFile(ChunkFileName, 5);
+        }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
             var f = DoExtendedSave();

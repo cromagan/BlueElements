@@ -109,7 +109,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         if (db == null) { return; }
 
         var chunkval = row?.ChunkValue ?? string.Empty;
-        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(chunkval, chunkval, column, row, EditableErrorReasonType.EditNormaly, true, false, true, false));
+        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(chunkval, column, row, EditableErrorReasonType.EditNormaly, true, false, true, false));
 
         if (tbl != null && row != null) {
             e.ContextMenu.Add(ItemOf("Anheften", true));
@@ -978,7 +978,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
         }
 
-        var m = Database.EditableErrorReason(db, EditableErrorReasonType.EditCurrently);
+        var m = Database.EditableErrorReason(db, EditableErrorReasonType.EditNormaly);
 
         grpAdminAllgemein.Enabled = string.IsNullOrEmpty(m);
         grpImport.Enabled = string.IsNullOrEmpty(m);

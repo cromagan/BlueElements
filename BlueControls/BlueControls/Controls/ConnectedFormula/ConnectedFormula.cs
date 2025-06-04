@@ -29,6 +29,7 @@ using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -49,6 +50,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
 
     private static List<string>? _visibleFor_AllUsed;
+
     private readonly List<string> _notAllowedChilds = [];
 
     private ItemCollectionPadItem? _pages;
@@ -84,6 +86,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public string CaptionForEditor => "Formular";
 
     public string ColumnQuickInfo => string.Empty;
+
     public Type? Editor { get; set; }
 
     public ReadOnlyCollection<string> NotAllowedChilds {
@@ -182,6 +185,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         return pg.GetSubItemCollection(keyOrCaption);
     }
+
+    public bool IsNowEditable() => LockEditing();
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }

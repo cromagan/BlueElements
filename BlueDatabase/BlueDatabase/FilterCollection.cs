@@ -42,6 +42,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private readonly string _coment;
 
     private readonly List<FilterItem> _internal = [];
+
     private Database? _database;
 
     private List<RowItem>? _rows;
@@ -133,6 +134,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public Type? Editor { get; set; }
+
     public bool IsDisposed { get; private set; }
 
     public string RowFilterText {
@@ -430,6 +432,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         return false;
     }
+
+    public bool IsNowEditable() => true;
 
     public bool IsRowFilterActiv() {
         var fi = this[null];

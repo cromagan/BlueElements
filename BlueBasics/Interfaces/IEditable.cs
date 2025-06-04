@@ -30,4 +30,10 @@ public interface IEditable {
     Type? Editor { get; set; }
 
     #endregion
+
+    #region Methods
+
+    bool IsNowEditable();
+
+    #endregion
 }

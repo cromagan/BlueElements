@@ -305,6 +305,20 @@ public class DatabaseChunk : Database {
         return true;
     }
 
+    public override string EditableErrorReason(EditableErrorReasonType mode) {
+        var f = base.EditableErrorReason(mode);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.EditNormaly) { return string.Empty; }
+
+        if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler"; }
+        if (!_chunks.TryGetValue(Chunk_Master.ToLower(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler"; }
+        if (!_chunks.TryGetValue(Chunk_Variables.ToLower(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler"; }
+        if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLower(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler"; }
+
+        return chkmain.EditableErrorReason(mode);
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -416,11 +430,9 @@ public class DatabaseChunk : Database {
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName).ToList();
 
-    internal override string IsValueEditable(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) {
-        var f = base.IsValueEditable(type, chunkValue, reason);
+    internal override string EditableErrorReason(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) {
+        var f = base.EditableErrorReason(type, chunkValue, reason);
         if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (reason == EditableErrorReasonType.EditNormaly) { return string.Empty; }
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
@@ -430,7 +442,7 @@ public class DatabaseChunk : Database {
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
-        return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.IsEditable(reason);
+        return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.EditableErrorReason(reason);
     }
 
     protected override void Dispose(bool disposing) {
@@ -589,6 +601,14 @@ public class DatabaseChunk : Database {
         _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
 
         return true;
+    }
+
+    public override void RepairAfterParse() {
+        base.RepairAfterParse();
+        if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditNormaly))) { return; }
+
+        FileStateUtcDate = new DateTime(2000, 1, 1);
+
     }
 
     #endregion

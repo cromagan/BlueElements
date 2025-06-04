@@ -423,9 +423,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// </summary>
 
     private void Column_DatenZurückschreiben() {
-        if (TableView.ErrorMessage(_column?.Database, EditableErrorReasonType.EditAcut) || _column?.Database is null) { return; }
+        if (TableView.ErrorMessage(_column?.Database, EditableErrorReasonType.EditAcut)) { return; }
 
-        if (_column.IsDisposed) { return; }
+        if (_column is not { IsDisposed: false }) { return; }
         if (IsClosed) { return; }
 
         if (_column.ColumNameAllowed(txbName.Text)) {

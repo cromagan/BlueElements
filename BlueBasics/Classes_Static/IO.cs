@@ -53,6 +53,31 @@ public static class IO {
 
     #region Methods
 
+    /// <summary>
+    /// Prüft, ob eine Datei gespeichert werden kann, basierend auf Dateizugriff und zeitlichen Beschränkungen
+    /// </summary>
+    /// <param name="filename">Der Pfad zur zu prüfenden Datei</param>
+    /// <param name="recentWriteThresholdSeconds">Schwellwert in Sekunden für kürzliche Schreibvorgänge</param>
+    /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
+    public static string CanSaveFile(string filename, int recentWriteThresholdSeconds) {
+        if (string.IsNullOrEmpty(filename)) { return "Kein Dateiname angegeben."; }
+
+        // Prüfen ob Datei schreibbar ist
+        if (!CanWrite(filename)) { return "Windows blockiert die Datei."; }
+
+        // Prüfen ob kürzlich geschrieben wurde
+        try {
+            FileInfo fileInfo = new(filename);
+            if (DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc).TotalSeconds < recentWriteThresholdSeconds) {
+                return "Anderer Speichervorgang noch nicht abgeschlossen.";
+            }
+        } catch {
+            return "Dateizugriffsfehler.";
+        }
+
+        return string.Empty;
+    }
+
     public static bool CanWrite(string filename) => ProcessFile(TryCanWrite, filename, string.Empty, false) is true;
 
     public static bool CanWriteInDirectory(string directory) {

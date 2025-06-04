@@ -40,12 +40,19 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     #region Fields
 
     public static readonly BlueFont DefaultFont = new();
+
     private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new();
+
     private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
+
     private static readonly ConcurrentDictionary<string, Font> _fontCache = new();
+
     private static readonly ConcurrentDictionary<(int color, float width), Pen> _penCache = new();
+
     private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
+
     private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();
+
     private readonly ConcurrentDictionary<string, string> _transformCache = new();
 
     /// <summary>
@@ -426,6 +433,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
     }
 
+    public bool IsNowEditable() => true;
+
     public SizeF MeasureString(string text) => _fontOl.MeasureString(text);
 
     public SizeF MeasureString(string text, StringFormat stringFormat) {
@@ -741,7 +750,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (capitals) { result.ParseableAdd("Capitals", capitals); }
         if (onlyupper) { result.ParseableAdd("OnlyUpper", onlyupper); }
         if (onlylower) { result.ParseableAdd("OnlyLower", onlylower); }
-        if (colorOutline.FromHtmlCode().A >0) { result.ParseableAdd("OutlineColor", colorOutline); }
+        if (colorOutline.FromHtmlCode().A > 0) { result.ParseableAdd("OutlineColor", colorOutline); }
         if (colorMain != "000000") { result.ParseableAdd("Color", colorMain); }
         if (colorBack.FromHtmlCode().A > 0) { result.ParseableAdd("BackColor", colorBack); }
         return result;

@@ -280,6 +280,8 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     public static implicit operator Bitmap(QuickImage qi) => qi._bitmap;
 
+    public bool IsNowEditable() => true;
+
     public void OnNeedImage(NeedImageEventArgs e) => NeedImage?.Invoke(this, e);
 
     public string ReadableText() => string.Empty;

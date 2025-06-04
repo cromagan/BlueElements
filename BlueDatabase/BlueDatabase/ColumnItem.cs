@@ -497,7 +497,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (!_columnTags.IsDifferentTo(value)) { return; }
-                
+
             _ = Database?.ChangeData(DatabaseDataType.ColumnTags, this, _columnTags.JoinWithCr(), value.JoinWithCr());
             OnPropertyChanged("ColumnTags");
         }
@@ -997,8 +997,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem column, bool doDropDown, bool keybordInputAllowed) {
         if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
 
-     
-
         if (column.RelationType == RelationType.DropDownValues) { return EditTypeTable.Dropdown_Single; }
 
         if (column.TextboxEditPossible()) {
@@ -1471,6 +1469,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return true;
     }
 
+    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.EditableErrorReason(EditableErrorReasonType.EditAcut));
+
     //}
     ///// <summary>
     ///// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
@@ -1557,7 +1557,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public void Repair() {
-        if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut))) { return; }
+        if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditNormaly))) { return; }
 
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
         if (IsDisposed) { return; }
@@ -1791,7 +1791,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _ignoreAtRowFilter = true;
                 _filterOptions = FilterOptions.Enabled;
 
-                if(_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly) {
+                if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly) {
                     _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
                 }
 

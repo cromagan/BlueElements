@@ -98,6 +98,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private ColumnViewItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
+    private bool _newRowsAllowed = false;
     private Progressbar? _pg;
 
     private List<RowData>? _rowsFilteredAndPinned;
@@ -980,8 +981,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Zoom = nz;
     }
 
-    public string EditableErrorReason(string oldChunkVal, string newChunkVal, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
-        var f = CellCollection.EditableErrorReason(oldChunkVal, newChunkVal, cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false);
+    public string EditableErrorReason(string newChunkVal, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
+        var f = CellCollection.EditableErrorReason(newChunkVal, cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (checkEditmode) {
@@ -1217,7 +1218,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         try {
             var displayR = DisplayRectangleWithoutSlider();
             var maxY = 0;
-            if (UserEdit_NewRowAllowed()) { maxY += 18; }
+            _newRowsAllowed = UserEdit_NewRowAllowed();
+            if (_newRowsAllowed) { maxY += 18; }
             var expanded = true;
             var lastCap = string.Empty;
 
@@ -2138,7 +2140,10 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    private static void NotEditableInfo(string reason) => Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
+    private static void NotEditableInfo(string reason) {
+        if (string.IsNullOrEmpty(reason)) { return; }
+        Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
+    }
 
     private static string UserEdited(Table table, string newValue, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool formatWarnung) {
         if (cellInThisDatabaseColumn?.Column is not { IsDisposed: false } contentHolderCellColumn) { return "Spalte nicht vorhanden"; } // Dummy prüfung
@@ -2179,7 +2184,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.EditableErrorReason(newChunkVal, newChunkVal, cellInThisDatabaseColumn, null, EditableErrorReasonType.EditCurrently, true, false, true);
+            var fe = table.EditableErrorReason(newChunkVal, cellInThisDatabaseColumn, null, EditableErrorReasonType.EditAcut, true, false, true);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
             var (newrow, message, _) = db.Row.GenerateAndAdd(filterColNewRow.ToArray(), "Neue Zeile über Tabellen-Ansicht");
@@ -2218,17 +2223,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             if (newValue == oldval) { return string.Empty; }
 
             var newChunkVal = cellInThisDatabaseRow.Row.ChunkValue;
-            var oldChunkVal = newChunkVal;
 
             if (cellInThisDatabaseColumn.Column == cellInThisDatabaseColumn.Column.Database?.Column.ChunkValueColumn) {
                 newChunkVal = newValue;
             }
 
-            var check1 = table.EditableErrorReason(oldChunkVal, newChunkVal, cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true);
+            var check1 = table.EditableErrorReason(newChunkVal, cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true);
             if (!string.IsNullOrEmpty(check1)) { return check1; }
-
-            //var check2 = CellCollection.EditableErrorReason(newChunkVal, contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false, true, false);
-            //if (!string.IsNullOrEmpty(check2)) { return check2; }
 
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
@@ -2580,7 +2581,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown, string chunkval) {
-        var f = EditableErrorReason(chunkval, chunkval, viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditNormaly, true, true, true);
+        var f = EditableErrorReason(chunkval, viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditNormaly, true, true, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
         if (viewItem?.Column is not { IsDisposed: false } contentHolderCellColumn) {
@@ -2961,7 +2962,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var drawWidth = realHead.Width - p2;
         var rowScript = db.CanDoValueChangedScript();
 
-        if (SliderY.Value < p16 && UserEdit_NewRowAllowed()) {
+        if (SliderY.Value < p16 && _newRowsAllowed) {
             string txt;
             var plus = 0;
             QuickImage? qi;
@@ -3960,7 +3961,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
 
-        return string.IsNullOrEmpty(EditableErrorReason(string.Empty, string.Empty, fcv, null, EditableErrorReasonType.EditNormaly, true, true, false));
+        return string.IsNullOrEmpty(EditableErrorReason(string.Empty, fcv, null, EditableErrorReasonType.EditNormaly, true, true, false));
     }
 
     #endregion

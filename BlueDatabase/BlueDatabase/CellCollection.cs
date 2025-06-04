@@ -123,7 +123,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="repairallowed"></param>
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
-    public static string EditableErrorReason(string oldChunkValue, string newChunkValue, ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked) {
+    public static string EditableErrorReason(string newChunkValue, ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked) {
         if (mode == EditableErrorReasonType.OnlyRead) {
             if (column == null || row == null) { return string.Empty; }
         }
@@ -134,6 +134,16 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         var f = column.EditableErrorReason(mode, checkEditmode);
         if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (!string.IsNullOrEmpty(newChunkValue) && row is not { }) {
+            if (db.Column.First() != db.Column.ChunkValueColumn || mode != EditableErrorReasonType.EditNormaly) {
+                var f2 = db.EditableErrorReason(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue, mode);
+                if (!string.IsNullOrEmpty(f2)) { return f2; }
+            }
+        }
+
+        var f3 = row?.EditableErrorReason(mode) ?? string.Empty;
+        if (!string.IsNullOrEmpty(f3)) { return f3; }
 
         if (column.RelationType == RelationType.CellValues) {
             if (ignoreLinked) { return string.Empty; }
@@ -149,7 +159,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (lrow != null) {
                 var chunkval = lrow.ChunkValue;
-                var tmp = EditableErrorReason(chunkval, chunkval, lcolumn, lrow, mode, checkUserRights, checkEditmode, false, false);
+                var tmp = EditableErrorReason(chunkval, lcolumn, lrow, mode, checkUserRights, checkEditmode, false, false);
                 return string.IsNullOrEmpty(tmp)
                     ? string.Empty
                     : "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp;
@@ -160,19 +170,17 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Allgemeiner Fehler.";
         }
 
-        if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
-            //if (string.IsNullOrEmpty(newChunkValue)) {
-            //    return "Bei Split-Datenbanken muss ein Chunk-Wert in der Split-Spalte sein.";
-            //}
+        //if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
+        //if (string.IsNullOrEmpty(newChunkValue)) {
+        //    return "Bei Split-Datenbanken muss ein Chunk-Wert in der Split-Spalte sein.";
+        //}
 
-            if (column == spc) {
-                var f1 = db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, oldChunkValue, mode);
-                if (!string.IsNullOrEmpty(f1)) { return f1; }
-            }
+        //if (column == spc) {
+        //    var f1 = db.EditableErrorReason(DatabaseDataType.UTF8Value_withoutSizeData, oldChunkValue, mode);
+        //    if (!string.IsNullOrEmpty(f1)) { return f1; }
+        //}
 
-            var f2 = db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue, mode);
-            if (!string.IsNullOrEmpty(f2)) { return f2; }
-        }
+        //}
 
         if (row == null) {
             if (db.Column.First() is not { IsDisposed: false } firstcol || firstcol != column) {
@@ -386,7 +394,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     if (oldvalue != newvalue) {
                         var chunkValue = inputRow.ChunkValue;
 
-                        var editableError = EditableErrorReason(chunkValue, chunkValue, inputColumn, inputRow, EditableErrorReasonType.EditAcut, false, false, false, true);
+                        var editableError = EditableErrorReason(chunkValue, inputColumn, inputRow, EditableErrorReasonType.EditAcut, false, false, false, true);
 
                         if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
                         //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert

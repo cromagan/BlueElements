@@ -55,7 +55,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     #region Fields
 
     public const string DatabaseVersion = "4.10";
+
     public static readonly ObservableCollection<Database> AllFiles = [];
+
     public static int MaxMasterCount = 3;
 
     /// <summary>
@@ -75,6 +77,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected readonly List<UndoItem> ChangesNotIncluded = [];
 
     protected NeedPassword? _needPassword;
+
     private static List<string> _allavailableTables = [];
 
     /// <summary>
@@ -83,35 +86,51 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private static Timer? _databaseUpdateTimer;
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
+
     private readonly List<string> _datenbankAdmin = [];
+
     private readonly List<string> _permissionGroupsNewRow = [];
+
     private readonly List<string> _tags = [];
+
     private readonly List<Variable> _variables = [];
+
     private string _additionalFilesPath;
+
     private string _cachePfad = string.Empty;
-    private string _canWriteError = string.Empty;
-    private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
+
     private string _caption = string.Empty;
+
     private Timer? _checker;
+
     private int _checkerTickCount = -5;
+
     private string _columnArrangements = string.Empty;
+
     private string _createDate;
+
     private string _creator;
-    private string _editNormalyError = string.Empty;
-    private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
+
     private ReadOnlyCollection<DatabaseScriptDescription> _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
+
     private ReadOnlyCollection<DatabaseScriptDescription> _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
+
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
-    //private float _globalScale = 1f;
     private string _globalShowPass = string.Empty;
 
     private bool _isInSave;
+
     private string _needsScriptFix = string.Empty;
+
     private DateTime _powerEditTime = DateTime.MinValue;
+
     private bool _readOnly;
+
     private string _rowQuickInfo = string.Empty;
+
     private bool _saveRequired = false;
+
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -120,7 +139,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     private string _standardFormulaFile = string.Empty;
 
     private string _temporaryDatabaseMasterTimeUtc = string.Empty;
+
     private string _temporaryDatabaseMasterUser = string.Empty;
+
     private string _variableTmp;
 
     #endregion
@@ -346,7 +367,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// <summary>
     /// Der Wert wird im System verankert und gespeichert.
     /// Bei Datenbanken, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
-    /// Kann hier nur gelesen werden! Da eine Änderung über die Property  die Datei wieder auf ungespeichert setzen würde, würde hier eine
+    /// Kann hier nur gelesen werden! Da eine Änderung über die Property die Datei wieder auf ungespeichert setzen würde, würde hier eine
     /// Kettenreaktion ausgelöst werden.
     /// </summary>
     public DateTime FileStateUtcDate { get; protected set; }
@@ -502,6 +523,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected DateTime IsInCache { get; set; } = new(0);
 
     protected string LoadedVersion { get; private set; }
+
     private string? _additionalFilesPathTemp { get; set; }
 
     #endregion
@@ -1108,9 +1130,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public string ChangeData(DatabaseDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, string.Empty, string.Empty);
 
-    //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-    //    if (ci.AdditionalData.FileSuffix().ToUpperInvariant() is not "BDB" or "MDB") { return null; }
-
     //    if (!FileExists(ci.AdditionalData)) { return null; }
     /// <summary>
     /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
@@ -1317,12 +1336,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //----------Alle Edits und Save ------------------------------------------------------------------------
         //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
         //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
-        if (CheckForLastError(ref _editNormalyNextCheckUtc, ref _editNormalyError)) { return _editNormalyError; }
+
         if (!string.IsNullOrEmpty(Filename)) {
-            if (!CanWriteInDirectory(Filename.FilePath())) {
-                _editNormalyError = "Sie haben im Verzeichnis der Datei keine Schreibrechte.";
-                return _editNormalyError;
-            }
+            if (!CanWrite(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
         }
 
         //---------- Save ------------------------------------------------------------------------------------------
@@ -1330,57 +1346,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
             if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-            if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
-            if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
-            if (CheckForLastError(ref _canWriteNextCheckUtc, ref _canWriteError) && !string.IsNullOrEmpty(_canWriteError)) {
-                return _canWriteError;
-            }
 
-            try {
-                FileInfo f2 = new(Filename);
-                if (DateTime.UtcNow.Subtract(f2.LastWriteTimeUtc).TotalSeconds < 5) {
-                    _canWriteError = "Anderer Speichervorgang noch nicht abgeschlossen.";
-                    return _canWriteError;
-                }
-            } catch {
-                _canWriteError = "Dateizugriffsfehler.";
-                return _canWriteError;
-            }
-            if (!CanWrite(Filename)) {
-                _canWriteError = "Windows blockiert die Datei.";
-                return _canWriteError;
-            }
+            var fileSaveResult = IO.CanSaveFile(Filename, 5);
+            if (!string.IsNullOrEmpty(fileSaveResult)) { return fileSaveResult; }
         }
         return string.Empty;
-
-        // Gibt true zurück, wenn die letzte Prüfung noch gülig ist
-        static bool CheckForLastError(ref DateTime nextCheckUtc, ref string lastMessage) {
-            if (DateTime.UtcNow.Subtract(nextCheckUtc).TotalSeconds < 0) { return true; }
-            lastMessage = string.Empty;
-            nextCheckUtc = DateTime.UtcNow.AddSeconds(5);
-            return false;
-        }
     }
 
-    //    //FirstColumn = sourceDatabase.FirstColumn;
-    //    AdditionalFilesPath = sourceDatabase.AdditionalFilesPath;
-    //    CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
-    //    Caption = sourceDatabase.Caption;
-    //    //TimeCode = sourceDatabase.TimeCode;
-    //    CreateDate = sourceDatabase.CreateDate;
-    //    Creator = sourceDatabase.Creator;
-    //    //FileStateUTCDate = sourceDatabase.FileStateUTCDate;
-    //    //Filename - nope
-    //    //Tablename - nope
-    //    //TimeCode - nope
-    //    //GlobalScale = sourceDatabase.GlobalScale;
-    //    GlobalShowPass = sourceDatabase.GlobalShowPass;
-    //    //RulesScript = sourceDatabase.RulesScript;
-    //    if (SortDefinition == null || SortDefinition.ParseableItems().FinishParseable() != sourceDatabase.SortDefinition?.ParseableItems().FinishParseable()) {
-    //        if (sourceDatabase.SortDefinition != null) {
-    //            SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition.ParseableItems().FinishParseable());
-    //        }
-    //    }
     public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE");
 
     /// <summary>
@@ -1402,7 +1374,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         OnCanDoScript(e);
         if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, name); }
 
-        var m = EditableErrorReason(EditableErrorReasonType.EditAcut);
+        var m = EditableErrorReason(EditableErrorReasonType.EditNormaly);
         if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, name); }
 
         if (script == null) {
@@ -1961,6 +1933,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return eventScriptEditedOld == eventScriptOld;
     }
 
+    public bool IsNowEditable() => string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.EditAcut));
+
     public bool IsRowScriptPossible(bool checkMessageTo) {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
@@ -2261,10 +2235,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public virtual void ReorganizeChunks() { }
 
-    public void RepairAfterParse() {
+    public virtual void RepairAfterParse() {
         // Nicht IsInCache setzen, weil ansonsten DatabaseFragments nicht mehr funktioniert
 
-        if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditAcut))) { return; }
+        if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditNormaly))) { return; }
 
         Column.Repair();
 
@@ -2327,7 +2301,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         var code = MyMasterCode;
 
-        if (!string.IsNullOrEmpty(IsValueEditable(DatabaseDataType.TemporaryDatabaseMasterUser, string.Empty, EditableErrorReasonType.EditCurrently))) {
+        if (!string.IsNullOrEmpty(EditableErrorReason(DatabaseDataType.TemporaryDatabaseMasterUser, string.Empty, EditableErrorReasonType.EditCurrently))) {
             return;
         }
 
@@ -2345,7 +2319,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.DebugPrint(ErrorType.Warning, t);
     }
 
-    internal virtual string IsValueEditable(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) => string.Empty;
+    internal virtual string EditableErrorReason(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) => string.Empty;
 
     internal void OnDropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
@@ -2384,7 +2358,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     protected void CreateWatcher() {
-        if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
+        if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.EditNormaly))) {
             _checker?.Dispose();
 
             _checker = new Timer(Checker_Tick);
