@@ -241,8 +241,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue) {
         if (column?.Database is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
 
-        if (string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
-
         var f = IsCellEditable(column, row, newChunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -430,7 +428,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
                     if (oldvalue != newvalue) {
                         var chunkValue = inputRow.ChunkValue;
-
                         var editableError = GrantWriteAccess(inputColumn, inputRow, chunkValue);
 
                         if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }

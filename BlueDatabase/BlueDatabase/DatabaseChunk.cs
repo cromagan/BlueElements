@@ -390,11 +390,11 @@ public class DatabaseChunk : Database {
         if (chunk.LoadFailed) {
             Freeze($"Chunk {chunk.KeyName} Laden fehlgeschlagen");
             return false;
-        }
-        //OnLoading();
+        }tt
+        OnLoading();
         var ok = Parse(chunk);
 
-        //OnLoaded();
+        OnLoaded();
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
         // Kurzer Lock um Race Condition zu vermeiden

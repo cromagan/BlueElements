@@ -2040,7 +2040,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 } else if (_mouseOverRow != null) {
                     if (c.RelationType == RelationType.CellValues) {
                         if (c.LinkedDatabase != null) {
-                            var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, true);
+                            var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, false);
                             if (lcolumn != null) { QuickInfo = QuickInfoText(lcolumn, c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
                             if (!string.IsNullOrEmpty(info) && db.IsAdministrator()) {
