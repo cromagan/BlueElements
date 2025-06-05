@@ -230,55 +230,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <summary>
     /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
     /// </summary>
-    /// <param name="row"></param>
-    /// <param name="column"></param>
-    /// <param name="mode"></param>
-    /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei internen Prozessen angeben.</param>
-    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
-    /// <param name="repairallowed"></param>
-    /// <param name="ignoreLinked"></param>
-    /// <returns></returns>
-    public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue) {
-        if (column?.Database is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
-
-        var f = db.CanSaveMainChunk();
-        if (!string.IsNullOrWhiteSpace(f)) { return f; }
-
-        //var f = IsCellEditable(column, row, newChunkValue);
-        //if (!string.IsNullOrEmpty(f)) { return f; }
-
-        //f = db.CanSaveMainChunk();
-        //if (!string.IsNullOrEmpty(f)) { return f; }
-
-        f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (row != null) {
-            f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-            if (!string.IsNullOrEmpty(f)) { return f; }
-        }
-
-        if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
-
-            if (!string.IsNullOrEmpty(info) && ! canrepair) { return info; }
-
-            if (lcolumn?.Database is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank verworfen."; }
-
-            db2.PowerEdit = db.PowerEdit;
-
-            if (lrow != null) {
-                var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue);
-                return !string.IsNullOrEmpty(tmp)
-                    ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp
-                    : string.Empty;
-            }
-
-            return "Allgemeiner Fehler.";
-        }
-
-        return string.Empty;
-    }
+    /// <param name="column">Die Spalte</param>
+    /// <param name="row">Die Zeile</param>
+    /// <param name="newChunkValue">Der neue Zellwert</param>
+    /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
+    public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue) =>
+        IO.ProcessFile(TryGrantWriteAccess, false, 60, column, row, newChunkValue) as string ?? "Unbekannter Fehler";
 
     /// <summary>
     /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
@@ -353,7 +310,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Allgemeiner Fehler.";
         }
 
-        if(row == null && db.Column.ChunkValueColumn == db.Column.First() && newChunkValue == null) {
+        if (row == null && db.Column.ChunkValueColumn == db.Column.First() && newChunkValue == null) {
             // Es soll eine neue Zeile erstellt werden, und die erste Spalte ist die Chunk-Spalte.
             // Wir wissen nicht, was das Ziel ist.
             return string.Empty;
@@ -670,6 +627,64 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     }
                 }
             }
+        }
+    }
+
+    private static (object? returnValue, bool retry) TryGrantWriteAccess(params object[] args) {
+        if (args.Length < 3 ||
+            args[0] is not ColumnItem column ||
+            args[1] is not RowItem row ||
+            args[2] is not string newChunkValue) {
+            return ("Ungültige Parameter.", false);
+        }
+
+        try {
+            if (column?.Database is not { IsDisposed: false } db) {
+                return ("Es ist keine Spalte ausgewählt.", false);
+            }
+
+            var f = db.CanSaveMainChunk();
+            if (!string.IsNullOrWhiteSpace(f)) {
+                return (f, true);
+            }
+
+            f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue);
+            if (!string.IsNullOrEmpty(f)) {
+                return (f, true);
+            }
+
+            if (row != null) {
+                f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+                if (!string.IsNullOrEmpty(f)) {
+                    return (f, true);
+                }
+            }
+
+            if (column.RelationType == RelationType.CellValues) {
+                var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
+                if (!string.IsNullOrEmpty(info) && !canrepair) {
+                    return (info, true);
+                }
+
+                if (lcolumn?.Database is not { IsDisposed: false } db2) {
+                    return ("Verknüpfte Datenbank verworfen.", false);
+                }
+
+                db2.PowerEdit = db.PowerEdit;
+
+                if (lrow != null) {
+                    var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue);
+                    return (!string.IsNullOrEmpty(tmp)
+                        ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp
+                        : string.Empty, true);
+                }
+
+                return ("Allgemeiner Fehler.", false);
+            }
+
+            return (string.Empty, false);
+        } catch (Exception) {
+            return (string.Empty, true); // Retry bei Exceptions
         }
     }
 

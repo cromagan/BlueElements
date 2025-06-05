@@ -39,7 +39,6 @@ public static class IO {
 
     public static string LastFilePath = string.Empty;
     private const int _fileExistenceCheckRetryCount = 20;
-    private const int _fileOperationRetryCount = 5;
     private static readonly ConcurrentDictionary<string, (DateTime CheckTime, bool Result)> _canWriteCache = new();
     private static readonly object _fileOperationLock = new();
 
@@ -65,7 +64,6 @@ public static class IO {
         // Prüfen ob Datei schreibbar ist
         if (!CanWrite(filename)) { return "Windows blockiert die Datei."; }
 
-
         if (recentWriteThresholdSeconds > 0) {
             // Prüfen ob kürzlich geschrieben wurde
             try {
@@ -80,7 +78,7 @@ public static class IO {
         return string.Empty;
     }
 
-    public static bool CanWrite(string filename) => ProcessFile(TryCanWrite, false, filename) is true;
+    public static bool CanWrite(string filename) => ProcessFile(TryCanWrite, false, 5, filename) is true;
 
     public static bool CanWriteInDirectory(string directory) {
         if (string.IsNullOrEmpty(directory)) { return false; }
@@ -150,9 +148,9 @@ public static class IO {
         return CheckPath(pfad);
     }
 
-    public static bool CopyFile(string source, string target, bool toBeSure) => ProcessFile(TryCopyFile, toBeSure, source, target) is true;
+    public static bool CopyFile(string source, string target, bool abortIfFailed) => ProcessFile(TryCopyFile, abortIfFailed, abortIfFailed ? 60 : 5, source, target) is true;
 
-    public static bool DeleteDir(string directory, bool toBeSure) => ProcessFile(TryDeleteDir, toBeSure, directory) is true;
+    public static bool DeleteDir(string directory, bool abortIfFailed) => ProcessFile(TryDeleteDir, abortIfFailed, abortIfFailed ? 60 : 5, directory) is true;
 
     /// <summary>
     /// Löscht eine Liste von Dateien
@@ -178,14 +176,14 @@ public static class IO {
         return did;
     }
 
-    public static bool DeleteFile(string file, bool toBeSure) => ProcessFile(TryDeleteFile, toBeSure, file) is true;
+    public static bool DeleteFile(string file, bool abortIfFailed) => ProcessFile(TryDeleteFile, abortIfFailed, abortIfFailed ? 60 : 5, file) is true;
 
     /// <summary>
     /// Prüft, ob ein Verzeichnis existiert, mit zusätzlichen Prüfungen und Fehlerbehandlung
     /// </summary>
     /// <param name="pfad">Der zu prüfende Pfad</param>
     /// <returns>True, wenn das Verzeichnis existiert</returns>
-    public static bool DirectoryExists(string pfad) => ProcessFile(TryDirectoryExists, false, pfad) is true;
+    public static bool DirectoryExists(string pfad) => ProcessFile(TryDirectoryExists, false, 5, pfad) is true;
 
     public static bool ExecuteFile(string fileName, string arguments = "", bool waitForExit = false, bool logException = true) {
         try {
@@ -208,7 +206,7 @@ public static class IO {
     /// </summary>
     /// <param name="file">Die zu prüfende Datei</param>
     /// <returns>True, wenn die Datei existiert</returns>
-    public static bool FileExists(string? file) { return ProcessFile(TryFileExists, false, file ?? string.Empty) is true; ; }
+    public static bool FileExists(string? file) { return ProcessFile(TryFileExists, false, 5, file ?? string.Empty) is true; ; }
 
     /// <summary>
     /// Gibt den Dateinamen ohne Suffix zurück.
@@ -307,7 +305,7 @@ public static class IO {
     /// <param name="filename">Der Dateiname</param>
     /// <param name="mustDo">True wenn die Funktion auf jeden Fall ein Ergebnis liefern muss</param>
     /// <returns>Dateizeitstempel und -größe als String</returns>
-    public static string GetFileInfo(string filename, bool mustDo) => ProcessFile(TryGetFileInfo, mustDo, filename) as string ?? string.Empty;
+    public static string GetFileInfo(string filename, bool abortIfFailed) => ProcessFile(TryGetFileInfo, abortIfFailed, abortIfFailed ? 60 : 5, filename) as string ?? string.Empty;
 
     /// <summary>
     /// Lädt Bytes aus einer Datei mit automatischer Retry-Logik und Dekomprimierung
@@ -315,7 +313,7 @@ public static class IO {
     public static (byte[] bytes, string fileinfo, bool failed) LoadBytesFromDisk(string filename, bool autoDecompress) {
         if (string.IsNullOrEmpty(filename)) { return (Array.Empty<byte>(), string.Empty, true); }
 
-        var result = ProcessFile(TryLoadBytesFromDisk, true, filename, autoDecompress);
+        var result = ProcessFile(TryLoadBytesFromDisk, false, 60, filename, autoDecompress);
 
         // Rückgabe ist ein object, das wir zu unserem Tupel casten müssen
         if (result is not null and ValueTuple<byte[], string, bool> loadResult) {
@@ -325,16 +323,16 @@ public static class IO {
         return (Array.Empty<byte>(), string.Empty, true);
     }
 
-    public static bool MoveDirectory(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveDirectory, toBeSure, oldName, newName) is true;
+    public static bool MoveDirectory(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveDirectory, abortIfFailed, abortIfFailed ? 60 : 5, oldName, newName) is true;
 
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist
     /// </summary>
     /// <param name="oldName">Quellpfad</param>
     /// <param name="newName">Zielpfad</param>
-    /// <param name="toBeSure">True für garantierte Ausführung (sonst Programmabbruch)</param>
+    /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <returns>True bei Erfolg</returns>
-    public static bool MoveFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveFile, toBeSure, oldName, newName) is true;
+    public static bool MoveFile(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveFile, abortIfFailed, abortIfFailed ? 60 : 5, oldName, newName) is true;
 
     /// <summary>
     /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
@@ -362,6 +360,36 @@ public static class IO {
             z--;
             if (z <= 1) { return string.Empty; }
             if (pfad.Substring(z - 1, 1) == "\\") { return pfad.Substring(0, z); }
+        }
+    }
+
+    /// <summary>
+    /// Führt einen Datei-Befehl mit erweiterter Fehlerbehandlung und Wiederholungsversuchen aus
+    /// </summary>
+    /// <param name="processMethod">Die auszuführende Methode</param>
+    /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
+    /// <param name="args">Variable Parameter</param>
+    public static object? ProcessFile(DoThis processMethod, bool abortIfFailed, int trySeconds, params object[] args) {
+        if (Develop.AllReadOnly) { return true; }
+
+        var startTime = DateTime.UtcNow;
+
+        while (true) {
+            var (returnValue, retry) = processMethod(args);
+            if (!retry) { return returnValue; }
+
+            // Bei abortIfFailed=true weiter versuchen, aber nach 60 Sekunden eine Fehlermeldung ausgeben
+            if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > trySeconds) {
+                var argsStr = string.Join(", ", args.Select(a => a?.ToString() ?? "null"));
+
+                if (abortIfFailed) {
+                    Develop.DebugPrint(ErrorType.Error, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + argsStr);
+                }
+
+                return returnValue;
+            }
+
+            Thread.Sleep(200);
         }
     }
 
@@ -471,39 +499,6 @@ public static class IO {
     }
 
     /// <summary>
-    /// Führt einen Datei-Befehl mit erweiterter Fehlerbehandlung und Wiederholungsversuchen aus
-    /// </summary>
-    /// <param name="processMethod">Die auszuführende Methode</param>
-    /// <param name="toBeSure">True für garantierte Ausführung (sonst Programmabbruch)</param>
-    /// <param name="args">Variable Parameter</param>
-    public static object? ProcessFile(DoThis processMethod, bool toBeSure, params object[] args) {
-        if (Develop.AllReadOnly) { return true; }
-
-        var mytry = 0;
-        var startTime = DateTime.UtcNow;
-
-        while (true) {
-            var (returnValue, retry) = processMethod(args);
-            if (!retry) { return returnValue; }
-
-            mytry++;
-
-            // Wenn maximale Anzahl Versuche erreicht ist
-            if (mytry > _fileOperationRetryCount) {
-                if (!toBeSure) { return returnValue; }
-
-                // Bei toBeSure=true weiter versuchen, aber nach 60 Sekunden eine Fehlermeldung ausgeben
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60) {
-                    var argsStr = string.Join(", ", args.Select(a => a?.ToString() ?? "null"));
-                    Develop.DebugPrint(ErrorType.Error, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + argsStr);
-                    return returnValue;
-                }
-            }
-            Thread.Sleep(200);
-        }
-    }
-
-    /// <summary>
     /// Entfernt Einträge aus dem _canWriteCache basierend auf einer Datei oder einem Verzeichnis
     /// </summary>
     /// <param name="fileOrDirectory">Datei oder Verzeichnis, dessen Cache-Einträge entfernt werden sollen</param>
@@ -582,7 +577,7 @@ public static class IO {
             File.Copy(source, target);
 
             // Warten bis die Datei mit korrekter Größe existiert - verwende ProcessFile
-            return (ProcessFile(TryWaitForCopiedFile, false, target, sourceInfo.Length) is true, false);
+            return (ProcessFile(TryWaitForCopiedFile, false, 60, target, sourceInfo.Length) is true, false);
         } catch {
             return (false, true);
         }
@@ -599,7 +594,7 @@ public static class IO {
             RemoveFromCanWriteCache(directory);
 
             // Warten bis das Verzeichnis gelöscht ist - verwende TryDirectoryExists negiert
-            return (ProcessFile(TryDirectoryExists, false, directory) is not true, false);
+            return (ProcessFile(TryDirectoryExists, false, 60, directory) is not true, false);
         } catch {
             return (false, true);
         }
