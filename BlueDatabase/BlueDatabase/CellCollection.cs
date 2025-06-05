@@ -241,11 +241,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue) {
         if (column?.Database is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
 
-        var f = IsCellEditable(column, row, newChunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        var f = db.CanSaveMainChunk();
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
-        f = db.CanSaveMainChunk();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        //var f = IsCellEditable(column, row, newChunkValue);
+        //if (!string.IsNullOrEmpty(f)) { return f; }
+
+        //f = db.CanSaveMainChunk();
+        //if (!string.IsNullOrEmpty(f)) { return f; }
 
         f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -256,9 +259,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, info, _) = LinkedCellData(column, row, true, true);
+            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
 
-            if (!string.IsNullOrEmpty(info)) { return info; }
+            if (!string.IsNullOrEmpty(info) && ! canrepair) { return info; }
 
             if (lcolumn?.Database is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank verworfen."; }
 
@@ -332,7 +335,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, true, false);
+            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
 
             if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
 

@@ -233,7 +233,23 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             return;
         }
 
-        lstEventScripts.Remove(_item.KeyName);
+        // Entferne das alte Item anhand der Objektreferenz, nicht nur des KeyNames
+        ReadableListItem? itemToRemove = null;
+        foreach (var listItem in lstEventScripts.Items) {
+            if (listItem is ReadableListItem rli && ReferenceEquals(rli.Item, _item)) {
+                itemToRemove = rli;
+                break;
+            }
+        }
+
+        if (itemToRemove != null) {
+            lstEventScripts.Remove(itemToRemove);
+        } else {
+            // Fallback: Entferne nach KeyName (nur wenn nicht leer)
+            if (!string.IsNullOrEmpty(_item.KeyName)) {
+                lstEventScripts.Remove(_item.KeyName);
+            }
+        }
 
         //DatabaseScriptDescription? newItem = null;
         //if (lstEventScripts.Checked.Count == 1 &&
@@ -508,11 +524,22 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-        var newScriptItem = ItemOf(new DatabaseScriptDescription(Database));
-        lstEventScripts.ItemAdd(newScriptItem);
+        // Erstelle neues Script, aber füge es NICHT direkt zur Liste hinzu
+        var newScript = new DatabaseScriptDescription(Database);
+
+        // Setze das neue Script als aktuelles Item
+        _item = newScript;
+
+        // WriteInfosBack wird das neue Script korrekt zur Liste hinzufügen
         WriteInfosBack();
 
-        lstEventScripts.Check(newScriptItem);
+        // Suche das hinzugefügte Item und wähle es aus
+        foreach (var item in lstEventScripts.Items) {
+            if (item is ReadableListItem rli && rli.Item == newScript) {
+                lstEventScripts.Check(rli);
+                break;
+            }
+        }
     }
 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {

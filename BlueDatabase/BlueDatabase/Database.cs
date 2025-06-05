@@ -231,7 +231,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public event EventHandler? InvalidateView;
 
-    public event EventHandler? Loaded;
+    public event EventHandler<FirstEventArgs>? Loaded;
 
     public event EventHandler? Loading;
 
@@ -1148,7 +1148,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
-        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+        //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
         var fileSaveResult = IO.CanSaveFile(Filename, 5);
         return fileSaveResult;
@@ -1989,7 +1989,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (ronly) { SetReadOnly(); }
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
-        OnLoaded();
+        OnLoaded(true);
 
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
@@ -2014,7 +2014,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         RepairAfterParse();
         Freeze("Stream-Datenbank");
         _saveRequired = false;
-        OnLoaded();
+        OnLoaded(true);
     }
 
     public string NextRowKey() {
@@ -2440,10 +2440,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         AdditionalRepair?.Invoke(this, System.EventArgs.Empty);
     }
 
-    protected void OnLoaded() {
+    protected void OnLoaded(bool isFirst) {
         if (IsDisposed) { return; }
         //IsInCache = FileStateUTCDate;
-        Loaded?.Invoke(this, System.EventArgs.Empty);
+        Loaded?.Invoke(this, new FirstEventArgs(isFirst));
     }
 
     protected void OnLoading() {

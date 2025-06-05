@@ -117,6 +117,7 @@
     <Compile Include="Enums\ChunkType.cs" />
     <Compile Include="Enums\Reason.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
+    <Compile Include="EventArgs\FirstEventArgs.cs" />
     <Compile Include="EventArgs\CellNullableEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />

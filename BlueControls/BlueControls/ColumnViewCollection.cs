@@ -306,6 +306,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem == null ? -1 : _internal.IndexOf(columnViewItem);
 
+    public void Invalidate_ContentWidthOfAllItems() {
+        foreach (var thisViewItem in _internal) {
+            thisViewItem?.Invalidate_ContentWidth();
+        }
+    }
+
     public void Invalidate_HeadSize() {
         _headSize = null;
 

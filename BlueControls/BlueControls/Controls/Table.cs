@@ -2282,30 +2282,41 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Invalidate();
     }
 
-    private void _Database_DatabaseLoaded(object sender, System.EventArgs e) {
+    private void _Database_DatabaseLoaded(object sender, FirstEventArgs e) {
         if (IsDisposed) { return; }
         // Wird auch bei einem Reload ausgeführt.
         // Es kann aber sein, dass eine Ansicht zurückgeholt wurde, und die Werte stimmen.
         // Deswegen prüfen, ob wirklich alles gelöscht werden muss, oder weiter behalten werden kann.
         // Auf Nothing muss auch geprüft werden, da bei einem Dispose oder beim Beenden sich die Datenbank auch änsdert....
 
-        if (!string.IsNullOrEmpty(_storedView)) {
-            ParseView(_storedView);
-            _storedView = string.Empty;
+        if (e.IsFirst) {
+            if (!string.IsNullOrEmpty(_storedView)) {
+                ParseView(_storedView);
+                _storedView = string.Empty;
+            } else {
+                ResetView();
+            }
+
+            Invalidate_FilterInput();
+            Invalidate_RowsInput();
+            Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
+            Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
+            CheckView();
+
+            GetÄhnlich();
+            FillFilters();
+            UpdateFilterleisteVisibility();
+            RepositionControls();
+
         } else {
-            ResetView();
+            _storedView = string.Empty;
+            if (CurrentArrangement is { } ca) {
+                ca.Invalidate_HeadSize();
+                ca.Invalidate_ContentWidthOfAllItems();
+                ca.Invalidate_XOfAllItems();
+            }
+            CheckView();
         }
-
-        Invalidate_FilterInput();
-        Invalidate_RowsInput();
-        Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
-        Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
-        CheckView();
-
-        GetÄhnlich();
-        FillFilters();
-        UpdateFilterleisteVisibility();
-        RepositionControls();
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);

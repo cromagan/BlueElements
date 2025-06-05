@@ -278,7 +278,7 @@ public class DatabaseChunk : Database {
         foreach (var file in fileQuery) {
             var chunkId = file.FileNameWithoutSuffix();
 
-            var ok = LoadChunkWithChunkId(chunkId, true, false);
+            var ok = LoadChunkWithChunkId(chunkId, true, false, false);
             if (!ok) { return false; }
         }
 
@@ -294,7 +294,7 @@ public class DatabaseChunk : Database {
     public override bool BeSureRowIsLoaded(string chunkValue) {
         var chunkId = GetChunkId(this, DatabaseDataType.UTF8Value_withoutSizeData, chunkValue);
 
-        return LoadChunkWithChunkId(chunkId, false, false);
+        return LoadChunkWithChunkId(chunkId, false, false, false);
     }
 
     public override bool BeSureToBeUpToDate() {
@@ -302,14 +302,14 @@ public class DatabaseChunk : Database {
 
         OnDropMessage(ErrorType.Info, "Lade Chunks von '" + TableName + "'");
 
-        if (!LoadChunkWithChunkId(Chunk_MainData, true, true)) { return false; }
+        if (!LoadChunkWithChunkId(Chunk_MainData, true, true, false)) { return false; }
 
         Column.GetSystems();
 
         if (Column.ChunkValueColumn != null) {
-            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, true)) { return false; }
-            if (!LoadChunkWithChunkId(Chunk_Master, true, true)) { return false; }
-            if (!LoadChunkWithChunkId(Chunk_Variables, true, true)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, true, true, false)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Master, true, true, false)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Variables, true, true, false)) { return false; }
         }
         IsInCache = DateTime.UtcNow;
 
@@ -325,7 +325,7 @@ public class DatabaseChunk : Database {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var ok = LoadChunkWithChunkId(chunkId, true, true);
+        var ok = LoadChunkWithChunkId(chunkId, true, true, false);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
@@ -339,7 +339,7 @@ public class DatabaseChunk : Database {
     /// <param name="chunkId"></param>
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public bool LoadChunkWithChunkId(string chunkId, bool important, bool mustExist) {
+    public bool LoadChunkWithChunkId(string chunkId, bool important, bool mustExist, bool isFirst) {
         if (string.IsNullOrEmpty(Filename)) { return true; } // Temporäre Datenbanken
 
         if (string.IsNullOrEmpty(chunkId)) { return false; }
@@ -390,11 +390,11 @@ public class DatabaseChunk : Database {
         if (chunk.LoadFailed) {
             Freeze($"Chunk {chunk.KeyName} Laden fehlgeschlagen");
             return false;
-        }tt
+        }
         OnLoading();
         var ok = Parse(chunk);
 
-        OnLoaded();
+        OnLoaded(isFirst);
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
         // Kurzer Lock um Race Condition zu vermeiden
@@ -458,7 +458,7 @@ public class DatabaseChunk : Database {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var ok = LoadChunkWithChunkId(chunkId, true, true);
+        var ok = LoadChunkWithChunkId(chunkId, true, true, false);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
@@ -470,9 +470,8 @@ public class DatabaseChunk : Database {
         _chunks.Clear();
     }
 
-    protected override bool LoadMainData() {
-        return LoadChunkWithChunkId(Chunk_MainData, true, true);
-    }
+    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true, true);
+
 
     protected override bool SaveInternal(DateTime setfileStateUtcDateTo) {
         if (Develop.AllReadOnly) { return true; }
