@@ -120,15 +120,17 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (_database == value) { return; }
 
-            OnChanging();
-            UnRegisterDatabaseEvents();
+            lock (_internal) {
+                if (IsDisposed) { return; }
+                OnChanging();
+                UnRegisterDatabaseEvents();
 
-            _database = value;
-            _internal.Clear();
+                _database = value;
+                _internal.Clear();
 
-            RegisterDatabaseEvents();
-
-            Invalidate_FilteredRows();
+                RegisterDatabaseEvents();
+                Invalidate_FilteredRows();
+            }
             OnPropertyChanged("Database");
         }
     }
@@ -197,17 +199,33 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         List<RowItem> tmpVisibleRows = [];
         var lockMe = new object();
+        var hasError = false;
+
         try {
-            _ = Parallel.ForEach(db.Row, thisRowItem => {
-                if (thisRowItem != null) {
-                    if (thisRowItem.MatchesTo(filter)) {
+            _ = Parallel.ForEach(db.Row, (thisRowItem, state) => {
+                try {
+                    if (hasError) {
+                        state.Break();
+                        return;
+                    }
+
+                    if (thisRowItem is { IsDisposed: false } && thisRowItem.MatchesTo(filter)) {
                         lock (lockMe) {
-                            tmpVisibleRows.Add(thisRowItem);
+                            if (!hasError) { // Double-check nach dem Lock
+                                tmpVisibleRows.Add(thisRowItem);
+                            }
                         }
                     }
+                } catch {
+                    hasError = true;
+                    state.Break();
                 }
             });
         } catch {
+            hasError = true;
+        }
+
+        if (hasError) {
             Develop.CheckStackOverflow();
             return CalculateFilteredRows(db, filter);
         }
@@ -727,17 +745,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
-                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
-                OnDisposingEvent();
-                Database = null;
-
-                Invalidate_FilteredRows();
-
-                //foreach (var thisf in _internal) {
-                //    thisf.Dispose();
-                //}
+                lock (_internal) {
+                    OnDisposingEvent();
+                    UnRegisterDatabaseEvents();
+                    _database = null;
+                    Invalidate_FilteredRows();
+                }
             }
-            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
             _internal.Clear();
             IsDisposed = true;
         }

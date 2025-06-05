@@ -27,6 +27,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -379,7 +380,7 @@ public class DatabaseChunk : Database {
                 Develop.DoEvents();
             }
 
-            System.Threading.Thread.Sleep(1000);
+            Thread.Sleep(1000);
         } while (true);
 
         OnDropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Datenbank '{Filename.FileNameWithoutSuffix()}'");
@@ -399,7 +400,7 @@ public class DatabaseChunk : Database {
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
         // Kurzer Lock um Race Condition zu vermeiden
         lock (chunksBeingSaved) {
-            if (ok && mustExist && chunk.Bytes.Length == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
+            if (ok && mustExist && chunk.Bytes.Count == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
                 chunk.SaveRequired = true;
             }
         }
@@ -471,7 +472,6 @@ public class DatabaseChunk : Database {
     }
 
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true, true);
-
 
     protected override bool SaveInternal(DateTime setfileStateUtcDateTo) {
         if (Develop.AllReadOnly) { return true; }
@@ -597,14 +597,14 @@ public class DatabaseChunk : Database {
             Cell.Clear();
         }
 
-        if (chunk.Bytes.Length == 0) {
+        if (chunk.Bytes.Count == 0) {
             // Bei leerer Datei trotzdem in Dictionary einfügen
             _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
             return true;
         }
 
         // Zuerst parsen, bevor der Chunk in die Dictionary kommt
-        var parseSuccessful = Parse(chunk.Bytes, chunk.IsMain, chunk.ChunkFileName);
+        var parseSuccessful = Parse(chunk.Bytes.ToArray(), chunk.IsMain, chunk.ChunkFileName);
 
         if (!parseSuccessful) {
             chunk.LoadFailed = true;

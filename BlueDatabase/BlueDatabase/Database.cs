@@ -78,6 +78,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected NeedPassword? _needPassword;
 
+    private static readonly object _timerLock = new object();
+
+    private static int _activeDatabaseCount = 0;
+
     private static List<string> _allavailableTables = [];
 
     /// <summary>
@@ -91,6 +95,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     private readonly List<string> _permissionGroupsNewRow = [];
 
+    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
     private readonly List<string> _tags = [];
 
     private readonly List<Variable> _variables = [];
@@ -1150,7 +1155,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
         //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
-        var fileSaveResult = IO.CanSaveFile(Filename, 5);
+        var fileSaveResult = CanSaveFile(Filename, 5);
         return fileSaveResult;
     }
 
@@ -1339,7 +1344,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Layouts\\"; }
         return string.Empty;
     }
-
     //    DatenbankAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
     //    PermissionGroupsNewRow = new(sourceDatabase.PermissionGroupsNewRow.Clone());
     public void Dispose() {
@@ -2258,15 +2262,22 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public virtual bool Save() {
-        if (_isInSave) { return false; }
+        // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
+        if (!_saveSemaphore.Wait(0)) {
+            return false;
+        }
 
-        if (!SaveRequired()) { return true; }
+        try {
+            if (!SaveRequired()) {
+                return true;
+            }
 
-        _isInSave = true;
-        var v = SaveInternal(FileStateUtcDate);
-        _isInSave = false;
-        OnInvalidateView();
-        return v;
+            var result = SaveInternal(FileStateUtcDate);
+            OnInvalidateView();
+            return result;
+        } finally {
+            _saveSemaphore.Release();
+        }
     }
 
     public void SaveAsAndChangeTo(string newFileName) {
@@ -2368,8 +2379,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (disposing) {
             try {
+                _saveSemaphore?.Dispose();
                 OnDisposingEvent();
-
                 UnregisterEvents();
 
                 // Timer zuerst disposen
@@ -2378,9 +2389,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                     _checker = null;
                 }
 
-                if (_databaseUpdateTimer != null) {
-                    _databaseUpdateTimer.Dispose();
-                    _databaseUpdateTimer = null;
+                // LÖSUNG: Static Timer verwalten basierend auf aktiven Database-Instanzen
+                lock (_timerLock) {
+                    _activeDatabaseCount--;
+                    if (_activeDatabaseCount <= 0) {
+                        _activeDatabaseCount = 0;
+                        if (_databaseUpdateTimer != null) {
+                            _databaseUpdateTimer.Dispose();
+                            _databaseUpdateTimer = null;
+                        }
+                    }
                 }
 
                 // Dann Collections disposen
@@ -2417,14 +2435,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected virtual void DoWorkAfterLastChanges(List<string>? files, DateTime starttimeUtc, DateTime endTimeUtc) { }
 
     protected virtual bool LoadMainData() {
-        var (bytes, _, failed) = Chunk.LoadBytesFromDisk(Filename);
+        var (bytes, _, failed) = IO.LoadBytesFromDisk(Filename, true);
 
         if (failed) {
             Freeze("Laden fehlgeschlagen!");
             return false;
         }
 
-        var ok = Parse(bytes.ToArray(), true, Filename);
+        var ok = Parse(bytes, true, Filename);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");
@@ -2838,10 +2856,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private void GenerateDatabaseUpdateTimer() {
-        lock (this) {
+        lock (_timerLock) {
+            _activeDatabaseCount++;
+
             if (_databaseUpdateTimer != null) { return; }
-            _databaseUpdateTimer = new Timer(DatabaseUpdater);
-            _ = _databaseUpdateTimer.Change(10000, 3 * 60 * 1000);
+
+            _databaseUpdateTimer = new Timer(DatabaseUpdater, null, 10000, 3 * 60 * 1000);
         }
     }
 

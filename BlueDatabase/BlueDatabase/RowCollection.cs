@@ -243,22 +243,35 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// </summary>
     /// <returns></returns>
     public static RowItem? NextRowToCeck() {
-        List<Database> l = [.. Database.AllFiles];
+        try {
+            List<Database> l = [.. Database.AllFiles];
 
-        if (Constants.GlobalRnd.Next(10) == 1) {
-            l.Shuffle();
-        } else {
-            l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
-        }
+            if (l.Count == 0) { return null; }
 
-        foreach (var thisDb in l) {
-            if (thisDb is { IsDisposed: false } db) {
-                if (!db.CanDoValueChangedScript()) { continue; }
-
-                var rowToCheck = db.Row.NextRowToCheck(false);
-                if (rowToCheck != null) { return rowToCheck; }
+            if (Constants.GlobalRnd.Next(10) == 1) {
+                l.Shuffle();
+            } else {
+                try {
+                    l = l.OrderByDescending(eintrag => eintrag?.LastUsedDate ?? DateTime.MinValue).ToList();
+                } catch {
+                    return null;
+                }
             }
-        }
+
+            foreach (var thisDb in l) {
+                if (thisDb is { IsDisposed: false } db) {
+                    try {
+                        if (!db.CanDoValueChangedScript()) { continue; }
+
+                        var rowToCheck = db.Row?.NextRowToCheck(false);
+                        if (rowToCheck != null) { return rowToCheck; }
+                    } catch (ObjectDisposedException) {
+                        // Database disposed während Verwendung - skip
+                        continue;
+                    }
+                }
+            }
+        } catch { }
 
         return null;
     }

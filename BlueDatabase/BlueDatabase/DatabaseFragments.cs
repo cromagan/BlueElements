@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
@@ -44,7 +45,7 @@ public class DatabaseFragments : Database {
     /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemacht werden.
     /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
     /// </summary>
-    private volatile int _doingChanges = 0;
+    private int _doingChanges = 0;
 
     private bool _masterNeeded;
 
@@ -124,6 +125,15 @@ public class DatabaseFragments : Database {
         base.Freeze(reason);
     }
 
+    public override string GrantWriteAccess(DatabaseDataType type, string? chunkValue) {
+        if (_writer == null) { return "Schreib-Objket nicht erstellt."; }
+
+        var f = base.GrantWriteAccess(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        return string.Empty;
+    }
+
     public override bool Save() {
         if (_writer == null) { return true; }
 
@@ -133,6 +143,15 @@ public class DatabaseFragments : Database {
             }
             return true;
         } catch { return false; }
+    }
+
+    internal override string IsValueEditable(DatabaseDataType type, string? chunkValue) {
+        if (_writer == null) { return "Schreib-Objket nicht erstellt."; }
+
+        var f = base.IsValueEditable(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        return string.Empty;
     }
 
     protected override void Dispose(bool disposing) {
@@ -271,16 +290,16 @@ public class DatabaseFragments : Database {
     }
 
     private void CloseWriter() {
-        if (_writer != null) {
-            lock (_writer) {
-                try {
-                    _writer.WriteLine("- EOF");
-                    _writer.Flush();
-                    _writer.Close();
-                    _writer.Dispose();
-                } catch { }
+        var writerToClose = _writer;
+        if (writerToClose != null) {
+            _writer = null; // Sofort null setzen um double disposal zu verhindern
+
+            try {
+                writerToClose.WriteLine("- EOF");
+                writerToClose.Flush();
+            } catch { } finally {
+                writerToClose.Dispose(); // Dispose ruft Close() automatisch auf
             }
-            _writer = null;
         }
     }
 
@@ -307,9 +326,8 @@ public class DatabaseFragments : Database {
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {
-                var reader = new StreamReader(new FileStream(thisf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Encoding.UTF8);
+                using var reader = new StreamReader(new FileStream(thisf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Encoding.UTF8);
                 var fil = reader.ReadToEnd();
-                reader.Close();
 
                 var fils = fil.SplitAndCutByCrToList();
 
@@ -356,9 +374,6 @@ public class DatabaseFragments : Database {
         data = data.OrderBy(obj => obj.DateTimeUtc).ToList();
 
         try {
-            //List<ColumnItem> columnsAdded = [];
-            //List<RowItem> rowsAdded = [];
-            //List<string> cellschanged = [];
             List<string> myfiles = [];
 
             if (checkedDataFiles != null) {
@@ -369,31 +384,28 @@ public class DatabaseFragments : Database {
                 }
             }
 
-            _doingChanges++;
-            foreach (var thisWork in data) {
-                if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
-                    Undo.Add(thisWork);
-                    ChangesNotIncluded.Add(thisWork);
+            Interlocked.Increment(ref _doingChanges);
+            try {
+                foreach (var thisWork in data) {
+                    if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
+                        Undo.Add(thisWork);
+                        ChangesNotIncluded.Add(thisWork);
 
-                    var c = Column[thisWork.ColName];
-                    var r = Row.SearchByKey(thisWork.RowKey);
+                        var c = Column[thisWork.ColName];
+                        var r = Row.SearchByKey(thisWork.RowKey);
 
-                    // HIER Wird der falsche Chunk übergeben!
-                    var error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate);
+                        var error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate);
 
-                    if (!string.IsNullOrEmpty(error)) {
-                        Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
-                        //Develop.DebugPrint(ErrorType.Error, "Fehler beim Nachladen: " + Error + " / " + TableName);
-                        _doingChanges--;
-                        return;
+                        if (!string.IsNullOrEmpty(error)) {
+                            Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
+                            return;
+                        }
                     }
-
-                    //if (c == null && columnchanged != null) { _ = columnsAdded.AddIfNotExists(columnchanged); }
-                    //if (r == null && rowchanged != null) { _ = rowsAdded.AddIfNotExists(rowchanged); }
-                    //if (rowchanged != null && columnchanged != null) { _ = cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
                 }
+            } finally {
+                Interlocked.Decrement(ref _doingChanges);
             }
-            _doingChanges--;
+
             IsInCache = endTimeUtc;
             DoWorkAfterLastChanges(myfiles, startTimeUtc, endTimeUtc);
             OnInvalidateView();
@@ -410,26 +422,16 @@ public class DatabaseFragments : Database {
         }
         CheckPath();
 
-        //LoadFragmentsNow();
-
         _myFragmentsFilename = TempFile(FragmengtsPath(), TableName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
 
         if (Develop.AllReadOnly) { return; }
 
+        FileStream? fileStream = null;
         try {
-            _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), Encoding.UTF8);
-        } catch {
-            // File Handle Leak verhindern: Eventuell teilweise erstellte Writer disposed
-            _writer?.Dispose();
-            _writer = null;
+            fileStream = new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read);
+            _writer = new StreamWriter(fileStream, Encoding.UTF8);
+            fileStream = null; // StreamWriter übernimmt ownership
 
-            Pause(3, false);
-            Develop.CheckStackOverflow();
-            StartWriter();
-            return;
-        }
-
-        try {
             _writer.AutoFlush = true;
             _writer.WriteLine("- DB " + DatabaseVersion);
             _writer.WriteLine("- Filename " + Filename);
@@ -438,7 +440,15 @@ public class DatabaseFragments : Database {
             var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]", string.Empty);
             _writer.WriteLine(l.ParseableItems().FinishParseable());
             _writer.Flush();
-        } catch { }
+        } catch {
+            fileStream?.Dispose(); // Nur disposen wenn StreamWriter failed
+            _writer?.Dispose();
+            _writer = null;
+
+            Pause(3, false);
+            Develop.CheckStackOverflow();
+            StartWriter();
+        }
     }
 
     #endregion

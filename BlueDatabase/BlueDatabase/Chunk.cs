@@ -41,9 +41,6 @@ public class Chunk : IHasKeyName {
     #region Fields
 
     public readonly string MainFileName = string.Empty;
-
-    private List<byte> _bytes = [];
-
     private string _fileinfo = string.Empty;
 
     private string _keyname = string.Empty;
@@ -64,7 +61,7 @@ public class Chunk : IHasKeyName {
 
     #region Properties
 
-    public byte[] Bytes => _bytes.ToArray();
+    public List<byte> Bytes { get; private set; } = [];
 
     public string ChunkFileName {
         get {
@@ -77,7 +74,7 @@ public class Chunk : IHasKeyName {
         }
     }
 
-    public long DataLenght => _bytes?.Count ?? 0;
+    public long DataLenght => Bytes?.Count ?? 0;
 
     public bool IsMain => string.Equals(KeyName, DatabaseChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
@@ -101,28 +98,6 @@ public class Chunk : IHasKeyName {
     #endregion
 
     #region Methods
-
-    public static (List<byte> bytes, string fileinfo, bool failed) LoadBytesFromDisk(string filename) {
-        var startTime = DateTime.UtcNow;
-
-        while (true) {
-            try {
-                var fileinfo = GetFileInfo(filename, true);
-                var bLoaded = File.ReadAllBytes(filename);
-                if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt(); }
-                return (bLoaded.ToList(), fileinfo, false);
-            } catch (Exception ex) {
-                // Home Office kann lange blockieren....
-                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 300) {
-                    Develop.DebugPrint(ErrorType.Error, "Die Datei<br>" + filename + "<br>konnte trotz mehrerer Versuche nicht geladen werden.<br><br>Die Fehlermeldung lautet:<br>" + ex.Message);
-
-                    return ([], string.Empty, true);
-                }
-            }
-
-            Pause(0.5, false);
-        }
-    }
 
     public static void SaveToByteList(List<byte> bytes, DatabaseDataType databaseDataType, string content) {
         var b = content.UTF8_ToByte();
@@ -152,7 +127,7 @@ public class Chunk : IHasKeyName {
 
         _lastcheck = DateTime.UtcNow;
 
-        _bytes.Clear();
+        Bytes = [];
     }
 
     public void LoadBytesFromDisk() {
@@ -165,13 +140,18 @@ public class Chunk : IHasKeyName {
         }
 
         _lastcheck = DateTime.UtcNow;
-        (_bytes, _fileinfo, LoadFailed) = LoadBytesFromDisk(c);
 
-        if (RemoveHeaderDataTypes(_bytes) is { } b) {
+        byte[] bytes;
+        (bytes, _fileinfo, LoadFailed) = IO.LoadBytesFromDisk(c, true);
+
+        if (LoadFailed) { return; }
+
+        if (RemoveHeaderDataTypes(bytes) is { } b) {
             _minBytes = (int)(b.Count * 0.1);
         }
 
-        if (LoadFailed) { return; }
+        Bytes.Clear();
+        Bytes = [.. bytes];
 
         ParseLockData();
     }
@@ -188,7 +168,7 @@ public class Chunk : IHasKeyName {
 
         // Prüfe, ob die Datei überhaupt existiert
         if (!FileExists(ChunkFileName)) {
-            return _bytes.Count > 0; // Nur neu laden, wenn wir Daten haben, die "verschwunden" sind
+            return Bytes.Count > 0; // Nur neu laden, wenn wir Daten haben, die "verschwunden" sind
         }
 
         if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
@@ -201,7 +181,7 @@ public class Chunk : IHasKeyName {
 
     public string Save(string filename) {
         if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
-        if (_bytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
+        if (Bytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
         if (_lastcheck.Year < 2000) { return "Chunk noch nicht geladen"; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
@@ -210,7 +190,7 @@ public class Chunk : IHasKeyName {
             Develop.SetUserDidSomething();
 
             // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
-            var contentBytes = RemoveHeaderDataTypes(_bytes);
+            var contentBytes = RemoveHeaderDataTypes(Bytes.ToArray());
             if (contentBytes == null || contentBytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
 
             // Neuen Header erstellen
@@ -246,42 +226,42 @@ public class Chunk : IHasKeyName {
         var cellContent = db.Cell.GetStringCore(column, row);
         if (string.IsNullOrEmpty(cellContent)) { return; }
 
-        _bytes.Add((byte)Routinen.CellFormatUTF8_V403);
+        Bytes.Add((byte)Routinen.CellFormatUTF8_V403);
 
         var columnKeyByte = column.KeyName.UTF8_ToByte();
-        SaveToByteList(_bytes, columnKeyByte.Length, 1);
-        _bytes.AddRange(columnKeyByte);
+        SaveToByteList(Bytes, columnKeyByte.Length, 1);
+        Bytes.AddRange(columnKeyByte);
 
         var rowKeyByte = row.KeyName.UTF8_ToByte();
-        SaveToByteList(_bytes, rowKeyByte.Length, 1);
-        _bytes.AddRange(rowKeyByte);
+        SaveToByteList(Bytes, rowKeyByte.Length, 1);
+        Bytes.AddRange(rowKeyByte);
 
         var cellContentByte = cellContent.UTF8_ToByte();
-        SaveToByteList(_bytes, cellContentByte.Length, 2);
-        _bytes.AddRange(cellContentByte);
+        SaveToByteList(Bytes, cellContentByte.Length, 2);
+        Bytes.AddRange(cellContentByte);
     }
 
     public void SaveToByteList(DatabaseDataType databaseDataType, string content, string columnname) {
         if (LoadFailed) { return; }
-        _bytes.Add((byte)Routinen.ColumnUTF8_V401);
-        _bytes.Add((byte)databaseDataType);
+        Bytes.Add((byte)Routinen.ColumnUTF8_V401);
+        Bytes.Add((byte)databaseDataType);
 
         var n = columnname.UTF8_ToByte();
-        SaveToByteList(_bytes, n.Length, 1);
-        _bytes.AddRange(n);
+        SaveToByteList(Bytes, n.Length, 1);
+        Bytes.AddRange(n);
 
         var b = content.UTF8_ToByte();
-        SaveToByteList(_bytes, b.Length, 3);
-        _bytes.AddRange(b);
+        SaveToByteList(Bytes, b.Length, 3);
+        Bytes.AddRange(b);
     }
 
     public void SaveToByteList(DatabaseDataType databaseDataType, string content) {
         if (LoadFailed) { return; }
         var b = content.UTF8_ToByte();
-        _bytes.Add((byte)Routinen.DatenAllgemeinUTF8);
-        _bytes.Add((byte)databaseDataType);
-        SaveToByteList(_bytes, b.Length, 3);
-        _bytes.AddRange(b);
+        Bytes.Add((byte)Routinen.DatenAllgemeinUTF8);
+        Bytes.Add((byte)databaseDataType);
+        SaveToByteList(Bytes, b.Length, 3);
+        Bytes.AddRange(b);
     }
 
     /// <summary>
@@ -390,7 +370,7 @@ public class Chunk : IHasKeyName {
         if (DeleteFile(filename, true)) {
             // Zuerst die Bytes leeren, um sicherzustellen, dass wir nicht versehentlich
             // anschließend wieder speichern
-            _bytes.Clear();
+            Bytes = [];
             _fileinfo = string.Empty;
             return true;
         }
@@ -466,7 +446,7 @@ public class Chunk : IHasKeyName {
 
         if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
 
-        f = IO.CanSaveFile(ChunkFileName, 5);
+        f = CanSaveFile(ChunkFileName, 5);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
@@ -493,14 +473,14 @@ public class Chunk : IHasKeyName {
                 if (LastEditApp != Develop.AppExe()) {
                     return $"Anderes Programm bearbeitet: {LastEditApp}";
                 } else {
-                    if (LastEditMachineName != Environment.MachineName || LastEditID != Generic.MyId) {
+                    if (LastEditMachineName != Environment.MachineName || LastEditID != MyId) {
                         return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditID}";
                     }
                 }
             }
         }
 
-        return IO.CanSaveFile(ChunkFileName, 1);
+        return CanSaveFile(ChunkFileName, 1);
     }
 
     internal void SaveToByteList(RowItem thisRow) {
@@ -526,7 +506,7 @@ public class Chunk : IHasKeyName {
         LastEditUser = UserName;
         LastEditApp = Develop.AppExe();
         LastEditMachineName = Environment.MachineName;
-        LastEditID = Generic.MyId;
+        LastEditID = MyId;
 
         // Dann die Werte zur ByteList hinzufügen
         SaveToByteList(headBytes, DatabaseDataType.Version, Database.DatabaseVersion);
@@ -536,14 +516,14 @@ public class Chunk : IHasKeyName {
         SaveToByteList(headBytes, DatabaseDataType.LastEditUser, LastEditUser);
         SaveToByteList(headBytes, DatabaseDataType.LastEditApp, LastEditApp);
         SaveToByteList(headBytes, DatabaseDataType.LastEditMachineName, LastEditMachineName);
-        SaveToByteList(headBytes, DatabaseDataType.LastEditID, Generic.MyId);
+        SaveToByteList(headBytes, DatabaseDataType.LastEditID, MyId);
 
         return headBytes;
     }
 
     private void ParseLockData() {
         var pointer = 0;
-        var data = _bytes.ToArray();
+        var data = Bytes.ToArray();
         var filename = ChunkFileName;
 
         while (pointer < data.Length) {
@@ -582,19 +562,18 @@ public class Chunk : IHasKeyName {
     /// </summary>
     /// <param name="bytes">Die zu verarbeitenden Bytes</param>
     /// <returns>Eine Liste von Bytes ohne Header-Daten oder null bei Fehlern</returns>
-    private List<byte>? RemoveHeaderDataTypes(List<byte>? bytes) {
+    private List<byte>? RemoveHeaderDataTypes(byte[]? bytes) {
         if (bytes == null) { return null; }
-        if (bytes.Count == 0) { return []; }
+        if (bytes.Length == 0) { return []; }
 
-        var data = bytes.ToArray();
-        var result = new List<byte>(data.Length);
+        var result = new List<byte>(bytes.Length);
         var pointer = 0;
         var filename = ChunkFileName;
 
         // Durch alle Datensätze gehen
-        while (pointer < data.Length) {
+        while (pointer < bytes.Length) {
             var startPointer = pointer;
-            var (newPointer, type, _, _, _) = Database.Parse(data, pointer, filename);
+            var (newPointer, type, _, _, _) = Database.Parse(bytes, pointer, filename);
 
             // Wenn Parse keine Fortschritte macht, abbrechen um Endlosschleife zu vermeiden
             if (newPointer <= startPointer) {
@@ -605,7 +584,7 @@ public class Chunk : IHasKeyName {
             if (!type.IsHeaderType() && !type.IsObsolete()) {
                 // Kompletten Datensatz hinzufügen
                 for (var i = startPointer; i < newPointer; i++) {
-                    result.Add(data[i]);
+                    result.Add(bytes[i]);
                 }
             }
 

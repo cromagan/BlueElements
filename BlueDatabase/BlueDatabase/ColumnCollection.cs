@@ -538,14 +538,27 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                // Alle externen Event-Handler abmelden
+                ColumnAdded = null;
+                ColumnDisposed = null;
+                ColumnPropertyChanged = null;
+                ColumnRemoved = null;
+                ColumnRemoving = null;
+
+                // Database Events sicher abmelden
                 Database = null;
-                foreach (var thisc in _internal) { thisc.Value.Dispose(); }
+
+                // Alle Columns dispose und deren Events abmelden
+                foreach (var kvp in _internal) {
+                    if (kvp.Value != null) {
+                        kvp.Value.PropertyChanged -= OnColumnPropertyChanged;
+                        kvp.Value.DisposingEvent -= Column_DisposingEvent;
+                        kvp.Value.Dispose();
+                    }
+                }
             }
 
             _internal.Clear();
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
             IsDisposed = true;
         }
     }

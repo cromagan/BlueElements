@@ -54,6 +54,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private readonly List<string> _linkedCellFilter = [];
 
+    private readonly object _linkedDatabaseLock = new object();
+
     private readonly List<string> _permissionGroupsChangeCell = [];
 
     private AdditionalCheck _additionalFormatCheck;
@@ -750,15 +752,19 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public Database? LinkedDatabase {
         get {
             if (IsDisposed || Database is not { IsDisposed: false }) { return null; }
-
             if (string.IsNullOrEmpty(_linkedDatabaseTableName)) { return null; }
 
-            if (_linkedDatabase is { IsDisposed: false }) {
-                return _linkedDatabase;
+            lock (_linkedDatabaseLock) {
+                if (_linkedDatabase is { IsDisposed: false }) {
+                    return _linkedDatabase;
+                }
             }
 
-            GetLinkedDatabase();
-            return _linkedDatabase;
+            GetLinkedDatabase(); // Außerhalb des Locks um Deadlock zu vermeiden
+
+            lock (_linkedDatabaseLock) {
+                return _linkedDatabase; // Final read mit Lock
+            }
         }
     }
 
@@ -2466,32 +2472,44 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     private void GetLinkedDatabase() {
-        Invalidate_LinkedDatabase(); // Um evtl. Events zu löschen
+        Invalidate_LinkedDatabase(); // Events sicher abmelden
 
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-        //foreach (var thisFile in AllFiles) {
-        //    if (thisFile.TableName.Equals(_linkedDatabaseTableName, StringComparison.OrdinalIgnoreCase)) {
-        //        _linkedDatabase = thisFile;
-        //        break;
-        //    }
-        //}
+        var newDatabase = Get(_linkedDatabaseTableName, false, null);
 
-        //if (_linkedDatabase == null && IsValidTableName(_linkedDatabaseTableName)) {
-        _linkedDatabase = Database.Get(_linkedDatabaseTableName, false, null);
-        //}
+        if (newDatabase != null) {
+            // Event-Registrierung vor dem Lock
+            newDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
+            newDatabase.DisposingEvent += _TMP_Linked_database_Disposing;
+        }
 
-        if (_linkedDatabase != null) {
-            _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
-            _linkedDatabase.DisposingEvent += _TMP_Linked_database_Disposing;
+        lock (_linkedDatabaseLock) {
+            _linkedDatabase = newDatabase; // Atomic assignment
         }
     }
 
     private void Invalidate_LinkedDatabase() {
-        if (_linkedDatabase != null) {
-            _linkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
-            _linkedDatabase.DisposingEvent -= _TMP_Linked_database_Disposing;
-            _linkedDatabase = null;
+        Database? databaseToCleanup = null;
+
+        lock (_linkedDatabaseLock) {
+            databaseToCleanup = _linkedDatabase;
+            _linkedDatabase = null; // Sofort auf null setzen (fail-fast)
+        }
+
+        // Event-Abmeldung außerhalb des Locks um Deadlocks zu vermeiden
+        if (databaseToCleanup != null) {
+            try {
+                databaseToCleanup.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
+            } catch (Exception) {
+                // Events können bereits abgemeldet sein - ignorieren
+            }
+
+            try {
+                databaseToCleanup.DisposingEvent -= _TMP_Linked_database_Disposing;
+            } catch (Exception) {
+                // Events können bereits abgemeldet sein - ignorieren
+            }
         }
     }
 

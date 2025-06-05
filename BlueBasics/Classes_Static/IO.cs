@@ -206,7 +206,6 @@ public static class IO {
     /// </summary>
     /// <param name="file">Die zu prüfende Datei</param>
     /// <returns>True, wenn die Datei existiert</returns>
-
     public static bool FileExists(string? file) { return ProcessFile(TryFileExists, file ?? string.Empty, string.Empty, false) is true; }
 
     /// <summary>
@@ -252,33 +251,33 @@ public static class IO {
     }
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
-                ? FileFormat.Unknown
-                : filename.FileSuffix().ToUpperInvariant() switch {
-                    "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
-                    "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
-                    "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
-                    "CSV" => FileFormat.CSV,
-                    "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
-                    "MSG" or "EML" => FileFormat.EMail,
-                    "PDF" => FileFormat.Pdf,
-                    "HTM" or "HTML" => FileFormat.HTML,
-                    "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
-                    "ICO" => FileFormat.Icon,
-                    "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
-                    "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
-                    "EXE" or "BAT" or "SCR" => FileFormat.Executable,
-                    "CHM" => FileFormat.HelpFile,
-                    "XML" => FileFormat.XMLFile,
-                    "VCF" => FileFormat.Visitenkarte,
-                    "MP3" or "WAV" or "AAC" => FileFormat.Sound,
-                    "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-                    "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Database,
-                    "BDBC" => FileFormat.DatabaseChunk,
-                    "LNK" or "URL" => FileFormat.Link,
-                    "BCR" => FileFormat.BlueCreativeFile,
-                    "BCS" => FileFormat.BlueCreativeSymbol,
-                    _ => FileFormat.Unknown
-                };
+                    ? FileFormat.Unknown
+                    : filename.FileSuffix().ToUpperInvariant() switch {
+                        "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
+                        "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
+                        "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+                        "CSV" => FileFormat.CSV,
+                        "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
+                        "MSG" or "EML" => FileFormat.EMail,
+                        "PDF" => FileFormat.Pdf,
+                        "HTM" or "HTML" => FileFormat.HTML,
+                        "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
+                        "ICO" => FileFormat.Icon,
+                        "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
+                        "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
+                        "EXE" or "BAT" or "SCR" => FileFormat.Executable,
+                        "CHM" => FileFormat.HelpFile,
+                        "XML" => FileFormat.XMLFile,
+                        "VCF" => FileFormat.Visitenkarte,
+                        "MP3" or "WAV" or "AAC" => FileFormat.Sound,
+                        "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
+                        "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Database,
+                        "BDBC" => FileFormat.DatabaseChunk,
+                        "LNK" or "URL" => FileFormat.Link,
+                        "BCR" => FileFormat.BlueCreativeFile,
+                        "BCS" => FileFormat.BlueCreativeSymbol,
+                        _ => FileFormat.Unknown
+                    };
 
     /// <summary>
     /// Gibt von einem Pfad den letzten Ordner zurück
@@ -307,6 +306,22 @@ public static class IO {
     /// <param name="mustDo">True wenn die Funktion auf jeden Fall ein Ergebnis liefern muss</param>
     /// <returns>Dateizeitstempel und -größe als String</returns>
     public static string GetFileInfo(string filename, bool mustDo) => ProcessFile(TryGetFileInfo, filename, string.Empty, mustDo) as string ?? string.Empty;
+
+    /// <summary>
+    /// Lädt Bytes aus einer Datei mit automatischer Retry-Logik und Dekomprimierung
+    /// </summary>
+    public static (byte[] bytes, string fileinfo, bool failed) LoadBytesFromDisk(string filename, bool autoDecompress) {
+        if (string.IsNullOrEmpty(filename)) { return (Array.Empty<byte>(), string.Empty, true); }
+
+        var result = ProcessFile(TryLoadBytesFromDisk, filename, autoDecompress.ToString(), true);
+
+        // Rückgabe ist ein object, das wir zu unserem Tupel casten müssen
+        if (result is not null and ValueTuple<byte[], string, bool> loadResult) {
+            return loadResult;
+        }
+
+        return (Array.Empty<byte>(), string.Empty, true);
+    }
 
     public static bool MoveDirectory(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveDirectory, oldName, newName, toBeSure) is true;
 
@@ -648,6 +663,29 @@ public static class IO {
             return (f.LastWriteTimeUtc.ToString1() + "-" + f.Length, false);
         } catch {
             return (string.Empty, true);
+        }
+    }
+
+    private static (object? returnValue, bool retry) TryLoadBytesFromDisk(string filename, string autoDecompressStr) {
+        try {
+            var autoDecompress = bool.Parse(autoDecompressStr);
+
+            var fileinfo = GetFileInfo(filename, false);
+            if (string.IsNullOrEmpty(fileinfo)) {
+                return ((Array.Empty<byte>(), string.Empty, true), true);
+            }
+
+            var bLoaded = File.ReadAllBytes(filename);
+
+            if (autoDecompress && bLoaded.IsZipped()) {
+                bLoaded = bLoaded.UnzipIt() ?? bLoaded;
+            }
+
+            return ((bLoaded, fileinfo, false), false);
+        } catch (IOException) {
+            return ((Array.Empty<byte>(), string.Empty, true), true);  // Retry bei IO-Fehlern
+        } catch {
+            return ((Array.Empty<byte>(), string.Empty, true), false); // Keine Retry bei anderen Fehlern
         }
     }
 

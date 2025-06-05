@@ -415,10 +415,23 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
+        var attempt = 0;
+        var maxAttempts = Math.Max(5, (int)(tryforsceonds * 10)); // Max 10 Versuche pro Sekunde
+
         do {
+            attempt++;
             var erg = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
+
             if (!erg.Failed) { return erg; }
-            if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
+
+            // Mehrere Ausstiegsbedingungen für Robustheit
+            if (!erg.GiveItAnotherTry || attempt >= maxAttempts || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) {
+                return erg;
+            }
+
+            // CPU-Last reduzieren zwischen Versuchen
+            Thread.Sleep(20);
+
         } while (true);
     }
 
@@ -707,7 +720,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        var m = Database?.CanSaveMainChunk() ?? "Keine Datenbank angekommen";
+        var m = Database?.CanWriteMainFile() ?? "Keine Datenbank angekommen";
         if (!string.IsNullOrEmpty(m) || Database is not { IsDisposed: false } || column == null) { return; }
 
         var columnVar = vars.Get(column.KeyName);
@@ -867,17 +880,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     internal string SetValueInternal(ColumnItem column, string value, Reason reason) {
         var tries = 0;
         var startTime = DateTime.UtcNow;
-        var maxWaitSeconds = 20; // Timeout nach 20 Sekunden
 
         while (true) {
+            tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures
+
             if (IsDisposed || column.Database is not { IsDisposed: false } db) { return "Datenbank ungültig"; }
 
-            // Timeout-Prüfung statt nur tries-Counter
-            if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > maxWaitSeconds) {
+            // Timeout-Prüfung ODER tries-Limit - doppelte Sicherheit
+            if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20 || tries > 100) {
                 return "Timeout: Wert konnte nicht gesetzt werden.";
             }
-
-            if (tries > 100) { return "Wert konnte nicht gesetzt werden."; }
 
             var cellKey = CellCollection.KeyOfCell(column, this);
 
@@ -885,7 +897,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
                 if (string.IsNullOrEmpty(value)) {
                     if (!db.Cell.TryRemove(cellKey, out _)) {
-                        tries++;
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
@@ -894,7 +905,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             } else {
                 if (!string.IsNullOrEmpty(value)) {
                     if (!db.Cell.TryAdd(cellKey, new CellItem(value))) {
-                        tries++;
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
