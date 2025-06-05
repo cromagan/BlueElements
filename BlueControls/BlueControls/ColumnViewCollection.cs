@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls;
 using BlueControls.BlueDatabaseDialogs;

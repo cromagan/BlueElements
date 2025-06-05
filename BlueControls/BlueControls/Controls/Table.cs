@@ -1074,7 +1074,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
     public string GrantWriteAccess(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, string newChunkVal) {
-        var f = IsCellEditable(newChunkVal, cellInThisDatabaseColumn, cellInThisDatabaseRow, true);
+        var f = IsCellEditable(cellInThisDatabaseColumn, cellInThisDatabaseRow, newChunkVal, true);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         var f2 = CellCollection.GrantWriteAccess(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, newChunkVal);
@@ -1104,7 +1104,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         ImportCsv(db, csvtxt);
     }
 
-    public string IsCellEditable(string newChunkVal, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool maychangeview) {
+    public string IsCellEditable(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, string? newChunkVal, bool maychangeview) {
         var f = CellCollection.IsCellEditable(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, newChunkVal);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
@@ -1762,7 +1762,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     protected override void OnDoubleClick(System.EventArgs e) {
         //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereignis ausgelöst
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
@@ -1777,7 +1777,15 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 var rc = RowCaptionOnCoordinate(MousePos().X, MousePos().Y);
 
                 if (string.IsNullOrEmpty(rc)) {
-                    Cell_Edit(ca, _mouseOverColumn, _mouseOverRow, true, _mouseOverRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
+                    if (_mouseOverRow?.Row is { } r) {
+                        Cell_Edit(ca, _mouseOverColumn, _mouseOverRow, true, r.ChunkValue);
+                    } else {
+                        if (db.Column.ChunkValueColumn == db.Column.First()) {
+                            Cell_Edit(ca, _mouseOverColumn, null, true, null);
+                        } else {
+                            Cell_Edit(ca, _mouseOverColumn, null, true, FilterCombined.ChunkVal);
+                        }
+                    }
                 }
 
                 //if (_mouseOverRow != null || MousePos().Y <= ca.HeadSize() + 18) {
@@ -2585,8 +2593,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
-    private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown, string chunkval) {
-        var f = IsCellEditable(chunkval, viewItem, cellInThisDatabaseRow, true);
+    private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown, string? chunkval) {
+        var f = IsCellEditable(viewItem, cellInThisDatabaseRow, chunkval, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
         if (viewItem?.Column is not { IsDisposed: false } contentHolderCellColumn) {
@@ -3964,7 +3972,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!db.AreScriptsExecutable()) { return false; }
 
-        return string.IsNullOrEmpty(IsCellEditable(string.Empty, fcv, null, false));
+        return string.IsNullOrEmpty(IsCellEditable(fcv, null, null, false));
     }
 
     #endregion

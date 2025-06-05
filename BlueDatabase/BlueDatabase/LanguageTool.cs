@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System.Collections.ObjectModel;
 

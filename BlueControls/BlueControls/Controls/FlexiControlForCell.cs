@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.CellRenderer;
@@ -337,9 +336,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
             return;
         }
 
-        var chunk = row.ChunkValue;
-
-        f.DisabledReason = CellCollection.IsCellEditable(column, row, chunk); // Rechteverwaltung einfliesen lassen.
+        f.DisabledReason = CellCollection.IsCellEditable(column, row, row.ChunkValue); // Rechteverwaltung einfliesen lassen.
     }
 
     private void F_ControlAdded(object sender, ControlEventArgs e) {

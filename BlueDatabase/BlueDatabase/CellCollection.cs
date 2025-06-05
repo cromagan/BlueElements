@@ -290,10 +290,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="repairallowed"></param>
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
-    public static string IsCellEditable(ColumnItem? column, RowItem? row, string newChunkValue) {
+    public static string IsCellEditable(ColumnItem? column, RowItem? row, string? newChunkValue) {
         if (column?.Database is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
 
         if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
+
+        var oldChunk = newChunkValue;
 
         if (!column.EditableWithTextInput && !column.EditableWithDropdown && !db.PowerEdit) {
             return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
@@ -321,6 +323,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
                 }
             }
+            oldChunk = row.ChunkValue;
         }
 
         if (!db.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
@@ -340,8 +343,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             db2.PowerEdit = db.PowerEdit;
 
             if (lrow != null) {
-                var chunkval = lrow.ChunkValue;
-                var tmp = IsCellEditable(lcolumn, lrow, chunkval);
+                var tmp = IsCellEditable(lcolumn, lrow, lrow.ChunkValue);
                 return !string.IsNullOrEmpty(tmp) ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp : string.Empty;
             }
 
@@ -350,7 +352,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Allgemeiner Fehler.";
         }
 
-        return string.Empty;
+        if(row == null && db.Column.ChunkValueColumn == db.Column.First() && newChunkValue == null) {
+            // Es soll eine neue Zeile erstellt werden, und die erste Spalte ist die Chunk-Spalte.
+            // Wir wissen nicht, was das Ziel ist.
+            return string.Empty;
+        }
+
+        if (oldChunk != newChunkValue) {
+            f = db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, oldChunk);
+            if (!string.IsNullOrEmpty(f)) { return f; }
+        }
+
+        return db.IsValueEditable(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue);
     }
 
     /// <summary>

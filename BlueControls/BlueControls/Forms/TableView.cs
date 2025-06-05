@@ -108,8 +108,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         var db = tbl?.Database ?? column?.Database ?? row?.Database;
         if (db == null) { return; }
 
-        var chunkval = row?.ChunkValue ?? string.Empty;
-        var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column, row, chunkval));
+        var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column, row, row?.ChunkValue));
 
         if (tbl != null && row != null) {
             e.ContextMenu.Add(ItemOf("Anheften", true));

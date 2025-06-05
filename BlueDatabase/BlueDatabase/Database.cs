@@ -2315,8 +2315,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
 
-    internal virtual string IsValueEditable(DatabaseDataType type, string chunkValue) => string.Empty;
-    internal virtual string GrantWriteAccess(DatabaseDataType type, string chunkValue) => string.Empty;
+    internal virtual string IsValueEditable(DatabaseDataType type, string? chunkValue) => string.Empty;
+    internal virtual string GrantWriteAccess(DatabaseDataType type, string? chunkValue) => string.Empty;
 
     internal void OnDropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
