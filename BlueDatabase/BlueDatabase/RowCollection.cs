@@ -764,17 +764,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //        var l = sourceDatabase.Row.SearchByKey(thisRow.KeyName);
     //        if (l == null) { _ = Remove(thisRow, "Clone - Zeile zuviel"); }
     //    }
-    private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
-        if (row1 == null) { return row2; }
-        if (row2 == null) { return row1; }
+    //private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
+    //    if (row1 == null) { return row2; }
+    //    if (row2 == null) { return row1; }
 
-        if (row1.Database?.Column.SysRowState is not { IsDisposed: false } srs1 ||
-            row2.Database?.Column.SysRowState is not { IsDisposed: false } srs2) {
-            return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
-        }
+    //    if (row1.Database?.Column.SysRowState is not { IsDisposed: false } srs1 ||
+    //        row2.Database?.Column.SysRowState is not { IsDisposed: false } srs2) {
+    //        return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
+    //    }
 
-        return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
-    }
+    //    return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
+    //}
 
     //    var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
     //    if (!string.IsNullOrEmpty(f)) {

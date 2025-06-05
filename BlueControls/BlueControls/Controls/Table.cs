@@ -981,37 +981,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         Zoom = nz;
     }
 
-    public string EditableErrorReason(string newChunkVal, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
-        var f = CellCollection.EditableErrorReason(newChunkVal, cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true, false);
-        if (!string.IsNullOrWhiteSpace(f)) { return f; }
-
-        if (checkEditmode) {
-            if (CurrentArrangement is not { IsDisposed: false } ca || !ca.Contains(cellInThisDatabaseColumn)) {
-                return "Ansicht veraltet";
-            }
-
-            if (cellInThisDatabaseRow != null) {
-                if (maychangeview && !EnsureVisible(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow)) {
-                    return "Zelle konnte nicht angezeigt werden.";
-                }
-                if (!IsOnScreen(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow, DisplayRectangle)) {
-                    return "Die Zelle wird nicht angezeigt.";
-                }
-            } else {
-                if (maychangeview && !EnsureVisible(cellInThisDatabaseColumn)) {
-                    return "Zelle konnte nicht angezeigt werden.";
-                }
-                //if (!IsOnScreen(viewItem, DisplayRectangle)) {
-                //    return "Die Zelle wird nicht angezeigt.";
-                //}
-            }
-        }
-
-        CellEditBlockReasonEventArgs ed = new(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, string.Empty);
-        OnBlockEdit(ed);
-        return ed.BlockReason;
-    }
-
     public bool EnsureVisible(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? row) => EnsureVisible(viewItem) && EnsureVisible(ca, row);
 
     public void ExpandAll() {
@@ -1104,6 +1073,16 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
+    public string GrantWriteAccess(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, string newChunkVal) {
+        var f = IsCellEditable(newChunkVal, cellInThisDatabaseColumn, cellInThisDatabaseRow, true);
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+
+        var f2 = CellCollection.GrantWriteAccess(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, newChunkVal);
+        if (!string.IsNullOrWhiteSpace(f)) { return f2; }
+
+        return string.Empty;
+    }
+
     public void ImportBdb() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         ImportBdb(db);
@@ -1123,6 +1102,32 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public void ImportCsv(string csvtxt) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
         ImportCsv(db, csvtxt);
+    }
+
+    public string IsCellEditable(string newChunkVal, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool maychangeview) {
+        var f = CellCollection.IsCellEditable(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, newChunkVal);
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+
+        if (CurrentArrangement is not { IsDisposed: false } ca || !ca.Contains(cellInThisDatabaseColumn)) {
+            return "Ansicht veraltet";
+        }
+
+        if (cellInThisDatabaseRow != null) {
+            if (maychangeview && !EnsureVisible(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow)) {
+                return "Zelle konnte nicht angezeigt werden.";
+            }
+            if (!IsOnScreen(ca, cellInThisDatabaseColumn, cellInThisDatabaseRow, DisplayRectangle)) {
+                return "Die Zelle wird nicht angezeigt.";
+            }
+        } else {
+            if (maychangeview && !EnsureVisible(cellInThisDatabaseColumn)) {
+                return "Zelle konnte nicht angezeigt werden.";
+            }
+        }
+
+        CellEditBlockReasonEventArgs ed = new(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, string.Empty);
+        OnBlockEdit(ed);
+        return ed.BlockReason;
     }
 
     public bool IsInHead(int y) {
@@ -2184,7 +2189,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.EditableErrorReason(newChunkVal, cellInThisDatabaseColumn, null, EditableErrorReasonType.EditAcut, true, false, true);
+            var fe = table.GrantWriteAccess(cellInThisDatabaseColumn, null, newChunkVal);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
             var (newrow, message, _) = db.Row.GenerateAndAdd(filterColNewRow.ToArray(), "Neue Zeile über Tabellen-Ansicht");
@@ -2228,7 +2233,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 newChunkVal = newValue;
             }
 
-            var check1 = table.EditableErrorReason(newChunkVal, cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true);
+            var check1 = table.GrantWriteAccess(cellInThisDatabaseColumn, cellInThisDatabaseRow, newChunkVal);
             if (!string.IsNullOrEmpty(check1)) { return check1; }
 
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
@@ -2581,7 +2586,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisDatabaseRow, bool preverDropDown, string chunkval) {
-        var f = EditableErrorReason(chunkval, viewItem, cellInThisDatabaseRow, EditableErrorReasonType.EditNormaly, true, true, true);
+        var f = IsCellEditable(chunkval, viewItem, cellInThisDatabaseRow, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
         if (viewItem?.Column is not { IsDisposed: false } contentHolderCellColumn) {
@@ -3959,9 +3964,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (!db.AreScriptsExecutable()) { return false; }
 
-        if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) { return false; }
-
-        return string.IsNullOrEmpty(EditableErrorReason(string.Empty, fcv, null, EditableErrorReasonType.EditNormaly, true, true, false));
+        return string.IsNullOrEmpty(IsCellEditable(string.Empty, fcv, null, false));
     }
 
     #endregion

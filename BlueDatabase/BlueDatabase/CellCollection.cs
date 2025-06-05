@@ -113,108 +113,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     #region Methods
 
     /// <summary>
-    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
-    /// </summary>
-    /// <param name="row"></param>
-    /// <param name="column"></param>
-    /// <param name="mode"></param>
-    /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei internen Prozessen angeben.</param>
-    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
-    /// <param name="repairallowed"></param>
-    /// <param name="ignoreLinked"></param>
-    /// <returns></returns>
-    public static string EditableErrorReason(string newChunkValue, ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked) {
-        if (mode == EditableErrorReasonType.OnlyRead) {
-            if (column == null || row == null) { return string.Empty; }
-        }
-
-        if (column?.Database is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
-
-        if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
-
-        var f = column.AreCellsEditable();
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (!string.IsNullOrEmpty(newChunkValue) && row is not { }) {
-            if (db.Column.First() != db.Column.ChunkValueColumn || mode != EditableErrorReasonType.EditNormaly) {
-                var f2 = db.EditableErrorReason(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue, mode);
-                if (!string.IsNullOrEmpty(f2)) { return f2; }
-            }
-        }
-
-        var f3 = row?.EditableErrorReason(mode) ?? string.Empty;
-        if (!string.IsNullOrEmpty(f3)) { return f3; }
-
-        if (column.RelationType == RelationType.CellValues) {
-            if (ignoreLinked) { return string.Empty; }
-            //repairallowed = repairallowed && mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditCurrently;
-
-            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, repairallowed, mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditCurrently);
-
-            if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
-
-            if (lcolumn?.Database is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank verworfen."; }
-
-            db2.PowerEdit = db.PowerEdit;
-
-            if (lrow != null) {
-                var chunkval = lrow.ChunkValue;
-                var tmp = EditableErrorReason(chunkval, lcolumn, lrow, mode, checkUserRights, checkEditmode, false, false);
-                return string.IsNullOrEmpty(tmp)
-                    ? string.Empty
-                    : "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp;
-            }
-
-            if (canrepair) { return lcolumn.AreCellsEditable(); }
-
-            return "Allgemeiner Fehler.";
-        }
-
-        //if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
-        //if (string.IsNullOrEmpty(newChunkValue)) {
-        //    return "Bei Split-Datenbanken muss ein Chunk-Wert in der Split-Spalte sein.";
-        //}
-
-        //if (column == spc) {
-        //    var f1 = db.EditableErrorReason(DatabaseDataType.UTF8Value_withoutSizeData, oldChunkValue, mode);
-        //    if (!string.IsNullOrEmpty(f1)) { return f1; }
-        //}
-
-        //}
-
-        if (row == null) {
-            if (db.Column.First() is not { IsDisposed: false } firstcol || firstcol != column) {
-                return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
-            }
-
-            if (checkUserRights && !db.PermissionCheck(db.PermissionGroupsNewRow, null)) {
-                return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
-            }
-
-            if (db.Column.ChunkValueColumn is { IsDisposed: false }) {
-                if (string.IsNullOrEmpty(newChunkValue) && mode != EditableErrorReasonType.EditNormaly) {
-                    return "Bei Split-Datenbanken muss ein Chunk-Wert in der Split-Spalte sein.";
-                }
-            }
-
-            return string.Empty;
-        }
-
-        if (db.Column.SysLocked != null) {
-            if (!db.PowerEdit) {
-                if (column != db.Column.SysLocked && row.CellGetBoolean(db.Column.SysLocked) && !column.EditAllowedDespiteLock) {
-                    return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
-                }
-            }
-        }
-
-        if (checkUserRights && !db.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
-            return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
-        }
-        return string.Empty;
-    }
-
-    /// <summary>
     ///
     /// </summary>
     /// <param name="varcol">Wird eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
@@ -260,15 +158,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         return (fc, string.Empty);
     }
-
-    /// <summary>
-    /// Diese Routine erstellt den umgekehrten Linked-Cell-Filter:
-    /// Es versucht rauszufinden, welche Zeile in der Datenbank von mycolumn von der Zeile linkedrow befüllt werden.
-    /// </summary>
-    /// <param name="mycolumn"></param>
-    /// <param name="linkedcolumn"></param>
-    /// <param name="linkedrow"></param>
-    /// <returns></returns>
 
     public static (FilterCollection? fc, string info) GetFilterReverse(ColumnItem mycolumn, ColumnItem linkedcolumn, RowItem linkedrow) {
         if (linkedcolumn.Database is not { IsDisposed: false } ldb || linkedcolumn.IsDisposed) { return (null, "Datenbank verworfen."); }
@@ -338,6 +227,140 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //return (fc, string.Empty);
     }
 
+    /// <summary>
+    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="column"></param>
+    /// <param name="mode"></param>
+    /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei internen Prozessen angeben.</param>
+    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
+    /// <param name="repairallowed"></param>
+    /// <param name="ignoreLinked"></param>
+    /// <returns></returns>
+    public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue) {
+        if (column?.Database is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
+
+        if (string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
+
+        var f = IsCellEditable(column, row, newChunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        f = db.CanSaveMainChunk();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (row != null) {
+            f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+            if (!string.IsNullOrEmpty(f)) { return f; }
+        }
+
+        if (column.RelationType == RelationType.CellValues) {
+            var (lcolumn, lrow, info, _) = LinkedCellData(column, row, true, true);
+
+            if (!string.IsNullOrEmpty(info)) { return info; }
+
+            if (lcolumn?.Database is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank verworfen."; }
+
+            db2.PowerEdit = db.PowerEdit;
+
+            if (lrow != null) {
+                var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue);
+                return !string.IsNullOrEmpty(tmp)
+                    ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp
+                    : string.Empty;
+            }
+
+            return "Allgemeiner Fehler.";
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="column"></param>
+    /// <param name="mode"></param>
+    /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei internen Prozessen angeben.</param>
+    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
+    /// <param name="repairallowed"></param>
+    /// <param name="ignoreLinked"></param>
+    /// <returns></returns>
+    public static string IsCellEditable(ColumnItem? column, RowItem? row, string newChunkValue) {
+        if (column?.Database is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
+
+        if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
+
+        if (!column.EditableWithTextInput && !column.EditableWithDropdown && !db.PowerEdit) {
+            return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
+        }
+
+        if (ColumnItem.UserEditDialogTypeInTable(column, false, true) == EditTypeTable.None) {
+            return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für die Spalte definiert.";
+        }
+
+        if (row == null) {
+            if (db.Column.First() is not { IsDisposed: false } firstcol || firstcol != column) {
+                return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
+            }
+
+            if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) {
+                return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
+            }
+
+            if (db.Column.ChunkValueColumn is { } cvc) {
+                if (cvc != db.Column.First() && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
+            }
+        } else {
+            if (!db.PowerEdit && db.Column.SysLocked != null) {
+                if (column != db.Column.SysLocked && row.CellGetBoolean(db.Column.SysLocked) && !column.EditAllowedDespiteLock) {
+                    return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
+                }
+            }
+        }
+
+        if (!db.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
+            return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
+        }
+
+        var f = db.CanWriteMainFile();
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+
+        if (column.RelationType == RelationType.CellValues) {
+            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, true, false);
+
+            if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
+
+            if (lcolumn?.Database is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank verworfen."; }
+
+            db2.PowerEdit = db.PowerEdit;
+
+            if (lrow != null) {
+                var chunkval = lrow.ChunkValue;
+                var tmp = IsCellEditable(lcolumn, lrow, chunkval);
+                return !string.IsNullOrEmpty(tmp) ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp : string.Empty;
+            }
+
+            if (canrepair) { return string.Empty; }
+
+            return "Allgemeiner Fehler.";
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Diese Routine erstellt den umgekehrten Linked-Cell-Filter:
+    /// Es versucht rauszufinden, welche Zeile in der Datenbank von mycolumn von der Zeile linkedrow befüllt werden.
+    /// </summary>
+    /// <param name="mycolumn"></param>
+    /// <param name="linkedcolumn"></param>
+    /// <param name="linkedrow"></param>
+    /// <returns></returns>
     public static string KeyOfCell(string colname, string rowKey) => colname.ToUpperInvariant() + "|" + rowKey;
 
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
@@ -395,7 +418,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     if (oldvalue != newvalue) {
                         var chunkValue = inputRow.ChunkValue;
 
-                        var editableError = EditableErrorReason(chunkValue, inputColumn, inputRow, EditableErrorReasonType.EditAcut, false, false, false, true);
+                        var editableError = GrantWriteAccess(inputColumn, inputRow, chunkValue);
 
                         if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
                         //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert

@@ -138,7 +138,7 @@ public class Method_Row : Method_Database, IUseableForButton {
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 var chunk = fic.ChunkVal;
-                var m = CellCollection.EditableErrorReason(chunk, srs, r, EditableErrorReasonType.EditAcut, false, false, true, false);
+                var m = CellCollection.GrantWriteAccess(srs, r, chunk);
                 if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {

@@ -2296,7 +2296,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         var code = MyMasterCode;
 
-        if (!string.IsNullOrEmpty(EditableErrorReason(DatabaseDataType.TemporaryDatabaseMasterUser, string.Empty, EditableErrorReasonType.EditCurrently))) {
+        if (!string.IsNullOrEmpty(GrantWriteAccess(DatabaseDataType.TemporaryDatabaseMasterUser, string.Empty))) {
             return;
         }
 
@@ -2314,7 +2314,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.DebugPrint(ErrorType.Warning, t);
     }
 
-    internal virtual string EditableErrorReason(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) => string.Empty;
+
+    internal virtual string IsValueEditable(DatabaseDataType type, string chunkValue) => string.Empty;
+    internal virtual string GrantWriteAccess(DatabaseDataType type, string chunkValue) => string.Empty;
 
     internal void OnDropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }

@@ -401,11 +401,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         GC.SuppressFinalize(this);
     }
 
-    public string EditableErrorReason(EditableErrorReasonType mode) {
-        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
-
-        return db.EditableErrorReason(DatabaseDataType.UTF8Value_withoutSizeData, ChunkValue, mode);
-    }
 
     /// <summary>
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
@@ -418,8 +413,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
-        var m = EditableErrorReason(EditableErrorReasonType.EditNormaly);
-        if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
+
 
         if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 

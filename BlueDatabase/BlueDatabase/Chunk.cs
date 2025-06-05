@@ -202,7 +202,9 @@ public class Chunk : IHasKeyName {
     public string Save(string filename) {
         if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
         if (_bytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
-        if (_lastcheck.Year < 2000) { return "Chonk noch nicht geladen"; }
+        if (_lastcheck.Year < 2000) { return "Chunk noch nicht geladen"; }
+
+        if (Develop.AllReadOnly) { return string.Empty; }
 
         try {
             Develop.SetUserDidSomething();
@@ -458,14 +460,33 @@ public class Chunk : IHasKeyName {
         return "speichervorgang unerwartet abgebrochen";
     }
 
-    internal string EditableErrorReason(EditableErrorReasonType reason) {
-        var important = reason is EditableErrorReasonType.EditCurrently or EditableErrorReasonType.EditAcut or EditableErrorReasonType.Save;
+    internal string GrantWriteAccess() {
+        var f = IsEditable();
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
+        if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
+
+        f = IO.CanSaveFile(ChunkFileName, 5);
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
+            f = DoExtendedSave();
+
+            if (!string.IsNullOrEmpty(f)) {
+                LastEditTimeUtc = DateTime.MinValue;
+                return $"Bearbeitung konnte nicht gesetzt werden ({f})";
+            }
+        }
+
+        return string.Empty;
+    }
+
+    internal string IsEditable() {
         if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
 
-        if (NeedsReload(important)) { return "Daten müssen neu geladen werden."; }
+        if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
 
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2 || reason == EditableErrorReasonType.Save) {
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2) {
             if (LastEditUser != UserName) {
                 return $"Aktueller Bearbeiter: {LastEditUser}";
             } else {
@@ -479,22 +500,7 @@ public class Chunk : IHasKeyName {
             }
         }
 
-        if (!important) { return string.Empty; }
-
-        if (reason == EditableErrorReasonType.Save) {
-            return IO.CanSaveFile(ChunkFileName, 5);
-        }
-
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
-            var f = DoExtendedSave();
-
-            if (!string.IsNullOrEmpty(f)) {
-                LastEditTimeUtc = DateTime.MinValue;
-                return $"Bearbeitung konnte nicht gesetzt werden ({f})";
-            }
-        }
-
-        return string.Empty;
+        return IO.CanSaveFile(ChunkFileName, 1);
     }
 
     internal void SaveToByteList(RowItem thisRow) {

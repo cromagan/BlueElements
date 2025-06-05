@@ -2093,20 +2093,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     internal static string MakeValidColumnName(string columnname) => columnname.Trim().ToUpperInvariant().Replace(" ", "_").Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
 
-    internal string AreCellsEditable() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Die Datenbank wurde verworfen."; }
-        if (IsDisposed) { return "Die Spalte wurde verworfen."; }
 
-        if (!EditableWithTextInput && !EditableWithDropdown && !db.PowerEdit) {
-            return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
-        }
-
-        if (UserEditDialogTypeInTable(this, false, true) == EditTypeTable.None) {
-            return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für sie Spalte definiert.";
-        }
-
-        return db.CanWriteMainFile();
-    }
 
     internal void Optimize() {
         if (!IsSystemColumn()) {

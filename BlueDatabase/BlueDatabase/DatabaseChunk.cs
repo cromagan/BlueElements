@@ -435,19 +435,30 @@ public class DatabaseChunk : Database {
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName).ToList();
 
-    internal override string EditableErrorReason(DatabaseDataType type, string chunkValue, EditableErrorReasonType reason) {
-        var f = base.EditableErrorReason(type, chunkValue, reason);
+    internal override string GrantWriteAccess(DatabaseDataType type, string chunkValue) {
+        var f = base.GrantWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var important = reason is EditableErrorReasonType.EditCurrently or EditableErrorReasonType.EditAcut or EditableErrorReasonType.Save;
-
-        var ok = LoadChunkWithChunkId(chunkId, important, true);
+        var ok = LoadChunkWithChunkId(chunkId, true, true);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
-        return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.EditableErrorReason(reason);
+        return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.GrantWriteAccess();
+    }
+
+    internal override string IsValueEditable(DatabaseDataType type, string chunkValue) {
+        var f = base.IsValueEditable(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        var chunkId = GetChunkId(this, type, chunkValue);
+
+        var ok = LoadChunkWithChunkId(chunkId, true, true);
+
+        if (!ok) { return "Chunk Lade-Fehler"; }
+
+        return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.IsEditable();
     }
 
     protected override void Dispose(bool disposing) {

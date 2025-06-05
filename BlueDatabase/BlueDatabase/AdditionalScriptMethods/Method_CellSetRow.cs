@@ -79,7 +79,7 @@ public class Method_CellSetRow : Method_Database {
 
         if (columnToSet == db.Column.ChunkValueColumn) { newchunkval = value; }
 
-        var m = CellCollection.EditableErrorReason(newchunkval, columnToSet, row, EditableErrorReasonType.EditAcut, false, false, true, false);
+        var m = CellCollection.GrantWriteAccess(columnToSet, row, newchunkval);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {
