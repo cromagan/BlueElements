@@ -446,10 +446,10 @@ public class Chunk : IHasKeyName {
 
         if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
 
-        f = CanSaveFile(ChunkFileName, 5);
-        if (!string.IsNullOrWhiteSpace(f)) { return f; }
-
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
+            f = CanSaveFile(ChunkFileName, 5);
+            if (!string.IsNullOrWhiteSpace(f)) { return f; }
+
             f = DoExtendedSave();
 
             if (!string.IsNullOrEmpty(f)) {

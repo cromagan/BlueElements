@@ -47,7 +47,7 @@ public static class IO {
 
     #region Delegates
 
-    private delegate (object? returnValue, bool retry) DoThis(string arg1, string arg2);
+    public delegate (object? returnValue, bool retry) DoThis(string arg1, string arg2);
 
     #endregion
 
@@ -65,16 +65,18 @@ public static class IO {
         // Prüfen ob Datei schreibbar ist
         if (!CanWrite(filename)) { return "Windows blockiert die Datei."; }
 
-        // Prüfen ob kürzlich geschrieben wurde
-        try {
-            FileInfo fileInfo = new(filename);
-            if (DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc).TotalSeconds < recentWriteThresholdSeconds) {
-                return "Anderer Speichervorgang noch nicht abgeschlossen.";
-            }
-        } catch {
-            return "Dateizugriffsfehler.";
-        }
 
+        if (recentWriteThresholdSeconds > 0) {
+            // Prüfen ob kürzlich geschrieben wurde
+            try {
+                FileInfo fileInfo = new(filename);
+                if (DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc).TotalSeconds < recentWriteThresholdSeconds) {
+                    return "Anderer Speichervorgang noch nicht abgeschlossen.";
+                }
+            } catch {
+                return "Dateizugriffsfehler.";
+            }
+        }
         return string.Empty;
     }
 
@@ -475,7 +477,7 @@ public static class IO {
     /// <param name="arg1">Erster Parameter</param>
     /// <param name="arg2">Zweiter Parameter</param>
     /// <param name="toBeSure">True für garantierte Ausführung (sonst Programmabbruch)</param>
-    private static object? ProcessFile(DoThis processMethod, string arg1, string arg2, bool toBeSure) {
+    public static object? ProcessFile(DoThis processMethod, string arg1, string arg2, bool toBeSure) {
         if (Develop.AllReadOnly) { return true; }
 
         var mytry = 0;
@@ -670,9 +672,12 @@ public static class IO {
         try {
             var autoDecompress = bool.Parse(autoDecompressStr);
 
-            var fileinfo = GetFileInfo(filename, false);
+            // Direkter Aufruf der Try-Methode anstatt GetFileInfo
+            var (fileinfoResult, retry) = TryGetFileInfo(filename, string.Empty);
+            var fileinfo = fileinfoResult as string ?? string.Empty;
+
             if (string.IsNullOrEmpty(fileinfo)) {
-                return ((Array.Empty<byte>(), string.Empty, true), true);
+                return ((Array.Empty<byte>(), string.Empty, true), retry);
             }
 
             var bLoaded = File.ReadAllBytes(filename);

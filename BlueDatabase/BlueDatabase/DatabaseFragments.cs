@@ -126,10 +126,12 @@ public class DatabaseFragments : Database {
     }
 
     public override string GrantWriteAccess(DatabaseDataType type, string? chunkValue) {
-        if (_writer == null) { return "Schreib-Objket nicht erstellt."; }
-
         var f = base.GrantWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (_writer == null) { StartWriter(); }
+
+        if (_writer == null) { return "Schreib-Objekt nicht erstellt."; }
 
         return string.Empty;
     }
@@ -143,15 +145,6 @@ public class DatabaseFragments : Database {
             }
             return true;
         } catch { return false; }
-    }
-
-    internal override string IsValueEditable(DatabaseDataType type, string? chunkValue) {
-        if (_writer == null) { return "Schreib-Objket nicht erstellt."; }
-
-        var f = base.IsValueEditable(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        return string.Empty;
     }
 
     protected override void Dispose(bool disposing) {
@@ -298,7 +291,9 @@ public class DatabaseFragments : Database {
                 writerToClose.WriteLine("- EOF");
                 writerToClose.Flush();
             } catch { } finally {
-                writerToClose.Dispose(); // Dispose ruft Close() automatisch auf
+                try {
+                    writerToClose.Dispose(); // Dispose ruft Close() automatisch auf
+                } catch { }
             }
         }
     }

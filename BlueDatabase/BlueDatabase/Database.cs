@@ -1152,7 +1152,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
 
         if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
+
         //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
         var fileSaveResult = CanSaveFile(Filename, 5);
@@ -1173,9 +1173,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern.";
         }
 
-        if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben"; }
-
-        if (!CanWrite(Filename)) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
+        if (!string.IsNullOrEmpty(Filename)) {
+            if (!CanWrite(Filename)) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
+        }
         return string.Empty;
     }
 
@@ -1344,6 +1344,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Layouts\\"; }
         return string.Empty;
     }
+
     //    DatenbankAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
     //    PermissionGroupsNewRow = new(sourceDatabase.PermissionGroupsNewRow.Clone());
     public void Dispose() {
@@ -1672,7 +1673,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return r;
     }
 
-    public virtual string GrantWriteAccess(DatabaseDataType type, string? chunkValue) => CanWriteMainFile();
+    public virtual string GrantWriteAccess(DatabaseDataType type, string? chunkValue) {
+        var f = CanWriteMainFile();
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
+        return string.Empty;
+    }
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
@@ -2262,6 +2268,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public virtual bool Save() {
+        if (string.IsNullOrEmpty(Filename)) { return true; }
+
         // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
         if (!_saveSemaphore.Wait(0)) {
             return false;

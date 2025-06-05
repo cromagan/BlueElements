@@ -431,7 +431,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             // CPU-Last reduzieren zwischen Versuchen
             Thread.Sleep(20);
-
         } while (true);
     }
 
@@ -462,23 +461,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return; }
-        if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return; }
+        //if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return; }
+        if (db.Column.SysRowChangeDate is not { IsDisposed: false } scd) { return; }
 
         InvalidateCheckData();
+        _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
-        if (CellIsNullOrEmpty(srs) && string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) {
+        if (CellIsNullOrEmpty(srs) && IsMyRow()) {
             Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} ist bereits invalidiert", 0);
-            _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
             return;
         }
 
         CellSet(srs, string.Empty, comment);
-
-        if (db.Column.SysRowChangeDate is { IsDisposed: false } scd) {
-            CellSet(scd, DateTime.UtcNow, comment);
-        }
-
-        _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
+        CellSet(scd, DateTime.UtcNow, comment);
 
         Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} invalidiert", 0);
     }

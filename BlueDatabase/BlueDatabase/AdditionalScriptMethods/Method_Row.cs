@@ -140,7 +140,7 @@ public class Method_Row : Method_Database, IUseableForButton {
                 if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {
-                Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Kein Zeilenupdate, da Zeile aktuell ist.", scp.Stufe);
+                Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
             return new DoItFeedback("Zeile konnte nicht angelegt werden", false, ld);
