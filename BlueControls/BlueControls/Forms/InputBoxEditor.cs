@@ -96,7 +96,11 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
         if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return false; }
 
-        if (!toEdit.IsNowEditable()) { return false; }
+        var m = toEdit.IsNowEditable();
+        if (!string.IsNullOrEmpty(m)) {
+            MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>{m}", ImageCode.Information, "Ok");
+            return false;
+        }
 
         if (!isDialog) { supportsCancel = false; }
 

@@ -401,7 +401,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         GC.SuppressFinalize(this);
     }
 
-
     /// <summary>
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
     /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
@@ -413,8 +412,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
-
-
         if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
@@ -473,7 +470,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} invalidiert", 0);
     }
 
-    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.CanWriteMainFile());
+    public string IsNowEditable() {
+        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+
+        return db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, ChunkValue);
+    }
 
     public bool IsNullOrEmpty() => IsDisposed || Database is not { IsDisposed: false } db
 || db.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));

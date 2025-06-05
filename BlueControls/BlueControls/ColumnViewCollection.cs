@@ -320,7 +320,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.CanSaveMainChunk());
+    public string IsNowEditable() {
+        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+
+        return db.GrantWriteAccess(DatabaseDataType.ColumnArrangement, DatabaseChunk.Chunk_Master);
+    }
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
 

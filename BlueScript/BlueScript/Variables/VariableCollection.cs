@@ -232,7 +232,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         return vf.ValueString;
     }
 
-    public bool IsNowEditable() => true;
+    public string IsNowEditable() => string.Empty;
 
     public List<string> ParseableItems() {
         List<string> result = [];

@@ -1668,6 +1668,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return r;
     }
 
+    public virtual string GrantWriteAccess(DatabaseDataType type, string? chunkValue) => CanWriteMainFile();
+
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
             var db = Get(thisFile, true, null);
@@ -1928,7 +1930,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return eventScriptEditedOld == eventScriptOld;
     }
 
-    public bool IsNowEditable() => string.IsNullOrEmpty(CanWriteMainFile());
+    public string IsNowEditable() => GrantWriteAccess(DatabaseDataType.Caption, DatabaseChunk.Chunk_Master);
 
     public bool IsRowScriptPossible(bool checkMessageTo) {
         if (Column.SysRowChangeDate == null) { return false; }
@@ -2314,9 +2316,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         Develop.DebugPrint(ErrorType.Warning, t);
     }
 
-
-    internal virtual string IsValueEditable(DatabaseDataType type, string? chunkValue) => string.Empty;
-    internal virtual string GrantWriteAccess(DatabaseDataType type, string? chunkValue) => string.Empty;
+    internal virtual string IsValueEditable(DatabaseDataType type, string? chunkValue) => CanWriteMainFile();
 
     internal void OnDropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }

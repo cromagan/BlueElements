@@ -186,7 +186,10 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return pg.GetSubItemCollection(keyOrCaption);
     }
 
-    public bool IsNowEditable() => LockEditing();
+    public string IsNowEditable() {
+        if (!LockEditing()) { return "Bearbeitung konnte nicht gesetzt werden"; }
+        return string.Empty;
+    }
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }

@@ -328,7 +328,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     public static bool EditabelErrorMessage(Database? database) {
         if (database == null) { return false; }
 
-        var m = database.CanSaveMainChunk();
+        var m = database.CanWriteMainFile();
         if (string.IsNullOrEmpty(m)) { return false; }
 
         MessageBox.Show("Aktion nicht möglich:<br>" + m);

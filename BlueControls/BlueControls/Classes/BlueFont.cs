@@ -433,7 +433,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
     }
 
-    public bool IsNowEditable() => true;
+    public string IsNowEditable() => string.Empty;
 
     public SizeF MeasureString(string text) => _fontOl.MeasureString(text);
 

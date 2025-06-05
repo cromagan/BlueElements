@@ -1470,7 +1470,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return true;
     }
 
-    public bool IsNowEditable() => Database is { IsDisposed: false } db && string.IsNullOrEmpty(db.CanSaveMainChunk());
+    public string IsNowEditable() {
+        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        return db.GrantWriteAccess(DatabaseDataType.ColumnName, DatabaseChunk.Chunk_Master);
+    }
 
     //}
     ///// <summary>
@@ -2092,8 +2095,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     internal static string MakeValidColumnName(string columnname) => columnname.Trim().ToUpperInvariant().Replace(" ", "_").Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
-
-
 
     internal void Optimize() {
         if (!IsSystemColumn()) {

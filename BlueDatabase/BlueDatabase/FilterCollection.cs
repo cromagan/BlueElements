@@ -433,7 +433,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return false;
     }
 
-    public bool IsNowEditable() => true;
+    public string IsNowEditable() => string.Empty;
 
     public bool IsRowFilterActiv() {
         var fi = this[null];

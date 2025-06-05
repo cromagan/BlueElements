@@ -33,7 +33,7 @@ public interface IEditable {
 
     #region Methods
 
-    bool IsNowEditable();
+    string IsNowEditable();
 
     #endregion
 }
