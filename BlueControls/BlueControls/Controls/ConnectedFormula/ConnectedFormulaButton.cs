@@ -306,16 +306,17 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         var f = ufb.DoIt(vars, args, fis, rn, ai);
 
         if (RowCollection.InvalidatedRowsManager.IsProcessing) {
-            f = "Ein anderer Prozess ist noch aktiv.";
+            f = "Ein anderer Prozess ist noch aktiv. Bitte kurz warten und nochmal starten.";
         } else {
             RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true);
         }
 
         if (!string.IsNullOrEmpty(f)) {
+            Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Fehler: " + f, 0);
             MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+        } else {
+            Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Häkchen, "Knopfdruck ausgeführt", 0);
         }
-
-        row?.DropMessage(ErrorType.Info, "Knopfdruck ausgeführt");
         main.Enabled = true;
         main.Refresh();
     }

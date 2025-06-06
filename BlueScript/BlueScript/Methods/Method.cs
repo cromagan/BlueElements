@@ -183,7 +183,10 @@ public abstract class Method : IReadableTextWithKey {
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
             var f = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
-            if (f.Failed) { return new GetEndFeedback($"Durch Befehl abgebrochen: {txt} -> {f.FailedReason}", ld, f.NeedsScriptFix); }
+            if (f.Failed) {
+                Develop.Message?.Invoke( BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage,   BlueBasics.Enums.ImageCode.Kritisch,  "Skript-Fehler: " + f.FailedReason, scp.Stufe);
+                return new GetEndFeedback($"Durch Befehl abgebrochen: {txt} -> {f.FailedReason}", ld, f.NeedsScriptFix); 
+            }
 
             if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
             if (f.Variable == null) { return new GetEndFeedback("Variablenfehler", ld, true); }

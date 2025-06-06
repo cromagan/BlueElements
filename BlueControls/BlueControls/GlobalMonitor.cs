@@ -27,7 +27,7 @@ public partial class GlobalMonitor : Form {
 
     public GlobalMonitor() {
         InitializeComponent();
-        GenerateUndoTabelle(tblLog);
+        GenerateLogTable(tblLog);
 
         Develop.Message += Message;
     }
@@ -36,10 +36,11 @@ public partial class GlobalMonitor : Form {
 
     #region Methods
 
-    public static void GenerateUndoTabelle(Table tblLog) {
+    public static void GenerateLogTable(Table tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
         Database db = new(Database.UniqueKeyValue()) {
-            LogUndo = false
+            LogUndo = false,
+            DropMessages = false
         };
         _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
@@ -116,7 +117,7 @@ public partial class GlobalMonitor : Form {
         }
     }
 
-    public void Message(ErrorType type, object? reference, string category, string symbol, string message, int indent) {
+    public void Message(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
         if (Disposing || IsDisposed) { return; }
 
         if (string.IsNullOrEmpty(category)) { return; }
@@ -142,7 +143,8 @@ public partial class GlobalMonitor : Form {
         var r = tblLog.Database?.Row.GenerateAndAdd(_n.ToString(), "New Undo Item");
         if (r == null) { return; }
 
-        if (!string.IsNullOrEmpty(symbol)) { r.CellSet("symbol", symbol + "|16", string.Empty); }
+        r.CellSet("symbol", symbol.ToString() + "|16", string.Empty);
+
         r.CellSet("Time", DateTime.Now.ToString7(), string.Empty);
         r.CellSet("category", category, string.Empty);
         r.CellSet("message", message, string.Empty);
@@ -157,7 +159,7 @@ public partial class GlobalMonitor : Form {
 
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
-        Develop.Message?.Invoke(ErrorType.Info, this, "Global", "Information", "Monitoring gestartet", 0);
+        Develop.Message?.Invoke(ErrorType.Info, this, "Global", ImageCode.Information, "Monitoring gestartet", 0);
     }
 
     private static void DisposeMonitor() {
@@ -235,7 +237,7 @@ public partial class GlobalMonitor : Form {
             _ = db.Row.Clear("Monitoring-Log geleert");
         }
 
-        Develop.Message?.Invoke(ErrorType.Info, this, "Global", "Information", "Monitoring-Log geleert", 0);
+        Develop.Message?.Invoke(ErrorType.Info, this, "Global", ImageCode.Information, "Monitoring-Log geleert", 0);
     }
 
     #endregion

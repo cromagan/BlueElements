@@ -372,14 +372,15 @@ public static class IO {
     public static object? ProcessFile(DoThis processMethod, bool abortIfFailed, int trySeconds, params object[] args) {
         if (Develop.AllReadOnly) { return true; }
 
-        var startTime = DateTime.UtcNow;
+        var startTime = Stopwatch.StartNew();
+        var stopw = Stopwatch.StartNew();
 
         while (true) {
             var (returnValue, retry) = processMethod(args);
             if (!retry) { return returnValue; }
 
             // Bei abortIfFailed=true weiter versuchen, aber nach 60 Sekunden eine Fehlermeldung ausgeben
-            if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > trySeconds) {
+            if (startTime.ElapsedMilliseconds > trySeconds * 1000) {
                 var argsStr = string.Join(", ", args.Select(a => a?.ToString() ?? "null"));
 
                 if (abortIfFailed) {
@@ -387,6 +388,11 @@ public static class IO {
                 }
 
                 return returnValue;
+            }
+
+            if (stopw.ElapsedMilliseconds > 10000) {
+                Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, "Warte auf Abschluss einer Dateioperation...", 0);
+                stopw = Stopwatch.StartNew();
             }
 
             Thread.Sleep(200);

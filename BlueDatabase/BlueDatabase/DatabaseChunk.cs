@@ -250,6 +250,8 @@ public class DatabaseChunk : Database {
         var f = base.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
+        if(Column.ChunkValueColumn == null) { return string.Empty; }
+
         if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler"; }
         if (!_chunks.TryGetValue(Chunk_Master.ToLower(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler"; }
         if (!_chunks.TryGetValue(Chunk_Variables.ToLower(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler"; }
@@ -330,7 +332,11 @@ public class DatabaseChunk : Database {
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
-        return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.GrantWriteAccess();
+        if (!_chunks.TryGetValue(chunkId, out var chunk)) {
+            return "Interner Chunk-Fehler";
+        } else {
+            return chunk.GrantWriteAccess();
+        }
     }
 
     /// <summary>
@@ -463,7 +469,13 @@ public class DatabaseChunk : Database {
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
-        return !_chunks.TryGetValue(chunkId, out var chunk) ? "Interner Chunk-Fehler" : chunk.IsEditable();
+        if(Column.ChunkValueColumn == null) { return string.Empty; }
+
+        if (!_chunks.TryGetValue(chunkId, out var chunk)) {
+            return "Interner Chunk-Fehler";
+        } else {
+            return chunk.IsEditable();
+        }
     }
 
     protected override void Dispose(bool disposing) {
@@ -483,7 +495,7 @@ public class DatabaseChunk : Database {
 
         #region Neue Chunks-Erstellen
 
-        DropMessage(ErrorType.Info, $"Erstelle Chunks der Datenank '{Caption}'");
+        DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Datenank '{Caption}'");
 
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
         if (chunksnew == null || chunksnew.Count == 0) { return false; }

@@ -108,7 +108,7 @@ public class Method_Row : Method_Database, IUseableForButton {
             }
         }
 
-        Develop.Message?.Invoke(BlueBasics.Enums.ErrorType.Info, null,  scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
+        Develop.Message?.Invoke(ErrorType.DevelopInfo, null,  scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
 
         RowItem? newrow;
 
@@ -137,11 +137,11 @@ public class Method_Row : Method_Database, IUseableForButton {
             var v = r.CellGetDateTime(srs);
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
-                var m = CellCollection.GrantWriteAccess(srs, r, fic.ChunkVal, 60, false);
+                var m = CellCollection.GrantWriteAccess(srs, r, fic.ChunkVal, 120, false);
                 if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {
-                Develop.Message?.Invoke(ErrorType.Info, null, scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
+                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
             return new DoItFeedback("Zeile konnte nicht angelegt werden", false, ld);

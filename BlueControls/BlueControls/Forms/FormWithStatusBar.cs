@@ -35,6 +35,16 @@ public partial class FormWithStatusBar : Form {
     /// </summary>
     private static readonly List<FormWithStatusBar> _formsWithStatusBar = [];
 
+    /// <summary>
+    /// Tracks ob der statische Handler bereits registriert wurde
+    /// </summary>
+    private static bool _staticHandlerRegistered = false;
+
+    /// <summary>
+    /// Lock für Thread-Sicherheit bei Handler-Registrierung
+    /// </summary>
+    private static readonly object _handlerLock = new();
+
     private DateTime _lastMessage = DateTime.UtcNow;
 
     #endregion
@@ -45,9 +55,8 @@ public partial class FormWithStatusBar : Form {
         InitializeComponent();
         _ = _formsWithStatusBar.AddIfNotExists(this);
 
-        if (Develop.Message == null) {
-            Develop.Message = FormWithStatusBar.UpdateStatusBar;
-        }
+        // Handler nur einmal statisch registrieren
+        RegisterStaticHandler();
     }
 
     #endregion
@@ -62,13 +71,23 @@ public partial class FormWithStatusBar : Form {
 
     #region Methods
 
+    /// <summary>
+    /// Registriert den statischen Handler nur einmal
+    /// </summary>
+    private static void RegisterStaticHandler() {
+        lock (_handlerLock) {
+            if (!_staticHandlerRegistered) {
+                Develop.Message += UpdateStatusBar;
+                _staticHandlerRegistered = true;
+            }
+        }
+    }
 
-
-    public static void UpdateStatusBar(ErrorType type, object? reference, string category, string symbol, string message, int indent) {
-
-
-            message = DateTime.Now.ToString("HH:mm:ss") + " " + message;
-        
+    /// <summary>
+    /// Statischer Handler der an alle FormWithStatusBar-Instanzen weiterleitet
+    /// </summary>
+    public static void UpdateStatusBar(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
+        message = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message;
 
         List<FormWithStatusBar> l = [.. _formsWithStatusBar];
 
@@ -77,20 +96,25 @@ public partial class FormWithStatusBar : Form {
         foreach (var thisf in l) {
             if (thisf is { Visible: true, IsDisposed: false }) {
                 try {
-                    var x = thisf.UpdateStatus(type, message, did);
+                    var x = thisf.UpdateStatus(type, symbol, message, did);
                     if (x) { did = true; }
                 } catch { }
             }
         }
     }
 
-    public bool UpdateStatus(ErrorType type, string message, bool didAlreadyMessagebox) {
+    /// <summary>
+    /// Aktualisiert die Statusleiste dieser Form-Instanz
+    /// </summary>
+    public bool UpdateStatus(ErrorType type, ImageCode symbol, string message, bool didAlreadyMessagebox) {
         try {
             if (IsDisposed || Disposing || !IsHandleCreated) { return false; }
             if (DesignMode) { return false; }
 
+            if (type == ErrorType.DevelopInfo) { return false; }
+
             if (InvokeRequired) {
-                return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox)));
+                return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, symbol, message, didAlreadyMessagebox)));
             }
 
             if (capStatusBar.InvokeRequired) { return false; }
@@ -98,7 +122,7 @@ public partial class FormWithStatusBar : Form {
             _lastMessage = DateTime.UtcNow;
             timMessageClearer.Enabled = true;
 
-            var imagecode = ImageCode.Information;
+            //var imagecode = ImageCode.Information;
 
             if (string.IsNullOrEmpty(message)) {
                 capStatusBar.Text = string.Empty;
@@ -113,11 +137,11 @@ public partial class FormWithStatusBar : Form {
             message = message.Replace("; ; ", "; ");
             message = message.TrimEnd("; ");
 
-            if (type == ErrorType.Warning) { imagecode = ImageCode.Warnung; }
-            if (type == ErrorType.Error) { imagecode = ImageCode.Kritisch; }
+            //if (type == ErrorType.Warning) { imagecode = ImageCode.Warnung; }
+            //if (type == ErrorType.Error) { imagecode = ImageCode.Kritisch; }
 
             if (type is ErrorType.Info || !DropMessages || didAlreadyMessagebox) {
-                capStatusBar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16) + "> " + message;
+                capStatusBar.Text = "<imagecode=" + QuickImage.Get(symbol, 16) + "> " + message;
                 capStatusBar.Refresh();
                 return false;
             }
@@ -126,7 +150,7 @@ public partial class FormWithStatusBar : Form {
                 Develop.DebugPrint(ErrorType.Warning, message);
 
                 if (type == ErrorType.Error) {
-                    Notification.Show(message, imagecode);
+                    Notification.Show(message, symbol);
                     //MessageBox.Show(message, imagecode, "Ok");
                     return true;
                 }
@@ -140,6 +164,15 @@ public partial class FormWithStatusBar : Form {
 
     protected override void OnFormClosed(FormClosedEventArgs e) {
         _ = _formsWithStatusBar.Remove(this);
+
+        // Handler nur entfernen, wenn keine Forms mehr vorhanden sind
+        lock (_handlerLock) {
+            if (_formsWithStatusBar.Count == 0 && _staticHandlerRegistered) {
+                Develop.Message -= UpdateStatusBar;
+                _staticHandlerRegistered = false;
+            }
+        }
+
         base.OnFormClosed(e);
     }
 

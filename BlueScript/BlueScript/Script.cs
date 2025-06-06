@@ -178,11 +178,11 @@ public class Script {
             }
         }
 
-        Develop.Message?.Invoke(ErrorType.Info, null, scp.MainInfo, "Skript", $"Parsen: {scp.Chain} START", scp.Stufe);
+        Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
 
         do {
             if (pos >= redScriptText.Length || endScript) {
-                Develop.Message?.Invoke(ErrorType.Info, null, scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
+                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
                 return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, endScript, string.Empty);
             }
@@ -193,7 +193,7 @@ public class Script {
             } else {
                 var f = CommandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
                 if (f.Failed) {
-                    Develop.Message?.Invoke(ErrorType.Info, null, scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {f.FailedReason}", scp.Stufe);
+                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {f.FailedReason}", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, f.NeedsScriptFix, false, false, f.FailedReason);
                 }
 
@@ -202,7 +202,7 @@ public class Script {
                 pos = f.Position;
                 ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
                 if (f.BreakFired) {
-                    Develop.Message?.Invoke(ErrorType.Info, null, scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
+                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty);
                 }
             }

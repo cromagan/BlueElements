@@ -627,7 +627,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
 
         if (!maybeok) {
-            Develop.Message?.Invoke(ErrorType.Info, null, "Datenbank", "Datenbank", "Lade Datenbank " + tablename, 0);
+            Develop.Message?.Invoke(ErrorType.Info, null, "Datenbank", ImageCode.Datenbank, "Lade Datenbank " + tablename, 0);
         }
 
         #endregion

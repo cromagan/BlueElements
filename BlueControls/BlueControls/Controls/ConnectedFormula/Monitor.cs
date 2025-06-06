@@ -18,7 +18,7 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.EventArgs;
+using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueDatabase;
 using System;
@@ -45,6 +45,9 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
+
+        // Handler für Develop.Message registrieren
+        Develop.Message += OnDevelopMessage;
     }
 
     #endregion
@@ -59,9 +62,6 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
 
             if (_lastRow == value) { return; }
 
-            if (_lastRow != null) {
-                _lastRow.DropMessage -= _lastRow_DropMessage;
-            }
             _n = 99999;
             _lastRow = value;
             capInfo.Text = string.Empty;
@@ -69,8 +69,8 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
 
             if (_lastRow != null) {
                 capInfo.Text = "Überwache: " + _lastRow.CellFirstString();
-                _lastRow.DropMessage += _lastRow_DropMessage;
-                _lastRow_DropMessage(this, new MessageEventArgs(BlueBasics.Enums.ErrorType.Info, "Überwachung gestartet"));
+                // Simuliere eine Start-Meldung
+                _lastRow_DropMessage(ErrorType.Info, ImageCode.Monitor, "Überwachung gestartet");
             }
         }
     }
@@ -78,6 +78,14 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
     #endregion
 
     #region Methods
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            // Handler wieder entfernen
+            Develop.Message -= OnDevelopMessage;
+        }
+        base.Dispose(disposing);
+    }
 
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
@@ -90,12 +98,15 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         LastRow = RowSingleOrNull();
     }
 
-    private void _lastRow_DropMessage(object sender, MessageEventArgs e) {
+    /// <summary>
+    /// Ursprüngliche Methode, angepasst für das neue Message-System
+    /// </summary>
+    private void _lastRow_DropMessage(ErrorType type, ImageCode symbol, string message) {
         if (Disposing || IsDisposed) { return; }
 
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(() => _lastRow_DropMessage(sender, e)));
+                _ = Invoke(new Action(() => _lastRow_DropMessage(type, symbol, message)));
                 return;
             } catch {
                 return;
@@ -105,12 +116,34 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         _n--;
         if (_n < 0) { _n = 99999; }
 
-        if (!string.IsNullOrWhiteSpace(capInfo.Text)) {
-            lstDone.ItemAdd(ItemOf(e, _n.ToStringInt7()));
-        }
+        lstDone.ItemAdd(ItemOf(message, Generic.GetUniqueKey(), symbol, false, _n.ToStringInt7()));
+        
 
         lstDone.Refresh();
-        //capInfo.Text = e.Message;
+        //capInfo.Text = message;
+    }
+
+    /// <summary>
+    /// Handler für Develop.Message - prüft ob die Referenz der überwachten Row entspricht
+    /// </summary>
+    private void OnDevelopMessage(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
+        message = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message;
+
+        // Nur Meldungen verarbeiten, die sich auf die überwachte Row beziehen
+        if (reference == _lastRow && _lastRow != null) {
+            _lastRow_DropMessage(type, symbol, message);
+            return;
+        }
+
+        if (reference is InvalidatedRowsManager) {
+            _lastRow_DropMessage(type, symbol, message);
+            return;
+        }
+
+        if (category == Develop.MonitorMessage) {
+            _lastRow_DropMessage(type, symbol, message);
+            return;
+        }
     }
 
     #endregion

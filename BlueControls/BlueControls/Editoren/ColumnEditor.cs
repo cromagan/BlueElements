@@ -532,7 +532,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
         if (tblFilterliste.Database == null) {
             Database db = new(Database.UniqueKeyValue()) {
-                LogUndo = false
+                LogUndo = false,
+                DropMessages = false
             };
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);

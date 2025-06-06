@@ -63,7 +63,7 @@ public static class Develop {
 
     #region Delegates
 
-    public delegate void MessageDelegate(ErrorType type, object? reference, string category, string symbol, string message, int indent);
+    public delegate void MessageDelegate(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent);
 
     #endregion
 
@@ -77,6 +77,7 @@ public static class Develop {
     public static string OrigingNumberDecimalSeparator { get; private set; } = ",";
 
     [DefaultValue(false)] private static bool ServiceStarted { get; set; }
+    public static string MonitorMessage = "Monitor-Message";
 
     #endregion
 
@@ -125,17 +126,17 @@ public static class Develop {
 
     public static void DebugPrint<T>(T @enum) where T : Enum => DebugPrint(ErrorType.Warning, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
 
-    public static void DebugPrint(ErrorType art, string meldung) {
+    public static void DebugPrint(ErrorType type, string message) {
         lock (SyncLockObject) {
             try {
                 if (_isTraceLogging) {
-                    if (art == ErrorType.Error) { AbortExe(); }
+                    if (type == ErrorType.Error) { AbortExe(); }
                     return;
                 }
                 _isTraceLogging = true;
-                if (art == ErrorType.Error) { _lastDebugMessage = string.Empty; }
+                if (type == ErrorType.Error) { _lastDebugMessage = string.Empty; }
                 if (DateTime.UtcNow.Subtract(_lastDebugTime).TotalSeconds > 5) { _lastDebugMessage = string.Empty; }
-                var net = art + (";" + meldung);
+                var net = type + (";" + message);
                 if (net == _lastDebugMessage) {
                     _isTraceLogging = false;
                     return;
@@ -148,7 +149,9 @@ public static class Develop {
                 var nr = 100;
                 List<string>? l = null;
                 Trace.WriteLine("<tr>");
-                switch (art) {
+
+
+                switch (type) {
                     case ErrorType.DevelopInfo:
                         if (!IsHostRunning()) {
                             _isTraceLogging = false;
@@ -160,12 +163,12 @@ public static class Develop {
 
                     case ErrorType.Info:
                         Trace.WriteLine("<th><font size = 3>Info");
-                        Message?.Invoke("Info", "Information", meldung, 0);
+                        Message?.Invoke(type, null, "Info", ImageCode.Information, message, 0);
                         nr = 5;
                         break;
 
                     case ErrorType.Warning:
-                        Message?.Invoke("Warnung", "Warnung", meldung, 0);
+                        Message?.Invoke(type, null, "Warnung", ImageCode.Warnung, message, 0);
 
                         if (IsHostRunning()) { Debugger.Break(); }
                         Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
@@ -173,7 +176,7 @@ public static class Develop {
                         break;
 
                     case ErrorType.Error:
-                        Message?.Invoke("Fehler, Programmabbruch", "Kritisch", meldung, 0);
+                        Message?.Invoke(type, null, "Fehler, Programmabbruch", ImageCode.Kritisch, message, 0);
                         if (IsHostRunning()) { Debugger.Break(); }
                         if (!FileExists(tmp)) { l = []; }
                         Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
@@ -181,7 +184,7 @@ public static class Develop {
                         break;
 
                     default:
-                        Message?.Invoke("Info Unbekannten Typs", "Sonne", meldung, 0);
+                        Message?.Invoke(type, null, "Info Unbekannten Typs", ImageCode.Sonne, message, 0);
                         Trace.WriteLine("<th>?");
                         _deleteTraceLog = false;
                         break;
@@ -197,10 +200,10 @@ public static class Develop {
                         first = false;
                     }
                 }
-                meldung = meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes(true);
-                Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + meldung + "</th>");
+                message = message.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes(true);
+                Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + message + "</th>");
                 Trace.WriteLine("</tr>");
-                if (art == ErrorType.Error) {
+                if (type == ErrorType.Error) {
                     TraceLogging_End();
                     List<string> endl = [];
                     HTML_AddHead(endl, "Beenden...");
@@ -210,7 +213,7 @@ public static class Develop {
                     endl.Add("Das Programm <b>" + AppName() + "</b> musste beendet werden.<br>");
                     endl.Add("<br>");
                     endl.Add("<u><b>Grund:</u></b><br>");
-                    endl.Add(meldung);
+                    endl.Add(message);
                     endl.Add("<br>");
                     endl.Add("<font size = 1>");
                     endl.Add("Datum: " + DateTime.Now);

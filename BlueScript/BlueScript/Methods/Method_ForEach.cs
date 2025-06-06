@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -81,7 +82,7 @@ internal class Method_ForEach : Method {
 
             if (t.ElapsedMilliseconds > 1000) {
                 t = Stopwatch.StartNew();
-                Develop.Message?.Invoke(BlueBasics.Enums.ErrorType.Info, null, "Skript", "Skript", $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", scp.Stufe +1);
+                Develop.Message?.Invoke(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", scp.Stufe +1);
             }
         }
 

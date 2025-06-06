@@ -78,7 +78,7 @@ public class Method_CellSetRow : Method_Database {
 
         if (columnToSet == db.Column.ChunkValueColumn) { newchunkval = value; }
 
-        var m = CellCollection.GrantWriteAccess(columnToSet, row, newchunkval, 60, false);
+        var m = CellCollection.GrantWriteAccess(columnToSet, row, newchunkval, 120, false);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {

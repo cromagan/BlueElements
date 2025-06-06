@@ -755,6 +755,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
                 if (FileExists(pf)) {
                     var db = new Database(name);
+                    db.DropMessages = false;
                     db.LoadFromFile(pf, false, null, string.Empty, false);
                     return db;
                 }
@@ -763,7 +764,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var d = GetEmmbedResource(assembly, name);
         if (d != null) {
             var db = new Database(name) {
-                LogUndo = false
+                LogUndo = false,
+                DropMessages = false
             };
             db.LoadFromStream(d);
             return db;
@@ -1997,7 +1999,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         CreateWatcher();
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
 
-        DropMessage(ErrorType.Info, $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen");
+        DropMessage(ErrorType.Info, $"Laden der Datenbank {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
     }
 
     public void LoadFromStream(Stream stream) {
@@ -2330,7 +2332,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     protected void DropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }
-        Develop.Message?.Invoke(type, this, Caption, "Datenbank", message, 0);
+        Develop.Message?.Invoke(type, this, Caption, ImageCode.Datenbank, message, 0);
     }
 
 
@@ -2434,7 +2436,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     protected virtual void DoWorkAfterLastChanges(List<string>? files, DateTime starttimeUtc, DateTime endTimeUtc) { }
 
     protected virtual bool LoadMainData() {
-        var (bytes, _, failed) = IO.LoadBytesFromDisk(Filename, true);
+        var (bytes, _, failed) = LoadBytesFromDisk(Filename, true);
 
         if (failed) {
             Freeze("Laden fehlgeschlagen!");

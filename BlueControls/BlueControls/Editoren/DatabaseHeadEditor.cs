@@ -96,7 +96,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     public static void AddUndosToTable(Table tblUndo, Database? database, float maxAgeInDays) {
         if (database is { IsDisposed: false } db) {
-            Develop.Message?.Invoke(ErrorType.Info, null, "?", "Information", $"Erstelle Tabellen Ansicht des Undo-Speichers der Datenbank '{db.Caption}'", 0);
+            Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Datenbank '{db.Caption}'", 0);
 
             List<UndoItem> un = [.. db.Undo]; // Kann und wird verändert!
 
@@ -196,7 +196,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     public static void GenerateUndoTabelle(Table tblUndo) {
         Database db = new(Database.UniqueKeyValue()) {
-            LogUndo = false
+            LogUndo = false,
+            DropMessages = false
         };
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);

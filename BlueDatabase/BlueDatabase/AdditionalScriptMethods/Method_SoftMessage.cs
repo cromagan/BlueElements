@@ -25,8 +25,6 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -71,7 +69,7 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
 
 
-        Develop.Message?.Invoke(ErrorType.Info, myDb, "Skript", "Database", txt, 0);
+        Develop.Message?.Invoke(ErrorType.Info, myDb, "Skript", ImageCode.Datenbank, txt, 0);
 
         return DoItFeedback.Null();
     }

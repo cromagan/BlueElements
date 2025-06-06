@@ -95,7 +95,7 @@ public class InvalidatedRowsManager {
 			return false;
 		}
 
-		Develop.Message?.Invoke(ErrorType.Info, rowItem, "Row", "Zeile", $"Neuer Job durch neue invalide Zeile: {rowItem.CellFirstString()} der Datenbank {db.Caption}", 0);
+		Develop.Message?.Invoke(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job durch neue invalide Zeile: {rowItem.CellFirstString()} der Datenbank {db.Caption}", 0);
 
 		// Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
 		return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);
@@ -114,7 +114,13 @@ public class InvalidatedRowsManager {
 		}
 
 		try {
-			Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", "Taschenrechner", $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
+			if (_invalidatedRows.Count > 0) {
+				Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
+			} else {
+				Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, "Keine invaliden Zeilen bekannt", 0);
+				return;
+			}
+
 
 			var totalProcessedCount = 0;
 			var entriesBeforeProcessing = 0;
@@ -124,7 +130,7 @@ public class InvalidatedRowsManager {
 				// Sammle alle aktuellen Schlüssel
 				var keysToProcess = _invalidatedRows.Keys.ToList();
 				if (keysToProcess.Count == 0) {
-					masterRow?.DropMessage(ErrorType.Info, $"Alle Einträge abgearbeitet");
+					masterRow?.DropMessage(ErrorType.DevelopInfo, $"Alle Einträge abgearbeitet");
 					break;
 				}
 
@@ -133,7 +139,7 @@ public class InvalidatedRowsManager {
 
 				// Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
 				if (newEntries > 0) {
-					masterRow?.DropMessage(ErrorType.Info, $"{newEntries} neue Einträge zum Abarbeiten");
+					Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Stern,  $"{newEntries} neue Einträge zum Abarbeiten", 0);
 				}
 
 				// Anzahl der zu verarbeitenden Zeilen vor der Verarbeitung merken
@@ -155,10 +161,10 @@ public class InvalidatedRowsManager {
 				Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
 			} while (true);
 
-			Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", "Taschenrechner", $"InvalidatetRowManager fertig", 0);
+			Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen fertig", 0);
 
 		} catch {
-			Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", "Taschenrechner", $"InvalidatetRowManager unerwartet abgebrochen", 0);
+			Develop.Message?.Invoke(ErrorType.Warning, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen unerwartet abgebrochen", 0);
 
 		} finally {
 			// Verarbeitung beenden, egal was passiert
