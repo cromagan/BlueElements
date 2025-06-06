@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -46,8 +45,8 @@ public partial class FormWithStatusBar : Form {
         InitializeComponent();
         _ = _formsWithStatusBar.AddIfNotExists(this);
 
-        if (Develop.StatusBarMessage == null) {
-            Develop.StatusBarMessage = FormWithStatusBar.UpdateStatusBar;
+        if (Develop.Message == null) {
+            Develop.Message = FormWithStatusBar.UpdateStatusBar;
         }
     }
 
@@ -63,24 +62,13 @@ public partial class FormWithStatusBar : Form {
 
     #region Methods
 
-    public static void UpdateStatusBar(ErrorType type, string text, bool addtime) {
-        switch (type) {
-            case ErrorType.Error:
-                Develop.MonitorMessage?.Invoke("Status-Bar, Fehler", "Kritisch", text, 0);
-                break;
 
-            case ErrorType.Warning:
-                Develop.MonitorMessage?.Invoke("Status-Bar, Warnung", "Warnung", text, 0);
-                break;
 
-            default:
-                Develop.MonitorMessage?.Invoke("Status-Bar, Info", "Information", text, 0);
-                break;
-        }
+    public static void UpdateStatusBar(ErrorType type, object? reference, string category, string symbol, string message, int indent) {
 
-        if (addtime && !string.IsNullOrEmpty(text)) {
-            text = DateTime.Now.ToString("HH:mm:ss") + " " + text;
-        }
+
+            message = DateTime.Now.ToString("HH:mm:ss") + " " + message;
+        
 
         List<FormWithStatusBar> l = [.. _formsWithStatusBar];
 
@@ -89,7 +77,7 @@ public partial class FormWithStatusBar : Form {
         foreach (var thisf in l) {
             if (thisf is { Visible: true, IsDisposed: false }) {
                 try {
-                    var x = thisf.UpdateStatus(type, text, did);
+                    var x = thisf.UpdateStatus(type, message, did);
                     if (x) { did = true; }
                 } catch { }
             }
@@ -149,8 +137,6 @@ public partial class FormWithStatusBar : Form {
             return false;
         }
     }
-
-    internal static void GotMessageDropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
 
     protected override void OnFormClosed(FormClosedEventArgs e) {
         _ = _formsWithStatusBar.Remove(this);

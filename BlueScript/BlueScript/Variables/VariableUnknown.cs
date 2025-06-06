@@ -98,7 +98,7 @@ public class VariableUnknown : Variable {
 
     protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         if (scp != null) {
-            Develop.MonitorMessage?.Invoke(scp.MainInfo, "Formel", "Unbekannte Variable erstellt (ukn): " + txt, scp.Stufe);
+            Develop.Message?.Invoke(ErrorType.Info, null, scp.MainInfo, "Formel", "Unbekannte Variable erstellt (ukn): " + txt, scp.Stufe);
         }
         return (true, txt);
     }

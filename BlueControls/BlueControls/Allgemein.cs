@@ -65,9 +65,6 @@ public static class Allgemein {
     private static void AllFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
-                if (thisit is ICanDropMessages dm) {
-                    dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
-                }
                 if (thisit is Database db) {
                     db.AdditionalRepair += Table.Database_AdditionalRepair;
                 }
@@ -76,9 +73,6 @@ public static class Allgemein {
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-                if (thisit is ICanDropMessages dm) {
-                    dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
-                }
                 if (thisit is Database db) {
                     db.AdditionalRepair += Table.Database_AdditionalRepair;
                 }

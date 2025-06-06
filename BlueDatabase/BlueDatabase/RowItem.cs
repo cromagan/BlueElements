@@ -41,7 +41,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable, IEditable, ICanDropMessages {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable, IEditable {
 
     #region Fields
 
@@ -72,8 +72,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     #endregion
 
     #region Events
-
-    public event EventHandler<MessageEventArgs>? DropMessage;
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
@@ -401,6 +399,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         GC.SuppressFinalize(this);
     }
 
+    public void DropMessage(ErrorType type, string message) {
+        if (IsDisposed) { return; }
+        if (Database is not { IsDisposed: false } db) { return; }
+        if (!db.DropMessages) { return; }
+
+        Develop.Message?.Invoke(type, this, db.Caption, "Zeile", message, 0);
+    }
+
     /// <summary>
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
     /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
@@ -468,14 +474,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
         if (CellIsNullOrEmpty(srs) && IsMyRow()) {
-            Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} ist bereits invalidiert", 0);
+            DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} ist bereits invalidiert");
             return;
         }
 
         CellSet(srs, string.Empty, comment);
         CellSet(scd, DateTime.UtcNow, comment);
 
-        Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeile {CellFirstString()} invalidiert", 0);
+        DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} invalidiert");
     }
 
     public string IsNowEditable() {
@@ -554,14 +560,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
         if (string.IsNullOrEmpty(CellGetString(srs))) { return true; }
         return CellGetDateTime(srs) < Database.EventScriptVersion;
-    }
-
-    public void OnDropMessage(ErrorType type, string message) {
-        if (IsDisposed) { return; }
-        if (Database is not { IsDisposed: false } db) { return; }
-
-        Develop.MonitorMessage?.Invoke(db.Caption, "Zeile", $"Zeilennachricht von {CellFirstString()}: {message}", 0);
-        DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 
     /// <summary>
@@ -685,9 +683,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
-            Develop.MonitorMessage?.Invoke($"{db.Caption}\\{CellFirstString()}", "Skript", $"Datenüberprüfung Start: Extended {extendedAllowed} Grund: {reason})", 0);
-            db.OnDropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
-            OnDropMessage(ErrorType.Info, $"Aktualisiere ({reason})");
+            DropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
 
             if (extendedAllowed) {
                 _ = RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);

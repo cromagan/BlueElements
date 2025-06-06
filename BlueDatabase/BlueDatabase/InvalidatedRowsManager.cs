@@ -29,190 +29,193 @@ namespace BlueDatabase;
 
 public class InvalidatedRowsManager {
 
-    #region Fields
+	#region Fields
 
-    // ConcurrentDictionary für threadsichere Sammlung der ungültigen Zeilen (Key = KeyName, Value = RowItem)
-    private readonly ConcurrentDictionary<string, RowItem> _invalidatedRows = new ConcurrentDictionary<string, RowItem>();
+	// ConcurrentDictionary für threadsichere Sammlung der ungültigen Zeilen (Key = KeyName, Value = RowItem)
+	private readonly ConcurrentDictionary<string, RowItem> _invalidatedRows = new ConcurrentDictionary<string, RowItem>();
 
-    // Lock-Objekt nur für den Verarbeitungsstatus
-    private readonly object _processingLock = new object();
+	// Lock-Objekt nur für den Verarbeitungsstatus
+	private readonly object _processingLock = new object();
 
-    //// ConcurrentDictionary für threadsichere Nachverfolgung verarbeiteter Einträge
-    //private readonly ConcurrentDictionary<string, bool> _processedRowIds = new ConcurrentDictionary<string, bool>();
-    // Flag für laufende Verarbeitung
-    private volatile bool _isProcessing = false;
+	//// ConcurrentDictionary für threadsichere Nachverfolgung verarbeiteter Einträge
+	//private readonly ConcurrentDictionary<string, bool> _processedRowIds = new ConcurrentDictionary<string, bool>();
+	// Flag für laufende Verarbeitung
+	private volatile bool _isProcessing = false;
 
-    #endregion
+	#endregion
 
-    #region Events
+	#region Events
 
-    public event EventHandler<RowEventArgs>? RowChecked;
+	public event EventHandler<RowEventArgs>? RowChecked;
 
-    #endregion
+	#endregion
 
-    #region Properties
+	#region Properties
 
-    /// <summary>
-    /// Überprüft, ob gerade eine Verarbeitung stattfindet.
-    /// Thread-sicher implementiert.
-    /// </summary>
-    public bool IsProcessing {
-        get {
-            lock (_processingLock) {
-                return _isProcessing;
-            }
-        }
-    }
+	/// <summary>
+	/// Überprüft, ob gerade eine Verarbeitung stattfindet.
+	/// Thread-sicher implementiert.
+	/// </summary>
+	public bool IsProcessing {
+		get {
+			lock (_processingLock) {
+				return _isProcessing;
+			}
+		}
+	}
 
-    /// <summary>
-    /// Gibt die aktuelle Anzahl der zu verarbeitenden Zeilen zurück.
-    /// </summary>
-    public int PendingRowsCount => _invalidatedRows.Count;
+	/// <summary>
+	/// Gibt die aktuelle Anzahl der zu verarbeitenden Zeilen zurück.
+	/// </summary>
+	public int PendingRowsCount => _invalidatedRows.Count;
 
-    #endregion
+	#endregion
 
-    #region Methods
+	#region Methods
 
-    /// <summary>
-    /// Fügt ein neues Row-Item zur Sammlung hinzu, wenn es nicht bereits vorhanden
-    /// oder als verarbeitet markiert ist.
-    /// </summary>
-    /// <param name="rowItem">Das hinzuzufügende Row-Item</param>
-    /// <returns>True wenn das Item hinzugefügt wurde, False wenn nicht</returns>
-    public bool AddInvalidatedRow(RowItem? rowItem) {
-        if (rowItem?.Database is not { IsDisposed: false } db) { return false; }
+	/// <summary>
+	/// Fügt ein neues Row-Item zur Sammlung hinzu, wenn es nicht bereits vorhanden
+	/// oder als verarbeitet markiert ist.
+	/// </summary>
+	/// <param name="rowItem">Das hinzuzufügende Row-Item</param>
+	/// <returns>True wenn das Item hinzugefügt wurde, False wenn nicht</returns>
+	public bool AddInvalidatedRow(RowItem? rowItem) {
+		if (rowItem?.Database is not { IsDisposed: false } db) { return false; }
 
-        // Ansosten ist Endloschleife mit Monitor
-        if (!db.CanDoValueChangedScript()) { return false; }
+		// Ansosten ist Endloschleife mit Monitor
+		if (!db.CanDoValueChangedScript()) { return false; }
 
-        //// Prüfe, ob die Zeile bereits als verarbeitet markiert ist
-        //if (_processedRowIds.ContainsKey(rowItem.KeyName)) {
-        //    return false;
-        //}
+		//// Prüfe, ob die Zeile bereits als verarbeitet markiert ist
+		//if (_processedRowIds.ContainsKey(rowItem.KeyName)) {
+		//    return false;
+		//}
 
-        // Prüfe, ob die Zeile bereits als verarbeitet markiert ist
-        if (_invalidatedRows.ContainsKey(rowItem.KeyName)) {
-            return false;
-        }
+		// Prüfe, ob die Zeile bereits als verarbeitet markiert ist
+		if (_invalidatedRows.ContainsKey(rowItem.KeyName)) {
+			return false;
+		}
 
-        rowItem.Database?.OnDropMessage(ErrorType.Info, $"Neuer Job durch neue invalide Zeile: {rowItem.CellFirstString()} der Datenbank {db.Caption}");
+		Develop.Message?.Invoke(ErrorType.Info, rowItem, "Row", "Zeile", $"Neuer Job durch neue invalide Zeile: {rowItem.CellFirstString()} der Datenbank {db.Caption}", 0);
 
-        // Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
-        return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);
-    }
+		// Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
+		return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);
+	}
 
-    /// <summary>
-    /// Verarbeitet alle ungültigen Zeilen. Verhindert parallele Aufrufe.
-    /// Verarbeitet auch Zeilen, die während der Ausführung hinzugekommen sind.
-    /// </summary>
-    /// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
-    /// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
-    public void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed) {
-        lock (_processingLock) {
-            if (_isProcessing) { return; }
-            _isProcessing = true;
-        }
+	/// <summary>
+	/// Verarbeitet alle ungültigen Zeilen. Verhindert parallele Aufrufe.
+	/// Verarbeitet auch Zeilen, die während der Ausführung hinzugekommen sind.
+	/// </summary>
+	/// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
+	/// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
+	public void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed) {
+		lock (_processingLock) {
+			if (_isProcessing) { return; }
+			_isProcessing = true;
+		}
 
-        try {
-            Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "Taschenrechner", $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
-            var totalProcessedCount = 0;
-            var entriesBeforeProcessing = 0;
+		try {
+			Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", "Taschenrechner", $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
 
-            // Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
-            do {
-                // Sammle alle aktuellen Schlüssel
-                var keysToProcess = _invalidatedRows.Keys.ToList();
-                if (keysToProcess.Count == 0) {
-                    masterRow?.OnDropMessage(ErrorType.Info, $"Alle Einträge abgearbeitet");
-                    break;
-                }
+			var totalProcessedCount = 0;
+			var entriesBeforeProcessing = 0;
 
-                // Prüfe, ob neue Einträge hinzugekommen sind
-                var newEntries = keysToProcess.Count - entriesBeforeProcessing;
+			// Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
+			do {
+				// Sammle alle aktuellen Schlüssel
+				var keysToProcess = _invalidatedRows.Keys.ToList();
+				if (keysToProcess.Count == 0) {
+					masterRow?.DropMessage(ErrorType.Info, $"Alle Einträge abgearbeitet");
+					break;
+				}
 
-                // Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
-                if (newEntries > 0) {
-                    masterRow?.OnDropMessage(ErrorType.Info, $"{newEntries} neue Einträge zum Abarbeiten");
-                }
+				// Prüfe, ob neue Einträge hinzugekommen sind
+				var newEntries = keysToProcess.Count - entriesBeforeProcessing;
 
-                // Anzahl der zu verarbeitenden Zeilen vor der Verarbeitung merken
-                entriesBeforeProcessing = keysToProcess.Count;
+				// Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
+				if (newEntries > 0) {
+					masterRow?.DropMessage(ErrorType.Info, $"{newEntries} neue Einträge zum Abarbeiten");
+				}
 
-                // Verarbeite alle Zeilen
-                foreach (var key in keysToProcess) {
-                    // Versuche, die Zeile zu entfernen und zu verarbeiten
-                    if (_invalidatedRows.TryRemove(key, out var row) && row != null) {
-                        // Verarbeite die Zeile
-                        ProcessSingleRow(row, masterRow, extendedAllowed, totalProcessedCount + 1);
-                        totalProcessedCount++;
-                        OnRowChecked(new RowEventArgs(row));
-                    }
-                    // KEIN else-Zweig mehr: TryRemove() Fehlschlag ist normal bei Concurrency
-                    // Andere Threads können das Item bereits verarbeitet haben
-                }
+				// Anzahl der zu verarbeitenden Zeilen vor der Verarbeitung merken
+				entriesBeforeProcessing = keysToProcess.Count;
 
-                Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
-            } while (true);
+				// Verarbeite alle Zeilen
+				foreach (var key in keysToProcess) {
+					// Versuche, die Zeile zu entfernen und zu verarbeiten
+					if (_invalidatedRows.TryRemove(key, out var row) && row != null) {
+						// Verarbeite die Zeile
+						ProcessSingleRow(row, masterRow, extendedAllowed, totalProcessedCount + 1);
+						totalProcessedCount++;
+						OnRowChecked(new RowEventArgs(row));
+					}
+					// KEIN else-Zweig mehr: TryRemove() Fehlschlag ist normal bei Concurrency
+					// Andere Threads können das Item bereits verarbeitet haben
+				}
 
-            Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "Taschenrechner", $"InvalidatetRowManager fertig", 0);
-        } catch {
-            Develop.MonitorMessage?.Invoke("InvalidatetRowManager", "Taschenrechner", $"InvalidatetRowManager unerwartet abgebrochen", 0);
-        } finally {
-            // Verarbeitung beenden, egal was passiert
-            lock (_processingLock) {
-                _isProcessing = false;
-            }
-        }
-    }
+				Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
+			} while (true);
 
-    /// <summary>
-    /// Markiert eine Zeile als verarbeitet, ohne sie tatsächlich zu verarbeiten.
-    /// Entfernt die Zeile aus der Liste der zu verarbeitenden Einträge, falls vorhanden.
-    /// </summary>
-    /// <param name="rowItem">Die als verarbeitet zu markierende Zeile</param>
-    /// <returns>True wenn die Zeile erfolgreich markiert wurde, False wenn nicht</returns>
-    public bool MarkAsProcessed(RowItem? rowItem) {
-        if (rowItem == null) { return false; }
+			Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", "Taschenrechner", $"InvalidatetRowManager fertig", 0);
 
-        // Versuche die Zeile aus der Liste der zu verarbeitenden zu entfernen
-        return _invalidatedRows.TryRemove(rowItem.KeyName, out _);
+		} catch {
+			Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", "Taschenrechner", $"InvalidatetRowManager unerwartet abgebrochen", 0);
 
-        //// Markiere die Zeile als verarbeitet
-        //return _processedRowIds.TryAdd(rowItem.KeyName, true);
-    }
+		} finally {
+			// Verarbeitung beenden, egal was passiert
+			lock (_processingLock) {
+				_isProcessing = false;
+			}
+		}
+	}
 
-    private void OnRowChecked(RowEventArgs e) {
-        RowChecked?.Invoke(this, e);
-    }
+	/// <summary>
+	/// Markiert eine Zeile als verarbeitet, ohne sie tatsächlich zu verarbeiten.
+	/// Entfernt die Zeile aus der Liste der zu verarbeitenden Einträge, falls vorhanden.
+	/// </summary>
+	/// <param name="rowItem">Die als verarbeitet zu markierende Zeile</param>
+	/// <returns>True wenn die Zeile erfolgreich markiert wurde, False wenn nicht</returns>
+	public bool MarkAsProcessed(RowItem? rowItem) {
+		if (rowItem == null) { return false; }
 
-    /// <summary>
-    /// Verarbeitet eine einzelne Zeile mit der tatsächlichen Verarbeitungslogik.
-    /// </summary>
-    /// <param name="row">Die zu verarbeitende Zeile</param>
-    /// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
-    /// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
-    /// <param name="currentIndex">Aktueller Index für Statusmeldungen</param>
-    private void ProcessSingleRow(RowItem row, RowItem? masterRow, bool extendedAllowed, int currentIndex) {
-        if (row.Database is not { IsDisposed: false } db) { return; }
+		// Versuche die Zeile aus der Liste der zu verarbeitenden zu entfernen
+		return _invalidatedRows.TryRemove(rowItem.KeyName, out _);
 
-        if (!extendedAllowed && row.NeedsRowInitialization()) {
-            masterRow?.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung");
-            return;
-        }
+		//// Markiere die Zeile als verarbeitet
+		//return _processedRowIds.TryAdd(rowItem.KeyName, true);
+	}
 
-        if (!row.NeedsRowUpdate()) {
-            masterRow?.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} bereits aktuell");
-            return;
-        }
+	private void OnRowChecked(RowEventArgs e) {
+		RowChecked?.Invoke(this, e);
+	}
 
-        masterRow?.OnDropMessage(ErrorType.Info, $"Nr. {currentIndex}: Aktualisiere {db.Caption} / {row.CellFirstString()}");
+	/// <summary>
+	/// Verarbeitet eine einzelne Zeile mit der tatsächlichen Verarbeitungslogik.
+	/// </summary>
+	/// <param name="row">Die zu verarbeitende Zeile</param>
+	/// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
+	/// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
+	/// <param name="currentIndex">Aktueller Index für Statusmeldungen</param>
+	private void ProcessSingleRow(RowItem row, RowItem? masterRow, bool extendedAllowed, int currentIndex) {
+		if (row.Database is not { IsDisposed: false } db) { return; }
 
-        if (masterRow?.Database != null) {
-            _ = row.UpdateRow(extendedAllowed, true, "Update von " + masterRow?.CellFirstString());
-        } else {
-            _ = row.UpdateRow(extendedAllowed, true, "Normales Update");
-        }
-    }
+		if (!extendedAllowed && row.NeedsRowInitialization()) {
+			masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung");
+			return;
+		}
 
-    #endregion
+		if (!row.NeedsRowUpdate()) {
+			masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} bereits aktuell");
+			return;
+		}
+
+		masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}: Aktualisiere {db.Caption} / {row.CellFirstString()}");
+
+		if (masterRow?.Database != null) {
+			_ = row.UpdateRow(extendedAllowed, true, "Update von " + masterRow?.CellFirstString());
+		} else {
+			_ = row.UpdateRow(extendedAllowed, true, "Normales Update");
+		}
+	}
+
+	#endregion
 }

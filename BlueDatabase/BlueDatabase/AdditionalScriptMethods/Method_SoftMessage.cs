@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
@@ -24,6 +25,8 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -66,7 +69,9 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
-        myDb.OnDropMessage(ErrorType.Info, txt);
+
+
+        Develop.Message?.Invoke(ErrorType.Info, myDb, "Skript", "Database", txt, 0);
 
         return DoItFeedback.Null();
     }

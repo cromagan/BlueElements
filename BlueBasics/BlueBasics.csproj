@@ -116,7 +116,6 @@
     <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="EventArgs\CancelReasonEventArgs.cs" />
     <Compile Include="EventArgs\EditingEventArgs.cs" />
-    <Compile Include="EventArgs\MessageEventArgs.cs" />
     <Compile Include="Extensions\DateExtensions.cs" />
     <Compile Include="Extensions\FloatExtensions.cs" />
     <Compile Include="Extensions\IntExtensions.cs" />
@@ -127,7 +126,6 @@
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Classes_Static\HTML.cs" />
     <Compile Include="Interfaces\IEditable.cs" />
-    <Compile Include="Interfaces\ICanDropMessages.cs" />
     <Compile Include="Interfaces\IDisposableExtendedWithEvent.cs" />
     <Compile Include="Interfaces\IHasKeyName.cs" />
     <Compile Include="Interfaces\IErrorCheckable.cs" />

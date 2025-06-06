@@ -1,4 +1,5 @@
 ﻿using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Forms;
@@ -28,7 +29,7 @@ public partial class GlobalMonitor : Form {
         InitializeComponent();
         GenerateUndoTabelle(tblLog);
 
-        Develop.MonitorMessage = Message;
+        Develop.Message += Message;
     }
 
     #endregion
@@ -115,14 +116,14 @@ public partial class GlobalMonitor : Form {
         }
     }
 
-    public void Message(string category, string symbol, string message, int indent) {
+    public void Message(ErrorType type, object? reference, string category, string symbol, string message, int indent) {
         if (Disposing || IsDisposed) { return; }
 
         if (string.IsNullOrEmpty(category)) { return; }
 
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(() => Message(category, symbol, message, indent)));
+                _ = Invoke(new Action(() => Message(type, reference, category, symbol, message, indent)));
                 return;
             } catch {
                 return;
@@ -148,15 +149,15 @@ public partial class GlobalMonitor : Form {
         r.CellSet("indent", indent, string.Empty);
         //tblLog.Refresh();
     }
-
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-        Develop.MonitorMessage = null;
+        Develop.Message -= Message;
         base.OnFormClosing(e);
     }
 
+
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
-        Develop.MonitorMessage?.Invoke("Global", "Information", "Monitoring gestartet", 0);
+        Develop.Message?.Invoke(ErrorType.Info, this, "Global", "Information", "Monitoring gestartet", 0);
     }
 
     private static void DisposeMonitor() {
@@ -189,7 +190,6 @@ public partial class GlobalMonitor : Form {
 
         // Setze den Monitor zurück
         if (Monitor != null) {
-            Develop.MonitorMessage = null; // Delegat zurücksetzen
             try {
                 Monitor.Dispose();
             } catch {
@@ -235,7 +235,7 @@ public partial class GlobalMonitor : Form {
             _ = db.Row.Clear("Monitoring-Log geleert");
         }
 
-        Develop.MonitorMessage?.Invoke("Global", "Information", "Monitoring-Log geleert", 0);
+        Develop.Message?.Invoke(ErrorType.Info, this, "Global", "Information", "Monitoring-Log geleert", 0);
     }
 
     #endregion

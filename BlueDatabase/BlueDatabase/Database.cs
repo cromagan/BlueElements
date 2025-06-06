@@ -50,7 +50,7 @@ using Timer = System.Threading.Timer;
 namespace BlueDatabase;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessages, IEditable {
+public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     #region Fields
 
@@ -231,8 +231,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public event EventHandler? Disposed;
 
     public event EventHandler? DisposingEvent;
-
-    public event EventHandler<MessageEventArgs>? DropMessage;
 
     public event EventHandler? InvalidateView;
 
@@ -1452,7 +1450,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (scf.Failed) {
                 if (row != null) { _ = RowCollection.FailedRows.TryAdd(row, scf.FailedReason); }
 
-                OnDropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
+                DropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
                 _ = ExecutingScript.Remove(scriptId);
                 _ = ExecutingScriptAnyDatabase.Remove(scriptId);
                 return scf;
@@ -1555,7 +1553,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (string.IsNullOrWhiteSpace(scriptname) && eventname != null) {
-                Develop.MonitorMessage?.Invoke($"{Caption}", "Blitz", $"Ereignis ausgelöst: {eventname}", 0);
+                DropMessage(ErrorType.DevelopInfo, $"Ereignis ausgelöst: {eventname}");
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 return l.Count == 1
                     ? ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, extended, false)
@@ -1648,7 +1646,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
 
         if (string.IsNullOrEmpty(FreezedReason)) {
-            Develop.MonitorMessage?.Invoke(TableName, "Datenbank", $"Datenbank {TableName} wird eingefohren: {reason}", 0);
+            DropMessage(ErrorType.DevelopInfo, $"Datenbank {TableName} wird eingefohren: {reason}");
         }
 
         FreezedReason = reason;
@@ -1732,7 +1730,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         var f = CanWriteMainFile();
 
         if (!string.IsNullOrEmpty(f)) {
-            OnDropMessage(ErrorType.Warning, "Abbruch, " + f);
+            DropMessage(ErrorType.Warning, "Abbruch, " + f);
             return "Abbruch, " + f;
         }
 
@@ -1759,7 +1757,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         if (zeil.Count == 0) {
-            OnDropMessage(ErrorType.Warning, "Abbruch, keine Zeilen zum Importieren erkannt.");
+            DropMessage(ErrorType.Warning, "Abbruch, keine Zeilen zum Importieren erkannt.");
             return "Abbruch, keine Zeilen zum Importieren erkannt.";
         }
 
@@ -1774,7 +1772,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             startZ = 1;
             for (var spaltNo = 0; spaltNo < zeil[0].GetUpperBound(0) + 1; spaltNo++) {
                 if (string.IsNullOrEmpty(zeil[0][spaltNo])) {
-                    OnDropMessage(ErrorType.Warning, "Abbruch, leerer Spaltenname.");
+                    DropMessage(ErrorType.Warning, "Abbruch, leerer Spaltenname.");
                     return "Abbruch,<br>leerer Spaltenname.";
                 }
                 zeil[0][spaltNo] = ColumnItem.MakeValidColumnName(zeil[0][spaltNo]);
@@ -1782,7 +1780,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 var col = Column[zeil[0][spaltNo]];
                 if (col == null) {
                     if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
-                        OnDropMessage(ErrorType.Warning, "Abbruch, ungültiger Spaltenname.");
+                        DropMessage(ErrorType.Warning, "Abbruch, ungültiger Spaltenname.");
                         return "Abbruch,<br>ungültiger Spaltenname.";
                     }
 
@@ -1793,7 +1791,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
 
                 if (col == null) {
-                    OnDropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
+                    DropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
                     return "Abbruch,<br>Spaltenfehler.";
                 }
 
@@ -1809,7 +1807,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
 
                 if (newc == null) {
-                    OnDropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
+                    DropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
                     return "Abbruch, Spaltenfehler.";
                 }
                 columns.Add(newc);
@@ -1827,10 +1825,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (zeil[rowNo].GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpperInvariant())) {
                     dictNeu.Add(zeil[rowNo][0].ToUpperInvariant(), zeil[rowNo]);
                 }
-                //else {
-                //    OnDropMessage(ErrorType.Warning, "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.");
-                //    return "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.";
-                //}
             } else {
                 dictNeu.Add(rowNo.ToString(), zeil[rowNo]);
             }
@@ -1848,7 +1842,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 if (!string.IsNullOrEmpty(cv) && !dictVorhanden.ContainsKey(cv)) {
                     dictVorhanden.Add(cv, thisR);
                 } else {
-                    OnDropMessage(ErrorType.Warning, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption + "' sind nicht eindeutig.");
+                    DropMessage(ErrorType.Warning, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption + "' sind nicht eindeutig.");
                     return "Abbruch, vorhandene Zeilen sind nicht eindeutig.";
                 }
             }
@@ -1870,7 +1864,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var maxColCount = Math.Min(thisD.Value.GetUpperBound(0) + 1, columns.Count);
 
             if (maxColCount == 0) {
-                OnDropMessage(ErrorType.Warning, "Abbruch, Leere Zeile im Import.");
+                DropMessage(ErrorType.Warning, "Abbruch, Leere Zeile im Import.");
                 return "Abbruch, Leere Zeile im Import.";
             }
 
@@ -1889,7 +1883,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (row == null) {
-                OnDropMessage(ErrorType.Warning, "Abbruch, Import-Fehler.");
+                DropMessage(ErrorType.Warning, "Abbruch, Import-Fehler.");
                 return "Abbruch, Import-Fehler.";
             }
 
@@ -1906,13 +1900,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             #region Speichern und Ausgabe
 
             if (DateTime.Now.Subtract(d1).TotalMinutes > 5) {
-                OnDropMessage(ErrorType.Info, "Import: Zwischenspeichern der Datenbank");
+                DropMessage(ErrorType.Info, "Import: Zwischenspeichern der Datenbank");
                 _ = Save();
                 d1 = DateTime.Now;
             }
 
             if (DateTime.Now.Subtract(d2).TotalSeconds > 4.5) {
-                OnDropMessage(ErrorType.Info, "Import: Zeile " + no + " von " + zeil.Count);
+                DropMessage(ErrorType.Info, "Import: Zeile " + no + " von " + zeil.Count);
                 d2 = DateTime.Now;
             }
             Develop.SetUserDidSomething();
@@ -1923,7 +1917,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         #endregion
 
         _ = Save();
-        OnDropMessage(ErrorType.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
+        DropMessage(ErrorType.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
         return string.Empty;
     }
 
@@ -1953,8 +1947,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
-        //Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Lade Datenbank von Dateisystem {fileNameToLoad.FileNameWithSuffix()}", 0);
-
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
@@ -1970,9 +1962,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
                 }
                 SaveAsAndChangeTo(fileNameToLoad);
             } else {
-                Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
                 Freeze("Datei existiert nicht");
-                Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Datenbank nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0);
+                DropMessage(ErrorType.Warning, $"Datenbank nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}");
                 return;
             }
         }
@@ -1993,8 +1984,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         _saveRequired = false;
         IsInCache = FileStateUtcDate;
 
-        //Develop.MonitorMessage?.Invoke(fileNameToLoad.FileNameWithoutSuffix(), "Datenbank", $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen", 0);
-
         _ = BeSureToBeUpToDate();
 
         RepairAfterParse();
@@ -2008,7 +1997,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         CreateWatcher();
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
 
-        OnDropMessage(ErrorType.Info, $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen");
+        DropMessage(ErrorType.Info, $"Laden der Datenbank {fileNameToLoad.FileNameWithSuffix()} abgeschlossen");
     }
 
     public void LoadFromStream(Stream stream) {
@@ -2337,11 +2326,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     internal virtual string IsValueEditable(DatabaseDataType type, string? chunkValue) => CanWriteMainFile();
 
-    internal void OnDropMessage(ErrorType type, string message) {
+
+    protected void DropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }
-        DropMessage?.Invoke(this, new MessageEventArgs(type, message));
+        Develop.Message?.Invoke(type, this, Caption, "Datenbank", message, 0);
     }
+
 
     //public void Variables_RemoveAll(bool isLoading) {
     //    //while (_variables.Count > 0) {
@@ -2959,7 +2950,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             CanDoScript = null;
             Disposed = null;
             DisposingEvent = null;
-            DropMessage = null;
             InvalidateView = null;
             Loaded = null;
             Loading = null;
@@ -2982,18 +2972,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         while (IsInCache.Year < 2000) {
             Thread.Sleep(1);
             if (t.ElapsedMilliseconds > 120 * 1000) {
-                Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} wurde nicht richtig initialisiert", 0);
+                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} wurde nicht richtig initialisiert");
                 return;
             }
 
             if (!string.IsNullOrEmpty(FreezedReason)) {
-                Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} eingefrohren {FreezedReason}", 0);
+                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} eingefrohren {FreezedReason}");
                 return;
             }
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                Develop.MonitorMessage?.Invoke(Filename.FileNameWithSuffix(), "Datenbank", $"Warte auf Abschluss der Initialsierung von {TableName}\\{Filename.FileNameWithSuffix()}", 0);
+                DropMessage(ErrorType.DevelopInfo, $"Warte auf Abschluss der Initialsierung von {TableName}\\{Filename.FileNameWithSuffix()}");
             }
         }
     }

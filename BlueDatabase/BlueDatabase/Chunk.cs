@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
@@ -350,13 +351,13 @@ public class Chunk : IHasKeyName {
             Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
 
             if (t.ElapsedMilliseconds > 120 * 1000) {
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
+                Develop.Message?.Invoke(ErrorType.Info, this, "Chunk-Laden", "Puzzle", $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
                 return false; // Explizit false zurückgeben, wenn die Initialisierung fehlschlägt
             }
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                Develop.MonitorMessage?.Invoke("Chunk-Laden", "Puzzle", $"Warte auf Abschluss der Initialisierung des Chunks {KeyName}", 0);
+                Develop.Message?.Invoke(ErrorType.Info, this, "Chunk-Laden", "Puzzle", $"Warte auf Abschluss der Initialisierung des Chunks {KeyName}", 0);
             }
         }
 
@@ -378,7 +379,7 @@ public class Chunk : IHasKeyName {
 
     internal string DoExtendedSave() {
         var filename = ChunkFileName;
-        Develop.MonitorMessage?.Invoke(MainFileName.FileNameWithSuffix(), "Diskette", $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
+        Develop.Message?.Invoke(ErrorType.Info, this, MainFileName.FileNameWithSuffix(), "Diskette", $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
         var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());

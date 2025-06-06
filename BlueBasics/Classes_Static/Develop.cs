@@ -42,8 +42,7 @@ public static class Develop {
     public static bool AllReadOnly = false;
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
-    public static Message? MonitorMessage = null;
-    public static MessageStatusBar? StatusBarMessage = null;
+    public static MessageDelegate? Message = null;
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
 
     private static readonly object SyncLockObject = new();
@@ -64,9 +63,7 @@ public static class Develop {
 
     #region Delegates
 
-    public delegate void Message(string category, string symbol, string message, int indent);
-
-    public delegate void MessageStatusBar(ErrorType type, string text, bool addtime);
+    public delegate void MessageDelegate(ErrorType type, object? reference, string category, string symbol, string message, int indent);
 
     #endregion
 
@@ -163,19 +160,20 @@ public static class Develop {
 
                     case ErrorType.Info:
                         Trace.WriteLine("<th><font size = 3>Info");
-                        MonitorMessage?.Invoke("Info", "Information", meldung, 0);
+                        Message?.Invoke("Info", "Information", meldung, 0);
                         nr = 5;
                         break;
 
                     case ErrorType.Warning:
-                        MonitorMessage?.Invoke("Warnung", "Warnung", meldung, 0);
+                        Message?.Invoke("Warnung", "Warnung", meldung, 0);
+
                         if (IsHostRunning()) { Debugger.Break(); }
                         Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
                         _deleteTraceLog = false;
                         break;
 
                     case ErrorType.Error:
-                        MonitorMessage?.Invoke("Fehler, Programmabbruch", "Kritisch", meldung, 0);
+                        Message?.Invoke("Fehler, Programmabbruch", "Kritisch", meldung, 0);
                         if (IsHostRunning()) { Debugger.Break(); }
                         if (!FileExists(tmp)) { l = []; }
                         Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
@@ -183,7 +181,7 @@ public static class Develop {
                         break;
 
                     default:
-                        MonitorMessage?.Invoke("Info Unbekannten Typs", "Sonne", meldung, 0);
+                        Message?.Invoke("Info Unbekannten Typs", "Sonne", meldung, 0);
                         Trace.WriteLine("<th>?");
                         _deleteTraceLog = false;
                         break;

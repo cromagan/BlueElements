@@ -162,7 +162,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Pendingworker.Add(l);
         l.RunWorkerAsync(row);
 
-        db.OnDropMessage(ErrorType.Info, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString());
+        Develop.Message?.Invoke(ErrorType.Info, db, "Database", "Skript", "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString(), 0);
     }
 
     public static void ExecuteValueChangedEvent() {
@@ -474,7 +474,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 var w = rows[0].CellFirstString();
                 rows.Clear();
                 Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
-                Database.OnDropMessage(ErrorType.Warning, "Skript fehlerhaft bei " + w);
+                Develop.Message?.Invoke(ErrorType.Warning, db, "Database","Skript", "Skript fehlerhaft bei " + w, 0);
                 return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol[0];
             }
 
@@ -900,7 +900,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return (null, $"Initialwert-Fehler: {string.Join("; ", initErrors)}", false);
         }
 
-        Develop.MonitorMessage?.Invoke(db.Caption, "PlusZeichen", $"Neue Zeile erstellt: {db.Caption}\\{item.CellFirstString()}", 0);
+        Develop.Message?.Invoke(ErrorType.Info, db, db.Caption, "PlusZeichen", $"Neue Zeile erstellt: {db.Caption}\\{item.CellFirstString()}", 0);
 
         var scriptResult = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
 

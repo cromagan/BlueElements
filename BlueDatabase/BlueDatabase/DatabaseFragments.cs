@@ -98,7 +98,7 @@ public class DatabaseFragments : Database {
         _isInFragmentLoader = true;
 
         try {
-            OnDropMessage(ErrorType.Info, "Lade Fragmente von '" + TableName + "'");
+            DropMessage(ErrorType.Info, "Lade Fragmente von '" + TableName + "'");
 
             var lastFragmentDate = DateTime.UtcNow;
             var (changes, files) = GetLastChanges(lastFragmentDate);
@@ -180,7 +180,7 @@ public class DatabaseFragments : Database {
 
         if (!Develop.AllReadOnly && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
             if (ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
-                OnDropMessage(ErrorType.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
+                DropMessage(ErrorType.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
                 if (!SaveInternal(IsInCache)) {
                     return;
                 }
@@ -229,7 +229,7 @@ public class DatabaseFragments : Database {
             }
 
             if (del) {
-                OnDropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
+                DropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
                 _ = DeleteFile(thisf, false);
                 //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
                 if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { break; }

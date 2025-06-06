@@ -76,7 +76,7 @@ public class Method_SetFailed : Method {
         //    vs.ReadOnly = true;
         //}
 
-        //Develop.MonitorMessage?.Invoke("Allgemein", "Kreuz", $"Nicht Erfolgreich gesetzt: {reason}", 0);
+        //Develop.MonitorMessage?.Invoke(ErrorType.Info, this, "Allgemein", "Kreuz", $"Nicht Erfolgreich gesetzt: {reason}", 0);
 
         var r = attvar.ValueStringGet(0);
 

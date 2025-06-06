@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript;
@@ -107,7 +108,7 @@ public class Method_Row : Method_Database, IUseableForButton {
             }
         }
 
-        Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
+        Develop.Message?.Invoke(BlueBasics.Enums.ErrorType.Info, null,  scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
 
         RowItem? newrow;
 
@@ -140,7 +141,7 @@ public class Method_Row : Method_Database, IUseableForButton {
                 if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {
-                Develop.MonitorMessage?.Invoke(scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
+                Develop.Message?.Invoke(ErrorType.Info, null, scp.MainInfo, "Skript", $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
             return new DoItFeedback("Zeile konnte nicht angelegt werden", false, ld);

@@ -81,7 +81,7 @@ internal class Method_ForEach : Method {
 
             if (t.ElapsedMilliseconds > 1000) {
                 t = Stopwatch.StartNew();
-                Develop.StatusBarMessage?.Invoke(BlueBasics.Enums.ErrorType.Info, $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", true);
+                Develop.Message?.Invoke(BlueBasics.Enums.ErrorType.Info, null, "Skript", "Skript", $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", scp.Stufe +1);
             }
         }
 
