@@ -1155,7 +1155,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (Database is not { IsDisposed: false } db) { return; }
-        if (!string.IsNullOrEmpty(db.CanSaveMainChunk())) { return; }
+        if (!string.IsNullOrEmpty(db.CanWriteMainFile())) { return; }
 
         if (source.Database != null) { source.Repair(); }
 

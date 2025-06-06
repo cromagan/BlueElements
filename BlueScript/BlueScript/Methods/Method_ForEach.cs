@@ -22,6 +22,7 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BlueScript.Methods;
 
@@ -66,13 +67,22 @@ internal class Method_ForEach : Method {
         var scx = new DoItFeedback(false, false);
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
+        var t = Stopwatch.StartNew();
+        var count = 0;
+
         foreach (var thisl in l) {
+            count++;
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEach");
             if (scx.Failed) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }
+
+            if (t.ElapsedMilliseconds > 1000) {
+                t = Stopwatch.StartNew();
+                Develop.StatusBarMessage?.Invoke(BlueBasics.Enums.ErrorType.Info, $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", true);
+            }
         }
 
         return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden

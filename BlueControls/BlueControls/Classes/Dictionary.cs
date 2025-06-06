@@ -59,12 +59,15 @@ internal static class Dictionary {
         if (word.IsNumeral()) { return true; }
         if (Constants.Char_Numerals.Contains(word.Substring(0, 1))) { return true; }// z.B. 00 oder 1b oder 2L
 
-        if (word != word.ToLowerInvariant() &&
-            word != word.ToUpperInvariant() &&
-            word != word.ToTitleCase()) { return false; }
+        //if (word != word.ToLowerInvariant() &&
+        //    word != word.ToUpperInvariant() &&
+        //    word != word.ToTitleCase()) { return false; }  //GmbH
 
-        if (word == word.ToLowerInvariant()) {
-            // Wenn ein Wort klein geschrieben ist, muss auch das kleingeschriebene in der Datenbank sein!
+        if (word == word.ToLowerInvariant() && word != word.ToUpperInvariant() && word != word.ToTitleCase()) {
+            // Wenn ein Wort klein geschrieben ist
+            // nicht GROSS gescrieben
+            // oder nicht am Worftanfang
+            // muss es genau so in der Datenbank sein!
             return _dictWords.Row[new FilterItem(fc, FilterType.Istgleich, word)] != null;
         }
 

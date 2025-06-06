@@ -98,7 +98,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private ColumnViewItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
-    private bool _newRowsAllowed = false;
+    private string _newRowsAllowed = string.Empty;
     private Progressbar? _pg;
 
     private List<RowData>? _rowsFilteredAndPinned;
@@ -1073,11 +1073,11 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
-    public string GrantWriteAccess(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, string newChunkVal) {
+    public string GrantWriteAccess(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, string newChunkVal, int waitforSeconds) {
         var f = IsCellEditable(cellInThisDatabaseColumn, cellInThisDatabaseRow, newChunkVal, true);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
-        var f2 = CellCollection.GrantWriteAccess(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, newChunkVal);
+        var f2 = CellCollection.GrantWriteAccess(cellInThisDatabaseColumn?.Column, cellInThisDatabaseRow?.Row, newChunkVal, waitforSeconds, false);
         if (!string.IsNullOrWhiteSpace(f)) { return f2; }
 
         return string.Empty;
@@ -1224,7 +1224,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var displayR = DisplayRectangleWithoutSlider();
             var maxY = 0;
             _newRowsAllowed = UserEdit_NewRowAllowed();
-            if (_newRowsAllowed) { maxY += 18; }
+            if (string.IsNullOrEmpty( _newRowsAllowed)) { maxY += 18; }
             var expanded = true;
             var lastCap = string.Empty;
 
@@ -2197,7 +2197,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.GrantWriteAccess(cellInThisDatabaseColumn, null, newChunkVal);
+            var fe = table.GrantWriteAccess(cellInThisDatabaseColumn, null, newChunkVal, 10);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
             var (newrow, message, _) = db.Row.GenerateAndAdd(filterColNewRow.ToArray(), "Neue Zeile über Tabellen-Ansicht");
@@ -2241,7 +2241,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 newChunkVal = newValue;
             }
 
-            var check1 = table.GrantWriteAccess(cellInThisDatabaseColumn, cellInThisDatabaseRow, newChunkVal);
+            var check1 = table.GrantWriteAccess(cellInThisDatabaseColumn, cellInThisDatabaseRow, newChunkVal, 10);
             if (!string.IsNullOrEmpty(check1)) { return check1; }
 
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
@@ -2986,7 +2986,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var drawWidth = realHead.Width - p2;
         var rowScript = db.CanDoValueChangedScript();
 
-        if (SliderY.Value < p16 && _newRowsAllowed) {
+        if (SliderY.Value < p16 && string.IsNullOrEmpty( _newRowsAllowed)) {
             string txt;
             var plus = 0;
             QuickImage? qi;
@@ -3976,14 +3976,25 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    private bool UserEdit_NewRowAllowed() {
-        if (IsDisposed || Database is not { IsDisposed: false } db || db.Column.Count == 0 || db.Column.First() is not { IsDisposed: false } fc) { return false; }
-        if (db.Column.Count == 0) { return false; }
-        if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return false; }
+    private string UserEdit_NewRowAllowed() {
 
-        if (!db.AreScriptsExecutable()) { return false; }
+        if (IsDisposed || Database is not { IsDisposed: false } db  ) { return "Datenbank verworfen"; }
+        if (db.Column.Count == 0) { return "Keine Spalten vorhanden"; }
+        if (db.Column.First() is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
-        return string.IsNullOrEmpty(IsCellEditable(fcv, null, null, false));
+        if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return "Erste Spalte nicht sichtbar"; }
+
+        if (!db.AreScriptsExecutable()) { return "Skripte nicht ausführbar"; }
+
+
+        string? chunkv = null; 
+
+        if(fc != db.Column.ChunkValueColumn) {
+            chunkv = FilterCombined.ChunkVal;
+        }
+
+
+        return IsCellEditable(fcv, null, chunkv, false);
     }
 
     #endregion

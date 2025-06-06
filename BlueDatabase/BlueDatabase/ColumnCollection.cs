@@ -149,6 +149,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
+        if (db.Column.Count == 0) { return null; }
+
+        foreach (var thisC in db.Column) {
+            if (thisC is { IsDisposed: false, IsFirst: true }) { return thisC; }
+        }
+
         if (string.IsNullOrEmpty(db.ColumnArrangements)) { return null; }
 
         var i = db.ColumnArrangements.IndexOf("ColumnName[J]", StringComparison.Ordinal);

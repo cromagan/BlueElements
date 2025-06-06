@@ -43,6 +43,7 @@ public static class Develop {
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
     public static Message? MonitorMessage = null;
+    public static MessageStatusBar? StatusBarMessage = null;
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
 
     private static readonly object SyncLockObject = new();
@@ -64,6 +65,8 @@ public static class Develop {
     #region Delegates
 
     public delegate void Message(string category, string symbol, string message, int indent);
+
+    public delegate void MessageStatusBar(ErrorType type, string text, bool addtime);
 
     #endregion
 

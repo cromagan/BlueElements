@@ -45,6 +45,10 @@ public partial class FormWithStatusBar : Form {
     public FormWithStatusBar() : base() {
         InitializeComponent();
         _ = _formsWithStatusBar.AddIfNotExists(this);
+
+        if (Develop.StatusBarMessage == null) {
+            Develop.StatusBarMessage = FormWithStatusBar.UpdateStatusBar;
+        }
     }
 
     #endregion

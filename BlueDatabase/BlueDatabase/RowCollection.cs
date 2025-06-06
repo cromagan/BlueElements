@@ -510,7 +510,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbank eines Filters nicht angegeben", true); }
             db2 ??= db1;
 
-            if (thisfi.Column?.Database != db2) { return (null, "Datenbanken der Spalten im Filter unterschiedlich", true); }
+            if (thisfi.Column?.Database is { } db3 && db3 != db2) { return (null, "Datenbanken der Spalten im Filter unterschiedlich", true); }
         }
 
         if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }

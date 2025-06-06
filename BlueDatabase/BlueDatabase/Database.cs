@@ -1153,7 +1153,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
 
-        //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
+
+        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
         var fileSaveResult = CanSaveFile(Filename, 5);
         return fileSaveResult;
@@ -1676,7 +1678,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     public virtual string GrantWriteAccess(DatabaseDataType type, string? chunkValue) {
         var f = CanWriteMainFile();
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
+
         return string.Empty;
     }
 
@@ -2276,9 +2278,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         }
 
         try {
-            if (!SaveRequired()) {
-                return true;
-            }
+            if (!SaveRequired()) { return true; }
 
             var result = SaveInternal(FileStateUtcDate);
             OnInvalidateView();
@@ -2480,7 +2480,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     protected virtual bool SaveInternal(DateTime setfileStateUtcDateTo) {
         if (Develop.AllReadOnly) { return true; }
 
-        var m = CanWriteMainFile();
+        var m = CanSaveMainChunk();
         if (!string.IsNullOrEmpty(m)) { return false; }
 
         Develop.SetUserDidSomething();
@@ -2900,12 +2900,17 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (MasterNeeded) { return true; }
 
-        var masters = 0;
-        foreach (var thisDb in AllFiles) {
-            if (MultiUserPossible && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
-                masters++;
-                if (masters >= MaxMasterCount) { return false; }
+        try {
+            var masters = 0;
+            foreach (var thisDb in AllFiles) {
+                if (MultiUserPossible && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+                    masters++;
+                    if (masters >= MaxMasterCount) { return false; }
+                }
             }
+        } catch {
+            Develop.CheckStackOverflow();
+            return NewMasterPossible();
         }
 
         return true;

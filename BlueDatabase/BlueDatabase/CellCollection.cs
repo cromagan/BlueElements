@@ -234,8 +234,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="row">Die Zeile</param>
     /// <param name="newChunkValue">Der neue Zellwert</param>
     /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
-    public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue) =>
-        IO.ProcessFile(TryGrantWriteAccess, false, 60, column, row, newChunkValue) as string ?? "Unbekannter Fehler";
+    public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
+        IO.ProcessFile(TryGrantWriteAccess, false, waitforSeconds, column, row, newChunkValue, waitforSeconds, onlyTopLevel) as string ?? "Unbekannter Fehler";
 
     /// <summary>
     /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
@@ -272,7 +272,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
 
-            if (db.Column.ChunkValueColumn is { } cvc) {
+            if (db.Column.ChunkValueColumn is { } cvc && newChunkValue != null) {
                 if (cvc != db.Column.First() && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
             }
         } else {
@@ -388,7 +388,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
                     if (oldvalue != newvalue) {
                         var chunkValue = inputRow.ChunkValue;
-                        var editableError = GrantWriteAccess(inputColumn, inputRow, chunkValue);
+                        var editableError = GrantWriteAccess(inputColumn, inputRow, chunkValue, 20, true);
 
                         if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
                         //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
@@ -631,10 +631,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     private static (object? returnValue, bool retry) TryGrantWriteAccess(params object[] args) {
-        if (args.Length < 3 ||
+        if (args.Length < 5 ||
             args[0] is not ColumnItem column ||
             args[1] is not RowItem row ||
-            args[2] is not string newChunkValue) {
+            args[2] is not string newChunkValue ||
+            args[3] is not int waitforseconds ||
+             args[4] is not bool onlyTopLevel) {
             return ("Ungültige Parameter.", false);
         }
 
@@ -643,7 +645,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return ("Es ist keine Spalte ausgewählt.", false);
             }
 
-            var f = db.CanSaveMainChunk();
+            var f = db.CanWriteMainFile();
             if (!string.IsNullOrWhiteSpace(f)) {
                 return (f, true);
             }
@@ -660,6 +662,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
             }
 
+            if (onlyTopLevel) { return (string.Empty, false); }
+
             if (column.RelationType == RelationType.CellValues) {
                 var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
                 if (!string.IsNullOrEmpty(info) && !canrepair) {
@@ -673,7 +677,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 db2.PowerEdit = db.PowerEdit;
 
                 if (lrow != null) {
-                    var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue);
+                    waitforseconds = Math.Max(1, waitforseconds / 2);
+
+                    var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
                     return (!string.IsNullOrEmpty(tmp)
                         ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp
                         : string.Empty, true);
@@ -684,7 +690,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             return (string.Empty, false);
         } catch (Exception) {
-            return (string.Empty, true); // Retry bei Exceptions
+            return ("Allgemeiner Fehler", true); // Retry bei Exceptions
         }
     }
 
