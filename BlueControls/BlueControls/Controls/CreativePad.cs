@@ -36,6 +36,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
@@ -46,7 +47,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("Click")]
-public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChangedFeedback {
+public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged {
 
     #region Fields
 
@@ -77,6 +78,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
     }
+
     #endregion
 
     #region Events
@@ -316,8 +318,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     public void OnItemRemoved() => ItemRemoved?.Invoke(this, System.EventArgs.Empty);
 
     //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
-
-    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public void OpenSaveDialog(string title) {
         title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
@@ -692,6 +692,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IPropertyChange
     private void OnGotNewItemCollection() => GotNewItemCollection?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPrintPage(PrintPageEventArgs e) => PrintPage?.Invoke(this, e);
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private void PicsSave_FileOk(object sender, CancelEventArgs e) {
         if (e.Cancel || _items == null) { return; }

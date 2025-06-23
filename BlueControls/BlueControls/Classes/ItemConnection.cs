@@ -24,11 +24,12 @@ using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;
 
-public class ItemConnection : IStringable, IPropertyChangedFeedback {
+public class ItemConnection : IStringable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -71,7 +72,7 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
         set {
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
-            OnPropertyChanged("Bei_Export_sichtbar");
+            OnPropertyChanged();
         }
     }
 
@@ -99,8 +100,6 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
         }
     }
 
-    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
-
     public List<string> ParseableItems() {
         List<string> result = [];
         result.ParseableAdd("Item1", Item1.KeyName);
@@ -112,6 +111,8 @@ public class ItemConnection : IStringable, IPropertyChangedFeedback {
         result.ParseableAdd("Print", _beiExportSichtbar);
         return result;
     }
+
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

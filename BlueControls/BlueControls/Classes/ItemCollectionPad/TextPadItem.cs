@@ -87,7 +87,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             if (value == _ausrichtung) { return; }
             _ausrichtung = value;
             InvalidateText();
-            OnPropertyChanged("Ausrichtung");
+            OnPropertyChanged();
         }
     }
 
@@ -103,7 +103,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             if (_style == value) { return; }
             _style = value;
             InvalidateText();
-            OnPropertyChanged("Style");
+            OnPropertyChanged();
         }
     }
 
@@ -120,7 +120,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             _textReplaced = value;
             InvalidateText();
             //CalculateSlavePoints();
-            OnPropertyChanged("Text");
+            OnPropertyChanged();
         }
     }
 
@@ -131,7 +131,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             value = Math.Min(value, 20);
             if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
-            OnPropertyChanged("TextScale");
+            OnPropertyChanged();
         }
     }
 

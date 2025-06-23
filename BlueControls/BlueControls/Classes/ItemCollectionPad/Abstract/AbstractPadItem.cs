@@ -33,6 +33,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using static BlueBasics.Generic;
 using static BlueBasics.Geometry;
 
@@ -102,7 +103,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
             if (IsDisposed) { return; }
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
-            OnPropertyChanged("Bei_Export_sichtbar");
+            OnPropertyChanged();
         }
     }
 
@@ -138,7 +139,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         set {
             if (_keyName == value) { return; }
             _keyName = value;
-            OnPropertyChanged("KeyName");
+            OnPropertyChanged();
         }
     }
 
@@ -411,15 +412,7 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
         }
         // JointPoint werden bewegt, wenn der JointParentPoint angesprochen wird
 
-        OnPropertyChanged("Position");
-    }
-
-    /// <summary>
-    /// Invalidiert UsedArea und löst das Ereignis Changed aus
-    /// </summary>
-    public override void OnPropertyChanged(string propertyname) {
-        _usedArea = default;
-        base.OnPropertyChanged(propertyname);
+        OnPropertyChanged();
     }
 
     //}
@@ -650,6 +643,14 @@ public abstract class AbstractPadItem : ParsebleItem, IReadableTextWithKey, IClo
     protected virtual void OnParentChanged() => ParentChanged?.Invoke(this, System.EventArgs.Empty);
 
     protected virtual void OnParentChanging() => ParentChanging?.Invoke(this, System.EventArgs.Empty);
+
+    /// <summary>
+    /// Invalidiert UsedArea und löst das Ereignis Changed aus
+    /// </summary>
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+        _usedArea = default;
+        base.OnPropertyChanged(propertyName);
+    }
 
     private void JointMiddle_Moved(object sender, MoveEventArgs e) {
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }

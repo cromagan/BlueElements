@@ -74,7 +74,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged("Style");
+            OnPropertyChanged();
         }
     }
 

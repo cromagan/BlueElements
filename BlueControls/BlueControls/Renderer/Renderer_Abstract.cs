@@ -28,6 +28,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 
 namespace BlueControls.CellRenderer;
 
@@ -72,7 +73,7 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
             if (_sheetStyle == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _sheetStyle = value;
-            OnPropertyChanged("SheetStyle");
+            OnPropertyChanged();
         }
     }
 
@@ -107,12 +108,6 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     public abstract void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale);
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
-
-    public override void OnPropertyChanged(string propertyname) {
-        _lastCode = ParseableItems().FinishParseable();
-
-        base.OnPropertyChanged(propertyname);
-    }
 
     public override List<string> ParseableItems() {
         List<string> result = [.. base.ParseableItems()];
@@ -158,6 +153,11 @@ public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEd
     protected abstract string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation);
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
+
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+        _lastCode = ParseableItems().FinishParseable();
+        base.OnPropertyChanged(propertyName);
+    }
 
     /// <summary>
     /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist, ab.

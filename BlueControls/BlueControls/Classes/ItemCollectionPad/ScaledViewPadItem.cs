@@ -67,7 +67,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             if (IsDisposed) { return; }
             if (value == _ausrichtung) { return; }
             _ausrichtung = value;
-            OnPropertyChanged("Ausrichtung");
+            OnPropertyChanged();
         }
     }
 
@@ -76,7 +76,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         internal set {
             if (value == _caption) { return; }
             _caption = value;
-            OnPropertyChanged("Caption");
+            OnPropertyChanged();
         }
     }
 
@@ -90,7 +90,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             if (!_includedjointPoints.IsDifferentTo(value)) { return; }
             _includedjointPoints = value;
             CalculateSize();
-            OnPropertyChanged("JointPoints");
+            OnPropertyChanged();
         }
     }
 
@@ -102,7 +102,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             if (Math.Abs(value - _scale) < Constants.DefaultTolerance) { return; }
             _scale = value;
             CalculateSize();
-            OnPropertyChanged("Scale");
+            OnPropertyChanged();
         }
     }
 
@@ -114,7 +114,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged("Style");
+            OnPropertyChanged();
         }
     }
 
@@ -125,7 +125,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             value = Math.Min(value, 20);
             if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
-            OnPropertyChanged("TextScale");
+            OnPropertyChanged();
         }
     }
 

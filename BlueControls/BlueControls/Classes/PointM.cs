@@ -26,13 +26,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 
 namespace BlueControls;
 
-public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChangedFeedback, IMirrorable {
+public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyPropertyChanged, IMirrorable {
 
     #region Fields
 
@@ -137,7 +138,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
         set {
             if (_parent == value) { return; }
             _parent = value;
-            OnPropertyChanged("Parent");
+            OnPropertyChanged();
         }
     }
 
@@ -203,8 +204,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
     }
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
-
-    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public List<string> ParseableItems() {
         List<string> result = [];
@@ -311,6 +310,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IPropertyChange
 
     public PointF ZoomAndMove(float zoom, float shiftX, float shiftY) =>
         new((_x * zoom) - shiftX + (zoom / 2), (_y * zoom) - shiftY + (zoom / 2));
+
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

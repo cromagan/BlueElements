@@ -24,10 +24,11 @@ using BlueControls.Enums;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 
 namespace BlueControls.ItemCollectionList;
 
-public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChangedFeedback {
+public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyPropertyChanged {
 
     #region Fields
 
@@ -81,7 +82,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         set {
             if (_enabled == value) { return; }
             _enabled = value;
-            OnPropertyChanged("Enabled");
+            OnPropertyChanged();
         }
     }
 
@@ -92,7 +93,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         protected set {
             if (_isCaption == value) { return; }
             _isCaption = value;
-            OnPropertyChanged("IsCaption");
+            OnPropertyChanged();
         }
     }
 
@@ -101,7 +102,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
         set {
             if (_keyName == value) { return; }
             _keyName = value;
-            OnPropertyChanged("KeyName");
+            OnPropertyChanged();
         }
     }
 
@@ -113,7 +114,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
             if (_userDefCompareKey == value) { return; }
             _userDefCompareKey = value;
             OnCompareKeyChanged();
-            OnPropertyChanged("UserDefCompareKey");
+            OnPropertyChanged();
         }
     }
 
@@ -181,8 +182,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
 
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
-
     public void SetCoordinates(Rectangle r) {
         Position = r;
         OnPropertyChanged("Position");
@@ -200,6 +199,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, IPropertyChan
     protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate);
 
     protected abstract string GetCompareKey();
+
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

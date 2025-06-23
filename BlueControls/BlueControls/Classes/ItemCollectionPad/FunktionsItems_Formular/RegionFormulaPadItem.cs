@@ -69,7 +69,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
             if (IsDisposed) { return; }
             if (_child == value) { return; }
             _child = value;
-            OnPropertyChanged("Child");
+            OnPropertyChanged();
         }
     }
 
@@ -85,7 +85,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         set {
             if (_borderStyle == value) { return; }
             _borderStyle = value;
-            OnPropertyChanged("RahmenStil");
+            OnPropertyChanged();
         }
     }
 

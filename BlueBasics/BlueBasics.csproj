@@ -155,7 +155,6 @@
     <Compile Include="Enums\Orientation.cs" />
     <Compile Include="Enums\KeyCode.cs" />
     <Compile Include="Classes_Static\IO.cs" />
-    <Compile Include="Interfaces\IPropertyChangedFeedback.cs" />
     <Compile Include="Extensions\CollectionExtension.cs" />
     <Compile Include="Interfaces\IParseable.cs" />
     <Compile Include="Interfaces\IReadableTextWithPropertyChanging.cs" />

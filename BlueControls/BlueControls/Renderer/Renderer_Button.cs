@@ -52,7 +52,7 @@ public class Renderer_Button : Renderer_Abstract {
             if (_bild_anzeigen == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _bild_anzeigen = value;
-            OnPropertyChanged("Bild_anzeigen");
+            OnPropertyChanged();
         }
     }
 
@@ -62,7 +62,7 @@ public class Renderer_Button : Renderer_Abstract {
             if (_checkstatus_anzeigen == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _checkstatus_anzeigen = value;
-            OnPropertyChanged("CheckStatus_anzeigen");
+            OnPropertyChanged();
         }
     }
 
@@ -74,7 +74,7 @@ public class Renderer_Button : Renderer_Abstract {
             if (_text_anzeigen == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _text_anzeigen = value;
-            OnPropertyChanged("Text_anzeigen");
+            OnPropertyChanged();
         }
     }
 

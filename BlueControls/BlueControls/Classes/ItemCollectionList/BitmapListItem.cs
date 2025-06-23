@@ -75,7 +75,7 @@ public class BitmapListItem : AbstractListItem {
         set {
             _imageFilename = string.Empty;
             _bitmap = value;
-            OnPropertyChanged("Bitmap");
+            OnPropertyChanged();
         }
     }
 
@@ -85,7 +85,7 @@ public class BitmapListItem : AbstractListItem {
             if (_caption == value) { return; }
             _caption = value;
             _captiontmp.Clear();
-            OnPropertyChanged("Caption");
+            OnPropertyChanged();
         }
     }
 

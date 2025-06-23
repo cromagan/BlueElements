@@ -97,7 +97,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
             _notAllowedChilds.Clear();
             _notAllowedChilds.AddRange(l);
-            OnPropertyChanged("NotAllowedChilds");
+            OnPropertyChanged();
         }
     }
 
@@ -117,7 +117,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 _pages.PropertyChanged += PadData_PropertyChanged;
             }
 
-            OnPropertyChanged("Pages");
+            OnPropertyChanged();
         }
     }
 
@@ -378,7 +378,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         base.OnLoaded();
     }
 
-    private void PadData_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(e.PropertyName);
+    private void PadData_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged();
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {

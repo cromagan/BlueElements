@@ -71,7 +71,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
             if (IsDisposed) { return; }
             if (_anzeige == value) { return; }
             _anzeige = value;
-            OnPropertyChanged("Anzeige");
+            OnPropertyChanged();
         }
     }
 
@@ -83,7 +83,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
             if (IsDisposed) { return; }
             if (_caption == value) { return; }
             _caption = value;
-            OnPropertyChanged("Caption");
+            OnPropertyChanged();
         }
     }
 
@@ -93,7 +93,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
             if (IsDisposed) { return; }
             if (_captionPosition == value) { return; }
             _captionPosition = value;
-            OnPropertyChanged("CaptionPosition");
+            OnPropertyChanged();
         }
     }
 

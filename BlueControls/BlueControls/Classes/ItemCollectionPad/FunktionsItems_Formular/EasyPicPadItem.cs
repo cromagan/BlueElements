@@ -63,7 +63,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
             if (IsDisposed) { return; }
             if (value == _bearbeitbar) { return; }
             _bearbeitbar = value;
-            OnPropertyChanged("Bearbeitbar");
+            OnPropertyChanged();
         }
     }
 
@@ -75,7 +75,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
             if (IsDisposed) { return; }
             if (value == _bild_dateiname) { return; }
             _bild_dateiname = value;
-            OnPropertyChanged("Bild_Dateiname");
+            OnPropertyChanged();
         }
     }
 

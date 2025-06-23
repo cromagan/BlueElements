@@ -119,7 +119,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
             if (Math.Abs(_size.Width - value.Width) < Constants.DefaultTolerance && Math.Abs(_size.Height - value.Height) < Constants.DefaultTolerance) { return; }
             _size = value;
             PointMoved(_pLo, new MoveEventArgs(false));
-            OnPropertyChanged("Size");
+            OnPropertyChanged();
         }
     }
 

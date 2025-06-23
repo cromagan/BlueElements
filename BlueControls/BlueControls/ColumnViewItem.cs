@@ -31,12 +31,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable, IPropertyChangedFeedback {
+public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -105,7 +106,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set {
             if (_backColor_ColumnCell.ToArgb() == value.ToArgb()) { return; }
             _backColor_ColumnCell = value;
-            OnPropertyChanged("BackColor_ColumnCell");
+            OnPropertyChanged();
         }
     }
 
@@ -117,7 +118,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set {
             if (_backColor_ColumnHead.ToArgb() == value.ToArgb()) { return; }
             _backColor_ColumnHead = value;
-            OnPropertyChanged("BackColor_ColumnHead");
+            OnPropertyChanged();
         }
     }
 
@@ -207,7 +208,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             if (_fontColor_Caption.ToArgb() == value.ToArgb()) { return; }
             _fontColor_Caption = value;
             Invalidate_Fonts();
-            OnPropertyChanged("FontColor_Caption");
+            OnPropertyChanged();
         }
     }
 
@@ -216,7 +217,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set {
             if (_horizontal = value) { return; }
             _horizontal = value;
-            OnPropertyChanged("Horizontal");
+            OnPropertyChanged();
         }
     }
 
@@ -277,7 +278,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             if (_viewType != value) {
                 _viewType = value;
                 Invalidate_DrawWidth();
-                OnPropertyChanged("ViewType");
+                OnPropertyChanged();
             }
         }
     }
@@ -428,8 +429,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
 
-    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
-
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [];
@@ -540,13 +539,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             moveDown += pcch;
         }
 
-
         return new Rectangle(r.Right - size, r.Top + moveDown, size, size);
     }
 
     public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private void _column_PropertyChanged(object sender, System.EventArgs e) => Invalidate_Fonts();
 

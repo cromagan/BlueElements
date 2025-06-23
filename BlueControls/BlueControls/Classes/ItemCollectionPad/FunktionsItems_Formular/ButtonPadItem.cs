@@ -83,7 +83,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_action == value) { return; }
             _action = value;
-            OnPropertyChanged("Aktion");
+            OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -97,7 +97,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg1 == value) { return; }
             _arg1 = value;
-            OnPropertyChanged("Arg1");
+            OnPropertyChanged();
         }
     }
 
@@ -108,7 +108,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg2 == value) { return; }
             _arg2 = value;
-            OnPropertyChanged("Arg2");
+            OnPropertyChanged();
         }
     }
 
@@ -119,7 +119,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg3 == value) { return; }
             _arg3 = value;
-            OnPropertyChanged("Arg3");
+            OnPropertyChanged();
         }
     }
 
@@ -130,7 +130,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg4 == value) { return; }
             _arg4 = value;
-            OnPropertyChanged("Arg4");
+            OnPropertyChanged();
         }
     }
 
@@ -141,7 +141,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg5 == value) { return; }
             _arg5 = value;
-            OnPropertyChanged("Arg5");
+            OnPropertyChanged();
         }
     }
 
@@ -152,7 +152,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg6 == value) { return; }
             _arg6 = value;
-            OnPropertyChanged("Arg6");
+            OnPropertyChanged();
         }
     }
 
@@ -163,7 +163,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg7 == value) { return; }
             _arg7 = value;
-            OnPropertyChanged("Arg7");
+            OnPropertyChanged();
         }
     }
 
@@ -174,7 +174,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_arg8 == value) { return; }
             _arg8 = value;
-            OnPropertyChanged("Arg8");
+            OnPropertyChanged();
         }
     }
 
@@ -187,7 +187,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_beschriftung == value) { return; }
             _beschriftung = value;
-            OnPropertyChanged("Beschriftung");
+            OnPropertyChanged();
         }
     }
 
@@ -198,7 +198,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_image == value) { return; }
             _image = value;
-            OnPropertyChanged("Bild");
+            OnPropertyChanged();
         }
     }
 
@@ -209,7 +209,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_quickinfo == value) { return; }
             _quickinfo = value;
-            OnPropertyChanged("ButtonQuickInfo");
+            OnPropertyChanged();
         }
     }
 
@@ -224,7 +224,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (_enabledwhenrows == value) { return; }
             _enabledwhenrows = value;
             if (!PossibleFor(Method.AllMethods.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
-            OnPropertyChanged("Drückbar_wenn");
+            OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
     }

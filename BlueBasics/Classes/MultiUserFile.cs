@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
 using static BlueBasics.Generic;
@@ -33,7 +34,7 @@ using Timer = System.Threading.Timer;
 
 namespace BlueBasics.MultiUserFile;
 
-public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseable, IPropertyChangedFeedback {
+public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -365,22 +366,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return true;
     }
 
-    public void OnPropertyChanged(string propertyname) {
-        if (IsDisposed) { return; }
-        if (_isSaving || _isLoading) { return; }
-
-        if (_lockCount < 1) {
-            if (!LockEditing()) {
-                Develop.DebugPrint(ErrorType.Error, "Änderungen nicht möglich!");
-                return;
-            }
-        }
-
-        //Develop.CheckStackForOverflow();
-        _isSaved = false;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
-    }
-
     public virtual List<string> ParseableItems() {
         List<string> result = [];
 
@@ -482,6 +467,22 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
     protected virtual void OnLoaded() => Loaded?.Invoke(this, System.EventArgs.Empty);
+
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+        if (IsDisposed) { return; }
+        if (_isSaving || _isLoading) { return; }
+
+        if (_lockCount < 1) {
+            if (!LockEditing()) {
+                Develop.DebugPrint(ErrorType.Error, "Änderungen nicht möglich!");
+                return;
+            }
+        }
+
+        //Develop.CheckStackForOverflow();
+        _isSaved = false;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 

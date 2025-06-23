@@ -76,7 +76,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
             if (IsDisposed) { return; }
             if (_defaultArrangement == value) { return; }
             _defaultArrangement = value;
-            OnPropertyChanged("Standard_Ansicht");
+            OnPropertyChanged();
         }
     }
 

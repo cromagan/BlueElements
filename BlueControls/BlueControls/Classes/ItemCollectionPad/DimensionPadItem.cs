@@ -136,7 +136,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged("Style");
+            OnPropertyChanged();
         }
     }
 
@@ -148,7 +148,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             if (IsDisposed) { return; }
             if (_textOben == Länge_In_Mm.ToStringFloat3()) { value = string.Empty; }
             _textOben = value;
-            OnPropertyChanged("Text_Oben");
+            OnPropertyChanged();
         }
     }
 
@@ -158,7 +158,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             if (IsDisposed) { return; }
             if (_textUnten == value) { value = string.Empty; }
             _textUnten = value;
-            OnPropertyChanged("Text_Unten");
+            OnPropertyChanged();
         }
     }
 
@@ -169,7 +169,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             value = Math.Min(value, 20);
             if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
-            OnPropertyChanged("TextScale");
+            OnPropertyChanged();
         }
     }
 

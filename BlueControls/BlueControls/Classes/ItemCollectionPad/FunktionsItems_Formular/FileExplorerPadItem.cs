@@ -65,7 +65,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
             if (IsDisposed) { return; }
             if (value == _bei_Bedarf_Erzeugen) { return; }
             _bei_Bedarf_Erzeugen = value;
-            OnPropertyChanged("Bei_Bedarf_erzeugen");
+            OnPropertyChanged();
         }
     }
 
@@ -79,7 +79,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
             if (IsDisposed) { return; }
             if (value == _filter) { return; }
             _filter = value;
-            OnPropertyChanged("Filter");
+            OnPropertyChanged();
         }
     }
 
@@ -93,7 +93,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
             if (IsDisposed) { return; }
             if (value == _leere_Ordner_Löschen) { return; }
             _leere_Ordner_Löschen = value;
-            OnPropertyChanged("Leere_Ordner_löschen");
+            OnPropertyChanged();
         }
     }
 
@@ -105,7 +105,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
             if (IsDisposed) { return; }
             if (value == _mindest_pfad) { return; }
             _mindest_pfad = value;
-            OnPropertyChanged("Mindest_Pfad");
+            OnPropertyChanged();
         }
     }
 
@@ -119,7 +119,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
             if (IsDisposed) { return; }
             if (value == _pfad) { return; }
             _pfad = value;
-            OnPropertyChanged("Pfad");
+            OnPropertyChanged();
         }
     }
 

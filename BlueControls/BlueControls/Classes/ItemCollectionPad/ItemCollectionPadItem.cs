@@ -44,6 +44,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
@@ -140,7 +141,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         set {
             if (_caption == value) { return; }
             _caption = value;
-            OnPropertyChanged("Caption");
+            OnPropertyChanged();
         }
     }
 
@@ -155,7 +156,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (value == _endless) { return; }
 
             _endless = value;
-            OnPropertyChanged("Endless");
+            OnPropertyChanged();
         }
     }
 
@@ -171,7 +172,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (IsDisposed) { return; }
             if (Math.Abs(_gridShow - value) < DefaultTolerance) { return; }
             _gridShow = value;
-            OnPropertyChanged("GridShow");
+            OnPropertyChanged();
         }
     }
 
@@ -185,7 +186,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (IsDisposed) { return; }
             if (Math.Abs(_gridsnap - value) < DefaultTolerance) { return; }
             _gridsnap = value;
-            OnPropertyChanged("GridSnap");
+            OnPropertyChanged();
         }
     }
 
@@ -204,7 +205,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         get => _randinMm;
         set {
             _randinMm = new Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
-            OnPropertyChanged("RandInMM");
+            OnPropertyChanged();
         }
     }
 
@@ -218,7 +219,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
             OnStyleChanged();
-            OnPropertyChanged("SheetStyle");
+            OnPropertyChanged();
         }
     }
 
@@ -233,7 +234,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             if (IsDisposed) { return; }
             if (_snapMode == value) { return; }
             _snapMode = value;
-            OnPropertyChanged("SnapMode");
+            OnPropertyChanged();
         }
     }
 
@@ -690,11 +691,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 m.TextScale = scale;
             }
         }
-    }
-
-    public override void OnPropertyChanged(string propertyname) {
-        IsSaved = false;
-        base.OnPropertyChanged(propertyname);
     }
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
@@ -1159,6 +1155,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     protected override void OnParentChanging() {
         base.OnParentChanging();
         UnRegisterEvents();
+    }
+
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+        IsSaved = false;
+        base.OnPropertyChanged(propertyName);
     }
 
     private void ConnectsTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {

@@ -53,7 +53,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
             if (_präfix == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _präfix = value;
-            OnPropertyChanged("Präfix");
+            OnPropertyChanged();
         }
     }
 
@@ -63,7 +63,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
             if (_suffix == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _suffix = value;
-            OnPropertyChanged("Suffix");
+            OnPropertyChanged();
         }
     }
 

@@ -336,7 +336,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         }
 
         //_childs.AddRange(((ListBox)sender).Checked);
-        OnPropertyChanged("Childs");
+        OnPropertyChanged();
         this.RaiseVersion();
         OnDoUpdateSideOptionMenu();
     }

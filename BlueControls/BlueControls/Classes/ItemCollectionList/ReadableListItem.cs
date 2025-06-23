@@ -29,7 +29,7 @@ public class ReadableListItem : TextListItem {
     public ReadableListItem(IReadableTextWithKey item, bool isCaption, bool enabled, string userDefCompareKey) : base(item.ReadableText(), item.KeyName, item.SymbolForReadableText(), isCaption, enabled, userDefCompareKey) {
         Item = item;
 
-        if (item is IPropertyChangedFeedback it2) {
+        if (item is INotifyPropertyChanged it2) {
             it2.PropertyChanged += Item_PropertyChanged;
         }
     }

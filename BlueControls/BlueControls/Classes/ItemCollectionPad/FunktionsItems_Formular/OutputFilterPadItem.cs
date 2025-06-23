@@ -71,7 +71,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             if (IsDisposed) { return; }
             if (_captionPosition == value) { return; }
             _captionPosition = value;
-            OnPropertyChanged("CaptionPosition");
+            OnPropertyChanged();
         }
     }
 
@@ -88,7 +88,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             if (IsDisposed) { return; }
             if (_columnName == value) { return; }
             _columnName = value;
-            OnPropertyChanged("ColumnName");
+            OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -103,7 +103,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             if (IsDisposed) { return; }
             if (_filterart_Bei_Texteingabe == value) { return; }
             _filterart_Bei_Texteingabe = value;
-            OnPropertyChanged("Filterart_bei_Texteingabe");
+            OnPropertyChanged();
         }
     }
 
@@ -116,7 +116,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             if (IsDisposed) { return; }
             if (_standard_Bei_Keiner_Eingabe == value) { return; }
             _standard_Bei_Keiner_Eingabe = value;
-            OnPropertyChanged("Standard_bei_keiner_Eingabe");
+            OnPropertyChanged();
         }
     }
 

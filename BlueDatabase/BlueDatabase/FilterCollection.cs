@@ -30,11 +30,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace BlueDatabase;
 
-public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IPropertyChangedFeedback, IReadableText, IEditable, IErrorCheckable {
+public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, INotifyPropertyChanged, IReadableText, IEditable, IErrorCheckable {
 
     #region Fields
 
@@ -131,7 +132,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 RegisterDatabaseEvents();
                 Invalidate_FilteredRows();
             }
-            OnPropertyChanged("Database");
+            OnPropertyChanged();
         }
     }
 
@@ -475,11 +476,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return fcn;
     }
 
-    public void OnPropertyChanged(string propertyname) {
-        if (IsDisposed) { return; }
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
-    }
-
     public void OnRowsChanged() {
         if (IsDisposed) { return; }
         //if(_rows == null) { return;}
@@ -640,17 +636,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnPropertyChanged("FilterItems");
     }
 
-    //public void RemoveRange(string origin) {
-    //    var l = new List<FilterItem>();
-
-    //    foreach (var thisItem in _internal) {
-    //        if (thisItem.Origin.Equals(origin, StringComparison.OrdinalIgnoreCase)) {
-    //            l.Add(thisItem);
-    //        }
-    //    }
-    //    RemoveRange(l);
-    //}
-
     public void RemoveRange(List<FilterItem> fi) {
         if (IsDisposed) { return; }
 
@@ -673,6 +658,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
+    //    foreach (var thisItem in _internal) {
+    //        if (thisItem.Origin.Equals(origin, StringComparison.OrdinalIgnoreCase)) {
+    //            l.Add(thisItem);
+    //        }
+    //    }
+    //    RemoveRange(l);
+    //}
     public QuickImage SymbolForReadableText() {
         switch (Count) {
             case 0:
@@ -686,6 +678,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
+    //public void RemoveRange(string origin) {
+    //    var l = new List<FilterItem>();
     public List<FilterItem> ToList() => _internal;
 
     public override string ToString() => ParseableItems().FinishParseable();
@@ -763,6 +757,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+        if (IsDisposed) { return; }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     private void RegisterDatabaseEvents() {
         if (_database != null) {

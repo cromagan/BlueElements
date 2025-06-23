@@ -87,7 +87,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             if (IsDisposed) { return; }
             if (_autoX == value) { return; }
             _autoX = value;
-            OnPropertyChanged("AutoX");
+            OnPropertyChanged();
         }
     }
 
@@ -97,7 +97,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             if (IsDisposed) { return; }
             if (_captionPosition == value) { return; }
             _captionPosition = value;
-            OnPropertyChanged("CaptionPosition");
+            OnPropertyChanged();
         }
     }
 
@@ -114,7 +114,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             if (IsDisposed) { return; }
             if (_columnName == value) { return; }
             _columnName = value;
-            OnPropertyChanged("ColumnName");
+            OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -128,7 +128,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             if (IsDisposed) { return; }
             if (_bearbeitung == value) { return; }
             _bearbeitung = value;
-            OnPropertyChanged("EditType");
+            OnPropertyChanged();
         }
     }
 

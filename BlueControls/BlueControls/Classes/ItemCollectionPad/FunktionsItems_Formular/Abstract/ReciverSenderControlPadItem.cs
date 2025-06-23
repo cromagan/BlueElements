@@ -80,7 +80,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             _databaseOutput = value;
             _databaseOutputName = value?.KeyName ?? string.Empty;
             _databaseOutputLoaded = true;
-            OnPropertyChanged("DatabaseOutput");
+            OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -94,7 +94,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             if (_outputColorId == value) { return; }
 
             _outputColorId = value;
-            OnPropertyChanged("OutputColorId");
+            OnPropertyChanged();
         }
     }
 
@@ -119,7 +119,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             OutputColorId = -1;
             OutputColorId = GetFreeColorId();
         }
-        OnPropertyChanged("Parent");
+        OnPropertyChanged();
     }
 
     public override string ErrorReason() {

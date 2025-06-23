@@ -22,10 +22,11 @@ using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace BlueBasics;
 
-public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback, ICloneable {
+public abstract class ParsebleItem : IParseable, INotifyPropertyChanged, ICloneable {
 
     #region Events
 
@@ -117,8 +118,6 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback, IClon
         throw new InvalidOperationException("Failed to clone object: parsing returned null");
     }
 
-    public virtual void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
-
     public virtual List<string> ParseableItems() {
         List<string> result = [];
         result.ParseableAdd("ClassId", MyClassId);
@@ -130,6 +129,8 @@ public abstract class ParsebleItem : IParseable, IPropertyChangedFeedback, IClon
     public abstract bool ParseThis(string key, string value);
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

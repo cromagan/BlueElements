@@ -28,6 +28,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
@@ -457,8 +458,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _nameInStyleSym;
     }
 
-    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
-
     public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapit‰lchen, OnlyUpper, OnlyLower, ColorBack.ToHtmlCode());
 
     public void ParseFinished(string parsed) {
@@ -821,6 +820,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private Brush GetMainBrush() => GetBrush(ColorMain);
 
     private Brush GetOutlineBrush() => GetBrush(ColorOutline);
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private bool SizeOk(float sizeToCheck) {
         // Windwows macht seltsamerweiﬂe bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015

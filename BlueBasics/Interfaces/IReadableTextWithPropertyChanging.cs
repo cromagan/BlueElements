@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using System.ComponentModel;
+
 namespace BlueBasics.Interfaces;
 
-public interface IReadableTextWithPropertyChanging : IReadableText, IPropertyChangedFeedback;
+public interface IReadableTextWithPropertyChanging : IReadableText, INotifyPropertyChanged;

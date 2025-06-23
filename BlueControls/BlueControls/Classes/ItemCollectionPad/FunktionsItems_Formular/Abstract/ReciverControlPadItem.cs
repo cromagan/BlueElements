@@ -34,6 +34,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
@@ -134,7 +135,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             _getFilterFromKeys.AddRange(value);
 
             CalculateInputColorIds();
-            OnPropertyChanged("Parents");
+            OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
     }
@@ -158,7 +159,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             ConnectedFormula.ConnectedFormula.Invalidate_VisibleFor_AllUsed();
 
             _visibleFor = tmp.AsReadOnly();
-            OnPropertyChanged("VisibleFor");
+            OnPropertyChanged();
         }
     }
 
@@ -168,7 +169,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         set {
             if (_xPosition == value) { return; }
             _xPosition = value;
-            OnPropertyChanged("X_Position");
+            OnPropertyChanged();
 
             if (_xPosition != XPosition.frei) {
                 PointMoved(_pLo, new MoveEventArgs(false));
@@ -341,12 +342,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         //   return modes.Any(mode => VisibleFor.Any(visible => string.Equals(mode, visible, StringComparison.OrdinalIgnoreCase)));
 
         return false;
-    }
-
-    public override void OnPropertyChanged(string propertyname) {
-        if (IsDisposed) { return; }
-        base.OnPropertyChanged(propertyname);
-        this.RaiseVersion();
     }
 
     public override List<string> ParseableItems() {
@@ -588,6 +583,12 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             }
         }
         return null;
+    }
+
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+        if (IsDisposed) { return; }
+        base.OnPropertyChanged(propertyName);
+        this.RaiseVersion();
     }
 
     #endregion

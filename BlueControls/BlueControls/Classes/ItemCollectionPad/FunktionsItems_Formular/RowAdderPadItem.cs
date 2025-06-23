@@ -95,7 +95,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (IsDisposed) { return; }
             if (_additinalInfoColumnName == value) { return; }
             _additinalInfoColumnName = value;
-            OnPropertyChanged("AdditionalInfoColumnName");
+            OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
     }
@@ -121,7 +121,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (IsDisposed) { return; }
             if (_entityId == value) { return; }
             _entityId = value;
-            OnPropertyChanged("EntityID");
+            OnPropertyChanged();
         }
     }
 
@@ -156,7 +156,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             if (IsDisposed) { return; }
             if (_originIdColumnName == value) { return; }
             _originIdColumnName = value;
-            OnPropertyChanged("OriginIDColumnName");
+            OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
     }
@@ -167,7 +167,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         set {
             if (value == _script_After) { return; }
             _script_After = value;
-            OnPropertyChanged("Script_After");
+            OnPropertyChanged();
         }
     }
 
@@ -177,7 +177,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         set {
             if (value == _script_Before) { return; }
             _script_Before = value;
-            OnPropertyChanged("Script_Before");
+            OnPropertyChanged();
         }
     }
 
@@ -187,7 +187,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         set {
             if (value == _script_MenuGeneration) { return; }
             _script_MenuGeneration = value;
-            OnPropertyChanged("Script_MenuGeneration");
+            OnPropertyChanged();
         }
     }
 

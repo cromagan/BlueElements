@@ -97,7 +97,7 @@ public class ComicCompPadItem : AbstractPadItem {
         set {
             if (_width == value) { return; }
             _width = value;
-            OnPropertyChanged("Width");
+            OnPropertyChanged();
         }
     }
 
@@ -240,7 +240,7 @@ public class ComicCompPadItem : AbstractPadItem {
             P2.X = _bitmap.Width;
             P2.Y = _bitmap.Height;
         }
-        OnPropertyChanged("Bitmap");
+        OnPropertyChanged();
     }
 
     #endregion

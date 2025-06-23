@@ -70,7 +70,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
             if (value == _script) { return; }
             _script = value;
             this.RaiseVersion();
-            OnPropertyChanged("Script");
+            OnPropertyChanged();
         }
     }
 
@@ -84,7 +84,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
             if (_sekunden == value) { return; }
             _sekunden = value;
             this.RaiseVersion();
-            OnPropertyChanged("Sekunden");
+            OnPropertyChanged();
         }
     }
 

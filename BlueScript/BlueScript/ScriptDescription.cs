@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using static BlueBasics.Constants;
 
 namespace BlueScript;
@@ -98,8 +99,6 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         if (!KeyName.IsFormat(FormatHolder.Text)) { return "Ungültiger Name"; }
         return string.Empty;
     }
-
-    public void OnPropertyChanged(string propertyname) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
 
     public virtual List<string> ParseableItems() {
         try {
@@ -196,6 +195,8 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             IsDisposed = true;
         }
     }
+
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

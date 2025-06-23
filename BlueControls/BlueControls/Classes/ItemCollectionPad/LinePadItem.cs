@@ -93,7 +93,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged("Style");
+            OnPropertyChanged();
         }
     }
 

@@ -76,7 +76,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         get => _bild_modus; set {
             if (_bild_modus == value) { return; }
             _bild_modus = value;
-            OnPropertyChanged("Bild_Modus");
+            OnPropertyChanged();
         }
     }
 
@@ -84,7 +84,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         get => _bitmap; set {
             if (_bitmap == value) { return; }
             _bitmap = value;
-            OnPropertyChanged("Bitmap");
+            OnPropertyChanged();
         }
     }
 
@@ -98,7 +98,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         get => _platzhalter_für_layout; set {
             if (_platzhalter_für_layout == value) { return; }
             _platzhalter_für_layout = value;
-            OnPropertyChanged("Platzhalter_Für_Layout");
+            OnPropertyChanged();
         }
     }
 
@@ -110,7 +110,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             if (_style == value) { return; }
             _style = value;
             this.InvalidateFont();
-            OnPropertyChanged("style");
+            OnPropertyChanged();
         }
     }
 
@@ -189,7 +189,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             _bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
         }
 
-        OnPropertyChanged("Bitmap");
+        OnPropertyChanged();
     }
 
     public override List<string> ParseableItems() {

@@ -75,7 +75,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             if (_autoRefresh == value) { return; }
             _autoRefresh = value;
-            OnPropertyChanged("AutoRefresh");
+            OnPropertyChanged();
         }
     }
 
@@ -93,7 +93,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             if (Math.Abs(_defaultCopyScale - value) < Constants.DefaultTolerance) { return; }
             _defaultCopyScale = value;
-            OnPropertyChanged("DefaultCopyScale");
+            OnPropertyChanged();
         }
     }
 
@@ -105,7 +105,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             if (IsDisposed) { return; }
             if (_design == value) { return; }
             _design = value;
-            OnPropertyChanged("Design");
+            OnPropertyChanged();
         }
     }
 
@@ -115,7 +115,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             if (IsDisposed) { return; }
             if (_formular == value) { return; }
             _formular = value;
-            OnPropertyChanged("Formular");
+            OnPropertyChanged();
         }
     }
 
@@ -133,7 +133,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             if (Math.Abs(_scale - value) < Constants.DefaultTolerance) { return; }
             _scale = value;
-            OnPropertyChanged("Scale");
+            OnPropertyChanged();
         }
     }
 
@@ -143,7 +143,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         set {
             if (value == _script) { return; }
             _script = value;
-            OnPropertyChanged("Script");
+            OnPropertyChanged();
         }
     }
 
@@ -153,7 +153,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             if (IsDisposed) { return; }
             if (_typ == value) { return; }
             _typ = value;
-            OnPropertyChanged("Typ");
+            OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
     }
