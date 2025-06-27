@@ -147,7 +147,9 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     public bool IsDisposed { get; private set; }
+
     public int MaxTextLenght { get; }
+
     public bool Multiline { get; set; }
 
     public string PlainText {
@@ -435,7 +437,27 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         return position + 1;
     }
 
-    private void ApplyAlignment() {
+    private void ApplyAlignmentToLine(int first, int last) {
+        if (Ausrichtung == Alignment.Top_Left || first > last || last >= Count) return;
+
+        float kx = 0;
+        if (Ausrichtung.HasFlag(Alignment.Right)) {
+            kx = _textDimensions.Width - this[last].Pos.X - this[last].Size.Width;
+        }
+        if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) {
+            kx = (_textDimensions.Width - this[last].Pos.X - this[last].Size.Width) / 2;
+        }
+
+        if (Math.Abs(kx) > 0.01f) {
+            for (var j = first; j <= last; j++) {
+                this[j].Pos.X += kx;
+            }
+        }
+    }
+
+    private void ApplyVerticalAlignment() {
+        if (!Ausrichtung.HasFlag(Alignment.VerticalCenter) && !Ausrichtung.HasFlag(Alignment.Bottom)) return;
+
         var ky = 0f;
         if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) {
             ky = (float)((_textDimensions.Height - (int)_height) / 2.0);
@@ -444,28 +466,9 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             ky = _textDimensions.Height - (int)_height;
         }
 
-        // Find line boundaries and apply horizontal alignment
-        var lineStart = 0;
-        for (var i = 0; i <= Count; i++) {
-            if (i == Count || this[i].IsLineBreak()) {
-                if (i > lineStart) {
-                    var lineEnd = i - 1;
-                    float kx = 0;
-                    if (Ausrichtung.HasFlag(Alignment.Right)) {
-                        kx = _textDimensions.Width - this[lineEnd].Pos.X - this[lineEnd].Size.Width;
-                    }
-                    if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) {
-                        kx = (_textDimensions.Width - this[lineEnd].Pos.X - this[lineEnd].Size.Width) / 2;
-                    }
-
-                    if (Math.Abs(kx) > 0.01f || Math.Abs(ky) > 0.01f) {
-                        for (var j = lineStart; j <= lineEnd; j++) {
-                            this[j].Pos.X += kx;
-                            this[j].Pos.Y += ky;
-                        }
-                    }
-                }
-                lineStart = i + 1;
+        if (Math.Abs(ky) > 0.01f) {
+            for (var i = 0; i < Count; i++) {
+                this[i].Pos.Y += ky;
             }
         }
     }
@@ -792,6 +795,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             akt++;
             if (akt > Count - 1) {
                 Row_SetOnLine(zbChar, akt - 1);
+                ApplyAlignmentToLine(zbChar, akt - 1);
                 break;
             }
 
@@ -808,6 +812,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                         isX = vZbxPixel;
                         var rowHeight = Row_SetOnLine(zbChar, akt - 1);
                         isY += rowHeight * _zeilenabstand;
+                        ApplyAlignmentToLine(zbChar, akt - 1);
                         zbChar = akt;
                     }
                 }
@@ -824,16 +829,19 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                 isX = vZbxPixel;
                 var rowHeight = Row_SetOnLine(zbChar, akt);
 
-                if (this[akt] is not ExtCharTopCode) {
+                if (this[akt] is ExtCharTopCode) {
+                    ApplyAlignmentToLine(zbChar, akt);
+                } else {
                     isY += (int)(rowHeight * _zeilenabstand);
+                    ApplyAlignmentToLine(zbChar, akt);
                 }
                 zbChar = akt + 1;
             }
         } while (true);
 
-        // Apply alignment if needed
-        if (Ausrichtung != Alignment.Top_Left) {
-            ApplyAlignment();
+        // Vertikale Ausrichtung am Ende anwenden
+        if (Ausrichtung != Alignment.Top_Left && Count > 0) {
+            ApplyVerticalAlignment();
         }
 
         _isPositionDirty = false;
