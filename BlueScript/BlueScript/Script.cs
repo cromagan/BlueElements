@@ -161,7 +161,7 @@ public class Script {
         return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], true, ld);
     }
 
-    public static int Line(string? txt, int? pos) => pos == null || txt == null ? 0 : txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
+
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string redScriptText, int lineadd, string subname, List<string>? attributes) {
         var pos = 0;
@@ -209,51 +209,7 @@ public class Script {
         } while (true);
     }
 
-    public static (string reducedText, string error) ReduceText(string txt) {
-        StringBuilder s = new();
-        var gänsef = false;
-        var comment = false;
-
-        txt = txt.RemoveEscape();// muss am Anfang gemacht werden, weil sonst die Zählweise nicht mehr stimmt
-
-        for (var pos = 0; pos < txt.Length; pos++) {
-            var c = txt.Substring(pos, 1);
-            var addt = true;
-            switch (c) {
-                case "\"":
-                    if (!comment) { gänsef = !gänsef; }
-                    break;
-
-                case "/":
-                    if (!gänsef) {
-                        if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//") { comment = true; }
-                    }
-                    break;
-
-                case "\r":
-                    if (gänsef) {
-                        var t = s.ToString();
-                        return (t, "Fehler mit Gänsefüssschen in Zeile " + Line(t, pos));
-                    }
-                    _ = s.Append("¶");
-                    comment = false;
-                    addt = false;
-                    break;
-
-                case " ":
-
-                case "\n":
-
-                case "\t":
-                    if (!gänsef) { addt = false; }
-                    break;
-            }
-            if (!comment && addt) {
-                _ = s.Append(c);
-            }
-        }
-        return (s.ToString(), string.Empty);
-    }
+    public static (string f, string error) ReduceText(string script) => script.RemoveEscape().NormalizedText(false, true, false, "¶");
 
     public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes) {
         (ReducedScriptText, var error) = ReduceText(ScriptText);

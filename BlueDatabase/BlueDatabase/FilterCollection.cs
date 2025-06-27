@@ -82,6 +82,48 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi != null) { Add(fi); }
     }
 
+    /// <summary>
+    /// Erstellt eine FilterCollection aus einer vollständigen SQL-SELECT-Anweisung
+    /// Beispiel: "SELECT * FROM Kunden WHERE Name = 'Mueller' AND Status = 'Aktiv'"
+    /// </summary>
+    /// <param name="sql">Die vollständige SQL-SELECT-Anweisung</param>
+    /// <param name="comment">Kommentar für den Filter</param>
+    public FilterCollection(string sql, string comment) {
+        _coment = comment;
+
+        if (string.IsNullOrWhiteSpace(sql)) {
+            Database = null;
+            return;
+        }
+
+        try {
+            // SQL normalisieren und in Großbuchstaben konvertieren
+            (var normalizedSql, var error) = sql.NormalizedText(true, true, true, " ");
+
+            if (!string.IsNullOrEmpty(error)) {
+                Develop.DebugPrint(ErrorType.Error, "Fehler beim Normalisieren der SQL-Anweisung: " + error);
+                Database = null;
+                return;
+            }
+
+            // Datenbank anhand des Tabellennamens finden
+            Database = GetTableFromSql(normalizedSql);
+            if (Database == null) {
+                Develop.DebugPrint(ErrorType.Warning, "Tabelle nicht gefunden in SQL: " + sql);
+                return;
+            }
+
+            // WHERE-Klausel extrahieren und parsen
+            var whereClause = ExtractWhereClauseFromSql(normalizedSql);
+            if (!string.IsNullOrWhiteSpace(whereClause)) {
+                ParseSqlWhereClause(whereClause);
+            }
+        } catch (Exception ex) {
+            Develop.DebugPrint(ErrorType.Error, "Fehler beim Parsen der SQL-Anweisung: " + ex.Message);
+            Database = null;
+        }
+    }
+
     #endregion
 
     #region Destructors
@@ -684,6 +726,195 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public override string ToString() => ParseableItems().FinishParseable();
 
+    /// <summary>
+    /// Extrahiert die WHERE-Klausel aus einer bereits normalisierten SQL-SELECT-Anweisung
+    /// </summary>
+    /// <param name="normalizedSql">Die bereits normalisierte SQL-Anweisung</param>
+    /// <returns>Die WHERE-Klausel ohne das Wort "WHERE" oder leerer String</returns>
+    private static string ExtractWhereClauseFromSql(string normalizedSql) {
+        if (string.IsNullOrWhiteSpace(normalizedSql)) { return string.Empty; }
+
+        // WHERE-Position finden (da bereits uppercase: nur "WHERE")
+        var whereIndex = normalizedSql.IndexOf(" WHERE ");
+
+        if (whereIndex == -1) { return string.Empty; }
+
+        // Alles nach WHERE extrahieren
+        var whereClause = normalizedSql.Substring(whereIndex + 7); // 7 = " WHERE ".Length
+
+        // Eventuelle ORDER BY, GROUP BY, HAVING entfernen
+        var endKeywords = new[] { " ORDER BY ", " GROUP BY ", " HAVING ", " LIMIT " };
+
+        foreach (var keyword in endKeywords) {
+            var keywordIndex = whereClause.IndexOf(keyword);
+            if (keywordIndex >= 0) {
+                whereClause = whereClause.Substring(0, keywordIndex);
+            }
+        }
+
+        return whereClause.Trim();
+    }
+
+    /// <summary>
+    /// Extrahiert den Tabellennamen aus einer bereits normalisierten SQL-SELECT-Anweisung und gibt die Datenbank zurück
+    /// </summary>
+    /// <param name="normalizedSql">Die bereits normalisierte SQL-Anweisung</param>
+    /// <returns>Die Datenbank oder null wenn nicht gefunden</returns>
+    private static Database? GetTableFromSql(string normalizedSql) {
+        if (string.IsNullOrWhiteSpace(normalizedSql)) { return null; }
+
+        // FROM-Klausel suchen
+        var fromMatch = System.Text.RegularExpressions.Regex.Match(normalizedSql,
+            @"\bFROM\s+([^\s]+)");
+
+        if (fromMatch.Success) {
+            var tableName = fromMatch.Groups[1].Value;
+
+            // Eventuelle Anführungszeichen oder eckige Klammern entfernen
+            tableName = tableName.Trim('[', ']', '"', '\'');
+
+            var validTableName = Database.MakeValidTableName(tableName);
+            return Database.Get(validTableName, false, null);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Parst die Werte einer IN-Klausel
+    /// </summary>
+    private static List<string> ParseInValues(string valuesString) {
+        var values = new List<string>();
+
+        // Einfache Implementierung: Split bei Komma und entferne Anführungszeichen
+        var parts = valuesString.Split(',');
+
+        foreach (var part in parts) {
+            var trimmed = part.Trim();
+            if (trimmed.StartsWith("'") && trimmed.EndsWith("'") && trimmed.Length >= 2) {
+                // Entferne Anführungszeichen
+                values.Add(trimmed.Substring(1, trimmed.Length - 2));
+            } else {
+                // Ohne Anführungszeichen
+                values.Add(trimmed);
+            }
+        }
+
+        return values;
+    }
+
+    /// <summary>
+    /// Parst eine einzelne SQL-Bedingung und erstellt ein FilterItem
+    /// </summary>
+    private static FilterItem? ParseSingleCondition(string condition, Database database) {
+        if (string.IsNullOrWhiteSpace(condition)) { return null; }
+
+        // IS NULL / IS NOT NULL
+        if (condition.EndsWith(" IS NULL")) {
+            var columnName = condition.Substring(0, condition.Length - 8).Trim();
+            var column = database.Column[columnName];
+            return column != null ? new FilterItem(column, FilterType.Istgleich, string.Empty) : null;
+        }
+
+        if (condition.EndsWith(" IS NOT NULL")) {
+            var columnName = condition.Substring(0, condition.Length - 12).Trim();
+            var column = database.Column[columnName];
+            return column != null ? new FilterItem(column, FilterType.Ungleich_MultiRowIgnorieren, string.Empty) : null;
+        }
+
+        // BETWEEN
+        var betweenMatch = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s+BETWEEN\s+'([^']+)'\s+AND\s+'([^']+)'");
+        if (betweenMatch.Success) {
+            var columnName = betweenMatch.Groups[1].Value;
+            var value1 = betweenMatch.Groups[2].Value;
+            var value2 = betweenMatch.Groups[3].Value;
+            var column = database.Column[columnName];
+            return column != null ? new FilterItem(column, FilterType.Between | FilterType.UND, $"{value1}|{value2}") : null;
+        }
+
+        // LIKE
+        var likeMatch = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s+LIKE\s+'([^']+)'");
+        if (likeMatch.Success) {
+            var columnName = likeMatch.Groups[1].Value;
+            var value = likeMatch.Groups[2].Value;
+            var column = database.Column[columnName];
+
+            if (column == null) { return null; }
+
+            // Bestimme FilterType basierend auf Wildcards
+            if (value.StartsWith("%") && value.EndsWith("%")) {
+                // %value% -> INSTR
+                var searchValue = value.Substring(1, value.Length - 2);
+                return new FilterItem(column, FilterType.Instr_GroßKleinEgal, searchValue);
+            } else if (value.EndsWith("%")) {
+                // value% -> BeginntMit
+                var searchValue = value.Substring(0, value.Length - 1);
+                return new FilterItem(column, FilterType.BeginntMit_GroßKleinEgal, searchValue);
+            } else {
+                // Exakte Übereinstimmung
+                return new FilterItem(column, FilterType.Istgleich_GroßKleinEgal, value);
+            }
+        }
+
+        // IN
+        var inMatch = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s+IN\s*\(([^)]+)\)");
+        if (inMatch.Success) {
+            var columnName = inMatch.Groups[1].Value;
+            var valuesString = inMatch.Groups[2].Value;
+            var column = database.Column[columnName];
+
+            if (column == null) { return null; }
+
+            // Parse die Werte in der IN-Klausel
+            var values = ParseInValues(valuesString);
+            return values.Count > 0 ? new FilterItem(column, FilterType.Istgleich_ODER_GroßKleinEgal, values) : null;
+        }
+
+        // Einfache Gleichheit: column = 'value'
+        var equalMatch = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s*=\s*'([^']*)'");
+        if (equalMatch.Success) {
+            var columnName = equalMatch.Groups[1].Value;
+            var value = equalMatch.Groups[2].Value;
+            var column = database.Column[columnName];
+            return column != null ? new FilterItem(column, FilterType.Istgleich_GroßKleinEgal, value) : null;
+        }
+
+        // Einfache Gleichheit ohne Anführungszeichen: column = value
+        var equalMatchNoQuotes = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s*=\s*([^'\s]+)");
+        if (equalMatchNoQuotes.Success) {
+            var columnName = equalMatchNoQuotes.Groups[1].Value;
+            var value = equalMatchNoQuotes.Groups[2].Value;
+            var column = database.Column[columnName];
+            return column != null ? new FilterItem(column, FilterType.Istgleich_GroßKleinEgal, value) : null;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Teilt die WHERE-Klausel in einzelne Bedingungen auf
+    /// Vereinfachte Implementierung ohne Klammern-Unterstützung
+    /// </summary>
+    private static List<string> SplitConditions(string whereClause) {
+        var conditions = new List<string>();
+
+        // Einfache Aufteilung bei AND (da bereits uppercase: nur " AND ")
+        var parts = whereClause.Split(new[] { " AND " }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var part in parts) {
+            if (!string.IsNullOrWhiteSpace(part)) {
+                conditions.Add(part.Trim());
+            }
+        }
+
+        return conditions;
+    }
+
     private void _Database_CellValueChanged(object sender, CellEventArgs e) {
         if (_rows == null) { return; }
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
@@ -761,6 +992,30 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Parst eine bereits normalisierte SQL-WHERE-Klausel und erstellt entsprechende FilterItems
+    /// </summary>
+    /// <param name="whereClause">Die bereits normalisierte WHERE-Klausel</param>
+    private void ParseSqlWhereClause(string whereClause) {
+        if (Database is not { IsDisposed: false } db) { return; }
+
+        try {
+            // Aufteilen in einzelne Bedingungen (vereinfacht, ohne Klammern-Parsing)
+            var conditions = SplitConditions(whereClause);
+
+            foreach (var condition in conditions) {
+                var filterItem = ParseSingleCondition(condition.Trim(), db);
+                if (filterItem != null) {
+                    AddInternal(filterItem);
+                }
+            }
+
+            Invalidate_FilteredRows();
+        } catch (Exception ex) {
+            Develop.DebugPrint(ErrorType.Warning, $"Fehler beim Parsen der SQL-WHERE-Klausel: {ex.Message}");
+        }
     }
 
     private void RegisterDatabaseEvents() {

@@ -321,10 +321,9 @@ public static partial class Extensions {
     /// <param name="value">Ein String, der mit { beginnt. Z.B. {Wert=100, Wert2=150}</param>
     /// <returns>Gibt immer eine List zurück.</returns>
     public static List<KeyValuePair<string, string>>? GetAllTags(this string value) {
-
         if (string.IsNullOrEmpty(value) || value.Length < 3) { return null; }
         if (value.Substring(0, 1) != "{") { return null; }
-        if (value.Substring(value.Length-1,1) != "}") { return null; }
+        if (value.Substring(value.Length - 1, 1) != "}") { return null; }
 
         List<KeyValuePair<string, string>> result = [];
         var start = 1;
@@ -338,7 +337,7 @@ public static partial class Extensions {
             tag = tag.Trim(",");
             tag = tag.Trim(" ");
             if (string.IsNullOrEmpty(tag)) {
-                Develop.DebugPrint(ErrorType.Warning, "Parsen nicht möglich:" + value); 
+                Develop.DebugPrint(ErrorType.Warning, "Parsen nicht möglich:" + value);
                 return null;
             }
 
@@ -365,6 +364,8 @@ public static partial class Extensions {
         while (noarunde);
         return result;
     }
+
+    public static int GetLineNumber(string? txt, int? pos) => pos == null || txt == null ? 0 : txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
 
     public static string HtmlSpecialToNormalChar(this string tXt, bool ignoreBr) {
         // http://sonderzeichentabelle.de/
@@ -419,28 +420,6 @@ public static partial class Extensions {
 
         return match.Success ? match.Index : -1;
     }
-
-    //public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
-    //    if (options == RegexOptions.IgnoreCase) {
-    //        value = value.ToUpperInvariant();
-    //        input = " " + input.ToUpperInvariant() + " ";
-    //    } else {
-    //        input = " " + input + " ";
-    //    }
-
-    //    startIndex++;
-    //    while (true) {
-    //        if (startIndex > input.Length - 1) { return -1; }
-    //        startIndex = input.IndexOf(value, startIndex, StringComparison.Ordinal);
-    //        if (startIndex < 0) { return -1; }
-    //        if (startIndex > 0 && startIndex < input.Length - value.Length) {
-    //            if (input[startIndex - 1].IsWordSeparator() && input[startIndex + value.Length].IsWordSeparator()) {
-    //                return startIndex - 1; // -1, weil ein Leereichen hinzugefügt wurde.
-    //            }
-    //            startIndex += value.Length;
-    //        }
-    //    }
-    //}
 
     public static string Insert(this string tXt, string insertTxt, string afterTxt, string whenNotContais) {
         if (string.IsNullOrEmpty(afterTxt)) { return tXt; }
@@ -556,6 +535,75 @@ public static partial class Extensions {
 
             pos++;
         } while (true);
+    }
+
+    public static (string reducedText, string error) NormalizedText(this string txt, bool convertToUpperCase, bool supportDoubleQuotes, bool supportSingleQuotes, string lineBreakReplacement) {
+        if (string.IsNullOrEmpty(txt)) { return (string.Empty, string.Empty); }
+
+        var result = new StringBuilder();
+        var inQuotes = false;
+        var quoteChar = '\0';
+        var comment = false;
+
+        for (var pos = 0; pos < txt.Length; pos++) {
+            var currentChar = txt[pos];
+            var addChar = true;
+
+            if (inQuotes) {
+                // Innerhalb von Anführungszeichen
+                if (currentChar == quoteChar) {
+                    // Ende von Anführungszeichen
+                    inQuotes = false;
+                } else if (currentChar == '\r') {
+                    // Zeilenumbruch innerhalb von Anführungszeichen ist ein Fehler
+                    var errorText = result.ToString();
+                    var lineNumber = GetLineNumber(errorText, pos);
+                    return (errorText, $"Fehler mit Anführungszeichen in Zeile {lineNumber}");
+                }
+            } else {
+                // Außerhalb von Anführungszeichen
+                if ((supportDoubleQuotes && currentChar == '"') || (supportSingleQuotes && currentChar == '\'')) {
+                    // Start von Anführungszeichen
+                    if (!comment) {
+                        inQuotes = true;
+                        quoteChar = currentChar;
+                    }
+                } else if (currentChar == '/' && pos < txt.Length - 1 && txt[pos + 1] == '/') {
+                    // Kommentar beginnt
+                    comment = true;
+                } else if (currentChar == '\r') {
+                    // Zeilenumbruch
+                    if (!string.IsNullOrEmpty(lineBreakReplacement)) {
+                        result.Append(lineBreakReplacement);
+                    }
+                    comment = false;
+                    addChar = false;
+                } else if (currentChar == '\n') {
+                    // \n ignorieren wenn lineBreakReplacement gesetzt
+                    if (!string.IsNullOrEmpty(lineBreakReplacement)) {
+                        addChar = false;
+                    }
+                } else if (currentChar is ' ' or '\t') {
+                    // Leerzeichen und Tabs normalisieren, mehrfache Leerzeichen vermeiden
+                    if (result.Length == 0 || result[result.Length - 1] != ' ') {
+                        result.Append(' ');
+                    }
+                    addChar = false;
+                }
+            }
+            if (!comment && addChar) {
+                var charToAdd = convertToUpperCase ? char.ToUpperInvariant(currentChar) : currentChar;
+                result.Append(charToAdd);
+            }
+        }
+
+        if (inQuotes) {
+            var errorText = result.ToString();
+            var lineNumber = GetLineNumber(errorText, txt.Length - 1);
+            return (errorText, $"Nicht geschlossene Anführungszeichen in Zeile {lineNumber}");
+        }
+
+        return (result.ToString().Trim(), string.Empty);
     }
 
     /// <summary>
