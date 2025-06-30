@@ -144,12 +144,40 @@ public static partial class Extensions {
         return sb.ToString();
     }
 
-    public static int CountString(this string text, string value) {
-        var anz = 0;
-        for (var z = 0; z <= text.Length - value.Length; z++) {
-            if (text.Substring(z, value.Length) == value) { anz++; }
+    /// <summary>
+    /// Zählt, wie oft ein einzelnes Zeichen bis zu einer bestimmten Position vorkommt
+    /// </summary>
+    public static int CountChar(this string text, char character, int? maxPosition = null) {
+        if (string.IsNullOrEmpty(text)) { return 0; }
+
+        var endPos = maxPosition.HasValue ? Math.Min(maxPosition.Value, text.Length) : text.Length;
+        if (endPos <= 0) return 0;
+
+        var count = 0;
+        for (var i = 0; i < endPos; i++) {
+            if (text[i] == character)
+                count++;
         }
-        return anz;
+
+        return count;
+    }
+
+    /// <summary>
+    /// Zählt, wie oft ein String-Wert im gesamten Text vorkommt
+    /// </summary>
+    public static int CountString(this string text, string value) {
+        if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(value))
+            return 0;
+
+        var count = 0;
+        var index = 0;
+
+        while ((index = text.IndexOf(value, index, StringComparison.Ordinal)) != -1) {
+            count++;
+            index += value.Length;
+        }
+
+        return count;
     }
 
     public static string CreateHtmlCodes(this string tXt, bool crlftoo) {
@@ -365,8 +393,6 @@ public static partial class Extensions {
         return result;
     }
 
-    public static int GetLineNumber(string? txt, int? pos) => pos == null || txt == null ? 0 : txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
-
     public static string HtmlSpecialToNormalChar(this string tXt, bool ignoreBr) {
         // http://sonderzeichentabelle.de/
         // http://www.htmlhelp.com/reference/html40/entities/special.html
@@ -537,7 +563,7 @@ public static partial class Extensions {
         } while (true);
     }
 
-    public static (string reducedText, string error) NormalizedText(this string txt, bool convertToUpperCase, bool supportDoubleQuotes, bool supportSingleQuotes, string lineBreakReplacement) {
+    public static (string normalizedText, string error) NormalizedText(this string txt, bool convertToUpperCase, bool supportDoubleQuotes, bool supportSingleQuotes, bool removesallpace, char lineBreakReplacement) {
         if (string.IsNullOrEmpty(txt)) { return (string.Empty, string.Empty); }
 
         var result = new StringBuilder();
@@ -557,7 +583,7 @@ public static partial class Extensions {
                 } else if (currentChar == '\r') {
                     // Zeilenumbruch innerhalb von Anführungszeichen ist ein Fehler
                     var errorText = result.ToString();
-                    var lineNumber = GetLineNumber(errorText, pos);
+                    var lineNumber = errorText.CountChar('¶', pos) + 1;
                     return (errorText, $"Fehler mit Anführungszeichen in Zeile {lineNumber}");
                 }
             } else {
@@ -573,33 +599,37 @@ public static partial class Extensions {
                     comment = true;
                 } else if (currentChar == '\r') {
                     // Zeilenumbruch
-                    if (!string.IsNullOrEmpty(lineBreakReplacement)) {
-                        result.Append(lineBreakReplacement);
-                    }
+
+                    result.Append(lineBreakReplacement);
+
                     comment = false;
                     addChar = false;
                 } else if (currentChar == '\n') {
                     // \n ignorieren wenn lineBreakReplacement gesetzt
-                    if (!string.IsNullOrEmpty(lineBreakReplacement)) {
-                        addChar = false;
-                    }
+
+                    addChar = false;
                 } else if (currentChar is ' ' or '\t') {
                     // Leerzeichen und Tabs normalisieren, mehrfache Leerzeichen vermeiden
-                    if (result.Length == 0 || result[result.Length - 1] != ' ') {
-                        result.Append(' ');
+
+                    if (!removesallpace) {
+                        if (result.Length > 0 &&
+                          result[result.Length - 1] != ' ' &&
+                          result[result.Length - 1] != lineBreakReplacement) {
+                            result.Append(' ');
+                        }
                     }
                     addChar = false;
                 }
             }
             if (!comment && addChar) {
-                var charToAdd = convertToUpperCase ? char.ToUpperInvariant(currentChar) : currentChar;
+                var charToAdd = convertToUpperCase && !inQuotes ? char.ToUpperInvariant(currentChar) : currentChar;
                 result.Append(charToAdd);
             }
         }
 
         if (inQuotes) {
             var errorText = result.ToString();
-            var lineNumber = GetLineNumber(errorText, txt.Length - 1);
+            var lineNumber = errorText.CountChar('¶', txt.Length - 1) + 1;
             return (errorText, $"Nicht geschlossene Anführungszeichen in Zeile {lineNumber}");
         }
 
@@ -635,7 +665,7 @@ public static partial class Extensions {
     /// <returns>Beispiel: Eine Liste mit: {"frisst", "vergräbt"}</returns>
     /// <remarks></remarks>
     public static List<string>? ReduceToMulti(this string text, string search, StringComparison compare) {
-        if (search.CountString("*") != 1) { return null; }
+        if (search.CountChar('*') != 1) { return null; }
         var e = search.Split('*');
         if (e.Length != 2) { return null; }
 

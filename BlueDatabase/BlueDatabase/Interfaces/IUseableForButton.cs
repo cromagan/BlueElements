@@ -63,14 +63,14 @@ public static class UseableForButton {
 
         var sx = ufb.TranslateButtonArgs(args, filterarg, rowarg);
 
-        var (reducedText, error) = Script.ReduceText(sx);
+        var (normalizedText, error) = Script.NormalizedText(sx);
 
         if (!string.IsNullOrEmpty(error)) {
             return "Fehler beim Berechnen der Attribute: " + error;
         }
 
         var ld = new LogData("Knopfdruck", 0);
-        var cdw = new CanDoFeedback(0, reducedText, string.Empty, ld);
+        var cdw = new CanDoFeedback(0, normalizedText, string.Empty, ld);
 
         var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, "Button", "Button");
         _ = ufb.DoIt(varCol, cdw, scp);

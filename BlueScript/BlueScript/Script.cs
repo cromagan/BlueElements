@@ -34,7 +34,7 @@ public class Script {
     #region Constructors
 
     public Script(VariableCollection? variablen, ScriptProperties scp) {
-        ReducedScriptText = string.Empty;
+        NormalizedScriptText = string.Empty;
 
         Variables = variablen ?? [];
 
@@ -63,8 +63,8 @@ public class Script {
 
     #region Properties
 
+    public string NormalizedScriptText { get; private set; }
     public ScriptProperties Properties { get; }
-    public string ReducedScriptText { get; private set; }
     public string ScriptText { get; set; } = string.Empty;
 
     public VariableCollection Variables { get; }
@@ -161,9 +161,9 @@ public class Script {
         return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], true, ld);
     }
 
+    public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
-
-    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string redScriptText, int lineadd, string subname, List<string>? attributes) {
+    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? attributes) {
         var pos = 0;
         var endScript = false;
 
@@ -181,17 +181,17 @@ public class Script {
         Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
 
         do {
-            if (pos >= redScriptText.Length || endScript) {
+            if (pos >= normalizedScriptText.Length || endScript) {
                 Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
                 return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, endScript, string.Empty);
             }
 
-            if (redScriptText.Substring(pos, 1) == "¶") {
+            if (normalizedScriptText.Substring(pos, 1) == "¶") {
                 pos++;
                 ld.LineAdd(1);
             } else {
-                var f = CommandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
+                var f = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, ld);
                 if (f.Failed) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {f.FailedReason}", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, f.NeedsScriptFix, false, false, f.FailedReason);
@@ -200,7 +200,7 @@ public class Script {
                 endScript = f.EndScript;
 
                 pos = f.Position;
-                ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
+                ld.LineAdd(normalizedScriptText.CountChar('¶', pos) + 1 - ld.Line + lineadd);
                 if (f.BreakFired) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty);
@@ -209,14 +209,12 @@ public class Script {
         } while (true);
     }
 
-    public static (string f, string error) ReduceText(string script) => script.RemoveEscape().NormalizedText(false, true, false, "¶");
-
     public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes) {
-        (ReducedScriptText, var error) = ReduceText(ScriptText);
+        (NormalizedScriptText, var error) = NormalizedText(ScriptText);
 
         return !string.IsNullOrEmpty(error)
             ? new ScriptEndedFeedback(error, false, true, subname)
-            : Parse(Variables, Properties, ReducedScriptText, lineadd, subname, attributes);
+            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, attributes);
     }
 
     #endregion

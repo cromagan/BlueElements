@@ -65,7 +65,7 @@ public class Method_CallByFilename : Method {
     /// <param name="scp"></param>
     /// <param name="ld"></param>
     /// <param name="aufgerufenVon">Name der Funktion, z.B. Do-Schleife</param>
-    /// <param name="reducedscripttext">Der Scripttext, der ausgeführt werden soll. Bereits standardisiert</param>
+    /// <param name="normalizedscripttext">Der Scripttext, der ausgeführt werden soll. Bereits standardisiert</param>
     /// <param name="keepVariables">Ob Variablen, die in dem Script erzeugt werden, nch außen getragen werden sollen</param>
     /// <param name="lineadd">Zb. bei einer Do Schleife, die Zeile, in der das Do steht. Bei Scripten aus dem Dateisytem 0</param>
     /// <param name="subname">Zb. bei einer Do Schleife, der gleich Wert wie in Infos.Logdata. Bei Scripten aus dem Dateisystem dessen Name</param>
@@ -73,7 +73,7 @@ public class Method_CallByFilename : Method {
     /// <param name="varCol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, LogData ld, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog) {
+    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, LogData ld, string aufgerufenVon, string normalizedscripttext, bool keepVariables, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog) {
         ScriptEndedFeedback scx;
 
         if (scp.Stufe > 10) {
@@ -86,13 +86,13 @@ public class Method_CallByFilename : Method {
 
         if (keepVariables) {
             if (addMe != null) { _ = varCol.Add(addMe); }
-            scx = Script.Parse(varCol, scp2, reducedscripttext, lineadd, subname, attributes);
+            scx = Script.Parse(varCol, scp2, normalizedscripttext, lineadd, subname, attributes);
         } else {
             var tmpv = new VariableCollection();
             _ = tmpv.AddRange(varCol);
             if (addMe != null) { _ = tmpv.Add(addMe); }
 
-            scx = Script.Parse(tmpv, scp2, reducedscripttext, lineadd, subname, attributes);
+            scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes);
 
             #region Kritische Variablen Disposen
 
@@ -137,7 +137,7 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback("Fehler beim Lesen der Datei: " + vs, true, ld);
         }
 
-        (f, var error) = Script.ReduceText(f);
+        (f, var error) = Script.NormalizedText(f);
 
         if (!string.IsNullOrEmpty(error)) {
             return new DoItFeedback("Fehler in Datei " + vs + ": " + error, true, ld);

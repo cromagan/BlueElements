@@ -138,8 +138,6 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         };
         var scf = sc.Parse(0, "Main", null);
 
-
-
         if (scf.Failed) {
             if (Generic.UserGroup == Constants.Administrator) {
                 List<string> l =
@@ -160,10 +158,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             }
         }
 
-
-
         return scf;
-
     }
 
     /// <summary>
@@ -277,8 +272,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             }
         }
 
-		var keyAndInfo = RepairMenu([.. _menu ?? [], .. selected], _infos);
-
+        var keyAndInfo = RepairMenu([.. _menu ?? [], .. selected], _infos);
 
         for (var z = 0; z < keyAndInfo.Count; z++) {
             var key = keyAndInfo[z].SplitBy("#")[0];
@@ -349,7 +343,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
                     #region ....normal hinzufügen
 
-                    it.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
+                    it.Indent = Math.Max(keyAndInfo[z].CountChar('\\'), 0);
                     f.ItemAdd(it);
                     _ = olditems.Remove(key);
                     it.UserDefCompareKey = z.ToStringInt10();
@@ -362,7 +356,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
                     var ndli = new DropDownListItem(dd_Name, true, string.Empty);
                     ndli.DropDownItems.Add(it);
-                    ndli.Indent = Math.Max(keyAndInfo[z].CountString("\\"), 0);
+                    ndli.Indent = Math.Max(keyAndInfo[z].CountChar('\\'), 0);
                     f.ItemAdd(ndli);
                     _ = olditems.Remove(dd_Name);
                     ndli.UserDefCompareKey = z.ToStringInt10();
@@ -406,19 +400,15 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
     private void F_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
 
-
         if (RowSingleOrNull() is not { IsDisposed: false } rowIn) { return; }
 
         //        var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
 
         var scf = ExecuteScript(Script_Before, Mode, EntityID, rowIn, false, "Before");
         if (scf.Failed) {
-
             Fehler("Interner Fehler: Skript BEFORE fehlerhaft", ImageCode.Kritisch);
             return;
         }
-
-
 
         if (e.Item is ReadableListItem { Item: AdderItem ai } rli) {
             if (f.Checked.Contains(rli.KeyName)) {
@@ -445,9 +435,6 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             Fehler("Interner Fehler: Skript AFTER fehlerhaft", ImageCode.Kritisch);
             return;
         }
-
-
-
     }
 
     private (string msg, string newid) GenerateEntityID(RowItem rowIn) {
@@ -571,7 +558,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
     private bool ShowMe(ICollection<string> selected, string textkey) {
         var t = RepairTextKey(textkey);
-        return t.CountString("\\") < 1 || Selected(selected, t) || Selected(selected, t.PathParent());
+        return t.CountChar('\\') < 1 || Selected(selected, t) || Selected(selected, t.PathParent());
     }
 
     #endregion

@@ -98,7 +98,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         try {
             // SQL normalisieren und in Groﬂbuchstaben konvertieren
-            (var normalizedSql, var error) = sql.NormalizedText(true, true, true, " ");
+            (var normalizedSql, var error) = sql.NormalizedText(true, true, true, false, ' ');
 
             if (!string.IsNullOrEmpty(error)) {
                 Develop.DebugPrint(ErrorType.Error, "Fehler beim Normalisieren der SQL-Anweisung: " + error);

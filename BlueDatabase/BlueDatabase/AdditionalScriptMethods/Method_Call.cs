@@ -80,7 +80,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
             }
         }
 
-        var (f, error) = Script.ReduceText(sc.Script);
+        var (f, error) = Script.NormalizedText(sc.Script);
 
         if (!string.IsNullOrEmpty(error)) {
             return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true, ld);
