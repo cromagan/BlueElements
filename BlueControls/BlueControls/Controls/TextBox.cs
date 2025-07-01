@@ -518,7 +518,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     protected override void DrawControl(Graphics gr, States state) {
         var effectWidth = Width;
-        var sliderVisible = _multiline ? _eTxt.Height() > Height - 16 : _eTxt.Height() > Height;
+        var sliderVisible = _multiline ? _eTxt.Height > Height - 16 : _eTxt.Height > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
 
         switch (_verhalten) {
@@ -538,7 +538,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 } else if (hp == 0) {
                     pos.X = Skin.PaddingSmal;
                 } else if (hp > _eTxt.Count - 1) {
-                    pos.X = _eTxt.Width() > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.Width() - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
+                    pos.X = _eTxt.Width > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.Width - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
                 } else {
                     var r = _eTxt.CursorPixelPosX(hp);
                     if (r.X > Width - (Skin.PaddingSmal * 4) - pos.X) {
@@ -556,9 +556,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 sliderVisible = false;
                 _eTxt.TextDimensions = Size.Empty;
                 Width = this is ComboBox
-                    ? Math.Max(_eTxt.Width() + (Skin.PaddingSmal * 3) + 20, Width)
-                    : Math.Max(_eTxt.Width() + (Skin.PaddingSmal * 3), Width);
-                Height = Math.Max(_eTxt.Height() + (Skin.PaddingSmal * 2), Height);
+                    ? Math.Max(_eTxt.Width + (Skin.PaddingSmal * 3) + 20, Width)
+                    : Math.Max(_eTxt.Width + (Skin.PaddingSmal * 3), Width);
+                Height = Math.Max(_eTxt.Height + (Skin.PaddingSmal * 2), Height);
                 _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
                 break;
 
@@ -582,7 +582,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _sliderY.Left = Width - _sliderY.Width;
                 _sliderY.Top = 0;
                 _eTxt.DrawingPos = _eTxt.DrawingPos with { Y = (int)-_sliderY.Value };
-                _sliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
+                _sliderY.Maximum = _eTxt.Height + 16 - DisplayRectangle.Height;
             }
         } else {
             if (_sliderY != null) {
@@ -599,7 +599,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         MarkAndGenerateZone(gr, state);
 
         if (!string.IsNullOrEmpty(_suffix)) {
-            Rectangle r = new(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
+            Rectangle r = new(_eTxt.Width + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
             if (_eTxt.Count > 0) {
                 r.X += 2;
                 Skin.Draw_FormatedText(gr, _suffix, null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, false);
@@ -889,8 +889,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (pixX < _eTxt.DrawingPos.X && pixY < _eTxt.DrawingPos.Y) { return 0; }
         pixX = Math.Max(pixX, _eTxt.DrawingPos.X);
         pixY = Math.Max(pixY, _eTxt.DrawingPos.Y);
-        pixX = Math.Min(pixX, _eTxt.DrawingPos.X + _eTxt.Width());
-        pixY = Math.Min(pixY, _eTxt.DrawingPos.Y + _eTxt.Height());
+        pixX = Math.Min(pixX, _eTxt.DrawingPos.X + _eTxt.Width);
+        pixY = Math.Min(pixY, _eTxt.DrawingPos.Y + _eTxt.Height);
         var c = _eTxt.Char_Search(pixX, pixY);
         if (c < 0) { c = 0; }
         return c < _eTxt.Count && pixX > _eTxt.DrawingPos.X + _eTxt[c].Pos.X + (_eTxt[c].Size.Width / 2.0) ? c + 1 : c;

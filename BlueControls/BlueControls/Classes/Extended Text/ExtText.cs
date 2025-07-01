@@ -61,12 +61,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     #region Fields
 
-    private readonly StringBuilder _stringBuilder = new(1024);
     private int? _height;
-
-    // Optimization fields
-    private bool _isPositionDirty = true;
-
     private string _sheetStyle = string.Empty;
     private Size _textDimensions;
 
@@ -133,6 +128,13 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     /// </summary>
     public Point DrawingPos { get; set; }
 
+    public int Height {
+        get {
+            EnsurePositions();
+            return _height ?? -1;
+        }
+    }
+
     public string HtmlText {
         get {
             _tmpHtmlText ??= ConvertCharToHtmlText();
@@ -190,6 +192,13 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             _textDimensions = value;
             ResetPosition(false);
             OnPropertyChanged();
+        }
+    }
+
+    public int Width {
+        get {
+            EnsurePositions();
+            return _width ?? 0;
         }
     }
 
@@ -318,11 +327,6 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         }
     }
 
-    public int Height() {
-        EnsurePositions();
-        return _height ?? -1;
-    }
-
     public bool InsertChar(AsciiKey ascii, int position) {
         if ((int)ascii < 13) { return false; }
         var c = new ExtCharAscii(this, position, (char)ascii);
@@ -346,11 +350,6 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     public string Substring(int startIndex, int lenght) => ConvertCharToPlainText(startIndex, startIndex + lenght - 1);
 
-    public int Width() {
-        EnsurePositions();
-        return (int)_width;
-    }
-
     public string Word(int atPosition) {
         var s = WordStart(atPosition);
         var e = WordEnd(atPosition);
@@ -359,7 +358,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     internal string ConvertCharToPlainText(int first, int last) {
         try {
-            _stringBuilder.Clear();
+            var _stringBuilder = new StringBuilder(1024);
             for (var cZ = first; cZ <= Math.Min(last, Count - 1); cZ++) {
                 _stringBuilder.Append(this[cZ].PlainText());
             }
@@ -448,8 +447,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         if (Count == 0) { return string.Empty; }
 
         // Ungefähre Größe vorallokieren - reduziert Reallokationen
-        _stringBuilder.Clear();
-        _stringBuilder.EnsureCapacity(Count * 3);
+        var _stringBuilder = new StringBuilder(Count * 3);
         var lastStufe = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
 
         for (var z = 0; z < Count; z++) {
@@ -703,9 +701,10 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         foreach (var thisChar in this) {
             if (thisChar.Style != last) {
                 last = thisChar.Style;
-                f = Skin.GetBlueFont(_sheetStyle, last);
+                f = thisChar.Font;
+            } else {
+                thisChar.Font = f;
             }
-            thisChar.Font = f;
         }
     }
 
@@ -778,7 +777,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     private void EnsurePositions() {
-        if (_isPositionDirty || _width == null) {
+        if (_width == null) {
             ReBreak();
         }
     }
@@ -801,10 +800,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     private void ReBreak() {
         _width = 0;
         _height = 0;
-        if (Count == 0) {
-            _isPositionDirty = false;
-            return;
-        }
+        if (Count == 0) { return; }
 
         var estimatedRows = Count / 50; // Geschätzte Zeilenanzahl
         var ri = new List<string>(estimatedRows);
@@ -882,15 +878,12 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         }
 
         #endregion
-
-        _isPositionDirty = false;
     }
 
     private void ResetPosition(bool andTmpText) {
         if (IsDisposed) { return; }
         _width = null;
         _height = null;
-        _isPositionDirty = true;
 
         if (andTmpText) {
             _tmpHtmlText = null;
