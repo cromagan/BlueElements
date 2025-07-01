@@ -229,34 +229,40 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     public int Char_Search(double pixX, double pixY) {
         EnsurePositions();
 
-        var bestMatch = -1;
-        var minDistance = double.MaxValue;
+        var cZ = -1;
+        var xDi = double.MaxValue;
+        var yDi = double.MaxValue;
+        var xNr = -1;
+        var yNr = -1;
 
-        for (var cZ = 0; cZ < Count; cZ++) {
-            if (this[cZ].Size.Width <= 0) continue;
+        do {
+            cZ++;
+            if (cZ > Count - 1) { break; }// Das Ende des Textes
+            if (this[cZ].Size.Width > 0) {
+                var matchX = pixX >= DrawingPos.X + this[cZ].Pos.X && pixX <= DrawingPos.X + this[cZ].Pos.X + this[cZ].Size.Width;
+                var matchY = pixY >= DrawingPos.Y + this[cZ].Pos.Y && pixY <= DrawingPos.Y + this[cZ].Pos.Y + this[cZ].Size.Height;
 
-            var charLeft = DrawingPos.X + this[cZ].Pos.X;
-            var charTop = DrawingPos.Y + this[cZ].Pos.Y;
-            var charRight = charLeft + this[cZ].Size.Width;
-            var charBottom = charTop + this[cZ].Size.Height;
+                if (matchX && matchY) { return cZ; }
 
-            // Direct hit
-            if (pixX >= charLeft && pixX <= charRight && pixY >= charTop && pixY <= charBottom) {
-                return cZ;
+                double tmpDi;
+                if (!matchX && matchY) {
+                    tmpDi = Math.Abs(pixX - (DrawingPos.X + this[cZ].Pos.X + (this[cZ].Size.Width / 2.0)));
+                    if (tmpDi < xDi) {
+                        xNr = cZ;
+                        xDi = tmpDi;
+                    }
+                } else if (matchX && !matchY) {
+                    tmpDi = Math.Abs(pixY - (DrawingPos.Y + this[cZ].Pos.Y + (this[cZ].Size.Height / 2.0)));
+                    if (tmpDi < yDi) {
+                        yNr = cZ;
+                        yDi = tmpDi;
+                    }
+                }
             }
+        } while (true);
 
-            // Calculate distance for fallback
-            var centerX = charLeft + (this[cZ].Size.Width / 2.0);
-            var centerY = charTop + (this[cZ].Size.Height / 2.0);
-            var distance = Math.Sqrt((pixX - centerX) * (pixX - centerX) + (pixY - centerY) * (pixY - centerY));
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                bestMatch = cZ;
-            }
-        }
-
-        return Math.Max(0, bestMatch);
+        cZ--;
+        return xNr >= 0 ? xNr : yNr >= 0 ? yNr : cZ >= 0 ? cZ : 0;
     }
 
     public Rectangle CursorPixelPosX(int charPos) {
@@ -290,10 +296,8 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     public void Delete(int first, int last) {
-        if (first >= Count || last < first) return;
-
-        var deleteCount = Math.Min(last - first, Count - first);
-        for (var z = 0; z < deleteCount; z++) {
+        var tempVar = last - first;
+        for (var z = 1; z <= tempVar; z++) {
             if (first < Count) {
                 RemoveAt(first);
             }
@@ -307,11 +311,8 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         EnsurePositions();
         DrawStates(gr, zoom);
 
-        // Only draw visible characters
-        var visibleRect = DrawingArea.Width > 0 && DrawingArea.Height > 0 ? DrawingArea : new Rectangle(0, 0, int.MaxValue, int.MaxValue);
-
         foreach (var t in this) {
-            if (t.IsVisible(zoom, DrawingPos, visibleRect)) {
+            if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
                 t.Draw(gr, DrawingPos, zoom);
             }
         }
@@ -357,30 +358,30 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     internal string ConvertCharToPlainText(int first, int last) {
-        if (first < 0 || last < first || Count == 0) return string.Empty;
-
-        last = Math.Min(last, Count - 1);
-        var capacity = (last - first + 1) * 2; // Estimate capacity
-
-        _stringBuilder.Clear();
-        _stringBuilder.EnsureCapacity(capacity);
-
-        for (var cZ = first; cZ <= last; cZ++) {
-            _stringBuilder.Append(this[cZ].PlainText());
+        try {
+            _stringBuilder.Clear();
+            for (var cZ = first; cZ <= Math.Min(last, Count - 1); cZ++) {
+                _stringBuilder.Append(this[cZ].PlainText());
+            }
+            return _stringBuilder.ToString().Replace("\n", string.Empty);
+        } catch {
+            // Wenn Chars geändert wird (und dann der Count nimmer stimmt)
+            Develop.CheckStackOverflow();
+            return ConvertCharToPlainText(first, last);
         }
-
-        var result = _stringBuilder.ToString();
-        return result.Replace("\n", string.Empty);
     }
 
     internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(this, position));
 
     internal void Mark(MarkState markstate, int first, int last) {
-        last = Math.Min(last, Count - 1);
-        for (var z = first; z <= last; z++) {
-            if (!this[z].Marking.HasFlag(markstate)) {
-                this[z].Marking |= markstate;
+        try {
+            for (var z = first; z <= Math.Min(last, Count - 1); z++) {
+                if (!this[z].Marking.HasFlag(markstate)) {
+                    this[z].Marking |= markstate;
+                }
             }
+        } catch {
+            Mark(markstate, first, last);
         }
     }
 
@@ -393,28 +394,34 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     internal int WordEnd(int pos) {
+        // Frühe Validierung und Abbruch
         if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeperator()) {
             return -1;
         }
 
+        // Direkte Suche ohne while-Schleife
         while (++pos < Count) {
             if (this[pos].IsWordSeperator()) {
                 return pos;
             }
         }
+
         return Count;
     }
 
     internal int WordStart(int pos) {
+        // Frühe Validierung und Abbruch
         if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeperator()) {
             return -1;
         }
 
+        // Direkte Suche ohne while-Schleife
         while (--pos >= 0) {
             if (this[pos].IsWordSeperator()) {
                 return pos + 1;
             }
         }
+
         return 0;
     }
 
@@ -437,54 +444,18 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         return position + 1;
     }
 
-    private void ApplyAlignmentToLine(int first, int last) {
-        if (Ausrichtung == Alignment.Top_Left || first > last || last >= Count) return;
-
-        float kx = 0;
-        if (Ausrichtung.HasFlag(Alignment.Right)) {
-            kx = _textDimensions.Width - this[last].Pos.X - this[last].Size.Width;
-        }
-        if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) {
-            kx = (_textDimensions.Width - this[last].Pos.X - this[last].Size.Width) / 2;
-        }
-
-        if (Math.Abs(kx) > 0.01f) {
-            for (var j = first; j <= last; j++) {
-                this[j].Pos.X += kx;
-            }
-        }
-    }
-
-    private void ApplyVerticalAlignment() {
-        if (!Ausrichtung.HasFlag(Alignment.VerticalCenter) && !Ausrichtung.HasFlag(Alignment.Bottom)) return;
-
-        var ky = 0f;
-        if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) {
-            ky = (float)((_textDimensions.Height - (int)_height) / 2.0);
-        }
-        if (Ausrichtung.HasFlag(Alignment.Bottom)) {
-            ky = _textDimensions.Height - (int)_height;
-        }
-
-        if (Math.Abs(ky) > 0.01f) {
-            for (var i = 0; i < Count; i++) {
-                this[i].Pos.Y += ky;
-            }
-        }
-    }
-
     private string ConvertCharToHtmlText() {
         if (Count == 0) { return string.Empty; }
 
+        // Ungefähre Größe vorallokieren - reduziert Reallokationen
         _stringBuilder.Clear();
-        _stringBuilder.EnsureCapacity(Count * 3); // Better capacity estimate
-
-        var lastFont = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
+        _stringBuilder.EnsureCapacity(Count * 3);
+        var lastStufe = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
 
         for (var z = 0; z < Count; z++) {
-            if (lastFont != this[z].Font) {
-                _stringBuilder.Append("<H").Append((int)this[z].GetStyle()).Append('>');
-                lastFont = this[z].Font;
+            if (lastStufe != this[z].Font) {
+                _stringBuilder.Append("<H").Append(this[z].GetStyle()).Append('>');
+                lastStufe = this[z].Font;
             }
             _stringBuilder.Append(this[z].HtmlText());
         }
@@ -498,15 +469,17 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             return;
         }
 
+        // Vorverarbeitung des Texts
         cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
 
         Clear();
         Capacity = Math.Max(Capacity, cactext.Length); // Pre-allocate capacity
-
         ResetPosition(true);
         var style = StyleBeginns;
         var font = Skin.GetBlueFont(SheetStyle, StyleBeginns);
 
+        // StringBuilder für temporäre String-Operationen
+        var temp = new StringBuilder(100);
         var pos = 0;
         var zeichen = -1;
 
@@ -516,17 +489,24 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             if (isRich) {
                 switch (ch) {
                     case '<':
-                        var endTag = cactext.IndexOf('>', pos + 1);
-                        if (endTag != -1) {
-                            DoHtmlCode(cactext, pos, ref zeichen, ref font, ref style);
-                            pos = endTag;
-                        } else {
+                        if (temp.Length > 0) {
                             zeichen++;
-                            Add(new ExtCharAscii(this, style, font, ch));
+                            Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
+                            temp.Clear();
                         }
+                        // HTML-Code verarbeiten
+                        DoHtmlCode(cactext, pos, ref zeichen, ref font, ref style);
+                        // Position zum Ende des HTML-Tags bewegen
+                        var endTag = cactext.IndexOf('>', pos + 1);
+                        pos = endTag != -1 ? endTag : cactext.Length;
                         break;
 
                     case '&':
+                        if (temp.Length > 0) {
+                            zeichen++;
+                            Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
+                            temp.Clear();
+                        }
                         pos = AddSpecialEntities(cactext, pos, style, font);
                         zeichen++;
                         break;
@@ -548,14 +528,16 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     private void DoHtmlCode(string htmlText, int start, ref int position, ref BlueFont font, ref PadStyles style) {
         var endpos = htmlText.IndexOf('>', start + 1);
-        if (endpos <= start) return;
-
+        if (endpos <= start) {
+            //Develop.DebugPrint("String-Fehler, > erwartet. " + htmlText);
+            return;
+        }
         var oricode = htmlText.Substring(start + 1, endpos - start - 1);
         var istgleich = oricode.IndexOf('=');
         string cod;
         string? attribut;
-
         if (istgleich < 0) {
+            // <H4> wird durch autoprüfung zu <H4 >
             cod = oricode.ToUpperInvariant().Trim();
             attribut = string.Empty;
         } else {
@@ -604,6 +586,16 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, false, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
+            //case "3":
+            //    style = PadStyles.Undefiniert;
+            //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
+            //    break;
+
+            //case "/3":
+            //    style = PadStyles.Undefiniert;
+            //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
+            //break;
+
             case "FONTSIZE":
                 style = PadStyles.Undefiniert;
                 _ = FloatTryParse(attribut, out var fs);
@@ -626,6 +618,12 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.ColorMain.ToHtmlCode(), attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack.ToHtmlCode());
                 break;
 
+            case "HR":
+            //    Position++;
+            //    this.GenerateAndAdd(new ExtChar(13, _Design, _State, PF, Stufe, MarkState));
+            //    Position++;
+            //    this.GenerateAndAdd(new ExtChar((int)enEtxtCodes.HorizontalLine, _Design, _State, PF, Stufe, MarkState));
+            //    break;
             case "BR":
                 position++;
                 Add(new ExtCharCrlfCode(this, style, font));
@@ -687,6 +685,14 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                 style = PadStyles.Überschrift;
                 font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
+
+            //case "MARKSTATE":
+            //    markState = (MarkState)IntParse(attribut);
+            //    break;
+
+            case "":
+                // ist evtl. ein <> ausruck eines Textes
+                break;
         }
     }
 
@@ -704,16 +710,22 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     private void DrawState(Graphics gr, float scale, MarkState state) {
-        var markStart = -1;
+        var tmas = -1;
+        for (var pos = 0; pos < Count; pos++) {
+            var tempVar = this[pos];
+            var marked = tempVar.Marking.HasFlag(state);
 
-        for (var pos = 0; pos <= Count; pos++) {
-            var isMarked = pos < Count && this[pos].Marking.HasFlag(state);
+            if (marked && tmas < 0) { tmas = pos; }
 
-            if (isMarked && markStart < 0) {
-                markStart = pos;
-            } else if (!isMarked && markStart >= 0) {
-                DrawZone(gr, scale, state, markStart, pos - 1);
-                markStart = -1;
+            if (!marked || pos == Count - 1) {
+                if (tmas > -1) {
+                    if (pos == Count - 1) {
+                        DrawZone(gr, scale, state, tmas, pos);
+                    } else {
+                        DrawZone(gr, scale, state, tmas, pos - 1);
+                    }
+                    tmas = -1;
+                }
             }
         }
     }
@@ -726,14 +738,15 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     private void DrawZone(Graphics gr, float scale, MarkState thisState, int markStart, int markEnd) {
-        if (markStart >= Count || markEnd >= Count) return;
-
         var startX = (this[markStart].Pos.X * scale) + DrawingPos.X;
         var startY = (this[markStart].Pos.Y * scale) + DrawingPos.Y;
         var endX = (this[markEnd].Pos.X * scale) + DrawingPos.X + (this[markEnd].Size.Width * scale);
         var endy = (this[markEnd].Pos.Y * scale) + DrawingPos.Y + (this[markEnd].Size.Height * scale);
 
         switch (thisState) {
+            case MarkState.None:
+                break;
+
             case MarkState.Ringelchen:
                 using (var pen = new Pen(Color.Red, 3 * scale)) {
                     gr.DrawLine(pen, startX, (int)(startY + (this[markStart].Size.Height * scale * 0.9)), endX, (int)(startY + (this[markStart].Size.Height * scale * 0.9)));
@@ -757,6 +770,10 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                     gr.FillRectangle(brush, startX, startY, endX - startX, endy - startY);
                 }
                 break;
+
+            default:
+                Develop.DebugPrint(thisState);
+                break;
         }
     }
 
@@ -776,15 +793,21 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+    /// <summary>
+    /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebenfalls mit eingerechnet.
+    /// Cursor_ComputePixelXPos wird am Ende aufgerufen, einschließlich Cursor_Repair und SetNewAkt.
+    /// </summary>
+    /// <remarks></remarks>
     private void ReBreak() {
         _width = 0;
         _height = 0;
-
         if (Count == 0) {
             _isPositionDirty = false;
             return;
         }
 
+        var estimatedRows = Count / 50; // Geschätzte Zeilenanzahl
+        var ri = new List<string>(estimatedRows);
         var vZbxPixel = 0f;
         var isX = 0f;
         var isY = 0f;
@@ -794,8 +817,8 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         do {
             akt++;
             if (akt > Count - 1) {
-                Row_SetOnLine(zbChar, akt - 1);
-                ApplyAlignmentToLine(zbChar, akt - 1);
+                _ = Row_SetOnLine(zbChar, akt - 1);
+                ri.Add(zbChar + ";" + (akt - 1));
                 break;
             }
 
@@ -810,9 +833,8 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                     if (isX + this[akt].Size.Width + 0.5 > _textDimensions.Width) {
                         akt = WordBreaker(akt, zbChar);
                         isX = vZbxPixel;
-                        var rowHeight = Row_SetOnLine(zbChar, akt - 1);
-                        isY += rowHeight * _zeilenabstand;
-                        ApplyAlignmentToLine(zbChar, akt - 1);
+                        isY += Row_SetOnLine(zbChar, akt - 1) * _zeilenabstand;
+                        ri.Add(zbChar + ";" + (akt - 1));
                         zbChar = akt;
                     }
                 }
@@ -823,33 +845,49 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             this[akt].Pos.X = isX;
             this[akt].Pos.Y = isY;
 
+            // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
             isX = (float)(isX + Math.Truncate(this[akt].Size.Width + 0.5));
 
             if (this[akt].IsLineBreak()) {
                 isX = vZbxPixel;
-                var rowHeight = Row_SetOnLine(zbChar, akt);
-
                 if (this[akt] is ExtCharTopCode) {
-                    ApplyAlignmentToLine(zbChar, akt);
+                    _ = Row_SetOnLine(zbChar, akt);
+                    ri.Add(zbChar + ";" + akt);
                 } else {
-                    isY += (int)(rowHeight * _zeilenabstand);
-                    ApplyAlignmentToLine(zbChar, akt);
+                    isY += (int)(Row_SetOnLine(zbChar, akt) * _zeilenabstand);
+                    ri.Add(zbChar + ";" + akt);
                 }
                 zbChar = akt + 1;
             }
         } while (true);
 
-        // Vertikale Ausrichtung am Ende anwenden
-        if (Ausrichtung != Alignment.Top_Left && Count > 0) {
-            ApplyVerticalAlignment();
+        #region enAlignment berechnen -------------------------------------
+
+        if (Ausrichtung != Alignment.Top_Left) {
+            var ky = 0f;
+            if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { ky = (float)((_textDimensions.Height - (int)_height) / 2.0); }
+            if (Ausrichtung.HasFlag(Alignment.Bottom)) { ky = _textDimensions.Height - (int)_height; }
+            foreach (var t in ri) {
+                var o = t.SplitAndCutBy(";");
+                var z1 = IntParse(o[0]);
+                var z2 = IntParse(o[1]);
+                float kx = 0;
+                if (Ausrichtung.HasFlag(Alignment.Right)) { kx = _textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width; }
+                if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) { kx = (_textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width) / 2; }
+                for (var z3 = z1; z3 <= z2; z3++) {
+                    this[z3].Pos.X += kx;
+                    this[z3].Pos.Y += ky;
+                }
+            }
         }
+
+        #endregion
 
         _isPositionDirty = false;
     }
 
     private void ResetPosition(bool andTmpText) {
         if (IsDisposed) { return; }
-
         _width = null;
         _height = null;
         _isPositionDirty = true;
@@ -879,29 +917,24 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         if (minZeichen < 0) { minZeichen = 0; }
         if (augZeichen > Count - 1) { augZeichen = Count - 1; }
         if (augZeichen < minZeichen + 1) { augZeichen = minZeichen + 1; }
-
-        if (this[augZeichen - 1].IsSpace() && !this[augZeichen].IsPossibleLineBreak()) {
-            return augZeichen;
-        }
-
+        // AusnahmeFall auschließen:
+        // Space-Zeichen - Dann Buchstabe
+        if (this[augZeichen - 1].IsSpace() && !this[augZeichen].IsPossibleLineBreak()) { return augZeichen; }
         var started = augZeichen;
-
-        // Find last non-separator character
-        while (augZeichen > minZeichen && this[augZeichen].IsPossibleLineBreak()) {
-            augZeichen--;
-        }
-
-        if (augZeichen <= minZeichen) { return started; }
-
-        // Find separator going backwards
-        while (augZeichen > minZeichen) {
+        // Das Letzte Zeichen Search, das kein Trennzeichen ist
+        do {
             if (this[augZeichen].IsPossibleLineBreak()) {
-                return augZeichen + 1;
+                augZeichen--;
+            } else {
+                break;
             }
+            if (augZeichen <= minZeichen) { return started; }
+        } while (true);
+        do {
+            if (this[augZeichen].IsPossibleLineBreak()) { return augZeichen + 1; }
             augZeichen--;
-        }
-
-        return started;
+            if (augZeichen <= minZeichen) { return started; }
+        } while (true);
     }
 
     #endregion
