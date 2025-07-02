@@ -1203,6 +1203,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         _saveRequired = true;
 
+        var colName = column?.KeyName ?? string.Empty;
+
         // ERST Speicher setzen
         var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
         if (!string.IsNullOrEmpty(error)) { return error; }
@@ -1218,8 +1220,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 oldChunkId = DatabaseChunk.GetChunkId(this, type, oldchunkvalue);
             }
 
-            var f2 = WriteValueToDiscOrServer(type, changedTo, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
+            var f2 = WriteValueToDiscOrServer(type, changedTo, colName, row, user, datetimeutc, oldChunkId, newChunkId, comment);
             if (!string.IsNullOrEmpty(f2)) {
+                DropMessage(ErrorType.Warning, $"Rollback aufgrund eines Fehlers:\r\n{f2}");
                 // Rollback: Vorherigen Wert im Speicher wiederherstellen
                 _ = SetValueInternal(type, column, row, previousValue, user, datetimeutc, Reason.NoUndo_NoInvalidate);
                 return f2;
@@ -1227,7 +1230,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (LogUndo) {
-            AddUndo(type, column, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", newchunkvalue);
+            AddUndo(type, colName, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", newchunkvalue);
         }
 
         return string.Empty;
@@ -2328,14 +2331,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     internal virtual string IsValueEditable(DatabaseDataType type, string? chunkValue) => CanWriteMainFile();
 
-
-    protected void DropMessage(ErrorType type, string message) {
-        if (IsDisposed) { return; }
-        if (!DropMessages) { return; }
-        Develop.Message?.Invoke(type, this, Caption, ImageCode.Datenbank, message, 0);
-    }
-
-
     //public void Variables_RemoveAll(bool isLoading) {
     //    //while (_variables.Count > 0) {
     //    //    //var va = _variables[_eventScript.Count - 1];
@@ -2356,7 +2351,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="userName"></param>
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
-    protected void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container, string chunkValue) {
+    protected void AddUndo(DatabaseDataType type, string column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container, string chunkValue) {
         if (IsDisposed) { return; }
         if (type.IsObsolete()) { return; }
         // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
@@ -2434,6 +2429,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="rowsAdded"></param>
     /// <param name="starttimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     protected virtual void DoWorkAfterLastChanges(List<string>? files, DateTime starttimeUtc, DateTime endTimeUtc) { }
+
+    protected void DropMessage(ErrorType type, string message) {
+        if (IsDisposed) { return; }
+        if (!DropMessages) { return; }
+        Develop.Message?.Invoke(type, this, Caption, ImageCode.Datenbank, message, 0);
+    }
 
     protected virtual bool LoadMainData() {
         var (bytes, _, failed) = LoadBytesFromDisk(Filename, true);
@@ -2536,6 +2537,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (column is not { IsDisposed: false } || Column.IsDisposed) {
                 //Develop.DebugPrint(ErrorType.Warning, "Spalte ist null! " + type);
                 //return ("Wert nicht gesetzt!", null, null);
+                DropMessage(ErrorType.Warning, $"Wert nicht gesetzt, Spalte nicht vorhanden");
                 return string.Empty;
             }
 
@@ -2744,7 +2746,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
+    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }

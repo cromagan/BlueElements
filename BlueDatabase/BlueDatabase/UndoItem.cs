@@ -44,7 +44,7 @@ public class UndoItem : IParseable {
         ChunkValue = chunkvalue;
     }
 
-    public UndoItem(string tablename, DatabaseDataType command, IHasKeyName? column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container, string chunkvalue) : this(tablename, command, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container, chunkvalue) { }
+    public UndoItem(string tablename, DatabaseDataType command, string column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container, string chunkvalue) : this(tablename, command, column, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container, chunkvalue) { }
 
     public UndoItem(string s) => this.Parse(s);
 

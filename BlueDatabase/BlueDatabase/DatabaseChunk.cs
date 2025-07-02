@@ -557,7 +557,7 @@ public class DatabaseChunk : Database {
 
     protected override bool SaveRequired() => _chunks.Values.Any(chunk => chunk.SaveRequired);
 
-    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         newChunkId = newChunkId.ToLower();
         oldChunkId = oldChunkId.ToLower();
 
