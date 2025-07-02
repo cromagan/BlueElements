@@ -2514,11 +2514,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private string KleineFehlerCorrect(string txt) {
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-        const char h4 = (char)1004; // H4 = Normaler Text, nach links rutschen
-        const char h3 = (char)1003; // überschrift
-        const char h2 = (char)1002; // überschrift
-        const char h1 = (char)1001; // überschrift
-        const char h7 = (char)1007; // bold
         if (TextFormatingAllowed) { txt = txt.HtmlSpecialToNormalChar(false); }
         string oTxt;
         do {
@@ -2544,22 +2539,22 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             txt = txt.Insert(" ", ";", " 1234567890\r");
             txt = txt.Insert(" ", ":", "1234567890 \\/\r"); // auch 3:50 Uhr
                                                             // H4= Normaler Text
-            txt = txt.Replace(" " + h4, h4 + " "); // H4 = Normaler Text, nach links rutschen
-            txt = txt.Replace("\r" + h4, h4 + "\r");
-            // Dei restlichen Hs'
-            txt = txt.Replace(h3 + " ", " " + h3); // Überschrift, nach Rechts
-            txt = txt.Replace(h2 + " ", " " + h2); // Überschrift, nach Rechts
-            txt = txt.Replace(h1 + " ", " " + h1); // Überschrift, nach Rechts
-            txt = txt.Replace(h7 + " ", " " + h7); // Bold, nach Rechts
-            txt = txt.Replace(h3 + "\r", "\r" + h3); // Überschrift, nach Rechts
-            txt = txt.Replace(h2 + "\r", "\r" + h2); // Überschrift, nach Rechts
-            txt = txt.Replace(h1 + "\r", "\r" + h1); // Überschrift, nach Rechts
-            txt = txt.Replace(h7 + "\r", "\r" + h7); // Bold, nach Rechts
-            txt = txt.Replace(h7 + h4.ToString(), h4.ToString());
-            txt = txt.Replace(h3 + h4.ToString(), h4.ToString());
-            txt = txt.Replace(h2 + h4.ToString(), h4.ToString());
-            txt = txt.Replace(h1 + h4.ToString(), h4.ToString());
-            txt = txt.Replace(h4 + h4.ToString(), h4.ToString());
+            txt = txt.Replace(" " + TempH4, TempH4 + " "); // H4 = Normaler Text, nach links rutschen
+            txt = txt.Replace("\r" + TempH4, TempH4 + "\r");
+            // Die restlichen Hs'
+            txt = txt.Replace(TempH3 + " ", " " + TempH3); // Überschrift, nach Rechts
+            txt = txt.Replace(TempH2 + " ", " " + TempH2); // Überschrift, nach Rechts
+            txt = txt.Replace(TempH1 + " ", " " + TempH1); // Überschrift, nach Rechts
+            txt = txt.Replace(TempBold + " ", " " + TempBold); // Bold, nach Rechts
+            txt = txt.Replace(TempH3 + "\r", "\r" + TempH3); // Überschrift, nach Rechts
+            txt = txt.Replace(TempH2 + "\r", "\r" + TempH2); // Überschrift, nach Rechts
+            txt = txt.Replace(TempH1 + "\r", "\r" + TempH1); // Überschrift, nach Rechts
+            txt = txt.Replace(TempBold + "\r", "\r" + TempBold); // Bold, nach Rechts
+            txt = txt.Replace(TempBold + TempH4.ToString(), TempH4.ToString());
+            txt = txt.Replace(TempH3 + TempH4.ToString(), TempH4.ToString());
+            txt = txt.Replace(TempH2 + TempH4.ToString(), TempH4.ToString());
+            txt = txt.Replace(TempH1 + TempH4.ToString(), TempH4.ToString());
+            txt = txt.Replace(TempH4 + TempH4.ToString(), TempH4.ToString());
             txt = txt.Replace(" °", "°");
             txt = txt.Replace(" .", ".");
             txt = txt.Replace(" ,", ",");
@@ -2580,6 +2575,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             txt = txt.Trim("\r");
             txt = txt.TrimEnd("\t");
         } while (oTxt != txt);
+
         if (TextFormatingAllowed) {
             txt = txt.CreateHtmlCodes(true);
             txt = txt.Replace("<br>", "\r");

@@ -38,6 +38,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
@@ -1208,6 +1209,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         // ERST Speicher setzen
         var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
         if (!string.IsNullOrEmpty(error)) { return error; }
+
+        // Bei Spaltenumbenennung auch ColumnArrangements aktualisieren
+        if (type == DatabaseDataType.ColumnName && column != null) {
+            UpdateColumnArrangementsAfterRename(previousValue, changedTo);
+        }
 
         // DANN Festplatte schreiben (nur bei nicht ReadOnly)
         if (!ReadOnly) {
@@ -2537,7 +2543,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (column is not { IsDisposed: false } || Column.IsDisposed) {
                 //Develop.DebugPrint(ErrorType.Warning, "Spalte ist null! " + type);
                 //return ("Wert nicht gesetzt!", null, null);
-                DropMessage(ErrorType.Warning, $"Wert nicht gesetzt, Spalte nicht vorhanden");
+                DropMessage(ErrorType.Info, $"Wert nicht gesetzt, Spalte nicht vorhanden");
                 return string.Empty;
             }
 
@@ -2962,6 +2968,21 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             ViewChanged = null;
         } catch (Exception ex) {
             Develop.DebugPrint(ErrorType.Warning, "Fehler beim Abmelden der Events: " + ex.Message);
+        }
+    }
+
+    private void UpdateColumnArrangementsAfterRename(string oldColumnName, string newColumnName) {
+        if (string.IsNullOrEmpty(_columnArrangements)) { return; }
+
+        var oldPattern = $"ColumnName={oldColumnName}".ToNonCritical();
+        var newPattern = $"ColumnName={newColumnName}".ToNonCritical();
+
+        var updatedArrangements = _columnArrangements.ReplaceWord(oldPattern, newPattern, RegexOptions.IgnoreCase);
+
+        if (updatedArrangements != _columnArrangements) {
+            _columnArrangements = updatedArrangements;
+            // Speichern ohne ChangeData aufzurufen (würde Endlosschleife verursachen)
+            _ = WriteValueToDiscOrServer(DatabaseDataType.ColumnArrangement, _columnArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
         }
     }
 

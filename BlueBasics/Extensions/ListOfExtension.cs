@@ -137,7 +137,7 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
         if (value == null || string.IsNullOrEmpty(value)) { return; }
-        col.Add(tagname + "=" + value.ToNonCriticalWithQuote());
+        col.Add(tagname + "=\"" + value.ToNonCritical() + "\"");
     }
 
     //public static void ParseableAdd<T>(this ICollection<string> col, string tagname, string nameofeveryItem, ICollection<T>? value) where T : IStringable? {

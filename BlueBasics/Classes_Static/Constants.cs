@@ -43,6 +43,17 @@ public static class Constants {
     public const string Everybody = "#Everybody";
     public const char FirstSortChar = '+';
     public const char SecondSortChar = '-';
+    public const char TempGreaterThan = '\uE010';
+    public const char TempH1 = '\uE001';
+    public const char TempH2 = '\uE002';
+    public const char TempH3 = '\uE003';
+    public const char TempH4 = '\uE004';
+    //public const char TempH5 = '\uE005';
+    //public const char TempH6 = '\uE006';
+    public const char TempH7 = '\uE007';
+    public const char TempLessThan = '\uE011';
+    public const char TempBold = '\uE000';
+
     public const string Win11 = "Windows 11";
     public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
@@ -123,7 +134,7 @@ public static class Constants {
                     //// Skandinavische Zeichen
                     //{"å", "a"},
                     //{"ø", "o"},
- 
+
                     //// Polnische Akzente
                     //{"ł", "l"},
                     //{"ń", "n"}, {"ś", "s"},

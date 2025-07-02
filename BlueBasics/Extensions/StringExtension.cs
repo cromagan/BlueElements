@@ -181,35 +181,61 @@ public static partial class Extensions {
     }
 
     public static string CreateHtmlCodes(this string tXt, bool crlftoo) {
-        // http://sonderzeichentabelle.de/
-        // http://www.htmlhelp.com/reference/html40/entities/special.html
-        tXt = tXt.Replace("&", "&amp;"); // Wichtig! An erster Stelle! ä-> &auml; -> &amp;auml;
-        tXt = tXt.Replace("ä", "&auml;");
-        tXt = tXt.Replace("ö", "&ouml;");
-        tXt = tXt.Replace("ü", "&uuml;");
-        tXt = tXt.Replace("Ä", "&Auml;");
-        tXt = tXt.Replace("Ö", "&Ouml;");
-        tXt = tXt.Replace("Ü", "&Uuml;");
-        tXt = tXt.Replace("ß", "&szlig;");
-        tXt = tXt.Replace("É", "&Eacute;");
-        tXt = tXt.Replace("é", "&eacute;");
-        tXt = tXt.Replace("€", "&euro;");
-        tXt = tXt.Replace("Ø", "&Oslash;");
-        tXt = tXt.Replace("ø", "&oslash;");
-        tXt = tXt.Replace("•", "&bull;");
-        tXt = tXt.Replace("<", "&lt;");
-        tXt = tXt.Replace(">", "&gt;");
-        tXt = tXt.Replace("\"", "&quot;");
-        if (!crlftoo) { return tXt; }
-        tXt = tXt.Replace("\r\n", "<br>", RegexOptions.IgnoreCase);
-        tXt = tXt.Replace("\r", "<br>", RegexOptions.IgnoreCase);
-        tXt = tXt.Replace("\n", "<br>", RegexOptions.IgnoreCase);
-        tXt = tXt.Replace(((char)1007).ToString(), "<H7>");
-        tXt = tXt.Replace(((char)1004).ToString(), "<H4>");
-        tXt = tXt.Replace(((char)1003).ToString(), "<H3>");
-        tXt = tXt.Replace(((char)1020).ToString(), "<");
-        tXt = tXt.Replace(((char)1021).ToString(), ">");
-        return tXt;
+        if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
+
+        var result = new StringBuilder(tXt.Length * 2); // Geschätzte Größe für HTML-Entitäten
+
+        for (var i = 0; i < tXt.Length; i++) {
+            var currentChar = tXt[i];
+
+            // Handle \r\n first (multi-character sequence)
+            if (crlftoo && currentChar == '\r' && i + 1 < tXt.Length && tXt[i + 1] == '\n') {
+                result.Append("<br>");
+                i++; // Skip the \n
+                continue;
+            }
+
+            // Handle single characters
+            if (HtmlEntities.TryGetValue(currentChar, out var entity)) {
+                result.Append(entity);
+            } else if (crlftoo) {
+                // Handle additional characters for crlftoo mode
+                switch (currentChar) {
+                    case '\r':
+                    case '\n':
+                        result.Append("<br>");
+                        break;
+
+                    case TempH7:
+                        result.Append("<H7>");
+                        break;
+
+                    case TempH4:
+                        result.Append("<H4>");
+                        break;
+
+                    case TempH3:
+                        result.Append("<H3>");
+                        break;
+
+                    case TempLessThan:
+                        result.Append("<");
+                        break;
+
+                    case TempGreaterThan:
+                        result.Append(">");
+                        break;
+
+                    default:
+                        result.Append(currentChar);
+                        break;
+                }
+            } else {
+                result.Append(currentChar);
+            }
+        }
+
+        return result.ToString();
     }
 
     public static string CutToUtf8Length(this string str, int byteLength) {
@@ -296,31 +322,53 @@ public static partial class Extensions {
         } catch { return null; }
     }
 
-    /// <summary>
-    /// Entfernt Leerzeichen und angebebene Textpaare am Anfang/Ende - mit genau einem Zeichen. Z.B. perfekt im Klammern zu entfernen
-    /// </summary>
-    /// <param name="txt"></param>
     public static string FromNonCritical(this string txt) {
-        // http://www.theasciicode.com.ar/ascii-printable-characters/braces-curly-brackets-opening-ascii-code-123.html
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
         if (txt.Length < 3) { return txt; }
-        if (!txt.Contains(";") && !txt.Contains("[")) { return txt; }
-        txt = txt.Replace("[A]", ";");
-        txt = txt.Replace("[B]", "<");
-        txt = txt.Replace("[C]", ">");
-        txt = txt.Replace("[D]", "\r\n");
-        txt = txt.Replace("[E]", "\r");
-        txt = txt.Replace("[F]", "\n");
-        txt = txt.Replace("[G]", "|");
-        txt = txt.Replace("[H]", "}");
-        txt = txt.Replace("[I]", "{");
-        txt = txt.Replace("[J]", "=");
-        txt = txt.Replace("[K]", ",");
-        txt = txt.Replace("[L]", "&");
-        txt = txt.Replace("[M]", "/");
-        txt = txt.Replace("[N]", "\""); // Um Anfang und Ende von Texten richtig zu finden. z.B. 1 1/2"
-        txt = txt.Replace("[Z]", "[");
-        return txt;
+
+        // Quick check - wenn keine codierten Zeichen vorhanden, direkt zurückgeben
+        if (!txt.Contains("[")) { return txt; }
+
+        var result = new List<char>(txt.Length);
+
+        for (int i = 0; i < txt.Length; i++) {
+            // Prüfe auf Pattern [X]
+            if (i <= txt.Length - 3 && txt[i] == '[' && txt[i + 2] == ']') {
+                char patternChar = txt[i + 1];
+
+                switch (patternChar) {
+                    case 'A': result.Add(';'); break;
+                    case 'B': result.Add('<'); break;
+                    case 'C': result.Add('>'); break;
+                    case 'D':
+                        result.Add('\r');
+                        result.Add('\n');
+                        break;
+
+                    case 'E': result.Add('\r'); break;
+                    case 'F': result.Add('\n'); break;
+                    case 'G': result.Add('|'); break;
+                    case 'H': result.Add('}'); break;
+                    case 'I': result.Add('{'); break;
+                    case 'J': result.Add('='); break;
+                    case 'K': result.Add(','); break;
+                    case 'L': result.Add('&'); break;
+                    case 'M': result.Add('/'); break;
+                    case 'N': result.Add('"'); break;
+                    case 'Z': result.Add('['); break;
+                    default:
+                        // Kein bekanntes Pattern, original Zeichen beibehalten
+                        result.Add(txt[i]);
+                        continue; // i wird nicht um 2 erhöht
+                }
+
+                i += 2; // Skip die nächsten 2 Zeichen (X])
+            } else {
+                result.Add(txt[i]);
+            }
+        }
+
+        return new string(result.ToArray());
     }
 
     public static bool FromPlusMinus(this string value) {
@@ -394,34 +442,77 @@ public static partial class Extensions {
     }
 
     public static string HtmlSpecialToNormalChar(this string tXt, bool ignoreBr) {
-        // http://sonderzeichentabelle.de/
-        // http://www.htmlhelp.com/reference/html40/entities/special.html
-        tXt = tXt.Replace("&amp;", "&"); // Wichtig! An erster Stelle! ä-> &auml; -> &amp;auml;
-        tXt = tXt.Replace("<H7>", ((char)1007).ToString());
-        tXt = tXt.Replace("<H4>", ((char)1004).ToString());
-        tXt = tXt.Replace("<H3>", ((char)1003).ToString());
-        tXt = tXt.Replace("&auml;", "ä");
-        tXt = tXt.Replace("&ouml;", "ö");
-        tXt = tXt.Replace("&uuml;", "ü");
-        tXt = tXt.Replace("&Auml;", "Ä");
-        tXt = tXt.Replace("&Ouml;", "Ö");
-        tXt = tXt.Replace("&Uuml;", "Ü");
-        tXt = tXt.Replace("&szlig;", "ß");
-        tXt = tXt.Replace("&Eacute;", "É");
-        tXt = tXt.Replace("&eacute;", "é");
-        tXt = tXt.Replace("&euro;", "€");
-        tXt = tXt.Replace("&Oslash;", "Ø");
-        tXt = tXt.Replace("&oslash;", "ø");
-        tXt = tXt.Replace("&bull;", "•");
-        if (!ignoreBr) {
-            tXt = tXt.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
+
+        var result = new StringBuilder(tXt.Length);
+
+        for (var i = 0; i < tXt.Length; i++) {
+            var foundEntity = false;
+
+            // Check for HTML entities (longest first to avoid conflicts)
+            if (tXt[i] == '&') {
+                foreach (var kvp in ReverseHtmlEntities) {
+                    var entity = kvp.Key;
+                    var character = kvp.Value;
+
+                    if (i + entity.Length <= tXt.Length &&
+                        string.Equals(tXt.Substring(i, entity.Length), entity, StringComparison.Ordinal)) {
+                        result.Append(character);
+                        i += entity.Length - 1; // -1 because the loop will increment
+                        foundEntity = true;
+                        break;
+                    }
+                }
+            }
+
+            // Special handling for <br> tags
+            else if (!ignoreBr && tXt[i] == '<' && i + 3 < tXt.Length) {
+                if (string.Equals(tXt.Substring(i, 4), "<br>", StringComparison.OrdinalIgnoreCase)) {
+                    result.Append('\r');
+                    i += 3; // Skip the remaining characters of <br>
+                    foundEntity = true;
+                }
+            }
+
+            // Special character mappings
+            else if (!foundEntity) {
+                switch (tXt[i]) {
+                    case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H7>", StringComparison.Ordinal):
+                        result.Append(TempH7);
+                        i += 3;
+                        foundEntity = true;
+                        break;
+
+                    case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H4>", StringComparison.Ordinal):
+                        result.Append(TempH4);
+                        i += 3;
+                        foundEntity = true;
+                        break;
+
+                    case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H3>", StringComparison.Ordinal):
+                        result.Append(TempH3);
+                        i += 3;
+                        foundEntity = true;
+                        break;
+
+                    case '<':
+                        result.Append(TempLessThan);
+                        foundEntity = true;
+                        break;
+
+                    case '>':
+                        result.Append(TempGreaterThan);
+                        foundEntity = true;
+                        break;
+                }
+            }
+
+            if (!foundEntity) {
+                result.Append(tXt[i]);
+            }
         }
-        tXt = tXt.Replace("<", ((char)1020).ToString());
-        tXt = tXt.Replace(">", ((char)1021).ToString());
-        tXt = tXt.Replace("&lt;", "<");
-        tXt = tXt.Replace("&gt;", ">");
-        tXt = tXt.Replace("&quot;", "\"");
-        return tXt;
+
+        return result.ToString();
     }
 
     public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
@@ -724,35 +815,22 @@ public static partial class Extensions {
     public static string RemoveXmlTags(this string text) => Regex.Replace(text, "<.*?>", string.Empty);
 
     public static string Replace(this string txt, string alt, string neu, RegexOptions options) {
-        if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(ErrorType.Error, "Regex option nicht erlaubt."); }
-        if (string.IsNullOrEmpty(alt)) { Develop.DebugPrint(ErrorType.Error, "ALT is Empty"); }
-        var oldPos = 0;
-        while (true) {
-            if (string.IsNullOrEmpty(txt)) { return txt; }
-            var posx = txt.ToUpperInvariant().IndexOf(alt.ToUpperInvariant(), oldPos, StringComparison.Ordinal);
-            if (posx >= 0) {
-                txt = txt.Substring(0, posx) + neu + txt.Substring(posx + alt.Length);
-                oldPos = posx + neu.Length;
-            } else {
-                return txt;
-            }
-        }
+        if (string.IsNullOrEmpty(txt) || string.IsNullOrEmpty(alt)) { return txt; }
+        return Regex.Replace(txt, Regex.Escape(alt), neu, options);
     }
 
     public static string ReplaceWord(this string input, string alt, string replacement, RegexOptions options) {
-        // return Regex.Replace(input, "\\b" + Alt + "\\b", replacement);
-        if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(ErrorType.Error, "Regex option nicht erlaubt."); }
-        if (replacement.IndexOf(alt, StringComparison.OrdinalIgnoreCase) >= 0) {
-            const string du = "@DUMMY@";
-            input = ReplaceWord(input, alt, du, options);
-            input = ReplaceWord(input, du, replacement, options);
-            return input;
-        }
-        while (true) {
-            var start = IndexOfWord(input, alt, 0, options);
-            if (start < 0) { return input; }
-            input = input.Substring(0, start) + replacement + input.Substring(start + alt.Length);
-        }
+        if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(alt)) { return input; }
+
+        // Exakt dasselbe Pattern wie in IndexOfWord
+        var pattern = $@"(?<![\p{{L}}\p{{N}}\p{{M}}]){Regex.Escape(alt)}(?![\p{{L}}\p{{N}}\p{{M}}])";
+
+        //var actualOptions = options;
+        //if ((options & RegexOptions.IgnoreCase) != 0) {
+        //    actualOptions |= RegexOptions.CultureInvariant;
+        //}
+
+        return Regex.Replace(input, pattern, replacement, options);
     }
 
     public static string Reverse(this string tXt) {
@@ -776,16 +854,24 @@ public static partial class Extensions {
     /// <param name="trennzeichen"></param>
     /// <returns></returns>
     public static string[] SplitAndCutBy(this string textToSplit, string trennzeichen) {
-        var w = Array.Empty<string>();
-        if (string.IsNullOrEmpty(textToSplit)) { return w; }
+        if (string.IsNullOrEmpty(textToSplit)) { return Array.Empty<string>(); }
 
-        textToSplit = textToSplit.TrimEnd(trennzeichen);
+        var parts = textToSplit.Split([trennzeichen], StringSplitOptions.None);
 
-        if (string.IsNullOrEmpty(textToSplit)) { return w; }
+        // Von hinten nach vorne die leeren Einträge entfernen
+        int lastNonEmpty = parts.Length - 1;
+        while (lastNonEmpty >= 0 && string.IsNullOrEmpty(parts[lastNonEmpty])) {
+            lastNonEmpty--;
+        }
 
-        w = textToSplit.Split([trennzeichen], StringSplitOptions.None);
-        //if (w.Length == 1 && string.IsNullOrEmpty(w[0])) { w = new string[0]; }
-        return w;
+        if (lastNonEmpty < 0) { return Array.Empty<string>(); }
+
+        if (lastNonEmpty == parts.Length - 1) { return parts; }// Keine leeren Einträge am Ende
+
+        // Array mit der richtiger Größe erstellen
+        var result = new string[lastNonEmpty + 1];
+        Array.Copy(parts, result, lastNonEmpty + 1);
+        return result;
     }
 
     /// <summary>
@@ -845,31 +931,39 @@ public static partial class Extensions {
     }
 
     public static string Sprachneutral(this string isValue) {
-        isValue = isValue.ToLowerInvariant();
-        isValue = isValue.Replace("ä", "a");
-        isValue = isValue.Replace("ö", "o");
-        isValue = isValue.Replace("ü", "u");
-        isValue = isValue.Replace("á", "a");
-        isValue = isValue.Replace("ó", "o");
-        isValue = isValue.Replace("ú", "u");
-        isValue = isValue.Replace("í", "i");
-        isValue = isValue.Replace("é", "e");
-        isValue = isValue.Replace("à", "a");
-        isValue = isValue.Replace("ò", "o");
-        isValue = isValue.Replace("ù", "u");
-        isValue = isValue.Replace("ì", "i");
-        isValue = isValue.Replace("è", "e");
-        isValue = isValue.Replace("â", "a");
-        isValue = isValue.Replace("ô", "o");
-        isValue = isValue.Replace("û", "u");
-        isValue = isValue.Replace("î", "i");
-        isValue = isValue.Replace("ê", "e");
-        isValue = isValue.Replace("ž", "z");
-        isValue = isValue.Replace("ß", "s");
-        isValue = isValue.TrimStart("\"");
-        isValue = isValue.TrimStart("'");
-        isValue = isValue.TrimStart(" ");
-        return isValue;
+        if (string.IsNullOrEmpty(isValue)) { return string.Empty; }
+
+        char[] result = new char[isValue.Length];
+        int writeIndex = 0;
+
+        // Normalisierung in einem Durchgang
+        for (int i = 0; i < isValue.Length; i++) {
+            char c = char.ToLowerInvariant(isValue[i]);
+
+            result[writeIndex++] = c switch {
+                'ä' or 'á' or 'à' or 'â' => 'a',
+                'ö' or 'ó' or 'ò' or 'ô' => 'o',
+                'ü' or 'ú' or 'ù' or 'û' => 'u',
+                'í' or 'ì' or 'î' => 'i',
+                'é' or 'è' or 'ê' => 'e',
+                'ž' => 'z',
+                'ß' => 's',
+                _ => c
+            };
+        }
+
+        // Trimming vom Anfang
+        int startIndex = 0;
+        while (startIndex < writeIndex) {
+            char c = result[startIndex];
+            if (c is '"' or '\'' or ' ') {
+                startIndex++;
+            } else {
+                break;
+            }
+        }
+
+        return startIndex >= writeIndex ? string.Empty : new string(result, startIndex, writeIndex - startIndex);
     }
 
     //public static string ParseTag(this string tXT, int startIndex) {
@@ -964,27 +1058,42 @@ public static partial class Extensions {
     }
 
     public static string ToNonCritical(this string txt) {
-        // http://www.theasciicode.com.ar/ascii-printable-characters/braces-curly-brackets-opening-ascii-code-123.html
-        if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-        txt = txt.Replace("[", "[Z]");
-        txt = txt.Replace(";", "[A]");
-        txt = txt.Replace("<", "[B]");
-        txt = txt.Replace(">", "[C]");
-        txt = txt.Replace("\r\n", "[D]");
-        txt = txt.Replace("\r", "[E]");
-        txt = txt.Replace("\n", "[F]");
-        txt = txt.Replace("|", "[G]");
-        txt = txt.Replace("}", "[H]");
-        txt = txt.Replace("{", "[I]");
-        txt = txt.Replace("=", "[J]");
-        txt = txt.Replace(",", "[K]");
-        txt = txt.Replace("&", "[L]");
-        txt = txt.Replace("/", "[M]");
-        txt = txt.Replace("\"", "[N]");
-        return txt;
-    }
+        if (string.IsNullOrEmpty(txt)) return string.Empty;
 
-    public static string ToNonCriticalWithQuote(this string txt) => "\"" + txt.ToNonCritical() + "\"";
+        var result = new List<char>(txt.Length * 2);
+
+        for (int i = 0; i < txt.Length; i++) {
+            char c = txt[i];
+
+            // Handle \r\n first (multi-character)
+            if (c == '\r' && i < txt.Length - 1 && txt[i + 1] == '\n') {
+                result.AddRange("[D]");
+                i++; // Skip the \n
+                continue;
+            }
+
+            // Handle single characters
+            switch (c) {
+                case '[': result.AddRange("[Z]"); break;
+                case ';': result.AddRange("[A]"); break;
+                case '<': result.AddRange("[B]"); break;
+                case '>': result.AddRange("[C]"); break;
+                case '\r': result.AddRange("[E]"); break;
+                case '\n': result.AddRange("[F]"); break;
+                case '|': result.AddRange("[G]"); break;
+                case '}': result.AddRange("[H]"); break;
+                case '{': result.AddRange("[I]"); break;
+                case '=': result.AddRange("[J]"); break;
+                case ',': result.AddRange("[K]"); break;
+                case '&': result.AddRange("[L]"); break;
+                case '/': result.AddRange("[M]"); break;
+                case '"': result.AddRange("[N]"); break;
+                default: result.Add(c); break;
+            }
+        }
+
+        return new string(result.ToArray());
+    }
 
     public static string ToTitleCase(this string text) {
         // Suchwort: #Camelcase
@@ -993,7 +1102,6 @@ public static partial class Extensions {
         return info.ToTitleCase(text);
     }
 
-    /// <returns></returns>
     public static string Trim(this string txt, List<List<string>> klammern) {
         var again = true;
         while (again) {
