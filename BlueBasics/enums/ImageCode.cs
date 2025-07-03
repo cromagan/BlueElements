@@ -60,6 +60,7 @@ public enum ImageCode {
     Fragezeichen,
     Gänsefüßchen,
     Ganzzahl,
+    Geldscheine,
     Gewicht,
     Gleitkommazahl,
     Globus,

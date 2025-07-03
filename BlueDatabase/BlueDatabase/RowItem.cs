@@ -163,7 +163,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), ro, qi);
 
             case ScriptType.Numeral:
-                _ = FloatTryParse(wert, out var f);
+                _ = DoubleTryParse(wert, out var f);
                 return new VariableDouble(column.KeyName, f, ro, qi);
 
             case ScriptType.String:

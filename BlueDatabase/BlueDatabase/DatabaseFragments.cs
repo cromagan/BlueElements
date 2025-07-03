@@ -164,33 +164,19 @@ public class DatabaseFragments : Database {
 
         _masterNeeded = files.Count > 8 || ChangesNotIncluded.Count > 40 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12;
 
-        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { return; }
-
-        #region Dateien, mit jungen Änderungen wieder entfernen, damit andere Datenbanken noch Zugriff haben
-
-        foreach (var thisch in ChangesNotIncluded) {
-            if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalMinutes < 20) {
-                _ = files.Remove(thisch.Container);
-            }
-        }
-
-        #endregion
-
         #region Bei Bedarf neue Komplett-Datenbank erstellen
 
-        if (!Develop.AllReadOnly && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
-            if (ChangesNotIncluded.Count > 50 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12) {
-                DropMessage(ErrorType.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
-                if (!SaveInternal(IsInCache)) {
-                    return;
-                }
-
-                OnInvalidateView();
-                ChangesNotIncluded.Clear();
-            }
+        if (_masterNeeded && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
+            DropMessage(ErrorType.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
+            if (!SaveInternal(IsInCache)) { return; }
+            _masterNeeded = false;
+            OnInvalidateView();
+            ChangesNotIncluded.Clear();
         }
 
         #endregion
+
+        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { return; }
 
         #region Dateien, mit zu jungen Änderungen entfernen
 
