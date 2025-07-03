@@ -24,8 +24,6 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace BlueScript;
 

@@ -178,6 +178,7 @@
     <Compile Include="Renderer\Renderer_Font.cs" />
     <Compile Include="Renderer\Renderer_DynamicSymbol.cs" />
     <Compile Include="Renderer\Renderer_Button.cs" />
+    <Compile Include="Renderer\Renderer_DateTime.cs" />
     <Compile Include="Renderer\Renderer_TextOneLine.cs" />
     <Compile Include="Renderer\Renderer_ImageAndText.cs" />
     <Compile Include="Classes\AdderItem.cs" />
@@ -1022,6 +1023,9 @@
   <ItemGroup>
     <PackageReference Include="FCTB">
       <Version>2.16.24</Version>
+    </PackageReference>
+    <PackageReference Include="System.Buffers">
+      <Version>4.5.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

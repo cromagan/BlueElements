@@ -70,6 +70,7 @@ public enum ImageCode {
     Groupbox,
     Häkchen,
     HäkchenDoppelt,
+    Haus,
     Herz,
     Hierarchie,
     Hochformat,

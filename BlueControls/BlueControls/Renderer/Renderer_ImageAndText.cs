@@ -301,11 +301,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld);
 
-    /// <summary>
-    /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
-    /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
-    /// </summary>
-    ///
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);
 

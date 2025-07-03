@@ -45,7 +45,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     public static string ClassId => "TextOneLine";
 
-    public override string Description => "Text wird immer einzeilig dargestellt.";
+    public override string Description => "Schnelle Darstellung eines einzeiligen Textes.";
 
     public string Präfix {
         get => _präfix;
@@ -134,11 +134,6 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
 
-    /// <summary>
-    /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
-    /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
-    /// </summary>
-    ///
     protected override Size CalculateContentSize(string content, TranslationType translate) {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         return this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
@@ -152,14 +147,11 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     /// <param name="translate"></param>
     /// <returns></returns>
     protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
-        //if (_bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
-
         content = LanguageTool.PrepaireText(content, style, _präfix, _suffix, translate, null);
 
-        content = content.Replace("\r\n", "; ");
-        content = content.Replace("\r", "; ");
+        if (content.IndexOf('\r') == -1) { return content; }
 
-        return content;
+        return content.Replace("\r\n", "; ").Replace("\r", "; ");
     }
 
     #endregion
