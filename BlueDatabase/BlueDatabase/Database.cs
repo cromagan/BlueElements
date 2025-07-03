@@ -1177,7 +1177,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (!string.IsNullOrEmpty(Filename)) {
-            if (!CanWrite(Filename)) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
+            if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
         }
         return string.Empty;
     }

@@ -223,7 +223,14 @@ public static class IO {
         }
     }
 
-    public static string FileNameWithSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileName(name);
+    public static string FileNameWithSuffix(this string name) {
+        try {
+            return string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileName(name);
+        } catch {
+            return string.Empty;
+        }
+
+    }
 
     /// <summary>
     /// Gibt den Dateipad eines Dateistrings zurück, mit abschließenden \.
@@ -390,8 +397,11 @@ public static class IO {
                 return returnValue;
             }
 
-            if (stopw.ElapsedMilliseconds > 10000) {
-                Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, "Warte auf Abschluss einer Dateioperation...", 0);
+            if (stopw.ElapsedMilliseconds > 5000) {
+                var operation = processMethod.Method.Name.Replace("Try", "").Replace("File", "").Replace("Dir", "");
+                var fileName = args.Length > 0 ? args[0]?.ToString()?.FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
+
+                Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}): {fileName}...", 0);
                 stopw = Stopwatch.StartNew();
             }
 
@@ -539,7 +549,7 @@ public static class IO {
 
             // Prüfen, ob wir für diese Datei bereits ein Ergebnis haben und ob es noch gültig ist
             if (_canWriteCache.TryGetValue(fileUpper, out var cacheEntry) &&
-                DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 10) {
+                DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 2) {
                 return (cacheEntry.Result, false);
             }
 

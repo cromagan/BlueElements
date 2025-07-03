@@ -101,86 +101,92 @@ public class InvalidatedRowsManager {
 		return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);
 	}
 
-	/// <summary>
-	/// Verarbeitet alle ungültigen Zeilen. Verhindert parallele Aufrufe.
-	/// Verarbeitet auch Zeilen, die während der Ausführung hinzugekommen sind.
-	/// </summary>
-	/// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
-	/// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
-	public void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed) {
-		lock (_processingLock) {
-			if (_isProcessing) { return; }
-			_isProcessing = true;
-		}
+    /// <summary>
+    /// Verarbeitet alle ungültigen Zeilen. Verhindert parallele Aufrufe.
+    /// Verarbeitet auch Zeilen, die während der Ausführung hinzugekommen sind.
+    /// </summary>
+    /// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
+    /// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
+    public void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed, Action? minutelyDelegate = null) {
+        lock (_processingLock) {
+            if (_isProcessing) { return; }
+            _isProcessing = true;
+        }
+        try {
+            if (_invalidatedRows.Count > 0) {
+                Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
+            } else {
+                Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, "Keine invaliden Zeilen bekannt", 0);
+                return;
+            }
 
-		try {
-			if (_invalidatedRows.Count > 0) {
-				Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
-			} else {
-				Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, "Keine invaliden Zeilen bekannt", 0);
-				return;
-			}
+            var totalProcessedCount = 0;
+            var entriesBeforeProcessing = 0;
+            var lastDelegateCall = DateTime.MinValue;
 
+            // Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
+            do {
+                // Prüfe, ob der Delegat aufgerufen werden soll (mindestens 1 Minute vergangen)
+                var currentTime = DateTime.Now;
+                if (minutelyDelegate != null && currentTime - lastDelegateCall >= TimeSpan.FromMinutes(1)) {
+                    minutelyDelegate();
+                    lastDelegateCall = currentTime;
+                }
 
-			var totalProcessedCount = 0;
-			var entriesBeforeProcessing = 0;
+                // Sammle alle aktuellen Schlüssel
+                var keysToProcess = _invalidatedRows.Keys.ToList();
+                if (keysToProcess.Count == 0) {
+                    masterRow?.DropMessage(ErrorType.DevelopInfo, $"Alle Einträge abgearbeitet");
+                    break;
+                }
 
-			// Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
-			do {
-				// Sammle alle aktuellen Schlüssel
-				var keysToProcess = _invalidatedRows.Keys.ToList();
-				if (keysToProcess.Count == 0) {
-					masterRow?.DropMessage(ErrorType.DevelopInfo, $"Alle Einträge abgearbeitet");
-					break;
-				}
+                // Prüfe, ob neue Einträge hinzugekommen sind
+                var newEntries = keysToProcess.Count - entriesBeforeProcessing;
 
-				// Prüfe, ob neue Einträge hinzugekommen sind
-				var newEntries = keysToProcess.Count - entriesBeforeProcessing;
+                // Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
+                if (newEntries > 0) {
+                    Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Stern, $"{newEntries} neue Einträge zum Abarbeiten", 0);
+                }
 
-				// Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
-				if (newEntries > 0) {
-					Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Stern,  $"{newEntries} neue Einträge zum Abarbeiten", 0);
-				}
+                // Anzahl der zu verarbeitenden Zeilen vor der Verarbeitung merken
+                entriesBeforeProcessing = keysToProcess.Count;
 
-				// Anzahl der zu verarbeitenden Zeilen vor der Verarbeitung merken
-				entriesBeforeProcessing = keysToProcess.Count;
+                // Verarbeite alle Zeilen
+                foreach (var key in keysToProcess) {
+                    // Versuche, die Zeile zu entfernen und zu verarbeiten
+                    if (_invalidatedRows.TryRemove(key, out var row) && row != null) {
+                        // Verarbeite die Zeile
+                        ProcessSingleRow(row, masterRow, extendedAllowed, totalProcessedCount + 1);
+                        totalProcessedCount++;
+                        OnRowChecked(new RowEventArgs(row));
+                    }
+                    // KEIN else-Zweig mehr: TryRemove() Fehlschlag ist normal bei Concurrency
+                    // Andere Threads können das Item bereits verarbeitet haben
+                }
 
-				// Verarbeite alle Zeilen
-				foreach (var key in keysToProcess) {
-					// Versuche, die Zeile zu entfernen und zu verarbeiten
-					if (_invalidatedRows.TryRemove(key, out var row) && row != null) {
-						// Verarbeite die Zeile
-						ProcessSingleRow(row, masterRow, extendedAllowed, totalProcessedCount + 1);
-						totalProcessedCount++;
-						OnRowChecked(new RowEventArgs(row));
-					}
-					// KEIN else-Zweig mehr: TryRemove() Fehlschlag ist normal bei Concurrency
-					// Andere Threads können das Item bereits verarbeitet haben
-				}
+                Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
+            } while (true);
 
-				Thread.Sleep(10);     // Eine kurze Pause, um anderen Threads Zeit zu geben
-			} while (true);
+            Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen fertig", 0);
 
-			Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen fertig", 0);
+        } catch {
+            Develop.Message?.Invoke(ErrorType.Warning, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen unerwartet abgebrochen", 0);
 
-		} catch {
-			Develop.Message?.Invoke(ErrorType.Warning, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen unerwartet abgebrochen", 0);
+        } finally {
+            // Verarbeitung beenden, egal was passiert
+            lock (_processingLock) {
+                _isProcessing = false;
+            }
+        }
+    }
 
-		} finally {
-			// Verarbeitung beenden, egal was passiert
-			lock (_processingLock) {
-				_isProcessing = false;
-			}
-		}
-	}
-
-	/// <summary>
-	/// Markiert eine Zeile als verarbeitet, ohne sie tatsächlich zu verarbeiten.
-	/// Entfernt die Zeile aus der Liste der zu verarbeitenden Einträge, falls vorhanden.
-	/// </summary>
-	/// <param name="rowItem">Die als verarbeitet zu markierende Zeile</param>
-	/// <returns>True wenn die Zeile erfolgreich markiert wurde, False wenn nicht</returns>
-	public bool MarkAsProcessed(RowItem? rowItem) {
+    /// <summary>
+    /// Markiert eine Zeile als verarbeitet, ohne sie tatsächlich zu verarbeiten.
+    /// Entfernt die Zeile aus der Liste der zu verarbeitenden Einträge, falls vorhanden.
+    /// </summary>
+    /// <param name="rowItem">Die als verarbeitet zu markierende Zeile</param>
+    /// <returns>True wenn die Zeile erfolgreich markiert wurde, False wenn nicht</returns>
+    public bool MarkAsProcessed(RowItem? rowItem) {
 		if (rowItem == null) { return false; }
 
 		// Versuche die Zeile aus der Liste der zu verarbeitenden zu entfernen
