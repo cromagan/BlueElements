@@ -140,6 +140,154 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     public ReadOnlyCollection<string> SearchValue { get; private set; }
 
+    public string Where {
+        get {
+            if (!this.IsOk()) { return string.Empty; }
+
+            if (FilterType == FilterType.AlwaysFalse) { return "1 = 0"; }
+
+            if (FilterType == FilterType.RowKey) {
+                if (SearchValue.Count == 1 && !string.IsNullOrEmpty(SearchValue[0])) {
+                    return $"RowID = '{EscapeSqlValue(SearchValue[0])}'";
+                }
+                return string.Empty;
+            }
+
+            if (Column == null) { return string.Empty; } // Row-Filter ist kein SQL-Filter
+
+            var columnName = Column.KeyName;
+            var caseSensitive = !FilterType.HasFlag(FilterType.GroßKleinEgal);
+
+            switch (FilterType) {
+                case FilterType.Istgleich:
+                case FilterType.Istgleich_MultiRowIgnorieren:
+                    if (SearchValue.Count == 1) {
+                        if (string.IsNullOrEmpty(SearchValue[0])) {
+                            return $"{columnName} IS NULL";
+                        }
+                        return $"{columnName} = '{EscapeSqlValue(SearchValue[0])}'";
+                    }
+                    break;
+
+                case FilterType.Istgleich_GroßKleinEgal:
+                case FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren:
+                    if (SearchValue.Count == 1) {
+                        if (string.IsNullOrEmpty(SearchValue[0])) {
+                            return $"{columnName} IS NULL";
+                        }
+                        return $"UPPER({columnName}) = UPPER('{EscapeSqlValue(SearchValue[0])}')";
+                    }
+                    break;
+
+                case FilterType.IstGleich_ODER:
+                    if (SearchValue.Count > 1) {
+                        var values = SearchValue.Select(v => $"'{EscapeSqlValue(v)}'").ToList();
+                        return $"{columnName} IN ({string.Join(", ", values)})";
+                    } else if (SearchValue.Count == 1) {
+                        if (string.IsNullOrEmpty(SearchValue[0])) {
+                            return $"{columnName} IS NULL";
+                        }
+                        return $"{columnName} = '{EscapeSqlValue(SearchValue[0])}'";
+                    }
+                    break;
+
+                case FilterType.Istgleich_ODER_GroßKleinEgal:
+                    if (SearchValue.Count > 1) {
+                        var values = SearchValue.Select(v => $"UPPER('{EscapeSqlValue(v)}')").ToList();
+                        return $"UPPER({columnName}) IN ({string.Join(", ", values)})";
+                    } else if (SearchValue.Count == 1) {
+                        if (string.IsNullOrEmpty(SearchValue[0])) {
+                            return $"{columnName} IS NULL";
+                        }
+                        return $"UPPER({columnName}) = UPPER('{EscapeSqlValue(SearchValue[0])}')";
+                    }
+                    break;
+
+                case FilterType.IstGleich_UND:
+                    if (SearchValue.Count > 1) {
+                        var conditions = SearchValue.Select(v =>
+                            string.IsNullOrEmpty(v) ? $"{columnName} IS NULL" : $"{columnName} = '{EscapeSqlValue(v)}'");
+                        return $"({string.Join(" AND ", conditions)})";
+                    } else if (SearchValue.Count == 1) {
+                        if (string.IsNullOrEmpty(SearchValue[0])) {
+                            return $"{columnName} IS NULL";
+                        }
+                        return $"{columnName} = '{EscapeSqlValue(SearchValue[0])}'";
+                    }
+                    break;
+
+                case FilterType.Istgleich_UND_GroßKleinEgal:
+                    if (SearchValue.Count > 1) {
+                        var conditions = SearchValue.Select(v =>
+                            string.IsNullOrEmpty(v) ? $"{columnName} IS NULL" : $"UPPER({columnName}) = UPPER('{EscapeSqlValue(v)}')");
+                        return $"({string.Join(" AND ", conditions)})";
+                    } else if (SearchValue.Count == 1) {
+                        if (string.IsNullOrEmpty(SearchValue[0])) {
+                            return $"{columnName} IS NULL";
+                        }
+                        return $"UPPER({columnName}) = UPPER('{EscapeSqlValue(SearchValue[0])}')";
+                    }
+                    break;
+
+                case FilterType.Ungleich_MultiRowIgnorieren:
+                    if (SearchValue.Count == 1) {
+                        if (string.IsNullOrEmpty(SearchValue[0])) {
+                            return $"{columnName} IS NOT NULL";
+                        }
+                        return $"{columnName} != '{EscapeSqlValue(SearchValue[0])}'";
+                    }
+                    break;
+
+                case FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal:
+                case FilterType.Ungleich_MultiRowIgnorieren_UND_GroßKleinEgal:
+                    if (SearchValue.Count == 1) {
+                        if (string.IsNullOrEmpty(SearchValue[0])) {
+                            return $"{columnName} IS NOT NULL";
+                        }
+                        return $"UPPER({columnName}) != UPPER('{EscapeSqlValue(SearchValue[0])}')";
+                    }
+                    break;
+
+                case FilterType.Instr:
+                    if (SearchValue.Count == 1 && !string.IsNullOrEmpty(SearchValue[0])) {
+                        return $"{columnName} LIKE '%{EscapeSqlValue(SearchValue[0])}%'";
+                    }
+                    break;
+
+                case FilterType.Instr_GroßKleinEgal:
+                case FilterType.Instr_UND_GroßKleinEgal:
+                    if (SearchValue.Count == 1 && !string.IsNullOrEmpty(SearchValue[0])) {
+                        return $"UPPER({columnName}) LIKE UPPER('%{EscapeSqlValue(SearchValue[0])}%')";
+                    }
+                    break;
+
+                case FilterType.BeginntMit:
+                    if (SearchValue.Count == 1 && !string.IsNullOrEmpty(SearchValue[0])) {
+                        return $"{columnName} LIKE '{EscapeSqlValue(SearchValue[0])}%'";
+                    }
+                    break;
+
+                case FilterType.BeginntMit_GroßKleinEgal:
+                    if (SearchValue.Count == 1 && !string.IsNullOrEmpty(SearchValue[0])) {
+                        return $"UPPER({columnName}) LIKE UPPER('{EscapeSqlValue(SearchValue[0])}%')";
+                    }
+                    break;
+
+                case FilterType.Between:
+                case FilterType.Between | FilterType.UND:
+                    if (SearchValue.Count == 1 && SearchValue[0].Contains("|")) {
+                        var parts = SearchValue[0].Split('|');
+                        if (parts.Length == 2) {
+                            return $"{columnName} BETWEEN '{EscapeSqlValue(parts[0])}' AND '{EscapeSqlValue(parts[1])}'";
+                        }
+                    }
+                    break;
+            }
+
+            return string.Empty;
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -276,7 +424,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         }
         var nam = Column.ReadableText();
 
-         if (SearchValue.Count > 1) {
+        if (SearchValue.Count > 1) {
             switch (FilterType) {
                 case FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroßKleinEgal
                     or FilterType.Istgleich_ODER_GroßKleinEgal:
@@ -363,6 +511,13 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         }
 
         return new FilterItem(db, Column, f, SearchValue.SortedDistinctList().AsReadOnly(), "Normalize");
+    }
+
+    private static string EscapeSqlValue(string value) {
+        if (string.IsNullOrEmpty(value)) { return value; }
+
+        // Einfacher SQL-Escape: Verdopple einfache Anführungszeichen
+        return value.Replace("'", "''");
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Database = null;

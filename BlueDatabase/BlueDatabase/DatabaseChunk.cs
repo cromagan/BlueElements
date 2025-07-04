@@ -132,6 +132,7 @@ public class DatabaseChunk : Database {
             mainChunk.SaveToByteList(DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ParseableItems().FinishParseable());
 
             mainChunk.SaveToByteList(DatabaseDataType.ColumnArrangement, db.ColumnArrangements);
+            mainChunk.SaveToByteList(DatabaseDataType.RowColorRules, db.RowColorRules);
 
             mainChunk.SaveToByteList(DatabaseDataType.EventScript, db.EventScript.ToString(true));
             mainChunk.SaveToByteList(DatabaseDataType.EventScriptEdited, db.EventScriptEdited.ToString(true));

@@ -113,6 +113,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private string _columnArrangements = string.Empty;
 
+    private string _rowColorRules = string.Empty;
+
     private string _createDate;
 
     private string _creator;
@@ -293,6 +295,15 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         set {
             if (_columnArrangements == value) { return; }
             _ = ChangeData(DatabaseDataType.ColumnArrangement, null, _columnArrangements, value);
+            OnViewChanged();
+        }
+    }
+
+    public string RowColorRules {
+        get => _rowColorRules;
+        set {
+            if (_rowColorRules == value) { return; }
+            _ = ChangeData(DatabaseDataType.RowColorRules, null, _rowColorRules, value);
             OnViewChanged();
         }
     }
@@ -2703,6 +2714,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case DatabaseDataType.ColumnArrangement:
                 _columnArrangements = value;
+                break;
+
+            case DatabaseDataType.RowColorRules:
+                _rowColorRules = value;
                 break;
 
             case DatabaseDataType.PermissionGroupsNewRow:

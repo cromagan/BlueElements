@@ -152,6 +152,7 @@ public enum DatabaseDataType : byte {
     LastEditTimeUTC = 78,
     EventScriptEdited = 79,
     LastEditID = 80,
+    RowColorRules = 81,
 
     ColumnName = 100,
 

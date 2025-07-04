@@ -216,6 +216,41 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
+    public string Where {
+        get {
+            if (IsDisposed || Count == 0) { return string.Empty; }
+
+            var conditions = new List<string>();
+
+            foreach (var filter in _internal) {
+                if (filter?.IsOk() == true) {
+                    var condition = filter.Where;
+                    if (!string.IsNullOrEmpty(condition)) {
+                        conditions.Add(condition);
+                    }
+                }
+            }
+
+            return conditions.Count > 0 ? string.Join(" AND ", conditions) : string.Empty;
+        }
+        set {
+            if (IsDisposed) { return; }
+
+            OnChanging();
+            Clear();
+
+            if (!string.IsNullOrWhiteSpace(value) && Database is { IsDisposed: false }) {
+                try {
+                    ParseSqlWhereClause(value);
+                } catch (Exception ex) {
+                    Develop.DebugPrint(ErrorType.Error, "Fehler beim Setzen der WHERE-Klausel: " + ex.Message);
+                }
+            }
+
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Indexers
