@@ -96,6 +96,32 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         SearchValue = searchValue is { Count: > 0 } ? new ReadOnlyCollection<string>(searchValue) : EmptyReadOnly;
     }
 
+    /// <summary>
+    /// Erstellt ein FilterItem aus einer SQL-WHERE-Bedingung
+    /// Beispiel: "Name = 'Mueller'" oder "Age BETWEEN 18 AND 65"
+    /// </summary>
+    /// <param name="database">Die Datenbank f¸r die Spaltenreferenzen</param>
+    /// <param name="whereCondition">Die SQL-WHERE-Bedingung</param>
+    public FilterItem(Database? database, string whereCondition, string origin) {
+        Database = database;
+        SearchValue = new List<string>().AsReadOnly();
+        Origin = origin;
+
+        if (string.IsNullOrWhiteSpace(whereCondition) || database == null) {
+            FilterType = FilterType.AlwaysFalse;
+            Column = null;
+            return;
+        }
+
+        try {
+            ParseWhereCondition(whereCondition.Trim());
+        } catch {
+            FilterType = FilterType.AlwaysFalse;
+            Column = null;
+            SearchValue = new List<string>().AsReadOnly();
+        }
+    }
+
     private FilterItem(Database? database, FilterType filterType, IList<string>? searchValue) {
         //Database?, weil AlwaysFalse keine Angaben braucht
         Database = database;
@@ -520,7 +546,161 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         return value.Replace("'", "''");
     }
 
+    /// <summary>
+    /// Parst die Werte einer IN-Klausel
+    /// </summary>
+    private static List<string> ParseInValues(string valuesString) {
+        var values = new List<string>();
+
+        // Einfache Implementierung: Split bei Komma und entferne Anf¸hrungszeichen
+        var parts = valuesString.Split(',');
+
+        foreach (var part in parts) {
+            var trimmed = part.Trim();
+            if (trimmed.StartsWith("'") && trimmed.EndsWith("'") && trimmed.Length >= 2) {
+                // Entferne Anf¸hrungszeichen
+                values.Add(trimmed.Substring(1, trimmed.Length - 2));
+            } else {
+                // Ohne Anf¸hrungszeichen
+                values.Add(trimmed);
+            }
+        }
+
+        return values;
+    }
+
     private void _database_Disposing(object sender, System.EventArgs e) => Database = null;
+
+    /// <summary>
+    /// Parst eine einzelne SQL-WHERE-Bedingung und setzt die entsprechenden Properties
+    /// </summary>
+    private void ParseWhereCondition(string condition) {
+        if (string.IsNullOrWhiteSpace(condition) || Database == null) {
+            FilterType = FilterType.AlwaysFalse;
+            return;
+        }
+
+        // IS NULL / IS NOT NULL
+        if (condition.EndsWith(" IS NULL", System.StringComparison.OrdinalIgnoreCase)) {
+            var columnName = condition.Substring(0, condition.Length - 8).Trim();
+            Column = Database.Column[columnName];
+            if (Column != null) {
+                FilterType = FilterType.Istgleich;
+                SearchValue = new List<string> { string.Empty }.AsReadOnly();
+                return;
+            }
+        }
+
+        if (condition.EndsWith(" IS NOT NULL", System.StringComparison.OrdinalIgnoreCase)) {
+            var columnName = condition.Substring(0, condition.Length - 12).Trim();
+            Column = Database.Column[columnName];
+            if (Column != null) {
+                FilterType = FilterType.Ungleich_MultiRowIgnorieren;
+                SearchValue = new List<string> { string.Empty }.AsReadOnly();
+                return;
+            }
+        }
+
+        // BETWEEN
+        var betweenMatch = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s+BETWEEN\s+'([^']+)'\s+AND\s+'([^']+)'",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (betweenMatch.Success) {
+            var columnName = betweenMatch.Groups[1].Value;
+            var value1 = betweenMatch.Groups[2].Value;
+            var value2 = betweenMatch.Groups[3].Value;
+            Column = Database.Column[columnName];
+            if (Column != null) {
+                FilterType = FilterType.Between | FilterType.UND;
+                SearchValue = new List<string> { $"{value1}|{value2}" }.AsReadOnly();
+                return;
+            }
+        }
+
+        // LIKE
+        var likeMatch = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s+LIKE\s+'([^']+)'",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (likeMatch.Success) {
+            var columnName = likeMatch.Groups[1].Value;
+            var value = likeMatch.Groups[2].Value;
+            Column = Database.Column[columnName];
+
+            if (Column != null) {
+                // Bestimme FilterType basierend auf Wildcards
+                if (value.StartsWith("%") && value.EndsWith("%")) {
+                    // %value% -> INSTR
+                    var searchValue = value.Substring(1, value.Length - 2);
+                    FilterType = FilterType.Instr_GroﬂKleinEgal;
+                    SearchValue = new List<string> { searchValue }.AsReadOnly();
+                } else if (value.EndsWith("%")) {
+                    // value% -> BeginntMit
+                    var searchValue = value.Substring(0, value.Length - 1);
+                    FilterType = FilterType.BeginntMit_GroﬂKleinEgal;
+                    SearchValue = new List<string> { searchValue }.AsReadOnly();
+                } else {
+                    // Exakte ‹bereinstimmung
+                    FilterType = FilterType.Istgleich_GroﬂKleinEgal;
+                    SearchValue = new List<string> { value }.AsReadOnly();
+                }
+                return;
+            }
+        }
+
+        // IN
+        var inMatch = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s+IN\s*\(([^)]+)\)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (inMatch.Success) {
+            var columnName = inMatch.Groups[1].Value;
+            var valuesString = inMatch.Groups[2].Value;
+            Column = Database.Column[columnName];
+
+            if (Column != null) {
+                // Parse die Werte in der IN-Klausel
+                var values = ParseInValues(valuesString);
+                if (values.Count > 0) {
+                    FilterType = FilterType.Istgleich_ODER_GroﬂKleinEgal;
+                    SearchValue = new ReadOnlyCollection<string>(values);
+                    return;
+                }
+            }
+        }
+
+        // Einfache Gleichheit: column = 'value'
+        var equalMatch = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s*=\s*'([^']*)'",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (equalMatch.Success) {
+            var columnName = equalMatch.Groups[1].Value;
+            var value = equalMatch.Groups[2].Value;
+            Column = Database.Column[columnName];
+            if (Column != null) {
+                FilterType = FilterType.Istgleich_GroﬂKleinEgal;
+                SearchValue = new List<string> { value }.AsReadOnly();
+                return;
+            }
+        }
+
+        // Einfache Gleichheit ohne Anf¸hrungszeichen: column = value
+        var equalMatchNoQuotes = System.Text.RegularExpressions.Regex.Match(condition,
+            @"(\w+)\s*=\s*([^'\s]+)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (equalMatchNoQuotes.Success) {
+            var columnName = equalMatchNoQuotes.Groups[1].Value;
+            var value = equalMatchNoQuotes.Groups[2].Value;
+            Column = Database.Column[columnName];
+            if (Column != null) {
+                FilterType = FilterType.Istgleich_GroﬂKleinEgal;
+                SearchValue = new List<string> { value }.AsReadOnly();
+                return;
+            }
+        }
+
+        // Wenn nichts geparst werden konnte
+        FilterType = FilterType.AlwaysFalse;
+        Column = null;
+    }
 
     #endregion
 }

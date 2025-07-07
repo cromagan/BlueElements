@@ -1167,7 +1167,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
 
-        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+        //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
         var fileSaveResult = CanSaveFile(Filename, 5);
         return fileSaveResult;
@@ -2293,7 +2293,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var result = SaveInternal(FileStateUtcDate);
             OnInvalidateView();
-            return result;
+            return string.IsNullOrEmpty( result);
         } finally {
             _saveSemaphore.Release();
         }
@@ -2488,22 +2488,22 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Loading?.Invoke(this, System.EventArgs.Empty);
     }
 
-    protected virtual bool SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (Develop.AllReadOnly) { return true; }
+    protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
 
-        var m = CanSaveMainChunk();
-        if (!string.IsNullOrEmpty(m)) { return false; }
+        var f = CanSaveMainChunk();
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         Develop.SetUserDidSomething();
 
         var chunksnew = DatabaseChunk.GenerateNewChunks(this, 1200, setfileStateUtcDateTo, false);
-        if (chunksnew == null || chunksnew.Count != 1) { return false; }
+        if (chunksnew == null || chunksnew.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
-        if (!string.IsNullOrEmpty(chunksnew[0].DoExtendedSave())) { return false; }
+        f = chunksnew[0].DoExtendedSave();
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         _saveRequired = false;
         FileStateUtcDate = setfileStateUtcDateTo;
-        return true;
+        return string.Empty;
     }
 
     protected virtual bool SaveRequired() => _saveRequired;

@@ -235,7 +235,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="newChunkValue">Der neue Zellwert</param>
     /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
     public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
-        IO.ProcessFile(TryGrantWriteAccess, false, waitforSeconds, column, row, newChunkValue, waitforSeconds, onlyTopLevel) as string ?? "Unbekannter Fehler";
+        IO.ProcessFile(TryGrantWriteAccess, false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel) as string ?? "Unbekannter Fehler";
 
     /// <summary>
     /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
@@ -632,9 +632,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     private static (object? returnValue, bool retry) TryGrantWriteAccess(params object[] args) {
         if (args.Length < 5 ||
-            args[0] is not ColumnItem column ||
-            args[1] is not RowItem row ||
-            args[2] is not string newChunkValue ||
+            args[0] is not string newChunkValue ||
+            args[1] is not ColumnItem column ||
+            args[2] is not RowItem row ||
             args[3] is not int waitforseconds ||
              args[4] is not bool onlyTopLevel) {
             return ("Ungültige Parameter.", false);

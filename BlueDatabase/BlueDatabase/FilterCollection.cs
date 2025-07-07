@@ -816,122 +816,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Parst die Werte einer IN-Klausel
-    /// </summary>
-    private static List<string> ParseInValues(string valuesString) {
-        var values = new List<string>();
-
-        // Einfache Implementierung: Split bei Komma und entferne Anführungszeichen
-        var parts = valuesString.Split(',');
-
-        foreach (var part in parts) {
-            var trimmed = part.Trim();
-            if (trimmed.StartsWith("'") && trimmed.EndsWith("'") && trimmed.Length >= 2) {
-                // Entferne Anführungszeichen
-                values.Add(trimmed.Substring(1, trimmed.Length - 2));
-            } else {
-                // Ohne Anführungszeichen
-                values.Add(trimmed);
-            }
-        }
-
-        return values;
-    }
-
-    /// <summary>
-    /// Parst eine einzelne SQL-Bedingung und erstellt ein FilterItem
-    /// </summary>
-    private static FilterItem? ParseSingleCondition(string condition, Database database) {
-        if (string.IsNullOrWhiteSpace(condition)) { return null; }
-
-        // IS NULL / IS NOT NULL
-        if (condition.EndsWith(" IS NULL")) {
-            var columnName = condition.Substring(0, condition.Length - 8).Trim();
-            var column = database.Column[columnName];
-            return column != null ? new FilterItem(column, FilterType.Istgleich, string.Empty) : null;
-        }
-
-        if (condition.EndsWith(" IS NOT NULL")) {
-            var columnName = condition.Substring(0, condition.Length - 12).Trim();
-            var column = database.Column[columnName];
-            return column != null ? new FilterItem(column, FilterType.Ungleich_MultiRowIgnorieren, string.Empty) : null;
-        }
-
-        // BETWEEN
-        var betweenMatch = System.Text.RegularExpressions.Regex.Match(condition,
-            @"(\w+)\s+BETWEEN\s+'([^']+)'\s+AND\s+'([^']+)'");
-        if (betweenMatch.Success) {
-            var columnName = betweenMatch.Groups[1].Value;
-            var value1 = betweenMatch.Groups[2].Value;
-            var value2 = betweenMatch.Groups[3].Value;
-            var column = database.Column[columnName];
-            return column != null ? new FilterItem(column, FilterType.Between | FilterType.UND, $"{value1}|{value2}") : null;
-        }
-
-        // LIKE
-        var likeMatch = System.Text.RegularExpressions.Regex.Match(condition,
-            @"(\w+)\s+LIKE\s+'([^']+)'");
-        if (likeMatch.Success) {
-            var columnName = likeMatch.Groups[1].Value;
-            var value = likeMatch.Groups[2].Value;
-            var column = database.Column[columnName];
-
-            if (column == null) { return null; }
-
-            // Bestimme FilterType basierend auf Wildcards
-            if (value.StartsWith("%") && value.EndsWith("%")) {
-                // %value% -> INSTR
-                var searchValue = value.Substring(1, value.Length - 2);
-                return new FilterItem(column, FilterType.Instr_GroßKleinEgal, searchValue);
-            } else if (value.EndsWith("%")) {
-                // value% -> BeginntMit
-                var searchValue = value.Substring(0, value.Length - 1);
-                return new FilterItem(column, FilterType.BeginntMit_GroßKleinEgal, searchValue);
-            } else {
-                // Exakte Übereinstimmung
-                return new FilterItem(column, FilterType.Istgleich_GroßKleinEgal, value);
-            }
-        }
-
-        // IN
-        var inMatch = System.Text.RegularExpressions.Regex.Match(condition,
-            @"(\w+)\s+IN\s*\(([^)]+)\)");
-        if (inMatch.Success) {
-            var columnName = inMatch.Groups[1].Value;
-            var valuesString = inMatch.Groups[2].Value;
-            var column = database.Column[columnName];
-
-            if (column == null) { return null; }
-
-            // Parse die Werte in der IN-Klausel
-            var values = ParseInValues(valuesString);
-            return values.Count > 0 ? new FilterItem(column, FilterType.Istgleich_ODER_GroßKleinEgal, values) : null;
-        }
-
-        // Einfache Gleichheit: column = 'value'
-        var equalMatch = System.Text.RegularExpressions.Regex.Match(condition,
-            @"(\w+)\s*=\s*'([^']*)'");
-        if (equalMatch.Success) {
-            var columnName = equalMatch.Groups[1].Value;
-            var value = equalMatch.Groups[2].Value;
-            var column = database.Column[columnName];
-            return column != null ? new FilterItem(column, FilterType.Istgleich_GroßKleinEgal, value) : null;
-        }
-
-        // Einfache Gleichheit ohne Anführungszeichen: column = value
-        var equalMatchNoQuotes = System.Text.RegularExpressions.Regex.Match(condition,
-            @"(\w+)\s*=\s*([^'\s]+)");
-        if (equalMatchNoQuotes.Success) {
-            var columnName = equalMatchNoQuotes.Groups[1].Value;
-            var value = equalMatchNoQuotes.Groups[2].Value;
-            var column = database.Column[columnName];
-            return column != null ? new FilterItem(column, FilterType.Istgleich_GroßKleinEgal, value) : null;
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Teilt die WHERE-Klausel in einzelne Bedingungen auf
     /// Vereinfachte Implementierung ohne Klammern-Unterstützung
     /// </summary>
@@ -1041,8 +925,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             var conditions = SplitConditions(whereClause);
 
             foreach (var condition in conditions) {
-                var filterItem = ParseSingleCondition(condition.Trim(), db);
-                if (filterItem != null) {
+                var filterItem = new FilterItem(db, condition.Trim());
+                if (filterItem.IsOk()) {
                     AddInternal(filterItem);
                 }
             }

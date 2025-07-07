@@ -984,17 +984,51 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (!Char_AZ.Contains(name.Substring(0, 1).ToUpperInvariant())) { return false; }
         if (name.Length > 128) { return false; }
 
-        if (name.ToUpperInvariant() == "USER") { return false; } // SQL System-Name
-        if (name.ToUpperInvariant() == "COMMENT") { return false; } // SQL System-Name
-        if (name.ToUpperInvariant() == "TABLE_NAME") { return false; } // SQL System-Name
-        if (name.ToUpperInvariant() == "COLUMN_NAME") { return false; } // SQL System-Name
-        if (name.ToUpperInvariant() == "OWNER") { return false; } // SQL System-Name
-        if (name.ToUpperInvariant() == "DATA_TYPE") { return false; } // SQL System-Name
-        if (name.ToUpperInvariant() == "DATA_LENGTH") { return false; } // SQL System-Name
-        if (name.ToUpperInvariant() == "OFFLINE") { return false; } // SQL System-Name
-        if (name.ToUpperInvariant() == "ONLINE") { return false; } // SQL System-Name
+        // Illegale Namen definieren (nur Oracle + SQL Server relevante Wörter)
+        string[] illegalNames = {
+        // SQL Standard Schlüsselwörter (beide Systeme)
+        //"SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "JOIN", "INNER", "LEFT", "RIGHT", "FULL", "OUTER",
+        //"ON", "AS", "AND", "OR", "NOT", "NULL", "IS", "IN", "EXISTS", "BETWEEN", "LIKE", "ORDER", "BY", "GROUP",
+        //"HAVING", "UNION", "ALL", "DISTINCT", "COUNT", "SUM", "AVG", "MIN", "MAX", "CASE", "WHEN", "THEN", "ELSE",
+        //"END", "IF", "CREATE", "ALTER", "DROP", "TABLE", "VIEW", "INDEX", "DATABASE", "SCHEMA", "CONSTRAINT",
+        //"PRIMARY", "FOREIGN", "KEY", "REFERENCES", "CHECK", "UNIQUE", "DEFAULT", "AUTO_INCREMENT", "IDENTITY",
+        
+        // SQL Datentypen (beide Systeme)
+        "INT", "INTEGER", "BIGINT", "SMALLINT", "TINYINT", "DECIMAL", "NUMERIC", "FLOAT", "REAL", "DOUBLE",
+        "CHAR", "VARCHAR", "NCHAR", "NVARCHAR", "DATE", "TIME", "DATETIME", "TIMESTAMP",
+        "YEAR", "BINARY", "VARBINARY", "BLOB", "CLOB", "BOOLEAN", "BIT", "MONEY", "SMALLMONEY", "GUID",
+        
+        // Oracle spezifische Datentypen
+        "VARCHAR2", "NUMBER", "ROWID", "MLSLABEL", "RAW", "LONG",
+        
+        // SQL Server spezifische Datentypen  
+        "NTEXT", "IMAGE", "UNIQUEIDENTIFIER",
+        
+        // SQL Funktionen (beide Systeme)
+        "ABS", "CEIL", "FLOOR", "ROUND", "SQRT", "POWER", "EXP", "LOG", "SIN", "COS", "TAN", "UPPER", "LOWER",
+        "TRIM", "LTRIM", "RTRIM", "LENGTH", "SUBSTRING", "REPLACE", "CONCAT", "GETDATE", "DATEADD",
+        "DATEDIFF", "CAST", "CONVERT", "ISNULL", "COALESCE",
+        
+        // System-Namen (beide Systeme)
+        "USER", "COMMENT", "TABLE_NAME", "COLUMN_NAME", "OWNER", "DATA_TYPE", "DATA_LENGTH", "OFFLINE", "ONLINE",
+        "SYSTEM", "ADMIN", "MASTER", "TEMP", "TEMPORARY", "LOG", "AUDIT", "BACKUP", "RESTORE", "TRANSACTION",
+        "COMMIT", "ROLLBACK", "SAVEPOINT", "LOCK", "UNLOCK", "GRANT", "REVOKE", "PRIVILEGE", "PERMISSION",
+        "ROLE", "LOGIN", "PASSWORD", "SESSION", "CONNECTION", "CATALOG", "SEQUENCE",
+        
+        // Oracle spezifische Systemnamen
+        "ROWNUM", "SYSDATE", "DUAL", "SYS", "SYSTEM_USER", "SESSION_USER", "CURRENT_USER", "CURRENT_DATE",
+        "CURRENT_TIME", "CURRENT_TIMESTAMP",
+        
+        // SQL Server spezifische Systemnamen
+        "ROWCOUNT", "IDENTITY_INSERT", "IDENTITYCOL", "ROWGUIDCOL", "TEXTSIZE", "CURSOR", "PROC", "PROCEDURE",
+        
+        
+        // BlueDatabase spezifisch
+        TmpNewDummy
+    };
 
-        return name.ToUpperInvariant() != TmpNewDummy; // BlueDatabase name bei neuen Spalten
+        // Prüfen ob Name in der Liste der illegalen Namen steht
+        return !illegalNames.Contains(name, StringComparer.OrdinalIgnoreCase);
     }
 
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool preverDropDown) => column is not { IsDisposed: false }

@@ -400,8 +400,10 @@ public static class IO {
             if (stopw.ElapsedMilliseconds > 5000) {
                 var operation = processMethod.Method.Name.Replace("Try", "").Replace("File", "").Replace("Dir", "");
                 var fileName = args.Length > 0 ? args[0]?.ToString()?.FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
+                var mess = "Keine weiteren Informationen vorhanden";
+                if(returnValue is string m) { mess = m; }
 
-                Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}): {fileName}...", 0);
+                Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... ({mess})", 0);
                 stopw = Stopwatch.StartNew();
             }
 

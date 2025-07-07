@@ -114,9 +114,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public ColumnItem? SysRowCreateDate { get; private set; }
     public ColumnItem? SysRowCreator { get; private set; }
     public ColumnItem? SysRowState { get; private set; }
-    private ColumnItem? _firstColumn { get; set; }
+    private ColumnItem? _firstColumn { get; set; }//TODO: Implementieren
 
-    #endregion
+    #endregion  
 
     #region Indexers
 

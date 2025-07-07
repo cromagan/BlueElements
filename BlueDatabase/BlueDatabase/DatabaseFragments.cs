@@ -168,7 +168,13 @@ public class DatabaseFragments : Database {
 
         if (_masterNeeded && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
             DropMessage(ErrorType.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
-            if (!SaveInternal(IsInCache)) { return; }
+
+            var f = SaveInternal(IsInCache);
+
+            if (!string.IsNullOrEmpty(f)) {
+                Develop.DebugPrint($"Komplettierung von {Caption} fehlgeschlagen: {f}");
+                return;
+            }
             _masterNeeded = false;
             OnInvalidateView();
             ChangesNotIncluded.Clear();

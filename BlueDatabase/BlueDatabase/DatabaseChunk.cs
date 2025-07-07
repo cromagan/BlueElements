@@ -251,7 +251,7 @@ public class DatabaseChunk : Database {
         var f = base.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if(Column.ChunkValueColumn == null) { return string.Empty; }
+        if (Column.ChunkValueColumn == null) { return string.Empty; }
 
         if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler"; }
         if (!_chunks.TryGetValue(Chunk_Master.ToLower(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler"; }
@@ -377,7 +377,7 @@ public class DatabaseChunk : Database {
             }
 
             if (t.ElapsedMilliseconds > 150 * 1000) {
-				DropMessage(ErrorType.DevelopInfo, $"Abbruch, {chunksBeingSaved.Count} Chunks wurden noch nicht gespeichert.");
+                DropMessage(ErrorType.DevelopInfo, $"Abbruch, {chunksBeingSaved.Count} Chunks wurden noch nicht gespeichert.");
                 return false;
             }
 
@@ -470,7 +470,7 @@ public class DatabaseChunk : Database {
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
-        if(Column.ChunkValueColumn == null) { return string.Empty; }
+        if (Column.ChunkValueColumn == null) { return string.Empty; }
 
         if (!_chunks.TryGetValue(chunkId, out var chunk)) {
             return "Interner Chunk-Fehler";
@@ -486,11 +486,9 @@ public class DatabaseChunk : Database {
 
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true, true);
 
-    protected override bool SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (Develop.AllReadOnly) { return true; }
-
-        var m = CanWriteMainFile();
-        if (!string.IsNullOrEmpty(m)) { return false; }
+    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+        var f = CanWriteMainFile();
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         Develop.SetUserDidSomething();
 
@@ -499,7 +497,7 @@ public class DatabaseChunk : Database {
         DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Datenank '{Caption}'");
 
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
-        if (chunksnew == null || chunksnew.Count == 0) { return false; }
+        if (chunksnew == null || chunksnew.Count == 0) { return "Fehler bei der Chunk Erzeugung"; }
 
         // Chunks für Speicherung vormerken
         var chunksToSave = new List<string>();
@@ -512,17 +510,18 @@ public class DatabaseChunk : Database {
             }
         }
 
-        var allok = true;
+        var allok = string.Empty;
 
         try {
             foreach (var thisChunk in chunksnew) {
                 if (chunksBeingSaved.ContainsKey(thisChunk.KeyName)) {
                     DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
 
-                    if (string.IsNullOrEmpty(thisChunk.DoExtendedSave())) {
+                    f = thisChunk.DoExtendedSave();
+                    if (string.IsNullOrEmpty(f)) {
                         _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
                     } else {
-                        allok = false;
+                        allok = f;
                     }
                 }
             }
@@ -533,7 +532,7 @@ public class DatabaseChunk : Database {
             }
         }
 
-        if (!allok) { return false; }
+        if (!string.IsNullOrEmpty(allok)) { return allok; }
 
         #endregion
 
@@ -553,7 +552,7 @@ public class DatabaseChunk : Database {
         #endregion
 
         FileStateUtcDate = setfileStateUtcDateTo;
-        return true;
+        return string.Empty;
     }
 
     protected override bool SaveRequired() => _chunks.Values.Any(chunk => chunk.SaveRequired);

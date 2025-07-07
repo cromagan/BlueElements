@@ -114,7 +114,8 @@ public partial class FormWithStatusBar : Form {
             if (type == ErrorType.DevelopInfo) { return false; }
 
             if (InvokeRequired) {
-                return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, symbol, message, didAlreadyMessagebox)));
+                BeginInvoke(new Func<bool>(() => UpdateStatus(type, symbol, message, didAlreadyMessagebox)));
+                return true;
             }
 
             if (capStatusBar.InvokeRequired) { return false; }
