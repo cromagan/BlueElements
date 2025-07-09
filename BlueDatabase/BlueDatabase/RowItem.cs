@@ -187,7 +187,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    public string CellFirstString() => Database?.Column.First() is not { IsDisposed: false } fc ? string.Empty : CellGetString(fc);
+    public string CellFirstString() => Database?.Column.First is not { IsDisposed: false } fc ? string.Empty : CellGetString(fc);
 
     public bool CellGetBoolean(string columnName) => CellGetBoolean(Database?.Column[columnName]);
 
@@ -378,7 +378,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var colsToRefresh = new List<ColumnItem>();
         if (db.SortDefinition?.Columns is { } lc) { colsToRefresh.AddRange(lc); }
         if (db.Column.SysChapter is { IsDisposed: false } csc) { _ = colsToRefresh.AddIfNotExists(csc); }
-        if (db.Column.First() is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
+        if (db.Column.First is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
 
         return CompareKey(colsToRefresh);
     }

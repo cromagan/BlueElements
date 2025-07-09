@@ -489,15 +489,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 return true;
 
             case "backcolorcolumnhead":
-                _backColor_ColumnHead = value.FromHtmlCode();
+                _backColor_ColumnHead = ColorParse(value);
                 return true;
 
             case "backcolorcolumncell":
-                _backColor_ColumnCell = value.FromHtmlCode();
+                _backColor_ColumnCell = ColorParse(value);
                 return true;
 
             case "fontcolorcaption":
-                _fontColor_Caption = value.FromHtmlCode();
+                _fontColor_Caption = ColorParse(value);
                 return true;
 
             case "fonthorizontal":

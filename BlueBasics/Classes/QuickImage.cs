@@ -362,8 +362,8 @@ public sealed class QuickImage : IReadableText, IEditable {
         BitmapExt? bmpSecond = null;
         var bmpOriE = new BitmapExt(bmpOri);
 
-        if (!string.IsNullOrEmpty(ChangeGreenTo)) { colgreen = ChangeGreenTo.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(Färbung)) { colfärb = Färbung.FromHtmlCode(); }
+        if (!string.IsNullOrEmpty(ChangeGreenTo)) { colgreen = ColorParse(ChangeGreenTo);  }
+        if (!string.IsNullOrEmpty(Färbung)) { colfärb = ColorParse(Färbung); }
 
         if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
             var tmpEx = Effekt ^ ImageCodeEffect.Durchgestrichen;

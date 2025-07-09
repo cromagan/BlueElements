@@ -150,7 +150,7 @@ public partial class VariableEditor : EditorEasy {
     }
 
     private void TableVariablen_CellValueChanged(object sender, CellEventArgs e) {
-        var c = tableVariablen.Database?.Column.First();
+        var c = tableVariablen.Database?.Column.First;
         if (e.Column == c) {
             if (e.Row.CellIsNullOrEmpty(c)) {
                 _ = RowCollection.Remove(e.Row, "Variable gelöscht");

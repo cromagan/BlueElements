@@ -21,39 +21,46 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
 using static BlueBasics.Converter;
 
 namespace BlueControls.CellRenderer;
 
 // ReSharper disable once UnusedMember.Global
-public class Renderer_DateTime : Renderer_Abstract {
+public class Renderer_Color : Renderer_Abstract {
 
     #region Fields
 
-    private string _format = string.Empty;
-
+    private bool _showHex = true;
+    private bool _showName = true;
     private bool _showSymbol = true;
-    private bool _utcToLocal = true;
 
     #endregion
 
     #region Properties
 
-    public static string ClassId => "DateTime";
+    public static string ClassId => "Color";
 
-    public override string Description => "Kann Uhrzeit/Datumsangaben verändert anzeigen.";
+    public override string Description => "Kann Hex-Farbcode (RGB oder ARGB) anzeigen (z.B. #ff0000) ";
 
-    public string Format {
-        get => _format;
+    public bool ShowHex {
+        get => _showHex;
         set {
-            if (_format == value) { return; }
+            if (_showHex == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _format = value;
+            _showHex = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ShowName {
+        get => _showName;
+        set {
+            if (_showName == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            _showName = value;
             OnPropertyChanged();
         }
     }
@@ -68,16 +75,6 @@ public class Renderer_DateTime : Renderer_Abstract {
         }
     }
 
-    public bool UTCToLocal {
-        get => _utcToLocal;
-        set {
-            if (_utcToLocal == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _utcToLocal = value;
-            OnPropertyChanged();
-        }
-    }
-
     #endregion
 
     #region Methods
@@ -85,85 +82,91 @@ public class Renderer_DateTime : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+        QuickImage? qi = null;
+        var pix = (int)(16 * scale);
 
-        QuickImage? qi= null;
+        var replacedText = content;
+        if (ColorTryParse(content, out var col)) {
+            replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
-        if (_showSymbol) {
-            var pix = (int)(14 * scale);
-            if (_utcToLocal) {
-                qi = QuickImage.Get(ImageCode.Haus, pix);
-            } else {
-                qi = QuickImage.Get(ImageCode.Globus, pix);
+            if (_showSymbol) {
+
+                qi = QuickImage.Get(ImageCode.Kreis, pix, Color.Magenta, col);
             }
-
         }
+
+        if (_showSymbol && qi == null) { qi = QuickImage.Get(ImageCode.Fragezeichen, pix); }
 
         Skin.Draw_FormatedText(gr, replacedText, qi, align, scaleddrawarea, this.GetFont(scale), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
-        [   new FlexiControlForProperty<string>(() => Format),
-            new FlexiControlForProperty<bool>(() => UTCToLocal),
-            new FlexiControlForProperty<bool>(() => ShowSymbol)
+        [   new FlexiControlForProperty<bool>(() => ShowSymbol),
+            new FlexiControlForProperty<bool>(() => ShowHex),
+            new FlexiControlForProperty<bool>(() => ShowName)
         ];
         return result;
     }
 
     public override List<string> ParseableItems() {
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Format", _format);
-        result.ParseableAdd("UTCToLocal", _utcToLocal);
         result.ParseableAdd("ShowSymbol", _showSymbol);
+        result.ParseableAdd("ShowHex", _showHex);
+        result.ParseableAdd("ShowName", _showName);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key.ToLower()) {
-            case "format":
-                _format = value.FromNonCritical();
-                return true;
-
-            case "utctolocal":
-                _utcToLocal = value.FromPlusMinus();
-                return true;
-
             case "showsymbol":
                 _showSymbol = value.FromPlusMinus();
+                return true;
+
+            case "showhex":
+                _showHex = value.FromPlusMinus();
+                return true;
+
+            case "showname":
+                _showName = value.FromPlusMinus();
                 return true;
         }
         return base.ParseThis(key, value);
     }
 
-    public override string ReadableText() => "Datum/Uhrzeit";
+    public override string ReadableText() => "Farbanzeige";
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Farbrad);
 
     protected override Size CalculateContentSize(string content, TranslationType translate) {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var contentSize = this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
 
         if (ShowSymbol) {
-            contentSize.Width = contentSize.Width + 16;
+            contentSize.Width = contentSize.Width + 18;
         }
 
         return contentSize;
     }
 
     protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
-        //if (string.IsNullOrWhiteSpace(_format) && !_utcToLocal) { return content; }
+        if (!_showHex && !_showName) { return string.Empty; }
 
-        if (!DateTimeTryParse(content, out var dt)) { return content; }
+        if (!ColorTryParse(content, out var col)) { return content; }
 
-        if (_utcToLocal) { dt = dt.ToLocalTime(); }
+        if (_showName && _showHex) {
+            var n = col.Name();
 
-        if (string.IsNullOrWhiteSpace(_format)) {
-            if (translate == TranslationType.Datum && LanguageTool.Translation != null) { return dt.ToString1(); }
-            return dt.ToString5();
+            if (string.IsNullOrEmpty(n)) { return col.ToHtmlCode(); }
+
+            return $"{col.ToHtmlCode()} {n}";
+        } else if (_showName) {
+            var n = col.Name();
+
+            if (!string.IsNullOrEmpty(n)) { return n; }
         }
 
-        return dt.ToString(_format, CultureInfo.InvariantCulture);
+        return col.ToHtmlCode();
     }
 
     #endregion

@@ -397,11 +397,14 @@ public static partial class Extensions {
     /// <param name="value">Ein String, der mit { beginnt. Z.B. {Wert=100, Wert2=150}</param>
     /// <returns>Gibt immer eine List zurück.</returns>
     public static List<KeyValuePair<string, string>>? GetAllTags(this string value) {
-        if (string.IsNullOrEmpty(value) || value.Length < 3) { return null; }
+        if (string.IsNullOrEmpty(value) || value.Length < 2) { return null; }
         if (value.Substring(0, 1) != "{") { return null; }
         if (value.Substring(value.Length - 1, 1) != "}") { return null; }
 
         List<KeyValuePair<string, string>> result = [];
+
+        if (value == "{}") { return result; }
+
         var start = 1;
         var noarunde = true;
         do {
@@ -562,8 +565,6 @@ public static partial class Extensions {
     public static bool IsDateTime(this string? txt) => txt != null && DateTimeTryParse(txt, out _);
 
     public static bool IsDouble(this string? txt) => txt is not null && DoubleTryParse(txt, out _);
-
-    public static bool IsHtmlColorCode(this string? txt) => txt != null && !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Char_Numerals + "abcdefABCDEF");
 
     public static bool IsLong(this string? txt) => txt is not null && long.TryParse(txt, out _);
 
@@ -772,7 +773,13 @@ public static partial class Extensions {
         return txt;
     }
 
-    public static bool RegexMatch(this string txt, string regex) => string.IsNullOrEmpty(regex) || new Regex(regex).IsMatch(txt);
+    public static bool RegexMatch(this string txt, string regex) {
+        try {
+            return string.IsNullOrEmpty(regex) || new Regex(regex).IsMatch(txt);
+        } catch {
+            return false;
+        }
+    }
 
     /// <summary>
     /// Löscht alle angegebnen Zeichen aus dem String. Gross- und Kleinschreibung wird unterschieden.

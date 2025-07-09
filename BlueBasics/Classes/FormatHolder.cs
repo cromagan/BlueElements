@@ -40,6 +40,18 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 1
     };
 
+    public static readonly FormatHolder Color = new("Color") {
+        Image = QuickImage.Get(ImageCode.Farbrad, 16),
+        RegexCheck = @"^#([0-9a-f]{6}|[0-9a-f]{8})$",
+        AllowedChars = Constants.Char_Numerals + "#abcdef",
+        TextFormatingAllowed = false,
+        AdditionalFormatCheck = AdditionalCheck.None,
+        SpellCheckingEnabled = false,
+        MultiLine = false,
+        MaxTextLenght = 8
+    };
+
+
     public static readonly FormatHolder Date = new("Date") {
         Image = QuickImage.Get(ImageCode.Uhr, 16),
         RegexCheck = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$",

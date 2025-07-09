@@ -59,12 +59,12 @@ public static class SkinDesignExtensions {
             HintergrundArt = hint
         };
 
-        if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = bc1.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(bc2)) { des.BackColor2 = bc2.FromHtmlCode(); }
+        if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = ColorParse(bc1); }
+        if (!string.IsNullOrEmpty(bc2)) { des.BackColor2 = ColorParse(bc2); }
         des.HintergrundArt = hint;
         des.RahmenArt = rahm;
-        if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = boc3.FromHtmlCode(); }
+        if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = ColorParse(boc1); }
+        if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = ColorParse(boc3); }
 
         des.SheetStyle = string.Empty;
 

@@ -52,6 +52,54 @@ public static class Converter {
         return base64;
     }
 
+    public static Color ColorParse(string input) {
+        if (string.IsNullOrEmpty(input)) { return Color.Magenta; }
+        return ColorTryParse(input, out Color color) ? color : Color.Magenta;
+    }
+
+    public static bool ColorTryParse(string input, out Color color) {
+        color = Color.Magenta; // Standardwert bei Fehler
+
+        if (string.IsNullOrWhiteSpace(input)) { return false; }
+
+        input = input.Trim().ToLower();
+
+        if (input.StartsWith("#")) { input = input.Substring(1); }
+
+        if (!(input.Length is 6 or 8 && input.ContainsOnlyChars(Constants.Char_Numerals + "abcdef"))) { return false; }
+
+        try {
+            switch (input.Length) {
+                case 6: // RGB
+                    {
+                        var r = int.Parse(input.Substring(0, 2), NumberStyles.HexNumber);
+                        var g = int.Parse(input.Substring(2, 2), NumberStyles.HexNumber);
+                        var b = int.Parse(input.Substring(4, 2), NumberStyles.HexNumber);
+                        color = Color.FromArgb(255, r, g, b);
+                        return true;
+                    }
+
+                case 8: // ARGB
+                    {
+                        var a = int.Parse(input.Substring(0, 2), NumberStyles.HexNumber);
+                        var r = int.Parse(input.Substring(2, 2), NumberStyles.HexNumber);
+                        var g = int.Parse(input.Substring(4, 2), NumberStyles.HexNumber);
+                        var b = int.Parse(input.Substring(6, 2), NumberStyles.HexNumber);
+                        color = Color.FromArgb(a, r, g, b);
+                        return true;
+                    }
+            }
+        } catch {
+            return false;
+        }
+        // 1. Versuche als Integer zu parsen (ARGB)
+        if (int.TryParse(input, out int intValue)) {
+            color = Color.FromArgb(intValue);
+            return true;
+        }
+        return false;
+    }
+
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird DateTime.UtcNow zurückgegeben.
     /// </summary>

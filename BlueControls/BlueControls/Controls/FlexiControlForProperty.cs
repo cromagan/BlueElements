@@ -398,7 +398,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<Color> ac:
-                if (ac.Get().ToHtmlCode() != Value) { ac.Set(Value.FromHtmlCode()); }
+                if (ac.Get().ToHtmlCode() != Value) { ac.Set(ColorParse(Value)); }
                 break;
 
             case Accessor<int> ai:

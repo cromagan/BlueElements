@@ -561,11 +561,11 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                 break;
 
             case "color":
-                ColorMain = value.FromHtmlCode();
+                ColorMain = ColorParse(value);
                 return true;
 
             case "backcolor":
-                ColorBack = value.FromHtmlCode();
+                ColorBack = ColorParse(value);
                 return true;
 
             case "italic":
@@ -594,7 +594,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                 return true;
 
             case "outlinecolor":
-                ColorOutline = value.FromHtmlCode();
+                ColorOutline = ColorParse(value);
                 return true;
 
             case "onlylower":
@@ -749,9 +749,9 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (capitals) { result.ParseableAdd("Capitals", capitals); }
         if (onlyupper) { result.ParseableAdd("OnlyUpper", onlyupper); }
         if (onlylower) { result.ParseableAdd("OnlyLower", onlylower); }
-        if (colorOutline.FromHtmlCode().A > 0) { result.ParseableAdd("OutlineColor", colorOutline); }
+        if (ColorParse(colorOutline).A > 0) { result.ParseableAdd("OutlineColor", colorOutline); }
         if (colorMain != "000000") { result.ParseableAdd("Color", colorMain); }
-        if (colorBack.FromHtmlCode().A > 0) { result.ParseableAdd("BackColor", colorBack); }
+        if (ColorParse(colorBack).A > 0) { result.ParseableAdd("BackColor", colorBack); }
         return result;
     }
 

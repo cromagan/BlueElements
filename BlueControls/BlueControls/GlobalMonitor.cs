@@ -44,7 +44,7 @@ public partial class GlobalMonitor : Form {
         };
         _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
-        var az = db.Column.GenerateAndAdd("Time", "Zeit", ColumnFormatHolder.DateTime);
+        var az = db.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolder.DateTime);
         _ = db.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolder.Long);
@@ -70,7 +70,7 @@ public partial class GlobalMonitor : Form {
         db.RepairAfterParse();
 
         var tcvc = ColumnViewCollection.ParseAll(db);
-        tcvc[1].ShowColumns("Symbol", "Time", "category", "indent", "Message");
+        tcvc[1].ShowColumns("Symbol", "Zeit", "category", "indent", "Message");
 
         db.ColumnArrangements = tcvc.ToString(false);
 
@@ -145,7 +145,7 @@ public partial class GlobalMonitor : Form {
 
         r.CellSet("symbol", symbol.ToString() + "|16", string.Empty);
 
-        r.CellSet("Time", DateTime.Now.ToString7(), string.Empty);
+        r.CellSet("Zeit", DateTime.Now.ToString7(), string.Empty);
         r.CellSet("category", category, string.Empty);
         r.CellSet("message", message, string.Empty);
         r.CellSet("indent", indent, string.Empty);

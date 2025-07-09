@@ -24,6 +24,7 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -79,9 +80,7 @@ public class Method_AddRows : Method_Database {
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        var c = db.Column.First();
-
-        if (c == null) { return new DoItFeedback("Erste Spalte nicht vorhanden", true, ld); }
+        if (db.Column.First is not { IsDisposed: false } c) { return new DoItFeedback("Erste Spalte nicht vorhanden", true, ld); }
 
         var d = attvar.ValueNumGet(1);
 

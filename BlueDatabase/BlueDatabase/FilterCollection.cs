@@ -321,7 +321,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (column is not { IsDisposed: false }) { return null; }
         if (column.Database is not { IsDisposed: false } db) { return null; }
 
-        if (!firstToo && db.Column.First() == column) { return null; }
+        if (!firstToo && db.Column.First == column) { return null; }
 
         if (column == db.Column.SysCorrect ||
             column == db.Column.SysRowChangeDate ||

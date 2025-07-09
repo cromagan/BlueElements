@@ -124,11 +124,11 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
                 return true;
 
             case "backcolor":
-                Hintergrundfarbe = value.FromHtmlCode();
+                Hintergrundfarbe = ColorParse(value);
                 return true;
 
             case "bordercolor":
-                Randfarbe = value.FromHtmlCode();
+                Randfarbe = ColorParse(value);
                 return true;
 
             case "borderwidth":

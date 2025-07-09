@@ -98,6 +98,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// </summary>
     //    /// <returns></returns>
 
+    public ColumnItem? First { get; private set; }
     public bool IsDisposed { get; private set; }
     public ColumnItem? SysChapter { get; private set; }
     public ColumnItem? SysCorrect { get; private set; }
@@ -111,12 +112,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public ColumnItem? SysRowChangeDate { get; private set; }
 
     public ColumnItem? SysRowChanger { get; private set; }
+    public ColumnItem? SysRowColor { get; private set; }
     public ColumnItem? SysRowCreateDate { get; private set; }
     public ColumnItem? SysRowCreator { get; private set; }
     public ColumnItem? SysRowState { get; private set; }
-    private ColumnItem? _firstColumn { get; set; }//TODO: Implementieren
 
-    #endregion  
+    #endregion
 
     #region Indexers
 
@@ -145,37 +146,37 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void Dispose() => Dispose(true);
 
-    public ColumnItem? First() {
-        // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
+    //public ColumnItem? First() {
+    //    // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
+    //    if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
-        if (db.Column.Count == 0) { return null; }
+    //    if (db.Column.Count == 0) { return null; }
 
-        foreach (var thisC in db.Column) {
-            if (thisC is { IsDisposed: false, IsFirst: true }) { return thisC; }
-        }
+    //    foreach (var thisC in db.Column) {
+    //        if (thisC is { IsDisposed: false, IsFirst: true }) { return thisC; }
+    //    }
 
-        if (string.IsNullOrEmpty(db.ColumnArrangements)) { return null; }
+    //    if (string.IsNullOrEmpty(db.ColumnArrangements)) { return null; }
 
-        var i = db.ColumnArrangements.IndexOf("ColumnName[J]", StringComparison.Ordinal);
+    //    var i = db.ColumnArrangements.IndexOf("ColumnName[J]", StringComparison.Ordinal);
 
-        if (i < 5) { return null; }
+    //    if (i < 5) { return null; }
 
-        var en = db.ColumnArrangements.IndexOf("[", i + 12, StringComparison.Ordinal);
+    //    var en = db.ColumnArrangements.IndexOf("[", i + 12, StringComparison.Ordinal);
 
-        if (en <= i) { return null; }
+    //    if (en <= i) { return null; }
 
-        var n = db.ColumnArrangements.Substring(i + 13, en - i - 13);
+    //    var n = db.ColumnArrangements.Substring(i + 13, en - i - 13);
 
-        if (n.StartsWith("SYS_")) { return null; }
+    //    if (n.StartsWith("SYS_")) { return null; }
 
-        //var l = db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false } && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
-        //if (l != null) { return l; }
+    //    //var l = db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false } && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
+    //    //if (l != null) { return l; }
 
-        //return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false })?.Column;
+    //    //return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false })?.Column;
 
-        return this[n];
-    }
+    //    return this[n];
+    //}
 
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format) => GenerateAndAdd(keyName, caption, format, string.Empty);
 
@@ -216,6 +217,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         string[] w = [
             "SYS_ROWSTATE",
             "SYS_CHAPTER",
+            "SYS_ROWCOLOR",
             "SYS_DATECHANGED",
             "SYS_CHANGER",
             "SYS_DATECREATED",
@@ -291,16 +293,21 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysRowChangeDate = null;
         SysChapter = null;
         SysRowState = null;
+        SysRowColor = null;
         ChunkValueColumn = null;
-        _firstColumn = null;
+        First = null;
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null) {
                 if (thisColumnItem.Value_for_Chunk != ChunkType.None) { ChunkValueColumn = thisColumnItem; }
-                if (thisColumnItem.IsFirst) { _firstColumn = thisColumnItem; }
+                if (thisColumnItem.IsFirst) { First = thisColumnItem; }
 
                 if (thisColumnItem.IsSystemColumn()) {
                     switch (thisColumnItem.KeyName.ToUpperInvariant()) {
+                        case "SYS_ROWCOLOR":
+                            SysRowColor = thisColumnItem;
+                            break;
+
                         case "SYS_LOCKED":
                             SysLocked = thisColumnItem;
                             break;

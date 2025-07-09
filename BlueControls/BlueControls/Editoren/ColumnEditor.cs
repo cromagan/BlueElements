@@ -135,7 +135,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void btnBackColor_Click(object sender, System.EventArgs e) {
-        ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
+        ColorDia.Color = ColorParse(QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo);
         _ = ColorDia.ShowDialog();
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
@@ -245,7 +245,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void btnTextColor_Click(object sender, System.EventArgs e) {
-        ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
+        ColorDia.Color = ColorParse(QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo);
         _ = ColorDia.ShowDialog();
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
@@ -435,8 +435,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
         _column.ColumnQuickInfo = txbQuickinfo.Text.Replace("\r", "<BR>");
         _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<BR>");
-        _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
-        _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
+        _column.BackColor = ColorParse(QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo);
+        _column.ForeColor = ColorParse(QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo);
         _column.LineStyleLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
         _column.LineStyleRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
         _column.RelationType = (RelationType)IntParse(cbxRelationType.Text);

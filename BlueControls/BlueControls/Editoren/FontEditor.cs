@@ -132,14 +132,14 @@ public partial class FontEditor : EditorEasy {
     }
 
     private void btnBackColor_Click(object sender, System.EventArgs e) {
-        ColorDia.Color = QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo.FromHtmlCode();
+        ColorDia.Color = ColorParse(QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo);
         _ = ColorDia.ShowDialog();
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
         ChangeFont();
     }
 
     private void cFarbe_Click(object sender, System.EventArgs e) {
-        ColorDia.Color = QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo.FromHtmlCode();
+        ColorDia.Color = ColorParse(QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo);
         _ = ColorDia.ShowDialog();
         btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
         ChangeFont();
@@ -163,7 +163,7 @@ public partial class FontEditor : EditorEasy {
     }
 
     private void cRandF_Click(object sender, System.EventArgs e) {
-        ColorDia.Color = QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo.FromHtmlCode();
+        ColorDia.Color = ColorParse(QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo);
         _ = ColorDia.ShowDialog();
         btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
         ChangeFont();

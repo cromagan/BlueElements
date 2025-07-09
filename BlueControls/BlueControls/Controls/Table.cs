@@ -422,7 +422,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var reverse = false;
         if (sortused is { } rsd) { colsToRefresh.AddRange(rsd.Columns); reverse = rsd.Reverse; }
         //if (db.Column.SysChapter is { IsDisposed: false } csc) { _ = colsToRefresh.AddIfNotExists(csc); }
-        if (db.Column.First() is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
+        if (db.Column.First is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
 
         #endregion
 
@@ -1780,7 +1780,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     if (_mouseOverRow?.Row is { } r) {
                         Cell_Edit(ca, _mouseOverColumn, _mouseOverRow, true, r.ChunkValue);
                     } else {
-                        if (db.Column.ChunkValueColumn == db.Column.First()) {
+                        if (db.Column.ChunkValueColumn == db.Column.First) {
                             Cell_Edit(ca, _mouseOverColumn, null, true, null);
                         } else {
                             Cell_Edit(ca, _mouseOverColumn, null, true, FilterCombined.ChunkVal);
@@ -2190,7 +2190,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (cellInThisDatabaseRow == null) {
             if (string.IsNullOrEmpty(newValue)) { return string.Empty; }
             if (cellInThisDatabaseColumn.Column?.Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
-            if (table?.Database?.Column.First() is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
+            if (table?.Database?.Column.First is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
 
             using var filterColNewRow = new FilterCollection(table.Database, "Edit-Filter");
             filterColNewRow.AddIfNotExists(table.FilterCombined.ToList());
@@ -2548,7 +2548,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        if (db.Column.First() is not { IsDisposed: false } co) { return; }
+        if (db.Column.First is not { IsDisposed: false } co) { return; }
 
         var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
 
@@ -2845,7 +2845,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     private void DoÄhnlich() {
         if (IsDisposed || Database is not { IsDisposed: false } db || db.Column.Count == 0) { return; }
 
-        var col = db.Column.First();
+        var col = db.Column.First;
 
         if (col == null) { return; } // Neue Datenbank?
 
@@ -2990,7 +2990,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             string txt;
             var plus = 0;
             QuickImage? qi;
-            if (Database.Column.First() is { IsDisposed: false } columnFirst && cellInThisDatabaseColumn == columnFirst) {
+            if (Database.Column.First is { IsDisposed: false } columnFirst && cellInThisDatabaseColumn == columnFirst) {
                 txt = "[Neue Zeile]";
                 plus = p16;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
@@ -4006,7 +4006,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (IsDisposed || Database is not { IsDisposed: false } db  ) { return "Datenbank verworfen"; }
         if (db.Column.Count == 0) { return "Keine Spalten vorhanden"; }
-        if (db.Column.First() is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
+        if (db.Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
         if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return "Erste Spalte nicht sichtbar"; }
 

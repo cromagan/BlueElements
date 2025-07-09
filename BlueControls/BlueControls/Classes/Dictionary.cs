@@ -53,7 +53,7 @@ internal static class Dictionary {
     /// <param name="word"></param>
     /// <returns></returns>
     public static bool IsWordOk(string word) {
-        if (!DictionaryRunning(false) || _dictWords?.Column.First() is not { IsDisposed: false } fc) { return true; }
+        if (!DictionaryRunning(false) || _dictWords?.Column.First is not { IsDisposed: false } fc) { return true; }
         if (string.IsNullOrEmpty(word)) { return true; }
         if (word.Length == 1) { return true; }
         if (word.IsNumeral()) { return true; }

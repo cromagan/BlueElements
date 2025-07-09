@@ -19,7 +19,6 @@
 
 using System;
 using System.Drawing;
-using System.Globalization;
 
 namespace BlueBasics;
 
@@ -65,23 +64,6 @@ public static partial class Extensions {
         return Color.FromArgb(alpha, (int)(255 * r), (int)(255 * g), (int)(255 * b));
     }
 
-    public static Color FromHtmlCode(this string color) {
-        if (!color.IsHtmlColorCode()) {
-            //Develop.DebugPrint("Farbcode ungültig: " + color);
-            return Color.Magenta;
-        }
-        var a = 255;
-        var pl = 0;
-        if (color.Length > 6) {
-            a = int.Parse(color.Substring(0, 2), NumberStyles.HexNumber);
-            pl = 2;
-        }
-        var r = int.Parse(color.Substring(pl, 2), NumberStyles.HexNumber);
-        var g = int.Parse(color.Substring(pl + 2, 2), NumberStyles.HexNumber);
-        var b = int.Parse(color.Substring(pl + 4, 2), NumberStyles.HexNumber);
-        return Color.FromArgb(a, r, g, b);
-    }
-
     public static bool IsMagentaOrTransparent(this Color col) => col.ToArgb() == -65281 || col.A == 0;
 
     //Used: Only BZL
@@ -100,6 +82,13 @@ public static partial class Extensions {
             (int)((color1.B * color1Prozent) + (color2.B * color2Prozent)));
     }
 
+    public static string Name(this Color color) {
+        if (color.IsKnownColor) {
+            return color.ToKnownColor().ToString(); // "Red"
+        }
+        return string.Empty;
+    }
+
     public static Color SetAlpha(this Color color, byte newAlpha) => Color.FromArgb(newAlpha, color.R, color.G, color.B);
 
     public static Color ToGrey(this Color color) {
@@ -108,18 +97,13 @@ public static partial class Extensions {
     }
 
     public static string ToHtmlCode(this Color color) {
-        var r = Convert.ToString(color.R, 16);
-        if (r.Length < 2) { r = "0" + r; }
-        var g = Convert.ToString(color.G, 16);
-        if (g.Length < 2) { g = "0" + g; }
-        var b = Convert.ToString(color.B, 16);
-        if (b.Length < 2) { b = "0" + b; }
-        var a = string.Empty;
-        if (color.A != 255) {
-            a = Convert.ToString(color.A, 16);
-            if (a.Length < 2) { a = "0" + a; }
+        if (color.A < 255) {
+            // Alpha, Red, Green, Blue
+            return $"#{color.A:x2}{color.R:x2}{color.G:x2}{color.B:x2}";
+        } else {
+            // Nur Red, Green, Blue
+            return $"#{color.R:x2}{color.G:x2}{color.B:x2}";
         }
-        return a + r + g + b;
     }
 
     #endregion

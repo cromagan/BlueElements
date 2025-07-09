@@ -113,8 +113,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private string _columnArrangements = string.Empty;
 
-    private string _rowColorRules = string.Empty;
-
     private string _createDate;
 
     private string _creator;
@@ -295,15 +293,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         set {
             if (_columnArrangements == value) { return; }
             _ = ChangeData(DatabaseDataType.ColumnArrangement, null, _columnArrangements, value);
-            OnViewChanged();
-        }
-    }
-
-    public string RowColorRules {
-        get => _rowColorRules;
-        set {
-            if (_rowColorRules == value) { return; }
-            _ = ChangeData(DatabaseDataType.RowColorRules, null, _rowColorRules, value);
             OnViewChanged();
         }
     }
@@ -1337,7 +1326,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         //    _ = vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));
         //}
 
-        if (Column.First() is { IsDisposed: false } fc) {
+        if (Column.First is { IsDisposed: false } fc) {
             _ = vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
 
             if (fc.ScriptType != ScriptType.Nicht_vorhanden && row != null) {
@@ -2293,7 +2282,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var result = SaveInternal(FileStateUtcDate);
             OnInvalidateView();
-            return string.IsNullOrEmpty( result);
+            return string.IsNullOrEmpty(result);
         } finally {
             _saveSemaphore.Release();
         }
@@ -2489,7 +2478,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
-
         var f = CanSaveMainChunk();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -2714,10 +2702,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case DatabaseDataType.ColumnArrangement:
                 _columnArrangements = value;
-                break;
-
-            case DatabaseDataType.RowColorRules:
-                _rowColorRules = value;
                 break;
 
             case DatabaseDataType.PermissionGroupsNewRow:

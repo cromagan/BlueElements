@@ -126,7 +126,6 @@
     <Compile Include="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
     <Compile Include="AdditionalScriptMethods\VariablePadItem.cs" />
     <Compile Include="Allgemein.cs" />
-    <Compile Include="Classes\RowColorRule.cs" />
     <Compile Include="GlobalMonitor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -176,6 +175,7 @@
     <Compile Include="Interfaces\IUniqueWindow.cs" />
     <Compile Include="Interfaces\IOpenScriptEditor.cs" />
     <Compile Include="Renderer\Renderer_Abstract.cs" />
+    <Compile Include="Renderer\Renderer_Color.cs" />
     <Compile Include="Renderer\Renderer_Font.cs" />
     <Compile Include="Renderer\Renderer_DynamicSymbol.cs" />
     <Compile Include="Renderer\Renderer_Button.cs" />

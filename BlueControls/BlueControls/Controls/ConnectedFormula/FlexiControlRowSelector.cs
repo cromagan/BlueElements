@@ -46,7 +46,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
         f.Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
         _showformat = showFormat;
 
-        if (string.IsNullOrEmpty(_showformat) && database is { Column.Count: > 0 } && database.Column.First() is { IsDisposed: false } fc) {
+        if (string.IsNullOrEmpty(_showformat) && database is { Column.Count: > 0 } && database.Column.First is { IsDisposed: false } fc) {
             _showformat = "~" + fc.KeyName + "~";
         }
     }

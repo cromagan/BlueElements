@@ -264,7 +264,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (row == null) {
-            if (db.Column.First() is not { IsDisposed: false } firstcol || firstcol != column) {
+            if (db.Column.First is not { IsDisposed: false } firstcol || firstcol != column) {
                 return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
             }
 
@@ -273,7 +273,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (db.Column.ChunkValueColumn is { } cvc && newChunkValue != null) {
-                if (cvc != db.Column.First() && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
+                if (cvc != db.Column.First && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
             }
         } else {
             if (!db.PowerEdit && db.Column.SysLocked != null) {
@@ -310,7 +310,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Allgemeiner Fehler.";
         }
 
-        if (row == null && db.Column.ChunkValueColumn == db.Column.First() && newChunkValue == null) {
+        if (row == null && db.Column.ChunkValueColumn == db.Column.First && newChunkValue == null) {
             // Es soll eine neue Zeile erstellt werden, und die erste Spalte ist die Chunk-Spalte.
             // Wir wissen nicht, was das Ziel ist.
             return string.Empty;
@@ -586,9 +586,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     private static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem?> allRows = [];
-        if (row?.Database?.Column.First() == null || row.Database.IsDisposed) { return allRows; }
+        if (row?.Database?.Column.First == null || row.Database.IsDisposed) { return allRows; }
 
-        var names = row.Database.Column.First()?.GetUcaseNamesSortedByLenght();
+        var names = row.Database.Column.First?.GetUcaseNamesSortedByLenght();
         var relationTextLine = completeRelationText.ToUpperInvariant().SplitAndCutByCr();
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
@@ -723,7 +723,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var dbtmp = Database;
         if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
 
-        var c = dbtmp.Column.First();
+        var c = dbtmp.Column.First;
         if (c == null) { return completeRelationText; }
 
         var names = c.GetUcaseNamesSortedByLenght();
@@ -788,7 +788,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
 
-        if (db.Column.First() is { IsDisposed: false } c && c == column) {
+        if (db.Column.First is { IsDisposed: false } c && c == column) {
             foreach (var thisColumn in db.Column) {
                 if (column.Relationship_to_First) {
                     RelationTextNameChanged(thisColumn, row.KeyName, previewsValue, currentValue);

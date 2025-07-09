@@ -471,7 +471,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
         if (_lastrow is not { IsDisposed: false } row) { return; }
 
-        var col = db.Column.First();
+        var col = db.Column.First;
         if (col == null) { return; }
 
         // Background-Thread für schwere Berechnungen

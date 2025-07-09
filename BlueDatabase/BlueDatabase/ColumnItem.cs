@@ -964,7 +964,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             Invalidate_ColumAndContent();
 
             if (oldd != _value_for_Chunk) {
-                Database?.Column.GetSystems();
                 Database?.ReorganizeChunks();
             }
 
@@ -992,37 +991,36 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //"HAVING", "UNION", "ALL", "DISTINCT", "COUNT", "SUM", "AVG", "MIN", "MAX", "CASE", "WHEN", "THEN", "ELSE",
         //"END", "IF", "CREATE", "ALTER", "DROP", "TABLE", "VIEW", "INDEX", "DATABASE", "SCHEMA", "CONSTRAINT",
         //"PRIMARY", "FOREIGN", "KEY", "REFERENCES", "CHECK", "UNIQUE", "DEFAULT", "AUTO_INCREMENT", "IDENTITY",
-        
+
         // SQL Datentypen (beide Systeme)
         "INT", "INTEGER", "BIGINT", "SMALLINT", "TINYINT", "DECIMAL", "NUMERIC", "FLOAT", "REAL", "DOUBLE",
         "CHAR", "VARCHAR", "NCHAR", "NVARCHAR", "DATE", "TIME", "DATETIME", "TIMESTAMP",
         "YEAR", "BINARY", "VARBINARY", "BLOB", "CLOB", "BOOLEAN", "BIT", "MONEY", "SMALLMONEY", "GUID",
-        
+
         // Oracle spezifische Datentypen
         "VARCHAR2", "NUMBER", "ROWID", "MLSLABEL", "RAW", "LONG",
-        
-        // SQL Server spezifische Datentypen  
+
+        // SQL Server spezifische Datentypen
         "NTEXT", "IMAGE", "UNIQUEIDENTIFIER",
-        
+
         // SQL Funktionen (beide Systeme)
         "ABS", "CEIL", "FLOOR", "ROUND", "SQRT", "POWER", "EXP", "LOG", "SIN", "COS", "TAN", "UPPER", "LOWER",
         "TRIM", "LTRIM", "RTRIM", "LENGTH", "SUBSTRING", "REPLACE", "CONCAT", "GETDATE", "DATEADD",
         "DATEDIFF", "CAST", "CONVERT", "ISNULL", "COALESCE",
-        
+
         // System-Namen (beide Systeme)
         "USER", "COMMENT", "TABLE_NAME", "COLUMN_NAME", "OWNER", "DATA_TYPE", "DATA_LENGTH", "OFFLINE", "ONLINE",
         "SYSTEM", "ADMIN", "MASTER", "TEMP", "TEMPORARY", "LOG", "AUDIT", "BACKUP", "RESTORE", "TRANSACTION",
         "COMMIT", "ROLLBACK", "SAVEPOINT", "LOCK", "UNLOCK", "GRANT", "REVOKE", "PRIVILEGE", "PERMISSION",
         "ROLE", "LOGIN", "PASSWORD", "SESSION", "CONNECTION", "CATALOG", "SEQUENCE",
-        
+
         // Oracle spezifische Systemnamen
         "ROWNUM", "SYSDATE", "DUAL", "SYS", "SYSTEM_USER", "SESSION_USER", "CURRENT_USER", "CURRENT_DATE",
         "CURRENT_TIME", "CURRENT_TIMESTAMP",
-        
+
         // SQL Server spezifische Systemnamen
         "ROWCOUNT", "IDENTITY_INSERT", "IDENTITYCOL", "ROWGUIDCOL", "TEXTSIZE", "CURSOR", "PROC", "PROCEDURE",
-        
-        
+
         // BlueDatabase spezifisch
         TmpNewDummy
     };
@@ -1425,7 +1423,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (_relationship_to_First) {
             if (!_multiLine) { return "Bei dieser Funktion muss mehrzeilig ausgewählt werden."; }
             //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-            if (db.Column.First() == this) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt."; }
+            if (db.Column.First == this) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt."; }
             //if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
             //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
         }
@@ -1559,7 +1557,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             "SYS_DATECREATED" or
             "SYS_DATECHANGED" or
             "SYS_LOCKED" or
-            "SYS_ROWSTATE";
+            "SYS_ROWSTATE" or 
+            "SYS_ROWCOLOR";
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
@@ -1791,6 +1790,26 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                     Caption = "Zeilen-Status";
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
+                    //LineLeft = ColumnLineStyle.Dick;
+                }
+                //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+
+                break;
+
+            case "SYS_ROWCOLOR":
+                _isKeyColumn = false;
+                _isFirst = false;
+                _relationship_to_First = false;
+                _relationType = RelationType.None;
+                _value_for_Chunk = ChunkType.None;
+                _spellCheckingEnabled = false;
+                _ignoreAtRowFilter = true;
+                this.GetStyleFrom(ColumnFormatHolder.Color); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                MaxCellLenght = MaxTextLenght;
+                if (setOpticalToo) {
+                    Caption = "Zeilenfarbe";
+                    ForeColor = Color.FromArgb(0, 0, 0);
+                    BackColor = Color.FromArgb(255, 255, 255);
                     //LineLeft = ColumnLineStyle.Dick;
                 }
                 //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
@@ -2223,6 +2242,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case DatabaseDataType.IsFirst:
                 _isFirst = newvalue.FromPlusMinus();
+                Database?.Column.GetSystems();
                 break;
 
             case DatabaseDataType.IsKeyColumn:
@@ -2284,6 +2304,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             case DatabaseDataType.Value_for_Chunk:
                 _value_for_Chunk = (ChunkType)IntParse(newvalue);
+                Database?.Column.GetSystems();
                 break;
 
             case DatabaseDataType.IgnoreAtRowFilter:

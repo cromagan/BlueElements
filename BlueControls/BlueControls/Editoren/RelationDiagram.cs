@@ -130,7 +130,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     private void BezPlus(RowFormulaPadItem initialItem) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
-        if (_column == null || initialItem.Row == null || db.Column.First() is not { IsDisposed: false } cf) { return; }
+        if (_column == null || initialItem.Row == null || db.Column.First is not { IsDisposed: false } cf) { return; }
 
         // Den Beziehungstext holen
         var t = initialItem.Row.CellGetString(_column).ToUpperInvariant();
@@ -347,7 +347,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
-        if (Database?.Column.First() is not { IsDisposed: false } c) { return; }
+        if (Database?.Column.First is not { IsDisposed: false } c) { return; }
 
         var il = new List<AbstractListItem>();
         il.AddRange(ItemsOf(c.Contents()));

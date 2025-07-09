@@ -111,7 +111,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
     public RowItem? this[string primärSchlüssel] {
         get {
-            if (Database?.Column.First() is { IsDisposed: false } c) {
+            if (Database?.Column.First is { IsDisposed: false } c) {
                 if (c.Value_for_Chunk != ChunkType.None) {
                     var ok = Database.BeSureRowIsLoaded(primärSchlüssel);
                     if (!ok) { return null; }
@@ -515,7 +515,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }
 
-        if (db2.Column.First() is not { }) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler", false); }
+        if (db2.Column.First is not { IsDisposed: false }) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler", false); }
 
         var f = db2.CanWriteMainFile();
         if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f, true); }
@@ -544,7 +544,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
-        if (db.Column.First() is not { IsDisposed: false } cf) { return null; }
+        if (db.Column.First is not { IsDisposed: false } cf) { return null; }
 
         return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).newrow;
     }
@@ -683,7 +683,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen", true); }
 
-        if (db.Column.First() is not { IsDisposed: false } co) { return (null, "Spalte nicht vorhanden", true); }
+        if (db.Column.First is not { IsDisposed: false } co) { return (null, "Spalte nicht vorhanden", true); }
 
         using var fic = new FilterCollection(db, "UnqiueRow");
 
