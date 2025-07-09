@@ -91,7 +91,7 @@ public class Renderer_Color : Renderer_Abstract {
 
             if (_showSymbol) {
 
-                qi = QuickImage.Get(ImageCode.Kreis, pix, Color.Magenta, col);
+                qi = QuickImage.Get(ImageCode.Kreis, pix, Color.Transparent, col);
             }
         }
 
@@ -158,11 +158,10 @@ public class Renderer_Color : Renderer_Abstract {
             var n = col.Name();
 
             if (string.IsNullOrEmpty(n)) { return col.ToHtmlCode(); }
-
             return $"{col.ToHtmlCode()} {n}";
+
         } else if (_showName) {
             var n = col.Name();
-
             if (!string.IsNullOrEmpty(n)) { return n; }
         }
 

@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Designer_Support;
 
@@ -46,7 +47,7 @@ public partial class QuickPicDesigner : Panel {
 
     public string ImgCode() {
         var e = (ImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)ImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)ImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)ImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)ImageCodeEffect.WindowsXPDisabled));
-        return QuickImage.GenerateCode(txbName.Text, IntParse(txbWidth.Text), IntParse(txbHeight.Text), e, txbFaerbung.Text, txbChangeGreen.Text, sldSat.Value, satLum.Value, 0, satTransparenz.Value, txbZweitsymbol.Text);
+        return QuickImage.GenerateCode(txbName.Text, IntParse(txbWidth.Text), IntParse(txbHeight.Text), e, ColorParse(txbFaerbung.Text), ColorParse(txbChangeGreen.Text), sldSat.Value, satLum.Value, 0, satTransparenz.Value, txbZweitsymbol.Text);
     }
 
     public void StartAll(string code) {
@@ -59,8 +60,8 @@ public partial class QuickPicDesigner : Panel {
 
         QuickImage l = new(code);
         txbName.Text = l.Name;
-        txbFaerbung.Text = l.Färbung;
-        txbChangeGreen.Text = l.ChangeGreenTo;
+        txbFaerbung.Text = l.Färbung.ToHtmlCode();
+        txbChangeGreen.Text = l.ChangeGreenTo.ToHtmlCode();
         chkbGrauStufen.Checked = l.Effekt.HasFlag(ImageCodeEffect.Graustufen);
         sldSat.Value = l.Sättigung;
         satLum.Value = l.Helligkeit;

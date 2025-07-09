@@ -195,7 +195,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public Color CellGetColor(string columnName) => CellGetColor(Database?.Column[columnName]);
 
-    public Color CellGetColor(ColumnItem? column) => Color.FromArgb(CellGetInteger(column));
+    public Color CellGetColor(ColumnItem? column) => ColorParse(Database?.Cell.GetString(column, this) ?? string.Empty);
 
     public int CellGetColorBgr(ColumnItem? column) {
         var c = CellGetColor(column);

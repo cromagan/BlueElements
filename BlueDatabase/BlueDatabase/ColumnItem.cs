@@ -1811,6 +1811,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                     ForeColor = Color.FromArgb(0, 0, 0);
                     BackColor = Color.FromArgb(255, 255, 255);
                     //LineLeft = ColumnLineStyle.Dick;
+                    AdminInfo = "Muss Werte im Format RGB oder ARGB enthalten.\r\nBeispiel: #ff0000 oder #ff120320";
                 }
                 //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
 

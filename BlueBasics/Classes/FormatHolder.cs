@@ -48,7 +48,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 8
+        MaxTextLenght = 9
     };
 
 

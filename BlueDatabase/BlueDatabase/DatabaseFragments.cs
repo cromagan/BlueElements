@@ -172,7 +172,7 @@ public class DatabaseFragments : Database {
             var f = SaveInternal(IsInCache);
 
             if (!string.IsNullOrEmpty(f)) {
-                Develop.DebugPrint($"Komplettierung von {Caption} fehlgeschlagen: {f}");
+                Develop.DebugPrint(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
                 return;
             }
             _masterNeeded = false;

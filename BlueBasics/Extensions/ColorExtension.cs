@@ -19,6 +19,7 @@
 
 using System;
 using System.Drawing;
+using System.Linq;
 
 namespace BlueBasics;
 
@@ -84,9 +85,21 @@ public static partial class Extensions {
 
     public static string Name(this Color color) {
         if (color.IsKnownColor) {
-            return color.ToKnownColor().ToString(); // "Red"
+            return color.ToKnownColor().ToString();
         }
-        return string.Empty;
+
+        // Für custom colors, versuche die nächstliegende bekannte Farbe zu finden
+        var knownColors = Enum.GetValues(typeof(KnownColor))
+            .Cast<KnownColor>()
+            .Where(k => k != KnownColor.Transparent)
+            .Select(k => Color.FromKnownColor(k))
+            .ToList();
+
+        var closest = knownColors
+            .OrderBy(c => Math.Abs(c.R - color.R) + Math.Abs(c.G - color.G) + Math.Abs(c.B - color.B))
+            .First();
+
+        return closest.ToKnownColor().ToString();
     }
 
     public static Color SetAlpha(this Color color, byte newAlpha) => Color.FromArgb(newAlpha, color.R, color.G, color.B);
@@ -96,7 +109,20 @@ public static partial class Extensions {
         return Color.FromArgb(color.A, w, w, w);
     }
 
+    public static string ToHtmlCode(this Color? color) {
+        if(color is not { } c) { return string.Empty; }
+
+        if (c.A < 255) {
+            // Alpha, Red, Green, Blue
+            return $"#{c.A:x2}{c.R:x2}{c.G:x2}{c.B:x2}";
+        } else {
+            // Nur Red, Green, Blue
+            return $"#{c.R:x2}{c.G:x2}{c.B:x2}";
+        }
+    }
+
     public static string ToHtmlCode(this Color color) {
+ 
         if (color.A < 255) {
             // Alpha, Red, Green, Blue
             return $"#{color.A:x2}{color.R:x2}{color.G:x2}{color.B:x2}";
@@ -105,6 +131,7 @@ public static partial class Extensions {
             return $"#{color.R:x2}{color.G:x2}{color.B:x2}";
         }
     }
+
 
     #endregion
 }

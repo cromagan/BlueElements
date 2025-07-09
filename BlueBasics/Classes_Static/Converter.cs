@@ -53,12 +53,12 @@ public static class Converter {
     }
 
     public static Color ColorParse(string input) {
-        if (string.IsNullOrEmpty(input)) { return Color.Magenta; }
-        return ColorTryParse(input, out Color color) ? color : Color.Magenta;
+        if (string.IsNullOrEmpty(input)) { return Color.Transparent; }
+        return ColorTryParse(input, out Color color) ? color : Color.Transparent;
     }
 
     public static bool ColorTryParse(string input, out Color color) {
-        color = Color.Magenta; // Standardwert bei Fehler
+        color = Color.Transparent; // Standardwert bei Fehler
 
         if (string.IsNullOrWhiteSpace(input)) { return false; }
 

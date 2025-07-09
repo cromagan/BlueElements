@@ -56,8 +56,8 @@ public sealed class QuickImage : IReadableText, IEditable {
         _ = int.TryParse(w[2], out var height);
 
         Effekt = (ImageCodeEffect)IntParse(w[3]);
-        Färbung = w[4];
-        ChangeGreenTo = w[5];
+        Färbung = string.IsNullOrEmpty(w[4]) ? null : ColorParse(w[4]);
+        ChangeGreenTo = string.IsNullOrEmpty(w[5]) ? null : ColorParse(w[5]);
         Helligkeit = string.IsNullOrEmpty(w[6]) ? 100 : IntParse(w[6]);
         Sättigung = string.IsNullOrEmpty(w[7]) ? 100 : IntParse(w[7]);
         DrehWinkel = string.IsNullOrEmpty(w[8]) ? 0 : IntParse(w[8]);
@@ -111,12 +111,12 @@ public sealed class QuickImage : IReadableText, IEditable {
     #region Properties
 
     public string CaptionForEditor => "Bild";
-    public string ChangeGreenTo { get; } = string.Empty;
+    public Color? ChangeGreenTo { get; }
     public string Code { get; } = string.Empty;
     public int DrehWinkel { get; }
     public Type? Editor { get; set; }
     public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
-    public string Färbung { get; } = string.Empty;
+    public Color? Färbung { get; }
     public int Height { get; private set; }
     public int Helligkeit { get; }
     public bool IsError { get; }
@@ -210,7 +210,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         }
     }
 
-    public static string GenerateCode(string name, int width, int height, ImageCodeEffect effekt, string färbung, string changeGreenTo, int sättigung, int helligkeit, int drehwinkel, int transparenz, string? zweitsymbol) {
+    public static string GenerateCode(string name, int width, int height, ImageCodeEffect effekt, Color? färbung, Color? changeGreenTo, int sättigung, int helligkeit, int drehwinkel, int transparenz, string? zweitsymbol) {
         var c = new StringBuilder();
 
         _ = c.Append(name);
@@ -221,10 +221,10 @@ public sealed class QuickImage : IReadableText, IEditable {
         _ = c.Append("|");
         if (effekt != ImageCodeEffect.Ohne) { _ = c.Append((int)effekt); }
         _ = c.Append("|");
-        if (färbung != "00ffffff") { _ = c.Append(färbung); }
+        if (färbung.HasValue && färbung.Value != Color.Transparent) { _ = c.Append(färbung.Value.ToHtmlCode()); }
 
         _ = c.Append("|");
-        if (changeGreenTo != "00ffffff") { _ = c.Append(changeGreenTo); }
+        if (changeGreenTo.HasValue && changeGreenTo.Value != Color.Transparent) { _ = c.Append(changeGreenTo.Value.ToHtmlCode()); }
         _ = c.Append("|");
         if (helligkeit != 100) { _ = c.Append(helligkeit); }
         _ = c.Append("|");
@@ -251,16 +251,16 @@ public sealed class QuickImage : IReadableText, IEditable {
             w[2] = string.Empty;
             return Get(w.JoinWith("|"));
         }
-        return Get(GenerateCode(image, squareWidth, 0, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+        return Get(GenerateCode(image, squareWidth, 0, ImageCodeEffect.Ohne, null, null, 100, 100, 0, 0, string.Empty));
     }
 
     public static QuickImage Get(ImageCode image) => Get(image, 16);
 
-    public static QuickImage Get(ImageCode image, int squareWidth) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, null, null, 100, 100, 0, 0, string.Empty));
 
-    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo, int helligkeit) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung.ToHtmlCode(), changeGreenTo.ToHtmlCode(), 100, helligkeit, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo, int helligkeit) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung, changeGreenTo, 100, helligkeit, 0, 0, string.Empty));
 
-    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung.ToHtmlCode(), changeGreenTo.ToHtmlCode(), 100, 100, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
 
     public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
@@ -343,8 +343,8 @@ public sealed class QuickImage : IReadableText, IEditable {
         #region Bild ohne besonderen Effekte, schnell abhandeln
 
         if (Effekt == ImageCodeEffect.Ohne &&
-            string.IsNullOrEmpty(ChangeGreenTo) &&
-            string.IsNullOrEmpty(Färbung) &&
+            !ChangeGreenTo.HasValue &&
+            !Färbung.HasValue &&
             Sättigung == 100 &&
             Helligkeit == 100 &&
             Transparenz == 0 &&
@@ -356,14 +356,9 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         #region Attribute in Variablen umsetzen
 
-        Color? colgreen = null;
-        Color? colfärb = null;
         BitmapExt? bmpKreuz = null;
         BitmapExt? bmpSecond = null;
         var bmpOriE = new BitmapExt(bmpOri);
-
-        if (!string.IsNullOrEmpty(ChangeGreenTo)) { colgreen = ColorParse(ChangeGreenTo);  }
-        if (!string.IsNullOrEmpty(Färbung)) { colfärb = ColorParse(Färbung); }
 
         if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
             var tmpEx = Effekt ^ ImageCodeEffect.Durchgestrichen;
@@ -418,8 +413,8 @@ public sealed class QuickImage : IReadableText, IEditable {
                 if (c.IsMagentaOrTransparent()) {
                     c = Color.FromArgb(0, 0, 0, 0);
                 } else {
-                    if (colgreen != null && c.ToArgb() == -16711936) { c = (Color)colgreen; }
-                    if (colfärb is { A: > 0 } cf) {
+                    if (ChangeGreenTo.HasValue && c.ToArgb() == -16711936) { c = ChangeGreenTo.Value; }
+                    if (Färbung is { A: > 0 } cf) {
                         c = cf.GetHue().FromHsb(cf.GetSaturation(), c.GetBrightness(), c.A);
                     }
                     if (Sättigung != 100 || Helligkeit != 100) { c = c.GetHue().FromHsb(c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }

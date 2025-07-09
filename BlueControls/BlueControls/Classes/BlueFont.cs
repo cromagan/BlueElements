@@ -151,9 +151,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, Color.Black, Color.Transparent, false, false, false, Color.Transparent);
 
-    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, string colorMain, string colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower, string colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower, colorBack).FinishParseable());
-
-    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower, Color colorBack) => Get(fontName, fontSize, bold, italic, underline, strikeout, colorMain.ToHtmlCode(), colorOutline.ToHtmlCode(), kapitälchen, onlyUpper, onlyLower, colorBack.ToHtmlCode());
+    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower, Color colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower, colorBack).FinishParseable());
 
     public static BlueFont Get(string toParse) {
         if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{") || _blueFontCache == null) {
@@ -458,7 +456,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _nameInStyleSym;
     }
 
-    public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower, ColorBack.ToHtmlCode());
+    public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower, ColorBack);
 
     public void ParseFinished(string parsed) {
         // StringBuilder ist bei vielen Replace-Operationen schneller,
@@ -737,7 +735,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     internal float Oberlänge(float scale) => _oberlänge * scale;
 
-    private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower, string colorBack) {
+    private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, bool capitals, bool onlyupper, bool onlylower, Color colorBack) {
         List<string> result = [];
 
         result.ParseableAdd("Name", fontName);
@@ -749,9 +747,9 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (capitals) { result.ParseableAdd("Capitals", capitals); }
         if (onlyupper) { result.ParseableAdd("OnlyUpper", onlyupper); }
         if (onlylower) { result.ParseableAdd("OnlyLower", onlylower); }
-        if (ColorParse(colorOutline).A > 0) { result.ParseableAdd("OutlineColor", colorOutline); }
-        if (colorMain != "000000") { result.ParseableAdd("Color", colorMain); }
-        if (ColorParse(colorBack).A > 0) { result.ParseableAdd("BackColor", colorBack); }
+        if (colorOutline.A > 0) { result.ParseableAdd("OutlineColor", colorOutline.ToHtmlCode()); }
+        if (colorMain.ToArgb() != Color.Black.ToArgb()) { result.ParseableAdd("Color", colorMain.ToHtmlCode()); }
+        if (colorBack.A > 0) { result.ParseableAdd("BackColor", colorBack.ToHtmlCode()); }
         return result;
     }
 

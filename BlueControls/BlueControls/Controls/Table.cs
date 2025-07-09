@@ -3016,13 +3016,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             if (cellInThisDatabaseRowData.Expanded) {
 
-                var rowBackgroundColor = GetRowBackgroundColor(cellInThisDatabaseRow);
-                if (rowBackgroundColor != Color.Transparent) {
-                    using var brush = new SolidBrush(rowBackgroundColor);
-                    gr.FillRectangle(brush, cellrectangle);
+                if (Database.Column.SysRowColor is { IsDisposed: false } src) {
+                    var rowBackgroundColor = cellInThisDatabaseRow.CellGetColor(src);
+                    if (rowBackgroundColor != Color.Transparent) {
+                        using var brush = new SolidBrush(rowBackgroundColor);
+                        gr.FillRectangle(brush, cellrectangle);
+                    }
+
                 }
-
-
                 if (cellInThisDatabaseRowData.MarkYellow) { gr.FillRectangle(BrushYellowTransparent, cellrectangle); }
 
                 if (isAdmin) {
@@ -3095,24 +3096,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
         }
     }
-
-    private Color GetRowBackgroundColor(RowItem row) {
-        if (row?.Database is not { IsDisposed: false } db) { return Color.Transparent; }
-
-        //// Beispiel: Einfärbung nach Status-Spalte
-        //if (db.Column["Status"] is { IsDisposed: false } statusColumn) {
-        //    var status = row.CellGetString(statusColumn);
-        //    return status switch {
-        //        "Aktiv" => Color.LightGreen.SetAlpha(100),
-        //        "Inaktiv" => Color.LightGray.SetAlpha(100),
-        //        "Fehler" => Color.LightCoral.SetAlpha(100),
-        //        _ => Color.Transparent
-        //    };
-        //}
-
-        return Color.Transparent;
-    }
-
 
     private void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int lfdNo, ColumnViewCollection ca, Rectangle realHead) {
         if (IsDisposed) { return; }
