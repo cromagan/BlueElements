@@ -1376,7 +1376,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             }
 
             if (_relationType != RelationType.None) {
-                return "Bei Spalten mit Verknüpfng zu anderen Datenbanken der Inhalt gespeichert werden.";
+                return "Bei Spalten mit Verknüpfung zu anderen Datenbanken der Inhalt gespeichert werden.";
             }
 
             if (_relationship_to_First) {
@@ -1385,9 +1385,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
 
         if (_isFirst) {
-            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
-                return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
-            }
+            //if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
+            //    return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
+            //}
 
             if (_relationship_to_First || _relationType != RelationType.None) {
                 return "Beziehungen zu anderen Zeilen und Erstpalte nicht kombinierbar.";

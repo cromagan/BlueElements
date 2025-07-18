@@ -23,23 +23,22 @@ public readonly struct CanDoFeedback {
 
     #region Constructors
 
-    public CanDoFeedback(int errorposition, string message, bool needsScriptFix, LogData? ld) {
+    public CanDoFeedback(int errorposition, string failedreason, bool needsScriptFix, LogData? ld) {
         ContinueOrErrorPosition = errorposition;
-        Message = message;
+        FailedReason = failedreason;
         NeedsScriptFix = needsScriptFix;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
         LogData = ld;
 
-        if(needsScriptFix) {
-            ld?.AddMessage(message);
+        if (needsScriptFix) {
+            ld?.AddMessage(failedreason);
         }
-
     }
 
     public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, LogData ld) {
         ContinueOrErrorPosition = continuePosition;
-        Message = string.Empty;
+        FailedReason = string.Empty;
         NeedsScriptFix = false;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
@@ -65,14 +64,14 @@ public readonly struct CanDoFeedback {
     /// </summary>
     public int ContinueOrErrorPosition { get; }
 
-    public LogData? LogData { get; }
-
     /// <summary>
     /// Gibt empty zurück, wenn der Befehl ausgeführt werden kann.
     /// Ansonsten den Grund, warum er nicht ausgeführt werden kann.
     /// Nur in Zusammenhang mit NeedsScriptFix zu benutzen, weil hier auch einfach die Meldung sein kann, dass der Befehl nicht erkannt wurde - was an sich kein Fehler ist.
     /// </summary>
-    public string Message { get; }
+    public string FailedReason { get; }
+
+    public LogData? LogData { get; }
 
     /// <summary>
     /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.

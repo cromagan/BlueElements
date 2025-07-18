@@ -34,7 +34,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
-    public List<string> ArgsForButtonDescription => ["Datenbank", "Auszuführendes Skript", "Zusätzliches Attribut"];
+    public List<string> ArgsForButtonDescription => ["Datenbank", "Auszuführendes Skript", "Attribut0"];
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "calldatabase";
     public override List<string> Constants => [];
@@ -48,7 +48,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
     public override MethodType MethodType => MethodType.SpecialVariables;
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Ein Skript einer anderen Datenbank ausführen";
-    public override string Returns => string.Empty;
+    public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "CallDatabase(DatabaseName, Scriptname, Attribut0, ...);";
 
@@ -83,9 +83,9 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         #endregion
 
-        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
-
-        return f.Failed ? new DoItFeedback(f.ProtocolText, true, ld) : DoItFeedback.Null();
+        var scx = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
+        scx.ConsumeBreakAndReturn();
+        return scx;
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1] + "," + args[2];

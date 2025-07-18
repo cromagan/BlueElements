@@ -29,23 +29,23 @@ public readonly struct GetEndFeedback {
     internal readonly string AttributeText;
     internal readonly int ContinuePosition;
     internal readonly string FailedReason = string.Empty;
-    internal readonly Variable? Variable;
+    internal readonly Variable? ReturnValue;
 
     #endregion
 
     #region Constructors
 
-    public GetEndFeedback(Variable? variable) {
+    public GetEndFeedback(Variable? returnvalue) {
         ContinuePosition = 0;
         AttributeText = string.Empty;
-        Variable = variable;
+        ReturnValue = returnvalue;
     }
 
-    public GetEndFeedback(string failedReason, LogData? ld, bool needsScriptFix) {
+    public GetEndFeedback(string failedReason, bool needsScriptFix, LogData? ld) {
         ContinuePosition = 0;
         FailedReason = failedReason;
         AttributeText = string.Empty;
-        Variable = null;
+        ReturnValue = null;
         NeedsScriptFix = needsScriptFix;
         ld?.AddMessage(FailedReason);
     }
@@ -53,7 +53,7 @@ public readonly struct GetEndFeedback {
     public GetEndFeedback(int continuePosition, string attributetext) {
         ContinuePosition = continuePosition;
         AttributeText = attributetext;
-        Variable = null;
+        ReturnValue = null;
         if (ContinuePosition == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
     }
 

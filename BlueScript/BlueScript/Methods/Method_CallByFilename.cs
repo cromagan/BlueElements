@@ -73,11 +73,11 @@ public class Method_CallByFilename : Method {
     /// <param name="varCol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, LogData ld, string aufgerufenVon, string normalizedscripttext, bool keepVariables, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog) {
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, bool keepVariables, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog, LogData ld) {
         ScriptEndedFeedback scx;
 
         if (scp.Stufe > 10) {
-            return new DoItFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", true, ld);
+            return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
         }
 
         var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");
@@ -112,11 +112,11 @@ public class Method_CallByFilename : Method {
         }
 
         if (scx.Failed) {
-            ld.Protocol.AddRange(scx.Protocol);
-            return new DoItFeedback("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", scx.NeedsScriptFix, ld);
+            scx.ChangeFailedReason("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", ld);
+            return scx;
         }
 
-        return new DoItFeedback(scx.BreakFired, scx.EndScript);
+        return scx;
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
@@ -152,9 +152,9 @@ public class Method_CallByFilename : Method {
 
         #endregion
 
-        var scx = CallSub(varCol, scp, ld, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null, a, vs);
-        if (scx.Failed) { return scx; }
-        return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
+        var scx = CallSub(varCol, scp, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null, a, vs, ld);
+        scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
+        return scx; 
     }
 
     #endregion

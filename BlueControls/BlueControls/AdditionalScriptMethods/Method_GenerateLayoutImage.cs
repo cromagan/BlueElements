@@ -80,8 +80,8 @@ public class Method_GenerateLayoutImage : Method_Database {
         var scx = l.ReplaceVariables(r);
 
         if (scx.Failed) {
-            ld.Protocol.AddRange(scx.Protocol);
-            return new DoItFeedback("Generierung fehlgeschlagen", true, ld);
+            scx.ChangeFailedReason("Generierung fehlgeschlagen", ld);
+            return scx;
         }
 
         var bmp = l.ToBitmap((float)sc);

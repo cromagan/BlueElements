@@ -78,11 +78,10 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
 
         foreach (var thisR in r) {
             if (thisR is { IsDisposed: false }) {
-                //s.Sub++;
-                var s2 = thisR.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
-                if (s2.Failed) {
-                    ld.Protocol.AddRange(s2.Protocol);
-                    return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen", true, ld);
+                var scx = thisR.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
+                if (scx.Failed) {
+                    scx.ChangeFailedReason("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen", ld);
+                    return scx;
                 }
             }
         }

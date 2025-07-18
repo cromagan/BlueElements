@@ -27,11 +27,10 @@ namespace BlueScript.Methods;
 // ReSharper disable once UnusedType.Global
 public class Method_SetFailed : Method {
 
-
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
-    public override string Command => "SetFailed";
+    public override string Command => "setfailed";
     public override List<string> Constants => [];
 
     public override string Description => "Markiert die Zeile als gescheitert, ohne sie als Fehlerhaft zu setzen.\r\n" +
@@ -53,43 +52,12 @@ public class Method_SetFailed : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
-
-        //SetFailed(varCol, attvar.ValueStringGet(0));
-
-        //return DoItFeedback.Null();
-        //if (string.IsNullOrEmpty(reason)) { reason = "Allgemeiner Fehler."; }
-        //var b = varCol.Get("successful");
-
-        //if (b is VariableBool vb) {
-
-        //    vb.ReadOnly = false;
-        //    vb.ValueBool = false;
-        //    vb.ReadOnly = true;
-        //}
-
-        //var s = varCol.Get("notsuccessfulreason");
-
-        //if (s is VariableString vs) {
-        //    vs.ReadOnly = false;
-        //    vs.ValueString = reason;
-        //    vs.ReadOnly = true;
-        //}
-
-        //Develop.MonitorMessage?.Invoke(ErrorType.Info, this, "Allgemein", "Kreuz", $"Nicht Erfolgreich gesetzt: {reason}", 0);
-
         var r = attvar.ValueStringGet(0);
 
         if (string.IsNullOrEmpty(r)) { return new DoItFeedback("Keine Fehlermeldung angegeben.", true, ld); }
 
         return new DoItFeedback(r, false, ld);
-
-
-
     }
-
-
-
 
     #endregion
 }

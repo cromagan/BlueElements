@@ -129,7 +129,7 @@ public class VariableBool : Variable {
                 var tmp1 = GetVariableByParsing(s1, dummyLog, varCol, scp);
                 if (tmp1.Failed) { return (false, null); }//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
 
-                v1 = tmp1.Variable;
+                v1 = tmp1.ReturnValue;
             } else {
                 if (check != "!") { return (false, null); }//new DoItFeedback(infos.LogData, s, "Wert vor Operator (" + check + ") nicht gefunden: " + txt);
             }
@@ -146,7 +146,7 @@ public class VariableBool : Variable {
                 return (false, null);//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
             }
 
-            var v2 = tmp2.Variable;
+            var v2 = tmp2.ReturnValue;
 
             #endregion
 

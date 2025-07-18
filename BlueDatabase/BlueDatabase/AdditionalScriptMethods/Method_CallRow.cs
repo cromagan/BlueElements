@@ -33,7 +33,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override List<List<string>> Args => [StringVal, RowVar, StringVal];
     public List<List<string>> ArgsForButton => [StringVal, StringVal];
-    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Zusätzliches Attribut"];
+    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Attribut0"];
     public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
     public override string Command => "callrow";
     public override List<string> Constants => [];
@@ -47,14 +47,13 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    //public override MethodType MethodType => MethodType.Database | MethodType.SpecialVariables;
-    public override MethodType MethodType => MethodType.Special;
+    public override MethodType MethodType => MethodType.SpecialVariables;
 
     public override bool MustUseReturnValue => false;
 
     public string NiceTextForUser => "Ein Skript mit der eingehenden Zeile ausführen";
 
-    public override string Returns => string.Empty;
+    public override string Returns => VariableListString.ShortName_Plain;
 
     public override string StartSequence => "(";
 
@@ -88,13 +87,13 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
         var vs = attvar.ValueStringGet(0);
 
-        var s2 = row.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
-        if (s2.Failed) {
-            ld.Protocol.AddRange(s2.Protocol);
-            return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen", true, ld);
+        var scx = row.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
+        if (scx.Failed) {
+            scx.ChangeFailedReason("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen", ld);
+            return scx;
         }
-
-        return DoItFeedback.Null();
+        scx.ConsumeBreakAndReturn();
+        return scx;
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + rowarg + "," + args[1];

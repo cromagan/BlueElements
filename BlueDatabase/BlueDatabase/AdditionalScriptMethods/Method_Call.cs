@@ -36,7 +36,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
     public List<List<string>> ArgsForButton => [StringVal, StringVal];
-    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Zusätzliches Attribut"];
+    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Attribut0"];
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "call";
     public override List<string> Constants => [];
@@ -55,7 +55,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public string NiceTextForUser => "Ein Skript aus dieser Datenbank ausführen";
 
-    public override string Returns => string.Empty;
+    public override string Returns => VariableListString.ShortName_Plain;
 
     public override string StartSequence => "(";
 
@@ -71,7 +71,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
         var vs = attvar.ValueStringGet(0);
 
         var sc = myDb.EventScript.Get(vs);
-        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
+        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs + "\r\nNur aktiv geschaltene Skripte werden berücksichtigt.", true, ld); }
 
         var newat = sc.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {
@@ -95,9 +95,9 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
         #endregion
 
-        var scx = Method_CallByFilename.CallSub(varCol, scp, ld, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null, a, vs);
-        if (scx.Failed) { return scx; }
-        return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
+        var scx = Method_CallByFilename.CallSub(varCol, scp, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null, a, vs, ld);
+        scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
+        return scx; 
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1];

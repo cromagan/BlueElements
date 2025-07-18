@@ -72,19 +72,20 @@ internal class Method_ForEachRow : Method_Database {
         var r = allFi.Rows;
         allFi.Dispose();
 
-        var scx = new DoItFeedback(false, false);
+        ScriptEndedFeedback? scx = null;
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
         foreach (var thisl in r) {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.LogData, "ForEachRow-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow");
-            if (scx.Failed) { return scx; }
-
-            if (scx.BreakFired || scx.EndScript) { break; }
+            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEachRow-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow", infos.LogData);
+            if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 
-        return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
+        if (scx == null) { return new DoItFeedback(); }
+
+        scx.ConsumeBreak();
+        return scx;
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

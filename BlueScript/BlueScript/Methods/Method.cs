@@ -137,7 +137,7 @@ public abstract class Method : IReadableTextWithKey {
 
         var (pos, which) = NextText(scriptText, startpos, [endSequence], false, false, KlammernAlle);
         if (pos < startpos) {
-            return new GetEndFeedback("Endpunkt '" + endSequence + "' nicht gefunden.", ld, true);
+            return new GetEndFeedback("Endpunkt '" + endSequence + "' nicht gefunden.", true, ld);
         }
 
         var txtBtw = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
@@ -182,17 +182,17 @@ public abstract class Method : IReadableTextWithKey {
             var (pos, _) = NextText(txt, posc, toSearch, true, false, KlammernAlle);
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
-            var f = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
-            if (f.Failed) {
-                Develop.Message?.Invoke( BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage,   BlueBasics.Enums.ImageCode.Kritisch,  "Skript-Fehler: " + f.FailedReason, scp.Stufe);
-                return new GetEndFeedback($"Durch Befehl abgebrochen: {txt} -> {f.FailedReason}", ld, f.NeedsScriptFix); 
+            var scx = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
+            if (scx.Failed) {
+                Develop.Message?.Invoke( BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage,   BlueBasics.Enums.ImageCode.Kritisch,  "Skript-Fehler: " + scx.FailedReason, scp.Stufe);
+                return new GetEndFeedback($"Durch Befehl abgebrochen: {txt} -> {scx.FailedReason}", scx.NeedsScriptFix, ld); 
             }
 
-            if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
-            if (f.Variable == null) { return new GetEndFeedback("Variablenfehler", ld, true); }
-            if (!f.Variable.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden", ld, true); }
+            if (pos == 0 && txt.Length == scx.Position) { return new GetEndFeedback(scx.ReturnValue); }
+            if (scx.ReturnValue == null) { return new GetEndFeedback("Variablenfehler", true, ld); }
+            if (!scx.ReturnValue.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden", true, ld); }
 
-            txt = txt.Substring(0, pos) + f.Variable.ValueForReplace + txt.Substring(f.Position);
+            txt = txt.Substring(0, pos) + scx.ReturnValue.ValueForReplace + txt.Substring(scx.Position);
             posc = pos;
         } while (true);
     }
@@ -207,7 +207,7 @@ public abstract class Method : IReadableTextWithKey {
     /// <param name="ld"></param>
     /// <returns></returns>
     public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol, LogData? ld) {
-        if (varCol is not { }) { return new GetEndFeedback("Interner Variablen-Fehler", ld, true); }
+        if (varCol is not { }) { return new GetEndFeedback("Interner Variablen-Fehler", true, ld); }
 
         var posc = 0;
         var allVarNames = varCol.AllStringableNames();
@@ -220,7 +220,7 @@ public abstract class Method : IReadableTextWithKey {
             var thisV = varCol.Get(which);
             var endz = pos + which.Length;
 
-            if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, ld, true); }
+            if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, true, ld); }
 
             txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(endz);
             posc = pos;
@@ -263,9 +263,9 @@ public abstract class Method : IReadableTextWithKey {
             } else {
                 var tmp2 = Variable.GetVariableByParsing(attributes[n], ld, varcol, scp);
                 if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Berechnungsfehler bei Attribut {n + 1} {tmp2.FailedReason}", tmp2.NeedsScriptFix); }
-                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
+                if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
-                v = tmp2.Variable;
+                v = tmp2.ReturnValue;
             }
 
             // Den Typ der Variable checken

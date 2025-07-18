@@ -20,82 +20,64 @@
 using BlueBasics;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace BlueScript.Structures;
 
-public class ScriptEndedFeedback {
+public class ScriptEndedFeedback : DoItFeedback {
 
-	#region Constructors
+    #region Constructors
 
-	public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool needsScriptFix, bool breakFired, bool endscript, string failedReason) {
-		Variables = variables;
-		GiveItAnotherTry = false;
-		Protocol = protocol;
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, null) {
+        Variables = variables;
+        GiveItAnotherTry = false;
+        Protocol = protocol.AsReadOnly();
+    }
 
-		ProtocolText = GenNiceProtokoll(protocol);
-		BreakFired = breakFired;
-		EndScript = endscript;
+    /// <summary>
+    /// Wird ausschließlich verwendet, wenn eine Vorabprüfung scheitert,
+    /// und das Skript erst gar nicht gestartet wird.
+    /// </summary>
+    /// <param name="failedReason"></param>
+    /// <param name="giveitanothertry"></param>
+    /// <param name="needsScriptFix"></param>
+    /// <param name="scriptname"></param>
+    public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base(needsScriptFix, false, true, "Start abgebrochen: " + failedReason, null, null) {
+        Variables = null;
+        GiveItAnotherTry = giveitanothertry;
+        Protocol = new ReadOnlyCollection<string>(["[" + scriptname + ", Start abgebrochen]@" + failedReason]);
+    }
 
-		FailedReason = failedReason;
-		NeedsScriptFix = needsScriptFix;
-	}
+    /// <summary>
+    /// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
+    /// </summary>
+    public ScriptEndedFeedback(VariableCollection variables, string failedReason) : base(false, false, true, failedReason, null, null) {
+        GiveItAnotherTry = false;
+        Protocol = new ReadOnlyCollection<string>([]);
 
-	/// <summary>
-	/// Wird ausschließlich verwendet, wenn eine Vorabprüfung scheitert,
-	/// und das Skript erst gar nicht gestartet wird.
-	/// </summary>
-	/// <param name="failedReason"></param>
-	/// <param name="giveitanothertry"></param>
-	/// <param name="needsScriptFix"></param>
-	/// <param name="scriptname"></param>
-	public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) {
-		Variables = null;
+        Variables = variables;
+    }
 
-		GiveItAnotherTry = giveitanothertry;
+    #endregion
 
-		Protocol = ["[" + scriptname + ", Start abgebrochen]@" + failedReason];
-		ProtocolText = GenNiceProtokoll(Protocol);
+    #region Properties
 
+    public bool GiveItAnotherTry { get; }
 
-		FailedReason = "Start abgebrochen: " + failedReason;
-		NeedsScriptFix = needsScriptFix;
-	}
+    public ReadOnlyCollection<string> Protocol { get; }
 
-	/// <summary>
-	/// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
-	/// </summary>
-	public ScriptEndedFeedback(VariableCollection variables, string failedReason) {
-		GiveItAnotherTry = false;
+    public string ProtocolText => "Skript-Protokoll:\r\n\r\n" + Protocol.JoinWith("\r\n\r\n").Replace("]@", "]\r\n");
 
-		Protocol = [];
-		ProtocolText = string.Empty;
+    public VariableCollection? Variables { get; }
 
-		NeedsScriptFix = false;
-		FailedReason = failedReason;
-		Variables = variables;
-	}
+    #endregion
 
-	#endregion
+    #region Methods
 
-	#region Properties
+    public override void ChangeFailedReason(string newfailedReason, LogData? ld) {
+        ld?.Protocol.AddRange(Protocol);
+        base.ChangeFailedReason(newfailedReason, ld);
+    }
 
-	public bool BreakFired { get; }
-	public bool EndScript { get; }
-
-	public bool GiveItAnotherTry { get; }
-	public string FailedReason { get; }
-	public List<string> Protocol { get; }
-	public string ProtocolText { get; }
-	public bool NeedsScriptFix { get; }
-
-	public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
-	public VariableCollection? Variables { get; }
-
-	#endregion
-
-	#region Methods
-
-	private static string GenNiceProtokoll(IEnumerable<string> protokoll) => "Skript-Protokoll:\r\n\r\n" + protokoll.JoinWith("\r\n\r\n").Replace("]@", "]\r\n");
-
-	#endregion
+    #endregion
 }
