@@ -87,6 +87,9 @@ public class Method_Filter : Method_Database {
 
         var f = new FilterCollection(allFi[0].Database, "method_filter");
         f.AddIfNotExists(allFi);
+
+        if (!string.IsNullOrEmpty(f.ErrorReason())) { return (null, f.ErrorReason(), true); }
+
         return (f, string.Empty, false);
     }
 

@@ -173,6 +173,10 @@ public class Script {
             for (var z = 0; z < attributes.Count; z++) {
                 _ = varCol.Add(new VariableString("Attribut" + z, attributes[z], true, "Attribut"));
             }
+
+            for (var z = attributes.Count; z < 20; z++) {
+                _ = varCol.Add(new VariableString("Attribut" + z, string.Empty, true, "Attribut"));
+            }
         }
 
         Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
@@ -201,12 +205,10 @@ public class Script {
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty, null);
                 }
 
-                if(scx.ReturnFired) {
+                if (scx.ReturnFired) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue );
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue);
                 }
-
-
             }
         } while (true);
     }

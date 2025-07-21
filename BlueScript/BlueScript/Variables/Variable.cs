@@ -320,6 +320,8 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
             ? txt
             : txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
 
+    public new string ToString() => $"({MyClassId}){_keyName}";
+
     protected abstract void SetValue(object? x);
 
     protected abstract (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp);

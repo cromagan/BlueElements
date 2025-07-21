@@ -48,7 +48,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
     public override MethodType MethodType => MethodType.SpecialVariables;
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Ein Skript einer anderen Datenbank ausführen";
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "CallDatabase(DatabaseName, Scriptname, Attribut0, ...);";
 
