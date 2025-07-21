@@ -1304,6 +1304,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
                 if (v != null) { _ = vars.Add(v); }
             }
+            _ = vars.Add(new VariableString("RowKey", row.KeyName, true, "Der interne Zeilenschlüssel."));
+
         }
 
         if (dbVariables) {
@@ -1329,7 +1331,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (Column.First is { IsDisposed: false } fc) {
             _ = vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
 
-            if (fc.ScriptType != ScriptType.Nicht_vorhanden && row != null) {
+            if (row != null) {
                 _ = vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
             }
         }

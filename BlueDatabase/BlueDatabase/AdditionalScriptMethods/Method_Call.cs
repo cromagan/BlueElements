@@ -34,7 +34,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
+    public override List<List<string>> Args => [StringVal, StringVal];
     public List<List<string>> ArgsForButton => [StringVal, StringVal];
     public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Attribut0"];
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
@@ -42,7 +42,6 @@ internal class Method_Call : Method_Database, IUseableForButton {
     public override List<string> Constants => [];
 
     public override string Description => "Ruft eine Subroutine auf.\r\n" +
-            "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
     public override bool GetCodeBlockAfter => false;
@@ -59,7 +58,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "Call(SubName, KeepVariables, Attribut0, ...);";
+    public override string Syntax => "Call(SubName, Attribut0, ...);";
 
     #endregion
 
@@ -89,13 +88,13 @@ internal class Method_Call : Method_Database, IUseableForButton {
         #region Attributliste erzeugen
 
         var a = new List<string>();
-        for (var z = 2; z < attvar.Attributes.Count; z++) {
+        for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs1) { a.Add(vs1.ValueString); }
         }
 
         #endregion
 
-        var scx = Method_CallByFilename.CallSub(varCol, scp, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null, a, vs, ld);
+        var scx = Method_CallByFilename.CallSub(varCol, scp, "Subroutinen-Aufruf [" + vs + "]", f, 0, vs, null, a, vs, ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         return scx; 
     }

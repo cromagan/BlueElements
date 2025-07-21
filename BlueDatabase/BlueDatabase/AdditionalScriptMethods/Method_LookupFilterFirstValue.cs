@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -37,7 +38,7 @@ public class Method_LookupFilterFirstValue : Method_Database {
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "LookupFilterFirstValue(ReturnColumn, NothingFoundValue, Filter, ...)";
 
@@ -60,31 +61,11 @@ public class Method_LookupFilterFirstValue : Method_Database {
 
         var returncolumn = db.Column[attvar.ValueStringGet(0)];
         if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
-
-        var l = new List<string>();
-
-        if (r.Count == 0) {
-            l.Add(attvar.ValueStringGet(1));
-            return new DoItFeedback(l);
-        }
-
-        var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
-        if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte {returncolumn.KeyName} 'im Skript vorhanden'?", true, ld); }
-        if (v is VariableListString vl) {
-            l.AddRange(vl.ValueList);
-        } else if (v is VariableString vs) {
-            var w = vs.ValueString;
-            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else if (v is VariableDouble vf) {
-            var w = vf.ValueForReplace;
-            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else {
-            return new DoItFeedback("Spaltentyp nicht unterstützt.", true, ld);
-        }
-
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
-        return new DoItFeedback(l);
+        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1)); }
+
+        return new DoItFeedback(r[0].CellGetString(returncolumn));
     }
 
     #endregion

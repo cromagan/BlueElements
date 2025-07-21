@@ -38,9 +38,9 @@ internal class Method_Return : Method {
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
-    public override string StartSequence => "(";
+    public override string StartSequence => string.Empty;
 
-    public override string Syntax => "Return(ReturnValue);";
+    public override string Syntax => "Return \"ReturnValue\";";
 
     #endregion
 

@@ -39,8 +39,8 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
     public override string Command => "calldatabase";
     public override List<string> Constants => [];
 
-    public override string Description => "Führt das Skript in der angegebenen Datenabank aus.\r\n" +
-            "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszühenden Skript zur Verfügung.\r\n" +
+    public override string Description => "Führt das Skript in der angegebenen Datenbank aus.\r\n" +
+            "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszührenden Skript zur Verfügung.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
 
     public override bool GetCodeBlockAfter => false;

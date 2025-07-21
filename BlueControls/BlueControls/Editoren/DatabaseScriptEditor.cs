@@ -206,7 +206,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 txbTestZeile.Text = db.Row.First()?.CellFirstString() ?? string.Empty;
             }
 
-            r = db.Row[txbTestZeile.Text];
+            r = db.Row[txbTestZeile.Text] ?? db.Row.SearchByKey(txbTestZeile.Text);
             if (r is not { IsDisposed: false }) {
                 return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             }

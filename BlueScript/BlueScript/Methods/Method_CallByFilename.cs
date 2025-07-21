@@ -33,13 +33,12 @@ public class Method_CallByFilename : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "callbyfilename";
     public override List<string> Constants => [];
 
     public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
-                                                "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
-                                            "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
+                                          "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
     public override bool GetCodeBlockAfter => false;
 
@@ -53,7 +52,7 @@ public class Method_CallByFilename : Method {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "CallByFilename(Filename, KeepVariables, Attribute0, ...);";
+    public override string Syntax => "CallByFilename(Filename, Attribute0, ...);";
 
     #endregion
 
@@ -73,7 +72,7 @@ public class Method_CallByFilename : Method {
     /// <param name="varCol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, bool keepVariables, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog, LogData ld) {
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog, LogData ld) {
         ScriptEndedFeedback scx;
 
         if (scp.Stufe > 10) {
@@ -82,33 +81,26 @@ public class Method_CallByFilename : Method {
 
         var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");
 
-        //Develop.MonitorMessage?.Invoke(subname, "Skript", "Skript: " + scp.Chain, scp.Stufe);
+        var tmpv = new VariableCollection();
+        _ = tmpv.AddRange(varCol);
+        if (addMe != null) { _ = tmpv.Add(addMe); }
 
-        if (keepVariables) {
-            if (addMe != null) { _ = varCol.Add(addMe); }
-            scx = Script.Parse(varCol, scp2, normalizedscripttext, lineadd, subname, attributes);
-        } else {
-            var tmpv = new VariableCollection();
-            _ = tmpv.AddRange(varCol);
-            if (addMe != null) { _ = tmpv.Add(addMe); }
+        scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes);
 
-            scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes);
+        #region Kritische Variablen Disposen
 
-            #region Kritische Variablen Disposen
-
-            foreach (var thisVar in tmpv) {
-                if (varCol.Get(thisVar.KeyName) == null) {
-                    thisVar.DisposeContent();
-                }
+        foreach (var thisVar in tmpv) {
+            if (varCol.Get(thisVar.KeyName) == null) {
+                thisVar.DisposeContent();
             }
+        }
 
-            #endregion
+        #endregion
 
-            if (scx.Failed) {
-                // Beim Abbruch sollen die aktuellen Variabeln angezeigt werden
-                varCol.Clear();
-                _ = varCol.AddRange(tmpv);
-            }
+        if (scx.Failed) {
+            // Beim Abbruch sollen die aktuellen Variabeln angezeigt werden
+            varCol.Clear();
+            _ = varCol.AddRange(tmpv);
         }
 
         if (scx.Failed) {
@@ -146,15 +138,15 @@ public class Method_CallByFilename : Method {
         #region Attributliste erzeugen
 
         var a = new List<string>();
-        for (var z = 2; z < attvar.Attributes.Count; z++) {
+        for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs1) { a.Add(vs1.ValueString); }
         }
 
         #endregion
 
-        var scx = CallSub(varCol, scp, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null, a, vs, ld);
+        var scx = CallSub(varCol, scp, "Datei-Subroutinen-Aufruf [" + vs + "]", f, 0, vs.FileNameWithSuffix(), null, a, vs, ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
-        return scx; 
+        return scx;
     }
 
     #endregion

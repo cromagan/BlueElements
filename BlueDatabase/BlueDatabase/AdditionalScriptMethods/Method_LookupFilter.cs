@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -32,12 +33,12 @@ public class Method_LookupFilter : Method_Database {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
     public override string Command => "lookupfilter";
     public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.\r\n\r\nAchtung: Das Laden einer Datenbank kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnlichr Befehle: CellGetRow, ImportLinked";
+    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als String zurück.\r\n\r\nAchtung: Das Laden einer Datenbank kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\n\r\nÄhnlichr Befehle: CellGetRow, ImportLinked";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "LookupFilter(ReturnColumn, NothingFoundValue, FoundToMuchValue, Filter, ...)";
 
@@ -62,36 +63,15 @@ public class Method_LookupFilter : Method_Database {
 
         var returncolumn = db.Column[attvar.ValueStringGet(0)];
         if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
+        returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
-        var l = new List<string>();
-
-        if (r.Count == 0) {
-            l.Add(attvar.ValueStringGet(1));
-            return new DoItFeedback(l);
-        }
-        if (r.Count > 1) {
-            l.Add(attvar.ValueStringGet(2));
-            return new DoItFeedback(l);
-        }
+        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1)); }
+        if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(2)); }
 
         var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
         if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte {returncolumn.KeyName} 'im Skript vorhanden'?", true, ld); }
 
-        if (v is VariableListString vl) {
-            l.AddRange(vl.ValueList);
-        } else if (v is VariableString vs) {
-            var w = vs.ValueString;
-            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else if (v is VariableDouble vf) {
-            var w = vf.ValueForReplace;
-            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else {
-            return new DoItFeedback("Spaltentyp nicht unterstützt.", true, ld);
-        }
-
-        returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
-
-        return new DoItFeedback(l);
+        return new DoItFeedback(r[0].CellGetString(returncolumn));
     }
 
     #endregion

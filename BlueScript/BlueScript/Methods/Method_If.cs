@@ -99,7 +99,7 @@ public class Method_If : Method {
         if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, infos.LogData); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = Method_CallByFilename.CallSub(varCol, scp, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If", infos.LogData);
+            var scx = Method_CallByFilename.CallSub(varCol, scp, "If-Befehl-Inhalt", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If", infos.LogData);
             return scx; // If muss die Breaks und Endsripts erhalten!
         }
 

@@ -75,7 +75,7 @@ internal class Method_ForEach : Method {
             count++;
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEach", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEach-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEach", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
             if (t.ElapsedMilliseconds > 1000) {

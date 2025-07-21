@@ -78,7 +78,7 @@ internal class Method_ForEachRow : Method_Database {
         foreach (var thisl in r) {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEachRow-Schleife", infos.CodeBlockAfterText, false, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEachRow-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 

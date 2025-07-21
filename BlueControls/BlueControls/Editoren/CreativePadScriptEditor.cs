@@ -123,7 +123,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
             txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
         }
 
-        var r = Database?.Row[txbTestZeile.Text];
+        var r = Database?.Row[txbTestZeile.Text] ?? Database?.Row.SearchByKey(txbTestZeile.Text); 
         if (r is not { IsDisposed: false }) {
             return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         }

@@ -33,12 +33,12 @@ public class Method_Lookup : Method_Database {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, StringVal, StringVal];
     public override string Command => "lookup";
     public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück.\r\n\r\nAchtung: Das Laden einer Datenbank kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
+    public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.\r\n\r\nAchtung: Das Laden einer Datenbank kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\n\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Database;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
@@ -54,44 +54,20 @@ public class Method_Lookup : Method_Database {
 
         if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
-        var c = db.Column[attvar.ValueStringGet(2)];
-        if (c == null) {
-            return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(2), true, ld);
-        }
-
         if (db.Column.First is not { IsDisposed: false } cf) {
             return new DoItFeedback("Erste Spalte der Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld);
         }
 
+
+        var returncolumn = db.Column[attvar.ValueStringGet(2)];
+        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(2), true, ld); }
+        returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
+
         var r = RowCollection.MatchesTo(new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
-        var l = new List<string>();
 
-        if (r.Count == 0) {
-            l.Add(attvar.ValueStringGet(3));
-            return new DoItFeedback(l);
-        }
-        if (r.Count > 1) {
-            l.Add(attvar.ValueStringGet(4));
-            return new DoItFeedback(l);
-        }
-
-        //var v = RowItem.CellToVariable(c, r[0]);
-        //if (v == null || v.Count != 1) {
-        //    return new DoItFeedback(ld, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(2));
-        //}
-
-        //if (v[0] is VariableListString vl) {
-        //    l.AddRange(vl.ValueList);
-        //} else if (v[0] is VariableString vs) {
-        //    var w = vs.ValueString;
-        //    if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        //} else {
-        //    return new DoItFeedback(ld, "Spaltentyp nicht unterstützt.");
-        //}
-
-        c.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
-
-        return new DoItFeedback(r[0].CellGetList(c));
+        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(3)); }
+        if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(4)); }
+        return new DoItFeedback(r[0].CellGetString(returncolumn));
     }
 
     #endregion

@@ -133,6 +133,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             e.ContextMenu.Add(ItemOf("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.CanBeChangedByRules()));
             e.ContextMenu.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.CanBeChangedByRules() && column.SaveContent));
             e.ContextMenu.Add(ItemOf(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator()));
+            e.ContextMenu.Add(ItemOf("Zeilenschlüssel Kopieren", "KeyCopy", ImageCode.Schlüssel, db.IsAdministrator()));
             //_ = e.CurrentMenu.Add(AddSeparator());
             e.ContextMenu.Add(ItemOf("Spalte", true));
             e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, db.IsAdministrator()));
@@ -239,6 +240,11 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
             case "ContentCopy":
                 Table.CopyToClipboard(column, row, true);
+                break;
+
+            case "KeyCopy":
+                _ = Generic.CopytoClipboard(row?.KeyName ?? string.Empty);
+                Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
                 break;
 
             case "SuchenUndErsetzen":
