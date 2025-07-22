@@ -38,7 +38,7 @@ public class Method_LookupFilterAllValues : Method_Database {
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Plain;
+    public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "LookupFilterAllValues(ReturnColumn, NothingFoundValue, Filter, ...)";
 
@@ -64,12 +64,12 @@ public class Method_LookupFilterAllValues : Method_Database {
         if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
-        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1)); }
+        if (r.Count == 0) { return new DoItFeedback(attvar.ValueListStringGet(1)); }
 
         List<string> list = [];
         foreach (var row in r) { list.AddRange(row.CellGetList(returncolumn)); }
 
-        return new DoItFeedback(list.SortedDistinctList().JoinWithCr());
+        return new DoItFeedback(list.SortedDistinctList());
     }
 
     #endregion

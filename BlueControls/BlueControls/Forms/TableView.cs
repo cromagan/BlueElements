@@ -1168,6 +1168,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return;
         }
 
+        var l = new List<ColumnItem>();
         var ok = true;
         foreach (var thisColumnItem in db.Column) {
             if (!thisColumnItem.IsOk()) {
@@ -1181,6 +1182,19 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 lstAufgaben.Enabled = true;
                 return;
             }
+
+            if (thisColumnItem.IsFirst) { l.Add(thisColumnItem); }
+        }
+
+        if (l.Count > 1) {
+            foreach (var thisColumnItem in l) {
+                var d = ItemOf("Spalte ' " + thisColumnItem.KeyName + " ' ist die erste Spalte", "#repaircolumn|" + thisColumnItem.KeyName, ImageCode.Kritisch);
+                d.Enabled = db.IsAdministrator();
+                lstAufgaben.ItemAdd(d);
+            }
+
+            lstAufgaben.Enabled = true;
+            return;
         }
 
         if (!db.AreScriptsExecutable()) {

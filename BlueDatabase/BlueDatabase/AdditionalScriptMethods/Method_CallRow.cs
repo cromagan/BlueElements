@@ -53,7 +53,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
     public string NiceTextForUser => "Ein Skript mit der eingehenden Zeile ausführen";
 
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
 
     public override string StartSequence => "(";
 

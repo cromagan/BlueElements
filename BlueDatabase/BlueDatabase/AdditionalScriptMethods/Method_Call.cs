@@ -54,7 +54,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     public string NiceTextForUser => "Ein Skript aus dieser Datenbank ausführen";
 
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
 
     public override string StartSequence => "(";
 

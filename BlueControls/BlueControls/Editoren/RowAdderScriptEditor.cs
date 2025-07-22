@@ -135,10 +135,10 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasData
                 return RowAdder.ExecuteScript(_item.Script_Before, "Testmodus", _item.EntityID, r, false, "Before");
 
             case 3:
-                return RowAdder.ExecuteScript(_item.Script_After, "Testmodus", _item.EntityID, r, true, "After");
+                return RowAdder.ExecuteScript(_item.Script_After, "Testmodus", _item.EntityID, r, false, "After");
 
             default:
-                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, "Testmodus", _item.EntityID, r, false, "Menu");
+                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, "Testmodus", _item.EntityID, r, true, "Menu");
         }
     }
 

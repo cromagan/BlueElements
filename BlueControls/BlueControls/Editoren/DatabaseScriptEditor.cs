@@ -303,7 +303,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         }
 
         //t2.AddRange(lstEventScripts.Items.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
-        Database.EventScriptEdited = new(t2);
+        Database.EventScript = new(t2);
 
         #endregion
     }
@@ -312,11 +312,11 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         WriteInfosBack();
 
         if (Database is { IsDisposed: false } db) {
-            if (!db.IsEventScriptCheckeIn()) {
-                if (MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok", "Aktiv schalten") == 1) {
-                    db.EventScript = db.EventScriptEdited;
-                }
-            }
+            //if (!db.IsEventScriptCheckeIn()) {
+            //    if (MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok", "Aktiv schalten") == 1) {
+            //        db.EventScript = db.EventScriptEdited;
+            //    }
+            //}
 
             if (!string.IsNullOrEmpty(db.NeedsScriptFix)) {
                 if (MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok", "Leeren") == 1) {
@@ -380,25 +380,25 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         MultiUserFile.SaveAll(false);
     }
 
-    private void btnScriptÜbertragen_Click(object sender, System.EventArgs e) {
-        if (_database == null) { return; }
+    //private void btnScriptÜbertragen_Click(object sender, System.EventArgs e) {
+    //    if (_database == null) { return; }
 
-        if (MessageBox.Show("Ihre Bearbeitungen werden Produktiv gesetzt!", ImageCode.Warnung, "OK", "Abbrechen") != 0) { return; }
-        Item = null;
-        _database.EventScript = _database.EventScriptEdited;
-        MultiUserFile.SaveAll(false);
-        UpdateList();
-    }
+    //    if (MessageBox.Show("Ihre Bearbeitungen werden Produktiv gesetzt!", ImageCode.Warnung, "OK", "Abbrechen") != 0) { return; }
+    //    Item = null;
+    //    _database.EventScript = _database.EventScriptEdited;
+    //    MultiUserFile.SaveAll(false);
+    //    UpdateList();
+    //}
 
-    private void btnSkriptÄnderungVerwerfen_Click(object sender, System.EventArgs e) {
-        if (_database == null) { return; }
+    //private void btnSkriptÄnderungVerwerfen_Click(object sender, System.EventArgs e) {
+    //    if (_database == null) { return; }
 
-        if (MessageBox.Show("Ihre Bearbeitungen gehen verloren!", ImageCode.Warnung, "OK", "Abbrechen") != 0) { return; }
-        Item = null;
-        _database.EventScriptEdited = _database.EventScript;
-        MultiUserFile.SaveAll(false);
-        UpdateList();
-    }
+    //    if (MessageBox.Show("Ihre Bearbeitungen gehen verloren!", ImageCode.Warnung, "OK", "Abbrechen") != 0) { return; }
+    //    Item = null;
+    //    _database.EventScriptEdited = _database.EventScript;
+    //    MultiUserFile.SaveAll(false);
+    //    UpdateList();
+    //}
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
@@ -424,7 +424,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         var l = new List<string>();
         // Durchlaufen aller Undo-Operationen in der Datenbank
         foreach (var thisUndo in db.Undo) {
-            if (thisUndo.Command is DatabaseDataType.EventScript or DatabaseDataType.EventScriptEdited) {
+            if (thisUndo.Command is DatabaseDataType.EventScript) {
                 l.Add("############################################################################");
                 l.Add("############################################################################");
                 l.Add("############################################################################");
@@ -564,7 +564,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         lstEventScripts.ItemClear();
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-        foreach (var thisSet in Database.EventScriptEdited) {
+        foreach (var thisSet in Database.EventScript) {
             AddTolist(thisSet);
         }
     }

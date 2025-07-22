@@ -477,9 +477,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             }
         }
 
-        if (_database?.Column.ChunkValueColumn is { } cvc && this.Count > 0) {
-            if (string.IsNullOrEmpty(InitValue(cvc, true, this.ToArray()))) { return "Chunk-Wert Filter fehlt."; }
-        }
+        //if (_database?.Column.ChunkValueColumn is { } cvc && this.Count > 0) {
+        //    if (string.IsNullOrEmpty(InitValue(cvc, true, this.ToArray()))) { return "Chunk-Wert Filter fehlt."; }
+        //}
         return string.Empty;
     }
 

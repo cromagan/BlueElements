@@ -219,15 +219,15 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         }
 
         if (!oic.IsKeyColumn && !oic.IsFirst ) {
-            return "Die Herkunft-ID-Spalte muss eine Schlüsselspalte sein.";
+            return $"Die Herkunft-ID-Spalte '{oic.Caption}' muss eine Schlüsselspalte oder die erste Spalte sein.";
         }
 
         if (AdditionalInfoColumn is not { IsDisposed: false } aci) {
             return "Spalte, in der die Zusatzinfo geschrieben werden soll, fehlt";
         }
 
-        if (aci.IsKeyColumn && !aci.IsFirst) {
-            return "Die Zusatzinfo-Spalte muss eine Schlüsselspalte sein.";
+        if (!aci.IsKeyColumn && !aci.IsFirst) {
+            return $"Die Zusatzinfo-Spalte '{aci.Caption}' muss eine Schlüsselspalte oder die erste Spalte sein.";
         }
 
         if (string.IsNullOrEmpty(Script_MenuGeneration)) {

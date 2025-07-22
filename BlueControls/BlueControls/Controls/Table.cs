@@ -3447,7 +3447,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var fa = ca?.Font_RowChapter ?? BlueFont.DefaultFont;
 
-        fa.DrawString(gr, info, 12, 12);
+        fa.DrawString(gr, info, 12, 50);
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }

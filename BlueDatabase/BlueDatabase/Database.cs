@@ -119,7 +119,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private ReadOnlyCollection<DatabaseScriptDescription> _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
 
-    private ReadOnlyCollection<DatabaseScriptDescription> _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
+    //private ReadOnlyCollection<DatabaseScriptDescription> _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
 
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
@@ -341,20 +341,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public ReadOnlyCollection<DatabaseScriptDescription> EventScriptEdited {
-        get => new(_eventScriptEdited);
-        set {
-            var l = new List<DatabaseScriptDescription>();
-            l.AddRange(value);
-            l.Sort();
+    //public ReadOnlyCollection<DatabaseScriptDescription> EventScriptEdited {
+    //    get => new(_eventScriptEdited);
+    //    set {
+    //        var l = new List<DatabaseScriptDescription>();
+    //        l.AddRange(value);
+    //        l.Sort();
 
-            var eventScriptEditedOld = _eventScriptEdited.ToString(false);
-            var eventScriptEditedNew = l.ToString(false);
+    //        var eventScriptEditedOld = _eventScriptEdited.ToString(false);
+    //        var eventScriptEditedNew = l.ToString(false);
 
-            if (eventScriptEditedOld == eventScriptEditedNew) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptEdited, null, eventScriptEditedOld, eventScriptEditedNew);
-        }
-    }
+    //        if (eventScriptEditedOld == eventScriptEditedNew) { return; }
+    //        _ = ChangeData(DatabaseDataType.EventScriptEdited, null, eventScriptEditedOld, eventScriptEditedNew);
+    //    }
+    //}
 
     public DateTime EventScriptVersion {
         get => _eventScriptVersion;
@@ -1942,12 +1942,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
 
-    public bool IsEventScriptCheckeIn() {
-        var eventScriptEditedOld = _eventScriptEdited.ToString(false);
-        var eventScriptOld = _eventScript.ToString(false);
+    //public bool IsEventScriptCheckeIn() {
+    //    var eventScriptEditedOld = _eventScriptEdited.ToString(false);
+    //    var eventScriptOld = _eventScript.ToString(false);
 
-        return eventScriptEditedOld == eventScriptOld;
-    }
+    //    return eventScriptEditedOld == eventScriptOld;
+    //}
 
     public string IsNowEditable() => GrantWriteAccess(DatabaseDataType.Caption, DatabaseChunk.Chunk_Master);
 
@@ -2413,7 +2413,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 Undo.Clear();
                 _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
-                _eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
+                //_eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
                 _datenbankAdmin.Clear();
                 _permissionGroupsNewRow.Clear();
                 _tags.Clear();
@@ -2680,14 +2680,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 _eventScript = vess.AsReadOnly();
                 break;
 
-            case DatabaseDataType.EventScriptEdited:
-                List<string> vese = [.. value.SplitAndCutByCr()];
-                var veses = new List<DatabaseScriptDescription>();
-                foreach (var t in vese) {
-                    veses.Add(new DatabaseScriptDescription(this, t));
-                }
-                _eventScriptEdited = veses.AsReadOnly();
-                break;
+            //case (DatabaseDataType)79: //.EventScriptEdited:
+
+            //    if (value.Length > 50) {
+            //        List<string> vese = [.. value.SplitAndCutByCr()];
+            //        var veses = new List<DatabaseScriptDescription>();
+            //        foreach (var t in vese) {
+            //            veses.Add(new DatabaseScriptDescription(this, t));
+            //        }
+            //        _eventScript = veses.AsReadOnly();
+            //    }
+
+            //    break;
 
             case DatabaseDataType.DatabaseVariables:
                 _variables.Clear();

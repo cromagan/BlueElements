@@ -152,11 +152,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 symb = ImageCode.Skript;
                 break;
 
-            case DatabaseDataType.EventScriptEdited:
-                alt = "[Skript alt (" + alt.Length + " Zeichen)]";
-                neu = "[Skript neu (" + neu.Length + " Zeichen)]";
-                symb = ImageCode.Skript;
-                break;
+            //case DatabaseDataType.EventScriptEdited:
+            //    alt = "[Skript alt (" + alt.Length + " Zeichen)]";
+            //    neu = "[Skript neu (" + neu.Length + " Zeichen)]";
+            //    symb = ImageCode.Skript;
+            //    break;
 
             case DatabaseDataType.Command_AddRow:
                 symb = ImageCode.PlusZeichen;

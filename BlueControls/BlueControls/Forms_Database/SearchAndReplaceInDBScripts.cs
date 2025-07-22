@@ -21,7 +21,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
+using System;
 using System.Collections.Generic;
+using static BlueBasics.Constants;
+using static BlueBasics.IO;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -47,79 +50,17 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
 
     private void AltNeu_TextChanged(object sender, System.EventArgs e) => Checkbuttons();
 
-    private void Checkbuttons() {
-        var canDo = Generic.IsAdministrator();
-        if (string.IsNullOrEmpty(txbAlt.Text)) { canDo = false; }
-        btnAusfuehren.Enabled = canDo;
-    }
-
-    private void ers_Click(object sender, System.EventArgs e) {
+    private void btnErsetzen_Click(object sender, System.EventArgs e) {
         if (_isWorking) { return; }
-        //var suchText = txbAlt.Text.Replace("\\r", "\r").Replace("\\t", "\t");
-        //var ersetzText = txbNeu.Text.Replace("\\r", "\r").Replace("\\t", "\t");
-        ////db.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+        _isWorking = true;
 
-        //if (IsDisposed || _table.Database is not Database db || db.IsDisposed) { return; }
-
-        //List<ColumnItem> sp = [];
-        //List<RowItem> ro = [];
-        //if (chkNurinAktuellerSpalte.Checked) {
-        //    if (_table.CursorPosColumn is ColumnItem c) { sp.Add(c); }
-        //} else {
-        //    sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.CanBeChangedByRules()));
-        //}
-        //foreach (var thisRow in db.Row) {
-        //    if (!chkAktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter.ToArray()) || _table.PinnedRows.Contains(thisRow)) {
-        //        if (db.Column.SysLocked is ColumnItem sl) {
-        //            if (!chkAbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
-        //        }
-        //    }
-        //}
         var count = 0;
-        //var geändeterText = string.Empty;
-        //var co = 0;
-        //var p = Progressbar.Show("Ersetze...", ro.Count);
-        //foreach (var thisRow in ro) {
-        //    co++;
-        //    p.Update(co);
-        //    foreach (var thiscolumn in sp) {
-        //        var trifft = false;
-        //        var originalText = thisRow.CellGetString(thiscolumn);
-
-        //        if (optSucheNach.Checked) {
-        //            trifft = originalText.Contains(suchText);
-        //        } else if (optSucheExact.Checked) {
-        //            trifft = originalText == suchText;
-        //        } else if (optInhaltEgal.Checked) {
-        //            trifft = true;
-        //        }
-
-        //        if (trifft) {
-        //            if (optErsetzeMit.Checked) {
-        //                geändeterText = originalText.Replace(suchText, ersetzText);
-        //            } else if (optErsetzeKomplett.Checked) {
-        //                geändeterText = ersetzText;
-        //            } else if (optFügeHinzu.Checked) {
-        //                List<string> tmp = [.. originalText.SplitAndCutByCr(), ersetzText];
-        //                geändeterText = tmp.SortedDistinctList().JoinWithCr();
-        //            }
-        //            if (geändeterText != originalText) {
-        //                count++;
-        //                thisRow.CellSet(thiscolumn, geändeterText, "Suchen und Ersetzen");
-        //            }
-        //        }
-        //    }
-        //}
-        //p.Close();
-
-        ////db.Row.ExecuteValueChangedEvent(true);
-        ///
 
         foreach (var thisDb in Database.AllFiles) {
             if (thisDb is { IsDisposed: false } db && !string.IsNullOrEmpty(db.Filename) && string.IsNullOrEmpty(db.CanWriteMainFile())) {
                 List<DatabaseScriptDescription> updatedScripts = [];
 
-                foreach (var thiss in db.EventScriptEdited) {
+                foreach (var thiss in db.EventScript) {
                     var neu = thiss.Script.Replace(txbAlt.Text, txbNeu.Text);
                     if (neu != thiss.Script) {
                         count++;
@@ -128,14 +69,53 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
                         updatedScripts.Add(thiss);
                     }
                 }
-                db.EventScriptEdited = updatedScripts.AsReadOnly();
-                db.EventScript = db.EventScriptEdited;
+                db.EventScript = updatedScripts.AsReadOnly();
                 db.NeedsScriptFix = string.Empty;
             }
         }
 
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
         _isWorking = false;
+    }
+
+    private void btnSuche_Click(object sender, System.EventArgs e) {
+        if (_isWorking) { return; }
+        _isWorking = true;
+
+        var l = new List<string>();
+
+        foreach (var thisDb in Database.AllFiles) {
+            if (thisDb is { IsDisposed: false } db) {
+                foreach (var thiss in db.EventScript) {
+                    // Prüfen, ob der Suchtext im Skript vorkommt
+                    if (thiss.Script.Contains(txbAlt.Text)) {
+                        // Datenbankname -> Skriptname zur Liste hinzufügen
+                        l.Add(string.Empty);
+                        l.Add(string.Empty);
+                        l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                        l.Add($"{db.Caption} -> {thiss.KeyName}");
+
+                        // Alle Zeilen durchgehen und die mit dem Suchtext zur Liste hinzufügen
+                        var lines = thiss.Script.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var line in lines) {
+                            if (line.Contains(txbAlt.Text)) {
+                                l.Add(line.Trim());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
+        _isWorking = false;
+    }
+
+    private void Checkbuttons() {
+        var canDo = Generic.IsAdministrator();
+        if (string.IsNullOrEmpty(txbAlt.Text)) { canDo = false; }
+        btnErsetzen.Enabled = canDo;
+        btnSuche.Enabled = canDo;
     }
 
     #endregion

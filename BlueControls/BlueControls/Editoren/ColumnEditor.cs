@@ -536,13 +536,13 @@ internal sealed partial class ColumnEditor : IIsEditor {
                 DropMessages = false
             };
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
-            _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
-
+            var spn = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
+            spn.IsFirst = true;
             var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
             if (vis is not { IsDisposed: false }) { return; }
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
             if (sp is not { IsDisposed: false }) { return; }
-
+     
             sp.Align = AlignmentHorizontal.Rechts;
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
