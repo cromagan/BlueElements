@@ -28,10 +28,14 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, null) {
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, ScriptDescription scd, string additionalInfo) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, null) {
         Variables = variables;
         GiveItAnotherTry = false;
         Protocol = protocol.AsReadOnly();
+
+        if (scd is { } && needsScriptFix) {
+            scd.FailedReason = additionalInfo + "\r\n\r\n\r\n" + ProtocolText;
+        }
     }
 
     /// <summary>
@@ -42,10 +46,14 @@ public class ScriptEndedFeedback : DoItFeedback {
     /// <param name="giveitanothertry"></param>
     /// <param name="needsScriptFix"></param>
     /// <param name="scriptname"></param>
-    public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base(needsScriptFix, false, true, "Start abgebrochen: " + failedReason, null, null) {
+    public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname, ScriptDescription? scd, string? additionalInfo) : base(needsScriptFix, false, true, "Start abgebrochen: " + failedReason, null, null) {
         Variables = null;
         GiveItAnotherTry = giveitanothertry;
         Protocol = new ReadOnlyCollection<string>(["[" + scriptname + ", Start abgebrochen]@" + failedReason]);
+
+        if (scd is { } && needsScriptFix) {
+            scd.FailedReason = additionalInfo + "\r\n\r\n\r\n" + ProtocolText;
+        }
     }
 
     /// <summary>

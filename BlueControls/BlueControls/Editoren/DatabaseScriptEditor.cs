@@ -86,7 +86,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 _database.DisposingEvent += _database_Disposing;
                 _database.CanDoScript += Database_CanDoScript;
 
-                txbNeedFix.Text = _database.NeedsScriptFix;
+                txbNeedFix.Text = _database.CheckScriptError();
 
                 tbcScriptEigenschaften.Enabled = true;
             } else {
@@ -180,16 +180,15 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     public override ScriptEndedFeedback ExecuteScript(bool testmode) {
         if (IsDisposed || Database is not { IsDisposed: false } db) {
-            return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein", null, null);
         }
 
         if (_item == null) {
-            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein", null, null);
         }
 
         if (!_item.IsOk()) {
-            return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false,
-                "Allgemein");
+            return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein", null, null);
         }
 
         WriteInfosBack();
@@ -198,8 +197,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         if (_item.NeedRow) {
             if (db.Row.Count == 0) {
-                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false,
-                    "Allgemein");
+                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein", null, null);
             }
 
             if (string.IsNullOrEmpty(txbTestZeile.Text)) {
@@ -208,13 +206,13 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
             r = db.Row[txbTestZeile.Text] ?? db.Row.SearchByKey(txbTestZeile.Text);
             if (r is not { IsDisposed: false }) {
-                return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
+                return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein", null, null);
             }
         }
 
         if (!testmode) {
             if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
-                return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein");
+                return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein", null, null);
             }
         }
 
@@ -227,7 +225,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         return f;
     }
 
-    public void UpdateValues(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, Database? database = null) {
+    public void UpdateValues(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, Database? database = null, string? failedReason = null) {
         if (_item == null) {
             capFehler.Text = string.Empty;
             return;
@@ -269,7 +267,8 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                                              userGroups ?? _item.UserGroups,
                                              database ?? _item.Database,
                                              eventTypes ?? _item.EventTypes,
-                                             needRow ?? _item.NeedRow);
+                                             needRow ?? _item.NeedRow,
+                                             failedReason ?? _item.FailedReason);
 
         AddTolist(_item);
 
@@ -287,10 +286,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     //                TableView.OpenColumnEditor(c, null, null);
     //            }
     public override void WriteInfosBack() {
-        if (IsDisposed || TableView.EditabelErrorMessage(Database) || Database is not
-            {
-                IsDisposed: false
-            }) { return; }
+        if (IsDisposed || TableView.EditabelErrorMessage(Database) || Database is not { IsDisposed: false }) { return; }
 
         UpdateValues(script: Script);
 
@@ -318,11 +314,11 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             //    }
             //}
 
-            if (!string.IsNullOrEmpty(db.NeedsScriptFix)) {
-                if (MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok", "Leeren") == 1) {
-                    db.NeedsScriptFix = db.CheckScriptError();
-                }
-            }
+            //if (!string.IsNullOrEmpty(db.NeedsScriptFixxxx)) {
+            //    if (MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok", "Leeren") == 1) {
+            //        db.NeedsScriptFixxxx = db.CheckScriptError();
+            //    }
+            //}
         }
 
         Item = null; // erst das Item!
@@ -362,7 +358,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
             }
 
-            if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
+            if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible()) {
                 didMessage = true;
                 _ = EnableScript();
             }
@@ -374,10 +370,10 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private void btnDeleteNeedsScriptFix_Click(object sender, System.EventArgs e) {
         if (_database == null) { return; }
 
-        _database.NeedsScriptFix = _database.CheckScriptError();
+        UpdateValues(failedReason: string.Empty);
 
-        txbNeedFix.Text = _database.NeedsScriptFix;
-        MultiUserFile.SaveAll(false);
+        txbNeedFix.Text = _database.CheckScriptError();
+        //MultiUserFile.SaveAll(false);
     }
 
     //private void btnScriptÜbertragen_Click(object sender, System.EventArgs e) {
@@ -488,7 +484,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-        if (chkZeile.Checked && !Database.IsRowScriptPossible(false)) {
+        if (chkZeile.Checked && !Database.IsRowScriptPossible()) {
             if (!EnableScript()) { chkZeile.Checked = false; }
 
             return;
@@ -512,7 +508,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         Database.EnableScript();
 
-        if (!Database.IsRowScriptPossible(false)) {
+        if (!Database.IsRowScriptPossible()) {
             MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
             return false;
         }

@@ -137,7 +137,7 @@ public class DatabaseChunk : Database {
             //mainChunk.SaveToByteList(DatabaseDataType.EventScriptEdited, db.EventScriptEdited.ToString(true));
             mainChunk.SaveToByteList(DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
 
-            mainChunk.SaveToByteList(DatabaseDataType.NeedsScriptFix, db.NeedsScriptFix);
+            //mainChunk.SaveToByteList(DatabaseDataType.NeedsScriptFix, db.NeedsScriptFix);
             varChunk.SaveToByteList(DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 
             foreach (var thisRow in db.Row) {

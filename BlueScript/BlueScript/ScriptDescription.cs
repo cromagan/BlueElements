@@ -33,18 +33,19 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     #region Constructors
 
-    public ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups) {
+    public ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason) {
         AdminInfo = adminInfo;
         Image = image;
         KeyName = name;
         ColumnQuickInfo = quickInfo;
         Script = script;
         UserGroups = userGroups;
+        FailedReason = failedReason;
     }
 
-    protected ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, EmptyReadOnly) { }
+    protected ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, EmptyReadOnly, string.Empty) { }
 
-    protected ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly) { }
+    protected ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly, string.Empty) { }
 
     #endregion
 
@@ -71,6 +72,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
     public string ColumnQuickInfo { get; private set; }
     public string CompareKey => KeyName;
 
+    public string FailedReason { get; private set; }
     public string Image { get; private set; }
 
     public bool IsDisposed { get; private set; }
@@ -97,6 +99,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
     public virtual string ErrorReason() {
         if (string.IsNullOrEmpty(KeyName)) { return "Kein Name angegeben."; }
         if (!KeyName.IsFormat(FormatHolder.Text)) { return "Ungültiger Name"; }
+        if (!string.IsNullOrEmpty(FailedReason)) { return "Das Skript enthält Syntax-Fehler."; }
         return string.Empty;
     }
 
@@ -111,6 +114,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             result.ParseableAdd("AdminInfo", AdminInfo);
             result.ParseableAdd("Image", Image);
             result.ParseableAdd("UserGroups", UserGroups, false);
+            result.ParseableAdd("FailedReason", FailedReason);
 
             return result;
         } catch {
@@ -150,6 +154,10 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
             case "image":
                 Image = value.FromNonCritical();
+                return true;
+
+            case "failedreason":
+                FailedReason = value.FromNonCritical();
                 return true;
 
             case "usergroups":

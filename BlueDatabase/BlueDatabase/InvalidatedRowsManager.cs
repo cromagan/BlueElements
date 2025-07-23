@@ -107,7 +107,7 @@ public class InvalidatedRowsManager {
     /// </summary>
     /// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
     /// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
-    public void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed, Action? minutelyDelegate = null) {
+    public void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed, Action? minutelyDelegate) {
         lock (_processingLock) {
             if (_isProcessing) { return; }
             _isProcessing = true;

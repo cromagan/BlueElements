@@ -161,7 +161,7 @@ public class Script {
 
     public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
-    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? attributes) {
+    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? attributes, ScriptDescription scd, string additionalInfo) {
         var pos = 0;
 
         var ld = new LogData(subname, lineadd + 1);
@@ -185,7 +185,7 @@ public class Script {
             if (pos >= normalizedScriptText.Length) {
                 Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
-                return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, string.Empty, null);
+                return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, string.Empty, null, scd, additionalInfo);
             }
 
             if (normalizedScriptText.Substring(pos, 1) == "¶") {
@@ -195,30 +195,30 @@ public class Script {
                 var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, ld);
                 if (scx.Failed) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, scx.NeedsScriptFix, false, false, scx.FailedReason, null, scd, additionalInfo);
                 }
 
                 pos = scx.Position;
                 ld.LineAdd(normalizedScriptText.CountChar('¶', pos) + 1 - ld.Line + lineadd);
                 if (scx.BreakFired) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty, null);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty, null, scd, additionalInfo);
                 }
 
                 if (scx.ReturnFired) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN", scp.Stufe);
-                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue, scd, additionalInfo);
                 }
             }
         } while (true);
     }
 
-    public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes) {
+    public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes, ScriptDescription scd, string additionalInfo) {
         (NormalizedScriptText, var error) = NormalizedText(ScriptText);
 
         return !string.IsNullOrEmpty(error)
-            ? new ScriptEndedFeedback(error, false, true, subname)
-            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, attributes);
+            ? new ScriptEndedFeedback(error, false, true, subname, scd, additionalInfo)
+            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, attributes, scd, additionalInfo);
     }
 
     #endregion

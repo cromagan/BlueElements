@@ -64,13 +64,12 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
                     var neu = thiss.Script.Replace(txbAlt.Text, txbNeu.Text);
                     if (neu != thiss.Script) {
                         count++;
-                        updatedScripts.Add(new DatabaseScriptDescription(thiss.AdminInfo, thiss.Image, thiss.KeyName, thiss.ColumnQuickInfo, neu, thiss.UserGroups, thiss.Database, thiss.EventTypes, thiss.NeedRow));
+                        updatedScripts.Add(new DatabaseScriptDescription(thiss.AdminInfo, thiss.Image, thiss.KeyName, thiss.ColumnQuickInfo, neu, thiss.UserGroups, thiss.Database, thiss.EventTypes, thiss.NeedRow, string.Empty));
                     } else {
                         updatedScripts.Add(thiss);
                     }
                 }
                 db.EventScript = updatedScripts.AsReadOnly();
-                db.NeedsScriptFix = string.Empty;
             }
         }
 

@@ -3344,13 +3344,13 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (db.IsAdministrator() && !db.ReadOnly) {
             // Skripte-Status anzeigen
-            if (!db.AreScriptsExecutable()) {
+            if (!string.IsNullOrEmpty(db.CheckScriptError())) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
                 ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, filterHeight + 12);
             } else {
                 // Verknüpfte Datenbanken überprüfen
                 foreach (var thisColumn in db.Column) {
-                    if (thisColumn.LinkedDatabase is { IsDisposed: false } linkedDb && !linkedDb.AreScriptsExecutable()) {
+                    if (thisColumn.LinkedDatabase is { IsDisposed: false } linkedDb && !string.IsNullOrEmpty(linkedDb.CheckScriptError())) {
                         gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
                         ca.Font_RowChapter.DrawString(gr, $"Skripte von {linkedDb.Caption} müssen repariert werden", 90, filterHeight + 12);
                         break; // Nur die erste fehlerhafte Datenbank anzeigen
@@ -3992,8 +3992,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (db.Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
         if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return "Erste Spalte nicht sichtbar"; }
-
-        if (!db.AreScriptsExecutable()) { return "Skripte nicht ausführbar"; }
+        
+        if (!db.IsScriptsExecutable(ScriptEventTypes.InitialValues)) { return "Skripte nicht ausführbar"; }
 
 
         string? chunkv = null; 

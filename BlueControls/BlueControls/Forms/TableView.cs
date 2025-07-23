@@ -34,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
@@ -151,8 +152,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         if (row != null) {
             e.ContextMenu.Add(ItemOf("Zeile", true));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator()));
-            e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), true));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator() && db.IsScriptsExecutable(ScriptEventTypes.row_deleting)));
+            e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), db.CanDoValueChangedScript()));
 
             var didmenu = false;
 
@@ -293,7 +294,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 if (row is { IsDisposed: false }) {
                     row.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
                     _ = row.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
-                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true);
+                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true, null);
                     //row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
                 }
@@ -1092,7 +1093,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                         _ = thisR.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
                     }
 
-                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true);
+                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
 
                     MessageBox.Show("Alle angezeigten Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
                     lstAufgaben.Enabled = true;
@@ -1163,6 +1164,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         Table.Invalidate();
         lstAufgaben.ItemClear();
 
+        bool addedit = true;
+
         if (db is not { IsDisposed: false } || !string.IsNullOrEmpty(db.FreezedReason)) {
             lstAufgaben.Enabled = false;
             return;
@@ -1197,41 +1200,33 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        if (!db.AreScriptsExecutable()) {
+        if (!string.IsNullOrEmpty(db.CheckScriptError())) {
             var d = ItemOf("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.ItemAdd(d);
             lstAufgaben.Enabled = true;
-            return;
+            addedit = false;
+            //return;
         }
 
-        if (!db.IsRowScriptPossible(false)) {
+        if (!db.IsRowScriptPossible()) {
             var d = ItemOf("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.ItemAdd(d);
             lstAufgaben.Enabled = true;
-            return;
         }
 
-        foreach (var thiss in db.EventScript) {
-            if (thiss is { UserGroups.Count: > 0 }) {
-                var d = ItemOf(thiss);
-                lstAufgaben.ItemAdd(d);
-                d.Enabled = db.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
-
-                if (d.Enabled && thiss.NeedRow && !db.IsRowScriptPossible(true)) {
-                    d.Enabled = false;
-                }
-
-                //d.QuickInfo = thiss.QuickInfo;
-            }
+        foreach (var script in db.EventScript.Where(s => s.UserGroups.Count > 0)) {
+            var item = ItemOf(script);
+            lstAufgaben.ItemAdd(item);
+            item.Enabled = db.PermissionCheck(script.UserGroups, null)
+                            && script.IsOk()
+                            && (!script.NeedRow || db.IsRowScriptPossible());
         }
 
-        //if (db.CanDoPrepareFormulaCheckScript()) {
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", ImageCode.HäkchenDoppelt));
-        //}
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", ImageCode.HäkchenDoppelt, db.CanDoValueChangedScript()));
 
-        if (db.IsAdministrator()) {
+        if (addedit) {
             var d = ItemOf("Skripte bearbeiten", "#editscript", ImageCode.Skript);
             lstAufgaben.ItemAdd(d);
             d.Enabled = db.IsAdministrator();

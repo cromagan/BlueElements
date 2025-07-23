@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Linq;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -37,13 +38,7 @@ public static class EventScriptExtension {
 
     public static List<DatabaseScriptDescription> Get(this ReadOnlyCollection<DatabaseScriptDescription> scripts, ScriptEventTypes type) {
         try {
-            var l = new List<DatabaseScriptDescription>();
-
-            foreach (var thisScript in scripts) {
-                if (thisScript.EventTypes.HasFlag(type)) { l.Add(thisScript); }
-            }
-
-            return l;
+            return scripts.Where(script => script.EventTypes.HasFlag(type)).ToList();
         } catch {
             Develop.CheckStackOverflow();
             return scripts.Get(type);
@@ -63,7 +58,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
 
     #region Constructors
 
-    public DatabaseScriptDescription(string adminInfo, string image, string keyName, string quickInfo, string script, ReadOnlyCollection<string> userGroups, Database? database, ScriptEventTypes eventTypes, bool needRow) : base(adminInfo, image, keyName, quickInfo, script, userGroups) {
+    public DatabaseScriptDescription(string adminInfo, string image, string keyName, string quickInfo, string script, ReadOnlyCollection<string> userGroups, Database? database, ScriptEventTypes eventTypes, bool needRow, string failedReason) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason) {
         Database = database;
         EventTypes = eventTypes;
         NeedRow = needRow;
@@ -141,7 +136,6 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
         return s;
     }
 
-
     public override int CompareTo(object obj) {
         if (obj is DatabaseScriptDescription v) {
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
@@ -203,7 +197,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
             if (NeedRow) { return "Routinen nach dem Laden einer Datenbank, dürfen sich nicht auf Zeilen beziehen."; }
         }
 
-        if (NeedRow && !Database.IsRowScriptPossible(false)) { return "Zeilenskripte in dieser Datenbank nicht möglich"; }
+        if (NeedRow && !Database.IsRowScriptPossible()) { return "Zeilenskripte in dieser Datenbank nicht möglich"; }
 
         if (EventTypes.ToString() == ((int)EventTypes).ToString()) { return "Skripte öffnen und neu speichern."; }
 

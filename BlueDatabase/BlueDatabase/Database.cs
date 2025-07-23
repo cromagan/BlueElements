@@ -127,8 +127,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private bool _isInSave;
 
-    private string _needsScriptFix = string.Empty;
-
     private DateTime _powerEditTime = DateTime.MinValue;
 
     private bool _readOnly;
@@ -327,7 +325,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public Type? Editor { get; set; }
 
     public ReadOnlyCollection<DatabaseScriptDescription> EventScript {
-        get => new(_eventScript);
+        get => _eventScript;
         set {
             var l = new List<DatabaseScriptDescription>();
             l.AddRange(value);
@@ -402,14 +400,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public virtual bool MasterNeeded => false;
 
     public virtual bool MultiUserPossible => false;
-
-    public string NeedsScriptFix {
-        get => _needsScriptFix;
-        set {
-            if (_needsScriptFix == value) { return; }
-            _ = ChangeData(DatabaseDataType.NeedsScriptFix, null, _needsScriptFix, value);
-        }
-    }
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
         get => new(_permissionGroupsNewRow);
@@ -1118,19 +1108,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    public bool AreScriptsExecutable() {
-        if (!string.IsNullOrEmpty(_needsScriptFix)) { return false; }
-
-        var count = 0;
-        foreach (var key in RowCollection.FailedRows.Keys) {
-            if (key.Database == this) {
-                count++;
-                if (count > 9) { return false; }
-            }
-        }
-        return true;
-    }
-
     public virtual bool BeSureAllDataLoaded(int anzahl) => !IsDisposed && BeSureToBeUpToDate();
 
     public virtual bool BeSureRowIsLoaded(string chunkValue) => true;
@@ -1140,7 +1117,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return !IsDisposed;
     }
 
-    public bool CanDoValueChangedScript() => IsRowScriptPossible(true) && EventScript.Get(ScriptEventTypes.value_changed).Count == 1;
+    public bool CanDoValueChangedScript() => IsRowScriptPossible() && IsScriptsExecutable(ScriptEventTypes.value_changed);
 
     /// <summary>
     /// Konkrete Prüfung, ob jetzt gespeichert werden kann
@@ -1243,51 +1220,17 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public string CheckScriptError() {
-        List<string> names = [];
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var thissc in _eventScript) {
-            if (!thissc.IsOk()) {
-                return thissc.KeyName + ": " + thissc.ErrorReason();
+        foreach (var script in _eventScript) {
+            if (!script.IsOk()) { return $"{script.KeyName}: {script.ErrorReason()}"; }
+            if (!names.Add(script.KeyName)) { return $"Skriptname '{script.KeyName}' mehrfach vorhanden"; }
+        }
+
+        foreach (ScriptEventTypes eventType in (ScriptEventTypes[])Enum.GetValues(typeof(ScriptEventTypes))) {
+            if (!IsScriptsExecutable(eventType)) {
+                return $"Skript '{eventType}' kann nicht ausgeführt werden.";
             }
-
-            if (names.Contains(thissc.KeyName, false)) {
-                return "Skriptname '" + thissc.KeyName + "' mehrfach vorhanden";
-            }
-
-            names.Add(thissc.KeyName);
-        }
-
-        var l = EventScript;
-        if (l.Get(ScriptEventTypes.export).Count > 1) {
-            return "Skript 'Export' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.row_deleting).Count > 1) {
-            return "Skript 'Zeile löschen' mehrfach vorhanden";
-        }
-
-        //if (l.Get(ScriptEventTypes.correct_changed).Count > 1) {
-        //    return "Skript 'Fehlerfrei verändert' mehrfach vorhanden";
-        //}
-
-        if (l.Get(ScriptEventTypes.loaded).Count > 1) {
-            return "Skript 'Datenank geladen' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.prepare_formula).Count > 1) {
-            return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.value_changed_extra_thread).Count > 1) {
-            return "Skript 'Wert geändert (Extra Thread)' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.InitialValues).Count > 1) {
-            return "Skript 'Zeile Initialisieren' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.value_changed).Count > 1) {
-            return "Skript 'Wert geändert' mehrfach vorhanden";
         }
 
         return string.Empty;
@@ -1305,7 +1248,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (v != null) { _ = vars.Add(v); }
             }
             _ = vars.Add(new VariableString("RowKey", row.KeyName, true, "Der interne Zeilenschlüssel."));
-
         }
 
         if (dbVariables) {
@@ -1381,14 +1323,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         var name = script?.KeyName ?? "Allgemein";
 
-        if (!ignoreError && !AreScriptsExecutable()) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler", false, true, name); }
-
         var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
-        if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, name); }
+        if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, name, null, null); }
 
         var m = CanWriteMainFile();
-        if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, name); }
+        if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, name, null, null); }
 
         if (script == null) {
             // Wenn keine DatabaseScriptDescription ankommt, hat die Vorroutine entschieden, dass alles ok ist
@@ -1396,11 +1336,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return new ScriptEndedFeedback(vars, string.Empty);
         }
 
-        if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, name); }
+        if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback("Das Skript ist fehlerhaft.", false, true, name, null, null); }
+
+        if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, name, null, null); }
         if (!script.NeedRow) { row = null; }
 
         if (!ignoreError && row != null && RowCollection.FailedRows.ContainsKey(row) && RowCollection.FailedRows.TryGetValue(row, out var reason)) {
-            return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, name);
+            return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, name, null, null);
         }
 
         var n = row?.CellFirstString() ?? "ohne Zeile";
@@ -1436,27 +1378,28 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 ScriptText = script.Script
             };
 
-            var scf = sc.Parse(0, script.KeyName, attributes);
+            var additionalInfo = "Datenbank: " + Caption + "\r\n" +
+                                "Benutzer: " + UserName + "\r\n" +
+                                "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
+                                "Extended: " + extended + "\r\n";
+
+            if (row is { IsDisposed: false } r) {
+                additionalInfo = additionalInfo + "Zeile: " + r.CellFirstString() + "\r\n";
+                if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
+                    additionalInfo = additionalInfo + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
+                }
+            }
+
+            var scf = sc.Parse(0, script.KeyName, attributes, script, additionalInfo);
 
             #endregion
 
             #region Fehlerprüfungen
 
-            if (scf.NeedsScriptFix && string.IsNullOrEmpty(NeedsScriptFix)) {
-                var t = "Datenbank: " + Caption + "\r\n" +
-                                  "Benutzer: " + UserName + "\r\n" +
-                                  "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
-                                  "Extended: " + extended + "\r\n";
-
-                if (row is { IsDisposed: false } r) {
-                    t = t + "Zeile: " + r.CellFirstString() + "\r\n";
-                    if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
-                        t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
-                    }
-                }
-
-                if (produktivphase && !ignoreError) {
-                    NeedsScriptFix = t + "\r\n\r\n\r\n" + scf.ProtocolText;
+            if (scf.NeedsScriptFix) {
+                if (!ignoreError) {
+                    // Siehe btnErsetzen_Click
+                    EventScript = NewEventScript;
                 }
             }
 
@@ -1473,19 +1416,19 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (row.IsDisposed) {
                     _ = ExecutingScript.Remove(scriptId);
                     _ = ExecutingScriptAnyDatabase.Remove(scriptId);
-                    return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, script.KeyName);
+                    return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, script.KeyName, null, null);
                 }
 
                 if (Column.SysRowChangeDate is null) {
                     _ = ExecutingScript.Remove(scriptId);
                     _ = ExecutingScriptAnyDatabase.Remove(scriptId);
-                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName);
+                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName, null, null);
                 }
 
                 if (row.RowStamp() != rowstamp) {
                     _ = ExecutingScript.Remove(scriptId);
                     _ = ExecutingScriptAnyDatabase.Remove(scriptId);
-                    return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName);
+                    return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName, null, null);
                 }
             }
 
@@ -1511,10 +1454,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (script.VirtalColumns) {
-                if (row is { IsDisposed: false } r) {
+                if (row is { IsDisposed: false } ro) {
                     foreach (var thisCol in Column) {
                         if (!thisCol.SaveContent) {
-                            r.VariableToCell(thisCol, vars, script.KeyName);
+                            ro.VariableToCell(thisCol, vars, script.KeyName);
                         }
                     }
                 }
@@ -1526,7 +1469,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             _ = ExecutingScriptAnyDatabase.Remove(scriptId);
 
             if (produktivphase && ExecutingScript.Count == 0 && ExecutingScriptAnyDatabase.Count == 0) {
-                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, extended);
+                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, extended, null);
             }
 
             return scf;
@@ -1558,11 +1501,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
                 Develop.DebugPrint(ErrorType.Error, "Event und Skript angekommen!");
-                return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
+                return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein", null, null);
             }
 
             if (eventname == null && string.IsNullOrWhiteSpace(scriptname)) {
-                return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein");
+                return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein", null, null);
             }
 
             if (string.IsNullOrWhiteSpace(scriptname) && eventname != null) {
@@ -1575,7 +1518,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var script = EventScript.Get(scriptname);
             return script == null
-                ? new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname)
+                ? new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname, null, null)
                 : ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, false);
         } catch {
             Develop.CheckStackOverflow();
@@ -1942,21 +1885,26 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
 
-    //public bool IsEventScriptCheckeIn() {
-    //    var eventScriptEditedOld = _eventScriptEdited.ToString(false);
-    //    var eventScriptOld = _eventScript.ToString(false);
+    public string IsNowEditable() => GrantWriteAccess(DatabaseDataType.Caption, DatabaseChunk.Chunk_Master);
 
     //    return eventScriptEditedOld == eventScriptOld;
     //}
-
-    public string IsNowEditable() => GrantWriteAccess(DatabaseDataType.Caption, DatabaseChunk.Chunk_Master);
-
-    public bool IsRowScriptPossible(bool checkMessageTo) {
+    public bool IsRowScriptPossible() {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; } // Nicht ReadOnly!
-        if (checkMessageTo && !AreScriptsExecutable()) { return false; }
+        //if (checkMessageTo && !AreScriptsExecutable()) { return false; }
         return true;
+    }
+
+    public bool IsScriptsExecutable(ScriptEventTypes type) {
+        var l = _eventScript.Get(type);
+
+        if (l.Count > 1) { return false; }
+
+        if (l.Count == 0) { return true; }
+
+        return l[0].IsOk();
     }
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
@@ -2265,8 +2213,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
-
-        if (string.IsNullOrEmpty(_needsScriptFix)) { NeedsScriptFix = CheckScriptError(); }
 
         OnAdditionalRepair();
     }
@@ -2720,11 +2666,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case DatabaseDataType.EventScriptVersion:
                 _eventScriptVersion = DateTimeParse(value);
-                break;
-
-            case DatabaseDataType.NeedsScriptFix:
-                _needsScriptFix = value;
-                Row.InvalidateAllCheckData();
                 break;
 
             case DatabaseDataType.UndoInOne:

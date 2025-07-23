@@ -150,8 +150,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
     public static void AddBackgroundWorker(RowItem row) {
         if (row.IsDisposed || row.Database is not { IsDisposed: false } db) { return; }
-        if (db.EventScript.Get(ScriptEventTypes.value_changed_extra_thread).Count != 1) { return; }
-        if (!db.IsRowScriptPossible(true)) { return; }
+        if (!db.IsScriptsExecutable(ScriptEventTypes.value_changed_extra_thread)) { return; }
+        if (!db.IsRowScriptPossible()) { return; }
 
         var l = new BackgroundWorker {
             WorkerReportsProgress = true
