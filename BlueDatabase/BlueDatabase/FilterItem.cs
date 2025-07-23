@@ -325,11 +325,11 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                                                   thisFilter.SearchValue.JoinWithCr() == SearchValue.JoinWithCr();
 
     public string ErrorReason() {
+        if (FilterType == FilterType.AlwaysFalse) { return string.Empty; }
+
         if (_database == null) { return "Keine Datenbank angegeben"; }
 
         if (_database.IsDisposed) { return "Datenbank verworfen"; }
-
-        if (FilterType == FilterType.AlwaysFalse) { return string.Empty; }
 
         if (FilterType is FilterType.GroﬂKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
 
@@ -358,6 +358,10 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 and not FilterType.Istgleich_MultiRowIgnorieren
                 and not FilterType.Istgleich_ODER_GroﬂKleinEgal
                 and not FilterType.Istgleich_UND_GroﬂKleinEgal) { return "Falscher Typ"; }
+        }
+
+        foreach (var thisV in SearchValue) {
+            if (thisV.Contains("~")) { return $"Unaufgelˆste Variable {thisV}"; }
         }
 
         return string.Empty;

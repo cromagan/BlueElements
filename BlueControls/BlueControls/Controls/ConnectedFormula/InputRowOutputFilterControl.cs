@@ -122,6 +122,11 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
             va = _filterwert;
         }
 
+        if (va.Contains("~")) {
+            FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Database, "IO2"));
+            return;
+        }
+
         //if (string.IsNullOrEmpty(va) && _standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
         //    FilterOutput.ChangeTo(new FilterItem(_outputcolumn?.Database, "IO2"));
         //    return;

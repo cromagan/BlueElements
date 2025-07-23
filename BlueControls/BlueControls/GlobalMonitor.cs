@@ -42,7 +42,8 @@ public partial class GlobalMonitor : Form {
             LogUndo = false,
             DropMessages = false
         };
-        _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        var dbi = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        dbi.IsFirst = true;
         _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
         var az = db.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolder.DateTime);
         _ = db.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);
