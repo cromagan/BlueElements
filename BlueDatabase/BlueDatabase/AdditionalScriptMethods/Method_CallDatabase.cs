@@ -83,6 +83,9 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         var scx = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
         scx.ConsumeBreakAndReturn();
+        if (scx.NeedsScriptFix) {
+            return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{db.Caption}' hat Fehler verursacht.", false, ld);
+        }
         return scx;
     }
 

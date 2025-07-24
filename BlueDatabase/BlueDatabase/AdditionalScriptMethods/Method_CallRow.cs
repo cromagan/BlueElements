@@ -88,8 +88,7 @@ public class Method_CallRow : Method_Database, IUseableForButton {
 
         var scx = row.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
         if (scx.Failed) {
-            scx.ChangeFailedReason("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen", ld);
-            return scx;
+            return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen", false, ld);
         }
         scx.ConsumeBreakAndReturn();
         return scx;

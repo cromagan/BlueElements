@@ -53,9 +53,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnZusatzDateien = new BlueControls.Controls.Button();
             this.chkExtendend = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
-            this.tabLastError = new System.Windows.Forms.TabPage();
-            this.txbNeedFix = new BlueControls.Controls.TextBox();
-            this.btnDeleteNeedsScriptFix = new BlueControls.Controls.Button();
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
             this.grpAktionen.SuspendLayout();
@@ -66,7 +63,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpEigenschaften.SuspendLayout();
             this.grpAuslöser.SuspendLayout();
             this.grpVerfügbareSkripte.SuspendLayout();
-            this.tabLastError.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpInfos
@@ -95,12 +91,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // grpAktionen
             // 
-            this.grpAktionen.Controls.Add(this.btnDeleteNeedsScriptFix);
             this.grpAktionen.Controls.Add(this.btnVersionErhöhen);
             this.grpAktionen.Location = new System.Drawing.Point(803, 3);
-            this.grpAktionen.Size = new System.Drawing.Size(350, 75);
+            this.grpAktionen.Size = new System.Drawing.Size(200, 75);
             this.grpAktionen.Controls.SetChildIndex(this.btnVersionErhöhen, 0);
-            this.grpAktionen.Controls.SetChildIndex(this.btnDeleteNeedsScriptFix, 0);
             // 
             // btnAusführen
             // 
@@ -110,13 +104,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tbcScriptEigenschaften
             // 
             this.tbcScriptEigenschaften.Controls.Add(this.tabKopfdaten);
-            this.tbcScriptEigenschaften.Controls.Add(this.tabLastError);
             this.tbcScriptEigenschaften.Location = new System.Drawing.Point(237, 110);
             this.tbcScriptEigenschaften.Size = new System.Drawing.Size(547, 427);
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[0];
             this.tbcScriptEigenschaften.TabIndex = 0;
             this.tbcScriptEigenschaften.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
-            this.tbcScriptEigenschaften.Controls.SetChildIndex(this.tabLastError, 0);
             this.tbcScriptEigenschaften.Controls.SetChildIndex(this.tabKopfdaten, 0);
             // 
             // tabKopfdaten
@@ -331,9 +323,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 160);
             this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
-            this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird zur Datenkonsitenzprüfung,\r\nfür Variablen für Formulare und nichtspeicherbare" +
-    " Spalten verwendet.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen " +
-    "oder\r\nlange dauernde Prozesse anstoßen.";
+            this.chkAuslöser_prepaireformula.QuickInfo = resources.GetString("chkAuslöser_prepaireformula.QuickInfo");
             this.chkAuslöser_prepaireformula.Size = new System.Drawing.Size(175, 16);
             this.chkAuslöser_prepaireformula.TabIndex = 19;
             this.chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
@@ -422,7 +412,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnVersionErhöhen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnVersionErhöhen.ImageCode = "Pfeil_Oben|16|||||85|0";
-            this.btnVersionErhöhen.Location = new System.Drawing.Point(224, 2);
+            this.btnVersionErhöhen.Location = new System.Drawing.Point(64, 2);
             this.btnVersionErhöhen.Name = "btnVersionErhöhen";
             this.btnVersionErhöhen.QuickInfo = "Skript-Version erhöhen bewirkt,\r\ndass alle Zeilen neu durchgerechnet\r\nwerden.";
             this.btnVersionErhöhen.Size = new System.Drawing.Size(120, 22);
@@ -488,39 +478,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnTest.Text = "Testen";
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
-            // tabLastError
-            // 
-            this.tabLastError.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabLastError.Controls.Add(this.txbNeedFix);
-            this.tabLastError.Location = new System.Drawing.Point(4, 25);
-            this.tabLastError.Name = "tabLastError";
-            this.tabLastError.Padding = new System.Windows.Forms.Padding(3);
-            this.tabLastError.Size = new System.Drawing.Size(776, 398);
-            this.tabLastError.TabIndex = 3;
-            this.tabLastError.Text = "Letzter Fehler";
-            // 
-            // txbNeedFix
-            // 
-            this.txbNeedFix.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbNeedFix.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbNeedFix.Location = new System.Drawing.Point(3, 3);
-            this.txbNeedFix.Margin = new System.Windows.Forms.Padding(20);
-            this.txbNeedFix.Name = "txbNeedFix";
-            this.txbNeedFix.Size = new System.Drawing.Size(770, 392);
-            this.txbNeedFix.TabIndex = 0;
-            // 
-            // btnDeleteNeedsScriptFix
-            // 
-            this.btnDeleteNeedsScriptFix.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnDeleteNeedsScriptFix.ImageCode = "Warnung|16||1";
-            this.btnDeleteNeedsScriptFix.Location = new System.Drawing.Point(168, 2);
-            this.btnDeleteNeedsScriptFix.Name = "btnDeleteNeedsScriptFix";
-            this.btnDeleteNeedsScriptFix.QuickInfo = "Löscht den Fehlerspeicher";
-            this.btnDeleteNeedsScriptFix.Size = new System.Drawing.Size(56, 66);
-            this.btnDeleteNeedsScriptFix.TabIndex = 46;
-            this.btnDeleteNeedsScriptFix.Text = "Fehler-speicher";
-            this.btnDeleteNeedsScriptFix.Click += new System.EventHandler(this.btnDeleteNeedsScriptFix_Click);
-            // 
             // DatabaseScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -542,7 +499,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpEigenschaften.ResumeLayout(false);
             this.grpAuslöser.ResumeLayout(false);
             this.grpVerfügbareSkripte.ResumeLayout(false);
-            this.tabLastError.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -577,8 +533,5 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capFehler;
         private Button chkAuslöser_deletingRow;
         private Button chkExtendend;
-        private TabPage tabLastError;
-        private TextBox txbNeedFix;
-        private Button btnDeleteNeedsScriptFix;
     }
 }

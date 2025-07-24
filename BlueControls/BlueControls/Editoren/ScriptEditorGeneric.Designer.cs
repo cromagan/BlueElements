@@ -33,9 +33,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.grpCode = new BlueControls.Controls.GroupBox();
             this.txtSkript = new FastColoredTextBoxNS.FastColoredTextBox();
-            this.grpVariablen = new BlueControls.VariableEditor();
-            this.grpAusgabeFenster = new BlueControls.Controls.GroupBox();
+            this.tabError = new BlueControls.Controls.TabControl();
+            this.tabCurrent = new System.Windows.Forms.TabPage();
             this.txbSkriptInfo = new BlueControls.Controls.TextBox();
+            this.tabLastError = new System.Windows.Forms.TabPage();
+            this.btnLeeren = new BlueControls.Controls.Button();
+            this.txbLastError = new BlueControls.Controls.TextBox();
+            this.grpVariablen = new BlueControls.VariableEditor();
             this.tabAssistent = new System.Windows.Forms.TabPage();
             this.lstAssistant = new BlueControls.Controls.ListBox();
             this.pnlStatusBar.SuspendLayout();
@@ -52,7 +56,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.splitContainer1.SuspendLayout();
             this.grpCode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
-            this.grpAusgabeFenster.SuspendLayout();
+            this.tabError.SuspendLayout();
+            this.tabCurrent.SuspendLayout();
+            this.tabLastError.SuspendLayout();
             this.tabAssistent.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -204,7 +210,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.grpVariablen);
-            this.splitContainer1.Panel2.Controls.Add(this.grpAusgabeFenster);
+            this.splitContainer1.Panel2.Controls.Add(this.tabError);
             this.splitContainer1.Size = new System.Drawing.Size(770, 392);
             this.splitContainer1.SplitterDistance = 199;
             this.splitContainer1.SplitterWidth = 8;
@@ -248,6 +254,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txtSkript.CharWidth = 8;
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
@@ -265,6 +272,74 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
             this.txtSkript.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TxtSkript_MouseUp);
             // 
+            // tabError
+            // 
+            this.tabError.Controls.Add(this.tabCurrent);
+            this.tabError.Controls.Add(this.tabLastError);
+            this.tabError.Dock = System.Windows.Forms.DockStyle.Right;
+            this.tabError.HotTrack = true;
+            this.tabError.Location = new System.Drawing.Point(360, 0);
+            this.tabError.Name = "tabError";
+            this.tabError.SelectedIndex = 0;
+            this.tabError.Size = new System.Drawing.Size(410, 185);
+            this.tabError.TabDefault = null;
+            this.tabError.TabDefaultOrder = new string[0];
+            this.tabError.TabIndex = 4;
+            // 
+            // tabCurrent
+            // 
+            this.tabCurrent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabCurrent.Controls.Add(this.txbSkriptInfo);
+            this.tabCurrent.Location = new System.Drawing.Point(4, 25);
+            this.tabCurrent.Name = "tabCurrent";
+            this.tabCurrent.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCurrent.Size = new System.Drawing.Size(402, 156);
+            this.tabCurrent.TabIndex = 0;
+            this.tabCurrent.Text = "Ausgabe";
+            // 
+            // txbSkriptInfo
+            // 
+            this.txbSkriptInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbSkriptInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txbSkriptInfo.Location = new System.Drawing.Point(3, 3);
+            this.txbSkriptInfo.Name = "txbSkriptInfo";
+            this.txbSkriptInfo.Size = new System.Drawing.Size(396, 150);
+            this.txbSkriptInfo.TabIndex = 1;
+            this.txbSkriptInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // tabLastError
+            // 
+            this.tabLastError.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabLastError.Controls.Add(this.btnLeeren);
+            this.tabLastError.Controls.Add(this.txbLastError);
+            this.tabLastError.Location = new System.Drawing.Point(4, 25);
+            this.tabLastError.Name = "tabLastError";
+            this.tabLastError.Padding = new System.Windows.Forms.Padding(3);
+            this.tabLastError.Size = new System.Drawing.Size(258, 156);
+            this.tabLastError.TabIndex = 1;
+            this.tabLastError.Text = "Letzer Fehler";
+            // 
+            // btnLeeren
+            // 
+            this.btnLeeren.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLeeren.ImageCode = "Papierkorb|16";
+            this.btnLeeren.Location = new System.Drawing.Point(168, 112);
+            this.btnLeeren.Name = "btnLeeren";
+            this.btnLeeren.Size = new System.Drawing.Size(88, 40);
+            this.btnLeeren.TabIndex = 3;
+            this.btnLeeren.Text = "leeren";
+            this.btnLeeren.Click += new System.EventHandler(this.btnLeeren_Click);
+            // 
+            // txbLastError
+            // 
+            this.txbLastError.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbLastError.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txbLastError.Location = new System.Drawing.Point(3, 3);
+            this.txbLastError.Name = "txbLastError";
+            this.txbLastError.Size = new System.Drawing.Size(252, 150);
+            this.txbLastError.TabIndex = 2;
+            this.txbLastError.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
             // grpVariablen
             // 
             this.grpVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -272,35 +347,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpVariablen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpVariablen.Location = new System.Drawing.Point(0, 0);
             this.grpVariablen.Name = "grpVariablen";
-            this.grpVariablen.Size = new System.Drawing.Size(359, 185);
+            this.grpVariablen.Size = new System.Drawing.Size(360, 185);
             this.grpVariablen.TabIndex = 3;
             this.grpVariablen.TabStop = false;
             this.grpVariablen.ToEdit = null;
-            // 
-            // grpAusgabeFenster
-            // 
-            this.grpAusgabeFenster.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpAusgabeFenster.Controls.Add(this.txbSkriptInfo);
-            this.grpAusgabeFenster.Dock = System.Windows.Forms.DockStyle.Right;
-            this.grpAusgabeFenster.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
-            this.grpAusgabeFenster.Location = new System.Drawing.Point(359, 0);
-            this.grpAusgabeFenster.Name = "grpAusgabeFenster";
-            this.grpAusgabeFenster.Size = new System.Drawing.Size(411, 185);
-            this.grpAusgabeFenster.TabIndex = 3;
-            this.grpAusgabeFenster.TabStop = false;
-            this.grpAusgabeFenster.Text = "Ausgabe";
-            // 
-            // txbSkriptInfo
-            // 
-            this.txbSkriptInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbSkriptInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbSkriptInfo.Location = new System.Drawing.Point(8, 24);
-            this.txbSkriptInfo.Name = "txbSkriptInfo";
-            this.txbSkriptInfo.Size = new System.Drawing.Size(396, 156);
-            this.txbSkriptInfo.TabIndex = 1;
-            this.txbSkriptInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // tabAssistent
             // 
@@ -309,7 +359,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAssistent.Location = new System.Drawing.Point(4, 25);
             this.tabAssistent.Name = "tabAssistent";
             this.tabAssistent.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAssistent.Size = new System.Drawing.Size(708, 514);
+            this.tabAssistent.Size = new System.Drawing.Size(776, 398);
             this.tabAssistent.TabIndex = 2;
             this.tabAssistent.Text = "Befehls-Assistent";
             // 
@@ -352,7 +402,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.splitContainer1.ResumeLayout(false);
             this.grpCode.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
-            this.grpAusgabeFenster.ResumeLayout(false);
+            this.tabError.ResumeLayout(false);
+            this.tabCurrent.ResumeLayout(false);
+            this.tabLastError.ResumeLayout(false);
             this.tabAssistent.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -370,11 +422,15 @@ namespace BlueControls.BlueDatabaseDialogs {
         private GroupBox grpCode;
         private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
         private VariableEditor grpVariablen;
-        private GroupBox grpAusgabeFenster;
         private Controls.TextBox txbSkriptInfo;
         private System.ComponentModel.IContainer components;
         private TabPage tabAssistent;
         private Controls.ListBox lstAssistant;
         protected RibbonBar ribMain;
+        private Controls.TabControl tabError;
+        private TabPage tabCurrent;
+        private TabPage tabLastError;
+        private Button btnLeeren;
+        private Controls.TextBox txbLastError;
     }
 }

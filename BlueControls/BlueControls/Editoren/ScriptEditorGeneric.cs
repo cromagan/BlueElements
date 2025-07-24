@@ -77,6 +77,11 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         set => txtSkript.Text = value.TrimEnd(" ") + "    ";
     }
 
+    public string LastFailedReason {
+        get => txbLastError.Text.TrimEnd(" ");
+        set => txbLastError.Text = value.TrimEnd(" ") + "    ";
+    }
+
     #endregion
 
     #region Methods
@@ -269,4 +274,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     #endregion
+
+    private void btnLeeren_Click(object sender, System.EventArgs e) {
+        txbLastError.Text = string.Empty;
+    }
 }

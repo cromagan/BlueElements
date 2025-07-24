@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -86,7 +85,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 _database.DisposingEvent += _database_Disposing;
                 _database.CanDoScript += Database_CanDoScript;
 
-                txbNeedFix.Text = _database.CheckScriptError();
+                //txbNeedFix.Text = _database.CheckScriptError();
 
                 tbcScriptEigenschaften.Enabled = true;
             } else {
@@ -126,6 +125,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 //chkAuslˆser_Fehlerfrei.Checked = value.EventTypes.HasFlag(ScriptEventTypes.correct_changed);
                 //chkAendertWerte.Checked = value.ChangeValuesAllowed;
                 Script = value.Script;
+                LastFailedReason = value.FailedReason;
 
                 lstPermissionExecute.ItemClear();
                 var l = Table.Permission_AllUsed(false).ToList();
@@ -146,6 +146,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 cbxPic.Text = string.Empty;
                 txbQuickInfo.Text = string.Empty;
                 Script = string.Empty;
+                LastFailedReason = string.Empty;
                 chkAuslˆser_newrow.Checked = false;
                 chkAuslˆser_valuechanged.Checked = false;
                 chkAuslˆser_prepaireformula.Checked = false;
@@ -276,7 +277,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     public override void WriteInfosBack() {
         if (IsDisposed || TableView.EditabelErrorMessage(Database) || Database is not { IsDisposed: false }) { return; }
 
-        UpdateValues(script: Script);
+        UpdateValues(script: Script, failedReason: LastFailedReason);
 
         #region Items sicherheitshalber in die Datenbank zur¸ck schreiben, nur so werden die gelˆschten und neuen erfasst
 
@@ -355,14 +356,14 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
 
-    private void btnDeleteNeedsScriptFix_Click(object sender, System.EventArgs e) {
-        if (_database == null) { return; }
+    //private void btnDeleteNeedsScriptFix_Click(object sender, System.EventArgs e) {
+    //    if (_database == null) { return; }
 
-        UpdateValues(failedReason: string.Empty);
+    //    UpdateValues(failedReason: string.Empty);
 
-        txbNeedFix.Text = _database.CheckScriptError();
-        //MultiUserFile.SaveAll(false);
-    }
+    //    //txbNeedFix.Text = _database.CheckScriptError();
+    //    //MultiUserFile.SaveAll(false);
+    //}
 
     //private void btnScript‹bertragen_Click(object sender, System.EventArgs e) {
     //    if (_database == null) { return; }

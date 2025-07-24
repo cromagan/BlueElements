@@ -79,10 +79,12 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
             if (value is CreativePadItem cpi) {
                 tbcScriptEigenschaften.Enabled = true;
                 Script = cpi.Script;
+                LastFailedReason = string.Empty;
                 _item = cpi;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
                 Script = string.Empty;
+                LastFailedReason = string.Empty;
             }
         }
     }

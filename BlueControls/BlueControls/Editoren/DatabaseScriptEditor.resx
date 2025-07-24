@@ -142,4 +142,11 @@ Erweitert darf länger dauern und den benutzer unterbrechen. Es wurd nach Schlü
 
 In welchen Modus sich das Skript befindet, kann mit der Variable 'Extended' abgefragt werden.</value>
   </data>
+  <data name="chkAuslöser_prepaireformula.QuickInfo" xml:space="preserve">
+    <value>Das Skript wird zur Datenkonsitenzprüfung,
+für Variablen für Formulare und nichtspeicherbare Spalten verwendet.
+
+Es kann keine Daten ändern, auf Festplatte zugreifen oder
+lange dauernde Prozesse anstoßen.</value>
+  </data>
 </root>

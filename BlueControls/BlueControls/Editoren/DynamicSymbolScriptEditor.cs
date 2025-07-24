@@ -58,10 +58,12 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
             if (value is DynamicSymbolPadItem cpi) {
                 tbcScriptEigenschaften.Enabled = true;
                 Script = cpi.Script;
+                LastFailedReason = string.Empty;
                 _item = cpi;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
                 Script = string.Empty;
+                LastFailedReason = string.Empty;
             }
         }
     }

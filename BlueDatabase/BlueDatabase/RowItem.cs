@@ -674,7 +674,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return new ScriptEndedFeedback([], RepairAllLinks());
         }
 
-        if (db.CanDoValueChangedScript()) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
+        if (!db.CanDoValueChangedScript()) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
         var mustBeExtended = string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
 
