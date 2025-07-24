@@ -58,7 +58,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
 
     #region Constructors
 
-    public DatabaseScriptDescription(string adminInfo, string image, string keyName, string quickInfo, string script, ReadOnlyCollection<string> userGroups, Database? database, ScriptEventTypes eventTypes, bool needRow, string failedReason) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason) {
+    public DatabaseScriptDescription(Database? database, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, string failedReason) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason) {
         Database = database;
         EventTypes = eventTypes;
         NeedRow = needRow;
@@ -114,9 +114,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
         }
     }
 
-    public ScriptEventTypes EventTypes {
-        get; private set;
-    } = 0;
+    public ScriptEventTypes EventTypes { get; private set; } = 0;
 
     public bool NeedRow { get; private set; }
 
@@ -146,7 +144,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
     }
 
     public override string ErrorReason() {
-        if (Database is not { IsDisposed: false }) { return "Datenbank verworfen"; }
+        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
 
         if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
             //if (ChangeValuesAllowed) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
@@ -200,6 +198,15 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
         if (NeedRow && !Database.IsRowScriptPossible()) { return "Zeilenskripte in dieser Datenbank nicht möglich"; }
 
         if (EventTypes.ToString() == ((int)EventTypes).ToString()) { return "Skripte öffnen und neu speichern."; }
+
+        foreach (var script in db.EventScript) {
+            if (script != this) {
+                if (string.Equals(script.KeyName, base.KeyName, StringComparison.OrdinalIgnoreCase)) { return $"Skriptname '{script.KeyName}' mehrfach vorhanden"; }
+
+                var gemeinsame = script.EventTypes & EventTypes;
+                if (gemeinsame != 0) { return $"Skript-Typ '{gemeinsame}' mehrfach vorhanden"; }
+            }
+        }
 
         return base.ErrorReason();
     }

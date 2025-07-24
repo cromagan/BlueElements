@@ -244,7 +244,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                 break;
 
             case "KeyCopy":
-                _ = Generic.CopytoClipboard(row?.KeyName ?? string.Empty);
+                _ = CopytoClipboard(row?.KeyName ?? string.Empty);
                 Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
                 break;
 

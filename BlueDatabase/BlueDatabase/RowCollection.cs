@@ -356,11 +356,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var r = filter.Rows;
 
-        if (r.Count > 5) {
+        if (r.Count > 10) {
             return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + filter.ReadableText(), true);
         }
 
+        if (r.Count == 0) {
+            if (!db.IsScriptsExecutable(ScriptEventTypes.InitialValues)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
+        }
+
         if (r.Count > 1) {
+            if (!db.IsScriptsExecutable(ScriptEventTypes.row_deleting)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
+
             db.Row.Combine(r);
             db.Row.RemoveYoungest(r, true);
 

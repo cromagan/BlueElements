@@ -53,10 +53,10 @@ public class Method_CellGetRow : Method_Database {
         if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
         if (row == MyRow(scp)) {
-            return new DoItFeedback("Zugriff der Werte der eigenen Zeile nur über Variabeln möglich.", true, ld);
+            return new DoItFeedback("Zugriff der Werte der eigenen Zeile nur über Variablen möglich.", true, ld);
         }
 
-        if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, ld); }
+        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, ld); }
 
         if (db.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
 

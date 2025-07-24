@@ -308,7 +308,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         if (RowCollection.InvalidatedRowsManager.IsProcessing) {
             f = "Ein anderer Prozess ist noch aktiv. Bitte kurz warten und nochmal starten.";
         } else {
-            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true);
+            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true, null);
         }
 
         if (!string.IsNullOrEmpty(f)) {

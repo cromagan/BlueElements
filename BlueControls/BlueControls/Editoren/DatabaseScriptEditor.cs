@@ -180,15 +180,15 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     public override ScriptEndedFeedback ExecuteScript(bool testmode) {
         if (IsDisposed || Database is not { IsDisposed: false } db) {
-            return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein", null, null);
+            return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
         }
 
         if (_item == null) {
-            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein", null, null);
+            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
         }
 
         if (!_item.IsOk()) {
-            return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein", null, null);
+            return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
         }
 
         WriteInfosBack();
@@ -197,7 +197,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
         if (_item.NeedRow) {
             if (db.Row.Count == 0) {
-                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein", null, null);
+                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
             }
 
             if (string.IsNullOrEmpty(txbTestZeile.Text)) {
@@ -206,13 +206,13 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
             r = db.Row[txbTestZeile.Text] ?? db.Row.SearchByKey(txbTestZeile.Text);
             if (r is not { IsDisposed: false }) {
-                return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein", null, null);
+                return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             }
         }
 
         if (!testmode) {
             if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
-                return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein", null, null);
+                return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein");
             }
         }
 
@@ -231,10 +231,14 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             return;
         }
 
-        // Entferne das alte Item anhand der Objektreferenz, nicht nur des KeyNames
-        ReadableListItem? itemToRemove = null;
+
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+
+
+            // Frontend-Update
+            ReadableListItem? itemToRemove = null;
         foreach (var listItem in lstEventScripts.Items) {
-            if (listItem is ReadableListItem rli && ReferenceEquals(rli.Item, _item)) {
+            if (listItem is ReadableListItem rli && rli.Item == _item) {
                 itemToRemove = rli;
                 break;
             }
@@ -249,26 +253,14 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             }
         }
 
-        //DatabaseScriptDescription? newItem = null;
-        //if (lstEventScripts.Checked.Count == 1 &&
-        //    !TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
-        //    if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem selectedlstEventScripts) {
-        //        newItem = selectedlstEventScripts.Item as DatabaseScriptDescription;
-        //    }
-        //}
+        // Backend-Update
+       db.UpdateScript(_item.KeyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason);
 
-        //Item = newItem;
 
-        _item = new DatabaseScriptDescription(adminInfo ?? _item.AdminInfo,
-                                             image ?? _item.Image,
-                                             keyName ?? _item.KeyName,
-                                             quickInfo ?? _item.ColumnQuickInfo,
-                                             script ?? _item.Script,
-                                             userGroups ?? _item.UserGroups,
-                                             database ?? _item.Database,
-                                             eventTypes ?? _item.EventTypes,
-                                             needRow ?? _item.NeedRow,
-                                             failedReason ?? _item.FailedReason);
+        // Aktualisiere _item Referenz (hole das neue Script aus der DB)
+        _item = db.EventScript.Get(_item.KeyName);
+
+        if(_item == null) { return; }
 
         AddTolist(_item);
 
@@ -280,11 +272,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         capFehler.Text = "<imagecode=Warnung|16> " + _item.ErrorReason();
     }
 
-    //    switch (e.Item.ToLowerInvariant()) {
-    //        case "spalteneigenschaftenbearbeiten":
-    //            if (c != null && !c.IsDisposed) {
-    //                TableView.OpenColumnEditor(c, null, null);
-    //            }
+
     public override void WriteInfosBack() {
         if (IsDisposed || TableView.EditabelErrorMessage(Database) || Database is not { IsDisposed: false }) { return; }
 
@@ -307,7 +295,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
 
-        if (Database is { IsDisposed: false } db) {
+        //if (Database is { IsDisposed: false } db) {
             //if (!db.IsEventScriptCheckeIn()) {
             //    if (MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok", "Aktiv schalten") == 1) {
             //        db.EventScript = db.EventScriptEdited;
@@ -319,7 +307,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             //        db.NeedsScriptFixxxx = db.CheckScriptError();
             //    }
             //}
-        }
+        //}
 
         Item = null; // erst das Item!
         Database = null;

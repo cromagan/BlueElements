@@ -235,7 +235,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             return;
         }
 
-        RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(_lastRow, true);
+        RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(_lastRow, true, null);
 
         var nowGeneratedId = GenerateEntityID(rowIn);
 

@@ -417,7 +417,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
-        if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein", null, null); }
+        if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         var attempt = 0;
@@ -656,9 +656,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, bool important, string reason) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein", null, null); }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
-        if (!important && Database.ExecutingScriptAnyDatabase.Count > 0) { return new ScriptEndedFeedback("Andere Skripte werden ausgeführt", false, false, "Allgemein", null, null); }
+        if (!important && Database.ExecutingScriptAnyDatabase.Count > 0) { return new ScriptEndedFeedback("Andere Skripte werden ausgeführt", false, false, "Allgemein"); }
 
         if (important) {
             var tim = Stopwatch.StartNew();
@@ -674,11 +674,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return new ScriptEndedFeedback([], RepairAllLinks());
         }
 
-        if (db.CanDoValueChangedScript()) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein", null, null); }
+        if (db.CanDoValueChangedScript()) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
         var mustBeExtended = string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
 
-        if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein", null, null); }
+        if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
             DropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
@@ -704,7 +704,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             db.OnInvalidateView();
             return ok;
         } catch {
-            return new ScriptEndedFeedback("Interner Fehler", false, true, "Allgemein", null, null);
+            return new ScriptEndedFeedback("Interner Fehler", false, true, "Allgemein");
         }
     }
 

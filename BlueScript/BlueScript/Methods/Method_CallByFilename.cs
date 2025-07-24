@@ -98,7 +98,7 @@ public class Method_CallByFilename : Method {
         #endregion
 
         if (scx.Failed) {
-            // Beim Abbruch sollen die aktuellen Variabeln angezeigt werden
+            // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
             varCol.Clear();
             _ = varCol.AddRange(tmpv);
         }

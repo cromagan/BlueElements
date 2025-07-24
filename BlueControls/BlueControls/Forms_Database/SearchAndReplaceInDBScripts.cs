@@ -23,6 +23,7 @@ using BlueControls.Forms;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
 
@@ -58,22 +59,18 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
 
         foreach (var thisDb in Database.AllFiles) {
             if (thisDb is { IsDisposed: false } db && !string.IsNullOrEmpty(db.Filename) && string.IsNullOrEmpty(db.CanWriteMainFile())) {
-                List<DatabaseScriptDescription> updatedScripts = [];
 
-                foreach (var thiss in db.EventScript) {
-                    var neu = thiss.Script.Replace(txbAlt.Text, txbNeu.Text);
-                    if (neu != thiss.Script) {
+                foreach (var script in db.EventScript.ToList()) { // ToList() für sichere Iteration
+                    var newScriptContent = script.Script.Replace(txbAlt.Text, txbNeu.Text);
+                    if (newScriptContent != script.Script) {
                         count++;
-                        updatedScripts.Add(new DatabaseScriptDescription(thiss.AdminInfo, thiss.Image, thiss.KeyName, thiss.ColumnQuickInfo, neu, thiss.UserGroups, thiss.Database, thiss.EventTypes, thiss.NeedRow, string.Empty));
-                    } else {
-                        updatedScripts.Add(thiss);
+                        Database.UpdateScript(script, scriptContent: newScriptContent, failedReason: string.Empty);
                     }
                 }
-                db.EventScript = updatedScripts.AsReadOnly();
             }
         }
 
-        MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
+        MessageBox.Show(count + " Skript(e) bearbeitet.", ImageCode.Information, "OK");
         _isWorking = false;
     }
 

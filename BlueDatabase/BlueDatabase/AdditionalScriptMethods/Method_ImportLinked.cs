@@ -35,7 +35,7 @@ public class Method_ImportLinked : Method_Database {
     public override List<List<string>> Args => [];
     public override string Command => "importlinked";
     public override List<string> Constants => [];
-    public override string Description => "Lädt alle verlinkte Zellen mit dem aktuellsten Wert in den Variablen-Speicher.\r\nVorherige Variabeln, die über den Befehl geladen wurden, werden gelöscht.";
+    public override string Description => "Lädt alle verlinkte Zellen mit dem aktuellsten Wert in den Variablen-Speicher.\r\nVorherige Variablen, die über den Befehl geladen wurden, werden gelöscht.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Database | MethodType.MyDatabaseRow;
@@ -68,7 +68,7 @@ public class Method_ImportLinked : Method_Database {
             var linkedDatabase = thisColumn.LinkedDatabase;
             if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback("Verlinkte Datenbank nicht vorhanden", true, ld); }
 
-            if (!linkedDatabase.AreScriptsExecutable()) { return new DoItFeedback("In der Datenbank '" + linkedDatabase.Caption + "' sind die Skripte defekt", false, ld); }
+            //if (!linkedDatabase.AreScriptsExecutable()) { return new DoItFeedback("In der Datenbank '" + linkedDatabase.Caption + "' sind die Skripte defekt", false, ld); }
 
             var targetColumn = linkedDatabase.Column[thisColumn.ColumnNameOfLinkedDatabase];
             if (targetColumn == null) { return new DoItFeedback("Die Spalte ist in der Zieldatenbank nicht vorhanden.", true, ld); }

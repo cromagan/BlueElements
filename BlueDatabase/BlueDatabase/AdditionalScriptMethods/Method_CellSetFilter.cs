@@ -72,7 +72,7 @@ public class Method_CellSetFilter : Method_Database {
         }
 
         if (r[0] == MyRow(scp)) {
-            return new DoItFeedback("Die eigene Zelle kann nur über die Variabeln geändert werden.", true, ld);
+            return new DoItFeedback("Die eigene Zelle kann nur über die Variablen geändert werden.", true, ld);
         }
 
         var value = string.Empty;
