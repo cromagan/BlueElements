@@ -674,7 +674,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return new ScriptEndedFeedback([], RepairAllLinks());
         }
 
-        if (!db.CanDoValueChangedScript()) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
+        if (!db.CanDoValueChangedScript(true)) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
         var mustBeExtended = string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
 
@@ -804,7 +804,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     internal void DoSystemColumns(Database db, ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
         if (reason == Reason.NoUndo_NoInvalidate) { return; }
 
-        // Die unterschiedlichen Reasons in der Routine beachten!
+        if (column.RelationType == RelationType.CellValues) { return; }
+
         if (db.Column.SysRowChanger is { IsDisposed: false } src && src != column) { _ = SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
         if (db.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { _ = SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 

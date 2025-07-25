@@ -226,27 +226,18 @@ public static class Generic {
     }
 
     public static List<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
-        //List<T> l = [];
-        //foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-        //    try {
-        //        foreach (var thist in thisas.GetTypes()) {
-        //            try {
-        //                if (thist is { IsClass: true, IsAbstract: false } && typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
-        //                    l.Add((T)Activator.CreateInstance(thist, constructorArgs));
-        //                }
-        //            } catch { }
-        //        }
-        //    } catch { }
-        //}
-        //return l;
-
-        List<T> l = [];
-        foreach (var thist in AllTypes) {
-            if (typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
-                l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+        try {
+            List<T> l = [];
+            foreach (var thist in AllTypes) {
+                if (typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
+                    l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+                }
             }
+            return l;
+        } catch {
+            Develop.CheckStackOverflow();
+            return GetInstaceOfType<T>(constructorArgs);
         }
-        return l;
     }
 
     public static string GetUniqueKey(int tmp, string type) {

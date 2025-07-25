@@ -1224,7 +1224,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             var displayR = DisplayRectangleWithoutSlider();
             var maxY = 0;
             _newRowsAllowed = UserEdit_NewRowAllowed();
-            if (string.IsNullOrEmpty( _newRowsAllowed)) { maxY += 18; }
+            if (string.IsNullOrEmpty(_newRowsAllowed)) { maxY += 18; }
             var expanded = true;
             var lastCap = string.Empty;
 
@@ -2307,7 +2307,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             FillFilters();
             UpdateFilterleisteVisibility();
             RepositionControls();
-
         } else {
             _storedView = string.Empty;
             if (CurrentArrangement is { } ca) {
@@ -2984,9 +2983,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var chpF = ca.Font_RowChapter.Scale(_zoom);
 
         var drawWidth = realHead.Width - p2;
-        var rowScript = db.CanDoValueChangedScript();
+        var rowScript = db.CanDoValueChangedScript(false);
 
-        if (SliderY.Value < p16 && string.IsNullOrEmpty( _newRowsAllowed)) {
+        if (SliderY.Value < p16 && string.IsNullOrEmpty(_newRowsAllowed)) {
             string txt;
             var plus = 0;
             QuickImage? qi;
@@ -3015,14 +3014,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 realHead.Width, GetPix(cellInThisDatabaseRowData.DrawHeight));
 
             if (cellInThisDatabaseRowData.Expanded) {
-
                 if (Database.Column.SysRowColor is { IsDisposed: false } src) {
                     var rowBackgroundColor = cellInThisDatabaseRow.CellGetColor(src);
                     if (rowBackgroundColor != Color.Transparent) {
                         using var brush = new SolidBrush(rowBackgroundColor);
                         gr.FillRectangle(brush, cellrectangle);
                     }
-
                 }
                 if (cellInThisDatabaseRowData.MarkYellow) { gr.FillRectangle(BrushYellowTransparent, cellrectangle); }
 
@@ -3986,22 +3983,19 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private string UserEdit_NewRowAllowed() {
-
-        if (IsDisposed || Database is not { IsDisposed: false } db  ) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
         if (db.Column.Count == 0) { return "Keine Spalten vorhanden"; }
         if (db.Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
         if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return "Erste Spalte nicht sichtbar"; }
-        
-        if (!db.IsScriptsExecutable(ScriptEventTypes.InitialValues)) { return "Skripte nicht ausführbar"; }
 
+        if (!db.IsScriptsExecutable(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
 
-        string? chunkv = null; 
+        string? chunkv = null;
 
-        if(fc != db.Column.ChunkValueColumn) {
+        if (fc != db.Column.ChunkValueColumn) {
             chunkv = FilterCombined.ChunkVal;
         }
-
 
         return IsCellEditable(fcv, null, chunkv, false);
     }

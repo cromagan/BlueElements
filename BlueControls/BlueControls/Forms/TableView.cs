@@ -152,8 +152,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         if (row != null) {
             e.ContextMenu.Add(ItemOf("Zeile", true));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator() && db.IsScriptsExecutable(ScriptEventTypes.row_deleting)));
-            e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), db.CanDoValueChangedScript()));
+            e.ContextMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator() && db.IsScriptsExecutable(ScriptEventTypes.row_deleting, true)));
+            e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), db.CanDoValueChangedScript(true)));
 
             var didmenu = false;
 
@@ -1224,7 +1224,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
                             && (!script.NeedRow || db.IsRowScriptPossible());
         }
 
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", ImageCode.HäkchenDoppelt, db.CanDoValueChangedScript()));
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", ImageCode.HäkchenDoppelt, db.CanDoValueChangedScript(true)));
 
         if (addedit) {
             var d = ItemOf("Skripte bearbeiten", "#editscript", ImageCode.Skript);

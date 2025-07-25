@@ -128,7 +128,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabKopfdaten.Location = new System.Drawing.Point(4, 25);
             this.tabKopfdaten.Name = "tabKopfdaten";
             this.tabKopfdaten.Padding = new System.Windows.Forms.Padding(3);
-            this.tabKopfdaten.Size = new System.Drawing.Size(776, 398);
+            this.tabKopfdaten.Size = new System.Drawing.Size(539, 398);
             this.tabKopfdaten.TabIndex = 0;
             this.tabKopfdaten.Text = "Kopfdaten";
             // 
@@ -139,7 +139,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capFehler.CausesValidation = false;
             this.capFehler.Location = new System.Drawing.Point(712, 80);
             this.capFehler.Name = "capFehler";
-            this.capFehler.Size = new System.Drawing.Size(237, 192);
+            this.capFehler.Size = new System.Drawing.Size(0, 192);
             this.capFehler.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbQuickInfo
@@ -157,7 +157,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.cbxPic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxPic.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxPic.Location = new System.Drawing.Point(436, 32);
+            this.cbxPic.Location = new System.Drawing.Point(199, 32);
             this.cbxPic.Name = "cbxPic";
             this.cbxPic.RaiseChangeDelay = 5;
             this.cbxPic.Size = new System.Drawing.Size(256, 24);
@@ -176,7 +176,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.capImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capImage.CausesValidation = false;
-            this.capImage.Location = new System.Drawing.Point(436, 8);
+            this.capImage.Location = new System.Drawing.Point(199, 8);
             this.capImage.Name = "capImage";
             this.capImage.Size = new System.Drawing.Size(152, 24);
             this.capImage.Text = "Bild:";
@@ -335,7 +335,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnVerlauf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnVerlauf.Enabled = false;
             this.btnVerlauf.ImageCode = "Undo|32";
-            this.btnVerlauf.Location = new System.Drawing.Point(708, 8);
+            this.btnVerlauf.Location = new System.Drawing.Point(471, 8);
             this.btnVerlauf.Name = "btnVerlauf";
             this.btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
             this.btnVerlauf.Size = new System.Drawing.Size(64, 66);
@@ -359,7 +359,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbName.Location = new System.Drawing.Point(8, 32);
             this.txbName.Name = "txbName";
             this.txbName.RaiseChangeDelay = 5;
-            this.txbName.Size = new System.Drawing.Size(412, 24);
+            this.txbName.Size = new System.Drawing.Size(175, 24);
             this.txbName.TabIndex = 13;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
             // 

@@ -100,12 +100,11 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
             if (_item == value) { return; }
             if (IsDisposed || Database is not { IsDisposed: false }) { return; }
 
-            WriteInfosBack();
+            if (_item != null) { WriteInfosBack(); }
 
             _item = null; // Um keine werte zurück zu Schreiben werden des anzeigen
 
             if (value != null) {
-                tbcScriptEigenschaften.Enabled = true;
                 tbcScriptEigenschaften.Enabled = true;
                 txbName.Text = value.KeyName;
                 txbQuickInfo.Text = value.ColumnQuickInfo;
@@ -137,6 +136,12 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 _item = value;
 
                 btnVerlauf.Enabled = _item != null;
+
+                if (value.IsOk()) {
+                    capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
+                } else {
+                    capFehler.Text = "<imagecode=Warnung|16> " + value.ErrorReason();
+                }
             } else {
                 tbcScriptEigenschaften.Enabled = false;
                 tbcScriptEigenschaften.Enabled = false;
@@ -154,9 +159,10 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
                 chkAuslöser_databaseloaded.Checked = false;
                 chkAuslöser_export.Checked = false;
                 btnVerlauf.Enabled = false;
+                capFehler.Text = string.Empty;
             }
 
-            UpdateValues();
+            UpdateList();
         }
     }
 
@@ -226,53 +232,22 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         return f;
     }
 
-    public void UpdateValues(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, Database? database = null, string? failedReason = null) {
+    public void UpdateValues(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null) {
         if (_item == null) {
             capFehler.Text = string.Empty;
             return;
         }
 
-
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-
-            // Frontend-Update
-            ReadableListItem? itemToRemove = null;
-        foreach (var listItem in lstEventScripts.Items) {
-            if (listItem is ReadableListItem rli && rli.Item == _item) {
-                itemToRemove = rli;
-                break;
-            }
-        }
-
-        if (itemToRemove != null) {
-            lstEventScripts.Remove(itemToRemove);
-        } else {
-            // Fallback: Entferne nach KeyName (nur wenn nicht leer)
-            if (!string.IsNullOrEmpty(_item.KeyName)) {
-                lstEventScripts.Remove(_item.KeyName);
-            }
-        }
-
         // Backend-Update
-       db.UpdateScript(_item.KeyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason);
-
+        db.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason);
 
         // Aktualisiere _item Referenz (hole das neue Script aus der DB)
-        _item = db.EventScript.Get(_item.KeyName);
+        _item = db.EventScript.Get(keyName ?? _item.KeyName);
 
-        if(_item == null) { return; }
-
-        AddTolist(_item);
-
-        if (_item.IsOk()) {
-            capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
-            return;
-        }
-
-        capFehler.Text = "<imagecode=Warnung|16> " + _item.ErrorReason();
+        UpdateList();
     }
-
 
     public override void WriteInfosBack() {
         if (IsDisposed || TableView.EditabelErrorMessage(Database) || Database is not { IsDisposed: false }) { return; }
@@ -297,17 +272,17 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         WriteInfosBack();
 
         //if (Database is { IsDisposed: false } db) {
-            //if (!db.IsEventScriptCheckeIn()) {
-            //    if (MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok", "Aktiv schalten") == 1) {
-            //        db.EventScript = db.EventScriptEdited;
-            //    }
-            //}
+        //if (!db.IsEventScriptCheckeIn()) {
+        //    if (MessageBox.Show("Es sind nicht aktiv geschaltene\r\nBearbeitungen vorhanden.", ImageCode.Information, "Ok", "Aktiv schalten") == 1) {
+        //        db.EventScript = db.EventScriptEdited;
+        //    }
+        //}
 
-            //if (!string.IsNullOrEmpty(db.NeedsScriptFixxxx)) {
-            //    if (MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok", "Leeren") == 1) {
-            //        db.NeedsScriptFixxxx = db.CheckScriptError();
-            //    }
-            //}
+        //if (!string.IsNullOrEmpty(db.NeedsScriptFixxxx)) {
+        //    if (MessageBox.Show("Fehlerspeicher ist nicht geleert.", ImageCode.Warnung, "Ok", "Leeren") == 1) {
+        //        db.NeedsScriptFixxxx = db.CheckScriptError();
+        //    }
+        //}
         //}
 
         Item = null; // erst das Item!
@@ -328,30 +303,6 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private void _database_Disposing(object sender, System.EventArgs e) {
         Database = null;
         Close();
-    }
-
-    private void AddTolist(DatabaseScriptDescription? thisSet) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
-
-        if (thisSet != null) {
-            var cap = "Sonstige";
-
-            if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
-
-            var it = ItemOf(thisSet);
-            it.UserDefCompareKey = cap + SecondSortChar + thisSet.CompareKey;
-
-            lstEventScripts.ItemAdd(it);
-
-            if (lstEventScripts[cap] == null) {
-                lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
-            }
-
-            if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible()) {
-                didMessage = true;
-                _ = EnableScript();
-            }
-        }
     }
 
     private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
@@ -507,24 +458,22 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
 
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
-        // Erstelle neues Script, aber füge es NICHT direkt zur Liste hinzu
-        var newScript = new DatabaseScriptDescription(Database);
+        var newitem = new DatabaseScriptDescription(Database);
 
-        // Setze das neue Script als aktuelles Item
-        _item = newScript;
-
-        // WriteInfosBack wird das neue Script korrekt zur Liste hinzufügen
-        WriteInfosBack();
-
-        // Suche das hinzugefügte Item und wähle es aus
-        foreach (var item in lstEventScripts.Items) {
-            if (item is ReadableListItem rli && rli.Item == newScript) {
-                lstEventScripts.Check(rli);
-                break;
-            }
+        if (db.EventScript.Get(newitem.KeyName) != null) {
+            Notification.Show("Es ist bereits ein neues Script vorhanden,\r\ndieses bearbeiten.");
+            return;
         }
+
+        List<DatabaseScriptDescription> l = [.. db.EventScript];
+        l.Add(newitem);
+        db.EventScript = l.AsReadOnly();
+
+        UpdateList();
+
+        Item = db.EventScript.Get(newitem.KeyName);
     }
 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
@@ -541,16 +490,77 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) => UpdateValues(userGroups: lstPermissionExecute.Checked.ToList().AsReadOnly());
 
-    private void txbName_TextChanged(object sender, System.EventArgs e) => UpdateValues(keyName: txbName.Text);
+    private void txbName_TextChanged(object sender, System.EventArgs e) {
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        if (_item == null) { return; }
+
+        if (!BlueScript.ScriptDescription.IsValidName(txbName.Text)) { return; }
+
+        if (!string.Equals(txbName.Text, _item.KeyName, StringComparison.OrdinalIgnoreCase)) {
+            if (db.EventScript.Get(txbName.Text) != null) { return; }
+        }
+
+        UpdateValues(keyName: txbName.Text);
+    }
 
     private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) => UpdateValues(quickInfo: txbQuickInfo.Text);
 
     private void UpdateList() {
-        lstEventScripts.ItemClear();
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || Database is not { IsDisposed: false }) {
+            lstEventScripts.ItemClear();
+            return;
+        }
+
+        #region Veraltete Items ermitteln
+
+        var toRemove = new List<ReadableListItem>();
+
+        foreach (var thisSet in lstEventScripts.Items) {
+            if (thisSet is ReadableListItem rli) {
+                if (!Database.EventScript.Contains(rli.Item)) {
+                    toRemove.Add(rli);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Veraltete Items entfernen
+
+        foreach (var thisSet in toRemove) {
+            lstEventScripts.Remove(thisSet);
+        }
+
+        #endregion
+
+        #region Neue Items hinzufügen
 
         foreach (var thisSet in Database.EventScript) {
-            AddTolist(thisSet);
+            if (thisSet != null) {
+                var cap = "Sonstige";
+
+                if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
+
+                var it = ItemOf(thisSet);
+                it.UserDefCompareKey = cap + SecondSortChar + thisSet.CompareKey;
+
+                if (lstEventScripts[it.KeyName] == null) { lstEventScripts.ItemAdd(it); }
+
+                if (lstEventScripts[cap] == null) { lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar)); }
+
+                if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible()) {
+                    didMessage = true;
+                    _ = EnableScript();
+                }
+            }
+        }
+
+        #endregion
+
+        if (_item != null) {
+            lstEventScripts.Check(_item.KeyName);
+        } else {
+            lstEventScripts.UncheckAll();
         }
     }
 

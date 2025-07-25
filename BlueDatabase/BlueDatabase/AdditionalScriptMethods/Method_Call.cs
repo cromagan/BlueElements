@@ -79,11 +79,11 @@ internal class Method_Call : Method_Database, IUseableForButton {
             }
         }
 
-        //var (f, error) = Script.NormalizedText(sc.Script);
+        var (f, error) = Script.NormalizedText(sc.Script);
 
-        //if (!string.IsNullOrEmpty(error)) {
-        //    return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true, ld);
-        //}
+        if (!string.IsNullOrEmpty(error)) {
+            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true, ld);
+        }
 
         #region Attributliste erzeugen
 
@@ -94,20 +94,16 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
         #endregion
 
-        var scx = myDb.ExecuteScript(null, vs, scp.ProduktivPhase, null, a, true, true);
-        scx.ConsumeBreakAndReturn();
+        //Diese Routine kann nicht benutzt werden, weil sie die Zeilenvariableen neu erstellt
+        //        var scx = myDb.ExecuteScript(null, vs, scp.ProduktivPhase, null, a, true, true);
+
+        var scx = Method_CallByFilename.CallSub(varCol, scp, "Subroutinen-Aufruf [" + vs + "]", f, 0, vs, null, a, vs, ld);
+        scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
+            Database.UpdateScript(sc, failedReason: scx.ProtocolText);
             return new DoItFeedback($"Unterskript '{sc.KeyName}' hat Fehler verursacht.", false, ld);
         }
-
         return scx;
-
-
-        //var scx = Method_CallByFilename.CallSub(varCol, scp, "Subroutinen-Aufruf [" + vs + "]", f, 0, vs, null, a, vs, ld);
-        //scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
-
-
-
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1];

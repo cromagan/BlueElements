@@ -150,9 +150,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
     public static void AddBackgroundWorker(RowItem row) {
         if (row.IsDisposed || row.Database is not { IsDisposed: false } db) { return; }
-        if (!db.IsScriptsExecutable(ScriptEventTypes.value_changed_extra_thread)) { return; }
+        if (!db.IsScriptsExecutable(ScriptEventTypes.value_changed_extra_thread, false)) { return; }
         if (!db.IsRowScriptPossible()) { return; }
-
         var l = new BackgroundWorker {
             WorkerReportsProgress = true
         };
@@ -192,7 +191,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 WaitDelay = Pendingworker.Count * 5;
                 if (Pendingworker.Count > 2) { break; }
 
-                if (!db.CanDoValueChangedScript()) { break; }
+                if (!db.CanDoValueChangedScript(false)) { break; }
 
                 var e = new CancelReasonEventArgs();
                 db.OnCanDoScript(e);
@@ -261,7 +260,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             foreach (var thisDb in l) {
                 if (thisDb is { IsDisposed: false } db) {
                     try {
-                        if (!db.CanDoValueChangedScript()) { continue; }
+                        if (!db.CanDoValueChangedScript(false)) { continue; }
 
                         var rowToCheck = db.Row?.NextRowToCheck(false);
                         if (rowToCheck != null) { return rowToCheck; }
@@ -322,7 +321,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisDb in l) {
             if (thisDb is { IsDisposed: false } db) {
-                if (!db.CanDoValueChangedScript()) { continue; }
+                if (!db.CanDoValueChangedScript(false)) { continue; }
                 _ = db.BeSureAllDataLoaded(30);
                 r.AddRange(db.Row);
             }
@@ -361,11 +360,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (r.Count == 0) {
-            if (!db.IsScriptsExecutable(ScriptEventTypes.InitialValues)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
+            if (!db.IsScriptsExecutable(ScriptEventTypes.InitialValues, true)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
         }
 
         if (r.Count > 1) {
-            if (!db.IsScriptsExecutable(ScriptEventTypes.row_deleting)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
+            if (!db.IsScriptsExecutable(ScriptEventTypes.row_deleting, true)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
 
             db.Row.Combine(r);
             db.Row.RemoveYoungest(r, true);
@@ -589,7 +588,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? NextRowToCheck(bool oldestTo) {
         if (Database is not { IsDisposed: false } db) { return null; }
 
-        if (!db.CanDoValueChangedScript()) { return null; }
+        if (!db.CanDoValueChangedScript(false)) { return null; }
 
         var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow());
         if (rowToCheck != null) { return rowToCheck; }

@@ -1557,7 +1557,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             "SYS_DATECREATED" or
             "SYS_DATECHANGED" or
             "SYS_LOCKED" or
-            "SYS_ROWSTATE" or 
+            "SYS_ROWSTATE" or
             "SYS_ROWCOLOR";
 
     public bool MultilinePossible() {
@@ -2049,8 +2049,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public QuickImage? SymbolForReadableText() {
         if (IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
         if (IsDisposed || Database is not { IsDisposed: false } db) { return QuickImage.Get(ImageCode.Warnung); }
-
-        if (this == db.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
 
         if (this == db.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
         if (this == db.Column.SysRowCreator) { return QuickImage.Get(ImageCode.Person); }

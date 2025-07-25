@@ -1157,7 +1157,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return !IsDisposed;
     }
 
-    public bool CanDoValueChangedScript() => IsRowScriptPossible() && IsScriptsExecutable(ScriptEventTypes.value_changed);
+    public bool CanDoValueChangedScript(bool returnValueCount0) => IsRowScriptPossible() && IsScriptsExecutable(ScriptEventTypes.value_changed, returnValueCount0);
 
     /// <summary>
     /// Konkrete Prüfung, ob jetzt gespeichert werden kann
@@ -1539,7 +1539,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
-                if (!IsScriptsExecutable(ev)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
+                if (!IsScriptsExecutable(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
                 DropMessage(ErrorType.DevelopInfo, $"Ereignis ausgelöst: {eventname}");
 
@@ -1932,12 +1932,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return true;
     }
 
-    public bool IsScriptsExecutable(ScriptEventTypes type) {
+    public bool IsScriptsExecutable(ScriptEventTypes type, bool returnValueCount0) {
         var l = _eventScript.Get(type);
 
         if (l.Count > 1) { return false; }
 
-        if (l.Count == 0) { return true; }
+        if (l.Count == 0) { return returnValueCount0; }
 
         return l[0].IsOk();
     }
@@ -2309,11 +2309,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
     }
 
-    public bool UpdateScript(string keyName, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null) {
+    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null) {
         var existingScript = EventScript.Get(keyName);
         if (existingScript == null) { return false; }
 
-        return UpdateScript(existingScript, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason);
+        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason);
     }
 
     internal void DevelopWarnung(string t) {

@@ -34,6 +34,10 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
     #region Constructors
 
     public ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason) {
+        if (string.IsNullOrEmpty(name)) {
+            name = "New script";
+        }
+
         AdminInfo = adminInfo;
         Image = image;
         KeyName = name;
@@ -86,6 +90,13 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     #region Methods
 
+    public static bool IsValidName(string name) {
+        if (string.IsNullOrEmpty(name)) { return false; }
+        if (!name.IsFormat(FormatHolder.Text)) { return false; }
+        if (string.Equals(name, "New script", StringComparison.OrdinalIgnoreCase)) { return false; }
+        return true;
+    }
+
     public abstract List<string> Attributes();
 
     public abstract int CompareTo(object obj);
@@ -97,8 +108,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
     }
 
     public virtual string ErrorReason() {
-        if (string.IsNullOrEmpty(KeyName)) { return "Kein Name angegeben."; }
-        if (!KeyName.IsFormat(FormatHolder.Text)) { return "Ungültiger Name"; }
+        if (!IsValidName(KeyName)) { return "Ungültiger Name"; }
         if (!string.IsNullOrEmpty(FailedReason)) { return "Das Skript enthält Syntax-Fehler."; }
         return string.Empty;
     }
