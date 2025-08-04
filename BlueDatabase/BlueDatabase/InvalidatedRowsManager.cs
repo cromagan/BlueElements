@@ -116,7 +116,7 @@ public class InvalidatedRowsManager {
             if (_invalidatedRows.Count > 0) {
                 Develop.Message?.Invoke(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
             } else {
-                Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, "Keine invaliden Zeilen bekannt", 0);
+                //Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, "Keine invaliden Zeilen bekannt", 0);
                 return;
             }
 
