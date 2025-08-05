@@ -5,7 +5,7 @@ using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls.BlueDatabaseDialogs {
-    public  partial class ScriptEditorGeneric {
+    public partial class ScriptEditorGeneric {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
@@ -231,8 +231,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // txtSkript
             // 
             this.txtSkript.AllowMacroRecording = false;
-            this.txtSkript.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.txtSkript.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSkript.AutoCompleteBracketsList = new char[] {
         '(',
@@ -366,7 +366,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // lstAssistant
             // 
             this.lstAssistant.AddAllowed = BlueControls.Enums.AddType.None;
-            this.lstAssistant.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.lstAssistant.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)));
             this.lstAssistant.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.lstAssistant.Location = new System.Drawing.Point(8, 8);

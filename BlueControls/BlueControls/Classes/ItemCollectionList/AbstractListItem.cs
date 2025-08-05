@@ -40,13 +40,14 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     /// <remarks></remarks>
     public object? Tag;
 
+    protected bool _isCaption;
+
     /// <summary>
     /// Ist das Item enabled?
     /// </summary>
     /// <remarks></remarks>
     private bool _enabled;
 
-    private bool _isCaption;
     private string _keyName;
 
     private Size _sizeUntouchedForListBox = Size.Empty;

@@ -1040,7 +1040,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         } while (true);
     }
 
-    public static bool UpdateScript(DatabaseScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null) {
+    public static bool UpdateScript(DatabaseScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {
         if (script?.Database is not { IsDisposed: false } db) { return false; }
 
         if (!string.IsNullOrEmpty(db.CanWriteMainFile())) { return false; }
@@ -1052,20 +1052,38 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         foreach (var existingScript in db.EventScript) {
             if (ReferenceEquals(existingScript, script)) {
                 found = true;
-                // Erstelle neues Script mit aktualisierten Werten
-                var newScript = new DatabaseScriptDescription(
-                    existingScript.Database,
-                    keyname ?? existingScript.KeyName,
-                    scriptContent ?? existingScript.Script,
-                    image ?? existingScript.Image,
-                    quickInfo ?? existingScript.ColumnQuickInfo,
-                    adminInfo ?? existingScript.AdminInfo,
-                    userGroups ?? existingScript.UserGroups,
-                    eventTypes ?? existingScript.EventTypes,
-                    needRow ?? existingScript.NeedRow,
-                    failedReason ?? existingScript.FailedReason
-                );
-                updatedScripts.Add(newScript);
+
+                if (!isDisposed) {
+                    // Prüfe ob sich wirklich etwas geändert hat
+                    var hasChanges = (keyname != null && keyname != existingScript.KeyName) ||
+                                    (scriptContent != null && scriptContent != existingScript.Script) ||
+                                    (image != null && image != existingScript.Image) ||
+                                    (quickInfo != null && quickInfo != existingScript.ColumnQuickInfo) ||
+                                    (adminInfo != null && adminInfo != existingScript.AdminInfo) ||
+                                    (eventTypes != null && !eventTypes.Equals(existingScript.EventTypes)) ||
+                                    (needRow != null && needRow != existingScript.NeedRow) ||
+                                    (userGroups != null && !userGroups.SequenceEqual(existingScript.UserGroups)) ||
+                                    (failedReason != null && failedReason != existingScript.FailedReason);
+
+                    if (hasChanges) {
+                        // Erstelle neues Script mit aktualisierten Werten
+                        var newScript = new DatabaseScriptDescription(
+                            existingScript.Database,
+                            keyname ?? existingScript.KeyName,
+                            scriptContent ?? existingScript.Script,
+                            image ?? existingScript.Image,
+                            quickInfo ?? existingScript.ColumnQuickInfo,
+                            adminInfo ?? existingScript.AdminInfo,
+                            userGroups ?? existingScript.UserGroups,
+                            eventTypes ?? existingScript.EventTypes,
+                            needRow ?? existingScript.NeedRow,
+                            failedReason ?? existingScript.FailedReason
+                        );
+                        updatedScripts.Add(newScript);
+                    } else {
+                        updatedScripts.Add(existingScript);
+                    }
+                }
             } else {
                 updatedScripts.Add(existingScript);
             }
@@ -2309,11 +2327,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString5();
     }
 
-    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null) {
+    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {
         var existingScript = EventScript.Get(keyName);
         if (existingScript == null) { return false; }
 
-        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason);
+        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed);
     }
 
     internal void DevelopWarnung(string t) {

@@ -26,12 +26,20 @@ namespace BlueControls.ItemCollectionList;
 
 public class TextListItem : AbstractListItem {
 
+    #region Fields
+
+    private QuickImage? _symbol;
+
+    private string _text;
+
+    #endregion
+
     #region Constructors
 
     public TextListItem(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(keyName, enabled) {
-        IsCaption = isCaption;
-        Text = readableText;
-        Symbol = symbol;
+        _isCaption = isCaption;
+        _text = readableText;
+        _symbol = symbol;
         UserDefCompareKey = userDefCompareKey;
     }
 
@@ -41,9 +49,23 @@ public class TextListItem : AbstractListItem {
 
     public override string QuickInfo => Text.CreateHtmlCodes(true);
 
-    public QuickImage? Symbol { get; set; }
+    public QuickImage? Symbol {
+        get => _symbol;
+        set {
+            if (_symbol == value) { return; }
+            _symbol = value;
+            OnPropertyChanged();
+        }
+    }
 
-    public string Text { get; set; }
+    public string Text {
+        get => _text;
+        set {
+            if (_text == value) { return; }
+            _text = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 

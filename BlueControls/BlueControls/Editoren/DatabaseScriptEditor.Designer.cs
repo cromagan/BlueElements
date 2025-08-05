@@ -106,7 +106,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbcScriptEigenschaften.Controls.Add(this.tabKopfdaten);
             this.tbcScriptEigenschaften.Location = new System.Drawing.Point(237, 110);
             this.tbcScriptEigenschaften.Size = new System.Drawing.Size(547, 427);
-            this.tbcScriptEigenschaften.TabDefaultOrder = new string[0];
+            this.tbcScriptEigenschaften.TabDefault = this.tabKopfdaten;
+            this.tbcScriptEigenschaften.TabDefaultOrder = new string[] {
+        "Kopfdaten",
+        "Skript-Editor",
+        "Befehls-Assistent"};
             this.tbcScriptEigenschaften.TabIndex = 0;
             this.tbcScriptEigenschaften.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
             this.tbcScriptEigenschaften.Controls.SetChildIndex(this.tabKopfdaten, 0);
@@ -389,6 +393,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts.TabIndex = 0;
             this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
             this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);
+            this.lstEventScripts.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstEventScripts_RemoveClicked);
             // 
             // cpZeile
             // 

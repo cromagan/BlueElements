@@ -79,7 +79,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public string LastFailedReason {
         get => txbLastError.Text.TrimEnd(" ");
-        set => txbLastError.Text = value.TrimEnd(" ") + "    ";
+        set => txbLastError.Text = value.TrimEnd(" ");
     }
 
     #endregion
