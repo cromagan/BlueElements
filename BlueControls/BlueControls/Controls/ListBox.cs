@@ -1158,7 +1158,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
     private bool IsChecked(string name) => _checked.Contains(name);
 
-    private void Item_PropertyChanged(object sender, System.EventArgs e) => Invalidate();
+    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
 
     private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem != null && thisItem.Contains(x, y + (int)SliderY.Value));
 

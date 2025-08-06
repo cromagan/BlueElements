@@ -118,13 +118,13 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             if (IsDisposed) { return []; }
             List<string> result = [];
 
-            result.ParseableAdd("Name", KeyName);
-            result.ParseableAdd("Script", Script);
-            result.ParseableAdd("QuickInfo", ColumnQuickInfo);
-            result.ParseableAdd("AdminInfo", AdminInfo);
+            result.ParseableAdd("Name", KeyName.Trim());
+            result.ParseableAdd("Script", Script.Replace("\r\n", "\r").TrimEnd(' '));
+            result.ParseableAdd("QuickInfo", ColumnQuickInfo.Replace("\r\n", "\r").TrimEnd(' '));
+            result.ParseableAdd("AdminInfo", AdminInfo.Replace("\r\n", "\r").TrimEnd(' '));
             result.ParseableAdd("Image", Image);
             result.ParseableAdd("UserGroups", UserGroups, false);
-            result.ParseableAdd("FailedReason", FailedReason);
+            result.ParseableAdd("FailedReason", FailedReason.Replace("\r\n", "\r").TrimEnd(' '));
 
             return result;
         } catch {

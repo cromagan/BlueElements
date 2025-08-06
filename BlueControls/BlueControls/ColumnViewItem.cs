@@ -546,9 +546,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private void _column_PropertyChanged(object sender, System.EventArgs e) => Invalidate_Fonts();
+    private void _column_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate_Fonts();
 
     private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_Fonts();
 
@@ -564,6 +562,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         Invalidate_Head();
         Invalidate_ContentWidth();
     }
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private void RegisterEvents() {
         if (_column != null) {

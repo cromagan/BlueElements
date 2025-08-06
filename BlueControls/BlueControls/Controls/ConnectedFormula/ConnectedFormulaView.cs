@@ -396,7 +396,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     //    Invalidate_FilterOutput();
     //    Invalidate_RowsInput();
-    private void _page_PropertyChanged(object sender, System.EventArgs e) => InvalidateView();
+    private void _page_PropertyChanged(object sender, PropertyChangedEventArgs e) => InvalidateView();
 
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {

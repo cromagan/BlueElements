@@ -405,7 +405,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="fc"></param>
     public void ChangeTo(FilterCollection? fc) {
-        if (!IsDifferentTo(fc, false)) { return; }
+        if (!IsDifferentTo(fc)) { return; }
 
         OnChanging();
 
@@ -513,15 +513,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnRowsChanged();
     }
 
-    public bool IsDifferentTo(FilterCollection? fc, bool ignoreDatabaseTag) {
+    public bool IsDifferentTo(FilterCollection? fc) {
         if (IsDisposed) { return false; }
         if (fc == this) { return false; }
 
         if (fc is not { IsDisposed: false }) { return true; }
 
         if (fc.Count != Count) { return true; }
-
-        if (!ignoreDatabaseTag && _database != fc.Database) { return true; }
 
         foreach (var thisf in this) {
             if (!fc.Exists(thisf)) { return true; }
@@ -875,6 +873,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) {
             fi = new FilterItem(null, "AddInternal");
         }
+
+        if (fi.FilterType == FilterType.AlwaysFalse && HasAlwaysFalse()) { return; }
+
+        if (Exists(fi)) { return; }
 
         _internal.Add(fi);
     }

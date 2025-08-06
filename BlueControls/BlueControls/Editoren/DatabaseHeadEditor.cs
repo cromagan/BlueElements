@@ -200,7 +200,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             DropMessages = false
         };
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        var f = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        f.IsFirst = true;
         _ = db.Column.GenerateAndAdd("Database", "Datenbank", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
         _ = db.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);

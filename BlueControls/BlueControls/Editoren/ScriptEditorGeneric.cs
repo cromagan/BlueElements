@@ -70,16 +70,16 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Properties
 
+    public string LastFailedReason {
+        get => txbLastError.Text.TrimEnd(" ");
+        set => txbLastError.Text = value.TrimEnd(" ");
+    }
+
     public virtual object? Object { get; set; }
 
     public string Script {
         get => txtSkript.Text.TrimEnd(" ");
         set => txtSkript.Text = value.TrimEnd(" ") + "    ";
-    }
-
-    public string LastFailedReason {
-        get => txbLastError.Text.TrimEnd(" ");
-        set => txbLastError.Text = value.TrimEnd(" ");
     }
 
     #endregion
@@ -169,6 +169,11 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         _befehlsReferenz = new Befehlsreferenz();
         _befehlsReferenz.Show();
+    }
+
+    private void btnLeeren_Click(object sender, System.EventArgs e) {
+        txbLastError.Text = string.Empty;
+        WriteInfosBack();
     }
 
     private void btnSave_Click(object sender, System.EventArgs e) {
@@ -274,8 +279,4 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     #endregion
-
-    private void btnLeeren_Click(object sender, System.EventArgs e) {
-        txbLastError.Text = string.Empty;
-    }
 }

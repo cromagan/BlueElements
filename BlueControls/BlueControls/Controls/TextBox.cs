@@ -810,7 +810,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         base.OnVisibleChanged(e);
     }
 
-    private void _eTxt_PropertyChanged(object sender, System.EventArgs e) => Invalidate();
+    private void _eTxt_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
 
     private void AbortSpellChecking() {
         if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }

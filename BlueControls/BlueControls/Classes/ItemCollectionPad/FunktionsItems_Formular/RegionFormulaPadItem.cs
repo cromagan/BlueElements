@@ -40,8 +40,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     #region Fields
 
-    private string _child = string.Empty;
     private GroupBoxStyle _borderStyle = GroupBoxStyle.Normal;
+    private string _child = string.Empty;
 
     #endregion
 
@@ -234,7 +234,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     //    }
     //}
 
-    private void ParentFormula_PropertyChanged(object sender, System.EventArgs e) {
+    private void ParentFormula_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         if (ParentFormula == null) { return; }
 

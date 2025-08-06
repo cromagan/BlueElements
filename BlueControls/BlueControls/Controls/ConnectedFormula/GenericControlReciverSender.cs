@@ -31,7 +31,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Fields
 
-    private const int MaxRecursionDepth = 12;
+    private const int MaxRecursionDepth = 10;
     private int _recursionDepth = 0;
 
     #endregion
@@ -119,7 +119,7 @@ public class GenericControlReciverSender : GenericControlReciver {
         FilterOutput.Database = null;
     }
 
-    private void FilterOutput_PropertyChanged(object sender, System.EventArgs e) {
+    private void FilterOutput_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
 
         if (_recursionDepth >= MaxRecursionDepth) {

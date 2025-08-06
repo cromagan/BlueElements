@@ -2900,8 +2900,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (CursorPosRow?.Row is { IsDisposed: false } setedrow) {
             using var nfc = new FilterCollection(setedrow, "Temp TableOutput");
             nfc.RemoveOtherAndAdd(FilterCombined, null);
+
+            if (!FilterOutput.IsDifferentTo(nfc)) { return; }
+
             FilterOutput.ChangeTo(nfc);
         } else {
+            if (!FilterOutput.IsDifferentTo(FilterCombined)) { return; }
             FilterOutput.ChangeTo(FilterCombined);
         }
 
@@ -3546,7 +3550,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         return true;
     }
 
-    private void Filter_PropertyChanged(object sender, System.EventArgs e) { DoFilterCombined(); }
+    private void Filter_PropertyChanged(object sender, PropertyChangedEventArgs e) { DoFilterCombined(); }
 
     private void Filter_ZeilenFilterSetzen() {
         if (IsDisposed || (Database?.IsDisposed ?? true)) {
@@ -3755,7 +3759,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                         Filter.Parse(code);
                         Filter.ParseFinished(code);
                         Filter.PropertyChanged += Filter_PropertyChanged;
-                        Filter_PropertyChanged(this, System.EventArgs.Empty);
+                        DoFilterCombined();
                         break;
 
                     case "sliderx":

@@ -26,6 +26,7 @@ using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -347,7 +348,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         }
     }
 
-    private void ParentFormula_PropertyChanged(object sender, System.EventArgs e) {
+    private void ParentFormula_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         if (ParentFormula == null) { return; }
 
