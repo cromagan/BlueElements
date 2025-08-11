@@ -36,6 +36,8 @@ namespace BlueControls.Forms {
             this.btnLastFormulas = new BlueControls.Controls.LastFilesCombo();
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.grpSpezial = new BlueControls.Controls.GroupBox();
+            this.btnMonitoring = new BlueControls.Controls.Button();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
             this.btnSaveLoad = new BlueControls.Controls.Button();
@@ -48,17 +50,15 @@ namespace BlueControls.Forms {
             this.btnFormular = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
-            this.grpSpezial = new BlueControls.Controls.GroupBox();
-            this.btnMonitoring = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpDatei.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
+            this.grpSpezial.SuspendLayout();
             this.tabAdmin.SuspendLayout();
             this.grpAdminAllgemein.SuspendLayout();
             this.grpAdminBearbeiten.SuspendLayout();
-            this.grpSpezial.SuspendLayout();
             this.SuspendLayout();
             // 
             // capStatusBar
@@ -158,6 +158,32 @@ namespace BlueControls.Forms {
             this.tabAllgemein.Size = new System.Drawing.Size(598, 81);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
+            // 
+            // grpSpezial
+            // 
+            this.grpSpezial.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpSpezial.CausesValidation = false;
+            this.grpSpezial.Controls.Add(this.btnMonitoring);
+            this.grpSpezial.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpSpezial.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpSpezial.Location = new System.Drawing.Point(0, 0);
+            this.grpSpezial.Name = "grpSpezial";
+            this.grpSpezial.Size = new System.Drawing.Size(80, 81);
+            this.grpSpezial.TabIndex = 5;
+            this.grpSpezial.TabStop = false;
+            this.grpSpezial.Text = "Spezial";
+            // 
+            // btnMonitoring
+            // 
+            this.btnMonitoring.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnMonitoring.ImageCode = "Monitor|16";
+            this.btnMonitoring.Location = new System.Drawing.Point(0, 2);
+            this.btnMonitoring.Name = "btnMonitoring";
+            this.btnMonitoring.QuickInfo = "A";
+            this.btnMonitoring.Size = new System.Drawing.Size(72, 66);
+            this.btnMonitoring.TabIndex = 46;
+            this.btnMonitoring.Text = "Monitoring starten";
+            this.btnMonitoring.Click += new System.EventHandler(this.btnMonitoring_Click);
             // 
             // tabAdmin
             // 
@@ -302,32 +328,6 @@ namespace BlueControls.Forms {
             this.CFormula.Text = "CFO";
             this.CFormula.ChildGotFocus += new System.EventHandler<System.Windows.Forms.ControlEventArgs>(this.CFormula_ChildGotFocus);
             // 
-            // grpSpezial
-            // 
-            this.grpSpezial.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpSpezial.CausesValidation = false;
-            this.grpSpezial.Controls.Add(this.btnMonitoring);
-            this.grpSpezial.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpSpezial.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpSpezial.Location = new System.Drawing.Point(0, 0);
-            this.grpSpezial.Name = "grpSpezial";
-            this.grpSpezial.Size = new System.Drawing.Size(80, 81);
-            this.grpSpezial.TabIndex = 5;
-            this.grpSpezial.TabStop = false;
-            this.grpSpezial.Text = "Spezial";
-            // 
-            // btnMonitoring
-            // 
-            this.btnMonitoring.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnMonitoring.ImageCode = "Monitor|16";
-            this.btnMonitoring.Location = new System.Drawing.Point(0, 2);
-            this.btnMonitoring.Name = "btnMonitoring";
-            this.btnMonitoring.QuickInfo = "A";
-            this.btnMonitoring.Size = new System.Drawing.Size(72, 66);
-            this.btnMonitoring.TabIndex = 46;
-            this.btnMonitoring.Text = "Monitoring starten";
-            this.btnMonitoring.Click += new System.EventHandler(this.btnMonitoring_Click);
-            // 
             // ConnectedFormulaForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -346,10 +346,10 @@ namespace BlueControls.Forms {
             this.tabFile.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
+            this.grpSpezial.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
             this.grpAdminAllgemein.ResumeLayout(false);
             this.grpAdminBearbeiten.ResumeLayout(false);
-            this.grpSpezial.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

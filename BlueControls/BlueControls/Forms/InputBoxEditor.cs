@@ -92,7 +92,10 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// <param name="supportsCancel"></param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
     public static bool Show(IEditable? toEdit, Type? editortype, bool isDialog, bool supportsCancel) {
-        if (editortype == null) { return false; }
+        if (editortype == null) {
+            MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Interne Bearbeitungsmethode nicht definiert", ImageCode.Information, "Ok");
+            return false;
+        }
 
         if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return false; }
 

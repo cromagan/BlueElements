@@ -47,7 +47,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("Click")]
-public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged {
+public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandling, INotifyPropertyChanged {
 
     #region Fields
 
@@ -304,9 +304,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             LastClickedItem = null;
 
             if (e.HotItem is PointM) {
-                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen));
-                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Verschieben));
-                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen));
+                e.ContextMenu.Add(ItemOf("Umbenennen", "Umbenennen", QuickImage.Get(ImageCode.Stift)));
+                e.ContextMenu.Add(ItemOf("Verschieben", "Verschieben", QuickImage.Get(ImageCode.Mauspfeil)));
+                e.ContextMenu.Add(ItemOf("Löschen", "Löschen", QuickImage.Get(ImageCode.Kreuz)));
             }
         }
 

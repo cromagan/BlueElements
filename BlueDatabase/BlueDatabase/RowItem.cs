@@ -40,7 +40,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable, IEditable {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable, IEditable, IHasInfo {
 
     #region Fields
 
@@ -453,6 +453,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         return thisss.GetHashString();
+    }
+
+    public string Infotext() {
+        if (!string.IsNullOrEmpty(QuickInfo)) { return QuickInfo; }
+
+        return CellFirstString();
     }
 
     //public void CloneFrom(RowItem source, bool nameAndKeyToo) {

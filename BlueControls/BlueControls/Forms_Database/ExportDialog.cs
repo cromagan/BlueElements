@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
@@ -235,8 +234,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
-
-        if(padSchachteln.Items is not {IsDisposed: false }) { return; }
+        if (padSchachteln.Items is not { IsDisposed: false }) { return; }
 
         _ = FloatTryParse(flxBreite.Value, out var b);
         _ = FloatTryParse(flxHöhe.Value, out var h);
@@ -322,8 +320,8 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.ContextMenu.Add(ItemOf(ContextMenuCommands.DateiPfadÖffnen));
-        e.ContextMenu.Add(ItemOf(ContextMenuCommands.Kopieren));
+        e.ContextMenu.Add(ItemOf("Dateipfad öffnen", "DateiPfadÖffnen", QuickImage.Get(ImageCode.Ordner)));
+        e.ContextMenu.Add(ItemOf("Kopieren", "Kopieren", QuickImage.Get(ImageCode.Kopieren)));
     }
 
     private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

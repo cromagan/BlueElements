@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.CellRenderer;
@@ -130,48 +131,6 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         se.Row = _lastrow;
     }
 
-    //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-    //    var (column, row) = GetTmpVariables();
-
-    //    switch (e.Item.KeyName.ToLowerInvariant()) {
-    //        case "spalteneigenschaftenbearbeiten":
-    //            TableView.OpenColumnEditor(column, null);
-    //            return true;
-
-    //        case "vorherigeninhaltwiederherstellen":
-    //            Table.DoUndo(column, row);
-    //            return true;
-
-    //            //default:
-    //            //    //if (Parent is Formula f) {
-    //            //    //    return f.ContextMenuItemClickedInternalProcessig(sender, e);
-    //            //    //}
-    //            //    break;
-    //    }
-    //    return false;
-    //}
-
-    //public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-    //    var (column, row) = GetTmpVariables();
-    //    if (column?.Database != null && column.Database.IsAdministrator()) {
-    //        items.Add(ItemOf(ContextMenuCommands.SpaltenEigenschaftenBearbeiten));
-    //    }
-    //    if (column?.Database != null && row != null && column.Database.IsAdministrator()) {
-    //        items.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen));
-    //    }
-    //    //if (Parent is Formula f) {
-    //    //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu, false);
-    //    //    f.GetContextMenuItems(null, x, out _, tags, ref cancel, ref translate);
-    //    //    if (x.Count > 0) {
-    //    //        if (items.Count > 0) {
-    //    //            items.Add(AddSeparator());
-    //    //        }
-    //    //        items.AddClonesFrom(x);
-    //    //    }
-    //    //}
-    //    hotItem = column;
-    //}
-
     protected override void DatabaseInput_CellValueChanged(object sender, CellEventArgs e) {
         try {
             if (InvokeRequired) {
@@ -282,7 +241,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
             if (FileExists(t.KeyName)) {
-                e.ContextMenu.Add(ItemOf(ContextMenuCommands.DateiÖffnen));
+                e.ContextMenu.Add(ItemOf("Öffnen / Ausführen", "DateiÖffnen", QuickImage.Get(ImageCode.Blitz)));
             }
         }
         if (e.HotItem is BitmapListItem) {

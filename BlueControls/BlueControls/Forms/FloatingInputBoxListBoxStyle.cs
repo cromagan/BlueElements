@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
@@ -86,7 +87,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         if (thisContextMenu.Count > 0) {
             thisContextMenu.Add(Separator());
-            thisContextMenu.Add(ItemOf(ContextMenuCommands.Abbruch));
+            thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC));
             var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, ce.HotItem, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         }
@@ -159,7 +160,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         ContextMenuItemClickedEventArgs ex = new(e.Item, e.HotItem, e.Control);
 
-        if (e.Control is IContextMenu cm) {
+        if (e.Control is IContextMenuWithInternalHandling cm) {
             cm.DoContextMenuItemClick(ex);
         }
     }

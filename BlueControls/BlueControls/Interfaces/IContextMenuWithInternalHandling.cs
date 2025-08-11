@@ -27,31 +27,28 @@ namespace BlueControls.Interfaces;
 /// Die ganze Erstellung und Handling übernimmt dabei FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
 /// Dabei werden die hier angegebenen Routinen und Events abgefragt und ausgelöst.
 /// </summary>
-public interface IContextMenu {
+public interface IContextMenuWithInternalHandling : IContextMenu {
 
     #region Events
 
 
-    /// <summary>
-    /// Dieses Event wird vom Steuerelement benutzt, um von außen zusätzliche Items zu erhalten.
-    /// </summary>
-    event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
+    // ReSharper disable once EventNeverSubscribedTo.Global
+    event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion
 
     #region Methods
 
-
-
     /// <summary>
-    /// Diese Routine wird als erstes aufgerufen und holt sich alle relevanten Daten.
-    /// Hier werden auch die Kontextmenü-Einträge erstellt, die intern abgehandelt werden müssen.
-    /// Und/Oder OnContextMenuInit wird aufgerufen - damit auch außerhalb es Steuerelementes
-    /// Einträge hinzugefügt werden können
+    /// Hier wird dem Steuerelement die Möglichkeit, den Kontextmenü-Befehl selbst abzuarbeiten.
+    /// Und/Oder OnContextMenuClicked aufzurufen
     /// </summary>
     /// <param name="e"></param>
-    void GetContextMenuItems(ContextMenuInitEventArgs e);
+    /// <returns></returns>
+    void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e);
+
+
 
     #endregion
 }

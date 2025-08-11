@@ -23,7 +23,6 @@ using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
@@ -105,226 +104,10 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     #region Methods
 
-    public static void ContextMenuInit(Table? tbl, ColumnItem? column, RowItem? row, ContextMenuInitEventArgs e) {
-        var db = tbl?.Database ?? column?.Database ?? row?.Database;
-        if (db == null) { return; }
+   
 
-        var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column, row, row?.ChunkValue));
 
-        if (tbl != null && row != null) {
-            e.ContextMenu.Add(ItemOf("Anheften", true));
-            if (tbl.PinnedRows.Contains(row)) {
-                e.ContextMenu.Add(ItemOf("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
-            } else {
-                e.ContextMenu.Add(ItemOf("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), true));
-            }
-        }
-
-        if (column != null) {
-            e.ContextMenu.Add(ItemOf("Sortierung", true));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungDefault, true));
-
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, true));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, true));
-            //_ = e.CurrentMenu.Add(AddSeparator());
-
-            e.ContextMenu.Add(ItemOf("Zelle", true));
-            e.ContextMenu.Add(ItemOf("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column.CanBeChangedByRules()));
-            e.ContextMenu.Add(ItemOf("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column.CanBeChangedByRules()));
-            e.ContextMenu.Add(ItemOf("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column.CanBeChangedByRules()));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column.CanBeChangedByRules() && column.SaveContent));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SuchenUndErsetzen, db.IsAdministrator()));
-            e.ContextMenu.Add(ItemOf("Zeilenschlüssel Kopieren", "KeyCopy", ImageCode.Schlüssel, db.IsAdministrator()));
-            //_ = e.CurrentMenu.Add(AddSeparator());
-            e.ContextMenu.Add(ItemOf("Spalte", true));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, db.IsAdministrator()));
-
-            e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, db.IsAdministrator()));
-            e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, db.IsAdministrator()));
-
-            e.ContextMenu.Add(ItemOf("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), db.IsAdministrator()));
-            e.ContextMenu.Add(ItemOf("Summe", "Summe", ImageCode.Summe, db.IsAdministrator()));
-
-            e.ContextMenu.Add(ItemOf("Voting", "Voting", ImageCode.Herz, db.IsAdministrator() && editable && column.CanBeChangedByRules()));
-
-            //_ = e.CurrentMenu.Add(AddSeparator());
-        }
-
-        if (row != null) {
-            e.ContextMenu.Add(ItemOf("Zeile", true));
-            e.ContextMenu.Add(ItemOf(ContextMenuCommands.ZeileLöschen, db.IsAdministrator() && db.IsScriptsExecutable(ScriptEventTypes.row_deleting, true)));
-            e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), db.CanDoValueChangedScript(true)));
-
-            var didmenu = false;
-
-            foreach (var thiss in db.EventScript) {
-                if (thiss is { UserGroups.Count: > 0 } && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {
-                    if (!didmenu) {
-                        e.ContextMenu.Add(ItemOf("Skripte", true));
-                        didmenu = true;
-                    }
-                    e.ContextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, thiss.SymbolForReadableText(), row != null && thiss.IsOk()));
-                }
-            }
-        }
-    }
-
-    public static void ContextMenuItemClicked(Table? tbl, ColumnItem? column, RowItem? row, ContextMenuItemClickedEventArgs e) {
-        var db = tbl?.Database ?? column?.Database ?? row?.Database;
-        if (db == null) { return; }
-
-        var valueCol0 = string.Empty;
-        if (row is { IsDisposed: false }) {
-            valueCol0 = row.CellFirstString();
-        }
-
-        //var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditAcut));
-
-        var ev = (e.Item.KeyName + "|").SplitAndCutBy("|");
-
-        switch (ev[0]) {
-            case "pinlösen":
-                tbl?.PinRemove(row);
-                break;
-
-            case "anpinnen":
-                tbl?.PinAdd(row);
-                break;
-
-            case "SpaltenSortierungDefault":
-                if (tbl != null) { tbl.SortDefinitionTemporary = null; }
-                break;
-
-            case "SpaltenSortierungAZ":
-                if (tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(db, column, false); }
-                break;
-
-            case "SpaltenSortierungZA":
-                if (tbl != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(db, column, true); }
-                break;
-
-            case "Skript":
-                if (row is { IsDisposed: false }) {
-                    var t = row.ExecuteScript(null, ev[1], true, 10, null, true, true);
-
-                    if (t is { Failed: false }) {
-                        MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
-                    } else {
-                        MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.FailedReason}<br><br>{t.Protocol.JoinWithCr()}", ImageCode.Kreuz, "Ok");
-                    }
-                }
-
-                break;
-
-            case "ZeileLöschen":
-                if (EditabelErrorMessage(db)) { return; }
-                if (!db.IsAdministrator()) { return; }
-                if (row is not { IsDisposed: false }) { return; }
-
-                if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
-                    _ = RowCollection.Remove(row, "Benutzer: löschen Befehl");
-                }
-
-                break;
-
-            case "ContentDelete":
-                if (EditabelErrorMessage(db)) { return; }
-
-                row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
-                //tbl.Database.Cell.Delete(column, row?.KeyName);
-                break;
-
-            case "SpaltenEigenschaftenBearbeiten":
-                OpenColumnEditor(column, row, tbl);
-                //CheckButtons();
-                break;
-
-            case "ContentCopy":
-                Table.CopyToClipboard(column, row, true);
-                break;
-
-            case "KeyCopy":
-                _ = CopytoClipboard(row?.KeyName ?? string.Empty);
-                Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
-                break;
-
-            case "SuchenUndErsetzen":
-                if (!db.IsAdministrator()) { return; }
-
-                tbl?.OpenSearchAndReplaceInCells();
-                break;
-
-            case "Summe":
-                if (!db.IsAdministrator() || tbl == null) { return; }
-
-                var summe = column?.Summe(tbl.FilterCombined);
-                if (!summe.HasValue) {
-                    MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
-                } else {
-                    MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
-                }
-
-                break;
-
-            case "Voting":
-                if (!db.IsAdministrator() || tbl == null || column == null) { return; }
-
-                var v = new Voting(column, [.. tbl.FilterCombined.Rows]);
-                _ = v.ShowDialog();
-                break;
-
-            case "Statistik":
-                if (!db.IsAdministrator() || column == null || tbl == null) { return; }
-
-                var split = false;
-                if (column.MultiLine) {
-                    split = MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
-                }
-
-                column.Statistik(tbl.RowsVisibleUnique(), !split);
-                break;
-
-            case "VorherigenInhaltWiederherstellen":
-                if (EditabelErrorMessage(db)) { return; }
-
-                Table.DoUndo(column, row);
-                break;
-
-            case "#datenüberprüfung":
-                if (row is { IsDisposed: false }) {
-                    row.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-                    _ = row.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
-                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true, null);
-                    //row.CheckRowDataIfNeeded();
-                    MessageBox.Show("Datenüberprüfung:\r\n" + row.CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
-                }
-                break;
-
-            case "CopyAll": {
-                    if (!db.IsAdministrator() || column == null || tbl == null) { return; }
-                    var txt = tbl.Export_CSV(FirstRow.Without, column);
-                    //txt = txt.TrimStart("Deutsch;\r\n");
-                    //txt = txt.TrimStart("Englisch;\r\n");
-                    txt = txt.Replace("|", "\r\n");
-                    txt = txt.Replace(";", string.Empty);
-                    _ = CopytoClipboard(txt);
-                    Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
-                    break;
-                }
-            case "CopyAll2": {
-                    if (!db.IsAdministrator() || column == null || tbl == null) { return; }
-                    var txt = tbl.Export_CSV(FirstRow.Without, column);
-                    //txt = txt.TrimStart("Deutsch;\r\n");
-                    //txt = txt.TrimStart("Englisch;\r\n");
-                    txt = txt.Replace("|", "\r\n");
-                    txt = txt.Replace(";", string.Empty);
-                    var l = txt.SplitAndCutByCrToList().SortedDistinctList().JoinWithCr();
-                    _ = CopytoClipboard(l);
-                    Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
-                    break;
-                }
-        }
-    }
+    
 
     /// <summary>
     /// Gibt TRUE zuück, wenn eine Fehlernachricht angezeigt wurde.
@@ -342,49 +125,9 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         return true;
     }
 
-    public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
-        if (column is not { IsDisposed: false }) { return; }
+ 
 
-        if (row is not { IsDisposed: false }) {
-            OpenColumnEditor(column, tableview);
-            return;
-        }
 
-        ColumnItem? columnLinked = null;
-        var posError = false;
-
-        if (column.RelationType == RelationType.CellValues) {
-            (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
-            posError = true;
-        }
-
-        var bearbColumn = column;
-        if (columnLinked != null) {
-            columnLinked.Repair();
-            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Datenbank",
-                    "Verlinkte Spalte") == 1) {
-                bearbColumn = columnLinked;
-            }
-        } else {
-            if (posError) {
-                Notification.Show(
-                    "Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?",
-                    ImageCode.Information);
-            }
-        }
-
-        column.Repair();
-        OpenColumnEditor(bearbColumn, tableview);
-        bearbColumn.Repair();
-    }
-
-    public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
-        if (column is not { IsDisposed: false }) { return; }
-        column.Editor = typeof(ColumnEditor);
-
-        using ColumnEditor w = new(column, tableview);
-        _ = w.ShowDialog();
-    }
 
     public static void OpenLayoutEditor(Database db, string layoutToOpen) {
         var x = db.CanWriteMainFile();
@@ -702,25 +445,8 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// <returns></returns>
     protected bool SwitchTabToDatabase(Database? database) => database is not null && !database.IsDisposed && SwitchTabToDatabase(database.TableName);
 
-    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (IsDisposed || sender is not Table { Database: { IsDisposed: false } db } tbl) { return; }
-        RowItem? row = null;
-        ColumnItem? column = null;
-        if (e.HotItem is RowItem r) { row = r; }
-        if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out row); }
-        ContextMenuInit(tbl, column, row, e);
-    }
+    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {   }
 
-    protected virtual void Table_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (sender is not Table { Database: { IsDisposed: false } db } tbl) { return; }
-        RowItem? row = null;
-        ColumnItem? column = null;
-        if (e.HotItem is RowItem r) { row = r; }
-        if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out row); }
-        ContextMenuItemClicked(tbl, column, row, e);
-    }
 
     protected virtual void Table_DatabaseChanged(object sender, System.EventArgs e) {
         Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
@@ -1077,7 +803,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
                 case "#repaircolumn":
                     var c = db.Column[com[1]];
-                    OpenColumnEditor(c, null);
+                    Table.OpenColumnEditor(c, null);
                     UpdateScripts(db);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 

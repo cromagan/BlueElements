@@ -38,7 +38,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  UserControl //
+public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInternalHandling //  UserControl //
                                                   {
     #region Fields
 

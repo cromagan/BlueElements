@@ -22,8 +22,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
@@ -398,38 +396,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
-
-    private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (IsDisposed || sender is not Table { Database: { IsDisposed: false } db }) { return; }
-        ColumnItem? column = null;
-        if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
-
-        e.ContextMenu.Add(ItemOf("Sortierung", true));
-        e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungAZ, column != null));
-        e.ContextMenu.Add(ItemOf(ContextMenuCommands.SpaltenSortierungZA, column != null));
-    }
-
-    private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (IsDisposed || sender is not Table { Database: { IsDisposed: false } db } tbl) { return; }
-        //RowItem? row = null;
-        ColumnItem? column = null;
-        //if (e.HotItem is RowItem r) { row = r; }
-        if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
-
-        if (column == null) { return; }
-
-        switch (e.Item.KeyName) {
-            case "SpaltenSortierungAZ":
-                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column, false);
-                break;
-
-            case "SpaltenSortierungZA":
-                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column, true);
-                break;
-        }
-    }
 
     private void WriteInfosBack() {
         if (TableView.EditabelErrorMessage(Database) || Database is not { IsDisposed: false }) { return; }

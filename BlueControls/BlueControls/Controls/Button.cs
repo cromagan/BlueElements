@@ -21,7 +21,9 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
@@ -35,7 +37,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(ButtonDesigner))]
 [DefaultEvent("Click")]
-public class Button : GenericControl, IBackgroundNone, ITranslateable {
+public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextMenu {
 
     #region Fields
 
@@ -72,6 +74,8 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
     #region Events
 
     public event EventHandler? CheckedChanged;
+
+    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     #endregion
 
@@ -145,6 +149,10 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
     #endregion
 
     #region Methods
+
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
+
+    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     internal static void DrawButton(Control? control, Graphics gr, Design buttontype, States state, QuickImage? qi, Alignment align, bool picHeight44, ExtText? etxt, string text, Rectangle displayRectangle, bool translate) {
         var design = Skin.DesignOf(buttontype, state);
@@ -316,9 +324,13 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
 
         if (!Enabled || IsDisposed) { return; }
 
-        if (_buttonStyle == ButtonStyle.SliderButton) {
-            if (_clickFirerer != null) { _clickFirerer.Interval = 500; }
-            ClickFirerer_Tick(null, e);
+        if (e.Button == MouseButtons.Right) {
+            FloatingInputBoxListBoxStyle.ContextMenuShow(this, null, e);
+        } else {
+            if (_buttonStyle == ButtonStyle.SliderButton) {
+                if (_clickFirerer != null) { _clickFirerer.Interval = 500; }
+                ClickFirerer_Tick(null, e);
+            }
         }
 
         Invalidate();

@@ -19,6 +19,9 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.BlueDatabaseDialogs;
+using BlueControls.EventArgs;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -29,11 +32,12 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-internal partial class ConnectedFormulaButton : GenericControlReciver {
+internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo {
 
     #region Fields
 
@@ -187,18 +191,37 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
     }
 
     public string ImageCode {
-        get => main.ImageCode;
-        set => main.ImageCode = value;
+        get => mainButton.ImageCode;
+        set => mainButton.ImageCode = value;
     }
 
     public new string Text {
-        get => main.Text;
-        set => main.Text = value;
+        get => mainButton.Text;
+        set => mainButton.Text = value;
     }
 
     #endregion
 
     #region Methods
+
+    public string Infotext() {
+        var m = Method.AllMethods.Get(_action);
+
+        if (m is not IUseableForButton ufb) { return "Keine Aktion definiert"; }
+
+        var t = m.ReadableText();
+
+        if (ufb.ArgsForButton.Count > 0) { t = t + "\r\n" + ufb.ArgsForButtonDescription[0] + " = " + Arg1; }
+        if (ufb.ArgsForButton.Count > 1) { t = t + "\r\n" + ufb.ArgsForButtonDescription[1] + " = " + Arg2; }
+        if (ufb.ArgsForButton.Count > 2) { t = t + "\r\n" + ufb.ArgsForButtonDescription[2] + " = " + Arg3; }
+        if (ufb.ArgsForButton.Count > 3) { t = t + "\r\n" + ufb.ArgsForButtonDescription[3] + " = " + Arg4; }
+        if (ufb.ArgsForButton.Count > 4) { t = t + "\r\n" + ufb.ArgsForButtonDescription[4] + " = " + Arg5; }
+        if (ufb.ArgsForButton.Count > 5) { t = t + "\r\n" + ufb.ArgsForButtonDescription[5] + " = " + Arg6; }
+        if (ufb.ArgsForButton.Count > 6) { t = t + "\r\n" + ufb.ArgsForButtonDescription[6] + " = " + Arg7; }
+        if (ufb.ArgsForButton.Count > 7) { t = t + "\r\n" + ufb.ArgsForButtonDescription[7] + " = " + Arg8; }
+
+        return t;
+    }
 
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
@@ -241,7 +264,16 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
     private void ButtonError(string message) => MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
 
-    private void F_MouseUp(object sender, MouseEventArgs e) {
+    private void mainButton_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+        e.ContextMenu.Add(ItemOf(this));
+
+        if (DatabaseInput is { IsDisposed: false } db) {
+            db.Editor ??= typeof(DatabaseHeadEditor);
+            e.ContextMenu.Add(ItemOf(db));
+        }
+    }
+
+    private void mainButton_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button != MouseButtons.Left) { return; }
 
         var m = Method.AllMethods.Get(_action);
@@ -256,8 +288,8 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
             return;
         }
 
-        main.Enabled = false;
-        main.Refresh();
+        mainButton.Enabled = false;
+        mainButton.Refresh();
 
         HandleChangesNow();
 
@@ -317,8 +349,8 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         } else {
             Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Häkchen, "Knopfdruck ausgeführt", 0);
         }
-        main.Enabled = true;
-        main.Refresh();
+        mainButton.Enabled = true;
+        mainButton.Refresh();
     }
 
     #endregion

@@ -168,6 +168,7 @@
     </Compile>
     <Compile Include="Enums\XPosition.cs" />
     <Compile Include="Interfaces\IComandBuilder.cs" />
+    <Compile Include="Interfaces\IContextMenu.cs" />
     <Compile Include="Interfaces\ISupportsTextScale.cs" />
     <Compile Include="Interfaces\IStyleableOne.cs" />
     <Compile Include="Interfaces\IStyleable.cs" />
@@ -389,7 +390,6 @@
     <Compile Include="Enums\ComboboxStyle.cs" />
     <Compile Include="Enums\ListBoxAppearance.cs" />
     <Compile Include="Enums\AddType.cs" />
-    <Compile Include="Enums\ContextMenuCommands.cs" />
     <Compile Include="Enums\CS.cs" />
     <Compile Include="Enums\ExStyle.cs" />
     <Compile Include="Enums\Kontur.cs" />
@@ -675,7 +675,7 @@
       <DependentUpon>GroupBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\ICanHaveVariables.cs" />
-    <Compile Include="Interfaces\IContextMenu.cs" />
+    <Compile Include="Interfaces\IContextMenuWithInternalHandling.cs" />
     <Compile Include="Classes\ItemCollectionList\AbstractListItem.cs" />
     <Compile Include="Classes\ItemCollectionList\BitmapListItem.cs" />
     <Compile Include="Classes\ItemCollectionList\CellLikeListItem.cs" />

@@ -45,7 +45,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("ItemClicked")]
-public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
+public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHandling, IBackgroundNone, ITranslateable {
 
     #region Fields
 
@@ -857,7 +857,10 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                             }
                         }
                     }
+
+                    // Erst Item Clicked. Zb. geht dann das Kontextmenu zu.
                     OnItemClicked(new AbstractListItemEventArgs(nd));
+                    nd.LeftClickExecute?.Invoke(nd);
                 }
                 break;
 

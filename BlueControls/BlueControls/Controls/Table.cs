@@ -50,6 +50,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
@@ -148,8 +149,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
-
     public event EventHandler? DatabaseChanged;
 
     public new event EventHandler<CellExtEventArgs>? DoubleClick;
@@ -202,6 +201,8 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     [DefaultValue(false)]
     public bool AutoPin { get; set; }
+
+    public bool ContextMenuDefault { get; set; } = true;
 
     public ColumnViewCollection? CurrentArrangement {
         get {
@@ -823,7 +824,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             foreach (var thisArrangement in tcvc) {
                 if (db.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
-                    columnArrangementSelector.ItemAdd(ItemOf(thisArrangement));
+                    columnArrangementSelector.ItemAdd(ItemOf(thisArrangement as IReadableTextWithKey));
                 }
             }
         }
@@ -965,8 +966,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         OnDatabaseChanged();
     }
 
-    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
-
     public void DoZoom(bool zoomIn) {
         var nz = _zoom;
 
@@ -1071,7 +1070,91 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
+    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        if (ContextMenuDefault && Database is { IsDisposed: false } db) {
+
+            #region Pinnen
+
+            if (_mouseOverRow?.Row is { IsDisposed: false } row) {
+                e.ContextMenu.Add(ItemOf("Anheften", true));
+                if (PinnedRows.Contains(row)) {
+                    e.ContextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, row, true));
+                } else {
+                    e.ContextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, row, true));
+                }
+            }
+
+            #endregion
+
+            #region Sortierung
+
+            if (_mouseOverColumn?.Column is { IsDisposed: false } column) {
+                e.ContextMenu.Add(ItemOf("Sortierung", true));
+                e.ContextMenu.Add(ItemOf("Sortierung zurückstetzen", QuickImage.Get("AZ|16|8|1"), ContextMenu_ResetSort, null, true));
+                e.ContextMenu.Add(ItemOf("Nach dieser Spalte aufsteigend sortieren", QuickImage.Get("AZ|16|8"), ContextMenu_SortAZ, column, true));
+                e.ContextMenu.Add(ItemOf("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, column, true));
+            }
+
+            #endregion
+
+            #region Zelle
+
+            if (_mouseOverColumn?.Column is { IsDisposed: false } column2 && _mouseOverRow?.Row is { IsDisposed: false } row2) {
+                var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column2, row2, row2?.ChunkValue));
+
+                e.ContextMenu.Add(ItemOf("Zelle", true));
+                e.ContextMenu.Add(ItemOf("Inhalt Kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, new { Column = column2, Row = row2 }, column2.CanBeChangedByRules()));
+                e.ContextMenu.Add(ItemOf("Inhalt Einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, null, editable && column2.CanBeChangedByRules()));
+                e.ContextMenu.Add(ItemOf("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, new { Column = column2, Row = row2 }, editable && column2.CanBeChangedByRules()));
+                e.ContextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, new { Column = column2, Row = row2 }, editable && column2.CanBeChangedByRules() && column2.SaveContent));
+                e.ContextMenu.Add(ItemOf("Suchen und Ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, null, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Zeilenschlüssel Kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, row2, db.IsAdministrator()));
+            }
+
+            #endregion
+
+            #region Spalte
+
+            if (_mouseOverColumn?.Column is { IsDisposed: false } column3) {
+                e.ContextMenu.Add(ItemOf("Spalte", true));
+                e.ContextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", QuickImage.Get(ImageCode.Stift, 16), ContextMenu_EditColumnProperties, column3, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, column3, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, column3, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, column3, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, column3, db.IsAdministrator()));
+
+                if (_mouseOverRow?.Row is { IsDisposed: false } row3) {
+                    var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column3, row3, row3?.ChunkValue));
+                    e.ContextMenu.Add(ItemOf("Voting", ImageCode.Herz, ContextMenu_Voting, column3, db.IsAdministrator() && editable && column3.CanBeChangedByRules()));
+                }
+            }
+
+            #endregion
+
+            #region Zeile
+
+            if (_mouseOverRow?.Row is { IsDisposed: false } row4) {
+                e.ContextMenu.Add(ItemOf("Zeile", true));
+                e.ContextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, row4, db.IsAdministrator() && db.IsScriptsExecutable(ScriptEventTypes.row_deleting, true)));
+                e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, row4, db.CanDoValueChangedScript(true)));
+
+                var didmenu = false;
+                foreach (var thiss in db.EventScript) {
+                    if (thiss is { UserGroups.Count: > 0 } && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {
+                        if (!didmenu) {
+                            e.ContextMenu.Add(ItemOf("Skripte", true));
+                            didmenu = true;
+                        }
+                        e.ContextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, new { Script = thiss, Row = row4 }, thiss.IsOk()));
+                    }
+                }
+            }
+
+            #endregion
+        }
+
+        OnContextMenuInit(e);
+    }
 
     public string GrantWriteAccess(ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, string newChunkVal, int waitforSeconds) {
         var f = IsCellEditable(cellInThisDatabaseColumn, cellInThisDatabaseRow, newChunkVal, true);
@@ -1138,6 +1221,47 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
+    public void OpenColumnEditor(ColumnItem? column, RowItem? row) {
+        if (column is not { IsDisposed: false }) { return; }
+
+        column.Editor = typeof(ColumnEditor);
+
+        if (row is not { IsDisposed: false }) {
+            column.Edit();
+            return;
+        }
+
+        ColumnItem? columnLinked = null;
+        var posError = false;
+
+        if (column.RelationType == RelationType.CellValues) {
+            (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
+            posError = true;
+        }
+
+        var bearbColumn = column;
+        if (columnLinked != null) {
+            columnLinked.Repair();
+            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Datenbank",
+                    "Verlinkte Spalte") == 1) {
+                bearbColumn = columnLinked;
+            }
+        } else {
+            if (posError) {
+                Notification.Show(
+                    "Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?",
+                    ImageCode.Information);
+            }
+        }
+
+        column.Repair();
+
+        using ColumnEditor w = new(column, this);
+        _ = w.ShowDialog();
+
+        bearbColumn.Repair();
+    }
 
     public void OpenScriptEditor() {
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
@@ -1758,8 +1882,6 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
     }
 
-    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
     protected override void OnDoubleClick(System.EventArgs e) {
         //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereignis ausgelöst
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
@@ -1943,24 +2065,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
                 case Keys.V:
                     if (e.Modifiers == Keys.Control) {
-                        if (CursorPosColumn != null && CursorPosRow?.Row != null) {
-                            if (!c.TextboxEditPossible() && c.RelationType != RelationType.DropDownValues) {
-                                NotEditableInfo("Die Zelle hat kein passendes Format.");
-                                _isinKeyDown = false;
-                                return;
-                            }
-                            if (!Clipboard.ContainsText()) {
-                                NotEditableInfo("Kein Text in der Zwischenablage.");
-                                _isinKeyDown = false;
-                                return;
-                            }
-                            var ntxt = Clipboard.GetText();
-                            if (CursorPosRow?.Row.CellGetString(c) == ntxt) {
-                                _isinKeyDown = false;
-                                return;
-                            }
-                            NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
-                        }
+                        PasteToCursor();
                     }
                     break;
             }
@@ -2096,7 +2201,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
 
             if (e.Button == MouseButtons.Right) {
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, CellCollection.KeyOfCell(_mouseOverColumn?.Column, _mouseOverRow?.Row), e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, new { _mouseOverColumn?.Column, _mouseOverRow?.Row }, e);
             }
         }
     }
@@ -2826,6 +2931,147 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         return null;
+    }
+
+    private void ContextMenu_ContentCopy(AbstractListItem item) {
+        if (item.Tag is not { } tag) { return; }
+        var column = (ColumnItem)tag.GetType().GetProperty("Column")?.GetValue(tag);
+        var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);
+        CopyToClipboard(column, row, true);
+    }
+
+    private void ContextMenu_ContentDelete(AbstractListItem item) {
+        if (item.Tag is not { } tag) { return; }
+        var column = (ColumnItem)tag.GetType().GetProperty("Column")?.GetValue(tag);
+        var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);
+        if (TableView.EditabelErrorMessage(Database)) { return; }
+        row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
+    }
+
+    private void ContextMenu_ContentPaste(AbstractListItem item) => PasteToCursor();
+
+    private void ContextMenu_CopyAll(AbstractListItem item) {
+        if (item.Tag is not ColumnItem column || Database is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        var txt = Export_CSV(FirstRow.Without, column);
+        txt = txt.Replace("|", "\r\n");
+        txt = txt.Replace(";", string.Empty);
+        CopytoClipboard(txt);
+        Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+    }
+
+    private void ContextMenu_CopyAllSorted(AbstractListItem item) {
+        if (item.Tag is not ColumnItem column || Database is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        var txt = Export_CSV(FirstRow.Without, column);
+        txt = txt.Replace("|", "\r\n");
+        txt = txt.Replace(";", string.Empty);
+        var l = txt.SplitAndCutByCrToList().SortedDistinctList().JoinWithCr();
+        CopytoClipboard(l);
+        Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+    }
+
+    private void ContextMenu_DataValidation(AbstractListItem item) {
+        if (item.Tag is not RowItem row || Database is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        row.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
+        _ = row.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
+        RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true, null);
+        MessageBox.Show("Datenüberprüfung:\r\n" + row.CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
+    }
+
+    private void ContextMenu_DeleteRow(AbstractListItem item) {
+        if (item.Tag is not RowItem row || Database is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        if (TableView.EditabelErrorMessage(Database)) { return; }
+        if (row is not { IsDisposed: false }) { return; }
+
+        var valueCol0 = row.CellFirstString();
+        if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
+            _ = RowCollection.Remove(row, "Benutzer: löschen Befehl");
+        }
+    }
+
+    private void ContextMenu_EditColumnProperties(AbstractListItem item) {
+        if (item.Tag is not ColumnItem column) { return; }
+        OpenColumnEditor(column, _mouseOverRow?.Row);
+    }
+
+    private void ContextMenu_ExecuteScript(AbstractListItem item) {
+        if (item.Tag is not { } tag) { return; }
+        var script = tag.GetType().GetProperty("Script")?.GetValue(tag);
+        var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);
+
+        if (row is not { IsDisposed: false } || script is not DatabaseScriptDescription scriptItem) { return; }
+
+        var t = row.ExecuteScript(null, scriptItem.KeyName, true, 10, null, true, true);
+        if (t is { Failed: false }) {
+            MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
+        } else {
+            MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.FailedReason}<br><br>{t.Protocol.JoinWithCr()}", ImageCode.Kreuz, "Ok");
+        }
+    }
+
+    private void ContextMenu_KeyCopy(AbstractListItem item) {
+        if (item.Tag is not RowItem row) { return; }
+        CopytoClipboard(row?.KeyName ?? string.Empty);
+        Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
+    }
+
+    private void ContextMenu_Pin(AbstractListItem item) {
+        if (item.Tag is not RowItem row) { return; }
+        PinAdd(row);
+    }
+
+    private void ContextMenu_ResetSort(AbstractListItem item) => SortDefinitionTemporary = null;
+
+    private void ContextMenu_RestorePreviousContent(AbstractListItem item) {
+        if (item.Tag is not { } tag) { return; }
+        var column = (ColumnItem)tag.GetType().GetProperty("Column")?.GetValue(tag);
+        var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);
+        if (TableView.EditabelErrorMessage(Database)) { return; }
+        DoUndo(column, row);
+    }
+
+    private void ContextMenu_SearchAndReplace(AbstractListItem item) {
+        if (Database is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        OpenSearchAndReplaceInCells();
+    }
+
+    private void ContextMenu_SortAZ(AbstractListItem item) {
+        if (item.Tag is not ColumnItem column || column.Database is not { IsDisposed: false } db) { return; }
+        SortDefinitionTemporary = new RowSortDefinition(db, column, false);
+    }
+
+    private void ContextMenu_SortZA(AbstractListItem item) {
+        if (item.Tag is not ColumnItem column || column.Database is not { IsDisposed: false } db) { return; }
+        SortDefinitionTemporary = new RowSortDefinition(db, column, true);
+    }
+
+    private void ContextMenu_Statistics(AbstractListItem item) {
+        if (item.Tag is not ColumnItem column || Database is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        var split = false;
+        if (column.MultiLine) {
+            split = MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
+        }
+        column.Statistik(RowsVisibleUnique(), !split);
+    }
+
+    private void ContextMenu_Sum(AbstractListItem item) {
+        if (item.Tag is not ColumnItem column || Database is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        var summe = column?.Summe(FilterCombined);
+        if (!summe.HasValue) {
+            MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
+        } else {
+            MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
+        }
+    }
+
+    private void ContextMenu_Unpin(AbstractListItem item) {
+        if (item.Tag is not RowItem row) { return; }
+        PinRemove(row);
+    }
+
+    private void ContextMenu_Voting(AbstractListItem item) {
+        if (item.Tag is not ColumnItem column || Database is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        var v = new Voting(column, [.. FilterCombined.Rows]);
+        _ = v.ShowDialog();
     }
 
     private void Cursor_Move(Direction richtung) {
@@ -3806,6 +4052,25 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         CheckView();
+    }
+
+    private void PasteToCursor() {
+        if (CursorPosColumn?.Column is not { } column || CursorPosRow?.Row is not { } row) {
+            NotEditableInfo("Interner Fehler.");
+            return;
+        }
+
+        if (!column.TextboxEditPossible() && column.RelationType != RelationType.DropDownValues) {
+            NotEditableInfo("Die Zelle hat kein passendes Format.");
+            return;
+        }
+        if (!Clipboard.ContainsText()) {
+            NotEditableInfo("Kein Text in der Zwischenablage.");
+            return;
+        }
+        var ntxt = Clipboard.GetText();
+        if (row.CellGetString(column) == ntxt) { return; }
+        NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
     }
 
     /// <summary>

@@ -366,13 +366,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
-        //if (it.Tag is not List<string> tags) { return; }
 
-        //_ = e.CurrentMenu.Add(ContextMenuCommands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
-        //_ = e.CurrentMenu.Add(ContextMenuCommands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
-        //_ = e.CurrentMenu.Add(AddSeparator());
-        e.ContextMenu.Add(ItemOf(ContextMenuCommands.Umbenennen, FileExists(it.KeyName)));
-        e.ContextMenu.Add(ItemOf(ContextMenuCommands.Löschen, FileExists(it.KeyName)));
+        e.ContextMenu.Add(ItemOf("Umbenennen", "Umbenennen", QuickImage.Get(ImageCode.Stift), FileExists(it.KeyName)));
+        e.ContextMenu.Add(ItemOf("Löschen", "Löschen", QuickImage.Get(ImageCode.Kreuz), FileExists(it.KeyName)));
         e.ContextMenu.Add(Separator());
         e.ContextMenu.Add(ItemOf("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner)));
     }

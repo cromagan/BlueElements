@@ -33,7 +33,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, IContextMenu {
+public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, IContextMenuWithInternalHandling {
 
     #region Fields
 

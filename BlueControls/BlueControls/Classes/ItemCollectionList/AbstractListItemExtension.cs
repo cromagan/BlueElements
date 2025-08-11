@@ -22,28 +22,19 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.CellRenderer;
-using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueControls.ItemCollectionList.AbstractListItem;
 
 namespace BlueControls.ItemCollectionList;
 
 public static class AbstractListItemExtension {
 
     #region Methods
-
-    public static List<AbstractListItem> AllAvailableColumArrangemengts(Database db) {
-        var tcvc = ColumnViewCollection.ParseAll(db);
-        var u2 = new List<AbstractListItem>();
-        foreach (var thisC in tcvc) {
-            u2.Add(ItemOf(thisC));
-        }
-        return u2;
-    }
 
     public static List<AbstractListItem> AllAvailableTables() {
         var ld = Database.AllAvailableTables();
@@ -54,141 +45,15 @@ public static class AbstractListItemExtension {
         return ld2;
     }
 
+    public static TextListItem ItemOf(IHasInfo info) => ItemOf("Information anzeigen", ImageCode.Information, ShowInfo, info, true);
+
+    public static TextListItem ItemOf(IEditable edit) => ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, OpenEditor, edit, true);
+
     public static TextListItem ItemOf(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
 
-    public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithPropertyChangingAndKey)column);
+    public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithKey)column);
 
     public static CellLikeListItem ItemOf(string value, ColumnItem columnStyle, Renderer_Abstract cellRenderer) => new(value, cellRenderer, true, columnStyle.DoOpticalTranslation, (Alignment)columnStyle.Align, columnStyle.SortType);
-
-    public static TextListItem ItemOf(ContextMenuCommands command, bool enabled = true) {
-        var internalName = command.ToString();
-        QuickImage? symbol;
-        string? readableText;
-        switch (command) {
-            case ContextMenuCommands.DateiPfadÖffnen:
-                readableText = "Dateipfad öffnen";
-                symbol = QuickImage.Get("Ordner|16");
-                break;
-
-            case ContextMenuCommands.Abbruch:
-                readableText = "Abbrechen";
-                symbol = QuickImage.Get("TasteESC|16");
-                break;
-
-            case ContextMenuCommands.Bearbeiten:
-                readableText = "Bearbeiten";
-                symbol = QuickImage.Get(ImageCode.Stift);
-                break;
-
-            case ContextMenuCommands.Kopieren:
-                readableText = "Kopieren";
-                symbol = QuickImage.Get(ImageCode.Kopieren);
-                break;
-
-            case ContextMenuCommands.InhaltLöschen:
-                readableText = "Inhalt löschen";
-                symbol = QuickImage.Get(ImageCode.Radiergummi);
-                break;
-
-            case ContextMenuCommands.ZeileLöschen:
-                readableText = "Zeile löschen";
-                symbol = QuickImage.Get("Zeile|16|||||||||Kreuz");
-                break;
-
-            case ContextMenuCommands.DateiÖffnen:
-                readableText = "Öffnen / Ausführen";
-                symbol = QuickImage.Get(ImageCode.Blitz);
-                break;
-
-            case ContextMenuCommands.SpaltenSortierungDefault:
-                readableText = "Sortierung zurückstetzen";
-                symbol = QuickImage.Get("AZ|16|8|1");
-                break;
-
-            case ContextMenuCommands.SpaltenSortierungAZ:
-                readableText = "Nach dieser Spalte aufsteigend sortieren";
-                symbol = QuickImage.Get("AZ|16|8");
-                break;
-
-            case ContextMenuCommands.SpaltenSortierungZA:
-                readableText = "Nach dieser Spalte absteigend sortieren";
-                symbol = QuickImage.Get("ZA|16|8");
-                break;
-
-            case ContextMenuCommands.Information:
-                readableText = "Informationen anzeigen";
-                symbol = QuickImage.Get(ImageCode.Frage);
-                break;
-
-            case ContextMenuCommands.ZellenInhaltKopieren:
-                readableText = "Zelleninhalt kopieren";
-                symbol = QuickImage.Get(ImageCode.Kopieren);
-                break;
-
-            case ContextMenuCommands.ZellenInhaltPaste:
-                readableText = "In Zelle einfügen";
-                symbol = QuickImage.Get(ImageCode.Clipboard);
-                break;
-
-            case ContextMenuCommands.SpaltenEigenschaftenBearbeiten:
-                readableText = "Spalteneigenschaften bearbeiten";
-                symbol = QuickImage.Get("Spalte|16|||||||||Stift");
-                break;
-
-            case ContextMenuCommands.Speichern:
-                readableText = "Speichern";
-                symbol = QuickImage.Get(ImageCode.Diskette);
-                break;
-
-            case ContextMenuCommands.Löschen:
-                readableText = "Löschen";
-                symbol = QuickImage.Get(ImageCode.Kreuz);
-                break;
-
-            case ContextMenuCommands.Verschieben:
-                readableText = "Verschieben";
-                symbol = QuickImage.Get(ImageCode.Mauspfeil);
-                break;
-
-            case ContextMenuCommands.Umbenennen:
-                readableText = "Umbenennen";
-                symbol = QuickImage.Get(ImageCode.Stift);
-                break;
-
-            case ContextMenuCommands.SuchenUndErsetzen:
-                readableText = "Suchen und ersetzen";
-                symbol = QuickImage.Get(ImageCode.Fernglas);
-                break;
-
-            case ContextMenuCommands.Einfügen:
-                readableText = "Einfügen";
-                symbol = QuickImage.Get(ImageCode.Clipboard);
-                break;
-
-            case ContextMenuCommands.Ausschneiden:
-                readableText = "Ausschneiden";
-                symbol = QuickImage.Get(ImageCode.Schere);
-                break;
-
-            case ContextMenuCommands.VorherigenInhaltWiederherstellen:
-                readableText = "Vorherigen Inhalt wieder herstellen";
-                symbol = QuickImage.Get(ImageCode.Undo);
-                break;
-
-            //case ContextMenuCommands.WeitereBefehle:
-            //    readableText = "Weitere Befehle";
-            //    symbol = QuickImage.Get(ImageCode.Hierarchie);
-            //    break;
-
-            default:
-                Develop.DebugPrint(command);
-                readableText = internalName;
-                symbol = QuickImage.Get(ImageCode.Fragezeichen);
-                break;
-        }
-        if (string.IsNullOrEmpty(internalName)) { Develop.DebugPrint(ErrorType.Error, "Interner Name nicht vergeben:" + command); }
-        return ItemOf(readableText, internalName, symbol, enabled);
-    }
 
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
@@ -217,6 +82,15 @@ public static class AbstractListItemExtension {
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled, string userDefCompareKey) => ItemOf(readableText, keyName, symbol, false, enabled, userDefCompareKey);
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
+
+    public static TextListItem ItemOf(string readableText, ImageCode symbol, ExecuteClick click, object? tag, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, tag, enabled);
+
+    public static TextListItem ItemOf(string readableText, QuickImage? symbol, ExecuteClick click, object? tag, bool enabled) {
+        var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
+        i.Tag = tag;
+        i.LeftClickExecute = click;
+        return i;
+    }
 
     public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, bool enabled, string userDefCompareKey) => ItemOf(readableText, keyName, symbol, false, enabled, userDefCompareKey);
 
@@ -248,7 +122,6 @@ public static class AbstractListItemExtension {
         l.AddRange(column.DropDownItems);
         if (column.ShowValuesOfOtherCellsInDropdown) { l.AddRange(column.Contents()); }
 
-
         if (column.RelationType == RelationType.DropDownValues) {
             var db2 = column.LinkedDatabase;
             if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return []; }
@@ -273,7 +146,6 @@ public static class AbstractListItemExtension {
                 Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
             }
         }
-
 
         if (checkedItemsAtRow?.Database is { IsDisposed: false }) {
             l.AddRange(checkedItemsAtRow.CellGetList(column));
@@ -374,6 +246,16 @@ public static class AbstractListItemExtension {
     public static LineListItem Separator() => SeparatorWith(string.Empty);
 
     public static LineListItem SeparatorWith(string userDefCompareKey) => new(string.Empty, userDefCompareKey);
+
+    private static void OpenEditor(AbstractListItem item) {
+        if (item.Tag is not IEditable edit) { return; }
+        edit.Edit();
+    }
+
+    private static void ShowInfo(AbstractListItem item) {
+        if (item.Tag is not IHasInfo info) { return; }
+        MessageBox.Show(info.Infotext(), ImageCode.Information, "Ok");
+    }
 
     #endregion
 }

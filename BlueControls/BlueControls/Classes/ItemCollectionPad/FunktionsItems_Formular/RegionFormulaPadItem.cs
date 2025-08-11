@@ -219,21 +219,6 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
     }
 
-    //private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.ContextMenu.Add(ItemOf(ContextMenuCommands.Bearbeiten));
-
-    //private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-    //    if (e.HotItem is not AbstractListItem it) { return; }
-
-    //    if (e.Item.KeyName.ToLowerInvariant() == "bearbeiten") {
-    //        MultiUserFile.SaveAll(false);
-
-    //        var x = new ConnectedFormulaEditor(it.KeyName, ParentFormula?.NotAllowedChilds);
-    //        _ = x.ShowDialog();
-    //        MultiUserFile.SaveAll(false);
-    //        x.Dispose();
-    //    }
-    //}
-
     private void ParentFormula_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         if (ParentFormula == null) { return; }

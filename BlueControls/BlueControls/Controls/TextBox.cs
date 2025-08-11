@@ -41,7 +41,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(TextBoxDesigner))]
 [DefaultEvent("TextChanged")]
-public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
+public partial class TextBox : GenericControl, IContextMenuWithInternalHandling, IInputFormat {
 
     #region Fields
 
@@ -394,9 +394,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 }
             }
             if (this is not ComboBox { DropDownStyle: not ComboBoxStyle.DropDown }) {
-                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled));
-                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Kopieren, _markStart >= 0));
-                e.ContextMenu.Add(ItemOf(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled));
+                e.ContextMenu.Add(ItemOf("Ausschneiden", "Ausschneiden", QuickImage.Get(ImageCode.Schere), (_markStart >= 0) && Enabled));
+                e.ContextMenu.Add(ItemOf("Kopieren", "Kopieren", QuickImage.Get(ImageCode.Kopieren), _markStart >= 0));
+                e.ContextMenu.Add(ItemOf("Einfügen", "Einfügen", QuickImage.Get(ImageCode.Clipboard), Clipboard.ContainsText() && Enabled));
+
                 if (_formatierungErlaubt) {
                     e.ContextMenu.Add(Separator());
                     e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));

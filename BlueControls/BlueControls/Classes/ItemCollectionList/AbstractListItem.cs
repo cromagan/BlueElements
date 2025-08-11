@@ -68,6 +68,12 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #endregion
 
+    #region Delegates
+
+    public delegate void ExecuteClick(AbstractListItem item);
+
+    #endregion
+
     #region Events
 
     public event EventHandler? CompareKeyChanged;
@@ -107,6 +113,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
+    public ExecuteClick? LeftClickExecute { get; set; }
     public abstract string QuickInfo { get; }
 
     public string UserDefCompareKey {

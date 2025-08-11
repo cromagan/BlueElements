@@ -19,9 +19,11 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using System;
@@ -85,6 +87,15 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     #endregion
 
     #region Methods
+
+    public static List<AbstractListItem> AllAvailableColumArrangemengts(Database db) {
+        var tcvc = ColumnViewCollection.ParseAll(db);
+        var u2 = new List<AbstractListItem>();
+        foreach (var thisC in tcvc) {
+            u2.Add(ItemOf(thisC as IReadableTextWithKey));
+        }
+        return u2;
+    }
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new Table();

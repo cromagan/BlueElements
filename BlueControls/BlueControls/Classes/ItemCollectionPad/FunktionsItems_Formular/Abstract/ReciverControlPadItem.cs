@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -91,7 +92,13 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             var g = GetFilterFromGet();
 
-            return g.Count == 0 ? null : g[0].DatabaseOutput;
+            if (g.Count > 0) {
+                if (g[0].DatabaseOutput is { IsDisposed: false } db) {
+                    db.Editor ??= typeof(DatabaseHeadEditor);
+                    return db;
+                }
+            }
+            return null;
         }
     }
 

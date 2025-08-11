@@ -37,7 +37,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("Click")]
-public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
+public partial class Caption : GenericControl, IContextMenuWithInternalHandling, IBackgroundNone, ITranslateable {
 
     #region Fields
 

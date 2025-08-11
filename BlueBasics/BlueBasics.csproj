@@ -133,6 +133,7 @@
     <Compile Include="Interfaces\IInputFormat.cs" />
     <Compile Include="Interfaces\IReadableTextWithKey.cs" />
     <Compile Include="Interfaces\IReadableTextWithPropertyChangingAndKey.cs" />
+    <Compile Include="Interfaces\IHasInfo.cs" />
     <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />
     <Compile Include="Classes\MultiUserFile.cs" />

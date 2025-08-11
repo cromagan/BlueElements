@@ -558,8 +558,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblUndo.Size = new System.Drawing.Size(1178, 608);
             this.tblUndo.TabIndex = 0;
             this.tblUndo.Text = "UndoTab";
-            this.tblUndo.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.tblUndo_ContextMenuInit);
-            this.tblUndo.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.tblUndo_ContextMenuItemClicked);
             // 
             // grpUndoActions
             // 
