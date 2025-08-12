@@ -87,7 +87,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         if (thisContextMenu.Count > 0) {
             thisContextMenu.Add(Separator());
-            thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC));
+            thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
             var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, ce.HotItem, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         }

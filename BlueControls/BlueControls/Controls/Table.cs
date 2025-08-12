@@ -1135,7 +1135,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
             if (_mouseOverRow?.Row is { IsDisposed: false } row4) {
                 e.ContextMenu.Add(ItemOf("Zeile", true));
-                e.ContextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, row4, db.IsAdministrator() && db.IsScriptsExecutable(ScriptEventTypes.row_deleting, true)));
+                e.ContextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, row4, db.IsAdministrator() && db.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)));
                 e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, row4, db.CanDoValueChangedScript(true)));
 
                 var didmenu = false;
@@ -4258,7 +4258,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return "Erste Spalte nicht sichtbar"; }
 
-        if (!db.IsScriptsExecutable(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
+        if (!db.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
 
         string? chunkv = null;
 

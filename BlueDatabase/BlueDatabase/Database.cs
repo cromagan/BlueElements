@@ -1175,7 +1175,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return !IsDisposed;
     }
 
-    public bool CanDoValueChangedScript(bool returnValueCount0) => IsRowScriptPossible() && IsScriptsExecutable(ScriptEventTypes.value_changed, returnValueCount0);
+    public bool CanDoValueChangedScript(bool returnValueCount0) => IsRowScriptPossible() && IsThisScriptBroken(ScriptEventTypes.value_changed, returnValueCount0);
 
     /// <summary>
     /// Konkrete Prüfung, ob jetzt gespeichert werden kann
@@ -1557,7 +1557,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
-                if (!IsScriptsExecutable(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
+                if (!IsThisScriptBroken(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
                 DropMessage(ErrorType.DevelopInfo, $"Ereignis ausgelöst: {eventname}");
 
@@ -1950,7 +1950,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return true;
     }
 
-    public bool IsScriptsExecutable(ScriptEventTypes type, bool returnValueCount0) {
+    public bool IsThisScriptBroken(ScriptEventTypes type, bool returnValueCount0) {
         var l = _eventScript.Get(type);
 
         if (l.Count > 1) { return false; }
@@ -2839,6 +2839,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var mustSave = (_checkerTickCount > 20 && timeSinceLastAction > 20) ||
                          _checkerTickCount > 110 ||
                          (Column.ChunkValueColumn != null && _checkerTickCount > 50);
+
+        if (_checkerTickCount < 200) {
+            // 200 * 2 Sekunden = 6,7 Minuten
+            if (e.Cancel && mustSave) { mustSave = false; }
+            if (mustSave && RowCollection.InvalidatedRowsManager.PendingRowsCount > 0) { mustSave = false; }
+        }
 
         // Speichern wenn nötig
         if (mustSave && Save()) {

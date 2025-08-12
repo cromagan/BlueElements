@@ -150,7 +150,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
     public static void AddBackgroundWorker(RowItem row) {
         if (row.IsDisposed || row.Database is not { IsDisposed: false } db) { return; }
-        if (!db.IsScriptsExecutable(ScriptEventTypes.value_changed_extra_thread, false)) { return; }
+        if (!db.IsThisScriptBroken(ScriptEventTypes.value_changed_extra_thread, false)) { return; }
         if (!db.IsRowScriptPossible()) { return; }
         var l = new BackgroundWorker {
             WorkerReportsProgress = true
@@ -360,11 +360,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (r.Count == 0) {
-            if (!db.IsScriptsExecutable(ScriptEventTypes.InitialValues, true)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
+            if (!db.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
         }
 
         if (r.Count > 1) {
-            if (!db.IsScriptsExecutable(ScriptEventTypes.row_deleting, true)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
+            if (!db.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
 
             db.Row.Combine(r);
             db.Row.RemoveYoungest(r, true);
