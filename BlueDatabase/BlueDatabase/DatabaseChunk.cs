@@ -491,60 +491,70 @@ public class DatabaseChunk : Database {
 
         Develop.SetUserDidSomething();
 
-        #region Neue Chunks-Erstellen
+        #region Neue Chunks-Erstellen (chunksnew)
 
-        DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Datenank '{Caption}'");
+        DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Datenbank '{Caption}'");
 
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
         if (chunksnew == null || chunksnew.Count == 0) { return "Fehler bei der Chunk Erzeugung"; }
 
-        // Chunks für Speicherung vormerken
-        var chunksToSave = new List<string>();
+        #endregion
+
+        #region Veränderte oder neue Chunks ermitteln (chunksToSave)
+
+        var chunksToSave = new List<Chunk>();
         foreach (var thisChunk in chunksnew) {
             _ = _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
             if (existingChunk == null || existingChunk.SaveRequired) {
-                if (chunksBeingSaved.TryAdd(thisChunk.KeyName, 0)) {
-                    chunksToSave.Add(thisChunk.KeyName);
-                }
+                chunksBeingSaved.TryAdd(thisChunk.KeyName, 0);
+                chunksToSave.Add(thisChunk);
             }
         }
 
+        #endregion
+
+        #region Chunks speichern, Fehler ermitteln (allok)
+
         var allok = string.Empty;
-
         try {
-            foreach (var thisChunk in chunksnew) {
-                if (chunksBeingSaved.ContainsKey(thisChunk.KeyName)) {
-                    DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
+            foreach (var thisChunk in chunksToSave) {
+                DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
 
-                    f = thisChunk.DoExtendedSave();
-                    if (string.IsNullOrEmpty(f)) {
-                        _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
-                    } else {
-                        allok = f;
-                    }
+                f = thisChunk.DoExtendedSave();
+                if (string.IsNullOrEmpty(f)) {
+                    _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
+                } else {
+                    allok = f;
                 }
+                _ = chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);  // Hier bereits entfernen, dass andere Routinen einen Fortschritt sehen
             }
         } finally {
             // Sicherstellen, dass alle vorgemerkten Chunks aus chunksBeingSaved entfernt werden
-            foreach (var chunkKey in chunksToSave) {
-                _ = chunksBeingSaved.TryRemove(chunkKey, out _);
+            foreach (var thisChunk in chunksToSave) {
+                _ = chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
             }
         }
 
-        if (!string.IsNullOrEmpty(allok)) { return allok; }
-
         #endregion
+
+        if (!string.IsNullOrEmpty(allok)) { return allok; }
 
         #region Nun gibt es noch Chunk-Leichen
 
         // Wenn aus einem Chunk alle Daten gelöscht wurden, den Chunk auch löschen
-        var chunks = new List<Chunk>();
-        chunks.AddRange(_chunks.Values);
+        var chunks = _chunks.Values.ToList();
         foreach (var thisChunk in chunks) {
             if (thisChunk.SaveRequired) {
-                DropMessage(ErrorType.Info, $"Lösche alten Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
-                _ = thisChunk.Delete();
-                _ = _chunks.TryRemove(thisChunk.KeyName, out _); // Den alten Fehlerhaften Chunk entfernen
+                // Prüfen ob Chunk wirklich leer ist. Sollte obsolet sein, weil nur befüllte Chunks zurück gegeben werden.
+                var rowsInChunk = RowsOfChunk(thisChunk);
+                if (rowsInChunk.Count == 0) {
+                    DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
+                    _ = thisChunk.Delete();
+                    _ = _chunks.TryRemove(thisChunk.KeyName, out _);
+                } else if (rowsInChunk.Count > 0) {
+                    // Debug-Info für unerwartete Fälle
+                    DropMessage(ErrorType.Warning, $"Chunk '{thisChunk.KeyName}' sollte leer sein, enthält aber {rowsInChunk.Count} Zeilen");
+                }
             }
         }
 

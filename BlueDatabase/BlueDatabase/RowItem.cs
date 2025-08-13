@@ -309,17 +309,21 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public void CellSet(ColumnItem column, DateTime value, string comment) => Database?.Cell.Set(column, this, value.ToString5(), comment);
 
     public RowCheckedEventArgs CheckRow() {
-        if (_lastCheckedEventArgs != null) { return _lastCheckedEventArgs; }
+        if (_lastCheckedEventArgs != null) {
+            if (_lastCheckedEventArgs.Feedback.NeedsScriptFix || !_lastCheckedEventArgs.Feedback.Failed) {
+                return _lastCheckedEventArgs;
+            }
+        }
 
         var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, 0, null, true, false);
 
         if (sef.Failed) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}");
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}");
             return _lastCheckedEventArgs;
         }
 
         if (RowCollection.FailedRows.TryGetValue(this, out var reason)) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, $"Zeilenstatus unbekannt, da temporäre Fehler aufgetreten sind: {reason}");
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, $"Zeilenstatus unbekannt, da temporäre Fehler aufgetreten sind: {reason}");
             return _lastCheckedEventArgs;
         }
 
@@ -354,7 +358,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-        _lastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef.Variables, m);
+        _lastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef, m);
 
         OnRowChecked(_lastCheckedEventArgs);
 

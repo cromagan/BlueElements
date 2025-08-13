@@ -600,77 +600,82 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public static Database? Get(string fileOrTableName, bool readOnly, NeedPassword? needPassword) {
-        if (fileOrTableName.Contains("|")) {
-            var t = fileOrTableName.SplitBy("|");
-            var tn = string.Empty;
-            var fn = string.Empty;
+        try {
+            if (fileOrTableName.Contains("|")) {
+                var t = fileOrTableName.SplitBy("|");
+                var tn = string.Empty;
+                var fn = string.Empty;
 
-            foreach (var thist in t) {
-                if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder.FilepathAndName)) {
-                    fn = thist;
+                foreach (var thist in t) {
+                    if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder.FilepathAndName)) {
+                        fn = thist;
+                    }
+                    if (string.IsNullOrEmpty(tn) && IsValidTableName(thist)) {
+                        tn = thist;
+                    }
                 }
-                if (string.IsNullOrEmpty(tn) && IsValidTableName(thist)) {
-                    tn = thist;
+
+                if (!string.IsNullOrEmpty(fn)) {
+                    fileOrTableName = fn;
+                } else if (!string.IsNullOrEmpty(tn)) {
+                    fileOrTableName = tn;
                 }
             }
 
-            if (!string.IsNullOrEmpty(fn)) {
-                fileOrTableName = fn;
-            } else if (!string.IsNullOrEmpty(tn)) {
-                fileOrTableName = tn;
+            #region Schauen, ob die Datenbank bereits geladen ist
+
+            var folder = new List<string>();
+
+            if (fileOrTableName.IsFormat(FormatHolder.FilepathAndName)) {
+                _ = folder.AddIfNotExists(fileOrTableName.FilePath());
+                fileOrTableName = fileOrTableName.FileNameWithoutSuffix();
             }
+
+            fileOrTableName = MakeValidTableName(fileOrTableName);
+
+            foreach (var thisFile in AllFiles) {
+                if (string.Equals(thisFile.TableName, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
+                    thisFile.WaitInitialDone();
+                    return thisFile;
+                }
+
+                if (thisFile.Filename.IsFormat(FormatHolder.FilepathAndName)) {
+                    _ = folder.AddIfNotExists(thisFile.Filename.FilePath());
+                }
+            }
+
+            #endregion
+
+            foreach (var thisfolder in folder) {
+                var f = thisfolder + fileOrTableName;
+
+                if (FileExists(f + ".cbdb")) {
+                    var db = new DatabaseChunk(fileOrTableName);
+                    db.LoadFromFile(f + ".cbdb", false, needPassword, string.Empty, readOnly);
+                    db.WaitInitialDone();
+                    return db;
+                }
+
+                if (FileExists(f + ".mbdb")) {
+                    var db = new DatabaseFragments(fileOrTableName);
+                    db.LoadFromFile(f + ".mbdb", false, needPassword, string.Empty, readOnly);
+                    db.WaitInitialDone();
+                    return db;
+                }
+
+                if (FileExists(f + ".bdb")) {
+                    var db = new Database(fileOrTableName);
+                    db.LoadFromFile(f + ".bdb", false, needPassword, string.Empty, readOnly);
+                    db.WaitInitialDone();
+                    return db;
+                }
+            }
+
+            return null;
+        } catch {
+            Develop.CheckStackOverflow();
+            return Get(fileOrTableName, readOnly, needPassword);
         }
-
-        #region Schauen, ob die Datenbank bereits geladen ist
-
-        var folder = new List<string>();
-
-        if (fileOrTableName.IsFormat(FormatHolder.FilepathAndName)) {
-            _ = folder.AddIfNotExists(fileOrTableName.FilePath());
-            fileOrTableName = fileOrTableName.FileNameWithoutSuffix();
-        }
-
-        fileOrTableName = MakeValidTableName(fileOrTableName);
-
-        foreach (var thisFile in AllFiles) {
-            if (string.Equals(thisFile.TableName, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
-                thisFile.WaitInitialDone();
-                return thisFile;
-            }
-
-            if (thisFile.Filename.IsFormat(FormatHolder.FilepathAndName)) {
-                _ = folder.AddIfNotExists(thisFile.Filename.FilePath());
-            }
-        }
-
-        #endregion
-
-        foreach (var thisfolder in folder) {
-            var f = thisfolder + fileOrTableName;
-
-            if (FileExists(f + ".cbdb")) {
-                var db = new DatabaseChunk(fileOrTableName);
-                db.LoadFromFile(f + ".cbdb", false, needPassword, string.Empty, readOnly);
-                db.WaitInitialDone();
-                return db;
-            }
-
-            if (FileExists(f + ".mbdb")) {
-                var db = new DatabaseFragments(fileOrTableName);
-                db.LoadFromFile(f + ".mbdb", false, needPassword, string.Empty, readOnly);
-                db.WaitInitialDone();
-                return db;
-            }
-
-            if (FileExists(f + ".bdb")) {
-                var db = new Database(fileOrTableName);
-                db.LoadFromFile(f + ".bdb", false, needPassword, string.Empty, readOnly);
-                db.WaitInitialDone();
-                return db;
-            }
-        }
-
-        return null;
     }
 
     public static bool IsValidTableName(string tablename) {

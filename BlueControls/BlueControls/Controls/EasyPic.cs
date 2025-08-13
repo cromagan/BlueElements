@@ -197,7 +197,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
 
         var ct = string.Empty;
 
-        if (RowSingleOrNull()?.CheckRow()?.Variables is { } list) {
+        if (RowSingleOrNull()?.CheckRow()?.Feedback.Variables is { } list) {
             ct = list.ReplaceInText(OriginalText);
         }
 
