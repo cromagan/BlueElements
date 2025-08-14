@@ -82,16 +82,37 @@ public class Script {
 
         #endregion
 
-        #region Befehle prüfen
+        #region Befehle prüfen mit Überladungsunterstützung
+
+        // Sammle alle passenden Methoden mit ihren CanDo-Ergebnissen
+        var candidateMethods = new List<(Method method, CanDoFeedback canDo)>();
 
         foreach (var thisC in scp.AllowedMethods) {
             var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
             if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
 
             if (string.IsNullOrEmpty(f.FailedReason)) {
-                var scx = thisC.DoIt(varCol, f, scp);
-                return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
+                candidateMethods.Add((thisC, f));
             }
+        }
+
+        if (candidateMethods.Count > 0) {
+            DoItFeedback? firstResult = null;
+
+            // Versuche alle Kandidaten auszuführen und nimm den ersten erfolgreichen
+            foreach (var (method, canDoResult) in candidateMethods) {
+                var scx = method.DoIt(varCol, canDoResult, scp);
+
+                firstResult ??= scx;
+
+                // Wenn diese Überladung erfolgreich war, verwende sie
+                if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
+                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, canDoResult.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
+                }
+
+            }
+            return new DoItWithEndedPosFeedback(firstResult?.NeedsScriptFix ?? true, pos, firstResult?.BreakFired ?? false, firstResult?.ReturnFired ?? false, firstResult?.FailedReason ?? "Interner Fehler", firstResult?.ReturnValue, null);
+
         }
 
         #endregion
