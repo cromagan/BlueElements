@@ -46,16 +46,16 @@ internal class Method_Number : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is VariableDouble vf) { return new DoItFeedback(vf.ValueNum); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+        if (attvar.Attributes[0] is VariableDouble vf) { return new DoItFeedback(vf.ValueNum, ld.EndPosition()); }
 
         if (attvar.Attributes[0] is VariableString vs) {
             if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {
-                return new DoItFeedback(dbl);
+                return new DoItFeedback(dbl, ld.EndPosition());
             }
         }
 
-        return attvar.Attributes[1] is { } v ? new DoItFeedback(v) : new DoItFeedback(attvar.ValueNumGet(1));
+        return attvar.Attributes[1] is { } v ? new DoItFeedback(v, ld.EndPosition()) : new DoItFeedback(attvar.ValueNumGet(1), ld.EndPosition());
     }
 
     #endregion

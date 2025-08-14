@@ -46,7 +46,7 @@ internal class Method_ReduceToChars : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).ReduceToChars(attvar.ValueStringGet(1)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> new(attvar.ValueStringGet(0).ReduceToChars(attvar.ValueStringGet(1)), ld.EndPosition());
 
     #endregion
 }

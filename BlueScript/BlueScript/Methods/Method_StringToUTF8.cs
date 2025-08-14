@@ -46,7 +46,7 @@ internal class Method_StringToUTF8 : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).StringtoUtf8());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> new(attvar.ValueStringGet(0).StringtoUtf8(), ld.EndPosition());
 
     #endregion
 }

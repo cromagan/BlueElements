@@ -56,7 +56,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var db = Database.Get(attvar.ValueStringGet(0), false, null);

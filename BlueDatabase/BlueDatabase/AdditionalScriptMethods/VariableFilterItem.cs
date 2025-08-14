@@ -80,12 +80,12 @@ public class VariableFilterItem : Variable {
 
     public override void DisposeContent() => _filter = null;
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
-        FilterItem = v.FilterItem;
-        return DoItFeedback.Null();
-    }
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariableFilterItem v) { return VerschiedeneTypen(variable); }
+		if (ReadOnly) { return Schreibgschützt(); }
+		FilterItem = v.FilterItem;
+		return string.Empty;
+	}
 
     protected override void SetValue(object? x) { }
 

@@ -54,7 +54,7 @@ internal class Method_WebPageScreenShot : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         // Da es keine Möglichkeit gibt, eine Url Variable (außerhalb eines If) zu deklarieren,
         // darf diese Routine nicht fehlschlagen.
 
@@ -82,9 +82,9 @@ internal class Method_WebPageScreenShot : Method_WebPage {
             // Wait for the screenshot to be taken.
             var bitmap = wb.ScreenshotOrNull();
 
-            return new DoItFeedback(bitmap);
+            return new DoItFeedback(bitmap, ld.EndPosition());
         } catch {
-            return new DoItFeedback(null as Bitmap);
+            return new DoItFeedback(null as Bitmap, ld.EndPosition());
         }
     }
 

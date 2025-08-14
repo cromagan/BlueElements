@@ -48,7 +48,7 @@ internal class Method_Compare : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var ignorenull = attvar.ValueBoolGet(0);
         var cases = attvar.ValueBoolGet(1);
 
@@ -81,11 +81,11 @@ internal class Method_Compare : Method {
                 if (!cases) { val = val.ToUpperInvariant(); }
                 firstval ??= val;
 
-                if (val != firstval) { return DoItFeedback.Falsch(); }
+                if (val != firstval) { return DoItFeedback.Falsch(ld.EndPosition()); }
             }
         }
 
-        return DoItFeedback.Wahr();
+        return DoItFeedback.Wahr(ld.EndPosition());
     }
 
     #endregion

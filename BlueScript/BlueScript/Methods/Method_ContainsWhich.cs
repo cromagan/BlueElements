@@ -49,7 +49,7 @@ internal class Method_ContainsWhitch : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var found = new List<string>();
 
         #region Wortliste erzeugen
@@ -85,7 +85,7 @@ internal class Method_ContainsWhitch : Method {
             }
         }
 
-        return new DoItFeedback(found);
+        return new DoItFeedback(found, ld.EndPosition());
     }
 
     #endregion

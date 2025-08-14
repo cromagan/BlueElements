@@ -44,7 +44,7 @@ public class Method_ItemCollectionPad : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(new VariableItemCollectionPad([]));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> new DoItFeedback(new VariableItemCollectionPad([]), ld.EndPosition());
 
     #endregion
 }

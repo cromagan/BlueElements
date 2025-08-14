@@ -46,16 +46,16 @@ internal class Method_Ping : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         try {
             var p = new Ping();
             var r = p.Send(attvar.ValueStringGet(0));
             if (r.Status == IPStatus.Success) {
-                return new DoItFeedback(r.RoundtripTime);
+                return new DoItFeedback(r.RoundtripTime, ld.EndPosition());
             }
         } catch { }
 
-        return new DoItFeedback(9999);
+        return new DoItFeedback(9999, ld.EndPosition());
     }
 
     #endregion

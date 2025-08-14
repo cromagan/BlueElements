@@ -46,18 +46,18 @@ internal class Method_Var : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen.", true, infos.LogData); }
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
+        if (string.IsNullOrEmpty(cdf.AttributText)) { return new DoItFeedback("Kein Text angekommen.", true, cdf); }
 
-        return VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
+        return VariablenBerechnung(varCol, cdf, scp, cdf.AttributText + ";", true);
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(ld.EndPosition());
     }
 
     #endregion

@@ -49,7 +49,7 @@ internal class Method_SaveText : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
 
         #region  Dateinamen ermitteln (filn)
 
@@ -87,7 +87,7 @@ internal class Method_SaveText : Method {
                 return new DoItFeedback("Export-Format unbekannt.", true, ld);
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     #endregion

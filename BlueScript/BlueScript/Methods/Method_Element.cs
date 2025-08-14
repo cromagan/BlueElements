@@ -45,12 +45,12 @@ internal class Method_Element : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var i = attvar.ValueIntGet(1);
         var list = attvar.ValueListStringGet(0);
         return i < 0 || i >= list.Count
             ? new DoItFeedback("Element '" + i + "' nicht in der Liste vorhanden", true, ld)
-            : new DoItFeedback(list[i]);
+            : new DoItFeedback(list[i], ld.EndPosition());
     }
 
     #endregion

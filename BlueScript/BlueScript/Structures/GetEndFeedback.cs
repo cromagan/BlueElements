@@ -22,12 +22,11 @@ using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
-public readonly struct GetEndFeedback {
+public class GetEndFeedback : CurrentPosition {
 
     #region Fields
 
     internal readonly string AttributeText;
-    internal readonly int ContinuePosition;
     internal readonly string FailedReason = string.Empty;
     internal readonly Variable? ReturnValue;
 
@@ -35,26 +34,22 @@ public readonly struct GetEndFeedback {
 
     #region Constructors
 
-    public GetEndFeedback(Variable? returnvalue) {
-        ContinuePosition = 0;
+    public GetEndFeedback(CurrentPosition cp, Variable? returnvalue) : base(cp) {
         AttributeText = string.Empty;
         ReturnValue = returnvalue;
     }
 
-    public GetEndFeedback(string failedReason, bool needsScriptFix, LogData? ld) {
-        ContinuePosition = 0;
+    public GetEndFeedback(CurrentPosition cp, string failedReason, bool needsScriptFix) : base(cp, failedReason) {
         FailedReason = failedReason;
         AttributeText = string.Empty;
         ReturnValue = null;
         NeedsScriptFix = needsScriptFix;
-        ld?.AddMessage(FailedReason);
     }
 
-    public GetEndFeedback(int continuePosition, string attributetext) {
-        ContinuePosition = continuePosition;
+    public GetEndFeedback(CurrentPosition cp, string attributetext) : base(cp) {
         AttributeText = attributetext;
         ReturnValue = null;
-        if (ContinuePosition == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
+        if (cp.Position == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
     }
 
     #endregion

@@ -46,30 +46,30 @@ internal class Method_AddPadItem : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback cdf){
         //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
-        if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
-        if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
+        if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(cdf); }
+        if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(cdf); }
 
-        if (attvar.Attributes[1] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
-        if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
+        if (attvar.Attributes[1] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(cdf); }
+        if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(cdf); }
 
-        if (iciv.Parent != null) { return new DoItFeedback("Das Item gehört breits einer Collection an", true, ld); }
+        if (iciv.Parent != null) { return new DoItFeedback("Das Item gehört breits einer Collection an", true, cdf); }
 
         icpv.Add(iciv);
 
-        if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null(); }
+        if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null(cdf.EndPosition()); }
 
         foreach (var pt in iciv.JointPoints) {
             var p = icpv.GetJointPoint(pt.KeyName, iciv);
             if (p != null) {
                 iciv.ConnectJointPoint(pt, p);
-                return DoItFeedback.Null();
+                return DoItFeedback.Null(ld.EndPosition());
             }
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     #endregion

@@ -46,7 +46,7 @@ internal class Method_ChangeDateTimeFormat : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var d = attvar.ValueDateGet(0);
 
         if (d == null) {
@@ -54,7 +54,7 @@ internal class Method_ChangeDateTimeFormat : Method {
         }
 
         try {
-            return new DoItFeedback(d.Value.ToString(attvar.ReadableText(1), CultureInfo.InvariantCulture));
+            return new DoItFeedback(d.Value.ToString(attvar.ReadableText(1), CultureInfo.InvariantCulture), ld.EndPosition());
         } catch {
             return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.", true, ld);
         }

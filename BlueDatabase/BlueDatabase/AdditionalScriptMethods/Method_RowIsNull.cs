@@ -48,10 +48,10 @@ public class Method_RowIsNull : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben.", true, ld); }
 
-        return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+        return vr.RowItem == null ? DoItFeedback.Wahr(ld.EndPosition()) : DoItFeedback.Falsch(ld.EndPosition());
     }
 
     #endregion

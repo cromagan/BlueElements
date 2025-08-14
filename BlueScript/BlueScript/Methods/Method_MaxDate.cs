@@ -48,7 +48,7 @@ internal class Method_MaxDate : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var d = new DateTime(0);
 
         var l = new List<string>();
@@ -73,7 +73,7 @@ internal class Method_MaxDate : Method {
         }
 
         try {
-            return new DoItFeedback(d.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
+            return new DoItFeedback(d.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture), ld.EndPosition());
         } catch {
             return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.", true, ld);
         }

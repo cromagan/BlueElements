@@ -45,7 +45,7 @@ public class Method_CellGetRow : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
@@ -77,7 +77,7 @@ public class Method_CellGetRow : Method_Database {
             return new DoItFeedback("Spaltentyp nicht unterstützt.", true, ld);
         }
 
-        return new DoItFeedback(l);
+        return new DoItFeedback(l, ld.EndPosition());
     }
 
     #endregion

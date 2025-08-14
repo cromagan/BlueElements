@@ -69,12 +69,12 @@ public class VariablePadItem : Variable {
 
     public override void DisposeContent() => _item = null;
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariablePadItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariablePadItem v) { return VerschiedeneTypen(variable); }
+        if (ReadOnly) { return Schreibgschützt(); }
         ValuePadItem = v.ValuePadItem;
-        return DoItFeedback.Null();
-    }
+		return string.Empty;
+	}
 
     protected override void SetValue(object? x) { }
 

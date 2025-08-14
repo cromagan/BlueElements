@@ -47,7 +47,7 @@ internal class Method_WebPageGetAllClasses : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
         if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback("Keine Webseite geladen", false, ld); }
@@ -74,7 +74,7 @@ internal class Method_WebPageGetAllClasses : Method_WebPage {
                 foreach (var id in ids) {
                     l.Add(id.ToString());
                 }
-                return new DoItFeedback(l);
+                return new DoItFeedback(l, ld.EndPosition());
             }
 
             // Es ist ein Fehler beim Ausführen des Skripts aufgetreten

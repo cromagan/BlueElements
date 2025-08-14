@@ -49,7 +49,7 @@ internal class Method_WebPageClick : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
         if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback( "Keine Webseite geladen", false, ld); }
@@ -73,7 +73,7 @@ internal class Method_WebPageClick : Method_WebPage {
                 return new DoItFeedback("Webseite konnte nicht neu geladen werden.", false, ld);
             }
 
-            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(); }
+            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(ld.EndPosition()); }
 
             //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
 
@@ -103,7 +103,7 @@ internal class Method_WebPageClick : Method_WebPage {
                 return new DoItFeedback("Webseite konnte nicht neu geladen werden.", false, ld);
             }
 
-            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(); }
+            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(ld.EndPosition()); }
 
             //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
 
@@ -125,7 +125,7 @@ internal class Method_WebPageClick : Method_WebPage {
                 return new DoItFeedback("Webseite konnte nicht neu geladen werden.", false, ld);
             }
 
-            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(); }
+            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(ld.EndPosition()); }
 
             //return new DoItFeedback(ld, "Fehler: Der Button wurde nicht gefunden.");
 

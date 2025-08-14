@@ -45,7 +45,7 @@ internal class Method_ImportCsv : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var txt = attvar.ValueStringGet(0);
@@ -58,7 +58,7 @@ internal class Method_ImportCsv : Method_Database {
 
         var sx = myDb.ImportCsv(txt, true, true, sep, false, false);
 
-        return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(sx, true, ld);
+        return string.IsNullOrEmpty(sx) ? DoItFeedback.Null(ld.EndPosition()) : new DoItFeedback(sx, true, ld);
     }
 
     #endregion

@@ -46,7 +46,7 @@ internal class Method_FreeDirectoryName : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
@@ -64,7 +64,7 @@ internal class Method_FreeDirectoryName : Method {
             }
 
             if (!DirectoryExists(pf + p)) {
-                return new DoItFeedback(p);
+                return new DoItFeedback(p, ld.EndPosition());
             }
         } while (true);
     }

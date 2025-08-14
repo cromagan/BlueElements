@@ -27,91 +27,90 @@ namespace BlueScript.Structures;
 /// <summary>
 /// Base feedback structure that represents the result of a script operation
 /// </summary>
-public class DoItFeedback {
+public class DoItFeedback : CurrentPosition {
 
     #region Constructors
 
-    public DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, LogData? ld) {
+    public DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, CurrentPosition? cp) : base(cp) {
         BreakFired = breakFired;
         ReturnFired = returnFired;
 
         FailedReason = failedReason;
         NeedsScriptFix = needsScriptFix;
 
-        if (Failed) {
-            ld?.AddMessage(failedReason);
-        } else {
+        if (!Failed) {
             ReturnValue = returnValue;
         }
     }
 
-    public DoItFeedback() { }
-
-    public DoItFeedback(Variable variable) {
+    public DoItFeedback() : base("Main", 0) { }
+    public DoItFeedback(CurrentPosition cp) : base(cp) { }
+    public DoItFeedback(Variable variable, CurrentPosition cp) : base(cp) {
         ReturnValue = variable;
     }
 
-    public DoItFeedback(string failedReason, bool needsScriptFix, LogData? ld) : this(needsScriptFix, false, false, failedReason, null, ld) { }
 
-    public DoItFeedback(string valueString) : this(new VariableString(Variable.DummyName(), valueString)) { }
+    public DoItFeedback(string failedReason, bool needsScriptFix, CurrentPosition? cp) : this(needsScriptFix, false, false, failedReason, null, cp) { }
 
-    public DoItFeedback(List<string>? list) : this(new VariableListString(list)) { }
+    public DoItFeedback(string valueString, CurrentPosition cp) : this(new VariableString(Variable.DummyName(), valueString), cp) { }
 
-    public DoItFeedback(Bitmap? bmp) : this(new VariableBitmap(bmp)) { }
+    public DoItFeedback(List<string>? list, CurrentPosition cp) : this(new VariableListString(list), cp) { }
 
-    public DoItFeedback(bool value) : this(new VariableBool(value)) { }
+    public DoItFeedback(Bitmap? bmp, CurrentPosition cp) : this(new VariableBitmap(bmp), cp) { }
 
-    public DoItFeedback(double value) : this(new VariableDouble(value)) { }
+    public DoItFeedback(bool value, CurrentPosition cp) : this(new VariableBool(value), cp) { }
 
-    public DoItFeedback(float value) : this(new VariableDouble(value)) { }
+    public DoItFeedback(double value, CurrentPosition cp) : this(new VariableDouble(value), cp) { }
 
-    public DoItFeedback(IEnumerable<string> list) : this(new VariableListString(list)) { }
+    public DoItFeedback(float value, CurrentPosition cp) : this(new VariableDouble(value), cp) { }
+
+    public DoItFeedback(IEnumerable<string> list, CurrentPosition cp) : this(new VariableListString(list), cp) { }
 
     #endregion
 
     #region Properties
 
     public bool BreakFired { get; private set; } = false;
-
     public virtual bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
     public string FailedReason { get; private set; } = string.Empty;
+
     public bool NeedsScriptFix { get; } = false;
+
     public bool ReturnFired { get; private set; } = false;
     public Variable? ReturnValue { get; private set; } = null;
+
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback AttributFehler(LogData? ld, Method method, SplittedAttributesFeedback f) =>
-        new("Befehl: " + method.Syntax + "\r\n" + f.FailedReason, f.NeedsScriptFix, ld);
+    public static DoItFeedback AttributFehler(CurrentPosition? cp, Method method, SplittedAttributesFeedback f) =>
+        new("Befehl: " + method.Syntax + "\r\n" + f.FailedReason, f.NeedsScriptFix, cp);
 
-    public static DoItFeedback Falsch() => new(false);
+    public static DoItFeedback Falsch(CurrentPosition cp) => new(false, cp);
 
-    public static DoItFeedback FalscherDatentyp(LogData ld) => new("Falscher Datentyp.", true, ld);
+    public static DoItFeedback FalscherDatentyp(CurrentPosition cp) => new("Falscher Datentyp.", true, cp);
 
-    public static DoItFeedback InternerFehler(LogData? ld) => new("Interner Programmierfehler. Admin verständigen.", true, ld);
+    public static DoItFeedback InternerFehler(CurrentPosition? cp) => new("Interner Programmierfehler. Admin verständigen.", true, cp);
 
-    public static DoItFeedback KlammerFehler(LogData ld) => new("Fehler bei der Klammersetzung.", true, ld);
+    public static DoItFeedback KlammerFehler(CurrentPosition cp) => new("Fehler bei der Klammersetzung.", true, cp);
 
-    public static DoItFeedback Null() => new();
+    public static DoItFeedback Null(CurrentPosition cp) => new(cp);
 
-    public static DoItFeedback Schreibgschützt(LogData ld) => new("Variable ist schreibgeschützt.", true, ld);
+    public static DoItFeedback Schreibgschützt(CurrentPosition cp) => new("Variable ist schreibgeschützt.", true, cp);
 
-    public static DoItFeedback TestModusInaktiv(LogData ld) => new("Im Testmodus deaktiviert.", true, ld);
+    public static DoItFeedback TestModusInaktiv(CurrentPosition cp) => new("Im Testmodus deaktiviert.", true, cp);
 
-    public static DoItFeedback VerschiedeneTypen(LogData ld, Variable var1, Variable var2) =>
-        new($"Variable '{var1.KeyName}' ist nicht der erwartete Typ {var2.MyClassId}, sondern {var1.MyClassId}", true, ld);
 
-    public static DoItFeedback Wahr() => new(true);
 
-    public static DoItFeedback WertKonnteNichtGesetztWerden(LogData ld, int atno) => new($"Der Wert das Attributes {atno + 1} konnte nicht gesetzt werden.", true, ld);
+    public static DoItFeedback Wahr(CurrentPosition cp) => new(true, cp);
 
-    public virtual void ChangeFailedReason(string newfailedReason, LogData? ld) {
+    public static DoItFeedback WertKonnteNichtGesetztWerden(CurrentPosition cp, int atno) => new($"Der Wert das Attributes {atno + 1} konnte nicht gesetzt werden.", true, cp);
+
+    public void ChangeFailedReason(string newfailedReason) {
         if (string.IsNullOrEmpty(newfailedReason)) { newfailedReason = "Allgemeiner Fehler"; }
 
         FailedReason = newfailedReason;
-        ld?.AddMessage(newfailedReason);
         ReturnValue = null;
     }
 

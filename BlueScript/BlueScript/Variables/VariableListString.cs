@@ -102,17 +102,11 @@ public class VariableListString : Variable {
 
     public override void DisposeContent() { }
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableListString v) {
-            return DoItFeedback.VerschiedeneTypen(ld, this, variable);
-        }
-
-        if (ReadOnly) {
-            return DoItFeedback.Schreibgschützt(ld);
-        }
-
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariableListString v) { return VerschiedeneTypen(variable); }
+        if (ReadOnly) { return Schreibgschützt(); }
         ValueList = v.ValueList;
-        return DoItFeedback.Null();
+        return string.Empty;
     }
 
     protected override void SetValue(object? x) {

@@ -85,7 +85,7 @@ public class Method_If : Method {
         return null;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
         var m = new List<Method>();
         foreach (var thism in scp.AllowedMethods) {
             if (!thism.MethodType.HasFlag(MethodType.SpecialVariables)) {
@@ -95,23 +95,23 @@ public class Method_If : Method {
 
         var scpt = new ScriptProperties(scp, m, scp.Stufe + 1, scp.Chain);
 
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
-        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, infos.LogData); }
+        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scpt);
+        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, cdf); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = Method_CallByFilename.CallSub(varCol, scp, "If-Befehl-Inhalt", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If", infos.LogData);
+            var scx = Method_CallByFilename.CallSub(varCol, scp, new CurrentPosition("If-Befehl-Inhalt", 0), cdf.CodeBlockAfterText, null, null, "If");
             return scx; // If muss die Breaks und Endsripts erhalten!
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(cdf.EndPosition());
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(ld.EndPosition());
     }
 
     #endregion

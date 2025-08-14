@@ -48,7 +48,7 @@ public class Method_DrawLine : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
         try {
@@ -58,7 +58,7 @@ public class Method_DrawLine : Method {
             return new DoItFeedback("Linie konnte nicht gezeichnet werden.", true, ld);
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     #endregion

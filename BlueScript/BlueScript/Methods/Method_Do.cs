@@ -46,9 +46,9 @@ internal class Method_Do : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
 
         var du = 0;
 
@@ -57,9 +57,9 @@ internal class Method_Do : Method {
         ScriptEndedFeedback scx;
         do {
             du++;
-            if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true, infos.LogData); }
+            if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true, cdf); }
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, "Do-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "Do", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition( "Do-Schleife", 0), cdf.CodeBlockAfterText, null, null, "Do");
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         } while (true);
 
@@ -67,12 +67,12 @@ internal class Method_Do : Method {
         return scx; 
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(ld.EndPosition());
     }
 
     #endregion

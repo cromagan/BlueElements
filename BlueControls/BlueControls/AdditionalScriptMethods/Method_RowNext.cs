@@ -53,7 +53,7 @@ public class Method_RowNext : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var mr = MyRow(scp);
         if (mr is not { IsDisposed: false }) { return DoItFeedback.InternerFehler(ld); }
 

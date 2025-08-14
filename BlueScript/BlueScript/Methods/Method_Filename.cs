@@ -46,7 +46,7 @@ internal class Method_Filename : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).FileNameWithoutSuffix());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> new(attvar.ValueStringGet(0).FileNameWithoutSuffix(), ld.EndPosition());
 
     #endregion
 }

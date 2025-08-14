@@ -47,17 +47,17 @@ internal class Method_Exists : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        return attvar.Failed ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        return attvar.Failed ? DoItFeedback.Falsch(cdf.EndPosition()) : DoItFeedback.Wahr(cdf.EndPosition());
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(ld.EndPosition());
     }
 
     #endregion

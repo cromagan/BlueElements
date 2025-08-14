@@ -47,7 +47,7 @@ internal class Method_DeletePoints : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         List<string> names = [];
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             names.Add(attvar.ValueStringGet(z));
@@ -65,7 +65,7 @@ internal class Method_DeletePoints : Method {
             iciv.DeleteJointPoints(names);
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     #endregion

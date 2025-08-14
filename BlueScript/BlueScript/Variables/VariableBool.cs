@@ -30,7 +30,6 @@ public class VariableBool : Variable {
 
     #region Fields
 
-    private static readonly LogData dummyLog = new("Bool", 0);
     private bool _valuebool;
 
     #endregion
@@ -86,12 +85,12 @@ public class VariableBool : Variable {
 
     public override void DisposeContent() { }
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableBool v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
-        ValueBool = v.ValueBool;
-        return DoItFeedback.Null();
-    }
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariableBool v) { return VerschiedeneTypen(variable); }
+		if (ReadOnly) { return Schreibgschützt(); }
+		ValueBool = v.ValueBool;
+		return string.Empty;
+	}
 
     protected override void SetValue(object? x) {
         if (x is bool val) {
@@ -126,7 +125,7 @@ public class VariableBool : Variable {
             var s1 = txt.Substring(0, i);
             Variable? v1 = null;
             if (!string.IsNullOrEmpty(s1)) {
-                var tmp1 = GetVariableByParsing(s1, dummyLog, varCol, scp);
+                var tmp1 = GetVariableByParsing(s1, null, varCol, scp);
                 if (tmp1.Failed) { return (false, null); }//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
 
                 v1 = tmp1.ReturnValue;
@@ -141,7 +140,7 @@ public class VariableBool : Variable {
             var s2 = txt.Substring(i + check.Length);
             if (string.IsNullOrEmpty(s2)) { return (false, null); }//new DoItFeedback(infos.LogData, s, "Wert nach Operator (" + check + ") nicht gefunden: " + txt);
 
-            var tmp2 = GetVariableByParsing(s2, dummyLog, varCol, scp);
+            var tmp2 = GetVariableByParsing(s2, null, varCol, scp);
             if (tmp2.Failed) {
                 return (false, null);//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
             }

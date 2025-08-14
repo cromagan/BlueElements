@@ -49,7 +49,7 @@ internal class Method_Sqrt : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(Math.Sqrt(attvar.ValueNumGet(0)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) => new(Math.Sqrt(attvar.ValueNumGet(0)), ld.EndPosition());
 
     #endregion
 }

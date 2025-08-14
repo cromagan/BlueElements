@@ -72,12 +72,12 @@ public class VariableAi : Variable {
 
     public override void DisposeContent() => _client?.Dispose();
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableAi v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
-        ValueClient = v.ValueClient;
-        return DoItFeedback.Null();
-    }
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariableAi v) { return VerschiedeneTypen(variable); }
+		if (ReadOnly) { return Schreibgschützt(); }
+		ValueClient = v.ValueClient;
+		return string.Empty;
+	}
 
     protected override void SetValue(object? x) { }
 

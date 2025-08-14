@@ -15,30 +15,49 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
+using static BlueBasics.Extensions;
 
-using BlueScript.Variables;
+#nullable enable
 
 namespace BlueScript.Structures;
 
-/// <summary>
-/// Extended feedback structure that includes position information
-/// </summary>
-public class DoItWithEndedPosFeedback : DoItFeedback {
+public class CurrentPosition {
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(bool needsScriptFix, int endpos, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, LogData? ld) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, ld) {
-        Position = endpos;
+    public CurrentPosition(string subname, int position) {
+        Subname = subname;
+        Position = position;
     }
 
-    public DoItWithEndedPosFeedback(string failedReason, bool needsScriptFix, LogData? ld) : base(failedReason, needsScriptFix, ld) { }
+    public CurrentPosition(CurrentPosition? cp) {
+        Subname = cp?.Subname ?? "Main";
+        Position = cp?.Position ?? 0;
+        Protokoll = cp?.Protokoll ?? string.Empty;
+        Chain = cp?.Chain ?? string.Empty;
+    }
+
+    public CurrentPosition(CurrentPosition? cp, string failedreason) : this(cp) {
+        Protokoll = failedreason + "\r\n" + Protokoll;
+    }
 
     #endregion
 
     #region Properties
 
+    public string Chain { get; } = string.Empty;
+
     public int Position { get; } = -1;
+
+    public string Protokoll { get; } = string.Empty;
+
+    public string Subname { get; } = string.Empty;
+
+    #endregion
+
+    #region Methods
+
+    public int Line(string normalizedScriptText) => normalizedScriptText.CountChar('¶', Position) + 1;
 
     #endregion
 }

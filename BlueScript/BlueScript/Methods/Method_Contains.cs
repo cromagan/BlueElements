@@ -48,7 +48,7 @@ internal class Method_Contains : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
 
         #region Wortliste erzeugen
 
@@ -64,22 +64,22 @@ internal class Method_Contains : Method {
 
         if (attvar.Attributes[0] is VariableListString vl2) {
             var x = vl2.ValueList;
-            return wordlist.Any(thisW => x.Contains(thisW, attvar.ValueBoolGet(1))) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+            return wordlist.Any(thisW => x.Contains(thisW, attvar.ValueBoolGet(1))) ? DoItFeedback.Wahr(ld.EndPosition()) : DoItFeedback.Falsch(ld.EndPosition());
         }
 
         if (attvar.Attributes[0] is VariableString vs2) {
             foreach (var thisW in wordlist) {
                 if (attvar.ValueBoolGet(1)) {
                     if (vs2.ValueString.Contains(thisW)) {
-                        return DoItFeedback.Wahr();
+                        return DoItFeedback.Wahr(ld.EndPosition());
                     }
                 } else {
                     if (vs2.ValueString.ToLowerInvariant().Contains(thisW.ToLowerInvariant())) {
-                        return DoItFeedback.Wahr();
+                        return DoItFeedback.Wahr(ld.EndPosition());
                     }
                 }
             }
-            return DoItFeedback.Falsch();
+            return DoItFeedback.Falsch(ld.EndPosition());
         }
 
         return DoItFeedback.FalscherDatentyp(ld);

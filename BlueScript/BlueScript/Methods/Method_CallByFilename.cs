@@ -72,11 +72,11 @@ public class Method_CallByFilename : Method {
     /// <param name="varCol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog, LogData ld) {
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, CanDoFeedback cp, string normalizedscripttext, Variable? addMe, List<string>? attributes, string chainlog) {
         ScriptEndedFeedback scx;
 
         if (scp.Stufe > 10) {
-            return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
+            return new ScriptEndedFeedback(cp, "'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
         }
 
         var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");
@@ -85,7 +85,7 @@ public class Method_CallByFilename : Method {
         _ = tmpv.AddRange(varCol);
         if (addMe != null) { _ = tmpv.Add(addMe); }
 
-        scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes);
+        scx = Script.Parse(tmpv, scp2, normalizedscripttext, cp, attributes);
 
         #region Kritische Variablen Disposen
 
@@ -104,14 +104,14 @@ public class Method_CallByFilename : Method {
         }
 
         if (scx.Failed) {
-            scx.ChangeFailedReason("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", ld);
+            scx.ChangeFailedReason("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen");
             return scx;
         }
 
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var vs = attvar.ValueStringGet(0);
         string f;
 

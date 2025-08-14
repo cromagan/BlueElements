@@ -46,7 +46,7 @@ public class Method_Lookup : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var db = Database.Get(attvar.ValueStringGet(0), false, null);
@@ -64,9 +64,9 @@ public class Method_Lookup : Method_Database {
 
         var r = RowCollection.MatchesTo(new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
 
-        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(3)); }
-        if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(4)); }
-        return new DoItFeedback(r[0].CellGetString(returncolumn));
+        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(3), ld.EndPosition()); }
+        if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(4), ld.EndPosition()); }
+        return new DoItFeedback(r[0].CellGetString(returncolumn), ld.EndPosition());
     }
 
     #endregion

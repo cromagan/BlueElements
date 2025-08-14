@@ -48,9 +48,9 @@ internal class Method_ForEach : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
 
         var l = attvar.ValueListStringGet(1);
 
@@ -58,11 +58,11 @@ internal class Method_ForEach : Method {
 
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, cdf); }
 
         var vari = varCol.Get(varnam);
         if (vari != null) {
-            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, cdf);
         }
 
         ScriptEndedFeedback? scx = null;
@@ -75,7 +75,7 @@ internal class Method_ForEach : Method {
             count++;
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEach-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEach", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition("ForEach-Schleife", cdf.Position), string.Empty, cdf.CodeBlockAfterText, cdf.Line - 1, cdf.Subname, nv, null, "ForEach", cdf);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
             if (t.ElapsedMilliseconds > 1000) {
@@ -85,7 +85,7 @@ internal class Method_ForEach : Method {
         }
 
         if(scx == null) {
-            return new DoItFeedback(false, false, false, string.Empty, null, infos.LogData);
+            return new DoItFeedback(false, false, false, string.Empty, null, cdf);
         }
 
 
@@ -93,12 +93,12 @@ internal class Method_ForEach : Method {
         return scx; 
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(ld.EndPosition());
     }
 
     #endregion

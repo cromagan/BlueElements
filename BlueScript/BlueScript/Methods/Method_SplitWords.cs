@@ -46,14 +46,14 @@ internal class Method_SplitWords : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var txt = attvar.ValueStringGet(0);
 
         var list = txt.HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
 
         list.Sort((s1, s2) => s2.Length.CompareTo(s1.Length));
 
-        return new DoItFeedback(list);
+        return new DoItFeedback(list, ld.EndPosition());
     }
 
     #endregion

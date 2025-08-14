@@ -60,14 +60,14 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
 
     public QuickImage ComandImage() => QuickImage.Get(ImageCode.Bild, 16);
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
         var x = attvar.ValueIntGet(1);
         var y = attvar.ValueIntGet(2);
         using var bmps = new BitmapExt(bmp);
         using var bmpa = bmps.Crop(x - 10, y - 5, 20, 10);
-        return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetHashString() == attvar.ValueStringGet(3));
+        return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetHashString() == attvar.ValueStringGet(3), ld.EndPosition());
     }
 
     public string GetCode(Form? form) {

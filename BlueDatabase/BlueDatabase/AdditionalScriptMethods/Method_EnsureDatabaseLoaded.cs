@@ -48,18 +48,18 @@ internal class Method_EnsureDatabaseLoaded : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var filn = attvar.ValueStringGet(0);
 
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
-        if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
+        if (!IO.FileExists(filn)) { return DoItFeedback.Falsch(ld.EndPosition()); }
 
         if (Database.Get(filn, false, null) is { IsDisposed: false }) {
-            return DoItFeedback.Wahr();
+            return DoItFeedback.Wahr(ld.EndPosition());
         }
 
-        return DoItFeedback.Falsch();
+        return DoItFeedback.Falsch(ld.EndPosition());
     }
 
     #endregion

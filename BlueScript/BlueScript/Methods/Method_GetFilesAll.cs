@@ -47,7 +47,7 @@ internal class Method_GetFilesAll : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
@@ -55,7 +55,7 @@ internal class Method_GetFilesAll : Method {
         }
 
         try {
-            return new DoItFeedback(Directory.GetFiles(pf, attvar.ValueStringGet(1), SearchOption.AllDirectories));
+            return new DoItFeedback(Directory.GetFiles(pf, attvar.ValueStringGet(1), SearchOption.AllDirectories), ld.EndPosition());
         } catch {
             return DoItFeedback.InternerFehler(ld);
         }

@@ -45,7 +45,7 @@ internal class Method_Substring : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var st = attvar.ValueIntGet(1);
         var en = attvar.ValueIntGet(2);
         if (st < 0) {
@@ -55,10 +55,10 @@ internal class Method_Substring : Method {
 
         var t = attvar.ValueStringGet(0);
 
-        if (st > t.Length) { return DoItFeedback.Null(); }
+        if (st > t.Length) { return DoItFeedback.Null(ld.EndPosition()); }
 
         if (st + en > t.Length) { en = t.Length - st; }
-        return new DoItFeedback(t.Substring(st, en));
+        return new DoItFeedback(t.Substring(st, en), ld.EndPosition());
     }
 
     #endregion

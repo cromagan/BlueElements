@@ -60,11 +60,11 @@ internal class Method_SetClipboard : Method, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var vs = attvar.ValueStringGet(0);
         _ = CopytoClipboard(vs);
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0];

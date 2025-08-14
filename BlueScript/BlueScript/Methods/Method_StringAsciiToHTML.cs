@@ -46,7 +46,7 @@ internal class Method_StringAsciiToHTML : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).CreateHtmlCodes(!attvar.ValueBoolGet(1)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> new(attvar.ValueStringGet(0).CreateHtmlCodes(!attvar.ValueBoolGet(1)), ld.EndPosition());
 
     #endregion
 }

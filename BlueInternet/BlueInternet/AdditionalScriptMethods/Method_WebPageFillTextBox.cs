@@ -49,7 +49,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
         if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback("Keine Webseite geladen", false, ld); }
@@ -71,7 +71,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
             //         return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
             //     }
 
-            //     return DoItFeedback.Null();
+            //     return DoItFeedback.Null(ld.EndPosition());
 
             #region Versuch, Textbox per ID
 
@@ -91,7 +91,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
                 return new DoItFeedback("Webseite konnte nicht neu geladen werden.", false, ld);
             }
 
-            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(); }
+            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(ld.EndPosition()); }
 
             #endregion
 
@@ -113,7 +113,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
                 return new DoItFeedback("Webseite konnte nicht neu geladen werden.", false, ld);
             }
 
-            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(); }
+            if (task is { IsFaulted: false, Result: { Success: true, Result: "success" } }) { return DoItFeedback.Null(ld.EndPosition()); }
 
             //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
 
@@ -132,7 +132,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
             //        // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
             //        return new DoItFeedback(infos.Data, "Fehler beim Befüllen des Feldes: " + response.Message);
             //    }
-            //    return DoItFeedback.Null();
+            //    return DoItFeedback.Null(ld.EndPosition());
             //}
             //return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
             return new DoItFeedback("Fehler beim Ausführen des TextBox-Befehles: " + task.Exception?.Message, false, ld);

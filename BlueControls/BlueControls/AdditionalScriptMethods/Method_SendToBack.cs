@@ -47,7 +47,7 @@ internal class Method_SendToBack : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         //if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
@@ -59,7 +59,7 @@ internal class Method_SendToBack : Method {
         if (iciv.Parent is not ItemCollectionPadItem { IsDisposed: false } icpv) { return new DoItFeedback("Das Item gehört keiner Collection an", true, ld); }
 
         icpv.SendToBack(iciv);
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
 
         //return new DoItFeedback(ld, "Keine übereinstimmenden JointPoints gefunden.");
     }

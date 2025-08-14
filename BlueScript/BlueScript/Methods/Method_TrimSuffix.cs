@@ -46,7 +46,7 @@ internal class Method_TrimSuffix : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var val = attvar.ValueStringGet(0);
 
         const string tmp = BlueBasics.Constants.Char_Numerals + " ";
@@ -60,12 +60,12 @@ internal class Method_TrimSuffix : Method {
             if (val.ToLowerInvariant().EndsWith(suf)) {
                 var c = val.Substring(val.Length - suf.Length - 1, 1);
                 if (tmp.Contains(c)) {
-                    return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "));
+                    return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), ld.EndPosition());
                 }
             }
         }
 
-        return new DoItFeedback(val);
+        return new DoItFeedback(val, ld.EndPosition());
     }
 
     #endregion

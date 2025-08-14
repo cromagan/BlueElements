@@ -17,32 +17,27 @@
 
 #nullable enable
 
+using System;
+
 namespace BlueScript.Structures;
 
-public readonly struct CanDoFeedback {
+public class CanDoFeedback : CurrentPosition {
 
     #region Constructors
 
-    public CanDoFeedback(int errorposition, string failedreason, bool needsScriptFix, LogData? ld) {
-        ContinueOrErrorPosition = errorposition;
+    public CanDoFeedback(string failedreason, bool needsScriptFix, CurrentPosition cdf) : base(cdf) {
+
         FailedReason = failedreason;
         NeedsScriptFix = needsScriptFix;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
-        LogData = ld;
-
-        if (needsScriptFix) {
-            ld?.AddMessage(failedreason);
-        }
     }
 
-    public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, LogData ld) {
-        ContinueOrErrorPosition = continuePosition;
+    public CanDoFeedback(string attributtext, string codeblockaftertext, CurrentPosition cdf) : base(cdf) {
         FailedReason = string.Empty;
         NeedsScriptFix = false;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
-        LogData = ld;
     }
 
     #endregion
@@ -59,10 +54,7 @@ public readonly struct CanDoFeedback {
     /// </summary>
     public string CodeBlockAfterText { get; }
 
-    /// <summary>
-    /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
-    /// </summary>
-    public int ContinueOrErrorPosition { get; }
+
 
     /// <summary>
     /// Gibt empty zurück, wenn der Befehl ausgeführt werden kann.
@@ -71,12 +63,12 @@ public readonly struct CanDoFeedback {
     /// </summary>
     public string FailedReason { get; }
 
-    public LogData? LogData { get; }
-
     /// <summary>
     /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
     /// </summary>
     public bool NeedsScriptFix { get; }
+
+    public CurrentPosition EndPosition() => throw new NotImplementedException();
 
     #endregion
 }

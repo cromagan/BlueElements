@@ -70,12 +70,12 @@ public class VariableBitmap : Variable {
 
     public override void DisposeContent() => _bmp?.Dispose();
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableBitmap v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
-        ValueBitmap = v.ValueBitmap;
-        return DoItFeedback.Null();
-    }
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariableBitmap v) { return VerschiedeneTypen(variable); }
+		if (ReadOnly) { return Schreibgschützt(); }
+		ValueBitmap = v.ValueBitmap;
+		return string.Empty;
+	}
 
     protected override void SetValue(object? x) { }
 

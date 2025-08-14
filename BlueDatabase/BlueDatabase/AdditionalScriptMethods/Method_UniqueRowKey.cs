@@ -46,7 +46,7 @@ public class Method_UniqueRowId : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(RowCollection.UniqueKeyValue());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> new(RowCollection.UniqueKeyValue());
 
     #endregion
 }

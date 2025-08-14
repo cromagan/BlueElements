@@ -45,7 +45,7 @@ public class Method_LookupFilter : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myDb, scp.ScriptName, true);
@@ -64,13 +64,13 @@ public class Method_LookupFilter : Method_Database {
         if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
-        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1)); }
-        if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(2)); }
+        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1), ld.EndPosition()); }
+        if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(2), ld.EndPosition()); }
 
         var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
         if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte {returncolumn.KeyName} 'im Skript vorhanden'?", true, ld); }
 
-        return new DoItFeedback(r[0].CellGetString(returncolumn));
+        return new DoItFeedback(r[0].CellGetString(returncolumn), ld.EndPosition());
     }
 
     #endregion

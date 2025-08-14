@@ -47,7 +47,7 @@ internal class Method_Dimension : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
@@ -66,7 +66,7 @@ internal class Method_Dimension : Method {
             Text_Unten = attvar.ValueStringGet(2)
         };
 
-        return new DoItFeedback(new VariablePadItem(d));
+        return new DoItFeedback(new VariablePadItem(d), ld.EndPosition());
     }
 
     #endregion

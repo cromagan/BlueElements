@@ -45,7 +45,7 @@ internal class Method_SetIfExists : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
@@ -56,23 +56,23 @@ internal class Method_SetIfExists : Method {
             switch (attvar.Attributes[z]) {
                 case VariableString vs:
                     if (attvar.ValueStringSet(0, vs.ValueString, ld) is { } dif) { return dif; }
-                    return DoItFeedback.Null();
+                    return DoItFeedback.Null(ld.EndPosition());
 
                 case VariableBool vb:
                     if (attvar.ValueBoolSet(0, vb.ValueBool, ld) is { } dif2) { return dif2; }
-                    return DoItFeedback.Null();
+                    return DoItFeedback.Null(ld.EndPosition());
 
                 case VariableDouble vf:
                     if (attvar.ValueNumSet(0, vf.ValueNum, ld) is { } dif3) { return dif3; }
-                    return DoItFeedback.Null();
+                    return DoItFeedback.Null(ld.EndPosition());
 
                 case VariableListString vl:
                     if (attvar.ValueListStringSet(0, vl.ValueList, ld) is { } dif4) { return dif4; }
-                    return DoItFeedback.Null();
+                    return DoItFeedback.Null(ld.EndPosition());
             }
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     #endregion

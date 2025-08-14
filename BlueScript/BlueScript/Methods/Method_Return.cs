@@ -46,7 +46,7 @@ internal class Method_Return : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) =>
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=>
         new DoItFeedback(false, false, true, string.Empty, attvar.Attributes[0], ld);
 
     #endregion

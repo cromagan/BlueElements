@@ -57,7 +57,7 @@ internal class Method_LoadUrl : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         //https://keyholesoftware.com/2019/02/11/create-your-own-web-bots-in-net-with-cefsharp/
 
         // Da es keine Möglichkeit gibt, eine Url Variable (außerhalb eines If) zu deklarieren,
@@ -79,11 +79,11 @@ internal class Method_LoadUrl : Method_WebPage {
             var browser = new ChromiumWebBrowser(attvar.ValueStringGet(0));
 
             if (!WaitLoaded(browser)) {
-                return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
+                return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser), ld.EndPosition());
             }
-            return new DoItFeedback(new VariableWebpage(browser));
+            return new DoItFeedback(new VariableWebpage(browser), ld.EndPosition());
         } catch {
-            return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
+            return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser), ld.EndPosition());
         }
     }
 

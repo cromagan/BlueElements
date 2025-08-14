@@ -84,12 +84,12 @@ public class VariableRowItem : Variable {
 
     public override void DisposeContent() => _row = null;
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
-        RowItem = v.RowItem;
-        return DoItFeedback.Null();
-    }
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariableRowItem v) { return VerschiedeneTypen(variable); }
+		if (ReadOnly) { return Schreibgschützt(); }
+		RowItem = v.RowItem;
+		return string.Empty;
+	}
 
     protected override void SetValue(object? x) {
         if (x is null) {

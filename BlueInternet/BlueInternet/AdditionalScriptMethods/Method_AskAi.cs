@@ -51,7 +51,7 @@ internal class Method_AskAi : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         if (attvar.Attributes[0] is not VariableAi mai) { return DoItFeedback.InternerFehler(ld); }
         if (mai.ValueClient is not { } client) { return DoItFeedback.InternerFehler(ld); }
 
@@ -72,7 +72,7 @@ internal class Method_AskAi : Method {
                 };
                 var firstResult = client.Messages.GetClaudeMessageAsync(parameters).GetAwaiter().GetResult();
 
-                return new DoItFeedback(firstResult.Message.ToString());
+                return new DoItFeedback(firstResult.Message.ToString(), ld.EndPosition());
             } catch {
                 tries++;
                 Generic.Pause(10, false);

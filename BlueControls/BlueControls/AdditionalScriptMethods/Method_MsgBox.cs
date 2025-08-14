@@ -49,7 +49,7 @@ public class Method_MsgBox : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var txt = attvar.ValueStringGet(0);
 
         var img = attvar.ValueStringGet(1);
@@ -66,7 +66,7 @@ public class Method_MsgBox : Method {
 
         var l = MessageBox.Show(txt, pic, true, buttons.ToArray());
 
-        return new DoItFeedback(l);
+        return new DoItFeedback(l, ld.EndPosition());
     }
 
     #endregion

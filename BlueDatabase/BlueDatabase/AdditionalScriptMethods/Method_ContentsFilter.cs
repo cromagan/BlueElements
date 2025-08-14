@@ -47,7 +47,7 @@ public class Method_ContentsFilter : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);
@@ -67,7 +67,7 @@ public class Method_ContentsFilter : Method_Database {
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
         var x = returncolumn.Contents(r);
-        return new DoItFeedback(x);
+        return new DoItFeedback(x, ld.EndPosition());
     }
 
     #endregion

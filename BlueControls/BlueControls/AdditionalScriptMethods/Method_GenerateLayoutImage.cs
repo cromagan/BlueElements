@@ -48,7 +48,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
 
         #region  Meine Zeile ermitteln (r)
 
@@ -88,7 +88,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         if (bmp == null) { return new DoItFeedback("Generierung fehlgeschlagen", true, ld); }
 
-        return new DoItFeedback(bmp);
+        return new DoItFeedback(bmp, ld.EndPosition());
     }
 
     #endregion

@@ -51,7 +51,7 @@ internal class Method_Min : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var l = new List<double>();
         foreach (var thisvar in attvar.Attributes) {
             switch (thisvar) {
@@ -75,7 +75,7 @@ internal class Method_Min : Method {
             }
         }
 
-        return l.Count > 0 ? new DoItFeedback(l.Min()) : new DoItFeedback("Keine gültigen Werte angekommen", true, ld);
+        return l.Count > 0 ? new DoItFeedback(l.Min(), ld.EndPosition()) : new DoItFeedback("Keine gültigen Werte angekommen", true, ld);
     }
 
     #endregion

@@ -60,7 +60,7 @@ public class Method_SetError : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         //if (!SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
         var r = MyRow(scp);
@@ -77,7 +77,7 @@ public class Method_SetError : Method_Database {
 
         vls.ValueList = l.SortedDistinctList();
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     #endregion

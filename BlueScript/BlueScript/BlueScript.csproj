@@ -74,7 +74,6 @@
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
     <Compile Include="Methods\Method_BackupControl.cs" />
     <Compile Include="Methods\Method_ExtractFirstText.cs" />
-    <Compile Include="Methods\Method_Try.cs" />
     <Compile Include="Methods\Method_ForEach.cs" />
     <Compile Include="Methods\Method_DownloadImage.cs" />
     <Compile Include="Methods\Method_DownloadWebPage.cs" />
@@ -148,11 +147,10 @@
     <Compile Include="Methods\Method_Min.cs" />
     <Compile Include="Script.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structures\CurrentPosition.cs" />
     <Compile Include="Structures\ScriptProperties.cs" />
-    <Compile Include="Structures\LogData.cs" />
     <Compile Include="Structures\ScriptEndedFeedback.cs" />
     <Compile Include="Structures\SplittedAttributesFeedback.cs" />
-    <Compile Include="Structures\DoItWithEndedPosFeedback.cs" />
     <Compile Include="Structures\GetEndFeedback.cs" />
     <Compile Include="Structures\DoItFeedback.cs" />
     <Compile Include="Structures\CanDoFeedback.cs" />

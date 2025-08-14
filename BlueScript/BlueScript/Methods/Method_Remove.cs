@@ -46,7 +46,7 @@ internal class Method_Remove : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);
@@ -58,7 +58,7 @@ internal class Method_Remove : Method {
                 tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));
             }
         }
-        return attvar.ValueListStringSet(0, tmpList, ld) is { } dif ? dif : DoItFeedback.Null();
+        return attvar.ValueListStringSet(0, tmpList, ld) is { } dif ? dif : DoItFeedback.Null(ld.EndPosition());
     }
 
     #endregion

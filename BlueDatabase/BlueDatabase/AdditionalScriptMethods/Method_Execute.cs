@@ -60,10 +60,10 @@ internal class Method_Execte : Method, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         _ = IO.ExecuteFile(attvar.ValueStringGet(0), attvar.ValueStringGet(1), false, false);
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + ", " + args[1];

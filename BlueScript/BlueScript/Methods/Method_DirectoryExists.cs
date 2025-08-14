@@ -47,7 +47,7 @@ internal class Method_DirectoryExists : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var pf = attvar.ValueStringGet(0);
 
         if (!pf.IsFormat(FormatHolder.Filepath)) {
@@ -55,7 +55,7 @@ internal class Method_DirectoryExists : Method {
         }
         //if(pf.IsFormat(FormatHolder.FilepathAndName))
 
-        return new DoItFeedback(IO.DirectoryExists(pf));
+        return new DoItFeedback(IO.DirectoryExists(pf), ld.EndPosition());
     }
 
     #endregion

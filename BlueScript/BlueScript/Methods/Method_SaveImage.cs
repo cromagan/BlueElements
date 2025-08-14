@@ -50,7 +50,7 @@ internal class Method_SaveImage : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
 
         #region  Bild ermitteln (img)
 
@@ -98,7 +98,7 @@ internal class Method_SaveImage : Method {
                 return new DoItFeedback("Export-Format unbekannt.", true, ld);
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     #endregion

@@ -49,14 +49,14 @@ public class Method_ResizeImage : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
         try {
             var bmp2 = bmp.Resize(attvar.ValueIntGet(1), attvar.ValueIntGet(2),
                 SizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
 
-            return new DoItFeedback(bmp2);
+            return new DoItFeedback(bmp2, ld.EndPosition());
         } catch {
             return new DoItFeedback("Bildgröße konnte nicht verändert werden.", true, ld);
         }

@@ -40,7 +40,7 @@ internal class Method_SendKeys : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
         var keySequence = attvar.ValueStringGet(0);
 
         if (string.IsNullOrEmpty(keySequence)) {
@@ -85,7 +85,7 @@ internal class Method_SendKeys : Method {
             }
         }
 
-        return DoItFeedback.Null();
+        return DoItFeedback.Null(ld.EndPosition());
     }
 
     private static KeyCode GetVirtualKeyCode(char c) {
