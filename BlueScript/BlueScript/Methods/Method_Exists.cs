@@ -48,7 +48,7 @@ internal class Method_Exists : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
         return attvar.Failed ? DoItFeedback.Falsch(cdf.EndPosition()) : DoItFeedback.Wahr(cdf.EndPosition());
     }
 

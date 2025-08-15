@@ -1551,7 +1551,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         try {
             scriptname ??= string.Empty;
-            var cp = new CurrentPosition();
 
             if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
                 Develop.DebugPrint(ErrorType.Error, "Event und Skript angekommen!");

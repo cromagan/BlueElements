@@ -27,7 +27,7 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(CurrentPosition cp, VariableCollection variables, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, cp) {
+    public ScriptEndedFeedback(DoItFeedback dif, VariableCollection variables, int position) : base(dif.Subname, position, dif.Protocol, dif.Chain, dif.NeedsScriptFix, dif.BreakFired, dif.ReturnFired, dif.FailedReason, dif.ReturnValue) {
         Variables = variables;
         GiveItAnotherTry = false;
     }
@@ -40,7 +40,7 @@ public class ScriptEndedFeedback : DoItFeedback {
     /// <param name="giveitanothertry"></param>
     /// <param name="needsScriptFix"></param>
     /// <param name="scriptname"></param>
-    public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base(needsScriptFix, false, true, $"[{scriptname},Start abgebrochen] {failedReason}", null, new CurrentPosition()) {
+    public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base("Main", 0, string.Empty, string.Empty, needsScriptFix, false, true, $"[{scriptname},Start abgebrochen] {failedReason}", null) {
         Variables = null;
         GiveItAnotherTry = giveitanothertry;
     }
@@ -48,7 +48,13 @@ public class ScriptEndedFeedback : DoItFeedback {
     /// <summary>
     /// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
     /// </summary>
-    public ScriptEndedFeedback(CurrentPosition cp, VariableCollection variables, string failedReason) : base(false, false, true, failedReason, null, cp) {
+    public ScriptEndedFeedback(CurrentPosition cp, VariableCollection variables, string failedReason) : base(cp.Subname, cp.Position, cp.Protocol, cp.Chain, false, false, true, failedReason, null) {
+        GiveItAnotherTry = false;
+        Variables = variables;
+    }
+
+    public ScriptEndedFeedback(string subname, int position, string protocol, string chain, bool needsScriptFix, bool breakFired, bool returnFired, VariableCollection variables, string failedReason)
+      : base(subname, position, protocol, chain, needsScriptFix, breakFired, returnFired, failedReason, null) {
         GiveItAnotherTry = false;
         Variables = variables;
     }

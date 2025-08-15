@@ -52,8 +52,8 @@ public class Method_Break : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=>
-        new(false, true, false, string.Empty, null, ld);
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback cdf) =>
+        new(cdf.Subname, cdf.Position, cdf.Protocol, cdf.Chain, false, true, false, string.Empty, null);
 
     #endregion
 }

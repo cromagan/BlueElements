@@ -71,13 +71,13 @@ public class Script {
 
     #region Methods
 
-    public static DoItFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, CurrentPosition cp) {
+    public static DoItFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, bool expectedvariablefeedback, CanDoFeedback cdf) {
         //if (MethodsAll == null) { return new DoItFeedback("Befehle nicht initialisiert", ld); }
 
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
-        if (scriptText.Length > pos && scriptText.Substring(pos, 1) == ";") {
-            return new DoItFeedback(false, false, false, string.Empty, null, cp);
+        if (cdf.NormalizedText.Length > cdf.Position && cdf.NormalizedText.Substring(cdf.Position, 1) == ";") {
+            return new DoItFeedback(cdf.Subname, cdf.Position + 1, cdf.Protocol, cdf.Chain, false, false, false, string.Empty, null);
         }
 
         #endregion
@@ -88,7 +88,7 @@ public class Script {
         var candidateMethods = new List<(Method method, CanDoFeedback canDo)>();
 
         foreach (var thisC in scp.AllowedMethods) {
-            var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, cp);
+            var f = thisC.CanDo(expectedvariablefeedback, cdf);
             if (f.NeedsScriptFix) { return new DoItFeedback(f.FailedReason, true, f); }
 
             if (string.IsNullOrEmpty(f.FailedReason)) {
@@ -107,11 +107,11 @@ public class Script {
 
                 // Wenn diese Überladung erfolgreich war, verwende sie
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
-                    return new DoItFeedback(scx.NeedsScriptFix, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, cp);
+                    return new DoItFeedback(scx.Subname, scx.Position, scx.Protocol, scx.Chain, scx.NeedsScriptFix, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue);
                 }
             }
 
-            return new DoItFeedback(firstResult?.NeedsScriptFix ?? true, firstResult?.BreakFired ?? false, firstResult?.ReturnFired ?? false, firstResult?.FailedReason ?? "Interner Fehler", firstResult?.ReturnValue, cp);
+            return new DoItFeedback(cdf.Subname, cdf.Position, cdf.Protocol, cdf.Chain, firstResult?.NeedsScriptFix ?? true, firstResult?.BreakFired ?? false, firstResult?.ReturnFired ?? false, firstResult?.FailedReason ?? "Interner Fehler", firstResult?.ReturnValue);
         }
 
         #endregion
@@ -119,19 +119,19 @@ public class Script {
         #region Variablen prüfen
 
         if (!expectedvariablefeedback) {
-            var maxl = scriptText.Length;
+            var maxl = cdf.NormalizedText.Length;
 
             foreach (var thisV in varCol) {
                 var commandtext = thisV.KeyName + "=";
                 var l = commandtext.Length;
-                if (pos + l < maxl) {
-                    if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
-                        var f = Method.GetEnd(scriptText, new CurrentPosition(cp.Subname, pos + l - 1), 1, ";");
+                if (cdf.Position + l < maxl) {
+                    if (string.Equals(cdf.NormalizedText.Substring(cdf.Position, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
+                        var f = Method.GetEnd(new CanDoFeedback(cdf, cdf.Position + l - 1), 1, ";");
                         if (f.Failed) {
-                            return new DoItFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, cp);
+                            return new DoItFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, cdf);
                         }
 
-                        return Method.VariablenBerechnung(varCol, cp, scp, commandtext + f.AttributeText + ";", false);
+                        return Method.VariablenBerechnung(varCol, new CanDoFeedback(cdf, 0, commandtext + f.NormalizedText + ";"), scp, false);
                     }
                 }
             }
@@ -142,18 +142,18 @@ public class Script {
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
         foreach (var thisC in scp.AllowedMethods) {
-            var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, cp);
+            var f = thisC.CanDo(!expectedvariablefeedback, cdf);
             if (f.NeedsScriptFix) {
-                return new DoItFeedback(f.FailedReason, true, cp);
+                return new DoItFeedback(f.FailedReason, true, cdf);
             }
 
             if (string.IsNullOrEmpty(f.FailedReason)) {
                 if (expectedvariablefeedback) {
-                    return new DoItFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), true, cp);
+                    return new DoItFeedback("Dieser Befehl hat keinen Rückgabewert: " + cdf.NormalizedText.Substring(cdf.Position), true, cdf);
                 }
 
                 //if (thisC.MustUseReturnValue) {
-                return new DoItFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), true, cp);
+                return new DoItFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + cdf.NormalizedText.Substring(cdf.Position), true, cdf);
                 //}
             }
         }
@@ -163,26 +163,24 @@ public class Script {
         #region Prüfen für bessere Fehlermeldung, alle Befehle prüfen
 
         foreach (var thisC in Method.AllMethods) {
-            var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, cp);
+            var f = thisC.CanDo(expectedvariablefeedback, cdf);
             //if (f.ScriptNeedFix) { return new DoItFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.FailedReason)) {
-                return new DoItFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", true, cp);
+                return new DoItFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", true, cdf);
             }
         }
 
         #endregion
 
-        var bef = (scriptText.Substring(pos) + "¶").SplitBy("¶");
+        var bef = (cdf.NormalizedText.Substring(cdf.Position) + "¶").SplitBy("¶");
 
-        return new DoItFeedback("Kann nicht geparsed werden: " + bef[0], true, cp);
+        return new DoItFeedback("Kann nicht geparsed werden: " + bef[0], true, cdf);
     }
 
     public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, CurrentPosition cp, List<string>? attributes) {
-        var pos = cp.Position + 1;
-
         if (attributes != null) {
             // Attribute nur löschen, wenn neue vorhanden sind.
             // Ansonsten werden bei Try / If / For diese gelöscht
@@ -197,36 +195,36 @@ public class Script {
         }
 
         Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain} START", cp.Stufe);
-
+        var pos = cp.Position;
         do {
             if (pos >= normalizedScriptText.Length) {
                 Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] ENDE (Regulär)", cp.Stufe);
-
-                return new ScriptEndedFeedback(new CurrentPosition(cp.Subname, pos), varCol, false, false, false, string.Empty, null);
+                return new ScriptEndedFeedback(cp.Subname, pos, cp.Protocol, cp.Chain, false, false, false, varCol, string.Empty);
             }
 
             if (normalizedScriptText.Substring(pos, 1) == "¶") {
                 pos++;
             } else {
-                var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, new CurrentPosition(cp.Subname, pos));
-                if (scx.Failed) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", cp.Stufe);
-                    return new ScriptEndedFeedback(scx, varCol, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
+                var dif = CommandOrVarOnPosition(varCol, scp, false, new CanDoFeedback(cp, pos, normalizedScriptText));
+
+                if (dif.Failed) {
+                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {dif.FailedReason}", cp.Stufe);
+                    return new ScriptEndedFeedback(dif, varCol, pos);
                 }
 
-                pos = scx.Position;
+                pos = dif.Position;
 
-                if (scx.BreakFired) {
+                if (dif.BreakFired) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] BREAK", cp.Stufe);
-                    return new ScriptEndedFeedback(scx, varCol, false, true, false, string.Empty, null);
+                    return new ScriptEndedFeedback(dif, varCol, pos);
                 }
 
-                if (scx.ReturnFired) {
+                if (dif.ReturnFired) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] RETURN", cp.Stufe);
-                    return new ScriptEndedFeedback(scx, varCol, false, false, true, string.Empty, scx.ReturnValue);
+                    return new ScriptEndedFeedback(dif, varCol, pos);
                 }
 
-                pos = scx.Position + 1;
+                pos = dif.Position + 1;
             }
         } while (true);
     }

@@ -23,6 +23,7 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using static BlueBasics.Constants;
 using static BlueBasics.Extensions;
@@ -129,19 +130,19 @@ public abstract class Method : IReadableTextWithKey {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback GetEnd(string scriptText, CurrentPosition cp, int lenghtStartSequence, string endSequence) {
+    public static GetEndFeedback GetEnd(CanDoFeedback cdf, int lenghtStartSequence, string endSequence) {
         //z.B: beim Befehl DO
         if (string.IsNullOrEmpty(endSequence)) {
-            return new GetEndFeedback(cp, string.Empty);
+            return new GetEndFeedback(cdf, string.Empty);
         }
 
-        var (pos, which) = NextText(scriptText, cp.Position, [endSequence], false, false, KlammernAlle);
-        if (pos < cp.Position) {
-            return new GetEndFeedback(cp, "Endpunkt '" + endSequence + "' nicht gefunden.", true);
+        var (pos, which) = NextText(cdf.NormalizedText, cdf.Position, [endSequence], false, false, KlammernAlle);
+        if (pos < cdf.Position) {
+            return new GetEndFeedback(cdf, "Endpunkt '" + endSequence + "' nicht gefunden.", true);
         }
 
-        var txtBtw = scriptText.Substring(cp.Position + lenghtStartSequence, pos - cp.Position - lenghtStartSequence);
-        return new GetEndFeedback(new CurrentPosition(cp.Subname, pos + which.Length), txtBtw);
+        var txtBtw = cdf.NormalizedText.Substring(cdf.Position + lenghtStartSequence, pos - cdf.Position - lenghtStartSequence);
+        return new GetEndFeedback(cdf, txtBtw);
     }
 
     public static List<Method> GetMethods(MethodType allowedMethods) {
@@ -156,14 +157,14 @@ public abstract class Method : IReadableTextWithKey {
         return m;
     }
 
-    public static DoItFeedback GetVariableByParsing(string txt, CurrentPosition cp, VariableCollection? varCol, ScriptProperties scp) {
-        if (string.IsNullOrEmpty(txt)) { return new DoItFeedback("Kein Wert zum Parsen angekommen.", true, cp); }
+    public static DoItFeedback GetVariableByParsing(string toParse, CanDoFeedback cdf, VariableCollection? varCol, ScriptProperties scp) {
+        if (string.IsNullOrEmpty(toParse)) { return new DoItFeedback("Kein Wert zum Parsen angekommen.", true, cdf); }
 
-        if (txt.StartsWith("(")) {
-            var (pose, _) = NextText(txt, 0, KlammerRundZu, false, false, KlammernAlle);
-            if (pose < txt.Length - 1) {
+        if (toParse.StartsWith("(")) {
+            var (pose, _) = NextText(toParse, 0, KlammerRundZu, false, false, KlammernAlle);
+            if (pose < toParse.Length - 1) {
                 // Wir haben so einen Fall: (true) || (true)
-                var scx = GetVariableByParsing(txt.Substring(1, pose - 1), cp, varCol, scp);
+                var scx = GetVariableByParsing(toParse.Substring(1, pose - 1), cdf, varCol, scp);
                 if (scx.Failed) {
                     scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()");
                     return scx;
@@ -176,58 +177,58 @@ public abstract class Method : IReadableTextWithKey {
                     scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId);
                     return scx;
                 }
-                return GetVariableByParsing(scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), cp, varCol, scp);
+                return GetVariableByParsing(scx.ReturnValue.ValueForReplace + toParse.Substring(pose + 1), cdf, varCol, scp);
             }
         }
 
-        txt = txt.Trim(KlammernRund);
+        toParse = toParse.Trim(KlammernRund);
 
-        var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernAlle);
+        var (uu, _) = NextText(toParse, 0, Method_If.UndUnd, false, false, KlammernAlle);
         if (uu > 0) {
-            var scx = GetVariableByParsing(txt.Substring(0, uu), cp, varCol, scp);
+            var scx = GetVariableByParsing(toParse.Substring(0, uu), cdf, varCol, scp);
             if (scx.Failed || scx.ReturnValue is null or VariableUnknown) {
-                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt.Substring(0, uu)}");
+                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {toParse.Substring(0, uu)}");
                 return scx;
             }
 
             if (scx.ReturnValue.ValueForReplace == "false") { return scx; }
-            return GetVariableByParsing(txt.Substring(uu + 2), cp, varCol, scp);
+            return GetVariableByParsing(toParse.Substring(uu + 2), cdf, varCol, scp);
         }
 
-        var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernAlle);
+        var (oo, _) = NextText(toParse, 0, Method_If.OderOder, false, false, KlammernAlle);
         if (oo > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, oo), cp, varCol, scp);
+            var txt1 = GetVariableByParsing(toParse.Substring(0, oo), cdf, varCol, scp);
             if (txt1.Failed || txt1.ReturnValue is null or VariableUnknown) {
-                return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, cp);
+                return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, cdf);
             }
 
             if (txt1.ReturnValue.ValueForReplace == "true") {
                 return txt1;
             }
-            return GetVariableByParsing(txt.Substring(oo + 2), cp, varCol, scp);
+            return GetVariableByParsing(toParse.Substring(oo + 2), cdf, varCol, scp);
         }
 
         // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
         if (varCol is { }) {
-            var t = Method.ReplaceVariable(txt, varCol, cp);
-            if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", t.NeedsScriptFix, cp); }
-            if (t.ReturnValue != null) { return new DoItFeedback(t.ReturnValue, new CurrentPosition(cp.Subname, cp.Position + txt.Length)); }
-            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, cp, varCol, scp); }
+            var t = Method.ReplaceVariable(toParse, varCol, cdf);
+            if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", t.NeedsScriptFix, cdf); }
+            if (t.ReturnValue != null) { return new DoItFeedback(t.ReturnValue, new CurrentPosition(cdf, cdf.Position + toParse.Length)); }
+            if (toParse != t.NormalizedText) { return GetVariableByParsing(t.NormalizedText, cdf, varCol, scp); }
 
-            var t2 = Method.ReplaceCommandsAndVars(txt, varCol, cp, scp);
-            if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", t2.NeedsScriptFix, cp); }
-            if (t2.ReturnValue != null) { return new DoItFeedback(t2.ReturnValue, new CurrentPosition(cp.Subname, cp.Position + txt.Length)); }
-            if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, cp, varCol, scp); }
+            var t2 = Method.ReplaceCommandsAndVars(varCol, cdf, scp);
+            if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", t2.NeedsScriptFix, cdf); }
+            if (t2.ReturnValue != null) { return new DoItFeedback(t2.ReturnValue, new CurrentPosition(cdf, cdf.Position + toParse.Length)); }
+            if (toParse != t2.NormalizedText) { return GetVariableByParsing(t2.NormalizedText, cdf, varCol, scp); }
         }
 
-        var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
+        var (posa, _) = NextText(toParse, 0, KlammerRundAuf, false, false, KlammernAlle);
         if (posa > -1) {
-            var (pose, _) = NextText(txt, posa, KlammerRundZu, false, false, KlammernAlle);
-            if (pose <= posa) { return DoItFeedback.KlammerFehler(cp); }
+            var (pose, _) = NextText(toParse, posa, KlammerRundZu, false, false, KlammernAlle);
+            if (pose <= posa) { return DoItFeedback.KlammerFehler(cdf); }
 
-            var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
+            var tmptxt = toParse.Substring(posa + 1, pose - posa - 1);
             if (!string.IsNullOrEmpty(tmptxt)) {
-                var scx = GetVariableByParsing(tmptxt, cp, varCol, scp);
+                var scx = GetVariableByParsing(tmptxt, cdf, varCol, scp);
                 if (scx.Failed) {
                     scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()");
                     return scx;
@@ -240,27 +241,27 @@ public abstract class Method : IReadableTextWithKey {
                     scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId);
                     return scx;
                 }
-                return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), cp, varCol, scp);
+                return GetVariableByParsing(toParse.Substring(0, posa) + scx.ReturnValue.ValueForReplace + toParse.Substring(pose + 1), cdf, varCol, scp);
             }
         }
 
-        var (cando, result) = TryParse(txt, varCol, scp);
+        var (cando, result) = TryParse(toParse, varCol, scp);
         if (cando) {
-            return new DoItFeedback(result, cp);
+            return new DoItFeedback(result, cdf);
         }
 
         foreach (var thisVt in Variable.VarTypes) {
             if (thisVt.GetFromStringPossible) {
-                if (thisVt.TryParse(txt, out var v) && v != null) {
-                    return new DoItFeedback(v, new CurrentPosition(cp.Subname, cp.Position + txt.Length));
+                if (thisVt.TryParse(toParse, out var v) && v != null) {
+                    return new DoItFeedback(v, new CurrentPosition(cdf, cdf.Position + toParse.Length));
                 }
             }
         }
 
-        return new DoItFeedback("Wert kann nicht geparsed werden: " + txt, true, cp);
+        return new DoItFeedback("Wert kann nicht geparsed werden: " + toParse, true, cdf);
     }
 
-    public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, CurrentPosition cdf, ScriptProperties scp) {
+    public static GetEndFeedback ReplaceCommandsAndVars(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
         List<string> toSearch = [];
 
         #region Mögliche Methoden
@@ -283,21 +284,20 @@ public abstract class Method : IReadableTextWithKey {
 
         var posc = 0;
         do {
-            var (pos, _) = NextText(txt, posc, toSearch, true, false, KlammernAlle);
-            if (pos < 0) { return new GetEndFeedback(cdf, txt); }
+            var (pos, _) = NextText(cdf.NormalizedText, posc, toSearch, true, false, KlammernAlle);
+            if (pos < 0) { return new GetEndFeedback(cdf, cdf.NormalizedText); }
 
-            var scx = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, cdf);
+            var scx = Script.CommandOrVarOnPosition(varCol, scp, true, cdf);
             if (scx.Failed) {
                 Develop.Message?.Invoke(BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Skript-Fehler: " + scx.FailedReason, cdf.Stufe);
-                return new GetEndFeedback(cdf, $"Durch Befehl abgebrochen: {txt} -> {scx.FailedReason}", scx.NeedsScriptFix);
+                return new GetEndFeedback(cdf, $"Durch Befehl abgebrochen: {cdf.NormalizedText} -> {scx.FailedReason}", scx.NeedsScriptFix);
             }
 
-            if (pos == 0 && txt.Length == scx.Position) { return new GetEndFeedback(cdf, scx.ReturnValue); }
+            if (pos == 0 && cdf.NormalizedText.Length == scx.Position) { return new GetEndFeedback(cdf, scx.ReturnValue); }
             if (scx.ReturnValue == null) { return new GetEndFeedback(cdf, "Variablenfehler", true); }
             if (!scx.ReturnValue.ToStringPossible) { return new GetEndFeedback(cdf, "Variable muss als Objekt behandelt werden", true); }
 
-            txt = txt.Substring(0, pos) + scx.ReturnValue.ValueForReplace + txt.Substring(scx.Position);
-            posc = pos;
+            cdf = new CanDoFeedback(cdf, pos, cdf.NormalizedText.Substring(0, pos) + scx.ReturnValue.ValueForReplace + cdf.NormalizedText.Substring(scx.Position));
         } while (true);
     }
 
@@ -306,39 +306,39 @@ public abstract class Method : IReadableTextWithKey {
     /// Gibt dann den ersetzten Text zurück.
     /// Achtung: nur Stringable Variablen werden berücksichtigt.
     /// </summary>
-    /// <param name="txt"></param>
+    /// <param name="toParse"></param>
     /// <param name="varCol"></param>
     /// <param name="cdf"></param>
     /// <returns></returns>
-    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol, CurrentPosition cp) {
-        if (varCol is not { }) { return new GetEndFeedback(cp, "Interner Variablen-Fehler", true); }
+    public static GetEndFeedback ReplaceVariable(string toParse, VariableCollection? varCol, CanDoFeedback cdf) {
+        if (varCol is not { }) { return new GetEndFeedback(cdf, "Interner Variablen-Fehler", true); }
 
         var posc = 0;
         var allVarNames = varCol.AllStringableNames();
 
         do {
-            var (pos, which) = NextText(txt, posc, allVarNames, true, true, KlammernAlle);
+            var (pos, which) = NextText(toParse, posc, allVarNames, true, true, KlammernAlle);
 
-            if (pos < 0) { return new GetEndFeedback(cp, txt); }
+            if (pos < 0) { return new GetEndFeedback(cdf, toParse); }
 
             var thisV = varCol.Get(which);
             var endz = pos + which.Length;
 
-            if (thisV == null) { return new GetEndFeedback(cp, "Variablen-Fehler " + which, true); }
+            if (thisV == null) { return new GetEndFeedback(cdf, "Variablen-Fehler " + which, true); }
 
-            txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(endz);
+            toParse = toParse.Substring(0, pos) + thisV.ValueForReplace + toParse.Substring(endz);
             posc = pos;
         } while (true);
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, int lastArgMinCount, CurrentPosition cp, ScriptProperties? scp) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, List<List<string>> types, int lastArgMinCount, CanDoFeedback cdf, ScriptProperties? scp) {
         if (types.Count == 0) {
-            return string.IsNullOrEmpty(attributText)
+            return string.IsNullOrEmpty(cdf.NormalizedText)
                 ? new SplittedAttributesFeedback([])
                 : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.", true);
         }
 
-        var attributes = SplitAttributeToString(attributText);
+        var attributes = SplitAttributeToString(cdf.NormalizedText);
         if (attributes is not { Count: not 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.", true); }
         if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", true); }
         if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", true); }
@@ -365,7 +365,7 @@ public abstract class Method : IReadableTextWithKey {
                 v = varcol?.Get(varn);
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
             } else {
-                var tmp2 = GetVariableByParsing(attributes[n], cp, varcol, scp);
+                var tmp2 = GetVariableByParsing(attributes[n], cdf, varcol, scp);
                 if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Berechnungsfehler bei Attribut {n + 1} {tmp2.FailedReason}", tmp2.NeedsScriptFix); }
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
@@ -393,99 +393,95 @@ public abstract class Method : IReadableTextWithKey {
     ///
     /// </summary>
     /// <param name="varCol"></param>
-    /// <param name="cp"></param>
+    /// <param name="cdf"></param>
     /// <param name="scp"></param>
     /// <param name="newcommand">Erwartet wird: X=5;</param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
-    public static DoItFeedback VariablenBerechnung(VariableCollection varCol, CurrentPosition cp, ScriptProperties scp, string newcommand, bool generateVariable) {
-        var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
+    public static DoItFeedback VariablenBerechnung(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp, bool generateVariable) {
+        var (pos, _) = NextText(cdf.NormalizedText, 0, Gleich, false, false, null);
 
-        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen", true, cp); }
+        if (pos < 1 || pos > cdf.NormalizedText.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen", true, cdf); }
 
-        var varnam = newcommand.Substring(0, pos);
+        var varnam = cdf.NormalizedText.Substring(0, pos);
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, cp); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, cdf); }
 
         var vari = varCol.Get(varnam);
         if (generateVariable && vari != null) {
-            return new DoItFeedback($"Variable {varnam} ist bereits vorhanden.", true, cp);
+            return new DoItFeedback($"Variable {varnam} ist bereits vorhanden.", true, cdf);
         }
         if (!generateVariable && vari == null) {
-            return new DoItFeedback($"Variable {varnam} nicht vorhanden.", true, cp);
+            return new DoItFeedback($"Variable {varnam} nicht vorhanden.", true, cdf);
         }
 
-        var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
+        var value = cdf.NormalizedText.Substring(pos + 1, cdf.NormalizedText.Length - pos - 2);
 
         List<List<string>> sargs = [[Variable.Any_Plain]];
 
-        var attvar = SplitAttributeToVars(varCol, value, sargs, 0, cp, scp);
+        var attvar = SplitAttributeToVars(varCol, sargs, 0, cdf, scp);
 
-        if (attvar.Failed) { return new DoItFeedback("Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.FailedReason, attvar.NeedsScriptFix, cp); }
+        if (attvar.Failed) { return new DoItFeedback("Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.FailedReason, attvar.NeedsScriptFix, cdf); }
 
-        if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback("Variable unbekannt", true, cp); }
+        if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback("Variable unbekannt", true, cdf); }
 
         if (attvar.Attributes[0] is { } v) {
             if (generateVariable) {
                 v.KeyName = varnam.ToLowerInvariant();
                 v.ReadOnly = false;
                 _ = varCol.Add(v);
-                return new DoItFeedback(v, cp);
+                return new DoItFeedback(v, cdf);
             }
 
             if (vari == null) {
                 // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
-                return DoItFeedback.InternerFehler(cp);
+                return DoItFeedback.InternerFehler(cdf);
             }
 
             var f = vari.GetValueFrom(v);
-            if (!string.IsNullOrEmpty(f)) { return new DoItFeedback(f, true, cp); }
+            if (!string.IsNullOrEmpty(f)) { return new DoItFeedback(f, true, cdf); }
 
-            return new DoItFeedback(v, new CurrentPosition(cp.Subname, cp.Position + newcommand.Length));
+            return new DoItFeedback(v, new CurrentPosition(cdf, cdf.Position + cdf.NormalizedText.Length));
         }
         // attvar.Attributes[0] müsste immer eine Variable sein...
-        return DoItFeedback.InternerFehler(cp);
+        return DoItFeedback.InternerFehler(cdf);
     }
 
-    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, CurrentPosition cp) {
+    public CanDoFeedback CanDo(bool expectedvariablefeedback, CanDoFeedback cdf) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns) && MustUseReturnValue) {
-            return new CanDoFeedback("Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, cp);
+            return new CanDoFeedback(cdf, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false);
         }
         if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback("Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, cp);
+            return new CanDoFeedback(cdf, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false);
         }
-        var maxl = scriptText.Length;
+        var maxl = cdf.NormalizedText.Length;
 
         var commandtext = Command + StartSequence;
         var l = commandtext.Length;
-        if (pos + l < maxl) {
-            if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
-                var f = GetEnd(scriptText, new CurrentPosition(cp.Subname, pos + Command.Length), StartSequence.Length, EndSequence);
+        if (cdf.Position + l < maxl) {
+            if (string.Equals(cdf.NormalizedText.Substring(cdf.Position, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
+                var f = GetEnd(new CanDoFeedback(cdf, cdf.Position + Command.Length, cdf.NormalizedText), StartSequence.Length, EndSequence);
                 if (f.Failed) {
-                    return new CanDoFeedback("Fehler bei " + commandtext, true, f);
+                    return new CanDoFeedback(f, "Fehler bei " + commandtext, true);
                 }
                 var cont = f.Position;
                 var codebltxt = string.Empty;
                 if (GetCodeBlockAfter) {
-                    var (codeblock, errorreason) = GetCodeBlockText(scriptText, cont);
-                    if (!string.IsNullOrEmpty(errorreason)) { return new CanDoFeedback(errorreason, true, cp); }
+                    var (codeblock, errorreason) = GetCodeBlockText(cdf.NormalizedText, cont);
+                    if (!string.IsNullOrEmpty(errorreason)) { return new CanDoFeedback(cdf, errorreason, true); }
                     codebltxt = codeblock;
                     cont = cont + codebltxt.Length + 2;
                 }
 
-                //if (!scp.AllowedMethods.HasFlag(MethodType)) {
-                //    return new CanDoFeedback(pos, "Befehl '" + Syntax + "' kann in diesem Skript an der aktuellen Position nicht benutzt werden.", true, ld);
-                //}
-
-                return new CanDoFeedback(f.AttributeText, codebltxt, new CurrentPosition(cp.Subname, cont));
+                return new CanDoFeedback(cdf, cont, f.NormalizedText, codebltxt);
             }
         }
 
-        return new CanDoFeedback("Kann nicht geparst werden", false, cp);
+        return new CanDoFeedback(cdf, "Kann nicht geparst werden", false);
     }
 
     public virtual DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
         return attvar.Failed
             ? DoItFeedback.AttributFehler(cdf, this, attvar)
             : DoIt(varCol, attvar, scp, cdf);
@@ -573,20 +569,20 @@ public abstract class Method : IReadableTextWithKey {
 
     public QuickImage? SymbolForReadableText() => null;
 
-    private static List<string>? SplitAttributeToString(string attributtext) {
-        if (string.IsNullOrEmpty(attributtext)) { return null; }
+    private static List<string>? SplitAttributeToString(string AttributeText) {
+        if (string.IsNullOrEmpty(AttributeText)) { return null; }
         List<string> attributes = [];
 
         #region Liste der Attribute splitten
 
         var posc = 0;
         do {
-            var (pos, _) = NextText(attributtext, posc, Komma, false, false, KlammernAlle);
+            var (pos, _) = NextText(AttributeText, posc, Komma, false, false, KlammernAlle);
             if (pos < 0) {
-                attributes.Add(attributtext.Substring(posc).Trim(KlammernRund));
+                attributes.Add(AttributeText.Substring(posc).Trim(KlammernRund));
                 break;
             }
-            attributes.Add(attributtext.Substring(posc, pos - posc).Trim(KlammernRund));
+            attributes.Add(AttributeText.Substring(posc, pos - posc).Trim(KlammernRund));
             posc = pos + 1;
         } while (true);
 

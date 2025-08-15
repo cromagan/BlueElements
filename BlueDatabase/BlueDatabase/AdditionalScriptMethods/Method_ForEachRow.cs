@@ -51,7 +51,7 @@ internal class Method_ForEachRow : Method_Database {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(cdf); }
 
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
 
         var varnam = "value";
@@ -78,7 +78,7 @@ internal class Method_ForEachRow : Method_Database {
         foreach (var thisl in r) {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition("ForEachRow-Schleife", 0), cdf.CodeBlockAfterText, nv, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, new CanDoFeedback("ForEachRow-Schleife", cdf.Position, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.CodeBlockAfterText, string.Empty), nv, null);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 

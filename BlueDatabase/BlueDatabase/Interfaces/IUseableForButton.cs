@@ -70,11 +70,10 @@ public static class UseableForButton {
             return "Fehler beim Berechnen der Attribute: " + error;
         }
 
-        var ld = new CurrentPosition("Knopfdruck", 0);
-        var cdw = new CanDoFeedback(normalizedText, string.Empty, ld);
+        var cdf = new CanDoFeedback("Knopfdruck", 0, string.Empty, string.Empty, string.Empty, false, normalizedText, string.Empty);
 
         var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, "Button");
-        var n = ufb.DoIt(varCol, cdw, scp);
+        var n = ufb.DoIt(varCol, cdf, scp);
 
         return n.Protocol;
     }

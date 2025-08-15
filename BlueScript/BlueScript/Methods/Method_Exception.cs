@@ -47,13 +47,13 @@ internal class Method_Exception : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        if (string.IsNullOrEmpty(cdf.AttributText)) { return new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.", true, cdf); }
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        if (string.IsNullOrEmpty(cdf.NormalizedText)) { return new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.", true, cdf); }
+        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
         return attvar.Attributes is not { Count: 1 } ? new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.", true, cdf)
             : new DoItFeedback("Abbruch durch Exception-Befehl: " + attvar.ValueStringGet(0), true, cdf);
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

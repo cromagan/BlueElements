@@ -71,11 +71,11 @@ public class Method_If : Method {
 
         var scpt = new ScriptProperties(scp, m);
 
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scpt);
+        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scpt);
         if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, cdf); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = Method_CallByFilename.CallSub(varCol, scp, new CurrentPosition("If-Befehl-Inhalt", 0), cdf.CodeBlockAfterText, null, null);
+            var scx = Method_CallByFilename.CallSub(varCol, scp, new CanDoFeedback("If-Befehl-Inhalt", cdf.Position, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.CodeBlockAfterText, string.Empty), null, null);
             return scx; // If muss die Breaks und Endsripts erhalten!
         }
 

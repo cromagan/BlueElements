@@ -49,7 +49,7 @@ internal class Method_ForEach : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
 
         var l = attvar.ValueListStringGet(1);
@@ -75,7 +75,7 @@ internal class Method_ForEach : Method {
             count++;
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition("ForEach-Schleife", cdf.Position), cdf.CodeBlockAfterText, null, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, new CanDoFeedback("ForEach-Schleife", cdf.Position, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.CodeBlockAfterText, string.Empty), null, null);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
             if (t.ElapsedMilliseconds > 1000) {
@@ -85,7 +85,7 @@ internal class Method_ForEach : Method {
         }
 
         if (scx == null) {
-            return new DoItFeedback(false, false, false, string.Empty, null, cdf);
+            return new DoItFeedback(cdf.Subname, cdf.Position, cdf.Protocol, cdf.Chain, false, false, false, string.Empty, null);
         }
 
         scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden

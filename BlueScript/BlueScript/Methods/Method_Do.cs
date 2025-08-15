@@ -47,7 +47,7 @@ internal class Method_Do : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
+        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
 
         var du = 0;
@@ -59,7 +59,7 @@ internal class Method_Do : Method {
             du++;
             if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true, cdf); }
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition("Do-Schleife", 0), cdf.CodeBlockAfterText, null, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, new CanDoFeedback("Do-Schleife", 0, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.CodeBlockAfterText, string.Empty), null, null);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         } while (true);
 

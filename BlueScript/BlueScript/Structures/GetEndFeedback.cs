@@ -22,43 +22,28 @@ using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
-public class GetEndFeedback : CurrentPosition {
+public class GetEndFeedback : CanDoFeedback {
 
     #region Fields
 
-    internal readonly string AttributeText;
-    internal readonly string FailedReason = string.Empty;
     internal readonly Variable? ReturnValue;
 
     #endregion
 
     #region Constructors
 
-    public GetEndFeedback(CurrentPosition cp, Variable? returnvalue) : base(cp) {
-        AttributeText = string.Empty;
+    public GetEndFeedback(CanDoFeedback cp, Variable? returnvalue) : base(cp) {
         ReturnValue = returnvalue;
     }
 
-    public GetEndFeedback(CurrentPosition cp, string failedReason, bool needsScriptFix) : base(cp, failedReason) {
-        FailedReason = failedReason;
-        AttributeText = string.Empty;
+    public GetEndFeedback(CanDoFeedback cp, string failedReason, bool needsScriptFix) : base(cp, failedReason, needsScriptFix) {
         ReturnValue = null;
-        NeedsScriptFix = needsScriptFix;
     }
 
-    public GetEndFeedback(CurrentPosition cp, string attributetext) : base(cp) {
-        AttributeText = attributetext;
+    public GetEndFeedback(CanDoFeedback cp, string attributetext) : base(cp, cp.Position, attributetext, string.Empty) {
         ReturnValue = null;
         if (cp.Position == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
     }
-
-    #endregion
-
-    #region Properties
-
-    public bool NeedsScriptFix { get; } = false;
-
-    internal bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
 
     #endregion
 }

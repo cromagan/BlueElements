@@ -31,12 +31,9 @@ public class DoItFeedback : CurrentPosition {
 
     #region Constructors
 
-    public DoItFeedback(bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, CurrentPosition? cp) : base(cp) {
+    public DoItFeedback(string subname, int position, string protocol, string chain, bool needsScriptFix, bool breakFired, bool returnFired, string failedreason, Variable? returnValue) : base(subname, position, protocol, chain, failedreason, needsScriptFix) {
         BreakFired = breakFired;
         ReturnFired = returnFired;
-
-        FailedReason = failedReason;
-        NeedsScriptFix = needsScriptFix;
 
         if (!Failed) {
             ReturnValue = returnValue;
@@ -51,7 +48,7 @@ public class DoItFeedback : CurrentPosition {
         ReturnValue = variable;
     }
 
-    public DoItFeedback(string failedReason, bool needsScriptFix, CurrentPosition? cp) : this(needsScriptFix, false, false, failedReason, null, cp) { }
+    public DoItFeedback(string failedReason, bool needsScriptFix, CurrentPosition? cp) : this(cp.Subname, cp.Position, cp.Protocol, cp.Chain, needsScriptFix, false, false, failedReason, null) { }
 
     public DoItFeedback(string valueString, CurrentPosition cp) : this(new VariableString(Variable.DummyName(), valueString), cp) { }
 
@@ -72,11 +69,6 @@ public class DoItFeedback : CurrentPosition {
     #region Properties
 
     public bool BreakFired { get; private set; } = false;
-    public virtual bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
-    public string FailedReason { get; private set; } = string.Empty;
-
-    public bool NeedsScriptFix { get; } = false;
-
     public bool ReturnFired { get; private set; } = false;
     public Variable? ReturnValue { get; private set; } = null;
 
@@ -108,7 +100,7 @@ public class DoItFeedback : CurrentPosition {
     public void ChangeFailedReason(string newfailedReason) {
         if (string.IsNullOrEmpty(newfailedReason)) { newfailedReason = "Allgemeiner Fehler"; }
 
-        FailedReason = newfailedReason;
+        //FailedReason = newfailedReason;
         ReturnValue = null;
     }
 
