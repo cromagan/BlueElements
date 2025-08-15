@@ -296,7 +296,7 @@ public abstract class Method : IReadableTextWithKey {
             if (pos == 0 && cdf.NormalizedText.Length == scx.Position) { return new GetEndFeedback(cdf, scx.ReturnValue); }
             if (scx.ReturnValue == null) { return new GetEndFeedback(cdf, "Variablenfehler", true); }
             if (!scx.ReturnValue.ToStringPossible) { return new GetEndFeedback(cdf, "Variable muss als Objekt behandelt werden", true); }
-
+            hier stimmt die Position nicht
             cdf = new CanDoFeedback(cdf, pos, cdf.NormalizedText.Substring(0, pos) + scx.ReturnValue.ValueForReplace + cdf.NormalizedText.Substring(scx.Position));
         } while (true);
     }
@@ -419,7 +419,7 @@ public abstract class Method : IReadableTextWithKey {
 
         List<List<string>> sargs = [[Variable.Any_Plain]];
 
-        var attvar = SplitAttributeToVars(varCol, sargs, 0, cdf, scp);
+        var attvar = SplitAttributeToVars(varCol, sargs, 0, new CanDoFeedback(cdf, value), scp);
 
         if (attvar.Failed) { return new DoItFeedback("Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.FailedReason, attvar.NeedsScriptFix, cdf); }
 
@@ -460,7 +460,7 @@ public abstract class Method : IReadableTextWithKey {
         var l = commandtext.Length;
         if (cdf.Position + l < maxl) {
             if (string.Equals(cdf.NormalizedText.Substring(cdf.Position, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
-                var f = GetEnd(new CanDoFeedback(cdf, cdf.Position + Command.Length, cdf.NormalizedText), StartSequence.Length, EndSequence);
+                var f = GetEnd(new CanDoFeedback(cdf, cdf.Position + Command.Length), StartSequence.Length, EndSequence);
                 if (f.Failed) {
                     return new CanDoFeedback(f, "Fehler bei " + commandtext, true);
                 }
@@ -473,7 +473,7 @@ public abstract class Method : IReadableTextWithKey {
                     cont = cont + codebltxt.Length + 2;
                 }
 
-                return new CanDoFeedback(cdf, cont, f.NormalizedText, codebltxt);
+                return new CanDoFeedback(cdf, 0, f.NormalizedText, codebltxt);
             }
         }
 

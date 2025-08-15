@@ -27,6 +27,11 @@ public class CanDoFeedback : CurrentPosition {
 
     #region Fields
 
+    /// <summary>
+    /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
+    /// </summary>
+    public readonly string CodeBlockAfterText;
+
     public readonly string NormalizedText;
 
     #endregion
@@ -49,27 +54,15 @@ public class CanDoFeedback : CurrentPosition {
 
     public CanDoFeedback(CurrentPosition cp, int position, string attributetext, string codeblockaftertext) : this(cp.Subname, position, cp.Protocol, cp.Chain, cp.FailedReason, cp.NeedsScriptFix, attributetext, codeblockaftertext) { }
 
-    public CanDoFeedback(CurrentPosition cp, int position, string attributetext) : this(cp.Subname, position, cp.Protocol, cp.Chain, cp.FailedReason, cp.NeedsScriptFix, attributetext, string.Empty) {
+    public CanDoFeedback(CurrentPosition cp, string attributetext) : this(cp.Subname, 0, cp.Protocol, cp.Chain, cp.FailedReason, cp.NeedsScriptFix, attributetext, string.Empty) {
         if (cp.Position == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
     }
 
     #endregion
 
-    #region Properties
-
-    /// <summary>
-    /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
-    /// </summary>
-    public string CodeBlockAfterText { get; }
-
-    #endregion
-
     #region Methods
 
-    public CurrentPosition EndPosition() {
-        Develop.DebugPrint_NichtImplementiert(true);
-        return new CurrentPosition();
-    }
+    public CurrentPosition EndPosition() => new CurrentPosition(this, Position + NormalizedText.Length);
 
     #endregion
 }

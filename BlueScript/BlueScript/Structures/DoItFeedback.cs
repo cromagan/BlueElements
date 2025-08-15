@@ -44,7 +44,7 @@ public class DoItFeedback : CurrentPosition {
 
     public DoItFeedback(CurrentPosition cp) : base(cp) { }
 
-    public DoItFeedback(Variable variable, CurrentPosition cp) : base(cp) {
+    public DoItFeedback(Variable? variable, CurrentPosition cp) : base(cp) {
         ReturnValue = variable;
     }
 

@@ -78,7 +78,7 @@ public class CurrentPosition {
     /// </summary>
     public bool NeedsScriptFix { get; }
 
-    public int Position { get; } = -1;
+    public int Position { get; } = 0;
     public string Protocol { get; } = string.Empty;
     public int Stufe => Chain.CountChar('\\', null);
     public string Subname { get; } = string.Empty;

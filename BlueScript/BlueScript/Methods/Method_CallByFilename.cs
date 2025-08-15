@@ -85,7 +85,7 @@ public class Method_CallByFilename : Method {
         _ = tmpv.AddRange(varCol);
         if (addMe != null) { _ = tmpv.Add(addMe); }
 
-        scx = Script.Parse(tmpv, scp2, cdf.NormalizedText, cdf, attributes);
+        scx = Script.Parse(cdf, cdf.NormalizedText, scp2, tmpv, attributes);
 
         #region Kritische Variablen Disposen
 
