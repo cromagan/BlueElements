@@ -87,10 +87,10 @@ public class VariableBool : Variable {
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableBool v) { return VerschiedeneTypen(variable); }
-		if (ReadOnly) { return Schreibgschützt(); }
-		ValueBool = v.ValueBool;
-		return string.Empty;
-	}
+        if (ReadOnly) { return Schreibgschützt(); }
+        ValueBool = v.ValueBool;
+        return string.Empty;
+    }
 
     protected override void SetValue(object? x) {
         if (x is bool val) {
@@ -100,125 +100,24 @@ public class VariableBool : Variable {
         }
     }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? varCol, ScriptProperties? scp) {
-        if (Method_If.GetBool(txt) is { } b) { return (true, b); }
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
 
-        if (scp == null) { return (false, null); }
+        switch (txt.ToLowerInvariant()) {
+            case "true":
+            case "+":
+            case "wahr":
+                result = true;
+                return true;
 
-        #region Auf Restliche Boolsche Operationen testen
-
-        //foreach (var check in Method_if.VergleichsOperatoren) {
-        var (i, check) = NextText(txt, 0, Method_If.VergleichsOperatoren, false, false, KlammernAlle);
-        if (i > -1) {
-            if (i < 1 && check != "!") {
-                return (false, null);//new DoItFeedback(infos.LogData, s, "Operator (" + check + ") am String-Start nicht erlaubt: " + txt);
-            } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
-
-            if (i >= txt.Length - 1) {
-                return (false, null);//new DoItFeedback(infos.LogData, s, "Operator (" + check + ") am String-Ende nicht erlaubt: " + txt);
-            } // siehe oben
-
-            #region Die Werte vor und nach dem Trennzeichen in den Variablen v1 und v2 ablegen
-
-            #region Ersten Wert als s1 ermitteln
-
-            var s1 = txt.Substring(0, i);
-            Variable? v1 = null;
-            if (!string.IsNullOrEmpty(s1)) {
-                var tmp1 = GetVariableByParsing(s1, null, varCol, scp);
-                if (tmp1.Failed) { return (false, null); }//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
-
-                v1 = tmp1.ReturnValue;
-            } else {
-                if (check != "!") { return (false, null); }//new DoItFeedback(infos.LogData, s, "Wert vor Operator (" + check + ") nicht gefunden: " + txt);
-            }
-
-            #endregion
-
-            #region Zweiten Wert als s2 ermitteln
-
-            var s2 = txt.Substring(i + check.Length);
-            if (string.IsNullOrEmpty(s2)) { return (false, null); }//new DoItFeedback(infos.LogData, s, "Wert nach Operator (" + check + ") nicht gefunden: " + txt);
-
-            var tmp2 = GetVariableByParsing(s2, null, varCol, scp);
-            if (tmp2.Failed) {
-                return (false, null);//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
-            }
-
-            var v2 = tmp2.ReturnValue;
-
-            #endregion
-
-            // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
-            if (v1 != null) {
-                if (v1.MyClassId != v2?.MyClassId) { return (false, null); }// return new DoItFeedback(infos.LogData, s, "Typen unterschiedlich: " + txt);
-
-                if (!v1.ToStringPossible) { return (false, null); }// return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-            } else {
-                if (v2 is not VariableBool) { return (false, null); }// return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-            }
-
-            #endregion
-
-            switch (check) {
-                case "==": {
-                        if (v1 == null) { return (false, null); }
-                        return (true, v1.ValueForReplace == v2.ValueForReplace);
-                    }
-
-                case "!=": {
-                        if (v1 == null) { return (false, null); }
-                        return (true, v1.ValueForReplace != v2.ValueForReplace);
-                    }
-
-                case ">=": {
-                        if (v1 is not VariableDouble v1Fl) { return (false, null); } //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableDouble v2Fl) { return (false, null); }  //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        return (true, v1Fl.ValueNum >= v2Fl.ValueNum);
-                    }
-
-                case "<=": {
-                        if (v1 is not VariableDouble v1Fl) { return (false, null); } //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableDouble v2Fl) { return (false, null); }  //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        return (true, v1Fl.ValueNum <= v2Fl.ValueNum);
-                    }
-
-                case "<": {
-                        if (v1 is not VariableDouble v1Fl) { return (false, null); } //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableDouble v2Fl) { return (false, null); }  //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        return (true, v1Fl.ValueNum < v2Fl.ValueNum);
-                    }
-
-                case ">": {
-                        if (v1 is not VariableDouble v1Fl) { return (false, null); } //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableDouble v2Fl) { return (false, null); }  //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        return (true, v1Fl.ValueNum > v2Fl.ValueNum);
-                    }
-
-                case "||": {
-                        if (v1 is not VariableBool v1Bo) { return (false, null); }                            // return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableBool v2Bo) { return (false, null); }// return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        return (true, v1Bo.ValueBool || v2Bo.ValueBool);
-                    }
-
-                case "&&": {
-                        if (v1 is not VariableBool v1Bo) { return (false, null); }  // return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableBool v2Bo) { return (false, null); }                                // return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        return (true, v1Bo.ValueBool && v2Bo.ValueBool);
-                    }
-
-                case "!": {
-                        // S1 dürfte eigentlich nie was sein: !False||!false
-                        // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
-                        if (v2 is not VariableBool v2Bo) { return (false, null); }   // return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        return (true, !v2Bo.ValueBool);
-                    }
-            }
+            case "false":
+            case "-":
+            case "falsch":
+                result = false;
+                return true;
         }
 
-        #endregion
-
-        return (false, null);
+        return false;
     }
 
     #endregion

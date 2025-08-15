@@ -73,12 +73,15 @@ public class VariablePadItem : Variable {
         if (variable is not VariablePadItem v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
         ValuePadItem = v.ValuePadItem;
-		return string.Empty;
-	}
+        return string.Empty;
+    }
 
     protected override void SetValue(object? x) { }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+        return false;
+    }
 
     #endregion
 }

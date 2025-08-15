@@ -66,7 +66,7 @@ internal class Method_ForEach : Method {
         }
 
         ScriptEndedFeedback? scx = null;
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method]);
 
         var t = Stopwatch.StartNew();
         var count = 0;
@@ -75,25 +75,24 @@ internal class Method_ForEach : Method {
             count++;
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition("ForEach-Schleife", cdf.Position), string.Empty, cdf.CodeBlockAfterText, cdf.Line - 1, cdf.Subname, nv, null, "ForEach", cdf);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition("ForEach-Schleife", cdf.Position), cdf.CodeBlockAfterText, null, null);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
             if (t.ElapsedMilliseconds > 1000) {
                 t = Stopwatch.StartNew();
-                Develop.Message?.Invoke(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", scp.Stufe +1);
+                Develop.Message?.Invoke(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", cdf.Stufe + 1);
             }
         }
 
-        if(scx == null) {
+        if (scx == null) {
             return new DoItFeedback(false, false, false, string.Empty, null, cdf);
         }
 
-
         scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
-        return scx; 
+        return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

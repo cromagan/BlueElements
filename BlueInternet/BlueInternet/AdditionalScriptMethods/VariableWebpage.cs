@@ -74,14 +74,17 @@ public class VariableWebpage : Variable {
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableWebpage v) { return VerschiedeneTypen(variable); }
-		if (ReadOnly) { return Schreibgschützt(); }
-		ValueWebpage = v.ValueWebpage;
-		return string.Empty;
-	}
+        if (ReadOnly) { return Schreibgschützt(); }
+        ValueWebpage = v.ValueWebpage;
+        return string.Empty;
+    }
 
     protected override void SetValue(object? x) { }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+        return false;
+    }
 
     #endregion
 }

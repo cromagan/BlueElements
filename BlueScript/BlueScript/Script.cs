@@ -109,12 +109,9 @@ public class Script {
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
                     return new DoItFeedback(scx.NeedsScriptFix, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, cp);
                 }
-
             }
 
-  
             return new DoItFeedback(firstResult?.NeedsScriptFix ?? true, firstResult?.BreakFired ?? false, firstResult?.ReturnFired ?? false, firstResult?.FailedReason ?? "Interner Fehler", firstResult?.ReturnValue, cp);
-
         }
 
         #endregion
@@ -135,7 +132,6 @@ public class Script {
                         }
 
                         return Method.VariablenBerechnung(varCol, cp, scp, commandtext + f.AttributeText + ";", false);
-
                     }
                 }
             }
@@ -185,9 +181,7 @@ public class Script {
     public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, CurrentPosition cp, List<string>? attributes) {
-        var pos = cp.Position+1;
-
-
+        var pos = cp.Position + 1;
 
         if (attributes != null) {
             // Attribute nur löschen, wenn neue vorhanden sind.
@@ -202,11 +196,11 @@ public class Script {
             }
         }
 
-        Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
+        Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain} START", cp.Stufe);
 
         do {
             if (pos >= normalizedScriptText.Length) {
-                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
+                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] ENDE (Regulär)", cp.Stufe);
 
                 return new ScriptEndedFeedback(new CurrentPosition(cp.Subname, pos), varCol, false, false, false, string.Empty, null);
             }
@@ -214,22 +208,21 @@ public class Script {
             if (normalizedScriptText.Substring(pos, 1) == "¶") {
                 pos++;
             } else {
-
                 var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, new CurrentPosition(cp.Subname, pos));
                 if (scx.Failed) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
+                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", cp.Stufe);
                     return new ScriptEndedFeedback(scx, varCol, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
                 }
 
                 pos = scx.Position;
 
                 if (scx.BreakFired) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
+                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] BREAK", cp.Stufe);
                     return new ScriptEndedFeedback(scx, varCol, false, true, false, string.Empty, null);
                 }
 
                 if (scx.ReturnFired) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN", scp.Stufe);
+                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {cp.Chain}\\[{pos + 1}] RETURN", cp.Stufe);
                     return new ScriptEndedFeedback(scx, varCol, false, false, true, string.Empty, scx.ReturnValue);
                 }
 
@@ -238,12 +231,12 @@ public class Script {
         } while (true);
     }
 
-    public ScriptEndedFeedback Parse(CurrentPosition cp, List<string>? attributes) {
+    public ScriptEndedFeedback Parse(List<string>? attributes) {
         (NormalizedScriptText, var error) = NormalizedText(ScriptText);
 
-        return !string.IsNullOrEmpty(error)
-            ? new ScriptEndedFeedback(cp, error, false, true)
-            : Parse(Variables, Properties, NormalizedScriptText,cp, attributes);
+        return string.IsNullOrEmpty(error)
+            ? Parse(Variables, Properties, NormalizedScriptText, new CurrentPosition(), attributes)
+            : new ScriptEndedFeedback(error, false, true, string.Empty);
     }
 
     #endregion

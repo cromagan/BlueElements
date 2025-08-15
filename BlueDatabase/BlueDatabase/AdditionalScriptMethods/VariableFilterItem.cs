@@ -82,14 +82,17 @@ public class VariableFilterItem : Variable {
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableFilterItem v) { return VerschiedeneTypen(variable); }
-		if (ReadOnly) { return Schreibgschützt(); }
-		FilterItem = v.FilterItem;
-		return string.Empty;
-	}
+        if (ReadOnly) { return Schreibgschützt(); }
+        FilterItem = v.FilterItem;
+        return string.Empty;
+    }
 
     protected override void SetValue(object? x) { }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+        return false;
+    }
 
     private void GetText() => _lastText = _filter == null || !_filter.IsOk() ? "Filter: [ERROR]" : "Filter: " + _filter.ReadableText();
 

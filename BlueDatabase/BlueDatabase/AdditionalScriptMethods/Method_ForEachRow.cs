@@ -51,7 +51,7 @@ internal class Method_ForEachRow : Method_Database {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(cdf); }
 
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf , scp);
+        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
 
         var varnam = "value";
@@ -62,23 +62,23 @@ internal class Method_ForEachRow : Method_Database {
 
         var vari = varCol.Get(varnam);
         if (vari != null) {
-            return new DoItFeedback(true, "Variable " + varnam + " ist bereits vorhanden.", cdf.LogData);
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, cdf);
         }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);
 
-        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback(needsScriptFix, $"Filter-Fehler: {failedReason}", cdf.LogData); }
+        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, cdf); }
 
         var r = allFi.Rows;
         allFi.Dispose();
 
         ScriptEndedFeedback? scx = null;
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method]);
 
         foreach (var thisl in r) {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEachRow-Schleife", cdf.CodeBlockAfterText, cdf.LogData.Line - 1, cdf.LogData.Subname, nv, null, "ForEachRow", cdf.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition("ForEachRow-Schleife", 0), cdf.CodeBlockAfterText, nv, null);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 
@@ -88,7 +88,7 @@ internal class Method_ForEachRow : Method_Database {
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

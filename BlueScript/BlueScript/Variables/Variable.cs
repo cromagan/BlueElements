@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static BlueBasics.Constants;
@@ -32,17 +33,18 @@ namespace BlueScript.Variables;
 
 public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyName {
 
-
-    public  string VerschiedeneTypen(Variable var2) =>    $"Variable '{KeyName}' ist nicht der erwartete Typ {var2.MyClassId}, sondern {MyClassId}";
-
-    public string Schreibgschützt() => $"Variable '{KeyName}' ist schreibgeschützt.";
-
-
     #region Fields
 
+    // Mit Caching für bessere Performance bei häufigen Aufrufen
+    private static readonly ConcurrentDictionary<Type, Variable> _instanceCache =
+        new ConcurrentDictionary<Type, Variable>();
+
     private static long _dummyCount;
+
     private static List<Variable>? _varTypes;
+
     private string _comment = string.Empty;
+
     private string _keyName = string.Empty;
 
     private bool _readOnly;
@@ -132,8 +134,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
             return "\"" + MyClassId + ";" + KeyName + "\"";
         }
         set {
-            var (cando, result) = TryParse(value, null, null);
-            if (!cando) {
+            if (!TryParseValue(value, out var result)) {
                 Develop.DebugPrint(ErrorType.Error, "Variablenfehler");
             }
             SetValue(result);
@@ -150,109 +151,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
         return "dummy" + _dummyCount;
     }
 
-    public static DoItFeedback GetVariableByParsing(string txt, CurrentPosition cp, VariableCollection? varCol, ScriptProperties scp) {
-        if (string.IsNullOrEmpty(txt)) { return new DoItFeedback("Kein Wert zum Parsen angekommen.", true, cp); }
-
-        if (txt.StartsWith("(")) {
-            var (pose, _) = NextText(txt, 0, KlammerRundZu, false, false, KlammernAlle);
-            if (pose < txt.Length - 1) {
-                // Wir haben so einen Fall: (true) || (true)
-                var scx = GetVariableByParsing(txt.Substring(1, pose - 1), cp, varCol, scp);
-                if (scx.Failed) {
-                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()");
-                    return scx;
-                }
-                if (scx.ReturnValue == null) {
-                    scx.ChangeFailedReason("Allgemeiner Befehls-Berechnungsfehler");
-                    return scx;
-                }
-                if (!scx.ReturnValue.ToStringPossible) {
-                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId);
-                    return scx;
-                }
-                return GetVariableByParsing(scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), cp, varCol, scp);
-            }
-        }
-
-        txt = txt.Trim(KlammernRund);
-
-        var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernAlle);
-        if (uu > 0) {
-            var scx = GetVariableByParsing(txt.Substring(0, uu), cp, varCol, scp);
-            if (scx.Failed || scx.ReturnValue is null or VariableUnknown) {
-                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt.Substring(0, uu)}");
-                return scx;
-            }
-
-            if (scx.ReturnValue.ValueForReplace == "false") { return scx; }
-            return GetVariableByParsing(txt.Substring(uu + 2), cp, varCol, scp);
-        }
-
-        var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernAlle);
-        if (oo > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, oo), cp, varCol, scp);
-            if (txt1.Failed || txt1.ReturnValue is null or VariableUnknown) {
-                return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, cp);
-            }
-
-            if (txt1.ReturnValue.ValueForReplace == "true") {
-                return txt1;
-            }
-            return GetVariableByParsing(txt.Substring(oo + 2), cp, varCol, scp);
-        }
-
-        // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
-        if (varCol is { }) {
-            var t = Method.ReplaceVariable(txt, varCol, cp);
-            if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", t.NeedsScriptFix, cp); }
-            if (t.ReturnValue != null) { return new DoItFeedback(t.ReturnValue, new CurrentPosition(cp.Subname, cp.Position + txt.Length)); }
-            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, cp, varCol, scp); }
-
-            var t2 = Method.ReplaceCommandsAndVars(txt, varCol, cp, scp);
-            if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", t2.NeedsScriptFix, cp); }
-            if (t2.ReturnValue != null) { return new DoItFeedback(t2.ReturnValue, new CurrentPosition(cp.Subname, cp.Position + txt.Length)); }
-            if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, cp, varCol, scp); }
-        }
-
-        var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
-        if (posa > -1) {
-            var (pose, _) = NextText(txt, posa, KlammerRundZu, false, false, KlammernAlle);
-            if (pose <= posa) { return DoItFeedback.KlammerFehler(cp); }
-
-            var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
-            if (!string.IsNullOrEmpty(tmptxt)) {
-                var scx = GetVariableByParsing(tmptxt, cp, varCol, scp);
-                if (scx.Failed) {
-                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()");
-                    return scx;
-                }
-                if (scx.ReturnValue == null) {
-                    scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()");
-                    return scx;
-                }
-                if (!scx.ReturnValue.ToStringPossible) {
-                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId);
-                    return scx;
-                }
-                return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), cp, varCol, scp);
-            }
-        }
-
-        //if (VarTypes == null) {
-        //    return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
-        //}
-
-        foreach (var thisVt in VarTypes) {
-            if (thisVt.GetFromStringPossible) {
-                if (thisVt.TryParse(txt, out var v, varCol, scp) && v != null) {
-                    return new DoItFeedback(v, new CurrentPosition(cp.Subname, cp.Position + txt.Length));
-                }
-            }
-        }
-
-        return new DoItFeedback("Wert kann nicht geparsed werden: " + txt, true, cp);
-    }
-
     public static bool IsValidName(string v) {
         v = v.ToLowerInvariant();
         var vo = v;
@@ -263,6 +161,11 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
             if (thisc.Command.Equals(v)) { return false; }
         }
         return true;
+    }
+
+    public static bool TryParseValue<T>(string txt, out object? result) where T : Variable, new() {
+        var instance = _instanceCache.GetOrAdd(typeof(T), _ => new T());
+        return instance.TryParseValue(txt, out result);
     }
 
     public int CompareTo(object obj) {
@@ -326,15 +229,12 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
             ? txt
             : txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
 
+    public string Schreibgschützt() => $"Variable '{KeyName}' ist schreibgeschützt.";
+
     public new string ToString() => $"({MyClassId}){_keyName}";
 
-    protected abstract void SetValue(object? x);
-
-    protected abstract (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp);
-
-    protected bool TryParse(string txt, out Variable? succesVar, VariableCollection? varCol, ScriptProperties scp) {
-        var (cando, result) = TryParse(txt, varCol, scp);
-        if (!cando) {
+    public bool TryParse(string txt, out Variable? succesVar) {
+        if (!TryParseValue(txt, out var result) || result == null) {
             succesVar = null;
             return false;
         }
@@ -352,6 +252,12 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
 
         return true;
     }
+
+    public string VerschiedeneTypen(Variable var2) => $"Variable '{KeyName}' ist nicht der erwartete Typ {var2.MyClassId}, sondern {MyClassId}";
+
+    protected abstract void SetValue(object? x);
+
+    protected abstract bool TryParseValue(string txt, out object? result);
 
     #endregion
 }

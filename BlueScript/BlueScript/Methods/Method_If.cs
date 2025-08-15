@@ -23,6 +23,7 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.Constants;
+using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
@@ -60,31 +61,6 @@ public class Method_If : Method {
 
     #region Methods
 
-    public static bool? GetBool(string txt) {
-        txt = txt.Trim(KlammernRund);
-
-        //            if (txt.Value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
-        //                txt.Value.Equals("false", StringComparison.OrdinalIgnoreCase)) {
-        //                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
-        //                ValueString = txt.Value;
-        //                Type = VariableDataType.Bool;
-        //                Readonly = true;
-        //                return;
-        //            }
-
-        switch (txt.ToLowerInvariant()) {
-            case "!false":
-            case "true":
-                return true;
-
-            case "!true":
-            case "false":
-                return false;
-        }
-
-        return null;
-    }
-
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
         var m = new List<Method>();
         foreach (var thism in scp.AllowedMethods) {
@@ -93,13 +69,13 @@ public class Method_If : Method {
             }
         }
 
-        var scpt = new ScriptProperties(scp, m, scp.Stufe + 1, scp.Chain);
+        var scpt = new ScriptProperties(scp, m);
 
         var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scpt);
         if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, cdf); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = Method_CallByFilename.CallSub(varCol, scp, new CurrentPosition("If-Befehl-Inhalt", 0), cdf.CodeBlockAfterText, null, null, "If");
+            var scx = Method_CallByFilename.CallSub(varCol, scp, new CurrentPosition("If-Befehl-Inhalt", 0), cdf.CodeBlockAfterText, null, null);
             return scx; // If muss die Breaks und Endsripts erhalten!
         }
 

@@ -43,12 +43,13 @@ public class DoItFeedback : CurrentPosition {
         }
     }
 
-    public DoItFeedback() : base("Main", 0) { }
+    public DoItFeedback() : base() { }
+
     public DoItFeedback(CurrentPosition cp) : base(cp) { }
+
     public DoItFeedback(Variable variable, CurrentPosition cp) : base(cp) {
         ReturnValue = variable;
     }
-
 
     public DoItFeedback(string failedReason, bool needsScriptFix, CurrentPosition? cp) : this(needsScriptFix, false, false, failedReason, null, cp) { }
 
@@ -79,7 +80,6 @@ public class DoItFeedback : CurrentPosition {
     public bool ReturnFired { get; private set; } = false;
     public Variable? ReturnValue { get; private set; } = null;
 
-
     #endregion
 
     #region Methods
@@ -100,8 +100,6 @@ public class DoItFeedback : CurrentPosition {
     public static DoItFeedback Schreibgschützt(CurrentPosition cp) => new("Variable ist schreibgeschützt.", true, cp);
 
     public static DoItFeedback TestModusInaktiv(CurrentPosition cp) => new("Im Testmodus deaktiviert.", true, cp);
-
-
 
     public static DoItFeedback Wahr(CurrentPosition cp) => new(true, cp);
 

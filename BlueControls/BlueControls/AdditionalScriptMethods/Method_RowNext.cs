@@ -53,7 +53,7 @@ public class Method_RowNext : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         var mr = MyRow(scp);
         if (mr is not { IsDisposed: false }) { return DoItFeedback.InternerFehler(ld); }
 
@@ -74,11 +74,11 @@ public class Method_RowNext : Method_Database {
             r.AddRange(myDb.Row);
         }
 
-        if (r.Count < 2) { return Method_Row.RowToObjectFeedback(null); }
+        if (r.Count < 2) { return Method_Row.RowToObjectFeedback(null, ld); }
 
         if (mr.Database != r[0].Database) { return new DoItFeedback("Filterfehler, falsche Datenbank", true, ld); }
 
-        if (!r.Contains(mr)) { return Method_Row.RowToObjectFeedback(null); }
+        if (!r.Contains(mr)) { return Method_Row.RowToObjectFeedback(null, ld); }
 
         var rsd = new RowSortDefinition(myDb, column, attvar.ValueBoolGet(1));
         var (rows, _) = Table.CalculateSortedRows(myDb, r, null, rsd);
@@ -93,8 +93,8 @@ public class Method_RowNext : Method_Database {
         }
 
         return givebackrow < 0 || givebackrow >= rows.Count
-            ? Method_Row.RowToObjectFeedback(null)
-            : Method_Row.RowToObjectFeedback(rows[givebackrow].Row);
+            ? Method_Row.RowToObjectFeedback(null, ld)
+            : Method_Row.RowToObjectFeedback(rows[givebackrow].Row, ld);
     }
 
     #endregion

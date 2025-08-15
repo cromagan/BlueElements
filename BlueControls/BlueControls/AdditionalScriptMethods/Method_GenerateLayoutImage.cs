@@ -48,7 +48,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
 
         #region  Meine Zeile ermitteln (r)
 
@@ -80,7 +80,7 @@ public class Method_GenerateLayoutImage : Method_Database {
         var scx = l.ReplaceVariables(r);
 
         if (scx.Failed) {
-            scx.ChangeFailedReason("Generierung fehlgeschlagen", ld);
+            scx.ChangeFailedReason("Generierung fehlgeschlagen");
             return scx;
         }
 

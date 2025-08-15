@@ -102,19 +102,21 @@ public class VariableDouble : Variable {
         }
     }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
+    protected override bool TryParseValue(string txt, out object? result) {
         var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernAlle);
         if (pos2 >= 0) {
             var erg = MathFormulaParser.Ergebnis(txt);
-            if (erg == null) { return (false, null); }
+            if (erg == null) { result = null; return false; }
             txt = erg.ToString();
         }
 
         if (DoubleTryParse(txt, out var zahl)) {
-            return (true, zahl);
+            result = zahl;
+            return true;
         }
 
-        return (false, null);
+        result = null;
+        return false;
     }
 
     #endregion

@@ -53,7 +53,7 @@ public class Method_RowFirstLatest : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, myDb, scp.ScriptName, true);
@@ -67,11 +67,11 @@ public class Method_RowFirstLatest : Method_Database {
         var column = db.Column[attvar.ValueStringGet(0)];
         if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Name(0), true, ld); }
 
-        if (r.Count < 1) { return Method_Row.RowToObjectFeedback(null); }
+        if (r.Count < 1) { return Method_Row.RowToObjectFeedback(null, ld); }
 
         var rsd = new RowSortDefinition(db, column, attvar.ValueBoolGet(1));
         var (rows, _) = Table.CalculateSortedRows(db, r, null, rsd);
-        return Method_Row.RowToObjectFeedback(rows[0].Row);
+        return Method_Row.RowToObjectFeedback(rows[0].Row, ld);
     }
 
     #endregion

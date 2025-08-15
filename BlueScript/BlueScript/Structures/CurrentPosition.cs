@@ -25,6 +25,8 @@ public class CurrentPosition {
 
     #region Constructors
 
+    public CurrentPosition() : this("Main", 0) { }
+
     public CurrentPosition(string subname, int position) {
         Subname = subname;
         Position = position;
@@ -33,12 +35,12 @@ public class CurrentPosition {
     public CurrentPosition(CurrentPosition? cp) {
         Subname = cp?.Subname ?? "Main";
         Position = cp?.Position ?? 0;
-        Protokoll = cp?.Protokoll ?? string.Empty;
+        Protocol = cp?.Protocol ?? string.Empty;
         Chain = cp?.Chain ?? string.Empty;
     }
 
     public CurrentPosition(CurrentPosition? cp, string failedreason) : this(cp) {
-        Protokoll = failedreason + "\r\n" + Protokoll;
+        Protocol = failedreason + "\r\n" + Protocol;
     }
 
     #endregion
@@ -49,8 +51,9 @@ public class CurrentPosition {
 
     public int Position { get; } = -1;
 
-    public string Protokoll { get; } = string.Empty;
+    public string Protocol { get; } = string.Empty;
 
+    public int Stufe => Chain.CountChar('\\', null);
     public string Subname { get; } = string.Empty;
 
     #endregion

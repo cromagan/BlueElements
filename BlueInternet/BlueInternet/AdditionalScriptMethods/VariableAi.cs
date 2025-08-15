@@ -74,14 +74,17 @@ public class VariableAi : Variable {
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableAi v) { return VerschiedeneTypen(variable); }
-		if (ReadOnly) { return Schreibgschützt(); }
-		ValueClient = v.ValueClient;
-		return string.Empty;
-	}
+        if (ReadOnly) { return Schreibgschützt(); }
+        ValueClient = v.ValueClient;
+        return string.Empty;
+    }
 
     protected override void SetValue(object? x) { }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+        return false;
+    }
 
     #endregion
 }

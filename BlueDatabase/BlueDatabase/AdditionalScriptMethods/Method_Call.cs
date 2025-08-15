@@ -64,7 +64,7 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var vs = attvar.ValueStringGet(0);
@@ -97,10 +97,10 @@ internal class Method_Call : Method_Database, IUseableForButton {
         //Diese Routine kann nicht benutzt werden, weil sie die Zeilenvariableen neu erstellt
         //        var scx = myDb.ExecuteScript(null, vs, scp.ProduktivPhase, null, a, true, true);
 
-        var scx = Method_CallByFilename.CallSub(varCol, scp, "Subroutinen-Aufruf [" + vs + "]", f, 0, vs, null, a, vs, ld);
+        var scx = Method_CallByFilename.CallSub(varCol, scp, new CurrentPosition("Subroutinen-Aufruf [" + vs + "]", 0), f, null, a);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
-            Database.UpdateScript(sc, failedReason: scx.ProtocolText);
+            Database.UpdateScript(sc, failedReason: scx.Protocol);
             return new DoItFeedback($"Unterskript '{sc.KeyName}' hat Fehler verursacht.", false, ld);
         }
         return scx;

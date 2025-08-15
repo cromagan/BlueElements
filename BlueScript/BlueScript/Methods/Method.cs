@@ -156,6 +156,110 @@ public abstract class Method : IReadableTextWithKey {
         return m;
     }
 
+    public static DoItFeedback GetVariableByParsing(string txt, CurrentPosition cp, VariableCollection? varCol, ScriptProperties scp) {
+        if (string.IsNullOrEmpty(txt)) { return new DoItFeedback("Kein Wert zum Parsen angekommen.", true, cp); }
+
+        if (txt.StartsWith("(")) {
+            var (pose, _) = NextText(txt, 0, KlammerRundZu, false, false, KlammernAlle);
+            if (pose < txt.Length - 1) {
+                // Wir haben so einen Fall: (true) || (true)
+                var scx = GetVariableByParsing(txt.Substring(1, pose - 1), cp, varCol, scp);
+                if (scx.Failed) {
+                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()");
+                    return scx;
+                }
+                if (scx.ReturnValue == null) {
+                    scx.ChangeFailedReason("Allgemeiner Befehls-Berechnungsfehler");
+                    return scx;
+                }
+                if (!scx.ReturnValue.ToStringPossible) {
+                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId);
+                    return scx;
+                }
+                return GetVariableByParsing(scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), cp, varCol, scp);
+            }
+        }
+
+        txt = txt.Trim(KlammernRund);
+
+        var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernAlle);
+        if (uu > 0) {
+            var scx = GetVariableByParsing(txt.Substring(0, uu), cp, varCol, scp);
+            if (scx.Failed || scx.ReturnValue is null or VariableUnknown) {
+                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt.Substring(0, uu)}");
+                return scx;
+            }
+
+            if (scx.ReturnValue.ValueForReplace == "false") { return scx; }
+            return GetVariableByParsing(txt.Substring(uu + 2), cp, varCol, scp);
+        }
+
+        var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernAlle);
+        if (oo > 0) {
+            var txt1 = GetVariableByParsing(txt.Substring(0, oo), cp, varCol, scp);
+            if (txt1.Failed || txt1.ReturnValue is null or VariableUnknown) {
+                return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, cp);
+            }
+
+            if (txt1.ReturnValue.ValueForReplace == "true") {
+                return txt1;
+            }
+            return GetVariableByParsing(txt.Substring(oo + 2), cp, varCol, scp);
+        }
+
+        // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
+        if (varCol is { }) {
+            var t = Method.ReplaceVariable(txt, varCol, cp);
+            if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", t.NeedsScriptFix, cp); }
+            if (t.ReturnValue != null) { return new DoItFeedback(t.ReturnValue, new CurrentPosition(cp.Subname, cp.Position + txt.Length)); }
+            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, cp, varCol, scp); }
+
+            var t2 = Method.ReplaceCommandsAndVars(txt, varCol, cp, scp);
+            if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", t2.NeedsScriptFix, cp); }
+            if (t2.ReturnValue != null) { return new DoItFeedback(t2.ReturnValue, new CurrentPosition(cp.Subname, cp.Position + txt.Length)); }
+            if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, cp, varCol, scp); }
+        }
+
+        var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
+        if (posa > -1) {
+            var (pose, _) = NextText(txt, posa, KlammerRundZu, false, false, KlammernAlle);
+            if (pose <= posa) { return DoItFeedback.KlammerFehler(cp); }
+
+            var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
+            if (!string.IsNullOrEmpty(tmptxt)) {
+                var scx = GetVariableByParsing(tmptxt, cp, varCol, scp);
+                if (scx.Failed) {
+                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()");
+                    return scx;
+                }
+                if (scx.ReturnValue == null) {
+                    scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()");
+                    return scx;
+                }
+                if (!scx.ReturnValue.ToStringPossible) {
+                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId);
+                    return scx;
+                }
+                return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), cp, varCol, scp);
+            }
+        }
+
+        var (cando, result) = TryParse(txt, varCol, scp);
+        if (cando) {
+            return new DoItFeedback(result, cp);
+        }
+
+        foreach (var thisVt in Variable.VarTypes) {
+            if (thisVt.GetFromStringPossible) {
+                if (thisVt.TryParse(txt, out var v) && v != null) {
+                    return new DoItFeedback(v, new CurrentPosition(cp.Subname, cp.Position + txt.Length));
+                }
+            }
+        }
+
+        return new DoItFeedback("Wert kann nicht geparsed werden: " + txt, true, cp);
+    }
+
     public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, CurrentPosition cdf, ScriptProperties scp) {
         List<string> toSearch = [];
 
@@ -180,12 +284,12 @@ public abstract class Method : IReadableTextWithKey {
         var posc = 0;
         do {
             var (pos, _) = NextText(txt, posc, toSearch, true, false, KlammernAlle);
-            if (pos < 0) { return new GetEndFeedback(cdf , txt); }
+            if (pos < 0) { return new GetEndFeedback(cdf, txt); }
 
             var scx = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, cdf);
             if (scx.Failed) {
-                Develop.Message?.Invoke( BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage,   BlueBasics.Enums.ImageCode.Kritisch,  "Skript-Fehler: " + scx.FailedReason, scp.Stufe);
-                return new GetEndFeedback( cdf,$"Durch Befehl abgebrochen: {txt} -> {scx.FailedReason}", scx.NeedsScriptFix); 
+                Develop.Message?.Invoke(BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Skript-Fehler: " + scx.FailedReason, cdf.Stufe);
+                return new GetEndFeedback(cdf, $"Durch Befehl abgebrochen: {txt} -> {scx.FailedReason}", scx.NeedsScriptFix);
             }
 
             if (pos == 0 && txt.Length == scx.Position) { return new GetEndFeedback(cdf, scx.ReturnValue); }
@@ -261,7 +365,7 @@ public abstract class Method : IReadableTextWithKey {
                 v = varcol?.Get(varn);
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
             } else {
-                var tmp2 = Variable.GetVariableByParsing(attributes[n], cp, varcol, scp);
+                var tmp2 = GetVariableByParsing(attributes[n], cp, varcol, scp);
                 if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Berechnungsfehler bei Attribut {n + 1} {tmp2.FailedReason}", tmp2.NeedsScriptFix); }
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
@@ -294,7 +398,7 @@ public abstract class Method : IReadableTextWithKey {
     /// <param name="newcommand">Erwartet wird: X=5;</param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
-    public static CurrentPosition VariablenBerechnung(VariableCollection varCol, CurrentPosition cp, ScriptProperties scp, string newcommand, bool generateVariable) {
+    public static DoItFeedback VariablenBerechnung(VariableCollection varCol, CurrentPosition cp, ScriptProperties scp, string newcommand, bool generateVariable) {
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
 
         if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen", true, cp); }
@@ -334,9 +438,8 @@ public abstract class Method : IReadableTextWithKey {
                 return DoItFeedback.InternerFehler(cp);
             }
 
-
             var f = vari.GetValueFrom(v);
-            if(!string.IsNullOrEmpty(f)) { return new DoItFeedback(f, true, cp); }
+            if (!string.IsNullOrEmpty(f)) { return new DoItFeedback(f, true, cp); }
 
             return new DoItFeedback(v, new CurrentPosition(cp.Subname, cp.Position + newcommand.Length));
         }
@@ -382,7 +485,7 @@ public abstract class Method : IReadableTextWithKey {
     }
 
     public virtual DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf , scp);
+        var attvar = SplitAttributeToVars(varCol, cdf.AttributText, Args, LastArgMinCount, cdf, scp);
         return attvar.Failed
             ? DoItFeedback.AttributFehler(cdf, this, attvar)
             : DoIt(varCol, attvar, scp, cdf);
@@ -490,6 +593,125 @@ public abstract class Method : IReadableTextWithKey {
         #endregion Liste der Attribute splitten
 
         return attributes;
+    }
+
+    private static (bool cando, bool result) TryParse(string txt, VariableCollection varCol, ScriptProperties scp) {
+        if (VariableBool.TryParseValue<VariableBool>(txt, out var result) && result is bool b) { return (true, b); }
+
+        #region Auf Restliche Boolsche Operationen testen
+
+        //foreach (var check in Method_if.VergleichsOperatoren) {
+        var (i, check) = NextText(txt, 0, Method_If.VergleichsOperatoren, false, false, KlammernAlle);
+        if (i > -1) {
+            if (i < 1 && check != "!") {
+                return (false, false);//new DoItFeedback(infos.LogData, s, "Operator (" + check + ") am String-Start nicht erlaubt: " + txt);
+            } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
+
+            if (i >= txt.Length - 1) {
+                return (false, false);//new DoItFeedback(infos.LogData, s, "Operator (" + check + ") am String-Ende nicht erlaubt: " + txt);
+            } // siehe oben
+
+            #region Die Werte vor und nach dem Trennzeichen in den Variablen v1 und v2 ablegen
+
+            #region Ersten Wert als s1 ermitteln
+
+            var s1 = txt.Substring(0, i);
+            Variable? v1 = null;
+            if (!string.IsNullOrEmpty(s1)) {
+                var tmp1 = GetVariableByParsing(s1, null, varCol, scp);
+                if (tmp1.Failed) { return (false, false); }//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
+
+                v1 = tmp1.ReturnValue;
+            } else {
+                if (check != "!") { return (false, false); }//new DoItFeedback(infos.LogData, s, "Wert vor Operator (" + check + ") nicht gefunden: " + txt);
+            }
+
+            #endregion
+
+            #region Zweiten Wert als s2 ermitteln
+
+            var s2 = txt.Substring(i + check.Length);
+            if (string.IsNullOrEmpty(s2)) { return (false, false); }//new DoItFeedback(infos.LogData, s, "Wert nach Operator (" + check + ") nicht gefunden: " + txt);
+
+            var tmp2 = GetVariableByParsing(s2, null, varCol, scp);
+            if (tmp2.Failed) {
+                return (false, false);//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
+            }
+
+            var v2 = tmp2.ReturnValue;
+
+            #endregion
+
+            // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
+            if (v1 != null) {
+                if (v1.MyClassId != v2?.MyClassId) { return (false, false); }// return new DoItFeedback(infos.LogData, s, "Typen unterschiedlich: " + txt);
+
+                if (!v1.ToStringPossible) { return (false, false); }// return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+            } else {
+                if (v2 is not VariableBool) { return (false, false); }// return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+            }
+
+            #endregion
+
+            switch (check) {
+                case "==": {
+                        if (v1 == null) { return (false, false); }
+                        return (true, v1.ValueForReplace == v2.ValueForReplace);
+                    }
+
+                case "!=": {
+                        if (v1 == null) { return (false, false); }
+                        return (true, v1.ValueForReplace != v2.ValueForReplace);
+                    }
+
+                case ">=": {
+                        if (v1 is not VariableDouble v1Fl) { return (false, false); } //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableDouble v2Fl) { return (false, false); }  //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        return (true, v1Fl.ValueNum >= v2Fl.ValueNum);
+                    }
+
+                case "<=": {
+                        if (v1 is not VariableDouble v1Fl) { return (false, false); } //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableDouble v2Fl) { return (false, false); }  //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        return (true, v1Fl.ValueNum <= v2Fl.ValueNum);
+                    }
+
+                case "<": {
+                        if (v1 is not VariableDouble v1Fl) { return (false, false); } //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableDouble v2Fl) { return (false, false); }  //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        return (true, v1Fl.ValueNum < v2Fl.ValueNum);
+                    }
+
+                case ">": {
+                        if (v1 is not VariableDouble v1Fl) { return (false, false); } //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableDouble v2Fl) { return (false, false); }  //  return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        return (true, v1Fl.ValueNum > v2Fl.ValueNum);
+                    }
+
+                case "||": {
+                        if (v1 is not VariableBool v1Bo) { return (false, false); }                            // return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableBool v2Bo) { return (false, false); }// return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        return (true, v1Bo.ValueBool || v2Bo.ValueBool);
+                    }
+
+                case "&&": {
+                        if (v1 is not VariableBool v1Bo) { return (false, false); }  // return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableBool v2Bo) { return (false, false); }                                // return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        return (true, v1Bo.ValueBool && v2Bo.ValueBool);
+                    }
+
+                case "!": {
+                        // S1 dürfte eigentlich nie was sein: !False||!false
+                        // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
+                        if (v2 is not VariableBool v2Bo) { return (false, false); }   // return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        return (true, !v2Bo.ValueBool);
+                    }
+            }
+        }
+
+        #endregion
+
+        return (false, false);
     }
 
     #endregion

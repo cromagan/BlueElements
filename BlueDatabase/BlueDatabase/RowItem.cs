@@ -666,6 +666,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, bool important, string reason) {
+        var cp = new CurrentPosition();
+
         if (IsDisposed || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
         if (!important && Database.ExecutingScriptAnyDatabase.Count > 0) { return new ScriptEndedFeedback("Andere Skripte werden ausgeführt", false, false, "Allgemein"); }
@@ -681,7 +683,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         if (db.Column.SysRowState is not { IsDisposed: false } srs) {
-            return new ScriptEndedFeedback([], RepairAllLinks());
+            return new ScriptEndedFeedback(cp, [], RepairAllLinks());
         }
 
         if (!db.CanDoValueChangedScript(true)) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
@@ -704,7 +706,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             var reas = RepairAllLinks();
 
             if (!string.IsNullOrEmpty(reas)) {
-                return new ScriptEndedFeedback([], reas);
+                return new ScriptEndedFeedback(cp, [], reas);
             }
 
             CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden

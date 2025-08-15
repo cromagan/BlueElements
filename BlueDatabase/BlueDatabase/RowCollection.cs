@@ -480,7 +480,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 rows.Clear();
                 Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
                 Develop.Message?.Invoke(ErrorType.Warning, db, "Database", ImageCode.Skript, "Skript fehlerhaft bei " + w, 0);
-                return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol[0];
+                return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol;
             }
 
             rows.RemoveAt(0);

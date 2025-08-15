@@ -3004,7 +3004,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (t is { Failed: false }) {
             MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
         } else {
-            MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.FailedReason}<br><br>{t.Protocol.JoinWithCr()}", ImageCode.Kreuz, "Ok");
+            MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.FailedReason}<br><br>{t.Protocol}", ImageCode.Kreuz, "Ok");
         }
     }
 

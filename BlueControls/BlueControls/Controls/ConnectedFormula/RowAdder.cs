@@ -131,12 +131,12 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
         var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
 
-        var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, "Row-Adder", "Row-Adder");
+        var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, "Row-Adder");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        var scf = sc.Parse(0, "Main", null);
+        var scf = sc.Parse(null);
 
         if (scf.Failed) {
             if (Generic.UserGroup == Constants.Administrator) {
@@ -152,7 +152,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     " ",
                     //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
                     " ",
-                    scf.ProtocolText
+                    scf.Protocol
                 ];
                 _ = l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
             }
@@ -462,7 +462,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         var scf = ExecuteScript(Script_MenuGeneration, Mode, EntityID, rowIn, true, "MenuGeneration");
 
         if (scf.Failed) {
-            return "Interner Fehler: Skript Menu Generation fehlerhaft; " + scf.ProtocolText;
+            return "Interner Fehler: Skript Menu Generation fehlerhaft; " + scf.Protocol;
         }
 
         var menu = scf.Variables?.GetList("Menu");

@@ -40,7 +40,7 @@ public class ScriptEndedFeedback : DoItFeedback {
     /// <param name="giveitanothertry"></param>
     /// <param name="needsScriptFix"></param>
     /// <param name="scriptname"></param>
-    public ScriptEndedFeedback(CurrentPosition cp, string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base(needsScriptFix, false, true, $"[{scriptname},Start abgebrochen] {failedReason}", null, cp) {
+    public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base(needsScriptFix, false, true, $"[{scriptname},Start abgebrochen] {failedReason}", null, new CurrentPosition()) {
         Variables = null;
         GiveItAnotherTry = giveitanothertry;
     }
@@ -62,5 +62,4 @@ public class ScriptEndedFeedback : DoItFeedback {
     public VariableCollection? Variables { get; }
 
     #endregion
-
 }

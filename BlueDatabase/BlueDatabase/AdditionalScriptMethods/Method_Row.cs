@@ -78,17 +78,17 @@ public class Method_Row : Method_Database, IUseableForButton {
 
     public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
 
-    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
+    public static DoItFeedback RowToObjectFeedback(RowItem? row, CurrentPosition cp) => new(new VariableRowItem(row), cp);
 
-    public static DoItFeedback UniqueRow(FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp, LogData ld) {
-        if (invalidateinDays < 0.01) { return new DoItFeedback(true, "Intervall zu kurz.", ld); }
+    public static DoItFeedback UniqueRow(FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp, CurrentPosition ld) {
+        if (invalidateinDays < 0.01) { return new DoItFeedback("Intervall zu kurz.", true, ld); }
 
-        if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback(true, "Fehler in der Filter", ld); }
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback(true, "Zeilen-Status-Spalte nicht gefunden", ld); }
+        if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Filter", true, ld); }
+        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback("Zeilen-Status-Spalte nicht gefunden", true, ld); }
 
         foreach (var thisFi in fic) {
             if (thisFi.Column is not { IsDisposed: false } c) {
-                return new DoItFeedback(true, "Fehler im Filter, Spalte ungültig", ld);
+                return new DoItFeedback("Fehler im Filter, Spalte ungültig", true, ld);
             }
 
             //if (thisFi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) {
@@ -100,15 +100,15 @@ public class Method_Row : Method_Database, IUseableForButton {
             //}
 
             if (FilterCollection.InitValue(c, true, fic.ToArray()) is not { } l) {
-                return new DoItFeedback(true, "Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.", ld);
+                return new DoItFeedback("Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.", true, ld);
             }
 
             if (thisFi.SearchValue[0] != l) {
-                return new DoItFeedback(true, "Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')", ld);
+                return new DoItFeedback("Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')", true, ld);
             }
         }
 
-        Develop.Message?.Invoke(ErrorType.DevelopInfo, null,  scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
+        Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {ld.Chain}\\Row-Befehl: {fic.ReadableText()}", ld.Stufe);
 
         RowItem? newrow;
 
@@ -127,7 +127,7 @@ public class Method_Row : Method_Database, IUseableForButton {
             } while (true);
 
             t.Stop();
-            if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(false, message, ld); }
+            if (!string.IsNullOrEmpty(message)) { return new DoItFeedback(message, false, ld); }
         } else {
             if (fic.Rows.Count != 1) { return DoItFeedback.TestModusInaktiv(ld); }
             newrow = fic.Rows[0];
@@ -138,19 +138,19 @@ public class Method_Row : Method_Database, IUseableForButton {
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 var m = CellCollection.GrantWriteAccess(srs, r, fic.ChunkVal, 120, false);
-                if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(false, $"Datenbanksperre: {m}", ld); }
+                if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {
-                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
+                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {ld.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", ld.Stufe);
             }
         } else {
-            return new DoItFeedback(false, "Zeile konnte nicht angelegt werden", ld);
+            return new DoItFeedback("Zeile konnte nicht angelegt werden", false, ld);
         }
 
-        return RowToObjectFeedback(newrow);
+        return RowToObjectFeedback(newrow, ld);
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);

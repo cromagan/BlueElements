@@ -104,11 +104,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
     #region Methods
 
-   
-
-
-    
-
     /// <summary>
     /// Gibt TRUE zuück, wenn eine Fehlernachricht angezeigt wurde.
     /// </summary>
@@ -124,10 +119,6 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         MessageBox.Show("Aktion nicht möglich:<br>" + m);
         return true;
     }
-
- 
-
-
 
     public static void OpenLayoutEditor(Database db, string layoutToOpen) {
         var x = db.CanWriteMainFile();
@@ -445,8 +436,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     /// <returns></returns>
     protected bool SwitchTabToDatabase(Database? database) => database is not null && !database.IsDisposed && SwitchTabToDatabase(database.TableName);
 
-    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {   }
-
+    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) { }
 
     protected virtual void Table_DatabaseChanged(object sender, System.EventArgs e) {
         Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
@@ -773,7 +763,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
             } else {
                 //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
                 var s = db.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
-                m = s.Protocol.JoinWithCr();
+                m = s.Protocol;
             }
 
             lstAufgaben.Enabled = true;

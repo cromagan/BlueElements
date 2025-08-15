@@ -117,19 +117,21 @@ public class VariableListString : Variable {
         }
     }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
+    protected override bool TryParseValue(string txt, out object? result) {
         if (txt.Length > 1 && txt.StartsWith("[") && txt.EndsWith("]")) {
             var t = txt.Trim(KlammernEckig);
 
-            if (string.IsNullOrEmpty(t)) { return (true, new List<string>()); } // Leere Liste
+            if (string.IsNullOrEmpty(t)) { result = new List<string>(); return true; } // Leere Liste
 
-            var l = Method.SplitAttributeToVars(vs, t, [[VariableString.ShortName_Plain]], 1, null, scp);
-            if (l.Failed) { return (false, null); }
+            var l = Method.SplitAttributeToVars(null, t, [[VariableString.ShortName_Plain]], 1, null, null);
+            if (l.Failed) { result = null; return false; }
 
-            return (true, l.Attributes.AllStringValues());
+            result = l.Attributes.AllStringValues();
+            return true;
         }
 
-        return (false, null);
+        result = null;
+        return false;
     }
 
     #endregion

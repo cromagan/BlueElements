@@ -46,10 +46,15 @@ public class VariableUnknown : Variable {
     #region Properties
 
     public static string ClassId => "ukn";
+
     public static string ShortName_Plain => "ukn";
+
     public static string ShortName_Variable => "*ukn";
+
     public override int CheckOrder => 100;
+
     public override bool GetFromStringPossible => true;
+
     public override bool IsNullOrEmpty => false;
 
     /// <summary>
@@ -58,6 +63,7 @@ public class VariableUnknown : Variable {
     public override string ReadableText => "[unknown]";
 
     public override string SearchValue => ReadableText;
+
     public override bool ToStringPossible => false;
 
     /// <summary>
@@ -85,8 +91,8 @@ public class VariableUnknown : Variable {
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableUnknown) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
-		return string.Empty;
-	}
+        return string.Empty;
+    }
 
     protected override void SetValue(object? x) {
         if (x is string val) {
@@ -96,11 +102,9 @@ public class VariableUnknown : Variable {
         }
     }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
-        if (scp != null) {
-            Develop.Message?.Invoke(ErrorType.Info, null, scp.MainInfo, ImageCode.Formel, "Unbekannte Variable erstellt (ukn): " + txt, scp.Stufe);
-        }
-        return (true, txt);
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+        return false;
     }
 
     #endregion

@@ -91,10 +91,10 @@ public class VariableString : Variable {
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableString v) { return VerschiedeneTypen(variable); }
-		if (ReadOnly) { return Schreibgschützt(); }
-		ValueString = v.ValueString;
-		return string.Empty;
-	}
+        if (ReadOnly) { return Schreibgschützt(); }
+        ValueString = v.ValueString;
+        return string.Empty;
+    }
 
     protected override void SetValue(object? x) {
         if (x is string val) {
@@ -104,15 +104,17 @@ public class VariableString : Variable {
         }
     }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
+    protected override bool TryParseValue(string txt, out object? result) {
         if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
             var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
             tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
-            if (tmp.Contains("\"")) { return (false, null); } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+            if (tmp.Contains("\"")) { result = null; return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
 
-            return (true, tmp);
+            result = tmp;
+            return true;
         }
-        return (false, null);
+        result = null;
+        return false;
     }
 
     #endregion

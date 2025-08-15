@@ -1385,7 +1385,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (script == null) {
             // Wenn keine DatabaseScriptDescription ankommt, hat die Vorroutine entschieden, dass alles ok ist
             var vars = CreateVariableCollection(row, true, dbVariables, true, false);
-            return new ScriptEndedFeedback(vars, string.Empty);
+            return new ScriptEndedFeedback(new CurrentPosition(), vars, string.Empty);
         }
 
         if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback("Das Skript ist fehlerhaft.", false, true, name); }
@@ -1424,13 +1424,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (row is { IsDisposed: false }) { ki = ki + "\\" + row.CellFirstString(); }
 
-            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, script.KeyName, ki);
+            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, ki);
 
             var sc = new Script(vars, scp) {
                 ScriptText = script.Script
             };
 
-            var scf = sc.Parse(0, script.KeyName, attributes);
+            var scf = sc.Parse(attributes);
 
             #endregion
 
@@ -1450,7 +1450,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
 
                 if (produktivphase && !ignoreError) {
-                    t = t + "\r\n\r\n\r\n" + scf.ProtocolText;
+                    t = t + "\r\n\r\n\r\n" + scf.Protocol;
                 }
 
                 UpdateScript(script, failedReason: t);
@@ -1551,6 +1551,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
         try {
             scriptname ??= string.Empty;
+            var cp = new CurrentPosition();
 
             if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
                 Develop.DebugPrint(ErrorType.Error, "Event und Skript angekommen!");

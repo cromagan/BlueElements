@@ -831,7 +831,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public ScriptEndedFeedback ReplaceVariables(RowItem? row) {
-        if (row is not { IsDisposed: false }) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
+        if (row is not { IsDisposed: false }) { return new ScriptEndedFeedback(string.Empty, false, false, "Export"); }
 
         var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
         if (script.Failed) { return script; }
@@ -944,13 +944,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
 
-        var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, "CreativePad-Generator", "CreativePad-Generator");
+        var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, "CreativePad-Generator");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
 
-        var t = sc.Parse(0, "Main", null);
+        var t = sc.Parse(null);
 
         if (t.Failed) {
             var ep = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));

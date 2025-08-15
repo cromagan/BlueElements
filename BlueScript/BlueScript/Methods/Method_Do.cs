@@ -52,22 +52,22 @@ internal class Method_Do : Method {
 
         var du = 0;
 
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe, scp.Chain);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method]);
 
         ScriptEndedFeedback scx;
         do {
             du++;
             if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true, cdf); }
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition( "Do-Schleife", 0), cdf.CodeBlockAfterText, null, null, "Do");
+            scx = Method_CallByFilename.CallSub(varCol, scp2, new CurrentPosition("Do-Schleife", 0), cdf.CodeBlockAfterText, null, null);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         } while (true);
 
         scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
-        return scx; 
+        return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
