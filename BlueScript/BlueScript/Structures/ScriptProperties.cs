@@ -26,16 +26,18 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties(string scriptname, List<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string mainInfo) {
+    public ScriptProperties(string scriptname, List<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ProduktivPhase = produktivphase;
         ScriptAttributes = scriptAttributes;
         AdditionalInfo = additionalInfo;
+        Stufe = 0;
+        Chain = chain;
         MainInfo = mainInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, List<Method> allowedMethods) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, scriptProperties.MainInfo) { }
+    public ScriptProperties(ScriptProperties scriptProperties, List<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
 
     #endregion
 
@@ -43,6 +45,7 @@ public class ScriptProperties {
 
     public object? AdditionalInfo { get; }
     public List<Method> AllowedMethods { get; }
+    public string Chain { get; } = string.Empty;
 
     public string MainInfo { get; } = string.Empty;
     public bool ProduktivPhase { get; }
@@ -53,6 +56,7 @@ public class ScriptProperties {
     public List<string> ScriptAttributes { get; }
 
     public string ScriptName { get; }
+    public int Stufe { get; }
 
     #endregion
 }

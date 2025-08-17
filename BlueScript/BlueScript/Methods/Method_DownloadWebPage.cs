@@ -52,12 +52,12 @@ internal class Method_DownloadWebPage : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var url = attvar.ValueStringGet(0);
         var varn = "X" + url.ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
 
         if (Last.Get(varn) is VariableString vb) {
-            return new DoItFeedback(vb.ValueString, ld.EndPosition());
+            return new DoItFeedback(vb.ValueString);
         }
 
         try {
@@ -65,9 +65,9 @@ internal class Method_DownloadWebPage : Method {
             var txt = Generic.Download(url);
 
             _ = Last.Add(new VariableString(varn, txt, true, string.Empty));
-            return new DoItFeedback(txt, ld.EndPosition());
+            return new DoItFeedback(txt);
         } catch {
-            return new DoItFeedback(string.Empty, ld.EndPosition());
+            return new DoItFeedback(string.Empty);
         }
     }
 

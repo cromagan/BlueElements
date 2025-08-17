@@ -51,13 +51,13 @@ internal class Method_CountString : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         switch (attvar.Attributes[0]) {
             case VariableString vs:
-                return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)), ld.EndPosition());
+                return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));
 
             case VariableListString vl:
-                return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ReadableText(1)), ld.EndPosition());
+                return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ReadableText(1)));
         }
 
         return DoItFeedback.InternerFehler(ld);

@@ -48,7 +48,7 @@ public class Method_ImportLinked : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var t = "Befehl: ImportLinked";
 
         varCol.RemoveWithComment(t);
@@ -90,7 +90,7 @@ public class Method_ImportLinked : Method_Database {
             _ = varCol.Add(v);
         }
 
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     #endregion

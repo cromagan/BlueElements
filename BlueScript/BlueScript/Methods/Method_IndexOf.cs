@@ -49,7 +49,7 @@ internal class Method_IndexOf : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var search = attvar.ValueStringGet(2);
         var sens = attvar.ValueBoolGet(1) ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
         var pos = -1;
@@ -62,7 +62,7 @@ internal class Method_IndexOf : Method {
             pos = vl.ValueList.FindIndex(x => x.Equals(search, sens));
         }
 
-        return new DoItFeedback(pos, ld.EndPosition());
+        return new DoItFeedback(pos);
     }
 
     #endregion

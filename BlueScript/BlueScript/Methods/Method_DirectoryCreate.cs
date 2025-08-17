@@ -57,16 +57,16 @@ internal class Method_DirectoryCreate : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var p = attvar.ValueStringGet(0).TrimEnd("\\");
 
-        if (DirectoryExists(p)) { return DoItFeedback.Wahr(ld.EndPosition()); }
+        if (DirectoryExists(p)) { return DoItFeedback.Wahr(); }
 
         try {
             _ = Directory.CreateDirectory(p);
         } catch { }
 
-        return !DirectoryExists(p) ? DoItFeedback.Falsch(ld.EndPosition()) : DoItFeedback.Wahr(ld.EndPosition());
+        return !DirectoryExists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
     #endregion

@@ -49,7 +49,7 @@ public class Method_CellSetFilter : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, myDb, scp.ScriptName, true);
@@ -68,7 +68,7 @@ public class Method_CellSetFilter : Method_Database {
         var r = allFi.Rows;
         allFi.Dispose();
         if (r.Count is 0 or > 1) {
-            return DoItFeedback.Falsch(ld.EndPosition());
+            return DoItFeedback.Falsch();
         }
 
         if (r[0] == MyRow(scp)) {
@@ -86,7 +86,7 @@ public class Method_CellSetFilter : Method_Database {
 
         columnToSet.AddSystemInfo("Edit with Script", db, scp.ScriptName);
 
-        return r[0].CellGetString(columnToSet) == value ? DoItFeedback.Wahr(ld.EndPosition()) : DoItFeedback.Falsch(ld.EndPosition());
+        return r[0].CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion

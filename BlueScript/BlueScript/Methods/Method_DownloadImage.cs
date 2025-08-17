@@ -53,7 +53,7 @@ internal class Method_DownloadImage : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Da es keine Möglichkeit gibt, eine Bild Variable (außerhalb eines If) zu deklarieren,
         // darf diese Routine nicht fehlschlagen.
 
@@ -61,7 +61,7 @@ internal class Method_DownloadImage : Method {
         var varn = "X" + url.ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
 
         if (Last.Get(varn) is VariableBitmap vb) {
-            return new DoItFeedback( vb.ValueBitmap, ld.EndPosition());
+            return new DoItFeedback(vb.ValueBitmap);
         }
 
         try {
@@ -71,9 +71,9 @@ internal class Method_DownloadImage : Method {
             if (img is Bitmap bmp2) { bmp = bmp2; }
 
             _ = Last.Add(new VariableBitmap(varn, bmp, true, string.Empty));
-            return new DoItFeedback(bmp, ld.EndPosition());
+            return new DoItFeedback(bmp);
         } catch {
-            return new DoItFeedback(null as Bitmap, ld.EndPosition());
+            return new DoItFeedback(null as Bitmap);
         }
     }
 

@@ -49,7 +49,7 @@ public class Method_CellSetRow : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
         if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
@@ -79,17 +79,17 @@ public class Method_CellSetRow : Method_Database {
         if (columnToSet == db.Column.ChunkValueColumn) { newchunkval = value; }
 
         var m = CellCollection.GrantWriteAccess(columnToSet, row, newchunkval, 120, false);
-        if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(ld.EndPosition()); }
+        if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {
             if (row.CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }
-            return DoItFeedback.Wahr(ld.EndPosition());
+            return DoItFeedback.Wahr();
         }
 
         row.CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + db.Caption + "'");
         columnToSet.AddSystemInfo("Edit with Script", db, scp.ScriptName);
 
-        return row.CellGetString(columnToSet) == value ? DoItFeedback.Wahr(ld.EndPosition()) : DoItFeedback.Falsch(ld.EndPosition());
+        return row.CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion

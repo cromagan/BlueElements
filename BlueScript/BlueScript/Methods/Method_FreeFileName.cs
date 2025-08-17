@@ -46,7 +46,7 @@ internal class Method_FreeFileName : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
         var nam = attvar.ValueStringGet(1);
         var suf = attvar.ValueStringGet(2);
@@ -56,7 +56,7 @@ internal class Method_FreeFileName : Method {
         }
 
         if (!string.IsNullOrEmpty(nam)) {
-            return new DoItFeedback(TempFile(pf, nam, suf), ld.EndPosition());
+            return new DoItFeedback(TempFile(pf, nam, suf));
         }
 
         var zeichen = BlueBasics.Constants.Char_AZ.ToLowerInvariant() + BlueBasics.Constants.Char_Numerals + BlueBasics.Constants.Char_AZ.ToUpperInvariant();
@@ -70,7 +70,7 @@ internal class Method_FreeFileName : Method {
             }
 
             if (!FileExists(pf + p + suf)) {
-                return new DoItFeedback(p, ld.EndPosition());
+                return new DoItFeedback(p);
             }
         } while (true);
     }

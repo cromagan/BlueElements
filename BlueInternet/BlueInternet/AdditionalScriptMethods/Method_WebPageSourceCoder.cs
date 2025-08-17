@@ -51,7 +51,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
         if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback("Keine Webseite geladen", false, ld); }
@@ -69,7 +69,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
             }
 
             if (task is { IsFaulted: false, Result: { Success: true, Result: string result } }) {
-                return new DoItFeedback(result, ld.EndPosition());
+                return new DoItFeedback(result);
             }
 
             //var task = wb.GetSourceAsync();

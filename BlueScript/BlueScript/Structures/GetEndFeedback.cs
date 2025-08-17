@@ -22,28 +22,48 @@ using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
-public class GetEndFeedback : CanDoFeedback {
+public readonly struct GetEndFeedback {
 
     #region Fields
 
+    internal readonly string AttributeText;
+    internal readonly int ContinuePosition;
+    internal readonly string FailedReason = string.Empty;
     internal readonly Variable? ReturnValue;
 
     #endregion
 
     #region Constructors
 
-    public GetEndFeedback(CanDoFeedback cp, Variable? returnvalue) : base(cp) {
+    public GetEndFeedback(Variable? returnvalue) {
+        ContinuePosition = 0;
+        AttributeText = string.Empty;
         ReturnValue = returnvalue;
     }
 
-    public GetEndFeedback(CanDoFeedback cp, string failedReason, bool needsScriptFix) : base(cp, failedReason, needsScriptFix) {
+    public GetEndFeedback(string failedReason, bool needsScriptFix, LogData? ld) {
+        ContinuePosition = 0;
+        FailedReason = failedReason;
+        AttributeText = string.Empty;
         ReturnValue = null;
+        NeedsScriptFix = needsScriptFix;
+        ld?.AddMessage(FailedReason);
     }
 
-    public GetEndFeedback(CanDoFeedback cp, string attributetext) : base(cp, cp.Position, attributetext, string.Empty) {
+    public GetEndFeedback(int continuePosition, string attributetext) {
+        ContinuePosition = continuePosition;
+        AttributeText = attributetext;
         ReturnValue = null;
-        if (cp.Position == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
+        if (ContinuePosition == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
     }
+
+    #endregion
+
+    #region Properties
+
+    public bool NeedsScriptFix { get; } = false;
+
+    internal bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
 
     #endregion
 }

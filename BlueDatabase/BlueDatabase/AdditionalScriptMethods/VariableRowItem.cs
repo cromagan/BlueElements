@@ -84,11 +84,11 @@ public class VariableRowItem : Variable {
 
     public override void DisposeContent() => _row = null;
 
-    public override string GetValueFrom(Variable variable) {
-        if (variable is not VariableRowItem v) { return VerschiedeneTypen(variable); }
-        if (ReadOnly) { return Schreibgschützt(); }
+    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
+        if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         RowItem = v.RowItem;
-        return string.Empty;
+        return DoItFeedback.Null();
     }
 
     protected override void SetValue(object? x) {
@@ -101,26 +101,26 @@ public class VariableRowItem : Variable {
         }
     }
 
-    protected override bool TryParseValue(string txt, out object? result) {
-        result = null;
-
+    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         if (txt.Length > 6 && txt.StartsWith("{ROW:") && txt.EndsWith("}")) {
             var t = txt.Substring(5, txt.Length - 6);
 
-            if (t == "?") { return true; }
+            if (t == "?") { return (true, null); }
 
             var tx = t.SplitBy(";");
-            if (tx.Length != 2) { return false; }
 
-            if (Database.Get(tx[0], false, null) is not { IsDisposed: false } db) { return false; }
+            if (tx.Length != 2) { return (false, null); }
 
-            if (db.Row.SearchByKey(tx[1]) is not { IsDisposed: false } row) { return false; }
+            var db = Database.Get(tx[0], false, null);
 
-            result = row;
-            return true;
+            if (db is null || db.IsDisposed) { return (false, null); }
+
+            var row = db.Row.SearchByKey(tx[1]);
+
+            return row is null || row.IsDisposed ? ((bool cando, object? result))(false, null) : ((bool cando, object? result))(true, row);
         }
 
-        return false;
+        return (false, null);
     }
 
     private void GetText() => _lastText = _row == null ? "Row: [NULL]" : "Row: " + _row.CellFirstString();

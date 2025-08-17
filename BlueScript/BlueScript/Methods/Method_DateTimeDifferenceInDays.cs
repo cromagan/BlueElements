@@ -45,7 +45,7 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d1 = attvar.ValueDateGet(0);
 
         if (d1 == null) {
@@ -56,7 +56,7 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
         return d2 == null
             ? new DoItFeedback("Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.", true, ld)
-            : new DoItFeedback(d1.Value.Subtract(d2.Value).TotalDays, ld.EndPosition());
+            : new DoItFeedback(d1.Value.Subtract(d2.Value).TotalDays);
     }
 
     #endregion

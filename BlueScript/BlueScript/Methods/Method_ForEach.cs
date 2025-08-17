@@ -48,9 +48,9 @@ internal class Method_ForEach : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var l = attvar.ValueListStringGet(1);
 
@@ -58,15 +58,15 @@ internal class Method_ForEach : Method {
 
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, cdf); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
 
         var vari = varCol.Get(varnam);
         if (vari != null) {
-            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, cdf);
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }
 
         ScriptEndedFeedback? scx = null;
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method]);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
         var t = Stopwatch.StartNew();
         var count = 0;
@@ -75,29 +75,30 @@ internal class Method_ForEach : Method {
             count++;
             var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, new CanDoFeedback("ForEach-Schleife", cdf.Position, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.CodeBlockAfterText, string.Empty), null, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEach-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEach", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
             if (t.ElapsedMilliseconds > 1000) {
                 t = Stopwatch.StartNew();
-                Develop.Message?.Invoke(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", cdf.Stufe + 1);
+                Develop.Message?.Invoke(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {count} von {l.Count} abschlossen ({thisl})", scp.Stufe +1);
             }
         }
 
-        if (scx == null) {
-            return new DoItFeedback(cdf.Subname, cdf.Position, cdf.Protocol, cdf.Chain, false, false, false, string.Empty, null);
+        if(scx == null) {
+            return new DoItFeedback(false, false, false, string.Empty, null, infos.LogData);
         }
 
+
         scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
-        return scx;
+        return scx; 
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch(ld.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
     #endregion

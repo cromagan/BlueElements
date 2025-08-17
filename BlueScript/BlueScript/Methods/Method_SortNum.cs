@@ -48,7 +48,7 @@ internal class Method_SortNum : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var nums = new List<double>();
@@ -63,7 +63,7 @@ internal class Method_SortNum : Method {
         }
 
         vli.ValueList = nums.ConvertAll(i => i.ToStringFloat5());
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     #endregion

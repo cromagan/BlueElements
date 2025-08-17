@@ -45,7 +45,7 @@ internal class Method_SetIfHasValue : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
@@ -55,27 +55,27 @@ internal class Method_SetIfHasValue : Method {
             switch (attvar.Attributes[z]) {
                 case VariableDouble vf:
                     if (vf.ValueNum != 0) {
-                        return attvar.ValueNumSet(0, vf.ValueNum, ld) is { } dif ? dif : DoItFeedback.Null(ld.EndPosition());
+                        return attvar.ValueNumSet(0, vf.ValueNum, ld) is { } dif ? dif : DoItFeedback.Null();
                     }
                     break;
 
                 case VariableString vs:
                     if (!string.IsNullOrEmpty(vs.ValueString)) {
-                        return attvar.ValueStringSet(0, vs.ValueString, ld) is { } dif2 ? dif2 : DoItFeedback.Null(ld.EndPosition());
+                        return attvar.ValueStringSet(0, vs.ValueString, ld) is { } dif2 ? dif2 : DoItFeedback.Null();
                     }
                     break;
 
                 case VariableBool vb:
                     if (attvar.ValueBoolSet(0, vb.ValueBool, ld) is { } dif3) { return dif3; }
-                    return DoItFeedback.Null(ld.EndPosition());
+                    return DoItFeedback.Null();
 
                 case VariableListString vl:
                     if (attvar.ValueListStringSet(0, vl.ValueList, ld) is { } dif4) { return dif4; }
-                    return DoItFeedback.Null(ld.EndPosition());
+                    return DoItFeedback.Null();
             }
         }
 
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     #endregion

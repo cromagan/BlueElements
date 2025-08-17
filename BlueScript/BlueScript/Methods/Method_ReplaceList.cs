@@ -48,7 +48,7 @@ internal class Method_ReplaceList : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);
@@ -94,7 +94,7 @@ internal class Method_ReplaceList : Method {
             }
         } while (again);
 
-        return attvar.ValueListStringSet(0, tmpList, ld) is { } dif ? dif : DoItFeedback.Null(ld.EndPosition());
+        return attvar.ValueListStringSet(0, tmpList, ld) is { } dif ? dif : DoItFeedback.Null();
     }
 
     #endregion

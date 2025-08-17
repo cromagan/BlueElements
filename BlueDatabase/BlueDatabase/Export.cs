@@ -504,7 +504,7 @@ public static class Export {
 
                 if (script.Failed) {
                     f = f + thisRow.CellFirstString() + "\r\n";
-                    onemled = script.Protocol;
+                    onemled = script.ProtocolText;
                 }
 
                 if (script.Variables != null) {

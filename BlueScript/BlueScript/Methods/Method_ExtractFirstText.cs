@@ -51,10 +51,10 @@ internal class Method_ExtractFirstText : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
 
-        return tags is not { Count: not 0 } ? new DoItFeedback(attvar.ValueStringGet(2), ld.EndPosition()) : new DoItFeedback(tags[0], ld.EndPosition());
+        return tags is not { Count: not 0 } ? new DoItFeedback(attvar.ValueStringGet(2)) : new DoItFeedback(tags[0]);
     }
 
     #endregion

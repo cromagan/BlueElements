@@ -45,7 +45,7 @@ internal class Method_RemoveDoubleSpaces : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var t = attvar.ValueStringGet(0);
         string ot;
         do {
@@ -62,7 +62,7 @@ internal class Method_RemoveDoubleSpaces : Method {
             t = t.Replace("> ", ">");
         } while (ot != t);
 
-        return new DoItFeedback(t, ld.EndPosition());
+        return new DoItFeedback(t);
     }
 
     #endregion

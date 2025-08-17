@@ -17,52 +17,66 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueScript.Variables;
-using System.Runtime.InteropServices;
-
 namespace BlueScript.Structures;
 
-public class CanDoFeedback : CurrentPosition {
+public readonly struct CanDoFeedback {
 
-    #region Fields
+    #region Constructors
+
+    public CanDoFeedback(int errorposition, string failedreason, bool needsScriptFix, LogData? ld) {
+        ContinueOrErrorPosition = errorposition;
+        FailedReason = failedreason;
+        NeedsScriptFix = needsScriptFix;
+        AttributText = string.Empty;
+        CodeBlockAfterText = string.Empty;
+        LogData = ld;
+
+        if (needsScriptFix) {
+            ld?.AddMessage(failedreason);
+        }
+    }
+
+    public CanDoFeedback(int continuePosition, string attributtext, string codeblockaftertext, LogData ld) {
+        ContinueOrErrorPosition = continuePosition;
+        FailedReason = string.Empty;
+        NeedsScriptFix = false;
+        AttributText = attributtext;
+        CodeBlockAfterText = codeblockaftertext;
+        LogData = ld;
+    }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Der Text zwischen dem StartString und dem EndString
+    /// </summary>
+    public string AttributText { get; }
 
     /// <summary>
     /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
     /// </summary>
-    public readonly string CodeBlockAfterText;
+    public string CodeBlockAfterText { get; }
 
-    public readonly string NormalizedText;
+    /// <summary>
+    /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
+    /// </summary>
+    public int ContinueOrErrorPosition { get; }
 
-    #endregion
+    /// <summary>
+    /// Gibt empty zurück, wenn der Befehl ausgeführt werden kann.
+    /// Ansonsten den Grund, warum er nicht ausgeführt werden kann.
+    /// Nur in Zusammenhang mit NeedsScriptFix zu benutzen, weil hier auch einfach die Meldung sein kann, dass der Befehl nicht erkannt wurde - was an sich kein Fehler ist.
+    /// </summary>
+    public string FailedReason { get; }
 
-    #region Constructors
+    public LogData? LogData { get; }
 
-    public CanDoFeedback(CanDoFeedback cdf) : base(cdf) {
-        NormalizedText = cdf.NormalizedText;
-        CodeBlockAfterText = cdf.CodeBlockAfterText;
-    }
-
-    public CanDoFeedback(string subname, int position, string protocol, string chain, string failedReason, bool needsScriptFix, string attributeText, string codeBlockAfterText) : base(subname, position, protocol, chain, failedReason, needsScriptFix) {
-        NormalizedText = attributeText;
-        CodeBlockAfterText = codeBlockAfterText;
-    }
-
-    public CanDoFeedback(CurrentPosition cp, string failedreason, bool needsScriptFix) : this(cp.Subname, cp.Position, cp.Protocol, cp.Chain, failedreason, needsScriptFix, string.Empty, string.Empty) { }
-
-    public CanDoFeedback(CanDoFeedback cdf, int position) : this(cdf.Subname, position, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.NormalizedText, cdf.CodeBlockAfterText) { }
-
-    public CanDoFeedback(CurrentPosition cp, int position, string attributetext, string codeblockaftertext) : this(cp.Subname, position, cp.Protocol, cp.Chain, cp.FailedReason, cp.NeedsScriptFix, attributetext, codeblockaftertext) { }
-
-    public CanDoFeedback(CurrentPosition cp, string attributetext) : this(cp.Subname, 0, cp.Protocol, cp.Chain, cp.FailedReason, cp.NeedsScriptFix, attributetext, string.Empty) {
-        if (cp.Position == attributetext.Length) { Develop.DebugPrint("Müsste das nicht eine Variable sein?"); }
-    }
-
-    #endregion
-
-    #region Methods
-
-    public CurrentPosition EndPosition() => new CurrentPosition(this, Position + NormalizedText.Length);
+    /// <summary>
+    /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
+    /// </summary>
+    public bool NeedsScriptFix { get; }
 
     #endregion
 }

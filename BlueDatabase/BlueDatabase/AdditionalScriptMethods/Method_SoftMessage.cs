@@ -63,7 +63,7 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
@@ -71,7 +71,7 @@ public class Method_SoftMessage : Method_Database, IUseableForButton {
 
         Develop.Message?.Invoke(ErrorType.Info, myDb, "Skript", ImageCode.Datenbank, txt, 0);
 
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0];

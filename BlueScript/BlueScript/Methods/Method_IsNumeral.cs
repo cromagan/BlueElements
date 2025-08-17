@@ -46,12 +46,12 @@ internal class Method_IsNumeral : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
-        if (attvar.Attributes[0] is VariableDouble) { return DoItFeedback.Wahr(ld.EndPosition()); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (attvar.Attributes[0] is VariableDouble) { return DoItFeedback.Wahr(); }
         if (attvar.Attributes[0] is VariableString vs) {
-            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(ld.EndPosition()); }
+            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
         }
-        return DoItFeedback.Falsch(ld.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
     #endregion

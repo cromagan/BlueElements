@@ -24,7 +24,6 @@ using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace BlueDatabase.Interfaces;
 
@@ -70,12 +69,13 @@ public static class UseableForButton {
             return "Fehler beim Berechnen der Attribute: " + error;
         }
 
-        var cdf = new CanDoFeedback("Knopfdruck", 0, string.Empty, string.Empty, string.Empty, false, normalizedText, string.Empty);
+        var ld = new LogData("Knopfdruck", 0);
+        var cdw = new CanDoFeedback(0, normalizedText, string.Empty, ld);
 
-        var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, "Button");
-        var n = ufb.DoIt(varCol, cdf, scp);
+        var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, "Button", "Button");
+        _ = ufb.DoIt(varCol, cdw, scp);
 
-        return n.Protocol;
+        return cdw.LogData.Protocol.JoinWithCr();
     }
 
     #endregion

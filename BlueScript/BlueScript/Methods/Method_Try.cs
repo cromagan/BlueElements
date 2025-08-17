@@ -26,22 +26,27 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_Exists : Method {
+internal class Method_Try : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[Variable.Any_Variable]];
-    public override string Command => "exists";
+    public override List<List<string>> Args => [];
+    public override string Command => "try";
+
     public override List<string> Constants => [];
-    public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
-    public override bool GetCodeBlockAfter => false;
+
+    public override string Description => "Führt den Codeblock innerhalb der geschweiften Klammern aus.\r\n" +
+                                              "Tritt währenddessen ein Fehler auf, wird der Codeblock verlassen und die weiteren Befehle innerhalb des Codeblocks ignoriert.\r\n" +
+                                          "Das Skript wird in jedem Fall nach dem Codeblock-Ende weiter ausgeführt.\r\n" +
+                                          "Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
+
+    public override bool GetCodeBlockAfter => true;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableBool.ShortName_Plain;
-
-    public override string StartSequence => "(";
-    public override string Syntax => "Exists(Variable)";
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => string.Empty;
+    public override string Syntax => "Try { }";
 
     #endregion
 
@@ -49,7 +54,9 @@ internal class Method_Exists : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        return attvar.Failed ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
+        if (!string.IsNullOrEmpty(attvar.FailedReason)) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+        var scx = Method_CallByFilename.CallSub(varCol, scp, "Try-Befehl", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "Try", infos.LogData);
+        return new DoItFeedback(false, scx.BreakFired, scx.ReturnFired, string.Empty, scx.ReturnValue, infos.LogData);
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {

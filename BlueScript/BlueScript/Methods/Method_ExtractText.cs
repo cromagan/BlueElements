@@ -50,10 +50,10 @@ internal class Method_ExtractText : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
 
-        return tags == null ? new DoItFeedback("Nichts extrahiert - Searchpattern fehlerhaft?", true, ld) : new DoItFeedback(tags, ld.EndPosition());
+        return tags == null ? new DoItFeedback("Nichts extrahiert - Searchpattern fehlerhaft?", true, ld) : new DoItFeedback(tags);
     }
 
     #endregion

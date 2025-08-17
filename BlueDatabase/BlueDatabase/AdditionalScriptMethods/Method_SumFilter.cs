@@ -47,7 +47,7 @@ public class Method_SumFilter : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);
@@ -68,7 +68,7 @@ public class Method_SumFilter : Method_Database {
 
         var x = returncolumn.Summe(r);
 
-        return x is not double xd ? new DoItFeedback("Summe konnte nicht berechnet werden.", true, ld) : new DoItFeedback(xd, ld.EndPosition());
+        return x is not double xd ? new DoItFeedback("Summe konnte nicht berechnet werden.", true, ld) : new DoItFeedback(xd);
     }
 
     #endregion

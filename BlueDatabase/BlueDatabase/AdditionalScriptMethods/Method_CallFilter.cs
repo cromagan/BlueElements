@@ -63,7 +63,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, myDb, scp.ScriptName, true);
@@ -71,7 +71,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
 
         var r = allFi.Rows;
         allFi.Dispose();
-        if (r.Count == 0) { return DoItFeedback.Null(ld.EndPosition()); }
+        if (r.Count == 0) { return DoItFeedback.Null(); }
 
         List<string> a = [attvar.ValueStringGet(1)];
         var vs = attvar.ValueStringGet(0);
@@ -85,7 +85,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
             }
         }
 
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1] + "," + filterarg;

@@ -45,19 +45,19 @@ internal class Method_EndsWith : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.ValueBoolGet(1)) {
                 if (attvar.ValueStringGet(0).EndsWith(attvar.ValueStringGet(z))) {
-                    return DoItFeedback.Wahr(ld.EndPosition());
+                    return DoItFeedback.Wahr();
                 }
             } else {
                 if (attvar.ValueStringGet(0).ToLowerInvariant().EndsWith(attvar.ValueStringGet(z).ToLowerInvariant())) {
-                    return DoItFeedback.Wahr(ld.EndPosition());
+                    return DoItFeedback.Wahr();
                 }
             }
         }
-        return DoItFeedback.Falsch(ld.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
     #endregion

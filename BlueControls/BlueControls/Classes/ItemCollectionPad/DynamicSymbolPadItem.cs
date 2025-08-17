@@ -123,12 +123,12 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
         //using var gr = Graphics.FromImage(bmp);
 
-        var scp = new ScriptProperties("DynamicSymbol", m, true, [], bmp, "DynamicSymbol");
+        var scp = new ScriptProperties("DynamicSymbol", m, true, [], bmp, "DynamicSymbol", "DynamicSymbol");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(null);
+        return sc.Parse(0, "Main", null);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

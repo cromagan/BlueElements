@@ -46,7 +46,7 @@ internal class Method_AddDays : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d = attvar.ValueDateGet(0);
 
         if (d == null) {
@@ -56,7 +56,7 @@ internal class Method_AddDays : Method {
         var nd = d.Value.AddDays(attvar.ValueNumGet(1));
 
         try {
-            return new DoItFeedback(nd.ToString(attvar.ReadableText(2), CultureInfo.InvariantCulture), ld.EndPosition());
+            return new DoItFeedback(nd.ToString(attvar.ReadableText(2), CultureInfo.InvariantCulture));
         } catch {
             return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(2) + "' ist fehlerhaft.", true, ld);
         }

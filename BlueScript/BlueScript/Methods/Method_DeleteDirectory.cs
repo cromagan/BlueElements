@@ -54,19 +54,19 @@ internal class Method_DeleteDirectory : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
         if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         if (!IO.DirectoryExists(filn)) {
-            return DoItFeedback.Wahr(ld.EndPosition());
+            return DoItFeedback.Wahr();
         }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         try {
-            return new DoItFeedback(IO.DeleteDir(filn, false), ld.EndPosition());
+            return new DoItFeedback(IO.DeleteDir(filn, false));
         } catch {
             return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld);
         }

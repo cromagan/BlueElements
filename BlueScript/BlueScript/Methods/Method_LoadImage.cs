@@ -48,7 +48,7 @@ internal class Method_LoadImage : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Da es keine Möglichkeit gibt, eine Bild Variable (außerhalb eines If) zu deklarieren,
         // darf diese Routine nicht fehlschlagen.
 
@@ -63,9 +63,9 @@ internal class Method_LoadImage : Method {
         try {
             Generic.CollectGarbage();
             var bmp = (Bitmap)Image_FromFile(attvar.ValueStringGet(0))!;
-            return new DoItFeedback(bmp, ld.EndPosition());
+            return new DoItFeedback(bmp);
         } catch {
-            return new DoItFeedback(null as Bitmap, ld.EndPosition());
+            return new DoItFeedback(null as Bitmap);
             //return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " + attvar.ValueString(0));
         }
     }

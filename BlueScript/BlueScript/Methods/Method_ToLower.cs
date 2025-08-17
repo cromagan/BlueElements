@@ -45,7 +45,7 @@ internal class Method_ToLower : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> new(attvar.ValueStringGet(0).ToLowerInvariant(), ld.EndPosition());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).ToLowerInvariant());
 
     #endregion
 }

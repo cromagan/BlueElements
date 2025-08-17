@@ -78,9 +78,9 @@ public class Method_Row : Method_Database, IUseableForButton {
 
     public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
 
-    public static DoItFeedback RowToObjectFeedback(RowItem? row, CurrentPosition cp) => new(new VariableRowItem(row), cp);
+    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
-    public static DoItFeedback UniqueRow(FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp, CurrentPosition ld) {
+    public static DoItFeedback UniqueRow(FilterCollection fic, double invalidateinDays, string coment, ScriptProperties scp, LogData ld) {
         if (invalidateinDays < 0.01) { return new DoItFeedback("Intervall zu kurz.", true, ld); }
 
         if (fic.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Filter", true, ld); }
@@ -108,7 +108,7 @@ public class Method_Row : Method_Database, IUseableForButton {
             }
         }
 
-        Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {ld.Chain}\\Row-Befehl: {fic.ReadableText()}", ld.Stufe);
+        Develop.Message?.Invoke(ErrorType.DevelopInfo, null,  scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
 
         RowItem? newrow;
 
@@ -141,16 +141,16 @@ public class Method_Row : Method_Database, IUseableForButton {
                 if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {
-                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {ld.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", ld.Stufe);
+                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Database?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
             return new DoItFeedback("Zeile konnte nicht angelegt werden", false, ld);
         }
 
-        return RowToObjectFeedback(newrow, ld);
+        return RowToObjectFeedback(newrow);
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);

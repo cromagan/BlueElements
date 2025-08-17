@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace BlueScript.Structures;
@@ -27,9 +28,10 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(DoItFeedback dif, VariableCollection variables, int position) : base(dif.Subname, position, dif.Protocol, dif.Chain, dif.NeedsScriptFix, dif.BreakFired, dif.ReturnFired, dif.FailedReason, dif.ReturnValue) {
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool needsScriptFix, bool breakFired, bool returnFired, string failedReason, Variable? returnValue) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, null) {
         Variables = variables;
         GiveItAnotherTry = false;
+        Protocol = protocol.AsReadOnly();
     }
 
     /// <summary>
@@ -40,22 +42,19 @@ public class ScriptEndedFeedback : DoItFeedback {
     /// <param name="giveitanothertry"></param>
     /// <param name="needsScriptFix"></param>
     /// <param name="scriptname"></param>
-    public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base("Main", 0, string.Empty, string.Empty, needsScriptFix, false, true, $"[{scriptname},Start abgebrochen] {failedReason}", null) {
+    public ScriptEndedFeedback(string failedReason, bool giveitanothertry, bool needsScriptFix, string scriptname) : base(needsScriptFix, false, true, "Start abgebrochen: " + failedReason, null, null) {
         Variables = null;
         GiveItAnotherTry = giveitanothertry;
+        Protocol = new ReadOnlyCollection<string>(["[" + scriptname + ", Start abgebrochen]@" + failedReason]);
     }
 
     /// <summary>
     /// Wird verwendet, wenn ein Script beendet wird, ohne weitere Vorkommnisse
     /// </summary>
-    public ScriptEndedFeedback(CurrentPosition cp, VariableCollection variables, string failedReason) : base(cp.Subname, cp.Position, cp.Protocol, cp.Chain, false, false, true, failedReason, null) {
+    public ScriptEndedFeedback(VariableCollection variables, string failedReason) : base(false, false, true, failedReason, null, null) {
         GiveItAnotherTry = false;
-        Variables = variables;
-    }
+        Protocol = new ReadOnlyCollection<string>([]);
 
-    public ScriptEndedFeedback(string subname, int position, string protocol, string chain, bool needsScriptFix, bool breakFired, bool returnFired, VariableCollection variables, string failedReason)
-      : base(subname, position, protocol, chain, needsScriptFix, breakFired, returnFired, failedReason, null) {
-        GiveItAnotherTry = false;
         Variables = variables;
     }
 
@@ -65,7 +64,20 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     public bool GiveItAnotherTry { get; }
 
+    public ReadOnlyCollection<string> Protocol { get; }
+
+    public string ProtocolText => "Skript-Protokoll:\r\n\r\n" + Protocol.JoinWith("\r\n\r\n").Replace("]@", "]\r\n");
+
     public VariableCollection? Variables { get; }
+
+    #endregion
+
+    #region Methods
+
+    public override void ChangeFailedReason(string newfailedReason, LogData? ld) {
+        ld?.Protocol.AddRange(Protocol);
+        base.ChangeFailedReason(newfailedReason, ld);
+    }
 
     #endregion
 }

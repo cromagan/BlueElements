@@ -64,25 +64,25 @@ internal class Method_Call : Method_Database, IUseableForButton {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback cdf) {
-        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(cdf); }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var vs = attvar.ValueStringGet(0);
 
         var sc = myDb.EventScript.Get(vs);
-        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs + "\r\nNur aktiv geschaltene Skripte werden berücksichtigt.", true, cdf); }
+        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs + "\r\nNur aktiv geschaltene Skripte werden berücksichtigt.", true, ld); }
 
         var newat = sc.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {
             if (!newat.Contains(thisAt)) {
-                return new DoItFeedback("Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.", true, cdf);
+                return new DoItFeedback("Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.", true, ld);
             }
         }
 
         var (f, error) = Script.NormalizedText(sc.Script);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true, cdf);
+            return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true, ld);
         }
 
         #region Attributliste erzeugen
@@ -97,11 +97,11 @@ internal class Method_Call : Method_Database, IUseableForButton {
         //Diese Routine kann nicht benutzt werden, weil sie die Zeilenvariableen neu erstellt
         //        var scx = myDb.ExecuteScript(null, vs, scp.ProduktivPhase, null, a, true, true);
 
-        var scx = Method_CallByFilename.CallSub(varCol, scp, new CanDoFeedback("Subroutinen-Aufruf [" + vs + "]", 0, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, f, string.Empty), null, a);
+        var scx = Method_CallByFilename.CallSub(varCol, scp, "Subroutinen-Aufruf [" + vs + "]", f, 0, vs, null, a, vs, ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
-            Database.UpdateScript(sc, failedReason: scx.Protocol);
-            return new DoItFeedback($"Unterskript '{sc.KeyName}' hat Fehler verursacht.", false, cdf);
+            Database.UpdateScript(sc, failedReason: scx.ProtocolText);
+            return new DoItFeedback($"Unterskript '{sc.KeyName}' hat Fehler verursacht.", false, ld);
         }
         return scx;
     }

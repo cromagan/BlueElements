@@ -46,10 +46,10 @@ internal class Method_Encrypt2 : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var wert = attvar.ValueStringGet(0).Encrypt("xyz");
 
-        return wert == null ? new DoItFeedback("Verschlüsselung fehlgeschlagen.", true, ld) : new DoItFeedback(wert, ld.EndPosition());
+        return wert == null ? new DoItFeedback("Verschlüsselung fehlgeschlagen.", true, ld) : new DoItFeedback(wert);
     }
 
     #endregion

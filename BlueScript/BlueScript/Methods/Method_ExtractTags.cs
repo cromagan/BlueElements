@@ -50,7 +50,7 @@ internal class Method_ExtractTags : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         const string comment = "Mit dem Befehl 'ExtractTags' erstellt";
         varCol.RemoveWithComment(comment);
 
@@ -70,7 +70,7 @@ internal class Method_ExtractTags : Method {
             }
         }
 
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     #endregion

@@ -45,7 +45,7 @@ public class Method_RowCount : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, myDb, scp.ScriptName, true);
@@ -54,7 +54,7 @@ public class Method_RowCount : Method_Database {
         var r = allFi.Rows;
         allFi.Dispose();
 
-        return new DoItFeedback(r.Count, ld.EndPosition());
+        return new DoItFeedback(r.Count);
     }
 
     #endregion

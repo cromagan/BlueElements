@@ -48,37 +48,37 @@ internal class Method_ForEachRow : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(cdf); }
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(infos.LogData); }
 
-        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var varnam = "value";
 
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, cdf); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
 
         var vari = varCol.Get(varnam);
         if (vari != null) {
-            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, cdf);
+            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);
 
-        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, cdf); }
+        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, infos.LogData); }
 
         var r = allFi.Rows;
         allFi.Dispose();
 
         ScriptEndedFeedback? scx = null;
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method]);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
         foreach (var thisl in r) {
             var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, new CanDoFeedback("ForEachRow-Schleife", cdf.Position, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.CodeBlockAfterText, string.Empty), nv, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEachRow-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 
@@ -88,12 +88,12 @@ internal class Method_ForEachRow : Method_Database {
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch(ld.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
     #endregion

@@ -122,12 +122,12 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
         //using var gr = Graphics.FromImage(bmp);
 
-        var scp = new ScriptProperties("Timer", Method.AllMethods, true, [], null, "Timer in Formular");
+        var scp = new ScriptProperties("Timer", Method.AllMethods, true, [], null, "Timer", "Timer in Formular");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(null);
+        return sc.Parse(0, "Main", null);
     }
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {

@@ -46,33 +46,33 @@ internal class Method_Do : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(cdf, this, attvar); }
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var du = 0;
 
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method]);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe, scp.Chain);
 
         ScriptEndedFeedback scx;
         do {
             du++;
-            if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true, cdf); }
+            if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", true, infos.LogData); }
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, new CanDoFeedback("Do-Schleife", 0, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.CodeBlockAfterText, string.Empty), null, null);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, "Do-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "Do", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         } while (true);
 
         scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
-        return scx;
+        return scx; 
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch(ld.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
     #endregion

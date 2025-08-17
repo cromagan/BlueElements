@@ -54,7 +54,7 @@ internal class Method_AutoCorrect : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var n = 0; n < attvar.Attributes.Count; n++) {
             var column = Column(scp, attvar, n);
             if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte in Datenbank nicht gefunden.", true, ld); }
@@ -111,7 +111,7 @@ internal class Method_AutoCorrect : Method_Database {
             }
         }
 
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     #endregion

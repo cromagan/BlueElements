@@ -49,7 +49,7 @@ internal class Method_LoadTextFile : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filen = attvar.ValueStringGet(0);
 
         if (filen.FileType() is not FileFormat.Textdocument and not FileFormat.CSV) {
@@ -75,7 +75,7 @@ internal class Method_LoadTextFile : Method {
                     return new DoItFeedback("Import-Format unbekannt.", true, ld);
             }
 
-            return new DoItFeedback(importText, ld.EndPosition());
+            return new DoItFeedback(importText);
         } catch {
             return new DoItFeedback("Datei konnte nicht geladen werden: " + filen, true, ld);
         }

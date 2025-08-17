@@ -47,12 +47,12 @@ internal class Method_FileExists : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
         return !filn.IsFormat(FormatHolder.FilepathAndName)
             ? new DoItFeedback("Dateinamen-Fehler!", true, ld)
-            : new DoItFeedback(IO.FileExists(filn), ld.EndPosition());
+            : new DoItFeedback(IO.FileExists(filn));
     }
 
     #endregion

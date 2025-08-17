@@ -48,7 +48,7 @@ internal class Method_ScaledView : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
@@ -72,7 +72,7 @@ internal class Method_ScaledView : Method {
         }
         d.IncludedJointPoints = n.AsReadOnly();
 
-        return new DoItFeedback(new VariablePadItem(d), ld.EndPosition());
+        return new DoItFeedback(new VariablePadItem(d));
     }
 
     #endregion

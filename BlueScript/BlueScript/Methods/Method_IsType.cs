@@ -46,9 +46,9 @@ internal class Method_IsType : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> string.Equals(attvar.ReadableText(1), attvar.MyClassId(0), StringComparison.OrdinalIgnoreCase)
-            ? DoItFeedback.Wahr(ld.EndPosition())
-            : DoItFeedback.Falsch(ld.EndPosition());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => string.Equals(attvar.ReadableText(1), attvar.MyClassId(0), StringComparison.OrdinalIgnoreCase)
+            ? DoItFeedback.Wahr()
+            : DoItFeedback.Falsch();
 
     #endregion
 }

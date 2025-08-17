@@ -46,7 +46,7 @@ public class Method_LookupFilterAllValues : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, myDb, scp.ScriptName, true);
@@ -64,12 +64,12 @@ public class Method_LookupFilterAllValues : Method_Database {
         if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
-        if (r.Count == 0) { return new DoItFeedback(attvar.ValueListStringGet(1), ld.EndPosition()); }
+        if (r.Count == 0) { return new DoItFeedback(attvar.ValueListStringGet(1)); }
 
         List<string> list = [];
         foreach (var row in r) { list.AddRange(row.CellGetList(returncolumn)); }
 
-        return new DoItFeedback(list.SortedDistinctList(), ld.EndPosition());
+        return new DoItFeedback(list.SortedDistinctList());
     }
 
     #endregion

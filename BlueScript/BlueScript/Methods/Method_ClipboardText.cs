@@ -46,7 +46,7 @@ internal class Method_ClipboardText : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> Clipboard.ContainsText() ? new DoItFeedback(Clipboard.GetText(), ld.EndPosition()) : DoItFeedback.Null(ld.EndPosition());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => Clipboard.ContainsText() ? new DoItFeedback(Clipboard.GetText()) : DoItFeedback.Null();
 
     #endregion
 }

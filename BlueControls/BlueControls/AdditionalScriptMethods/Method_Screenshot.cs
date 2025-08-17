@@ -46,7 +46,7 @@ public class Method_Screenshot : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld)=> new DoItFeedback(ScreenShot.GrabAllScreens(), ld.EndPosition());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(ScreenShot.GrabAllScreens());
 
     #endregion
 }

@@ -51,7 +51,7 @@ internal class Method_Max : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var l = new List<double>();
         foreach (var thisvar in attvar.Attributes) {
             switch (thisvar) {
@@ -75,7 +75,7 @@ internal class Method_Max : Method {
             }
         }
 
-        return l.Count > 0 ? new DoItFeedback(l.Max(), ld.EndPosition()) : new DoItFeedback("Keine gültigen Werte angekommen", true, ld);
+        return l.Count > 0 ? new DoItFeedback(l.Max()) : new DoItFeedback("Keine gültigen Werte angekommen", true, ld);
     }
 
     #endregion

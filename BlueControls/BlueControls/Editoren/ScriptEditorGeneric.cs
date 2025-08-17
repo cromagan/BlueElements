@@ -130,7 +130,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         WriteCommandsToList();
 
         if (f.Failed) {
-            Message(f.Protocol);
+            Message(f.ProtocolText);
             return;
         }
 

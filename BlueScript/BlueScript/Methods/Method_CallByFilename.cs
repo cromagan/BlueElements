@@ -72,20 +72,20 @@ public class Method_CallByFilename : Method {
     /// <param name="varCol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, CanDoFeedback cdf, Variable? addMe, List<string>? attributes) {
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog, LogData ld) {
         ScriptEndedFeedback scx;
 
-        if (cdf.Stufe > 10) {
-            return new ScriptEndedFeedback("'" + cdf.Subname + "' wird zu verschachtelt aufgerufen.", false, true, scp.ScriptName);
+        if (scp.Stufe > 10) {
+            return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
         }
 
-        var scp2 = new ScriptProperties(scp, scp.AllowedMethods);
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");
 
         var tmpv = new VariableCollection();
         _ = tmpv.AddRange(varCol);
         if (addMe != null) { _ = tmpv.Add(addMe); }
 
-        scx = Script.Parse(cdf, cdf.NormalizedText, scp2, tmpv, attributes);
+        scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes);
 
         #region Kritische Variablen Disposen
 
@@ -104,14 +104,14 @@ public class Method_CallByFilename : Method {
         }
 
         if (scx.Failed) {
-            scx.ChangeFailedReason("'" + scp.ScriptName + "' wegen vorheriger Fehler abgebrochen");
+            scx.ChangeFailedReason("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", ld);
             return scx;
         }
 
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback cdf) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var vs = attvar.ValueStringGet(0);
         string f;
 
@@ -123,16 +123,16 @@ public class Method_CallByFilename : Method {
             } else if (FileExists(addp + vs)) {
                 f = File.ReadAllText(addp + vs, Encoding.UTF8);
             } else {
-                return new DoItFeedback("Datei nicht gefunden: " + vs, true, cdf);
+                return new DoItFeedback("Datei nicht gefunden: " + vs, true, ld);
             }
         } catch {
-            return new DoItFeedback("Fehler beim Lesen der Datei: " + vs, true, cdf);
+            return new DoItFeedback("Fehler beim Lesen der Datei: " + vs, true, ld);
         }
 
         (f, var error) = Script.NormalizedText(f);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback("Fehler in Datei " + vs + ": " + error, true, cdf);
+            return new DoItFeedback("Fehler in Datei " + vs + ": " + error, true, ld);
         }
 
         #region Attributliste erzeugen
@@ -144,7 +144,7 @@ public class Method_CallByFilename : Method {
 
         #endregion
 
-        var scx = CallSub(varCol, scp, new CanDoFeedback("Datei-Subroutinen-Aufruf [" + vs + "]", cdf.Position, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, f, string.Empty), null, null);
+        var scx = CallSub(varCol, scp, "Datei-Subroutinen-Aufruf [" + vs + "]", f, 0, vs.FileNameWithSuffix(), null, a, vs, ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         return scx;
     }

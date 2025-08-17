@@ -115,7 +115,7 @@ public class Method_Filter : Method_Database {
         }
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         if (Database.Get(attvar.ValueStringGet(0), false, null) is not { IsDisposed: false } db) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
@@ -147,7 +147,7 @@ public class Method_Filter : Method_Database {
 
         filterColumn.AddSystemInfo("Filter in Script", db, scp.ScriptName);
 
-        return new DoItFeedback(new VariableFilterItem(fii), ld.EndPosition());
+        return new DoItFeedback(new VariableFilterItem(fii));
     }
 
     #endregion

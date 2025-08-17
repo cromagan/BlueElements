@@ -64,7 +64,7 @@ internal class Method_LoadPadItem : Method {
         return t;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filen = attvar.ValueStringGet(0);
 
         if (filen.FileType() is not FileFormat.BlueCreativeSymbol) {
@@ -74,7 +74,7 @@ internal class Method_LoadPadItem : Method {
         if (!IO.FileExists(filen)) {
             //return new DoItFeedback(ld, "Datei nicht gefunden: " +filen);
 
-            return new DoItFeedback(new VariablePadItem(DummyItem()), ld.EndPosition());
+            return new DoItFeedback(new VariablePadItem(DummyItem()));
         }
 
         try {
@@ -88,10 +88,10 @@ internal class Method_LoadPadItem : Method {
 
             api.GetNewIdsForEverything();
 
-            return new DoItFeedback(new VariablePadItem(api), ld.EndPosition());
+            return new DoItFeedback(new VariablePadItem(api));
         } catch {
             //return new DoItFeedback(ld, "Datei konnte nicht geladen werden: " +filen);
-            return new DoItFeedback(new VariablePadItem(DummyItem()), ld.EndPosition());
+            return new DoItFeedback(new VariablePadItem(DummyItem()));
         }
     }
 

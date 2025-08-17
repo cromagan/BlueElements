@@ -46,7 +46,7 @@ internal class Method_TrimEnd : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var val = attvar.ValueStringGet(0);
 
         string txt;
@@ -58,7 +58,7 @@ internal class Method_TrimEnd : Method {
             }
         } while (txt != val);
 
-        return new DoItFeedback(val, ld.EndPosition());
+        return new DoItFeedback(val);
     }
 
     #endregion

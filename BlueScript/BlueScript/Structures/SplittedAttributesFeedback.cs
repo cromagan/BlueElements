@@ -43,13 +43,16 @@ public readonly struct SplittedAttributesFeedback {
 
     #endregion
 
-    #region Properties
 
-    public VariableCollection Attributes { get; }
     public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason) || ScriptIssueType != ScriptIssueType.ohne;
 
-    public string FailedReason { get; } = string.Empty;
+    #region Properties
+
     public bool NeedsScriptFix { get; } = false;
+
+    public VariableCollection Attributes { get; }
+    public string FailedReason { get; }= string.Empty;
+
     public ScriptIssueType ScriptIssueType { get; } = ScriptIssueType.ohne;
 
     #endregion
@@ -110,17 +113,17 @@ public readonly struct SplittedAttributesFeedback {
     public List<string> ValueListStringGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return []; }
 
-        return Attributes[varno] is VariableListString vs ? vs.ValueList : [];
+        return Attributes[varno] is VariableListString vs ? vs.ValueList : ([]);
     }
 
-    public DoItFeedback? ValueListStringSet(int varno, List<string> value, CanDoFeedback cdf) {
-        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(cdf, varno); }
+    public DoItFeedback? ValueListStringSet(int varno, List<string> value, LogData ld) {
+        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
 
         if (Attributes[varno] is VariableListString vs) {
             vs.ValueList = value;
             return null;
         }
-        return DoItFeedback.WertKonnteNichtGesetztWerden(cdf, varno);
+        return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno);
     }
 
     public double ValueNumGet(int varno) {
@@ -135,34 +138,34 @@ public readonly struct SplittedAttributesFeedback {
         return Attributes[varno] is VariableString vs ? vs.ValueString : string.Empty;
     }
 
-    internal DoItFeedback? ValueBoolSet(int varno, bool value, CanDoFeedback cdf) {
-        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(cdf, varno); }
+    internal DoItFeedback? ValueBoolSet(int varno, bool value, LogData ld) {
+        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
 
         if (Attributes[varno] is VariableBool vs) {
             vs.ValueBool = value;
             return null;
         }
-        return DoItFeedback.WertKonnteNichtGesetztWerden(cdf, varno);
+        return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno);
     }
 
-    internal DoItFeedback? ValueNumSet(int varno, double value, CanDoFeedback cdf) {
-        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(cdf, varno); }
+    internal DoItFeedback? ValueNumSet(int varno, double value, LogData ld) {
+        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
 
         if (Attributes[varno] is VariableDouble vs) {
             vs.ValueNum = value;
             return null;
         }
-        return DoItFeedback.WertKonnteNichtGesetztWerden(cdf, varno);
+        return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno);
     }
 
-    internal DoItFeedback? ValueStringSet(int varno, string value, CanDoFeedback cdf) {
-        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(cdf, varno); }
+    internal DoItFeedback? ValueStringSet(int varno, string value, LogData ld) {
+        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
 
         if (Attributes[varno] is VariableString vs) {
             vs.ValueString = value;
             return null;
         }
-        return DoItFeedback.WertKonnteNichtGesetztWerden(cdf, varno);
+        return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno);
     }
 
     #endregion

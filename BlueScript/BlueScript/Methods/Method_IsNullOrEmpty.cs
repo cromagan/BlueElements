@@ -47,31 +47,31 @@ internal class Method_IsNullOrEmpty : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
 
         if (attvar.Attributes.Count == 0) {
             return attvar.ScriptIssueType != ScriptIssueType.VariableNichtGefunden
-                ? DoItFeedback.AttributFehler(cdf, this, attvar)
-                : DoItFeedback.Wahr(cdf.EndPosition());
+                ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
+                : DoItFeedback.Wahr();
         }
 
         var v = attvar.Attributes[0];
         if (v == null) { return DoItFeedback.InternerFehler(null); }
 
-        if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(cdf.EndPosition()); }
+        if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(); }
 
-        if (v is VariableUnknown) { return DoItFeedback.Wahr(cdf.EndPosition()); }
+        if (v is VariableUnknown) { return DoItFeedback.Wahr(); }
 
-        return DoItFeedback.Falsch(cdf.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch(ld.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
     #endregion

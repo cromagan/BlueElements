@@ -47,7 +47,7 @@ internal class Method_IsDropDownItem : Method_Database {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var column = Column(scp, attvar, 1);
         if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte in Datenbank nicht gefunden", true, ld); }
 
@@ -57,7 +57,7 @@ internal class Method_IsDropDownItem : Method_Database {
 
         tocheck = tocheck.SortedDistinctList();
 
-        return tocheck.Any(thisstring => !column.DropDownItems.Contains(thisstring)) ? DoItFeedback.Falsch(ld.EndPosition()) : DoItFeedback.Wahr(ld.EndPosition());
+        return tocheck.Any(thisstring => !column.DropDownItems.Contains(thisstring)) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
     #endregion

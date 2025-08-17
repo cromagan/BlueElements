@@ -46,19 +46,19 @@ internal class Method_Exception : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
-        if (string.IsNullOrEmpty(cdf.NormalizedText)) { return new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.", true, cdf); }
-        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scp);
-        return attvar.Attributes is not { Count: 1 } ? new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.", true, cdf)
-            : new DoItFeedback("Abbruch durch Exception-Befehl: " + attvar.ValueStringGet(0), true, cdf);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.", true, infos.LogData); }
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        return attvar.Attributes is not { Count: 1 } ? new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.", true, infos.LogData)
+            : new DoItFeedback("Abbruch durch Exception-Befehl: " + attvar.ValueStringGet(0), true, infos.LogData);
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch(ld.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
     #endregion

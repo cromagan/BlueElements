@@ -58,7 +58,7 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
 
     public QuickImage ComandImage() => QuickImage.Get(ImageCode.Mauspfeil, 16);
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var xdown = attvar.ValueIntGet(0);
         var ydown = attvar.ValueIntGet(1);
 
@@ -78,7 +78,7 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
         _ = WindowsRemoteControl.MoveMouse(xup, yup);
         Generic.Pause(0.01, false);
         WindowsRemoteControl.MouseAction(MouseEventFlags.MOUSEEVENTF_LEFTUP, xup, yup);
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     public string GetCode(Form? form) {

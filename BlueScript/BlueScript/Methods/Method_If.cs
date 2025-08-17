@@ -23,7 +23,6 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.Constants;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
@@ -61,7 +60,32 @@ public class Method_If : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback cdf, ScriptProperties scp) {
+    public static bool? GetBool(string txt) {
+        txt = txt.Trim(KlammernRund);
+
+        //            if (txt.Value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+        //                txt.Value.Equals("false", StringComparison.OrdinalIgnoreCase)) {
+        //                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
+        //                ValueString = txt.Value;
+        //                Type = VariableDataType.Bool;
+        //                Readonly = true;
+        //                return;
+        //            }
+
+        switch (txt.ToLowerInvariant()) {
+            case "!false":
+            case "true":
+                return true;
+
+            case "!true":
+            case "false":
+                return false;
+        }
+
+        return null;
+    }
+
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var m = new List<Method>();
         foreach (var thism in scp.AllowedMethods) {
             if (!thism.MethodType.HasFlag(MethodType.SpecialVariables)) {
@@ -69,25 +93,25 @@ public class Method_If : Method {
             }
         }
 
-        var scpt = new ScriptProperties(scp, m);
+        var scpt = new ScriptProperties(scp, m, scp.Stufe + 1, scp.Chain);
 
-        var attvar = SplitAttributeToVars(varCol, Args, LastArgMinCount, cdf, scpt);
-        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, cdf); }
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
+        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, infos.LogData); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = Method_CallByFilename.CallSub(varCol, scp, new CanDoFeedback("If-Befehl-Inhalt", cdf.Position, cdf.Protocol, cdf.Chain, cdf.FailedReason, cdf.NeedsScriptFix, cdf.CodeBlockAfterText, string.Empty), null, null);
+            var scx = Method_CallByFilename.CallSub(varCol, scp, "If-Befehl-Inhalt", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If", infos.LogData);
             return scx; // If muss die Breaks und Endsripts erhalten!
         }
 
-        return DoItFeedback.Null(cdf.EndPosition());
+        return DoItFeedback.Null();
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
-        return DoItFeedback.Falsch(ld.EndPosition());
+        return DoItFeedback.Falsch();
     }
 
     #endregion

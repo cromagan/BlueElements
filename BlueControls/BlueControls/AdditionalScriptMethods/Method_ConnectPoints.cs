@@ -47,7 +47,7 @@ internal class Method_ConnectPoints : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         //if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
@@ -58,11 +58,11 @@ internal class Method_ConnectPoints : Method {
 
         if (iciv.Parent is not ItemCollectionPadItem { IsDisposed: false }) { return new DoItFeedback("Das Item gehört keiner Collection an", true, ld); }
 
-        if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null(ld.EndPosition()); }
+        if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null(); }
 
         iciv.ConnectJointPoint(iciv, attvar.ValueStringGet(1), attvar.ValueStringGet(2), attvar.ValueBoolGet(3), attvar.ValueBoolGet(4));
 
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
 
         //return new DoItFeedback(ld, "Keine übereinstimmenden JointPoints gefunden.");
     }

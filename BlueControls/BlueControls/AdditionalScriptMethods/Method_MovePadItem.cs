@@ -47,7 +47,7 @@ internal class Method_MovePadItem : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is VariableItemCollectionPad icp) {
             if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
             icpv.Items_Move(attvar.ValueIntGet(1), attvar.ValueIntGet(2));
@@ -59,7 +59,7 @@ internal class Method_MovePadItem : Method {
             iciv.Move(attvar.ValueIntGet(1), attvar.ValueIntGet(2), false);
         }
 
-        return DoItFeedback.Null(ld.EndPosition());
+        return DoItFeedback.Null();
     }
 
     #endregion

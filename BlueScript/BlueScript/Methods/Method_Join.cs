@@ -46,9 +46,9 @@ internal class Method_Join : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, CanDoFeedback ld){
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var tmp = attvar.ValueListStringGet(0);
-        return new DoItFeedback(tmp.JoinWith(attvar.ValueStringGet(1)), ld.EndPosition());
+        return new DoItFeedback(tmp.JoinWith(attvar.ValueStringGet(1)));
     }
 
     #endregion
