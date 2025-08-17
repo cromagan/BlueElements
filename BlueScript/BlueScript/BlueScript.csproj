@@ -46,7 +46,6 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Methods\Method_Encrypt2.cs" />
     <Compile Include="Methods\Method_Stop.cs" />
     <Compile Include="Methods\Method_Decrypt.cs" />
     <Compile Include="Methods\Method_DeleteDirectory.cs" />

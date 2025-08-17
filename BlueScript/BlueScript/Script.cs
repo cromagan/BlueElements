@@ -132,7 +132,7 @@ public class Script {
                             return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, ld);
                         }
 
-                        var scx = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.AttributeText + ";", false);
+                        var scx = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.NormalizedText + ";", false);
                         return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinuePosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, ld);
                     }
                 }

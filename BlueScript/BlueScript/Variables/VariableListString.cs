@@ -112,21 +112,20 @@ public class VariableListString : Variable {
     protected override void SetValue(object? x) {
         if (x is List<string> val) {
             _list = val;
+        } else if (x is string[] val2) {
+            _list = val2.ToList();
         } else {
             Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
         }
     }
 
     protected override bool TryParseValue(string txt, out object? result) {
-        if (txt.Length > 1 && txt.StartsWith("[") && txt.EndsWith("]")) {
-            var t = txt.Trim(KlammernEckig);
+        if (txt.Length > 3 && txt.StartsWith("[\"") && txt.EndsWith("\"]")) {
+            var t = txt.Substring(2, txt.Length - 4);
 
             if (string.IsNullOrEmpty(t)) { result = new List<string>(); return true; } // Leere Liste
 
-            var l = Method.SplitAttributeToVars(null, [[VariableString.ShortName_Plain]], 1, null, null);
-            if (l.Failed) { result = null; return false; }
-
-            result = l.Attributes.AllStringValues();
+            result = t.SplitBy("\",\"");
             return true;
         }
 

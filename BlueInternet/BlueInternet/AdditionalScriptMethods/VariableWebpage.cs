@@ -72,16 +72,19 @@ public class VariableWebpage : Variable {
 
     public override void DisposeContent() => _browser?.Dispose();
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableWebpage v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariableWebpage v) { return VerschiedeneTypen(variable); }
+        if (ReadOnly) { return Schreibgschützt(); }
         ValueWebpage = v.ValueWebpage;
-        return DoItFeedback.Null();
+        return string.Empty;
     }
 
     protected override void SetValue(object? x) { }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+        return false;
+    }
 
     #endregion
 }

@@ -60,31 +60,6 @@ public class Method_If : Method {
 
     #region Methods
 
-    public static bool? GetBool(string txt) {
-        txt = txt.Trim(KlammernRund);
-
-        //            if (txt.Value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
-        //                txt.Value.Equals("false", StringComparison.OrdinalIgnoreCase)) {
-        //                if (Type is not VariableDataType.NotDefinedYet and not VariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
-        //                ValueString = txt.Value;
-        //                Type = VariableDataType.Bool;
-        //                Readonly = true;
-        //                return;
-        //            }
-
-        switch (txt.ToLowerInvariant()) {
-            case "!false":
-            case "true":
-                return true;
-
-            case "!true":
-            case "false":
-                return false;
-        }
-
-        return null;
-    }
-
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var m = new List<Method>();
         foreach (var thism in scp.AllowedMethods) {

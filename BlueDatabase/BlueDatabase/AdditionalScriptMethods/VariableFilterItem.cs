@@ -80,16 +80,19 @@ public class VariableFilterItem : Variable {
 
     public override void DisposeContent() => _filter = null;
 
-    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
-        if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
+    public override string GetValueFrom(Variable variable) {
+        if (variable is not VariableFilterItem v) { return VerschiedeneTypen(variable); }
+        if (ReadOnly) { return Schreibgschützt(); }
         FilterItem = v.FilterItem;
-        return DoItFeedback.Null();
+        return string.Empty;
     }
 
     protected override void SetValue(object? x) { }
 
-    protected override (bool cando, object? result) TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => (false, null);
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+        return false;
+    }
 
     private void GetText() => _lastText = _filter == null || !_filter.IsOk() ? "Filter: [ERROR]" : "Filter: " + _filter.ReadableText();
 

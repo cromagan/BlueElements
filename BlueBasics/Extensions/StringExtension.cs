@@ -1172,7 +1172,7 @@ public static partial class Extensions {
         return tXt;
     }
 
-    public static byte[] UTF8_ToByte(this string? tXt) => tXt == null || string.IsNullOrEmpty(tXt) ? [] : Encoding.UTF8.GetBytes(tXt);
+    public static byte[] UTF8_ToByte(this string? tXt) => tXt == null || string.IsNullOrEmpty(tXt) ? ([]) : Encoding.UTF8.GetBytes(tXt);
 
     #endregion
 }
