@@ -33,7 +33,7 @@ internal class Method_Table : Method {
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
-    public override string Command => "database";
+    public override string Command => "table";
     public override List<string> Constants => [];
     public override string Description => "Versucht die Tabelle in den Speicher zu holen.";
     public override bool GetCodeBlockAfter => false;
@@ -42,7 +42,7 @@ internal class Method_Table : Method {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableTable.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "Databse(Filename/Tablename)";
+    public override string Syntax => "Table(Filename/Tablename)";
 
     #endregion
 
