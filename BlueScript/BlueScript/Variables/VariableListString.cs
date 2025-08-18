@@ -123,6 +123,8 @@ public class VariableListString : Variable {
         if (txt.Length > 3 && txt.StartsWith("[\"") && txt.EndsWith("\"]")) {
             var t = txt.Substring(2, txt.Length - 4);
 
+            t=t.Replace("\", \"", "\",\"");
+
             if (string.IsNullOrEmpty(t)) { result = new List<string>() { string.Empty }; return true; } // Leere Liste
 
             result = t.SplitBy("\",\"");
