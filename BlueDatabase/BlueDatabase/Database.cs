@@ -1315,7 +1315,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _ = vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         _ = vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
         _ = vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
-        _ = vars.Add(new VariableDatabase("Tabelle", this, true, "Die aktuelle Tabelle"));
+        _ = vars.Add(new VariableDatabase("Table", this, true, "Die aktuelle Tabelle"));
         _ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
         _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
         _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
