@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueControls.ItemCollectionPad;
-using BlueScript.Structures;
 
 namespace BlueScript.Variables;
 

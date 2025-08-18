@@ -21,7 +21,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -135,7 +134,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
         }
         set {
             if (!TryParseValue(value, out var result)) {
-                Develop.DebugPrint(ErrorType.Error, "Variablenfehler");
+                Develop.DebugPrint(ErrorType.Error, "Variablenfehler: " + value);
             }
             SetValue(result);
         }
@@ -234,7 +233,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
     public new string ToString() => $"({MyClassId}){_keyName}";
 
     public bool TryParse(string txt, out Variable? succesVar) {
-        if (!TryParseValue(txt, out var result) || result == null) {
+        if (!TryParseValue(txt, out var result)) {
             succesVar = null;
             return false;
         }

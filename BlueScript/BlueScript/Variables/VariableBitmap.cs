@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueScript.Structures;
 using System.Collections.Generic;
 using System.Drawing;
 

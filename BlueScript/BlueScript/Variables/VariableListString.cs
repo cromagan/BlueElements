@@ -19,11 +19,8 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueScript.Methods;
-using BlueScript.Structures;
 using System.Collections.Generic;
 using System.Linq;
-using static BlueBasics.Constants;
 
 namespace BlueScript.Variables;
 
@@ -120,10 +117,13 @@ public class VariableListString : Variable {
     }
 
     protected override bool TryParseValue(string txt, out object? result) {
+
+        if (txt == "[]") { result = new List<string>(); return true; } // Leere Liste
+
         if (txt.Length > 3 && txt.StartsWith("[\"") && txt.EndsWith("\"]")) {
             var t = txt.Substring(2, txt.Length - 4);
 
-            if (string.IsNullOrEmpty(t)) { result = new List<string>(); return true; } // Leere Liste
+            if (string.IsNullOrEmpty(t)) { result = new List<string>() { string.Empty }; return true; } // Leere Liste
 
             result = t.SplitBy("\",\"");
             return true;

@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueScript.Structures;
 using System;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;

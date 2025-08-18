@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueScript.Structures;
 
 namespace BlueScript.Variables;
 
@@ -103,8 +102,8 @@ public class VariableUnknown : Variable {
     }
 
     protected override bool TryParseValue(string txt, out object? result) {
-        result = null;
-        return false;
+        result = txt;
+        return true;
     }
 
     #endregion

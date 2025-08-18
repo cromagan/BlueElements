@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase;
-using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript;

@@ -19,7 +19,6 @@
 
 using BlueBasics.Interfaces;
 using BlueDatabase;
-using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript;
