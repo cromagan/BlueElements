@@ -134,7 +134,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
         }
         set {
             if (!TryParseValue(value, out var result)) {
-                Develop.DebugPrint(ErrorType.Error, "Variablenfehler: " + value);
+                Develop.DebugPrint(ErrorType.Error, $"Variablenfehler({MyClassId}): {value}");
             }
             SetValue(result);
         }

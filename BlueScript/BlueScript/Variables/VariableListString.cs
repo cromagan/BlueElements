@@ -118,7 +118,7 @@ public class VariableListString : Variable {
 
     protected override bool TryParseValue(string txt, out object? result) {
 
-        if (txt == "[]") { result = new List<string>(); return true; } // Leere Liste
+        if (txt is "[]" or "[ ]") { result = new List<string>(); return true; } // Leere Liste
 
         if (txt.Length > 3 && txt.StartsWith("[\"") && txt.EndsWith("\"]")) {
             var t = txt.Substring(2, txt.Length - 4);
