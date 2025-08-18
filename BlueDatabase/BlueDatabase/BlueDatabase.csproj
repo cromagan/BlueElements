@@ -77,16 +77,17 @@
   <ItemGroup>
     <Compile Include="AdditionalScriptMethods\Method_AddRows.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallDatabase.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Filter_OLD2.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SumFilter.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_DatabaseGeneric.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Execute.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_EnsureDatabaseLoaded.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ForEachRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ImportLinked.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_LookupFilterAllValues.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_LookupFilterFirstValue.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_FilterAllValues.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_FilterFirstValue.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowDelete.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Call.cs" />
@@ -94,7 +95,6 @@
     <Compile Include="AdditionalScriptMethods\Method_CellSetRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CellSetFilter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallFilter.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_ContentsFilter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ImportCSV.cs" />
     <Compile Include="AdditionalScriptMethods\Method_IsDropDownItem.cs" />
     <Compile Include="AdditionalScriptMethods\Method_RowCount.cs" />
@@ -102,10 +102,11 @@
     <Compile Include="AdditionalScriptMethods\Method_RowIsNull.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
     <Compile Include="AdditionalScriptMethods\Method_MatchColumnFormat.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_LookupFilter.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_Lookup.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CellGetFilter.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CellGetKey.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Filter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetError.cs" />
+    <Compile Include="AdditionalScriptMethods\VariableDatabase.cs" />
     <Compile Include="AdditionalScriptMethods\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptMethods\VariableFilterItem.cs" />
     <Compile Include="Chunk.cs" />

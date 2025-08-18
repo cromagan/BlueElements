@@ -28,12 +28,12 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_Filter : Method_DatabaseGeneric {
+public class Method_Filter_OLD2 : Method_DatabaseGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [DatabaseVar, StringVal, StringVal, StringVal];
-    public override string Command => "filter";
+    public override List<List<string>> Args => [StringVal, StringVal, StringVal, StringVal];
+    public override string Command => "filterold";
 
     public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
 
@@ -49,7 +49,7 @@ public class Method_Filter : Method_DatabaseGeneric {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFilterItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "Filter(Datenbank, Spalte, Filtertyp, Wert)";
+    public override string Syntax => "FilterOLD(Datenbank, Spalte, Filtertyp, Wert)";
 
     #endregion
 
@@ -118,7 +118,7 @@ public class Method_Filter : Method_DatabaseGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (attvar.Attributes[0] is not VariableDatabase vdb || vdb.Database is not { IsDisposed: false } db) { return new DoItFeedback("Datenbank nicht vorhanden", true, ld); }
+        if (Database.Get(attvar.ValueStringGet(0), false, null) is not { IsDisposed: false } db) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
 
         //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 

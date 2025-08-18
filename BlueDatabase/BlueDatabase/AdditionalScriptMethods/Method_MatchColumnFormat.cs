@@ -28,7 +28,7 @@ using static BlueBasics.Extensions;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_MatchColumnFormat : Method_Database {
+internal class Method_MatchColumnFormat : Method_DatabaseGeneric {
 
     #region Properties
 

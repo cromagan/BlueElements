@@ -24,48 +24,48 @@ using BlueScript.Variables;
 
 namespace BlueScript;
 
-public class VariableRowItem : Variable {
+public class VariableDatabase : Variable {
 
     #region Fields
 
     private string _lastText = string.Empty;
-    private RowItem? _row;
+    private Database? _database;
 
     #endregion
 
     #region Constructors
 
-    public VariableRowItem(string name, RowItem? value, bool ronly, string comment) : base(name, ronly, comment) {
-        _row = value;
+    public VariableDatabase(string name, Database? value, bool ronly, string comment) : base(name, ronly, comment) {
+        _database = value;
         GetText();
     }
 
-    public VariableRowItem() : this(string.Empty, null, true, string.Empty) { }
+    public VariableDatabase() : this(string.Empty, null, true, string.Empty) { }
 
-    public VariableRowItem(RowItem? value) : this(DummyName(), value, true, string.Empty) { }
+    public VariableDatabase(Database? value) : this(DummyName(), value, true, string.Empty) { }
 
-    public VariableRowItem(string name) : this(name, null, true, string.Empty) { }
+    public VariableDatabase(string name) : this(name, null, true, string.Empty) { }
 
     #endregion
 
     #region Properties
 
-    public static string ClassId => "row";
-    public static string ShortName_Variable => "*row";
+    public static string ClassId => "bdb";
+    public static string ShortName_Variable => "*bdb";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
-    public override bool IsNullOrEmpty => _row == null;
+    public override bool IsNullOrEmpty => _database == null;
 
     /// <summary>
-    /// Gibt den Text "Row: CellFirstString" zurück.
+    /// Gibt den Text "Database: Caption" zurück.
     /// </summary>
     public override string ReadableText => _lastText;
 
-    public RowItem? RowItem {
-        get => _row;
+    public Database? Database {
+        get => _database;
         private set {
             if (ReadOnly) { return; }
-            _row = value;
+            _database = value;
 
             GetText();
         }
@@ -75,26 +75,26 @@ public class VariableRowItem : Variable {
 
     public override bool ToStringPossible => true;
 
-    public override string ValueForReplace => _row is null || _row.Database is not { IsDisposed: false } db ? "{ROW:?}" : "{ROW:" + db.TableName + ";" + _row.KeyName + "}";
+    public override string ValueForReplace => _database is not { IsDisposed: false } db ? "{DB:?}" : "{DB:" + db.TableName + "}";
 
     #endregion
 
     #region Methods
 
-    public override void DisposeContent() => _row = null;
+    public override void DisposeContent() => _database = null;
 
     public override string GetValueFrom(Variable variable) {
-        if (variable is not VariableRowItem v) { return VerschiedeneTypen(variable); }
+        if (variable is not VariableDatabase v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
-        RowItem = v.RowItem;
+        Database = v.Database;
         return string.Empty;
     }
 
     protected override void SetValue(object? x) {
         if (x is null) {
-            _row = null;
-        } else if (x is RowItem r) {
-            _row = r;
+            _database = null;
+        } else if (x is Database db) {
+            _database = db;
         } else {
             Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
         }
@@ -104,26 +104,21 @@ public class VariableRowItem : Variable {
     protected override bool TryParseValue(string txt, out object? result) {
         result = null;
 
-        if (txt.Length > 6 && txt.StartsWith("{ROW:") && txt.EndsWith("}")) {
-            var t = txt.Substring(5, txt.Length - 6);
+        if (txt.Length > 6 && txt.StartsWith("{DB:") && txt.EndsWith("}")) {
+            var t = txt.Substring(4, txt.Length - 5);
 
             if (t == "?") { return true; }
 
-            var tx = t.SplitBy(";");
-            if (tx.Length != 2) { return false; }
+            if (Database.Get(t, false, null) is not { IsDisposed: false } db) { return false; }
 
-            if (Database.Get(tx[0], false, null) is not { IsDisposed: false } db) { return false; }
-
-            if (db.Row.SearchByKey(tx[1]) is not { IsDisposed: false } row) { return false; }
-
-            result = row;
+            result = db;
             return true;
         }
 
         return false;
     }
 
-    private void GetText() => _lastText = _row == null ? "Row: [NULL]" : "Row: " + _row.CellFirstString();
+    private void GetText() => _lastText = _database == null ? "Database: [NULL]" : "Database: " + _database.TableName;
 
     #endregion
 }

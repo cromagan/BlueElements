@@ -19,6 +19,7 @@
 
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -28,11 +29,11 @@ using System.Diagnostics;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallDatabase : Method_Database, IUseableForButton {
+public class Method_CallDatabase : Method_DatabaseGeneric, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [DatabaseVar, StringVal, StringVal];
     public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
     public List<string> ArgsForButtonDescription => ["Datenbank", "Auszuführendes Skript", "Attribut0"];
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
@@ -59,9 +60,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        var db = Database.Get(attvar.ValueStringGet(0), false, null);
-        if (db == null) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
-
+        if (attvar.Attributes[0] is not VariableDatabase vdb || vdb.Database is not { IsDisposed: false } db) { return new DoItFeedback("Datenbank nicht vorhanden", true, ld); }
         if (db == myDb) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 
         var m = db.CanWriteMainFile();
@@ -89,7 +88,11 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
         return scx;
     }
 
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1] + "," + args[2];
+    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) {
+        var db = Database.Get(args[0], false, null);
+        var vdb = new VariableDatabase(db);
+       return vdb.ValueForReplace + "," + args[1] + "," + args[2];
+    }
 
     #endregion
 }

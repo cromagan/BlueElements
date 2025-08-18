@@ -27,7 +27,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_SetError : Method_Database {
+public class Method_SetError : Method_DatabaseGeneric {
 
     #region Fields
 

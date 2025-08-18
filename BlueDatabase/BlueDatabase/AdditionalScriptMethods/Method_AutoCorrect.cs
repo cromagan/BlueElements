@@ -28,7 +28,7 @@ using static BlueBasics.Converter;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_AutoCorrect : Method_Database {
+internal class Method_AutoCorrect : Method_DatabaseGeneric {
 
     #region Properties
 

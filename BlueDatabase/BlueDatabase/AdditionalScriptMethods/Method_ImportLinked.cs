@@ -28,7 +28,7 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_ImportLinked : Method_Database {
+public class Method_ImportLinked : Method_DatabaseGeneric {
 
     #region Properties
 

@@ -25,7 +25,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_ImportCsv : Method_Database {
+internal class Method_ImportCsv : Method_DatabaseGeneric {
 
     #region Properties
 

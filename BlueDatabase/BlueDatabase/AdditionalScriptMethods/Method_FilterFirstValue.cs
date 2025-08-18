@@ -25,23 +25,21 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_ContentsFilter : Method_Database {
+public class Method_FilterFirstValue : Method_DatabaseGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FilterVar];
-    public override string Command => "contentsfilter";
+    public override List<List<string>> Args => [StringVal, StringVal, FilterVar];
+    public override string Command => "filterfirstvalue";
     public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
+    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.\r\n\r\nAchtung: Das Laden einer Datenbank kann sehr Zeitintensiv sein.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird der nächstbeste zurückgegeben.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.MyDatabaseRow;
+    public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableListString.ShortName_Plain;
-
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-
-    public override string Syntax => "ContentsFilter(Colum, Filter, ...)";
+    public override string Syntax => "FilterFirstValue(ReturnColumn, NothingFoundValue, Filter, ...)";
 
     #endregion
 
@@ -50,9 +48,8 @@ public class Method_ContentsFilter : Method_Database {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);
+        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, myDb, scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
-
         if (allFi.Database is not { IsDisposed: false } db) {
             allFi.Dispose();
             return new DoItFeedback("Datenbankfehler!", true, ld);
@@ -61,13 +58,13 @@ public class Method_ContentsFilter : Method_Database {
         var r = allFi.Rows;
         allFi.Dispose();
 
-        var returncolumn = db.Column[attvar.ReadableText(0)];
-        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ReadableText(0), true, ld); }
-
+        var returncolumn = db.Column[attvar.ValueStringGet(0)];
+        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
         returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
 
-        var x = returncolumn.Contents(r);
-        return new DoItFeedback(x);
+        if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1)); }
+
+        return new DoItFeedback(r[0].CellGetString(returncolumn));
     }
 
     #endregion

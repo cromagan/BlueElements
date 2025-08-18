@@ -29,7 +29,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_SoftMessage : Method_Database, IUseableForButton {
+public class Method_SoftMessage : Method_DatabaseGeneric, IUseableForButton {
 
     #region Properties
 

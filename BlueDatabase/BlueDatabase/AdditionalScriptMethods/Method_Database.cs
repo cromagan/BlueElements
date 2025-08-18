@@ -17,47 +17,50 @@
 
 #nullable enable
 
-using BlueScript;
-using BlueScript.Methods;
+using BlueBasics;
+using BlueBasics.Interfaces;
+using BlueDatabase;
+using BlueScript.Enums;
 using BlueScript.Structures;
+using BlueScript.Variables;
 using System.Collections.Generic;
 
-namespace BlueDatabase.AdditionalScriptMethods;
+namespace BlueScript.Methods;
 
-public abstract class Method_Database : Method {
+// ReSharper disable once UnusedMember.Global
+internal class Method_Database : Method {
 
-    #region Fields
+    #region Properties
 
-    public static readonly List<string> FilterVar = [VariableFilterItem.ShortName_Variable];
-
-    public static readonly List<string> RowVar = [VariableRowItem.ShortName_Variable];
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "database";
+    public override List<string> Constants => [];
+    public override string Description => "Versucht die Datenbank in den Speicher zu holen.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableDatabase.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "Databse(Filename/Tablename)";
 
     #endregion
 
     #region Methods
 
-    protected static Database? MyDatabase(ScriptProperties scp) {
-        if (scp.AdditionalInfo is Database { IsDisposed: false } db) { return db; }
-        if (scp.AdditionalInfo is RowItem r) { return r.Database; }
-        return null;
-    }
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        var filn = attvar.ValueStringGet(0);
 
-    protected static RowItem? MyRow(ScriptProperties scp) {
-        if (scp.AdditionalInfo is RowItem r) { return r; }
-        return null;
-    }
+        //if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
-    protected ColumnItem? Column(ScriptProperties scp, SplittedAttributesFeedback attvar, int no) {
-        var c = attvar.Attributes[no];
-        if (c == null) { return null; }
+        //if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
 
-        if (c.KeyName.ToUpperInvariant().StartsWith("ID_")) {
-            return MyDatabase(scp)?.Column[c.SearchValue];
+        if (Database.Get(filn, false, null) is { IsDisposed: false } db) {
+            return new DoItFeedback(new VariableDatabase(db));
         }
 
-        return MyDatabase(scp)?.Column[c.KeyName];
+        return new DoItFeedback($"Datenbank '{filn}' nicht gefunden", true, ld);
     }
-
 
     #endregion
 }

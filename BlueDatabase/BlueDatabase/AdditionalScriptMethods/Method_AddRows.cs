@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueDatabase.Enums;
+using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -28,11 +29,11 @@ using System.Diagnostics;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_AddRows : Method_Database {
+public class Method_AddRows : Method_DatabaseGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FloatVal, ListStringVar, FilterVar];
+    public override List<List<string>> Args => [DatabaseVar, FloatVal, ListStringVar, FilterVar];
     public override string Command => "addrows";
     public override List<string> Constants => [];
 
@@ -62,8 +63,7 @@ public class Method_AddRows : Method_Database {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        var db = Database.Get(attvar.ValueStringGet(0), false, null);
-        if (db == null) { return new DoItFeedback("Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld); }
+        if (attvar.Attributes[0] is not VariableDatabase vdb || vdb.Database is not { IsDisposed: false} db  ) { return new DoItFeedback("Datenbank nicht vorhanden", true, ld); }
 
         if (!db.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 

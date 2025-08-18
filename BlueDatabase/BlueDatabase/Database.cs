@@ -1305,7 +1305,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (dbVariables) {
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Tabellen-Kopf-Variable\r\n" + thisvar.Comment);
                 _ = vars.Add(v);
             }
         }
@@ -1315,9 +1315,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _ = vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
         _ = vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
         _ = vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
+        _ = vars.Add(new VariableDatabase("Tabelle", this, true, "Die aktuelle Tabelle"));
         _ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
-        _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
-        _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
+        _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
+        _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
 
         //if (Column.SysCorrect is { IsDisposed: false } csc && row is { IsDisposed: false }) {
         //    _ = vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));

@@ -28,7 +28,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_ForEachRow : Method_Database {
+internal class Method_ForEachRow : Method_DatabaseGeneric {
 
     #region Properties
 
