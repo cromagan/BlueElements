@@ -267,7 +267,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         PermissionGroups_NewRow.ItemAddRange(Table.Permission_AllUsed(false));
 
         lbxTableAdmin.ItemClear();
-        lbxTableAdmin.Check(db.DatenbankAdmin);
+        lbxTableAdmin.Check(db.TableAdmin);
 
         txbKennwort.Text = db.GlobalShowPass;
         lbxSortierSpalten.ItemClear();
@@ -414,7 +414,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         Database.Tags = new(txbTags.Text.SplitAndCutByCrToList());
 
-        Database.DatenbankAdmin = new(lbxTableAdmin.Checked);
+        Database.TableAdmin = new(lbxTableAdmin.Checked);
 
         var tmp = PermissionGroups_NewRow.Checked.ToList();
         _ = tmp.Remove(Constants.Administrator);

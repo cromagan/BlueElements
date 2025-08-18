@@ -115,7 +115,7 @@ public class DatabaseChunk : Database {
 
             mainChunk.SaveToByteList(DatabaseDataType.Tags, db.Tags.JoinWithCr());
             mainChunk.SaveToByteList(DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
-            mainChunk.SaveToByteList(DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
+            mainChunk.SaveToByteList(DatabaseDataType.DatabaseAdminGroups, db.TableAdmin.JoinWithCr());
 
             mainChunk.SaveToByteList(DatabaseDataType.AdditionalFilesPath, db.AdditionalFilesPath);
             mainChunk.SaveToByteList(DatabaseDataType.RowQuickInfo, db.RowQuickInfo);

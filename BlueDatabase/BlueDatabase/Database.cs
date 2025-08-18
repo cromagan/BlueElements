@@ -92,7 +92,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
-    private readonly List<string> _datenbankAdmin = [];
+    private readonly List<string> _tableAdmin = [];
 
     private readonly List<string> _permissionGroupsNewRow = [];
 
@@ -311,11 +311,11 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public ReadOnlyCollection<string> TabelleAdmin {
-        get => new(_datenbankAdmin);
+    public ReadOnlyCollection<string> TableAdmin {
+        get => new(_tableAdmin);
         set {
-            if (!_datenbankAdmin.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr());
+            if (!_tableAdmin.IsDifferentTo(value)) { return; }
+            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, _tableAdmin.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -1940,10 +1940,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
-        if (_datenbankAdmin.Count == 0) { return false; }
-        if (_datenbankAdmin.Contains(Everybody, false)) { return true; }
-        if (!string.IsNullOrEmpty(UserName) && _datenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
-        return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
+        if (_tableAdmin.Count == 0) { return false; }
+        if (_tableAdmin.Contains(Everybody, false)) { return true; }
+        if (!string.IsNullOrEmpty(UserName) && _tableAdmin.Contains("#User: " + UserName, false)) { return true; }
+        return !string.IsNullOrEmpty(UserGroup) && _tableAdmin.Contains(UserGroup, false);
     }
 
     public string IsNowEditable() => GrantWriteAccess(DatabaseDataType.Caption, DatabaseChunk.Chunk_Master);
@@ -2271,7 +2271,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         SortDefinition?.Repair();
 
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
-        TabelleAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
+        TableAdmin = RepairUserGroups(TableAdmin).AsReadOnly();
 
         OnAdditionalRepair();
     }
@@ -2426,7 +2426,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 Undo.Clear();
                 _eventScript = new ReadOnlyCollection<DatabaseScriptDescription>([]);
                 //_eventScriptEdited = new ReadOnlyCollection<DatabaseScriptDescription>([]);
-                _datenbankAdmin.Clear();
+                _tableAdmin.Clear();
                 _permissionGroupsNewRow.Clear();
                 _tags.Clear();
 
@@ -2651,7 +2651,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case DatabaseDataType.DatabaseAdminGroups:
-                _datenbankAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
+                _tableAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                 break;
 
             case DatabaseDataType.SortDefinition:

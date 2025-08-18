@@ -624,7 +624,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
             }
         }
         e.AddRange(db.PermissionGroupsNewRow);
-        e.AddRange(db.DatenbankAdmin);
+        e.AddRange(db.TableAdmin);
 
         var tcvc = ColumnViewCollection.ParseAll(db);
         foreach (var thisArrangement in tcvc) {

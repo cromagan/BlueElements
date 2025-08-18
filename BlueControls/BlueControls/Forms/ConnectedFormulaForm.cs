@@ -47,7 +47,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     public ConnectedFormulaForm() => InitializeComponent();
 
     public ConnectedFormulaForm(string filename, string mode) : this() {
-        btnEingehendeDatenbank.Enabled = false;
+        btnEingehendeTabelle.Enabled = false;
         btnAusgehendeDatenbank.Enabled = false;
 
         CFormula.Mode = mode;
@@ -71,7 +71,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         }
     }
 
-    private void btnEingehendeDatenbank_Click(object sender, System.EventArgs e) {
+    private void btnEingehendeTabelle_Click(object sender, System.EventArgs e) {
         if (_lastItem is ReciverControlPadItem { DatabaseInput: { IsDisposed: false } db }) {
             var c = new TableView(db, false, true, true);
             _ = c.ShowDialog();
@@ -233,7 +233,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
             _lastItem = null;
         }
 
-        btnEingehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is ReciverControlPadItem;
+        btnEingehendeTabelle.Enabled = Generic.IsAdministrator() && _lastItem is ReciverControlPadItem;
         btnAusgehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is ReciverSenderControlPadItem;
 
         if (_lastItem is ReciverControlPadItem fcpi) {
