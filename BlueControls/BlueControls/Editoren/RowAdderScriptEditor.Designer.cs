@@ -89,7 +89,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnDatenbankKopf.Name = "btnDatenbankKopf";
             this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
             this.btnDatenbankKopf.TabIndex = 46;
-            this.btnDatenbankKopf.Text = "Datenbank-Kopf";
+            this.btnDatenbankKopf.Text = "Tabellen-Kopf";
             this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
             // 
             // grpScripte
@@ -187,7 +187,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.grpScripte);
             this.Name = "RowAdderScriptEditor";
-            this.Text = "Datenbank-Eigenschaften";
+            this.Text = "Tabellen-Eigenschaften";
             this.Controls.SetChildIndex(this.ribMain, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
             this.Controls.SetChildIndex(this.grpScripte, 0);

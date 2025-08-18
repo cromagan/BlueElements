@@ -93,7 +93,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
         Close();
     }
 
-    private void btnDatenbankwählen_Click(object sender, System.EventArgs e) => _ = LoadTab.ShowDialog();
+    private void btnChoseTable_Click(object sender, System.EventArgs e) => _ = LoadTab.ShowDialog();
 
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
@@ -101,7 +101,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
 
     private void CheckButtons() {
         if (_database == null) {
-            txtInfo.Text = "Keine Datenbank gewählt.";
+            txtInfo.Text = "Keine Tabelle gewählt.";
             btnImport.Enabled = false;
             return;
         }
@@ -149,7 +149,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasDatabase {
         if (_files is not { Count: not 0 }) { return; }
         if (_database == null) { return; }
 
-        var m = "Datenbank-Fehler";
+        var m = "Tabellen-Fehler";
 
         if (Database is { IsDisposed: false }) {
             m = Database.ImportBdb(_files, _database.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);

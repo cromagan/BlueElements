@@ -26,14 +26,14 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_CellSetFilter : Method_DatabaseGeneric {
+public class Method_CellSetFilter : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, FilterVar];
     public override string Command => "cellsetfilter";
     public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und setzt den Wert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
+    public override string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und setzt den Wert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
 
@@ -58,7 +58,7 @@ public class Method_CellSetFilter : Method_DatabaseGeneric {
         var db = allFi.Database;
         if (db is not { IsDisposed: false }) {
             allFi.Dispose();
-            return new DoItFeedback("Datenbank verworfen.", true, ld);
+            return new DoItFeedback("Tabelle verworfen.", true, ld);
         }
 
         if (db.Column[attvar.ValueStringGet(1)] is not { IsDisposed: false } columnToSet) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(4), true, ld); }

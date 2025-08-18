@@ -25,14 +25,14 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CellGetFilter : Method_DatabaseGeneric {
+public class Method_CellGetFilter : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
     public override string Command => "cellgetfilter";
     public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als String zurück.\r\n\r\nAchtung: Das Laden einer Datenbank kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\n\r\nÄhnlichr Befehle: CellGetRow, ImportLinked";
+    public override string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\n\r\nÄhnlichr Befehle: CellGetRow, ImportLinked";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;

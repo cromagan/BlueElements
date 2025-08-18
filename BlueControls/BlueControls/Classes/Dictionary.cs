@@ -67,7 +67,7 @@ internal static class Dictionary {
             // Wenn ein Wort klein geschrieben ist
             // nicht GROSS gescrieben
             // oder nicht am Worftanfang
-            // muss es genau so in der Datenbank sein!
+            // muss es genau so in der Tabelle sein!
             return _dictWords.Row[new FilterItem(fc, FilterType.Istgleich, word)] != null;
         }
 

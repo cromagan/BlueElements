@@ -118,8 +118,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="varcol">Wird eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
     /// <returns></returns>
     public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(Database? linkedDatabase, ColumnItem inputColumn, RowItem? inputRow, VariableCollection? varcol) {
-        if (linkedDatabase is not { IsDisposed: false }) { return (null, "Verlinkte Datenbank verworfen."); }
-        if (inputColumn.Database is not { IsDisposed: false } || inputColumn.IsDisposed) { return (null, "Datenbank verworfen."); }
+        if (linkedDatabase is not { IsDisposed: false }) { return (null, "Verlinkte Tabelle verworfen."); }
+        if (inputColumn.Database is not { IsDisposed: false } || inputColumn.IsDisposed) { return (null, "Tabelle verworfen."); }
 
         var fi = new List<FilterItem>();
 
@@ -160,11 +160,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public static (FilterCollection? fc, string info) GetFilterReverse(ColumnItem mycolumn, ColumnItem linkedcolumn, RowItem linkedrow) {
-        if (linkedcolumn.Database is not { IsDisposed: false } ldb || linkedcolumn.IsDisposed) { return (null, "Datenbank verworfen."); }
+        if (linkedcolumn.Database is not { IsDisposed: false } ldb || linkedcolumn.IsDisposed) { return (null, "Tabelle verworfen."); }
 
         if (mycolumn.RelationType != RelationType.CellValues) { return (null, "Falsches Format."); }
 
-        if (mycolumn.Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen."); }
+        if (mycolumn.Database is not { IsDisposed: false } db) { return (null, "Tabelle verworfen."); }
 
         var fi = new List<FilterItem>();
 
@@ -244,7 +244,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="column"></param>
     /// <param name="mode"></param>
     /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei internen Prozessen angeben.</param>
-    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
+    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Tabelleansicht empfohlen.</param>
     /// <param name="repairallowed"></param>
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
@@ -296,7 +296,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
 
-            if (lcolumn?.Database is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank verworfen."; }
+            if (lcolumn?.Database is not { IsDisposed: false } db2) { return "Verknüpfte Tabelle verworfen."; }
 
             db2.PowerEdit = db.PowerEdit;
 
@@ -326,7 +326,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     /// <summary>
     /// Diese Routine erstellt den umgekehrten Linked-Cell-Filter:
-    /// Es versucht rauszufinden, welche Zeile in der Datenbank von mycolumn von der Zeile linkedrow befüllt werden.
+    /// Es versucht rauszufinden, welche Zeile in der Tabelle von mycolumn von der Zeile linkedrow befüllt werden.
     /// </summary>
     /// <param name="mycolumn"></param>
     /// <param name="linkedcolumn"></param>
@@ -347,10 +347,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, RowItem? inputRow, bool repairallowed, bool addRowIfNotExists) {
-        if (inputColumn?.Database is not { IsDisposed: false } db) { return (null, null, "Eigene Datenbank verworfen.", false); }
+        if (inputColumn?.Database is not { IsDisposed: false } db) { return (null, null, "Eigene Tabelle verworfen.", false); }
         if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
         if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine Split-Spalte sein.", false); }
-        if (inputColumn.LinkedDatabase is not { IsDisposed: false } linkedDatabase) { return (null, null, "Verknüpfte Datenbank verworfen.", false); }
+        if (inputColumn.LinkedDatabase is not { IsDisposed: false } linkedDatabase) { return (null, null, "Verknüpfte Tabelle verworfen.", false); }
         if (inputRow is not { IsDisposed: false }) { return (null, null, "Keine Zeile zum finden des Zeilenschlüssels angegeben.", false); }
 
         if (linkedDatabase.Column[inputColumn.ColumnNameOfLinkedDatabase] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieldatenbank nicht vorhanden.", false); }
@@ -391,7 +391,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                         var editableError = GrantWriteAccess(inputColumn, inputRow, chunkValue, 20, true);
 
                         if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
-                        //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
+                        //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
                         //row.CellSet(column, targetRow.KeyName);
                         //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
@@ -429,8 +429,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     {
         try {
             if (IsDisposed || Database is not { IsDisposed: false }) {
-                Database?.DevelopWarnung("Datenbank ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Datenbank ungültig!");
+                Database?.DevelopWarnung("Tabelle ungültig!");
+                Develop.DebugPrint(ErrorType.Error, "Tabelle ungültig!");
                 return string.Empty;
             }
 
@@ -471,21 +471,21 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public string Set(ColumnItem? column, RowItem? row, string value, string comment) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank ungültig!"; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Tabelle ungültig!"; }
 
-        if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Datenbank eingefroren!"; }
+        if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Tabelle eingefroren!"; }
 
         if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
 
         if (row is not { IsDisposed: false }) { return "Zeile ungültig!"; }
 
-        if (db != row.Database || db != column.Database) { return "Datenbank ungültig!"; }
+        if (db != row.Database || db != column.Database) { return "Tabelle ungültig!"; }
 
         if (column.RelationType == RelationType.CellValues) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
 
             //return db.ChangeData(DatabaseDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
-            lrow?.CellSet(lcolumn, value, "Verlinkung der Datenbank " + db.Caption + " (" + comment + ")");
+            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + db.Caption + " (" + comment + ")");
             return string.Empty;
         }
 
@@ -671,7 +671,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
 
                 if (lcolumn?.Database is not { IsDisposed: false } db2) {
-                    return ("Verknüpfte Datenbank verworfen.", false);
+                    return ("Verknüpfte Tabelle verworfen.", false);
                 }
 
                 db2.PowerEdit = db.PowerEdit;

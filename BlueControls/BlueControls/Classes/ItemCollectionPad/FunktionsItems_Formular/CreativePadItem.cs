@@ -333,7 +333,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     }
 
     /// <summary>
-    /// Skripte der Datenbank
+    /// Skripte der Tabelle
     /// </summary>
     public void Skripte_Bearbeiten() {
         if (DatabaseInput is { IsDisposed: false } db) {

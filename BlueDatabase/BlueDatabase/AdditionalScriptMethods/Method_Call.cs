@@ -30,7 +30,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_Call : Method_DatabaseGeneric, IUseableForButton {
+internal class Method_Call : Method_TableGeneric, IUseableForButton {
 
     #region Properties
 
@@ -52,7 +52,7 @@ internal class Method_Call : Method_DatabaseGeneric, IUseableForButton {
 
     public override bool MustUseReturnValue => false;
 
-    public string NiceTextForUser => "Ein Skript aus dieser Datenbank ausführen";
+    public string NiceTextForUser => "Ein Skript aus dieser Tabelle ausführen";
 
     public override string Returns => VariableString.ShortName_Plain;
 

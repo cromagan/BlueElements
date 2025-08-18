@@ -27,21 +27,21 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CellGetKey : Method_DatabaseGeneric {
+public class Method_CellGetKey : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [DatabaseVar, StringVal, StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal, StringVal];
     public override string Command => "cellgetkey";
     public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.\r\n\r\nAchtung: Das Laden einer Datenbank kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\n\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
+    public override string Description => "Sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\n\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Database;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "CellGetKey(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
+    public override string Syntax => "CellGetKey(Table, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
     #endregion
 
@@ -50,11 +50,11 @@ public class Method_CellGetKey : Method_DatabaseGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (attvar.Attributes[0] is not VariableDatabase vdb || vdb.Database is not { IsDisposed: false } db) { return new DoItFeedback("Datenbank nicht vorhanden", true, ld); }
-        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false } db) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
+        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
         if (db.Column.First is not { IsDisposed: false } cf) {
-            return new DoItFeedback("Erste Spalte der Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld);
+            return new DoItFeedback("Erste Spalte der Tabelle '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld);
         }
 
         var returncolumn = db.Column[attvar.ValueStringGet(2)];

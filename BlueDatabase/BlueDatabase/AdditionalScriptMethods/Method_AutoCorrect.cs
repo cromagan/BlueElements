@@ -28,7 +28,7 @@ using static BlueBasics.Converter;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_AutoCorrect : Method_DatabaseGeneric {
+internal class Method_AutoCorrect : Method_TableGeneric {
 
     #region Properties
 
@@ -57,7 +57,7 @@ internal class Method_AutoCorrect : Method_DatabaseGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var n = 0; n < attvar.Attributes.Count; n++) {
             var column = Column(scp, attvar, n);
-            if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte in Datenbank nicht gefunden.", true, ld); }
+            if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte in Tabelle nicht gefunden.", true, ld); }
             var columnVar = attvar.Attributes[n];
 
             if (columnVar is not { ReadOnly: false }) { return new DoItFeedback("Variable ist schreibgeschützt.", true, ld); }

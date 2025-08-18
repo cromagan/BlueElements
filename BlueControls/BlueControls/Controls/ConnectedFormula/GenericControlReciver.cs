@@ -250,7 +250,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             }
         }
 
-        // Prüfen, ob die Row zur aktuellen Datenbank gehört
+        // Prüfen, ob die Row zur aktuellen Tabelle gehört
         if (row != null && _databaseInput is { IsDisposed: false } dbi) {
             if (row.Database != dbi) {
                 row = null;
@@ -327,7 +327,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter") {
                 new FilterItem(mustbeDatabase, string.Empty)
             };
-                //Develop.DebugPrint(ErrorType.Error, "Datenbank Fehler");
+                //Develop.DebugPrint(ErrorType.Error, "Tabelle Fehler");
             }
             Invalidate_RowsInput();
         } catch (Exception ex) {
@@ -493,7 +493,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             if (fc2.Count == 0) { return null; }
 
             if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
-                return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 1"), "Datenbanken inkonsistent");
+                return new FilterCollection(new FilterItem(mustbeDatabase, "Tabellen inkonsistent 1"), "Tabellen inkonsistent");
             }
 
             return fc2;
@@ -505,7 +505,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             if (thiss is { IsDisposed: false, FilterOutput: { IsDisposed: false } fi }) {
                 if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
                     fc?.Dispose();
-                    return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsistent 2"), "Datenbanken inkonsistent");
+                    return new FilterCollection(new FilterItem(mustbeDatabase, "Tabellen inkonsistent 2"), "Tabellen inkonsistent");
                 }
 
                 fc ??= new FilterCollection(fi.Database, "filterofsender");

@@ -66,7 +66,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public override bool DatabaseInputMustMatchOutputDatabase => true;
 
-    public override string Description => "Darstellung einer Datenbank als bearbeitbare und filterbare Tabelle.";
+    public override string Description => "Darstellung einer Tabelle als bearbeitbare und filterbare Tabelle.";
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;

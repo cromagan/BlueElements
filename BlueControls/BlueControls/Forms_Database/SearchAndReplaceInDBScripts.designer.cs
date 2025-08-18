@@ -142,7 +142,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "SearchAndReplaceInDBScripts";
             this.ShowInTaskbar = false;
-            this.Text = "Suchen und Ersetzen in allen Datenbank Skripten";
+            this.Text = "Suchen und Ersetzen in allen Tabelle Skripten";
             this.TopMost = true;
             this.grpSuche.ResumeLayout(false);
             this.grpErsetzen.ResumeLayout(false);

@@ -94,7 +94,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     public static void AddUndosToTable(Table tblUndo, Database? database, float maxAgeInDays) {
         if (database is { IsDisposed: false } db) {
-            Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Datenbank '{db.Caption}'", 0);
+            Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{db.Caption}'", 0);
 
             List<UndoItem> un = [.. db.Undo]; // Kann und wird verändert!
 
@@ -266,8 +266,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         PermissionGroups_NewRow.Suggestions.Clear();
         PermissionGroups_NewRow.ItemAddRange(Table.Permission_AllUsed(false));
 
-        DatenbankAdmin.ItemClear();
-        DatenbankAdmin.Check(db.DatenbankAdmin);
+        lbxTableAdmin.ItemClear();
+        lbxTableAdmin.Check(db.DatenbankAdmin);
 
         txbKennwort.Text = db.GlobalShowPass;
         lbxSortierSpalten.ItemClear();
@@ -289,8 +289,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         txbStandardFormulaFile.Text = db.StandardFormulaFile;
         txbZeilenQuickInfo.Text = db.RowQuickInfo.Replace("<br>", "\r");
 
-        DatenbankAdmin.Suggestions.Clear();
-        DatenbankAdmin.ItemAddRange(Table.Permission_AllUsed(false));
+        lbxTableAdmin.Suggestions.Clear();
+        lbxTableAdmin.ItemAddRange(Table.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
         lbxSortierSpalten.Suggestions.AddRange(ItemsOf(db.Column, true));
@@ -369,7 +369,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     private void GenerateInfoText() {
         if (IsDisposed || Database is not { IsDisposed: false }) {
-            capInfo.Text = "Datenbank-Fehler";
+            capInfo.Text = "Tabellen-Fehler";
             return;
         }
 
@@ -414,7 +414,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         Database.Tags = new(txbTags.Text.SplitAndCutByCrToList());
 
-        Database.DatenbankAdmin = new(DatenbankAdmin.Checked);
+        Database.DatenbankAdmin = new(lbxTableAdmin.Checked);
 
         var tmp = PermissionGroups_NewRow.Checked.ToList();
         _ = tmp.Remove(Constants.Administrator);

@@ -30,7 +30,7 @@ using System.IO;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_Export : Method_DatabaseGeneric, IUseableForButton {
+internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
     #region Properties
 
@@ -44,7 +44,7 @@ internal class Method_Export : Method_DatabaseGeneric, IUseableForButton {
     public override string Command => "export";
 
     public override List<string> Constants => ["CSV", "BDB"];
-    public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei BDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
+    public override string Description => "Exportiert die Tabelle im angegeben Format. Achtung, bei BDB wird immer die gesamte Tabelle exportiert und die angegebenen Attribute ingnoriert.";
 
     public override bool GetCodeBlockAfter => false;
 
@@ -78,17 +78,17 @@ internal class Method_Export : Method_DatabaseGeneric, IUseableForButton {
 
         var r = allFi.Rows;
 
-        #region  Datenbank ermitteln (db)
+        #region  Tabelle ermitteln (db)
 
         if (myDb == null || allFi.Database != myDb) {
             allFi.Dispose();
-            return new DoItFeedback("Datenbankfehler!", true, ld);
+            return new DoItFeedback("Tabellenfehler!", true, ld);
         }
 
         allFi.Dispose();
 
         if (!myDb.BeSureAllDataLoaded(-1)) {
-            return new DoItFeedback("Datenbank konnte nicht aktualisiert werden.", true, ld);
+            return new DoItFeedback("Tabelle konnte nicht aktualisiert werden.", true, ld);
         }
 
         #endregion

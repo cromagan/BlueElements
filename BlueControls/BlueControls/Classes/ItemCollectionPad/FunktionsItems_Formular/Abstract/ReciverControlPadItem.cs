@@ -45,7 +45,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 /// <summary>
-/// Standard für Objekte, die einen Datenbank/Zeilenbezug haben.
+/// Standard für Objekte, die einen Tabellen/Zeilenbezug haben.
 /// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>

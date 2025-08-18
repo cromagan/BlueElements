@@ -116,7 +116,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSaveLoad.ImageCode = "Diskette|16";
             this.btnSaveLoad.Location = new System.Drawing.Point(8, 2);
             this.btnSaveLoad.Name = "btnSaveLoad";
-            this.btnSaveLoad.QuickInfo = "Aktualisiert die Datenbank-Daten. (Speichern, neu Laden)";
+            this.btnSaveLoad.QuickInfo = "Aktualisiert die Tabellen-Daten. (Speichern, neu Laden)";
             this.btnSaveLoad.Size = new System.Drawing.Size(48, 66);
             this.btnSaveLoad.TabIndex = 45;
             this.btnSaveLoad.Text = "Daten aktual.";

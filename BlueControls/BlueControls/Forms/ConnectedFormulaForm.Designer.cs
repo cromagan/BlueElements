@@ -45,8 +45,8 @@ namespace BlueControls.Forms {
             this.btnScript = new BlueControls.Controls.Button();
             this.btnElementBearbeiten = new BlueControls.Controls.Button();
             this.capClicked = new BlueControls.Controls.Caption();
-            this.btnAusgehendeDatenbank = new BlueControls.Controls.Button();
-            this.btnEingehendeDatenbank = new BlueControls.Controls.Button();
+            this.btnAusgehendeTabelle = new BlueControls.Controls.Button();
+            this.btnEingehendeTabelle = new BlueControls.Controls.Button();
             this.btnFormular = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
@@ -217,7 +217,7 @@ namespace BlueControls.Forms {
             this.btnSaveLoad.ImageCode = "Diskette|16";
             this.btnSaveLoad.Location = new System.Drawing.Point(8, 2);
             this.btnSaveLoad.Name = "btnSaveLoad";
-            this.btnSaveLoad.QuickInfo = "Aktualisiert die Datenbank-Daten. (Speichern, neu Laden)";
+            this.btnSaveLoad.QuickInfo = "Aktualisiert die Tabellen-Daten. (Speichern, neu Laden)";
             this.btnSaveLoad.Size = new System.Drawing.Size(56, 66);
             this.btnSaveLoad.TabIndex = 43;
             this.btnSaveLoad.Text = "Daten aktual.";
@@ -282,7 +282,7 @@ namespace BlueControls.Forms {
             this.btnAusgehendeDatenbank.Name = "btnAusgehendeDatenbank";
             this.btnAusgehendeDatenbank.Size = new System.Drawing.Size(64, 66);
             this.btnAusgehendeDatenbank.TabIndex = 46;
-            this.btnAusgehendeDatenbank.Text = "Ausgeh. Datenbank";
+            this.btnAusgehendeDatenbank.Text = "Ausgeh. Tabelle";
             this.btnAusgehendeDatenbank.Click += new System.EventHandler(this.btnAusgehendeDatenbank_Click);
             // 
             // btnEingehendeDatenbank
@@ -294,7 +294,7 @@ namespace BlueControls.Forms {
             this.btnEingehendeDatenbank.Name = "btnEingehendeDatenbank";
             this.btnEingehendeDatenbank.Size = new System.Drawing.Size(64, 66);
             this.btnEingehendeDatenbank.TabIndex = 45;
-            this.btnEingehendeDatenbank.Text = "Eingeh. Datenbank";
+            this.btnEingehendeDatenbank.Text = "Eingeh. Tabelle";
             this.btnEingehendeDatenbank.Click += new System.EventHandler(this.btnEingehendeDatenbank_Click);
             // 
             // btnFormular
@@ -311,7 +311,7 @@ namespace BlueControls.Forms {
             // LoadTab
             // 
             this.LoadTab.Filter = "*.CFO Formulare|*.CFO|*.* Alle Dateien|*";
-            this.LoadTab.Title = "Bitte Datenbank laden!";
+            this.LoadTab.Title = "Bitte Tabelle laden!";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
             // CFormula

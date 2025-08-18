@@ -95,7 +95,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
     #region Methods
 
     public ColumnViewCollection? CloneOfCurrentArrangement() {
-        // Überprüfen, ob die Datenbank oder das aktuelle Objekt verworfen wurde
+        // Überprüfen, ob die Tabelle oder das aktuelle Objekt verworfen wurde
         if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
 
         var tcvc = ColumnViewCollection.ParseAll(db);
@@ -330,7 +330,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
     }
 
     /// <summary>
-    /// Überträgt die aktuelle Ansicht fest in den Datenbankcode hinein
+    /// Überträgt die aktuelle Ansicht fest in den Tabellecode hinein
     /// </summary>
 
     private void chkShowCaptions_CheckedChanged(object sender, System.EventArgs e) {
@@ -439,7 +439,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
             return;
         }
 
-        #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
+        #region Erst alle Spalten der eigenen Tabelle erzeugen, um später verweisen zu können
 
         var x = 0f;
         foreach (var thisColumnViewItem in ca) {
@@ -521,7 +521,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
                                 }
                                 kx = it2.UsedArea.Right;
 
-                                // und noch die Datenbank auf die Spalte zeigen lassem
+                                // und noch die Tabelle auf die Spalte zeigen lassem
                                 _ = Pad.Items.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
                             }
                         }

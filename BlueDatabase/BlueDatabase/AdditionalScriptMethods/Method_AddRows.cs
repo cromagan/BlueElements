@@ -29,15 +29,15 @@ using System.Diagnostics;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_AddRows : Method_DatabaseGeneric {
+public class Method_AddRows : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [DatabaseVar, FloatVal, ListStringVar, FilterVar];
+    public override List<List<string>> Args => [TableVar, FloatVal, ListStringVar, FilterVar];
     public override string Command => "addrows";
     public override List<string> Constants => [];
 
-    public override string Description => "Lädt eine andere Datenbank (Database) und erstellt mehrere neue Zeilen.\r\n" +
+    public override string Description => "Erstellt mehrere neue Zeilen.\r\n" +
                                           "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind.\r\n" +
                                           "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5).\r\n" +
                                           "Leere KeyValues werden übersprungen.\r\n" +
@@ -54,7 +54,7 @@ public class Method_AddRows : Method_DatabaseGeneric {
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "AddRows(database, AgeInDays keyvalues, filter, ...);";
+    public override string Syntax => "AddRows(table, AgeInDays keyvalues, filter, ...);";
 
     #endregion
 
@@ -63,9 +63,9 @@ public class Method_AddRows : Method_DatabaseGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (attvar.Attributes[0] is not VariableDatabase vdb || vdb.Database is not { IsDisposed: false} db  ) { return new DoItFeedback("Datenbank nicht vorhanden", true, ld); }
+        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false} db  ) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
 
-        if (!db.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        if (!db.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
         var m = db.CanWriteMainFile();
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Datenbanksperre: {m}", false, ld); }

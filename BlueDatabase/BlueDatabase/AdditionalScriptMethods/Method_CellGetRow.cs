@@ -25,7 +25,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_CellGetRow : Method_DatabaseGeneric {
+public class Method_CellGetRow : Method_TableGeneric {
 
     #region Properties
 
@@ -56,7 +56,7 @@ public class Method_CellGetRow : Method_DatabaseGeneric {
             return new DoItFeedback("Zugriff der Werte der eigenen Zeile nur über Variablen möglich.", true, ld);
         }
 
-        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, ld); }
+        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{db.Caption}' sind die Skripte defekt", false, ld); }
 
         if (db.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
 

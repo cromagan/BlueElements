@@ -89,7 +89,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     ///// <param name="column"></param>
     ///// <returns></returns>
     //public void AddFromParser(ColumnItem? column) {
-    //    if (column.Database != Database) { Develop.DebugPrint(ErrorType.Error, "Parent-Datenbanken unterschiedlich!"); }
+    //    if (column.Database != Database) { Develop.DebugPrint(ErrorType.Error, "Parent-Tabellen unterschiedlich!"); }
     //    if (Contains(column)) { Develop.DebugPrint(ErrorType.Error, "Spalte bereits vorhanden!"); }
     //    base.GenerateAndAdd(column);
     //}
@@ -414,7 +414,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    }
     internal string ChangeName(string oldName, string newName) {
         if (oldName == newName) { return string.Empty; }
-        if (IsDisposed || Database is not { IsDisposed: false }) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return "Tabelle verworfen"; }
 
         var ok = _internal.TryRemove(oldName.ToUpperInvariant(), out var vcol);
         if (!ok) { return "Entfernen fehlgeschlagen"; }
@@ -467,7 +467,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     internal string ExecuteCommand(DatabaseDataType type, string name, Reason reason) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen!"; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Tabelle verworfen!"; }
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = this[name];

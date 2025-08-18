@@ -106,7 +106,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 return;
             }
 
-            // Datenbank anhand des Tabellennamens finden
+            // Tabelle anhand des Tabellennamens finden
             Database = GetTableFromSql(normalizedSql);
             if (Database == null) {
                 Develop.DebugPrint(ErrorType.Warning, "Tabelle nicht gefunden in SQL: " + sql);
@@ -409,7 +409,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         OnChanging();
 
-        // Datenbankwechsel nur bei Unterschieden durchführen
+        // Tabellewechsel nur bei Unterschieden durchführen
         if (_database != fc?.Database) {
             UnRegisterDatabaseEvents();
             _database = fc?.Database;
@@ -473,7 +473,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             if (!string.IsNullOrEmpty(f)) { return f; }
 
             if (_database != thisf.Database) {
-                return "Filter haben unterschiedliche Datenbanken";
+                return "Filter haben unterschiedliche Tabellen";
             }
         }
 
@@ -792,10 +792,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Extrahiert den Tabellennamen aus einer bereits normalisierten SQL-SELECT-Anweisung und gibt die Datenbank zurück
+    /// Extrahiert den Tabellennamen aus einer bereits normalisierten SQL-SELECT-Anweisung und gibt die Tabelle zurück
     /// </summary>
     /// <param name="normalizedSql">Die bereits normalisierte SQL-Anweisung</param>
-    /// <returns>Die Datenbank oder null wenn nicht gefunden</returns>
+    /// <returns>Die Tabelle oder null wenn nicht gefunden</returns>
     private static Database? GetTableFromSql(string normalizedSql) {
         if (string.IsNullOrWhiteSpace(normalizedSql)) { return null; }
 

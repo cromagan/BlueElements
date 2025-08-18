@@ -347,7 +347,7 @@ public class DatabaseChunk : Database {
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
     public bool LoadChunkWithChunkId(string chunkId, bool important, bool mustExist, bool isFirst) {
-        if (string.IsNullOrEmpty(Filename)) { return true; } // Temporäre Datenbanken
+        if (string.IsNullOrEmpty(Filename)) { return true; } // Temporäre Tabellen
 
         if (string.IsNullOrEmpty(chunkId)) { return false; }
 
@@ -389,7 +389,7 @@ public class DatabaseChunk : Database {
             Thread.Sleep(1000);
         } while (true);
 
-        DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Datenbank '{Filename.FileNameWithoutSuffix()}'");
+        DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
 
         var chunk = new Chunk(Filename, chunkId);
         chunk.LoadBytesFromDisk();
@@ -493,7 +493,7 @@ public class DatabaseChunk : Database {
 
         #region Neue Chunks-Erstellen (chunksnew)
 
-        DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Datenbank '{Caption}'");
+        DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Tabelle '{Caption}'");
 
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
         if (chunksnew == null || chunksnew.Count == 0) { return "Fehler bei der Chunk Erzeugung"; }
@@ -518,7 +518,7 @@ public class DatabaseChunk : Database {
         var allok = string.Empty;
         try {
             foreach (var thisChunk in chunksToSave) {
-                DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
+                DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
 
                 f = thisChunk.DoExtendedSave();
                 if (string.IsNullOrEmpty(f)) {
@@ -548,7 +548,7 @@ public class DatabaseChunk : Database {
                 // Prüfen ob Chunk wirklich leer ist. Sollte obsolet sein, weil nur befüllte Chunks zurück gegeben werden.
                 var rowsInChunk = RowsOfChunk(thisChunk);
                 if (rowsInChunk.Count == 0) {
-                    DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Datenbank '{Caption}'");
+                    DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
                     _ = thisChunk.Delete();
                     _ = _chunks.TryRemove(thisChunk.KeyName, out _);
                 } else if (rowsInChunk.Count > 0) {
@@ -574,7 +574,7 @@ public class DatabaseChunk : Database {
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
+        if (ReadOnly) { return "Tabelle schreibgeschützt!"; } // Sicherheitshalber!
 
         if (Develop.AllReadOnly) { return string.Empty; }
 

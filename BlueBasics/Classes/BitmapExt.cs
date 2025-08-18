@@ -598,7 +598,7 @@ public class BitmapExt : IDisposableExtended {
                 _bitmap?.Dispose();
                 _bitmap = null;
             }
-            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
+            // Nicht verwaltete Ressourcen (Bitmap, Tabellenverbindungen, ...)
             //UnlockBits(false);
             //_bitmap?.Dispose();
             IsDisposed = true;

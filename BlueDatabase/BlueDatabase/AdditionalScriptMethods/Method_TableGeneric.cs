@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
-public abstract class Method_DatabaseGeneric : Method {
+public abstract class Method_TableGeneric : Method {
 
     #region Fields
 
@@ -32,7 +32,7 @@ public abstract class Method_DatabaseGeneric : Method {
 
     public static readonly List<string> RowVar = [VariableRowItem.ShortName_Variable];
 
-    public static readonly List<string> DatabaseVar = [VariableDatabase.ShortName_Variable];
+    public static readonly List<string> TableVar = [VariableTable.ShortName_Variable];
 
     #endregion
 

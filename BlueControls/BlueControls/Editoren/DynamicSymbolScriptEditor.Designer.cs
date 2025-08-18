@@ -26,7 +26,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Name = "DynamicSymbolScriptEditor";
-            this.Text = "Datenbank-Eigenschaften";
+            this.Text = "Tabellen-Eigenschaften";
             this.grpAusführen.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);

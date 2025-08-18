@@ -28,11 +28,11 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_Filter : Method_DatabaseGeneric {
+public class Method_Filter : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [DatabaseVar, StringVal, StringVal, StringVal];
+    public override List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal];
     public override string Command => "filter";
 
     public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
@@ -41,7 +41,7 @@ public class Method_Filter : Method_DatabaseGeneric {
                                              "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.\r\n" +
                                          "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
         "Bei Between müssen die Werte so Angegeben werden: 50|100\r\n\r\n" +
-                                         "Alternative: FilterInMyDB - erstellt einen Filter der aktuellen Datanbank und kann deswegen in Routinen benutzt werden, die schnell abgehandelt werden müssen.";
+                                         "Alternative: FilterInMyDB - erstellt einen Filter der aktuellen Tabelle und kann deswegen in Routinen benutzt werden, die schnell abgehandelt werden müssen.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -49,7 +49,7 @@ public class Method_Filter : Method_DatabaseGeneric {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFilterItem.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "Filter(Datenbank, Spalte, Filtertyp, Wert)";
+    public override string Syntax => "Filter(Table, Spalte, Filtertyp, Wert)";
 
     #endregion
 
@@ -68,13 +68,13 @@ public class Method_Filter : Method_DatabaseGeneric {
 
                 if (db.IsDisposed) { return (null, "Datenbankfehler!", false); }
 
-                //if (db != sourcedatabase && !db.AreScriptsExecutable()) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", false); }
+                //if (db != sourcedatabase && !db.AreScriptsExecutable()) { return (null, $"In der Tabelle '{db.Caption}' sind die Skripte defekt", false); }
             }
 
             if (!fii.IsOk()) { return (null, $"Der Filter des Attributes {z + 1} ist fehlerhaft.", true); }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
 
             if (z > ab) {
-                if (fii.Database != allFi[0].Database) { return (null, "Filter über verschiedene Datenbanken wird nicht unterstützt.", true); }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
+                if (fii.Database != allFi[0].Database) { return (null, "Filter über verschiedene Tabellen wird nicht unterstützt.", true); }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Tabellen wird nicht unterstützt."); }
             }
 
             allFi.Add(fii);
@@ -118,14 +118,14 @@ public class Method_Filter : Method_DatabaseGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (attvar.Attributes[0] is not VariableDatabase vdb || vdb.Database is not { IsDisposed: false } db) { return new DoItFeedback("Datenbank nicht vorhanden", true, ld); }
+        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false } db) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
 
-        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
         #region Spalte ermitteln
 
         var filterColumn = db.Column[attvar.ValueStringGet(1)];
-        if (filterColumn == null) { return new DoItFeedback("Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Datenbank nicht gefunden", true, ld); }
+        if (filterColumn == null) { return new DoItFeedback("Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Tabelle nicht gefunden", true, ld); }
 
         #endregion
 

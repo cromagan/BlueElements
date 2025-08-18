@@ -54,7 +54,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     }
 
     public FilterItem(string filterCode, Database? database) {
-        // Database?, weil always False keine Datenbank braucht
+        // Database?, weil always False keine Tabelle braucht
         Database = database;
         Origin = string.Empty;
 
@@ -100,7 +100,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     /// Erstellt ein FilterItem aus einer SQL-WHERE-Bedingung
     /// Beispiel: "Name = 'Mueller'" oder "Age BETWEEN 18 AND 65"
     /// </summary>
-    /// <param name="database">Die Datenbank für die Spaltenreferenzen</param>
+    /// <param name="database">Die Tabelle für die Spaltenreferenzen</param>
     /// <param name="whereCondition">Die SQL-WHERE-Bedingung</param>
     public FilterItem(Database? database, string whereCondition, string origin) {
         Database = database;
@@ -139,7 +139,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     public ColumnItem? Column { get; private set; }
 
     /// <summary>
-    /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
+    /// Der Edit-Dialog braucht die Tabelle, um mit Texten die Spalte zu suchen.
     /// </summary>
     public Database? Database {
         get => _database;
@@ -327,13 +327,13 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     public string ErrorReason() {
         if (FilterType == FilterType.AlwaysFalse) { return string.Empty; }
 
-        if (_database == null) { return "Keine Datenbank angegeben"; }
+        if (_database == null) { return "Keine Tabelle angegeben"; }
 
-        if (_database.IsDisposed) { return "Datenbank verworfen"; }
+        if (_database.IsDisposed) { return "Tabelle verworfen"; }
 
         if (FilterType is FilterType.GroßKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
 
-        if (Column != null && Column?.Database != Database) { return "Datenbanken inkonsistent"; }
+        if (Column != null && Column?.Database != Database) { return "Tabellen inkonsistent"; }
 
         if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
 

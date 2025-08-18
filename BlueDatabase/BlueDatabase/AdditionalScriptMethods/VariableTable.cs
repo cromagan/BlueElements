@@ -24,48 +24,48 @@ using BlueScript.Variables;
 
 namespace BlueScript;
 
-public class VariableDatabase : Variable {
+public class VariableTable : Variable {
 
     #region Fields
 
     private string _lastText = string.Empty;
-    private Database? _database;
+    private Database? _table;
 
     #endregion
 
     #region Constructors
 
-    public VariableDatabase(string name, Database? value, bool ronly, string comment) : base(name, ronly, comment) {
-        _database = value;
+    public VariableTable(string name, Database? value, bool ronly, string comment) : base(name, ronly, comment) {
+        _table = value;
         GetText();
     }
 
-    public VariableDatabase() : this(string.Empty, null, true, string.Empty) { }
+    public VariableTable() : this(string.Empty, null, true, string.Empty) { }
 
-    public VariableDatabase(Database? value) : this(DummyName(), value, true, string.Empty) { }
+    public VariableTable(Database? value) : this(DummyName(), value, true, string.Empty) { }
 
-    public VariableDatabase(string name) : this(name, null, true, string.Empty) { }
+    public VariableTable(string name) : this(name, null, true, string.Empty) { }
 
     #endregion
 
     #region Properties
 
-    public static string ClassId => "bdb";
-    public static string ShortName_Variable => "*bdb";
+    public static string ClassId => "tbl";
+    public static string ShortName_Variable => "*tbl";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
-    public override bool IsNullOrEmpty => _database == null;
+    public override bool IsNullOrEmpty => _table == null;
 
     /// <summary>
-    /// Gibt den Text "Database: Caption" zurück.
+    /// Gibt den Text "Table: Caption" zurück.
     /// </summary>
     public override string ReadableText => _lastText;
 
-    public Database? Database {
-        get => _database;
+    public Database? Table {
+        get => _table;
         private set {
             if (ReadOnly) { return; }
-            _database = value;
+            _table = value;
 
             GetText();
         }
@@ -75,26 +75,26 @@ public class VariableDatabase : Variable {
 
     public override bool ToStringPossible => true;
 
-    public override string ValueForReplace => _database is not { IsDisposed: false } db ? "{DB:?}" : "{DB:" + db.TableName + "}";
+    public override string ValueForReplace => _table is not { IsDisposed: false } db ? "{TBL:?}" : "{TBL:" + db.TableName + "}";
 
     #endregion
 
     #region Methods
 
-    public override void DisposeContent() => _database = null;
+    public override void DisposeContent() => _table = null;
 
     public override string GetValueFrom(Variable variable) {
-        if (variable is not VariableDatabase v) { return VerschiedeneTypen(variable); }
+        if (variable is not VariableTable v) { return VerschiedeneTypen(variable); }
         if (ReadOnly) { return Schreibgschützt(); }
-        Database = v.Database;
+        Table = v.Table;
         return string.Empty;
     }
 
     protected override void SetValue(object? x) {
         if (x is null) {
-            _database = null;
+            _table = null;
         } else if (x is Database db) {
-            _database = db;
+            _table = db;
         } else {
             Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
         }
@@ -104,8 +104,8 @@ public class VariableDatabase : Variable {
     protected override bool TryParseValue(string txt, out object? result) {
         result = null;
 
-        if (txt.Length > 6 && txt.StartsWith("{DB:") && txt.EndsWith("}")) {
-            var t = txt.Substring(4, txt.Length - 5);
+        if (txt.Length > 6 && txt.StartsWith("{TBL:") && txt.EndsWith("}")) {
+            var t = txt.Substring(5, txt.Length - 6);
 
             if (t == "?") { return true; }
 
@@ -118,7 +118,7 @@ public class VariableDatabase : Variable {
         return false;
     }
 
-    private void GetText() => _lastText = _database == null ? "Database: [NULL]" : "Database: " + _database.TableName;
+    private void GetText() => _lastText = _table == null ? "Table: [NULL]" : "Table: " + _table.TableName;
 
     #endregion
 }

@@ -85,7 +85,7 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
                 foreach (var thiss in db.EventScript) {
                     // Prüfen, ob der Suchtext im Skript vorkommt
                     if (thiss.Script.Contains(txbAlt.Text)) {
-                        // Datenbankname -> Skriptname zur Liste hinzufügen
+                        // Tabellename -> Skriptname zur Liste hinzufügen
                         l.Add(string.Empty);
                         l.Add(string.Empty);
                         l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");

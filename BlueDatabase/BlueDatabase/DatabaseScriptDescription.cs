@@ -144,7 +144,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
     }
 
     public override string ErrorReason() {
-        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
         if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
             //if (ChangeValuesAllowed) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
@@ -192,10 +192,10 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.loaded)) {
-            if (NeedRow) { return "Routinen nach dem Laden einer Datenbank, dürfen sich nicht auf Zeilen beziehen."; }
+            if (NeedRow) { return "Routinen nach dem Laden einer Tabelle, dürfen sich nicht auf Zeilen beziehen."; }
         }
 
-        if (NeedRow && !Database.IsRowScriptPossible()) { return "Zeilenskripte in dieser Datenbank nicht möglich"; }
+        if (NeedRow && !Database.IsRowScriptPossible()) { return "Zeilenskripte in dieser Tabelle nicht möglich"; }
 
         if (EventTypes.ToString() == ((int)EventTypes).ToString()) { return "Skripte öffnen und neu speichern."; }
 

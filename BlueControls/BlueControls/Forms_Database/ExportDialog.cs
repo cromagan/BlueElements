@@ -294,7 +294,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Exported_ItemClicked(object sender, AbstractListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not { IsDisposed: false }) { return "Tabelle verworfen"; }
         if (_rowsForExport is not { Count: not 0 }) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
         ////TODO: Schachteln implementieren

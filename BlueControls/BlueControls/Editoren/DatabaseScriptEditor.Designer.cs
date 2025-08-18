@@ -268,11 +268,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_databaseloaded.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkAuslöser_databaseloaded.Location = new System.Drawing.Point(8, 24);
             this.chkAuslöser_databaseloaded.Name = "chkAuslöser_databaseloaded";
-            this.chkAuslöser_databaseloaded.QuickInfo = "Das Skript wird direkt nach dem ersten Laden einer Datenbank angestoßen.\r\n\r\nEs ka" +
+            this.chkAuslöser_databaseloaded.QuickInfo = "Das Skript wird direkt nach dem ersten Laden einer Tabelle angestoßen.\r\n\r\nEs ka" +
     "nn verwendet werden, um z.B. Backups zu erstellen.";
             this.chkAuslöser_databaseloaded.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_databaseloaded.TabIndex = 21;
-            this.chkAuslöser_databaseloaded.Text = "Datenbank geladen";
+            this.chkAuslöser_databaseloaded.Text = "Tabelle geladen";
             this.chkAuslöser_databaseloaded.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_export
@@ -433,7 +433,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnDatenbankKopf.Name = "btnDatenbankKopf";
             this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
             this.btnDatenbankKopf.TabIndex = 45;
-            this.btnDatenbankKopf.Text = "Datenbank-Kopf";
+            this.btnDatenbankKopf.Text = "Tabellen-Kopf";
             this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
             // 
             // btnSpaltenuebersicht
@@ -477,7 +477,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnTest.ImageCode = "Abspielen|16";
             this.btnTest.Location = new System.Drawing.Point(0, 2);
             this.btnTest.Name = "btnTest";
-            this.btnTest.QuickInfo = "Keine Änderung der Daten\r\nin den Datenbanken.";
+            this.btnTest.QuickInfo = "Keine Änderung der Daten\r\nin den Tabellen.";
             this.btnTest.Size = new System.Drawing.Size(60, 66);
             this.btnTest.TabIndex = 3;
             this.btnTest.Text = "Testen";
@@ -489,7 +489,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.grpVerfügbareSkripte);
             this.Name = "DatabaseScriptEditor";
-            this.Text = "Datenbank-Eigenschaften";
+            this.Text = "Tabellen-Eigenschaften";
             this.Controls.SetChildIndex(this.ribMain, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
             this.Controls.SetChildIndex(this.grpVerfügbareSkripte, 0);

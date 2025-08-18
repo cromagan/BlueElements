@@ -1021,7 +1021,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capSortiermaske.Location = new System.Drawing.Point(8, 312);
             this.capSortiermaske.Name = "capSortiermaske";
             this.capSortiermaske.Size = new System.Drawing.Size(216, 40);
-            this.capSortiermaske.Text = "Bei der Datenbank-Zeilen-Sortierung fungiert diese Spalte als:";
+            this.capSortiermaske.Text = "Bei der Tabellen-Zeilen-Sortierung fungiert diese Spalte als:";
             this.capSortiermaske.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capRegex
@@ -1071,7 +1071,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capLinkedDatabase.Location = new System.Drawing.Point(8, 48);
             this.capLinkedDatabase.Name = "capLinkedDatabase";
             this.capLinkedDatabase.Size = new System.Drawing.Size(152, 16);
-            this.capLinkedDatabase.Text = "Vernküpfte Datenbank:";
+            this.capLinkedDatabase.Text = "Vernküpfte Tabelle:";
             // 
             // BlueFrame1
             // 
@@ -1525,7 +1525,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.caption1.Location = new System.Drawing.Point(8, 8);
             this.caption1.Name = "caption1";
             this.caption1.Size = new System.Drawing.Size(232, 16);
-            this.caption1.Text = "Werte aus anderer Datenbank benutzen:";
+            this.caption1.Text = "Werte aus anderer Tabelle benutzen:";
             this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // ColumnEditor

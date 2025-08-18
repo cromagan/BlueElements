@@ -52,7 +52,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     private string _entityId = string.Empty;
 
     /// <summary>
-    /// Eine Spalte in der Ziel-Datenbank.
+    /// Eine Spalte in der Ziel-Tabelle.
     /// In diese wird die generierte ID des klickbaren Elements gespeichert.
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
@@ -88,7 +88,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         }
     }
 
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird eine Zusatzinfo gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
+    [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird eine Zusatzinfo gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string AdditionalInfoColumnName {
         get => _additinalInfoColumnName;
         set {
@@ -149,7 +149,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
-    [Description("Eine Spalte in der Ziel-Datenbank.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
+    [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
     public string OriginIDColumnName {
         get => _originIdColumnName;
         set {

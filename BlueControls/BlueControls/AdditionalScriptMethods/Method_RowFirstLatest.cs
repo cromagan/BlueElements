@@ -27,7 +27,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_RowFirstLatest : Method_DatabaseGeneric {
+public class Method_RowFirstLatest : Method_TableGeneric {
 
     #region Properties
 

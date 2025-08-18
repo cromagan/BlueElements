@@ -243,8 +243,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.optZeilenZuorden.Name = "optZeilenZuorden";
             this.optZeilenZuorden.Size = new Size(512, 32);
             this.optZeilenZuorden.TabIndex = 0;
-            this.optZeilenZuorden.Text = "Die <b>erste Spalte</b> des Imports soll der <b>ersten Spalte</b> der Datenbank z" +
-    "ugeordnet werden. <br>Wenn der Eintrag nicht in der Datenbank vorhanden ist, wir" +
+            this.optZeilenZuorden.Text = "Die <b>erste Spalte</b> des Imports soll der <b>ersten Spalte</b> der Tabelle z" +
+    "ugeordnet werden. <br>Wenn der Eintrag nicht in der Tabelle vorhanden ist, wir" +
     "d eine neue Zeile erstellt.";
             // 
             // ImportCsv

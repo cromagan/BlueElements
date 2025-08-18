@@ -106,7 +106,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Indexers
 
     /// <summary>
-    /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
+    /// Durchsucht die erste (interne) Spalte der Tabelle nach dem hier angegebenen Prmärschlüssel.
     /// </summary>
     /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
     public RowItem? this[string primärSchlüssel] {
@@ -145,7 +145,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Methods
 
     /// <summary>
-    /// Durchsucht  Datenbank mit dem angegeben Filter..
+    /// Durchsucht  Tabelle mit dem angegeben Filter..
     /// </summary>
     /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
     public static void AddBackgroundWorker(RowItem row) {
@@ -238,7 +238,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
+    /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
     /// </summary>
     /// <returns></returns>
     public static RowItem? NextRowToCeck() {
@@ -296,7 +296,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             db ??= thisr.Database;
 
             if (db != thisr.Database) {
-                Develop.DebugPrint(ErrorType.Error, "Datenbanken inkonsitent");
+                Develop.DebugPrint(ErrorType.Error, "Tabellen inkonsitent");
                 return false;
             }
         }
@@ -312,7 +312,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                                                             && string.IsNullOrEmpty(r.Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty, r.ChunkValue));
 
     /// <summary>
-    /// Prüft alle Datenbanken im Speicher und gibt die dringenste Update-Aufgabe aller Datenbanken zurück.
+    /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
     /// </summary>
     /// <returns></returns>
     public static List<RowItem> RowListToCheck() {
@@ -349,7 +349,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static (RowItem? newrow, string message, bool stoptrying) UniqueRow(FilterCollection filter, string coment) {
-        if (filter.Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen", true); }
+        if (filter.Database is not { IsDisposed: false } db) { return (null, "Tabelle verworfen", true); }
 
         if (filter.Count < 1) { return (null, "Kein Filter angekommen.", true); }
 
@@ -360,11 +360,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (r.Count == 0) {
-            if (!db.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
+            if (!db.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return (null, $"In der Tabelle '{db.Caption}' sind die Skripte defekt", true); }
         }
 
         if (r.Count > 1) {
-            if (!db.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)) { return (null, $"In der Datenbank '{db.Caption}' sind die Skripte defekt", true); }
+            if (!db.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)) { return (null, $"In der Tabelle '{db.Caption}' sind die Skripte defekt", true); }
 
             db.Row.Combine(r);
             db.Row.RemoveYoungest(r, true);
@@ -438,7 +438,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     ///// <summary>
-    ///// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
+    ///// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Tabellen einzigartig ist.
     ///// </summary>
     ///// <returns></returns>
     //public List<RowData> AllRows() {
@@ -457,7 +457,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
-        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
         var m = db.CanWriteMainFile();
         if (!string.IsNullOrEmpty(m)) { return m; }
@@ -512,18 +512,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Database? db2 = null;
 
         foreach (var thisfi in filter) {
-            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Datenbank eines Filters nicht angegeben", true); }
+            if (thisfi.Database is not { IsDisposed: false } db1) { return (null, "Tabelle eines Filters nicht angegeben", true); }
             db2 ??= db1;
 
-            if (thisfi.Column?.Database is { } db3 && db3 != db2) { return (null, "Datenbanken der Spalten im Filter unterschiedlich", true); }
+            if (thisfi.Column?.Database is { } db3 && db3 != db2) { return (null, "Tabellen der Spalten im Filter unterschiedlich", true); }
         }
 
-        if (db2 is not { IsDisposed: false }) { return (null, "Datenbanken verworfen", true); }
+        if (db2 is not { IsDisposed: false }) { return (null, "Tabellen verworfen", true); }
 
-        if (db2.Column.First is not { IsDisposed: false }) { return (null, "Datenbank hat keine erste Spalte, Systeminterner Fehler", false); }
+        if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
         var f = db2.CanWriteMainFile();
-        if (!string.IsNullOrEmpty(f)) { return (null, "In der Datenbank sind keine neuen Zeilen möglich: " + f, true); }
+        if (!string.IsNullOrEmpty(f)) { return (null, "In der Tabelle sind keine neuen Zeilen möglich: " + f, true); }
 
         var s = db2.NextRowKey();
         if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
@@ -557,8 +557,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    List<Database> done = new();
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
-    //    if (database is not Database db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
-    //    if (db.IsDisposed) { return "Datenbank verworfen"; }
+    //    if (database is not Database db) { return "Verlinkung zur Tabelle fehlhlerhaft"; }
+    //    if (db.IsDisposed) { return "Tabelle verworfen"; }
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
 
@@ -686,7 +686,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Used: Only BZL
         if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen", true); }
 
-        if (Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen", true); }
+        if (Database is not { IsDisposed: false } db) { return (null, "Tabelle verworfen", true); }
 
         if (db.Column.First is not { IsDisposed: false } co) { return (null, "Spalte nicht vorhanden", true); }
 
@@ -709,7 +709,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
         if (type == DatabaseDataType.Command_AddRow) {
             var row = SearchByKey(rowkey);
@@ -850,7 +850,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="comment"></param>
     /// <returns></returns>
     private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
-        if (Database is not { IsDisposed: false } db) { return (null, "Datenbank verworfen!", true); }
+        if (Database is not { IsDisposed: false } db) { return (null, "Tabelle verworfen!", true); }
 
         var f = db.CanWriteMainFile();
         if (!string.IsNullOrEmpty(f)) { return (null, "Neue Zeilen nicht möglich: " + f, true); }

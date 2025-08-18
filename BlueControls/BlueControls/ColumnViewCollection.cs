@@ -327,7 +327,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string IsNowEditable() {
-        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
         return db.GrantWriteAccess(DatabaseDataType.ColumnArrangement, DatabaseChunk.Chunk_Master);
     }

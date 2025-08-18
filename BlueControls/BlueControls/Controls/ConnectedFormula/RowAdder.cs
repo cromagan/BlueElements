@@ -147,7 +147,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     generatedentityID,
                     //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
                     //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
-                    //"Datenbank: " + Database.Caption,
+                    //"Tabelle: " + Database.Caption,
                     " ",
                     " ",
                     //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",

@@ -33,7 +33,7 @@ using System.Linq;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_Row : Method_DatabaseGeneric, IUseableForButton {
+public class Method_Row : Method_TableGeneric, IUseableForButton {
 
     #region Properties
 

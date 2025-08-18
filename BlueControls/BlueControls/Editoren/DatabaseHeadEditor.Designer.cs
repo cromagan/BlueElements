@@ -31,7 +31,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.PermissionGroups_NewRow = new BlueControls.Controls.ListBox();
             this.capNeueZeilenInfo = new BlueControls.Controls.Caption();
             this.Caption22 = new BlueControls.Controls.Caption();
-            this.DatenbankAdmin = new BlueControls.Controls.ListBox();
+            this.lbxTableAdmin = new BlueControls.Controls.ListBox();
             this.capNeueZeilen = new BlueControls.Controls.Caption();
             this.grpKennwort = new BlueControls.Controls.GroupBox();
             this.capKennwort = new BlueControls.Controls.Caption();
@@ -99,7 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpBenutzergruppen.Controls.Add(this.PermissionGroups_NewRow);
             this.grpBenutzergruppen.Controls.Add(this.capNeueZeilenInfo);
             this.grpBenutzergruppen.Controls.Add(this.Caption22);
-            this.grpBenutzergruppen.Controls.Add(this.DatenbankAdmin);
+            this.grpBenutzergruppen.Controls.Add(this.lbxTableAdmin);
             this.grpBenutzergruppen.Controls.Add(this.capNeueZeilen);
             this.grpBenutzergruppen.Location = new System.Drawing.Point(16, 16);
             this.grpBenutzergruppen.Name = "grpBenutzergruppen";
@@ -149,22 +149,22 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption22.Location = new System.Drawing.Point(8, 24);
             this.Caption22.Name = "Caption22";
             this.Caption22.Size = new System.Drawing.Size(176, 22);
-            this.Caption22.Text = "Datenbank-Administratoren:";
+            this.Caption22.Text = "Tabellen-Administratoren:";
             this.Caption22.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // DatenbankAdmin
+            // lbxTableAdmin
             // 
-            this.DatenbankAdmin.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.DatenbankAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.lbxTableAdmin.AddAllowed = BlueControls.Enums.AddType.Text;
+            this.lbxTableAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.DatenbankAdmin.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
-            this.DatenbankAdmin.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.DatenbankAdmin.FilterText = null;
-            this.DatenbankAdmin.Location = new System.Drawing.Point(8, 46);
-            this.DatenbankAdmin.Name = "DatenbankAdmin";
-            this.DatenbankAdmin.Size = new System.Drawing.Size(176, 434);
-            this.DatenbankAdmin.TabIndex = 4;
-            this.DatenbankAdmin.Translate = false;
+            this.lbxTableAdmin.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
+            this.lbxTableAdmin.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
+            this.lbxTableAdmin.FilterText = null;
+            this.lbxTableAdmin.Location = new System.Drawing.Point(8, 46);
+            this.lbxTableAdmin.Name = "lbxTableAdmin";
+            this.lbxTableAdmin.Size = new System.Drawing.Size(176, 434);
+            this.lbxTableAdmin.TabIndex = 4;
+            this.lbxTableAdmin.Translate = false;
             // 
             // capNeueZeilen
             // 
@@ -194,7 +194,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capKennwort.Location = new System.Drawing.Point(8, 24);
             this.capKennwort.Name = "capKennwort";
             this.capKennwort.Size = new System.Drawing.Size(216, 22);
-            this.capKennwort.Text = "Zum Öffnen der Datenbank:";
+            this.capKennwort.Text = "Zum Öffnen der Tabelle:";
             this.capKennwort.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbKennwort
@@ -432,7 +432,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnOptimize.QuickInfo = "Stellt alle Spalten um, \r\ndass die Daten";
             this.btnOptimize.Size = new System.Drawing.Size(200, 32);
             this.btnOptimize.TabIndex = 48;
-            this.btnOptimize.Text = "Datenbank optimieren";
+            this.btnOptimize.Text = "Tabelle optimieren";
             this.btnOptimize.Click += new System.EventHandler(this.btnOptimize_Click);
             // 
             // txbStandardFormulaFile
@@ -602,7 +602,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.MinimizeBox = false;
             this.Name = "DatabaseHeadEditor";
             this.ShowInTaskbar = false;
-            this.Text = "Datenbank-Eigenschaften";
+            this.Text = "Tabellen-Eigenschaften";
             this.Controls.SetChildIndex(this.GlobalTab, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
             this.Controls.SetChildIndex(this.btnOk, 0);
@@ -632,7 +632,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbTags;
         private ListBox lbxSortierSpalten;
         private Caption Caption22;
-        private ListBox DatenbankAdmin;
+        private ListBox lbxTableAdmin;
         private TabPage tabAllgemein;
         private TabPage tabSortierung;
         private TabPage tabRechte;

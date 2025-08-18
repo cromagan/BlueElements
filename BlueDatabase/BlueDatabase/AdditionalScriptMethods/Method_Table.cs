@@ -28,19 +28,19 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_Database : Method {
+internal class Method_Table : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "database";
     public override List<string> Constants => [];
-    public override string Description => "Versucht die Datenbank in den Speicher zu holen.";
+    public override string Description => "Versucht die Tabelle in den Speicher zu holen.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableDatabase.ShortName_Variable;
+    public override string Returns => VariableTable.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "Databse(Filename/Tablename)";
 
@@ -56,10 +56,10 @@ internal class Method_Database : Method {
         //if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
 
         if (Database.Get(filn, false, null) is { IsDisposed: false } db) {
-            return new DoItFeedback(new VariableDatabase(db));
+            return new DoItFeedback(new VariableTable(db));
         }
 
-        return new DoItFeedback($"Datenbank '{filn}' nicht gefunden", true, ld);
+        return new DoItFeedback($"Tabelle '{filn}' nicht gefunden", true, ld);
     }
 
     #endregion

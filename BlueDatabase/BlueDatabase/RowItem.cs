@@ -421,7 +421,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
-        if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
+        if (Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         var attempt = 0;
@@ -494,7 +494,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public string IsNowEditable() {
-        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
         return db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, ChunkValue);
     }
@@ -576,7 +576,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <returns>Empty, wenn alles in Ordung ist. Ansonten ein Grund.</returns>
     public string RepairAllLinks() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
         foreach (var thisColumn in db.Column) {
             if (thisColumn.RelationType == RelationType.CellValues) {
@@ -666,7 +666,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, bool important, string reason) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
 
         if (!important && Database.ExecutingScriptAnyDatabase.Count > 0) { return new ScriptEndedFeedback("Andere Skripte werden ausgeführt", false, false, "Allgemein"); }
 
@@ -691,7 +691,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
-            DropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Datenbank {db.Caption} ({reason})");
+            DropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {db.Caption} ({reason})");
 
             if (extendedAllowed) {
                 _ = RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
@@ -719,7 +719,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        var m = Database?.CanWriteMainFile() ?? "Keine Datenbank angekommen";
+        var m = Database?.CanWriteMainFile() ?? "Keine Tabelle angekommen";
         if (!string.IsNullOrEmpty(m) || Database is not { IsDisposed: false } || column == null) { return; }
 
         var columnVar = vars.Get(column.KeyName);
@@ -884,7 +884,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         while (true) {
             tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures
 
-            if (IsDisposed || column.Database is not { IsDisposed: false } db) { return "Datenbank ungültig"; }
+            if (IsDisposed || column.Database is not { IsDisposed: false } db) { return "Tabelle ungültig"; }
 
             // Timeout-Prüfung ODER tries-Limit - doppelte Sicherheit
             if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20 || tries > 100) {
@@ -945,7 +945,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
                 Database = null;
             }
-            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
+            // Nicht verwaltete Ressourcen (Bitmap, Tabellenverbindungen, ...)
             _tmpQuickInfo = null;
             InvalidateCheckData();
 

@@ -27,7 +27,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedType.Global
-public class Method_SetError : Method_DatabaseGeneric {
+public class Method_SetError : Method_TableGeneric {
 
     #region Fields
 
@@ -42,8 +42,8 @@ public class Method_SetError : Method_DatabaseGeneric {
     public override List<string> Constants => [];
 
     public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
-                                          "Die hier angegebenen Variablen müssen einer Spalte der Datenbank entsprechen.\r\n" +
-                                          "Diese werden dann als 'fehlerhaft' in der Datenbank-Zeile markiert, mit der hier\r\n" +
+                                          "Die hier angegebenen Variablen müssen einer Spalte der Tabelle entsprechen.\r\n" +
+                                          "Diese werden dann als 'fehlerhaft' in der Tabellen-Zeile markiert, mit der hier\r\n" +
                                           "angegebenen Nachricht.";
 
     public override bool GetCodeBlockAfter => false;

@@ -184,7 +184,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
 
     public override ScriptEndedFeedback ExecuteScript(bool testmode) {
         if (IsDisposed || Database is not { IsDisposed: false } db) {
-            return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
 
         if (_item == null) {
@@ -283,13 +283,13 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
     }
 
     private void btnVerlauf_Click(object sender, System.EventArgs e) {
-        // Überprüfen, ob die Datenbank oder die Instanz selbst verworfen wurde
+        // Überprüfen, ob die Tabelle oder die Instanz selbst verworfen wurde
         if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
 
         // Das ausgewählte Skript aus der Liste abrufen
         var selectedlstEventScripts = lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem item ? (DatabaseScriptDescription)item.Item : null;
         var l = new List<string>();
-        // Durchlaufen aller Undo-Operationen in der Datenbank
+        // Durchlaufen aller Undo-Operationen in der Tabelle
         foreach (var thisUndo in db.Undo) {
             if (thisUndo.Command is DatabaseDataType.EventScript) {
                 l.Add("############################################################################");

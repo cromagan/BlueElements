@@ -237,7 +237,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     public RowData? CursorPosRow { get; private set; }
 
     /// <summary>
-    /// Datenbanken können mit DatabaseSet gesetzt werden.
+    /// Tabellen können mit DatabaseSet gesetzt werden.
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -519,9 +519,9 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         if (cola) { t += " - Spalten-Anordnungen<br>"; }
         if (column.UsedInScript()) { t += " - Skripte<br>"; }
         if (db.RowQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
-        //if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Datenbank-Tags<br>"; }
+		//if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Tabellen-Tags<br>"; }
 
-        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
+		if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
 
         if (!string.IsNullOrEmpty(column.ColumnSystemInfo)) {
             t += "<br><br><b>Gesammelte Infos:</b><br>";
@@ -569,7 +569,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     //        return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
     //            : new Size(16, 16);
     //    }
-    public static string Database_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, FormatHolder.Text);
+    public static string Database_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolder.Text);
 
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column is not { IsDisposed: false }) { return; }
@@ -680,7 +680,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
     public static void SearchNextText(string searchTxt, Table tableView, ColumnViewItem? column, RowData? row, out ColumnViewItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
         if (tableView.Database is not { IsDisposed: false } db) {
-            MessageBox.Show("Datenbank-Fehler.", ImageCode.Information, "OK");
+            MessageBox.Show("Tabellen-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
             return;
@@ -688,7 +688,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         searchTxt = searchTxt.Trim();
         if (tableView.CurrentArrangement is not { IsDisposed: false } ca) {
-            MessageBox.Show("Datenbank-Ansichts-Fehler.", ImageCode.Information, "OK");
+            MessageBox.Show("Tabellen-Ansichts-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
             return;
@@ -902,7 +902,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         CloseAllComponents();
 
         if (Database is { IsDisposed: false } db1) {
-            // auch Disposed Datenbanken die Bezüge entfernen!
+            // auch Disposed Tabellen die Bezüge entfernen!
             db1.Cell.CellValueChanged -= _Database_CellValueChanged;
             db1.Loaded -= _Database_DatabaseLoaded;
             db1.Loading -= _Database_StoreView;
@@ -1243,14 +1243,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         var bearbColumn = column;
         if (columnLinked != null) {
             columnLinked.Repair();
-            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Datenbank",
+            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle",
                     "Verlinkte Spalte") == 1) {
                 bearbColumn = columnLinked;
             }
         } else {
             if (posError) {
                 Notification.Show(
-                    "Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?",
+                    "Keine aktive Verlinkung.<br>Spalte in dieser Tabelle wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Tabelle vorhanden?",
                     ImageCode.Information);
             }
         }
@@ -1744,7 +1744,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         if (Database is not { IsDisposed: false } db) {
-            DrawWaitScreen(gr, "Keine Datenbank geladen.", null);
+            DrawWaitScreen(gr, "Keine Tabelle geladen.", null);
             return;
         }
 
@@ -1771,7 +1771,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         if (FilterCombined.Database != null && Database != FilterCombined.Database) {
-            DrawWaitScreen(gr, "Filter fremder Datenbank: " + FilterCombined.Database.Caption, ca);
+            DrawWaitScreen(gr, "Filter fremder Tabelle: " + FilterCombined.Database.Caption, ca);
             return;
         }
 
@@ -2153,7 +2153,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                                 QuickInfo = "Verlinkungs-Status: " + info;
                             }
                         } else {
-                            QuickInfo = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
+                            QuickInfo = "Verknüpfung zur Ziel-Tabelle fehlerhaft.";
                         }
                     } else if (db.IsAdministrator()) {
                         QuickInfo = Database.UndoText(_mouseOverColumn?.Column, _mouseOverRow?.Row);
@@ -2294,7 +2294,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         if (cellInThisDatabaseRow == null) {
             if (string.IsNullOrEmpty(newValue)) { return string.Empty; }
-            if (cellInThisDatabaseColumn.Column?.Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+            if (cellInThisDatabaseColumn.Column?.Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
             if (table?.Database?.Column.First is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
 
             using var filterColNewRow = new FilterCollection(table.Database, "Edit-Filter");
@@ -2392,7 +2392,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         // Wird auch bei einem Reload ausgeführt.
         // Es kann aber sein, dass eine Ansicht zurückgeholt wurde, und die Werte stimmen.
         // Deswegen prüfen, ob wirklich alles gelöscht werden muss, oder weiter behalten werden kann.
-        // Auf Nothing muss auch geprüft werden, da bei einem Dispose oder beim Beenden sich die Datenbank auch änsdert....
+        // Auf Nothing muss auch geprüft werden, da bei einem Dispose oder beim Beenden sich die Tabelle auch änsdert....
 
         if (e.IsFirst) {
             if (!string.IsNullOrEmpty(_storedView)) {
@@ -3092,7 +3092,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         var col = db.Column.First;
 
-        if (col == null) { return; } // Neue Datenbank?
+        if (col == null) { return; } // Neue Tabelle?
 
         var fi = new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
         using var fc = new FilterCollection(fi, "doähnliche");
@@ -3595,12 +3595,12 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
                 ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, filterHeight + 12);
             } else {
-                // Verknüpfte Datenbanken überprüfen
+                // Verknüpfte Tabellen überprüfen
                 foreach (var thisColumn in db.Column) {
                     if (thisColumn.LinkedDatabase is { IsDisposed: false } linkedDb && !string.IsNullOrEmpty(linkedDb.CheckScriptError())) {
                         gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
                         ca.Font_RowChapter.DrawString(gr, $"Skripte von {linkedDb.Caption} müssen repariert werden", 90, filterHeight + 12);
-                        break; // Nur die erste fehlerhafte Datenbank anzeigen
+                        break; // Nur die erste fehlerhafte Tabelle anzeigen
                     }
                 }
             }
@@ -4252,7 +4252,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     private string UserEdit_NewRowAllowed() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
         if (db.Column.Count == 0) { return "Keine Spalten vorhanden"; }
         if (db.Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 

@@ -29,18 +29,18 @@ using System.Diagnostics;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallDatabase : Method_DatabaseGeneric, IUseableForButton {
+public class Method_CallTable : Method_TableGeneric, IUseableForButton {
 
     #region Properties
 
-    public override List<List<string>> Args => [DatabaseVar, StringVal, StringVal];
+    public override List<List<string>> Args => [TableVar, StringVal, StringVal];
     public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
-    public List<string> ArgsForButtonDescription => ["Datenbank", "Auszuführendes Skript", "Attribut0"];
+    public List<string> ArgsForButtonDescription => ["Tabelle", "Auszuführendes Skript", "Attribut0"];
     public ButtonArgs ClickableWhen => ButtonArgs.Egal;
-    public override string Command => "calldatabase";
+    public override string Command => "calltable";
     public override List<string> Constants => [];
 
-    public override string Description => "Führt das Skript in der angegebenen Datenbank aus.\r\n" +
+    public override string Description => "Führt das Skript in der angegebenen Tabelle aus.\r\n" +
             "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszührenden Skript zur Verfügung.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
 
@@ -48,10 +48,10 @@ public class Method_CallDatabase : Method_DatabaseGeneric, IUseableForButton {
     public override int LastArgMinCount => 0;
     public override MethodType MethodType => MethodType.SpecialVariables;
     public override bool MustUseReturnValue => false;
-    public string NiceTextForUser => "Ein Skript einer anderen Datenbank ausführen";
+    public string NiceTextForUser => "Ein Skript einer anderen Tabelle ausführen";
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "CallDatabase(DatabaseName, Scriptname, Attribut0, ...);";
+    public override string Syntax => "CallTable(Table, Scriptname, Attribut0, ...);";
 
     #endregion
 
@@ -60,7 +60,7 @@ public class Method_CallDatabase : Method_DatabaseGeneric, IUseableForButton {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (attvar.Attributes[0] is not VariableDatabase vdb || vdb.Database is not { IsDisposed: false } db) { return new DoItFeedback("Datenbank nicht vorhanden", true, ld); }
+        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false } db) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
         if (db == myDb) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 
         var m = db.CanWriteMainFile();
@@ -90,7 +90,7 @@ public class Method_CallDatabase : Method_DatabaseGeneric, IUseableForButton {
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) {
         var db = Database.Get(args[0], false, null);
-        var vdb = new VariableDatabase(db);
+        var vdb = new VariableTable(db);
        return vdb.ValueForReplace + "," + args[1] + "," + args[2];
     }
 

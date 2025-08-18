@@ -125,7 +125,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasDatabase {
 
     private void CheckButtons() {
         if (_database == null || _table == null) {
-            txtInfo.Text = "Keine Datenbank gewählt.";
+            txtInfo.Text = "Keine Tabelle gewählt.";
             btnExecute.Enabled = false;
             return;
         }

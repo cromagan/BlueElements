@@ -28,7 +28,7 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_ImportLinked : Method_DatabaseGeneric {
+public class Method_ImportLinked : Method_TableGeneric {
 
     #region Properties
 
@@ -66,15 +66,15 @@ public class Method_ImportLinked : Method_DatabaseGeneric {
             if (thisColumn.RelationType != RelationType.CellValues) { continue; }
 
             var linkedDatabase = thisColumn.LinkedDatabase;
-            if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback("Verlinkte Datenbank nicht vorhanden", true, ld); }
+            if (linkedDatabase is not { IsDisposed: false }) { return new DoItFeedback("Verlinkte Tabelle nicht vorhanden", true, ld); }
 
-            //if (!linkedDatabase.AreScriptsExecutable()) { return new DoItFeedback("In der Datenbank '" + linkedDatabase.Caption + "' sind die Skripte defekt", false, ld); }
+            //if (!linkedDatabase.AreScriptsExecutable()) { return new DoItFeedback("In der Tabelle '" + linkedDatabase.Caption + "' sind die Skripte defekt", false, ld); }
 
             var targetColumn = linkedDatabase.Column[thisColumn.ColumnNameOfLinkedDatabase];
             if (targetColumn == null) { return new DoItFeedback("Die Spalte ist in der Zieldatenbank nicht vorhanden.", true, ld); }
 
             var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedDatabase, thisColumn, r, varCol);
-            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback("Berechnungsfehler im Datenbankkopf der verlinkten Zellen: " + info, true, ld); }
+            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback("Berechnungsfehler im Tabellekopf der verlinkten Zellen: " + info, true, ld); }
 
             var rows = fc.Rows;
             if (rows.Count > 1) { return new DoItFeedback("Suchergebnis liefert mehrere Ergebnisse.", true, ld); }

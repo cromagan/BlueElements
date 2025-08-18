@@ -27,7 +27,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_RowNext : Method_DatabaseGeneric {
+public class Method_RowNext : Method_TableGeneric {
 
     #region Properties
 
@@ -76,7 +76,7 @@ public class Method_RowNext : Method_DatabaseGeneric {
 
         if (r.Count < 2) { return Method_Row.RowToObjectFeedback(null); }
 
-        if (mr.Database != r[0].Database) { return new DoItFeedback("Filterfehler, falsche Datenbank", true, ld); }
+        if (mr.Database != r[0].Database) { return new DoItFeedback("Filterfehler, falsche Tabelle", true, ld); }
 
         if (!r.Contains(mr)) { return Method_Row.RowToObjectFeedback(null); }
 

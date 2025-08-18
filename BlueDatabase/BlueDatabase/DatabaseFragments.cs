@@ -164,10 +164,10 @@ public class DatabaseFragments : Database {
 
         _masterNeeded = files.Count > 8 || ChangesNotIncluded.Count > 40 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12;
 
-        #region Bei Bedarf neue Komplett-Datenbank erstellen
+        #region Bei Bedarf neue Komplett-Tabelle erstellen
 
         if (_masterNeeded && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
-            DropMessage(ErrorType.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
+            DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + TableName);
 
             var f = SaveInternal(IsInCache);
 
@@ -245,7 +245,7 @@ public class DatabaseFragments : Database {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
+        if (ReadOnly) { return "Tabelle schreibgeschützt!"; } // Sicherheitshalber!
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
@@ -350,12 +350,12 @@ public class DatabaseFragments : Database {
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
         if (Column.ChunkValueColumn is { IsDisposed: false }) {
-            // Split-Datenbanken und Fragmente gehen nicht, siehe kommentar weiter unten
+            // Split-Tabellen und Fragmente gehen nicht, siehe kommentar weiter unten
             return;
         }
 
         if (!string.IsNullOrEmpty(Filename) && IsInCache.Year < 2000) {
-            Develop.DebugPrint(ErrorType.Error, "Datenbank noch nicht korrekt geladen!");
+            Develop.DebugPrint(ErrorType.Error, "Tabelle noch nicht korrekt geladen!");
             return;
         }
 
@@ -385,7 +385,7 @@ public class DatabaseFragments : Database {
                         var error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate);
 
                         if (!string.IsNullOrEmpty(error)) {
-                            Freeze("Datenbank-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
+                            Freeze("Tabellen-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
                             return;
                         }
                     }

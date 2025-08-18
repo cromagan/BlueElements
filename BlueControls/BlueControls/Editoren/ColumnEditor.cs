@@ -615,7 +615,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     /// <summary>
     /// Holt die Werte aus tblFilterliste und schreibt sie in _Column.LinkedCellFilter
-    /// Hat tblFilterliste keine Datenbank, bleibt die Variable _Column.LinkedCellFilter unverändert
+    /// Hat tblFilterliste keine Tabelle, bleibt die Variable _Column.LinkedCellFilter unverändert
     /// </summary>
 
     private void GetLinkedCellFilter() {

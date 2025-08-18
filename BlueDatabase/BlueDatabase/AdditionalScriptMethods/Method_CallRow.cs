@@ -27,7 +27,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallRow : Method_DatabaseGeneric, IUseableForButton {
+public class Method_CallRow : Method_TableGeneric, IUseableForButton {
 
     #region Properties
 
@@ -41,7 +41,7 @@ public class Method_CallRow : Method_DatabaseGeneric, IUseableForButton {
     public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
             "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
-        "Kein Zugriff auf auf Datenbank-Variablen!";
+        "Kein Zugriff auf auf Tabellen-Variablen!";
 
     public override bool GetCodeBlockAfter => false;
 
@@ -69,7 +69,7 @@ public class Method_CallRow : Method_DatabaseGeneric, IUseableForButton {
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
         if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         //if (row?.Database is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
-        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Datenbank '{db.Caption}' sind die Skripte defekt", false, ld); }
+        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{db.Caption}' sind die Skripte defekt", false, ld); }
 
         //if (row == MyRow(scp)) {
         //    return new DoItFeedback("Skripte der eigenen Zeile mit Call aufrufen.", true, ld);

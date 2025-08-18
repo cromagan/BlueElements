@@ -35,13 +35,13 @@ public enum MethodType {
     Math = 2,
 
     /// <summary>
-    /// Methoden, die über einer Datenbank aufgerufen werden müssen.
-    /// Z.B. weil sie die eigene Datenbank brauchen, um andere Datenbanken finden zu können.
+    /// Methoden, die über einer Tabelle aufgerufen werden müssen.
+    /// Z.B. weil sie die eigene Tabelle brauchen, um andere Tabellen finden zu können.
     /// </summary>
     Database = 4,
 
     /// <summary>
-    /// Methoden, die sich innerhalb der aktuellen Zeile der Datenbank bewegen. Muss immer gemeinsam mit dem Attribut 'Database' verwendet werden.
+    /// Methoden, die sich innerhalb der aktuellen Zeile der Tabelle bewegen. Muss immer gemeinsam mit dem Attribut 'Database' verwendet werden.
     /// </summary>
     MyDatabaseRow = 8,
 

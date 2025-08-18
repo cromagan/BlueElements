@@ -69,7 +69,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
     /// </summary>
     /// <param name="txt"></param>
     /// <param name="vorschlagsText"></param>
-    /// <param name="suggest">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
+    /// <param name="suggest">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Tabelle auch Bilder etc. angezeigt werden können.</param>
     /// <returns></returns>
 
     private static string Show(string txt, string vorschlagsText, List<AbstractListItem>? suggest, bool texteingabeErlaubt) {

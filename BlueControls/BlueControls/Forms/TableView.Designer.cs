@@ -36,7 +36,7 @@ namespace BlueControls.Forms {
             this.ribMain = new BlueControls.Controls.RibbonBar();
             this.tabFile = new System.Windows.Forms.TabPage();
             this.grpOrdner = new BlueControls.Controls.GroupBox();
-            this.btnDatenbankenSpeicherort = new BlueControls.Controls.Button();
+            this.btnTabellenSpeicherort = new BlueControls.Controls.Button();
             this.btnTemporärenSpeicherortÖffnen = new BlueControls.Controls.Button();
             this.grpDatei = new BlueControls.Controls.GroupBox();
             this.btnLetzteDateien = new BlueControls.Controls.LastFilesCombo();
@@ -167,7 +167,7 @@ namespace BlueControls.Forms {
             // 
             this.grpOrdner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpOrdner.CausesValidation = false;
-            this.grpOrdner.Controls.Add(this.btnDatenbankenSpeicherort);
+            this.grpOrdner.Controls.Add(this.btnTabellenSpeicherort);
             this.grpOrdner.Controls.Add(this.btnTemporärenSpeicherortÖffnen);
             this.grpOrdner.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpOrdner.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
@@ -178,17 +178,17 @@ namespace BlueControls.Forms {
             this.grpOrdner.TabStop = false;
             this.grpOrdner.Text = "Ordner";
             // 
-            // btnDatenbankenSpeicherort
+            // btnTabellenSpeicherort
             // 
-            this.btnDatenbankenSpeicherort.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnDatenbankenSpeicherort.ImageCode = "Ordner";
-            this.btnDatenbankenSpeicherort.Location = new System.Drawing.Point(8, 2);
-            this.btnDatenbankenSpeicherort.Name = "btnDatenbankenSpeicherort";
-            this.btnDatenbankenSpeicherort.QuickInfo = "Speicherort der Datenbanken öffnen";
-            this.btnDatenbankenSpeicherort.Size = new System.Drawing.Size(88, 66);
-            this.btnDatenbankenSpeicherort.TabIndex = 27;
-            this.btnDatenbankenSpeicherort.Text = "Datenbanken-Pfad";
-            this.btnDatenbankenSpeicherort.Click += new System.EventHandler(this.btnDatenbankenSpeicherort_Click);
+            this.btnTabellenSpeicherort.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnTabellenSpeicherort.ImageCode = "Ordner";
+            this.btnTabellenSpeicherort.Location = new System.Drawing.Point(8, 2);
+            this.btnTabellenSpeicherort.Name = "btnTabellenSpeicherort";
+            this.btnTabellenSpeicherort.QuickInfo = "Speicherort der Tabellen öffnen";
+            this.btnTabellenSpeicherort.Size = new System.Drawing.Size(88, 66);
+            this.btnTabellenSpeicherort.TabIndex = 27;
+            this.btnTabellenSpeicherort.Text = "Datenbanken-Pfad";
+            this.btnTabellenSpeicherort.Click += new System.EventHandler(this.btnTabellenSpeicherort_Click);
             // 
             // btnTemporärenSpeicherortÖffnen
             // 
@@ -586,7 +586,7 @@ namespace BlueControls.Forms {
             this.btnSaveLoad.ImageCode = "Diskette|16";
             this.btnSaveLoad.Location = new System.Drawing.Point(80, 2);
             this.btnSaveLoad.Name = "btnSaveLoad";
-            this.btnSaveLoad.QuickInfo = "Aktualisiert die Datenbank-Daten. (Speichern, neu Laden)";
+            this.btnSaveLoad.QuickInfo = "Aktualisiert die Tabellen-Daten. (Speichern, neu Laden)";
             this.btnSaveLoad.Size = new System.Drawing.Size(48, 66);
             this.btnSaveLoad.TabIndex = 43;
             this.btnSaveLoad.Text = "Daten aktual.";
@@ -686,7 +686,7 @@ namespace BlueControls.Forms {
             this.btnDatenbankKopf.Name = "btnDatenbankKopf";
             this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
             this.btnDatenbankKopf.TabIndex = 37;
-            this.btnDatenbankKopf.Text = "Datenbank-Kopf";
+            this.btnDatenbankKopf.Text = "Tabellen-Kopf";
             this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
             // 
             // btnLayouts
@@ -785,7 +785,7 @@ namespace BlueControls.Forms {
             this.btnMDBImport.ImageCode = "Tabelle||||||||||Datenbank";
             this.btnMDBImport.Location = new System.Drawing.Point(72, 2);
             this.btnMDBImport.Name = "btnMDBImport";
-            this.btnMDBImport.QuickInfo = "Importiert in die aktuell angezeigte Datenbank\r\nDaten einer andere Datenbank.";
+            this.btnMDBImport.QuickInfo = "Importiert in die aktuell angezeigte Tabelle\r\nDaten einer andere Tabelle.";
             this.btnMDBImport.Size = new System.Drawing.Size(64, 66);
             this.btnMDBImport.TabIndex = 40;
             this.btnMDBImport.Text = "Datei-Import";
@@ -797,7 +797,7 @@ namespace BlueControls.Forms {
             this.btnClipboardImport.ImageCode = "Tabelle||||||||||Clipboard";
             this.btnClipboardImport.Location = new System.Drawing.Point(8, 2);
             this.btnClipboardImport.Name = "btnClipboardImport";
-            this.btnClipboardImport.QuickInfo = "Importiert in die aktuell angezeigte Datenbank\r\nDaten aus dem Clipboard.";
+            this.btnClipboardImport.QuickInfo = "Importiert in die aktuell angezeigte Tabelle\r\nDaten aus dem Clipboard.";
             this.btnClipboardImport.Size = new System.Drawing.Size(64, 66);
             this.btnClipboardImport.TabIndex = 39;
             this.btnClipboardImport.Text = "Clipboard-Import";
@@ -912,15 +912,15 @@ namespace BlueControls.Forms {
             // 
             // LoadTab
             // 
-            this.LoadTab.Filter = "Datenbanken (*.BDB;*.MBDB;*.CBDB)|*.BDB;*.MBDB;*.CBDB|Alle Dateien (*.*)|*.*";
-            this.LoadTab.Title = "Bitte Datenbank laden!";
+            this.LoadTab.Filter = "Tabellen (*.BDB;*.MBDB;*.CBDB)|*.BDB;*.MBDB;*.CBDB|Alle Dateien (*.*)|*.*";
+            this.LoadTab.Title = "Bitte Tabelle laden!";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
             // SaveTab
             // 
-            this.SaveTab.Filter = "*.BDB Datenbanken|*.BDB|*.MBDB Datenbanken|*.MBDB|*.CBDB Datenbanken|*.CBDB|*.* A" +
+            this.SaveTab.Filter = "*.BDB Tabellen|*.BDB|*.MBDB Tabellen|*.MBDB|*.CBDB Tabellen|*.CBDB|*.* A" +
     "lle Dateien|*";
-            this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
+            this.SaveTab.Title = "Bitte neuen Dateinamen der Tabelle wählen.";
             // 
             // grpAufräumen
             // 
@@ -1010,7 +1010,7 @@ namespace BlueControls.Forms {
         private ComboBox btnDrucken;
         private TabPage tabFile;
         private GroupBox grpOrdner;
-        private Button btnDatenbankenSpeicherort;
+        private Button btnTabellenSpeicherort;
         private Button btnTemporärenSpeicherortÖffnen;
         private GroupBox grpDatei;
         private LastFilesCombo btnLetzteDateien;

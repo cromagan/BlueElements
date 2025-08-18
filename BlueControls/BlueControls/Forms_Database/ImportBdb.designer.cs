@@ -30,7 +30,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txtInfo = new Caption();
             this.btnCancel = new Button();
             this.LoadTab = new OpenFileDialog();
-            this.btnDatenbankwählen = new Button();
+            this.btnChoseTable = new Button();
             this.cbxColDateiname = new ComboBox();
             this.capColumn = new Caption();
             this.btnDateienlöschen = new Button();
@@ -80,20 +80,20 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // LoadTab
             // 
-            this.LoadTab.Filter = "Datenbanken (*.BDB;*.MBDB)|*.BDB;*.MBDB;*.CBDB|Alle Dateien (*.*)|*.*";
+            this.LoadTab.Filter = "Tabellen (*.BDB;*.MBDB)|*.BDB;*.MBDB;*.CBDB|Alle Dateien (*.*)|*.*";
             this.LoadTab.Multiselect = true;
-            this.LoadTab.Title = "Bitte Datenbank wählen.";
+            this.LoadTab.Title = "Bitte Tabelle wählen.";
             this.LoadTab.FileOk += new CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // btnDatenbankwählen
+            // btnChoseTable
             // 
-            this.btnDatenbankwählen.ImageCode = "Datenbank|24";
-            this.btnDatenbankwählen.Location = new Point(8, 8);
-            this.btnDatenbankwählen.Name = "btnDatenbankwählen";
-            this.btnDatenbankwählen.Size = new Size(184, 40);
-            this.btnDatenbankwählen.TabIndex = 97;
-            this.btnDatenbankwählen.Text = "Datenbank(en) wählen";
-            this.btnDatenbankwählen.Click += new EventHandler(this.btnDatenbankwählen_Click);
+            this.btnChoseTable.ImageCode = "Datenbank|24";
+            this.btnChoseTable.Location = new Point(8, 8);
+            this.btnChoseTable.Name = "btnChoseTable";
+            this.btnChoseTable.Size = new Size(184, 40);
+            this.btnChoseTable.TabIndex = 97;
+            this.btnChoseTable.Text = "Tabelle(n) wählen";
+            this.btnChoseTable.Click += new EventHandler(this.btnChoseTable_Click);
             // 
             // cbxColDateiname
             // 
@@ -132,7 +132,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.btnDateienlöschen);
             this.Controls.Add(this.capColumn);
             this.Controls.Add(this.cbxColDateiname);
-            this.Controls.Add(this.btnDatenbankwählen);
+            this.Controls.Add(this.btnChoseTable);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnImport);
             this.Controls.Add(this.txtInfo);
@@ -144,7 +144,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.SetChildIndex(this.btnImport, 0);
             this.Controls.SetChildIndex(this.btnCancel, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.Controls.SetChildIndex(this.btnDatenbankwählen, 0);
+            this.Controls.SetChildIndex(this.btnChoseTable, 0);
             this.Controls.SetChildIndex(this.cbxColDateiname, 0);
             this.Controls.SetChildIndex(this.capColumn, 0);
             this.Controls.SetChildIndex(this.btnDateienlöschen, 0);
@@ -156,7 +156,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnImport;
         private Button btnCancel;
         private OpenFileDialog LoadTab;
-        private Button btnDatenbankwählen;
+        private Button btnChoseTable;
         private ComboBox cbxColDateiname;
         private Caption capColumn;
         private Button btnDateienlöschen;

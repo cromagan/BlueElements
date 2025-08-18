@@ -90,7 +90,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private string _captionGroup3;
 
     /// <summary>
-    /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
+    /// Die Quell-Spalte (aus der verlinkten Tabelle) ist immer
     /// </summary>
     private string _columnNameOfLinkedDatabase;
 
@@ -493,7 +493,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     /// <summary>
-    /// Was in Textfeldern oder Datenbankzeilen für ein Suffix angezeigt werden soll. Beispiel: mm
+    /// Was in Textfeldern oder Tabellezeilen für ein Suffix angezeigt werden soll. Beispiel: mm
     /// </summary>
     public List<string> ColumnTags {
         get => _columnTags;
@@ -730,7 +730,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     /// <summary>
-    /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
+    /// Die Quell-Spalte (aus der verlinkten Tabelle) ist immer
     /// </summary>
     public List<string> LinkedCellFilter {
         get => _linkedCellFilter;
@@ -1314,7 +1314,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public string ErrorReason() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
         if (string.IsNullOrEmpty(_keyName)) { return "Der Spaltenname ist nicht definiert."; }
 
         if (!IsValidColumnName(_keyName)) { return "Der Spaltenname ist ungültig."; }
@@ -1331,13 +1331,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (string.IsNullOrEmpty(_caption)) { return "Spalten Beschriftung fehlt."; }
 
         if (_relationType != RelationType.None) {
-            if (LinkedDatabase is not { IsDisposed: false } db2) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
-            if (db == db2) { return "Zirkelbezug mit verknüpfter Datenbank."; }
+            if (LinkedDatabase is not { IsDisposed: false } db2) { return "Verknüpfte Tabelle fehlt oder existiert nicht."; }
+            if (db == db2) { return "Zirkelbezug mit verknüpfter Tabelle."; }
             var c = db2.Column[_columnNameOfLinkedDatabase];
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
             if (_linkedCellFilter.Count == 0) {
                 if (_relationType != RelationType.DropDownValues) {
-                    return "Keine Filter für verknüpfte Datenbank definiert.";
+                    return "Keine Filter für verknüpfte Tabelle definiert.";
                 }
             }
         } else {
@@ -1376,7 +1376,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             }
 
             if (_relationType != RelationType.None) {
-                return "Bei Spalten mit Verknüpfung zu anderen Datenbanken der Inhalt gespeichert werden.";
+                return "Bei Spalten mit Verknüpfung zu anderen Tabellen der Inhalt gespeichert werden.";
             }
 
             if (_relationship_to_First) {
@@ -1430,7 +1430,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (_relationType == RelationType.CellValues) {
             if (_scriptType is not ScriptType.Nicht_vorhanden) {
-                return "Spalten mit Verlinkungen zu anderen Datenbanken können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
+                return "Spalten mit Verlinkungen zu anderen Tabellen können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
             }
         }
 
@@ -1510,7 +1510,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public string IsNowEditable() {
-        if (Database is not { IsDisposed: false } db) { return "Datenbank verworfen"; }
+        if (Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
         return db.GrantWriteAccess(DatabaseDataType.ColumnName, DatabaseChunk.Chunk_Master);
     }
 
@@ -1627,7 +1627,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //        _function = ColumnFunction.Normal;
         //        break;
 
-        //    case ColumnFunction.Verknüpfung_zu_anderer_Datenbank:
+        //    case ColumnFunction.Verknüpfung_zu_anderer_Tabelle:
         //        RelationType = RelationType.CellValues;
         //        _function = ColumnFunction.Normal;
 
@@ -2189,7 +2189,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             case DatabaseDataType.ColumnName:
                 var oldname = _keyName;
                 _keyName = newvalue.ToUpperInvariant();
-                var ok = Database?.Column.ChangeName(oldname, _keyName) ?? "Datenbank verworfen";
+                var ok = Database?.Column.ChangeName(oldname, _keyName) ?? "Tabelle verworfen";
 
                 if (!string.IsNullOrEmpty(ok)) {
                     var reason = "Schwerer Spalten Umbenennungsfehler, " + ok;

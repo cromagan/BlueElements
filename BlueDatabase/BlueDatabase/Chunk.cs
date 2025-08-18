@@ -164,7 +164,7 @@ public class Chunk : IHasKeyName {
     /// <returns></returns>
     public bool NeedsReload(bool important) {
         if (LoadFailed) { return true; }
-        if (string.IsNullOrEmpty(MainFileName)) { return false; } // Temporäre Datenbanken
+        if (string.IsNullOrEmpty(MainFileName)) { return false; } // Temporäre Tabellen
 
         // Prüfe, ob die Datei überhaupt existiert
         if (!FileExists(ChunkFileName)) {

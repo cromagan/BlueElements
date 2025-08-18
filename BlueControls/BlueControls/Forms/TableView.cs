@@ -165,7 +165,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     /// <summary>
-    /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
+    /// Erstellt einen Reiter mit den nötigen Tags um eine Tabelle laden zu können - lädt die Tabelle aber selbst nicht.
     /// HIer wird auch die Standard-Ansicht als Tag Injiziert
     /// </summary>
     protected void AddTabPage(string tablename, string settings) {
@@ -247,7 +247,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         btnOeffnen.Enabled = true;
         btnDrucken.Enabled = datenbankDa;
 
-        btnDatenbankenSpeicherort.Enabled = Table.Database is { IsDisposed: false } db && !string.IsNullOrEmpty(db.Filename);
+        btnTabellenSpeicherort.Enabled = Table.Database is { IsDisposed: false } db && !string.IsNullOrEmpty(db.Filename);
 
         btnZeileLöschen.Enabled = datenbankDa;
         lstAufgaben.Enabled = datenbankDa;
@@ -377,7 +377,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         }
 
         if (!maybeok) {
-            Develop.Message?.Invoke(ErrorType.Info, null, "Datenbank", ImageCode.Datenbank, "Lade Datenbank " + tablename, 0);
+            Develop.Message?.Invoke(ErrorType.Info, null, "Datenbank", ImageCode.Datenbank, "Lade Tabelle " + tablename, 0);
         }
 
         #endregion
@@ -402,7 +402,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     /// <summary>
-    /// Sucht den Tab mit der angegebenen Datenbank.
+    /// Sucht den Tab mit der angegebenen Tabelle.
     /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
     /// </summary>
     /// <returns></returns>
@@ -439,7 +439,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     /// <summary>
-    /// Sucht den Tab mit der angegebenen Datenbank.
+    /// Sucht den Tab mit der angegebenen Tabelle.
     /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
     /// </summary>
     /// <returns></returns>
@@ -543,7 +543,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
         Table.ImportClipboard();
     }
 
-    private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
+    private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
 
@@ -709,7 +709,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
 
         if (Table.Database is not { IsDisposed: false } db || !db.IsAdministrator()) {
             tabAdmin.Enabled = false;
-            return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
+            return; // Weitere funktionen benötigen sicher eine Tabelle um keine Null Exception auszulösen
         }
 
         var m = db.CanWriteMainFile();
@@ -880,7 +880,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     }
 
     /// <summary>
-    /// Diese Routine lädt die Datenbank, falls nötig.
+    /// Diese Routine lädt die Tabelle, falls nötig.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>

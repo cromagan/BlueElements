@@ -27,7 +27,7 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallFilter : Method_DatabaseGeneric, IUseableForButton {
+public class Method_CallFilter : Method_TableGeneric, IUseableForButton {
 
     #region Properties
 
@@ -38,10 +38,10 @@ public class Method_CallFilter : Method_DatabaseGeneric, IUseableForButton {
     public override string Command => "callfilter";
     public override List<string> Constants => [];
 
-    public override string Description => "Sucht Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus.\r\n" +
+    public override string Description => "Sucht Zeilen und ruft in dessen Tabelle ein Skript für jede Zeile aus.\r\n" +
                                                 "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
                                             "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
-                                            "Kein Zugriff auf auf Datenbank-Variablen!";
+                                            "Kein Zugriff auf auf Tabellen-Variablen!";
 
     public override bool GetCodeBlockAfter => false;
 

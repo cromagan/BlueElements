@@ -67,13 +67,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public readonly List<UndoItem> Undo;
 
     /// <summary>
-    /// Wann die Datenbank zuletzt angeschaut / geöffnet / geladen wurde.
+    /// Wann die Tabelle zuletzt angeschaut / geöffnet / geladen wurde.
     /// Bestimmt die Reihenfolge der Reparaturen
     /// </summary>
     public DateTime LastUsedDate = DateTime.UtcNow;
 
     /// <summary>
-    /// So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
+    /// So viele Änderungen sind seit dem letzten erstellen der Komplett-Tabelle erstellen auf Festplatte gezählt worden
     /// </summary>
     protected readonly List<UndoItem> ChangesNotIncluded = [];
 
@@ -86,7 +86,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private static List<string> _allavailableTables = [];
 
     /// <summary>
-    /// Der Globale Timer, der die Datenbanken regelmäßig updated
+    /// Der Globale Timer, der die Tabellen regelmäßig updated
     /// </summary>
     private static Timer? _databaseUpdateTimer;
 
@@ -181,7 +181,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         //_globalShowPass = string.Empty;
         _creator = UserName;
         _createDate = DateTime.UtcNow.ToString9();
-        FileStateUtcDate = new DateTime(0); // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
+        FileStateUtcDate = new DateTime(0); // Wichtig, dass das Datum bei Tabellen ohne den Wert immer alles laden
         //_caption = string.Empty;
         LoadedVersion = DatabaseVersion;
         //_globalScale = 1f;
@@ -195,7 +195,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
         // Die Events registriert werden, um z.B: das Passwort abzufragen
-        // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können.
+        // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Tabelle finden können.
         // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
         AllFiles.Add(this);
         GenerateDatabaseUpdateTimer();
@@ -271,7 +271,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    [Description("Der Name der Datenbank.")]
+    [Description("Der Name der Tabelle.")]
     public string Caption {
         get => _caption;
         set {
@@ -311,7 +311,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public ReadOnlyCollection<string> DatenbankAdmin {
+    public ReadOnlyCollection<string> TabelleAdmin {
         get => new(_datenbankAdmin);
         set {
             if (!_datenbankAdmin.IsDifferentTo(value)) { return; }
@@ -368,7 +368,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     /// <summary>
     /// Der Wert wird im System verankert und gespeichert.
-    /// Bei Datenbanken, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
+    /// Bei Tabellen, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
     /// Kann hier nur gelesen werden! Da eine Änderung über die Property die Datei wieder auf ungespeichert setzen würde, würde hier eine
     /// Kettenreaktion ausgelöst werden.
     /// </summary>
@@ -530,7 +530,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
-        // Wenn eine Datenbank z.B. im gleichen Verzeichnis liegt,
+        // Wenn eine Tabelle z.B. im gleichen Verzeichnis liegt,
         // reicht es, das Verzeichnis einmal zu prüfen
         var allreadychecked = new List<Database>();
 
@@ -622,7 +622,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            #region Schauen, ob die Datenbank bereits geladen ist
+            #region Schauen, ob die Tabelle bereits geladen ist
 
             var folder = new List<string>();
 
@@ -696,7 +696,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
+    /// Sucht die Tabelle im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
     public static Database? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream) {
         if (Develop.IsHostRunning() && !mustBeStream) {
@@ -1166,8 +1166,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     //        Tags = new(sourceDatabase.Tags.Clone());
     //    }
     public virtual string AreAllDataCorrect() {
-        if (IsDisposed) { return "Datenbank verworfen."; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
+        if (IsDisposed) { return "Tabelle verworfen."; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
         return string.Empty;
     }
 
@@ -1210,10 +1210,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var f = AreAllDataCorrect();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
+        if (ReadOnly) { return "Tabelle schreibgeschützt!"; }
 
         if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) {
-            return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern.";
+            return "Diese Programm kann nur Tabellen bis Version " + DatabaseVersion + " speichern.";
         }
 
         if (!string.IsNullOrEmpty(Filename)) {
@@ -1238,8 +1238,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
     public string ChangeData(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, string oldchunkvalue, string newchunkvalue) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
+        if (IsDisposed) { return "Tabelle verworfen!"; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
         _saveRequired = true;
@@ -1313,9 +1313,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _ = vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
         _ = vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
         _ = vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-        _ = vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+        _ = vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Tabelle ist."));
         _ = vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
-        _ = vars.Add(new VariableDatabase("Table", this, true, "Die aktuelle Tabelle"));
+        _ = vars.Add(new VariableTable("Table", this, true, "Die aktuelle Tabelle"));
         _ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
         _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
         _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
@@ -1354,7 +1354,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    //    DatenbankAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
+    //    TabelleAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
     //    PermissionGroupsNewRow = new(sourceDatabase.PermissionGroupsNewRow.Clone());
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -1438,7 +1438,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             #region Fehlerprüfungen
 
             if (scf.NeedsScriptFix && string.IsNullOrEmpty(script.FailedReason)) {
-                var t = "Datenbank: " + Caption + "\r\n" +
+                var t = "Tabelle: " + Caption + "\r\n" +
                                   "Benutzer: " + UserName + "\r\n" +
                                   "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
                                   "Extended: " + extended + "\r\n";
@@ -1654,7 +1654,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Friert die Datenbank komplett ein, nur noch Ansicht möglich.
+    /// Friert die Tabelle komplett ein, nur noch Ansicht möglich.
     /// Setzt auch ReadOnly.
     /// </summary>
     /// <param name="reason"></param>
@@ -1663,7 +1663,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
 
         if (string.IsNullOrEmpty(FreezedReason)) {
-            DropMessage(ErrorType.DevelopInfo, $"Datenbank {TableName} wird eingefohren: {reason}");
+            DropMessage(ErrorType.DevelopInfo, $"Tabelle {TableName} wird eingefohren: {reason}");
         }
 
         FreezedReason = reason;
@@ -1859,7 +1859,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (!string.IsNullOrEmpty(cv) && !dictVorhanden.ContainsKey(cv)) {
                     dictVorhanden.Add(cv, thisR);
                 } else {
-                    DropMessage(ErrorType.Warning, "Abbruch, vorhandene Zeilen der Datenbank '" + Caption + "' sind nicht eindeutig.");
+                    DropMessage(ErrorType.Warning, "Abbruch, vorhandene Zeilen der Tabelle '" + Caption + "' sind nicht eindeutig.");
                     return "Abbruch, vorhandene Zeilen sind nicht eindeutig.";
                 }
             }
@@ -1917,7 +1917,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             #region Speichern und Ausgabe
 
             if (DateTime.Now.Subtract(d1).TotalMinutes > 5) {
-                DropMessage(ErrorType.Info, "Import: Zwischenspeichern der Datenbank");
+                DropMessage(ErrorType.Info, "Import: Zwischenspeichern der Tabelle");
                 _ = Save();
                 d1 = DateTime.Now;
             }
@@ -1983,7 +1983,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 SaveAsAndChangeTo(fileNameToLoad);
             } else {
                 Freeze("Datei existiert nicht");
-                DropMessage(ErrorType.Warning, $"Datenbank nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}");
+                DropMessage(ErrorType.Warning, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}");
                 return;
             }
         }
@@ -2017,7 +2017,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         CreateWatcher();
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
 
-        DropMessage(ErrorType.Info, $"Laden der Datenbank {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
+        DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
     }
 
     public void LoadFromStream(Stream stream) {
@@ -2152,7 +2152,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     #endregion
 
-                    #region Bei verschlüsselten Datenbanken das Passwort abfragen
+                    #region Bei verschlüsselten Tabellen das Passwort abfragen
 
                     if (command == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
                         var pwd = string.Empty;
@@ -2175,8 +2175,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
                     if (!string.IsNullOrEmpty(error)) {
-                        Freeze("Datenbank-Ladefehler");
-                        Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + error);
+                        Freeze("Tabellen-Ladefehler");
+                        Develop.DebugPrint("Schwerer Tabellenfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + error);
                         return false;
                     }
                 }
@@ -2271,7 +2271,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         SortDefinition?.Repair();
 
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
-        DatenbankAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
+        TabelleAdmin = RepairUserGroups(DatenbankAdmin).AsReadOnly();
 
         OnAdditionalRepair();
     }
@@ -2313,7 +2313,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + TableName;
 
     /// <summary>
-    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
+    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
     /// </summary>
     public void TryToSetMeTemporaryMaster() {
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
@@ -2525,8 +2525,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="user"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected string SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
-        if ((reason != Reason.NoUndo_NoInvalidate) && !string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
+        if (IsDisposed) { return "Tabelle verworfen!"; }
+        if ((reason != Reason.NoUndo_NoInvalidate) && !string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;
@@ -2595,7 +2595,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 default:
                     if (LoadedVersion == DatabaseVersion) {
-                        Freeze("Ladefehler der Datenbank");
+                        Freeze("Ladefehler der Tabelle");
                         if (!ReadOnly) {
                             Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
                         }
@@ -2753,7 +2753,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             default:
                 // Variable type
                 if (LoadedVersion == DatabaseVersion) {
-                    Freeze("Ladefehler der Datenbank");
+                    Freeze("Ladefehler der Tabelle");
                     if (!ReadOnly) {
                         Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + TableName);
                     }
@@ -2765,8 +2765,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren!"; } // Sicherheitshalber!
+        if (IsDisposed) { return "Tabelle verworfen!"; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
 
         return string.Empty;
@@ -2776,7 +2776,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         foreach (var thisDb in AllFiles) {
             if (thisDb is { IsDisposed: false, IsInCache.Year: < 2000 }) {
                 //if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
-                if (!string.IsNullOrEmpty(thisDb.Filename)) { return true; } // Irgend eine Datenbank wird aktuell geladen
+                if (!string.IsNullOrEmpty(thisDb.Filename)) { return true; } // Irgend eine Tabelle wird aktuell geladen
             }
         }
 
@@ -2947,7 +2947,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
         try {
             if (e.Done) { return; }
-            // Es werden alle Datenbanken abgefragt, also kann nach der ersten nicht schluss sein...
+            // Es werden alle Tabellen abgefragt, also kann nach der ersten nicht schluss sein...
 
             if (string.IsNullOrWhiteSpace(AdditionalFilesPathWhole())) { return; }
 
@@ -3015,12 +3015,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         while (IsInCache.Year < 2000) {
             Thread.Sleep(1);
             if (t.ElapsedMilliseconds > 120 * 1000) {
-                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} wurde nicht richtig initialisiert");
+                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {Filename.FileNameWithSuffix()} wurde nicht richtig initialisiert");
                 return;
             }
 
             if (!string.IsNullOrEmpty(FreezedReason)) {
-                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Datenbank {Filename.FileNameWithSuffix()} eingefrohren {FreezedReason}");
+                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {Filename.FileNameWithSuffix()} eingefrohren {FreezedReason}");
                 return;
             }
 

@@ -48,7 +48,7 @@ public partial class Befehlsreferenz : Form {
         foreach (var thisDb in Database.AllFiles) {
             if (!thisDb.IsDisposed && !string.IsNullOrEmpty(thisDb.Filename)) {
                 if (thisDb.EventScript.ToString(false).ContainsWord(thisc.KeyName, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
-                    _ = thisc.UsesInDB.AddIfNotExists("Datenbank: " + thisDb.Caption);
+                    _ = thisc.UsesInDB.AddIfNotExists("Tabelle: " + thisDb.Caption);
                     if (thisc.UsesInDB.Count >= max) { return; }
                 }
             }

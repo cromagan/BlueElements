@@ -93,7 +93,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
         //ACHUNG:
-        // Column ist für die Filter in dieser Datenbank zuständig
+        // Column ist für die Filter in dieser Tabelle zuständig
         // lColumn für das Aussehen und Verhalten des FilterDialogs
 
         //if (_column.Function == ColumnFunction.Verknüpfung_zu_anderer_Datenbank) {

@@ -67,7 +67,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public ColumnViewItem? CVI { get; }
 
-    public string Datenbank => IsDisposed || CVI?.Column?.Database is not { IsDisposed: false } db ? "?" : db.TableName;
+    public string Tabelle => IsDisposed || CVI?.Column?.Database is not { IsDisposed: false } db ? "?" : db.TableName;
 
     public override string Description => string.Empty;
 

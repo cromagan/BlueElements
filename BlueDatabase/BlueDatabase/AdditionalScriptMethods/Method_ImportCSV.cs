@@ -25,14 +25,14 @@ using System.Collections.Generic;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_ImportCsv : Method_DatabaseGeneric {
+internal class Method_ImportCsv : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "importcsv";
     public override List<string> Constants => [];
-    public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Datenbank.";
+    public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Tabelle.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Database;

@@ -102,7 +102,7 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasDatabase {
             MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
             return;
         }
-        var m = "Datenbank-Fehler";
+        var m = "Tabellen-Fehler";
 
         if (Database is { IsDisposed: false }) {
             m = Database.ImportCsv(_originalImportText, optSpalteZuordnen.Checked, optZeilenZuorden.Checked, tr, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);

@@ -33,7 +33,7 @@ public class Method_UniqueRowId : Method {
     public override List<List<string>> Args => [];
     public override string Command => "uniquerowkey";
     public override List<string> Constants => [];
-    public override string Description => "Gibt einen systemweit einzigartigen Zeilenschlüssel aller geladenen Datenbanken aus.";
+    public override string Description => "Gibt einen systemweit einzigartigen Zeilenschlüssel aller geladenen Tabellen aus.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;

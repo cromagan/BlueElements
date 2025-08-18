@@ -105,7 +105,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
 
     public override ScriptEndedFeedback ExecuteScript(bool testmode) {
         if (IsDisposed || Database is not { IsDisposed: false }) {
-            return new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
 
         if (_item == null) {

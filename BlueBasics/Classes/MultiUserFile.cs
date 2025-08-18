@@ -213,7 +213,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
                 _watcher?.Dispose();
                 _checker.Dispose();
             }
-            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
+            // Nicht verwaltete Ressourcen (Bitmap, Tabellenverbindungen, ...)
             IsDisposed = true;
         }
     }
@@ -263,7 +263,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     }
 
     /// <summary>
-    /// Friert die Datenbank komplett ein, nur noch Ansicht möglich.
+    /// Friert die Tabelle komplett ein, nur noch Ansicht möglich.
     /// Setzt auch ReadOnly.
     /// </summary>
     /// <param name="reason"></param>

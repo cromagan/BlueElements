@@ -95,7 +95,7 @@ public class InvalidatedRowsManager {
             return false;
         }
 
-        Develop.Message?.Invoke(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Datenbank {db.Caption}", 0);
+        Develop.Message?.Invoke(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Tabelle {db.Caption}", 0);
 
         // Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
         return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);

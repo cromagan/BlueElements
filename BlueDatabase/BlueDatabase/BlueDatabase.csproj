@@ -76,14 +76,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdditionalScriptMethods\Method_AddRows.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_CallDatabase.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CallTable.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Filter_OLD2.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SumFilter.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_DatabaseGeneric.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_TableGeneric.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Execute.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
-    <Compile Include="AdditionalScriptMethods\Method_Database.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Table.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ForEachRow.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ImportLinked.cs" />
     <Compile Include="AdditionalScriptMethods\Method_FilterAllValues.cs" />
@@ -106,7 +106,7 @@
     <Compile Include="AdditionalScriptMethods\Method_CellGetKey.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Filter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetError.cs" />
-    <Compile Include="AdditionalScriptMethods\VariableDatabase.cs" />
+    <Compile Include="AdditionalScriptMethods\VariableTable.cs" />
     <Compile Include="AdditionalScriptMethods\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptMethods\VariableFilterItem.cs" />
     <Compile Include="Chunk.cs" />
