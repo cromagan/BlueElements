@@ -182,18 +182,16 @@ public abstract class Method : IReadableTextWithKey {
 
         if (txt.StartsWith("[")) {
             var (pose, _) = NextText(txt, 0, KlammerEckigZu, false, false, KlammernAlle);
-            if (pose == txt.Length-1) {
+            if (pose == txt.Length - 1) {
                 var tl = txt.Substring(1, pose - 1);
 
-                string nt = string.Empty;
-                if (!string.IsNullOrEmpty(tl)) {
+                if (!string.IsNullOrWhiteSpace(tl)) {
                     var l = SplitAttributeToVars(varCol, tl, [[VariableString.ShortName_Plain]], 1, ld, scp);
                     if (l.Failed) {
                         return new DoItFeedback(l.FailedReason, l.NeedsScriptFix, ld);
                     }
-                    txt = "[\""+ l.Attributes.AllStringValues().JoinWith("\",\"") + "\"]";
+                    txt = "[\"" + l.Attributes.AllStringValues().JoinWith("\",\"") + "\"]";
                 }
-
             }
         }
 
