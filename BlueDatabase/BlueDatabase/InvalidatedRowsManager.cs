@@ -209,16 +209,16 @@ public class InvalidatedRowsManager {
         if (row.Database is not { IsDisposed: false } db) { return; }
 
         if (!extendedAllowed && row.NeedsRowInitialization()) {
-            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung");
+            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}  (Offen: {_invalidatedRows.Count + 1}): Zeile {db.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung");
             return;
         }
 
         if (!row.NeedsRowUpdate()) {
-            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}: Zeile {db.Caption} / {row.CellFirstString()} bereits aktuell");
+            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Zeile {db.Caption} / {row.CellFirstString()} bereits aktuell");
             return;
         }
 
-        masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}: Aktualisiere {db.Caption} / {row.CellFirstString()}");
+        masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {db.Caption} / {row.CellFirstString()}");
 
         if (masterRow?.Database != null) {
             _ = row.UpdateRow(extendedAllowed, true, "Update von " + masterRow?.CellFirstString());

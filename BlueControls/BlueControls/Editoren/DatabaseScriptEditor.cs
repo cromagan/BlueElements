@@ -365,7 +365,7 @@ public sealed partial class DatabaseScriptEditor : ScriptEditorGeneric, IHasData
         txbTestZeile.Enabled = chkZeile.Checked;
     }
 
-    private void Database_CanDoScript(object sender, CancelReasonEventArgs e) {
+    private void Database_CanDoScript(object sender, CanDoScriptEventArgs e) {
         if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
     }

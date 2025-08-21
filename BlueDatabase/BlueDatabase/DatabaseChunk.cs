@@ -545,16 +545,15 @@ public class DatabaseChunk : Database {
         var chunks = _chunks.Values.ToList();
         foreach (var thisChunk in chunks) {
             if (thisChunk.SaveRequired) {
-                // Prüfen ob Chunk wirklich leer ist. Sollte obsolet sein, weil nur befüllte Chunks zurück gegeben werden.
+                // Prüfen ob Chunk wirklich leer ist. 
+                // Kann passieren, wenn ein Chunk geändert wurde während des Speichervorgangnes.
+                // Dann wird er nicht zum Speichern hzurückgegeben und fälschlicherwerise als Leer erkannt
                 var rowsInChunk = RowsOfChunk(thisChunk);
                 if (rowsInChunk.Count == 0) {
                     DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
                     _ = thisChunk.Delete();
                     _ = _chunks.TryRemove(thisChunk.KeyName, out _);
-                } else if (rowsInChunk.Count > 0) {
-                    // Debug-Info für unerwartete Fälle
-                    DropMessage(ErrorType.Warning, $"Chunk '{thisChunk.KeyName}' sollte leer sein, enthält aber {rowsInChunk.Count} Zeilen");
-                }
+                } 
             }
         }
 

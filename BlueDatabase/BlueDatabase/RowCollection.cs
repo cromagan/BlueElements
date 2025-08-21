@@ -191,9 +191,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 WaitDelay = Pendingworker.Count * 5;
                 if (Pendingworker.Count > 2) { break; }
 
-                if (!db.CanDoValueChangedScript(false)) { break; }
+                if (!db.CanDoValueChangedScript(true)) { break; }
 
-                var e = new CancelReasonEventArgs();
+                var e = new CanDoScriptEventArgs(true);
                 db.OnCanDoScript(e);
                 if (e.Cancel) { break; }
 

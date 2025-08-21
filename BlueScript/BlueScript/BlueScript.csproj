@@ -46,6 +46,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventArgs\CanDoScriptEventArgs.cs" />
     <Compile Include="Methods\Method_Stop.cs" />
     <Compile Include="Methods\Method_Decrypt.cs" />
     <Compile Include="Methods\Method_DeleteDirectory.cs" />
@@ -166,7 +167,6 @@
     <Compile Include="Variables\Variable.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="EventArgs\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
   <ItemGroup>

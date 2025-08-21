@@ -32,6 +32,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace BlueDatabase;
 
@@ -338,6 +339,8 @@ public class Chunk : IHasKeyName {
         SaveToByteList(DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
     }
+
+    public override string ToString() => KeyName;
 
     /// <summary>
     /// Wartet bis zu 120 Sekunden, bis die Initialladung ausgeführt wurde

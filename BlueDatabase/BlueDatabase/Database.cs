@@ -225,7 +225,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public event EventHandler? AdditionalRepair;
 
-    public event EventHandler<CancelReasonEventArgs>? CanDoScript;
+    public event EventHandler<CanDoScriptEventArgs>? CanDoScript;
 
     public event EventHandler? Disposed;
 
@@ -1376,7 +1376,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         var name = script?.KeyName ?? "Allgemein";
-        var e = new CancelReasonEventArgs();
+        var e = new CanDoScriptEventArgs(extended);
         OnCanDoScript(e);
         if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, name); }
 
@@ -2050,7 +2050,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return key;
     }
 
-    public void OnCanDoScript(CancelReasonEventArgs e) {
+    public void OnCanDoScript(CanDoScriptEventArgs e) {
         if (IsDisposed) { return; }
         CanDoScript?.Invoke(this, e);
     }
@@ -2825,7 +2825,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsDisposed || !string.IsNullOrEmpty(FreezedReason)) { return; }
 
         // Script-Überprüfung
-        var e = new CancelReasonEventArgs();
+        var e = new CanDoScriptEventArgs(false);
         OnCanDoScript(e);
         if (!e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
 
