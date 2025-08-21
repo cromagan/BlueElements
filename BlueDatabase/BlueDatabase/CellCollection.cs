@@ -641,38 +641,26 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         try {
-            if (column?.Database is not { IsDisposed: false } db) {
-                return ("Es ist keine Spalte ausgewählt.", false);
-            }
+            if (column?.Database is not { IsDisposed: false } db) { return ("Es ist keine Spalte ausgewählt.", false); }
 
             var f = db.CanWriteMainFile();
-            if (!string.IsNullOrWhiteSpace(f)) {
-                return (f, true);
-            }
+            if (!string.IsNullOrEmpty(f)) { return (f, true); }
 
             f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, newChunkValue);
-            if (!string.IsNullOrEmpty(f)) {
-                return (f, true);
-            }
+            if (!string.IsNullOrEmpty(f)) { return (f, true); }
 
             if (row != null) {
                 f = db.GrantWriteAccess(DatabaseDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-                if (!string.IsNullOrEmpty(f)) {
-                    return (f, true);
-                }
+                if (!string.IsNullOrEmpty(f)) { return (f, true); }
             }
 
             if (onlyTopLevel) { return (string.Empty, false); }
 
             if (column.RelationType == RelationType.CellValues) {
                 var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
-                if (!string.IsNullOrEmpty(info) && !canrepair) {
-                    return (info, true);
-                }
+                if (!string.IsNullOrEmpty(info) && !canrepair) { return (info, true); }
 
-                if (lcolumn?.Database is not { IsDisposed: false } db2) {
-                    return ("Verknüpfte Tabelle verworfen.", false);
-                }
+                if (lcolumn?.Database is not { IsDisposed: false } db2) { return ("Verknüpfte Tabelle verworfen.", false); }
 
                 db2.PowerEdit = db.PowerEdit;
 
@@ -680,9 +668,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     waitforseconds = Math.Max(1, waitforseconds / 2);
 
                     var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
-                    return (!string.IsNullOrEmpty(tmp)
-                        ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp
-                        : string.Empty, true);
+                    if (!string.IsNullOrEmpty(tmp)) { return ("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, true); }
+                    return (string.Empty, false);
                 }
 
                 return ("Allgemeiner Fehler.", false);
