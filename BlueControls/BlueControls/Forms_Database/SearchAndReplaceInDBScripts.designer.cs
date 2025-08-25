@@ -134,7 +134,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // SearchAndReplaceInDBScripts
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(589, 336);
             this.Controls.Add(this.grpSonderzeichen);
             this.Controls.Add(this.grpErsetzen);

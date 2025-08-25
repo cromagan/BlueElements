@@ -354,6 +354,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
 
         var oldcode = ca.ParseableItems().FinishParseable();
 
+        var view = Pad.ViewToString();
+        if (Pad.Fitting) { view = string.Empty; }
+
         ca.RemoveAll();
 
         var permanentPossible = true;
@@ -395,6 +398,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase, IIsEd
             ChangeCurrentArrangementto(ca);
             db.RepairAfterParse();
             ShowOrder();
+
+            if (!string.IsNullOrEmpty(view)) { Pad.ParseView(view); }
         }
     }
 

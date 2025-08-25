@@ -162,9 +162,14 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         } catch { }
     }
 
-    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) {
+        // Komplett keine Skalierung durchführen - Tab-Größen bleiben unverändert
+        // Nur die Position kann sich ändern, aber nicht die Größe der Tabs
+    }
 
-    protected override void ScaleCore(float dx, float dy) { }
+    protected override void ScaleCore(float dx, float dy) {
+        // Keine Skalierung des Kerns
+    }
 
     protected override void WndProc(ref Message m) {
         try {

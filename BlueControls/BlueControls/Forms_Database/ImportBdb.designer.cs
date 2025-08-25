@@ -126,8 +126,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ImportBdb
             // 
-            this.AutoScaleDimensions = new SizeF(6F, 13F);
-            this.AutoScaleMode = AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new Size(731, 164);
             this.Controls.Add(this.btnDateienlöschen);
             this.Controls.Add(this.capColumn);

@@ -57,8 +57,8 @@ namespace BlueControls.Forms
             // 
             // SelectionBoxSoft
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(228, 249);
             this.Controls.Add(this.lstbx);
             this.Name = "SelectionBoxSoft";

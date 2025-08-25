@@ -14,6 +14,7 @@ namespace BeCreative {
         /// </summary>
         [STAThread]
         private static void Main() {
+            // DPI-Awareness MUSS vor allen anderen Application-Aufrufen stehen
             Application.EnableVisualStyles();
 
             Develop.StartService();

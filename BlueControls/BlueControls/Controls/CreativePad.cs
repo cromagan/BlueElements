@@ -132,6 +132,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
             ZoomFit();
             Invalidate();
             OnGotNewItemCollection();
+            OnPropertyChanged();
         }
     }
 
@@ -154,6 +155,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
             _showInPrintMode = value;
             OnDrawModeChanged();
             Unselect();
+            OnPropertyChanged();
         }
     }
 
@@ -165,6 +167,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
             _showJointPoints = value;
             OnDrawModeChanged();
             Unselect();
+            OnPropertyChanged();
         }
     }
 
@@ -596,17 +599,26 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
 
     private void _Items_ItemAdded(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (_items.Count() > 0 || Fitting) { ZoomFit(); }
+        OnPropertyChanged("Items");
+        if (_items.Count() == 0 || Fitting) { ZoomFit(); }
         Invalidate();
     }
 
     private void _Items_ItemRemoved(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
+        OnPropertyChanged("Items");
         if (Fitting) { ZoomFit(); }
 
         Unselect();
         Invalidate();
         OnItemRemoved();
+    }
+
+    private void _Items_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        OnPropertyChanged(e.PropertyName);
+        if (_items.Count() == 0 || Fitting) { ZoomFit(); }
+        Invalidate();
     }
 
     private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) => OnBeginnPrint(e);
@@ -632,12 +644,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
         }
 
         return tmp;
-    }
-
-    private void Items_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-        OnPropertyChanged(e.PropertyName);
     }
 
     private void MoveItems(float x, float y, bool doSnap, bool modifyMouseDown) {
@@ -704,7 +710,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
         if (_items != null) {
             _items.ItemRemoved += _Items_ItemRemoved;
             _items.ItemAdded += _Items_ItemAdded;
-            _items.PropertyChanged += Items_PropertyChanged;
+            _items.PropertyChanged += _Items_PropertyChanged;
         }
     }
 
@@ -749,7 +755,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
         if (_items != null) {
             _items.ItemRemoved -= _Items_ItemRemoved;
             _items.ItemAdded -= _Items_ItemAdded;
-            _items.PropertyChanged -= Items_PropertyChanged;
+            _items.PropertyChanged -= _Items_PropertyChanged;
         }
     }
 

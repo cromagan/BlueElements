@@ -39,7 +39,8 @@ namespace BlueControls {
             // 
             // ScreenShot
             // 
-            this.AutoScaleMode = AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new Size(292, 272);
             this.Controls.Add(this.zoomPic);
             this.DoubleBuffered = true;

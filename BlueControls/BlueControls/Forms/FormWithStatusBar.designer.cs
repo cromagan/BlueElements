@@ -51,6 +51,8 @@ namespace BlueControls.Forms {
             // 
             // FormWithStatusBar
             // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new Size(287, 172);
             this.Controls.Add(this.pnlStatusBar);
             this.Name = "FormWithStatusBar";

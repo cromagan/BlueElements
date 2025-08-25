@@ -481,7 +481,8 @@ namespace BlueControls.Forms {
             // 
             // ExportDialog
             // 
-            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new Size(868, 716);
             this.Controls.Add(this.Tabs);
             this.Controls.Add(this.c_Layoutx);

@@ -483,7 +483,8 @@ namespace BlueControls.Forms {
             // 
             // PadEditor
             // 
-            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new Size(884, 361);
             this.Controls.Add(this.Pad);
             this.Controls.Add(this.tabRightSide);

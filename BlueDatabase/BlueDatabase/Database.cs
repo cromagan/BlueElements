@@ -92,11 +92,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
-    private readonly List<string> _tableAdmin = [];
-
     private readonly List<string> _permissionGroupsNewRow = [];
-
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
+    private readonly List<string> _tableAdmin = [];
     private readonly List<string> _tags = [];
 
     private readonly List<Variable> _variables = [];
@@ -311,14 +309,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public ReadOnlyCollection<string> TableAdmin {
-        get => new(_tableAdmin);
-        set {
-            if (!_tableAdmin.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, _tableAdmin.JoinWithCr(), value.JoinWithCr());
-        }
-    }
-
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
 
@@ -339,21 +329,6 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    //public ReadOnlyCollection<DatabaseScriptDescription> EventScriptEdited {
-    //    get => new(_eventScriptEdited);
-    //    set {
-    //        var l = new List<DatabaseScriptDescription>();
-    //        l.AddRange(value);
-    //        l.Sort();
-
-    //        var eventScriptEditedOld = _eventScriptEdited.ToString(false);
-    //        var eventScriptEditedNew = l.ToString(false);
-
-    //        if (eventScriptEditedOld == eventScriptEditedNew) { return; }
-    //        _ = ChangeData(DatabaseDataType.EventScriptEdited, null, eventScriptEditedOld, eventScriptEditedNew);
-    //    }
-    //}
-
     public DateTime EventScriptVersion {
         get => _eventScriptVersion;
         set {
@@ -362,10 +337,22 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
+    //        if (eventScriptEditedOld == eventScriptEditedNew) { return; }
+    //        _ = ChangeData(DatabaseDataType.EventScriptEdited, null, eventScriptEditedOld, eventScriptEditedNew);
+    //    }
+    //}
     public List<string> ExecutingScript { get; } = [];
 
+    //        var eventScriptEditedOld = _eventScriptEdited.ToString(false);
+    //        var eventScriptEditedNew = l.ToString(false);
     public string Filename { get; protected set; } = string.Empty;
 
+    //public ReadOnlyCollection<DatabaseScriptDescription> EventScriptEdited {
+    //    get => new(_eventScriptEdited);
+    //    set {
+    //        var l = new List<DatabaseScriptDescription>();
+    //        l.AddRange(value);
+    //        l.Sort();
     /// <summary>
     /// Der Wert wird im System verankert und gespeichert.
     /// Bei Tabellen, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
@@ -459,6 +446,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         set {
             if (_standardFormulaFile == value) { return; }
             _ = ChangeData(DatabaseDataType.StandardFormulaFile, null, _standardFormulaFile, value);
+        }
+    }
+
+    public ReadOnlyCollection<string> TableAdmin {
+        get => new(_tableAdmin);
+        set {
+            if (!_tableAdmin.IsDifferentTo(value)) { return; }
+            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, _tableAdmin.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -2302,12 +2297,16 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
 
         Filename = newFileName;
-
-        var chunks = DatabaseChunk.GenerateNewChunks(this, 100, FileStateUtcDate, false);
+        var currentTime = DateTime.UtcNow;
+        var chunks = DatabaseChunk.GenerateNewChunks(this, 100, currentTime, false);
 
         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return; }
 
         _ = mainchunk.Save(newFileName);
+
+        // IsInCache auf FileStateUtcDate setzen, damit WaitInitialDone() nicht wartet
+        FileStateUtcDate = currentTime;
+        IsInCache = currentTime;
     }
 
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + TableName;

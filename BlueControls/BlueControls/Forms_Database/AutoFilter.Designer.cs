@@ -140,8 +140,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // AutoFilter
             // 
-            this.AutoScaleDimensions = new SizeF(6F, 13F);
-            this.AutoScaleMode = AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackgroundImage = ((Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new Size(165, 159);
             this.Controls.Add(this.capInfo);

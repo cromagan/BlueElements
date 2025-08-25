@@ -23,7 +23,7 @@
     <DefineConstants>DEBUG;TRACE;WINDOWSFORMSWITHCUSTOMSUBMAIN</DefineConstants>
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>BeCreative.xml</DocumentationFile>
-    <WarningLevel>1</WarningLevel>
+    <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -54,6 +54,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />

@@ -1268,8 +1268,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     private void OnItemAdded() {
         if (IsDisposed) { return; }
-        ItemAdded?.Invoke(this, System.EventArgs.Empty);
         OnPropertyChanged("Items");
+        ItemAdded?.Invoke(this, System.EventArgs.Empty);
     }
 
     private void OnItemRemoved() {

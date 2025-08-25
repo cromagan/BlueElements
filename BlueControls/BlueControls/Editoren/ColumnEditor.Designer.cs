@@ -1530,7 +1530,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // ColumnEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1112, 796);
             this.Controls.Add(this.btnSpaltenkopf);
             this.Controls.Add(this.capTabellenname);

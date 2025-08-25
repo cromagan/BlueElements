@@ -8,15 +8,12 @@ using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
-namespace BlueControls.BlueDatabaseDialogs
-{
+namespace BlueControls.BlueDatabaseDialogs {
     public sealed partial class ImportCsv {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
             }
             base.Dispose(disposing);
         }
@@ -24,8 +21,7 @@ namespace BlueControls.BlueDatabaseDialogs
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
             this.btnImportieren = new Button();
             this.chkDoppelteTrennzeichen = new Button();
             this.grpTrennzeichen = new GroupBox();
@@ -72,10 +68,12 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // chkDoppelteTrennzeichen
             // 
+            this.chkDoppelteTrennzeichen.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
+                                                                  | AnchorStyles.Right)));
             this.chkDoppelteTrennzeichen.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.chkDoppelteTrennzeichen.Location = new Point(8, 40);
             this.chkDoppelteTrennzeichen.Name = "chkDoppelteTrennzeichen";
-            this.chkDoppelteTrennzeichen.Size = new Size(376, 16);
+            this.chkDoppelteTrennzeichen.Size = new Size(715, 16);
             this.chkDoppelteTrennzeichen.TabIndex = 7;
             this.chkDoppelteTrennzeichen.Text = "Aufeinanderfolgende Trennzeichen als ein Zeichen behandeln";
             // 
@@ -152,7 +150,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capEinträge
             // 
-            this.capEinträge.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+            this.capEinträge.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
                                                        | AnchorStyles.Right)));
             this.capEinträge.CausesValidation = false;
             this.capEinträge.Location = new Point(8, 8);
@@ -161,15 +159,19 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // chkTrennzeichenAmAnfang
             // 
+            this.chkTrennzeichenAmAnfang.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
+                                                                  | AnchorStyles.Right)));
             this.chkTrennzeichenAmAnfang.ButtonStyle = ButtonStyle.Checkbox_Text;
             this.chkTrennzeichenAmAnfang.Location = new Point(8, 56);
             this.chkTrennzeichenAmAnfang.Name = "chkTrennzeichenAmAnfang";
-            this.chkTrennzeichenAmAnfang.Size = new Size(224, 16);
+            this.chkTrennzeichenAmAnfang.Size = new Size(715, 16);
             this.chkTrennzeichenAmAnfang.TabIndex = 10;
             this.chkTrennzeichenAmAnfang.Text = "Trennzeichen am Anfang entfernen";
             // 
             // grpSpaltenOptionen
             // 
+            this.grpSpaltenOptionen.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
+                                                             | AnchorStyles.Right)));
             this.grpSpaltenOptionen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpSpaltenOptionen.CausesValidation = false;
             this.grpSpaltenOptionen.Controls.Add(this.optSpalteNachderReihe);
@@ -183,21 +185,25 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // optSpalteNachderReihe
             // 
+            this.optSpalteNachderReihe.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
+                                                                | AnchorStyles.Right)));
             this.optSpalteNachderReihe.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.optSpalteNachderReihe.Location = new Point(8, 40);
             this.optSpalteNachderReihe.Name = "optSpalteNachderReihe";
-            this.optSpalteNachderReihe.Size = new Size(512, 24);
+            this.optSpalteNachderReihe.Size = new Size(516, 24);
             this.optSpalteNachderReihe.TabIndex = 1;
             this.optSpalteNachderReihe.Text = "Alle Einträge importieren, <b>interne Spaltenreihenfolge</b> benutzen und nichts " +
     "zuordnen.";
             // 
             // optSpalteZuordnen
             // 
+            this.optSpalteZuordnen.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
+                                                            | AnchorStyles.Right)));
             this.optSpalteZuordnen.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.optSpalteZuordnen.Checked = true;
             this.optSpalteZuordnen.Location = new Point(8, 16);
             this.optSpalteZuordnen.Name = "optSpalteZuordnen";
-            this.optSpalteZuordnen.Size = new Size(512, 24);
+            this.optSpalteZuordnen.Size = new Size(516, 24);
             this.optSpalteZuordnen.TabIndex = 0;
             this.optSpalteZuordnen.Text = "Die <b>erste Zeile</b> enthält den Spaltennamen und zu diesen zuordnen.";
             // 
@@ -214,6 +220,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // grpZeilenOptionen
             // 
+            this.grpZeilenOptionen.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
+                                                            | AnchorStyles.Right)));
             this.grpZeilenOptionen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpZeilenOptionen.CausesValidation = false;
             this.grpZeilenOptionen.Controls.Add(this.optZeilenAlle);
@@ -227,21 +235,25 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // optZeilenAlle
             // 
+            this.optZeilenAlle.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
+                                                        | AnchorStyles.Right)));
             this.optZeilenAlle.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.optZeilenAlle.Location = new Point(8, 56);
             this.optZeilenAlle.Name = "optZeilenAlle";
-            this.optZeilenAlle.Size = new Size(512, 24);
+            this.optZeilenAlle.Size = new Size(516, 24);
             this.optZeilenAlle.TabIndex = 1;
             this.optZeilenAlle.Text = "<b>Jede Zeile</b> importieren, auch wenn dadurch <b>doppelte</b> Einträge entsteh" +
     "en.";
             // 
             // optZeilenZuorden
             // 
+            this.optZeilenZuorden.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left)
+                                                           | AnchorStyles.Right)));
             this.optZeilenZuorden.ButtonStyle = ButtonStyle.Optionbox_Text;
             this.optZeilenZuorden.Checked = true;
             this.optZeilenZuorden.Location = new Point(8, 24);
             this.optZeilenZuorden.Name = "optZeilenZuorden";
-            this.optZeilenZuorden.Size = new Size(512, 32);
+            this.optZeilenZuorden.Size = new Size(516, 32);
             this.optZeilenZuorden.TabIndex = 0;
             this.optZeilenZuorden.Text = "Die <b>erste Spalte</b> des Imports soll der <b>ersten Spalte</b> der Tabelle z" +
     "ugeordnet werden. <br>Wenn der Eintrag nicht in der Tabelle vorhanden ist, wir" +
@@ -249,8 +261,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ImportCsv
             // 
-            this.AutoScaleDimensions = new SizeF(6F, 13F);
-            this.AutoScaleMode = AutoScaleMode.Font;
+            this.AutoScaleDimensions = new SizeF(96F, 96F);
+            this.AutoScaleMode = AutoScaleMode.None;
             this.ClientSize = new Size(731, 326);
             this.Controls.Add(this.grpZeilenOptionen);
             this.Controls.Add(this.grpTrennzeichen);

@@ -24,9 +24,11 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using static BlueBasics.Converter;
 using static BlueBasics.Constants;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -49,8 +51,6 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     /// </summary>
     public Point MousePos11;
 
-    protected bool Fitting = true;
-
     private Rectangle _lastPaintArea;
     private Size _lastSize;
     private bool _lastSliderXVisible;
@@ -70,6 +70,8 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     #endregion
 
     #region Properties
+
+    public bool Fitting { get; private set; } = true;
 
     [DefaultValue(false)]
     public bool ScreenshotMode {
@@ -176,6 +178,40 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         return _lastPaintArea;
     }
 
+    public void ParseView(string toParse) {
+        if (IsDisposed) { return; }
+
+        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
+            foreach (var pair in x) {
+                switch (pair.Key) {
+                    case "sliderx":
+                        SliderX.Maximum = Math.Max(SliderX.Maximum, IntParse(pair.Value));
+                        SliderX.Value = IntParse(pair.Value);
+                        break;
+
+                    case "slidery":
+                        SliderY.Maximum = Math.Max(SliderY.Maximum, IntParse(pair.Value));
+                        SliderY.Value = IntParse(pair.Value);
+                        break;
+
+                    case "zoom":
+                        Zoom = FloatParse(pair.Value.FromNonCritical());
+                        break;
+                }
+            }
+        }
+
+        Fitting = false;
+    }
+
+    public string ViewToString() {
+        List<string> result = [];
+        result.ParseableAdd("Zoom", _zoom);
+        result.ParseableAdd("SliderX", SliderX.Value);
+        result.ParseableAdd("SliderY", SliderY.Value);
+        return result.FinishParseable();
+    }
+
     public void ZoomFit() {
         if (IsDisposed) { return; }
         var mb = MaxBounds();
@@ -183,6 +219,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         x.Inflate(-16, -16);
         _zoomFit = ItemCollectionPadItem.ZoomFitValue(mb, x.Size);
         Zoom = _zoomFit;
+        Fitting = true;
     }
 
     public void ZoomIn(MouseEventArgs e) {
