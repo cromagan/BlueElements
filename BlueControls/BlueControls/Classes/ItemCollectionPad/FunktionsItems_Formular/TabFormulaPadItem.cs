@@ -297,7 +297,10 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         var tmp = ListOfChildsPages();
 
         List<string> notUse = [.. tmp.ToListOfString(), .. ParentFormula?.NotAllowedChilds];
-        ParentFormula?.AddChilds(childs.Suggestions, notUse.AsReadOnly());
+
+        var allchilds = ParentFormula?.AllKnownChilds(notUse.AsReadOnly());
+        childs.Suggestions.Clear();
+        childs.Suggestions.AddRange(allchilds);
 
         foreach (var thisc in tmp) {
             childs.AddAndCheck(ItemOf(thisc));

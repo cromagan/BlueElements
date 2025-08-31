@@ -190,6 +190,19 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
+
+    /// <summary>
+    /// Gibt zurück, ob die Collection Items enthält.
+    /// Die Collection "Head" gibt immer true zurück.
+    /// </summary>
+    public bool HasItems { 
+        get { 
+            if(string.Equals(_caption,"Head", StringComparison.OrdinalIgnoreCase)) { return true; }
+
+            return _internal.Count > 0;
+        }
+    }
+
     public override float Höhe {
         get => base.Höhe;
         set {
@@ -697,6 +710,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
+
+        if (!HasItems) { return []; }
 
         List<string> result = [.. base.ParseableItems()];
 

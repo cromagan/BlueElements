@@ -92,12 +92,28 @@ public static partial class Extensions {
                 return SecondSortChar + isValue.Sprachneutral();
 
             case SortierTyp.ZahlenwertFloat:
-                if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
                 if (DoubleTryParse(isValue, out var dw)) {
                     var t = dw.ToStringFloat10_3();
                     if (!t.Contains(",")) { t += ",000"; }
 
-                    if (dw >= 0) { t = "A" + t; }
+                    if (dw < 0) {
+                        // Transformiere negative Werte, damit größere Beträge (stärker negativ) lexikographisch zuerst kommen.
+                        // Vorgehen: Ziffern (ohne Komma) 9-komplementieren.
+                        // t Format: -dddddddddd,ddd (Länge 15), bereits 10 Stellen vor Komma + 3 Nachkommastellen.
+                        if (t.Length >= 15 && t[0] == '-') {
+                            var core = t.Substring(1); // 14 Zeichen: 10 Ziffern + ',' + 3 Ziffern
+                            var chars = core.ToCharArray();
+                            for (var i = 0; i < chars.Length; i++) {
+                                var c = chars[i];
+                                if (c is >= '0' and <= '9') { chars[i] = (char)('0' + ('9' - c)); }
+                            }
+                            core = new string(chars);
+                            t = "-" + core; // Länge bleibt 15
+                        }
+                    } else {
+                        t = "A" + t; // positives Kennzeichen
+                    }
+
                     while (t.Length < 15) { t += "0"; }
                     return compareKeySOk + t;
                 }
@@ -151,7 +167,8 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(text)) { return 0; }
 
         var endPos = maxPosition.HasValue ? Math.Min(maxPosition.Value, text.Length) : text.Length;
-        if (endPos <= 0) return 0;
+        if (endPos <= 0)
+            return 0;
 
         var count = 0;
         for (var i = 0; i < endPos; i++) {
@@ -337,25 +354,53 @@ public static partial class Extensions {
                 char patternChar = txt[i + 1];
 
                 switch (patternChar) {
-                    case 'A': result.Add(';'); break;
-                    case 'B': result.Add('<'); break;
-                    case 'C': result.Add('>'); break;
+                    case 'A':
+                        result.Add(';');
+                        break;
+                    case 'B':
+                        result.Add('<');
+                        break;
+                    case 'C':
+                        result.Add('>');
+                        break;
                     case 'D':
                         result.Add('\r');
                         result.Add('\n');
                         break;
 
-                    case 'E': result.Add('\r'); break;
-                    case 'F': result.Add('\n'); break;
-                    case 'G': result.Add('|'); break;
-                    case 'H': result.Add('}'); break;
-                    case 'I': result.Add('{'); break;
-                    case 'J': result.Add('='); break;
-                    case 'K': result.Add(','); break;
-                    case 'L': result.Add('&'); break;
-                    case 'M': result.Add('/'); break;
-                    case 'N': result.Add('"'); break;
-                    case 'Z': result.Add('['); break;
+                    case 'E':
+                        result.Add('\r');
+                        break;
+                    case 'F':
+                        result.Add('\n');
+                        break;
+                    case 'G':
+                        result.Add('|');
+                        break;
+                    case 'H':
+                        result.Add('}');
+                        break;
+                    case 'I':
+                        result.Add('{');
+                        break;
+                    case 'J':
+                        result.Add('=');
+                        break;
+                    case 'K':
+                        result.Add(',');
+                        break;
+                    case 'L':
+                        result.Add('&');
+                        break;
+                    case 'M':
+                        result.Add('/');
+                        break;
+                    case 'N':
+                        result.Add('"');
+                        break;
+                    case 'Z':
+                        result.Add('[');
+                        break;
                     default:
                         // Kein bekanntes Pattern, original Zeichen beibehalten
                         result.Add(txt[i]);
@@ -582,7 +627,7 @@ public static partial class Extensions {
         var gans = false;
         var pos = startpos;
         var maxl = txt.Length;
-        const string tr = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t¶";
+        const string tr = "&.,;\\?!\" ~|=<>+-(){}[]/*`´^\r\n\t¶";
 
         var historie = string.Empty;
 
@@ -1065,7 +1110,8 @@ public static partial class Extensions {
     }
 
     public static string ToNonCritical(this string txt) {
-        if (string.IsNullOrEmpty(txt)) return string.Empty;
+        if (string.IsNullOrEmpty(txt))
+            return string.Empty;
 
         var result = new List<char>(txt.Length * 2);
 
@@ -1081,21 +1127,51 @@ public static partial class Extensions {
 
             // Handle single characters
             switch (c) {
-                case '[': result.AddRange("[Z]"); break;
-                case ';': result.AddRange("[A]"); break;
-                case '<': result.AddRange("[B]"); break;
-                case '>': result.AddRange("[C]"); break;
-                case '\r': result.AddRange("[E]"); break;
-                case '\n': result.AddRange("[F]"); break;
-                case '|': result.AddRange("[G]"); break;
-                case '}': result.AddRange("[H]"); break;
-                case '{': result.AddRange("[I]"); break;
-                case '=': result.AddRange("[J]"); break;
-                case ',': result.AddRange("[K]"); break;
-                case '&': result.AddRange("[L]"); break;
-                case '/': result.AddRange("[M]"); break;
-                case '"': result.AddRange("[N]"); break;
-                default: result.Add(c); break;
+                case '[':
+                    result.AddRange("[Z]");
+                    break;
+                case ';':
+                    result.AddRange("[A]");
+                    break;
+                case '<':
+                    result.AddRange("[B]");
+                    break;
+                case '>':
+                    result.AddRange("[C]");
+                    break;
+                case '\r':
+                    result.AddRange("[E]");
+                    break;
+                case '\n':
+                    result.AddRange("[F]");
+                    break;
+                case '|':
+                    result.AddRange("[G]");
+                    break;
+                case '}':
+                    result.AddRange("[H]");
+                    break;
+                case '{':
+                    result.AddRange("[I]");
+                    break;
+                case '=':
+                    result.AddRange("[J]");
+                    break;
+                case ',':
+                    result.AddRange("[K]");
+                    break;
+                case '&':
+                    result.AddRange("[L]");
+                    break;
+                case '/':
+                    result.AddRange("[M]");
+                    break;
+                case '"':
+                    result.AddRange("[N]");
+                    break;
+                default:
+                    result.Add(c);
+                    break;
             }
         }
 

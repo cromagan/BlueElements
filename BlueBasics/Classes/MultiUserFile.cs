@@ -108,7 +108,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     /// <summary>
     /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
-    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehten.
+    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehen.
     /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
@@ -167,7 +167,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <summary>
     ///
     /// </summary>
-    /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blockiert ist.</param>
+    /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blokiert ist.</param>
     public static void SaveAll(bool mustSave) {
         if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
@@ -276,7 +276,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                 thisFile.Save(true);
-                Develop.DebugPrint(ErrorType.Warning, "Doppletes Laden von " + fileName);
+                Develop.DebugPrint(ErrorType.Warning, "Doppeltes Laden von " + fileName);
                 return false;
             }
         }
@@ -294,13 +294,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             //if (createWhenNotExisting) {
             //    SaveAsAndChangeTo(fileNameToLoad);
             //} else {
-            Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
+            Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);  // ReadOnly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
             return;
             //}
         }
         Filename = fileNameToLoad;
         ReCreateWatcher();
-        // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
+        // Wenn ein Dateiname auf Nix gesetzt wird, z.B: bei Bitmap import
         while (!Load_Reload()) { }
     }
 
@@ -330,7 +330,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
             OnLoaded();
 
-            return ReloadNeeded;
+            return !ReloadNeeded; 
         } catch {
             return false;
         } finally {
@@ -621,7 +621,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
         var (data, fileinfo) = LoadFromDisk();
         if (dataUncompressed != data) {
-            // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichtert und ungeladen.
+            // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichert und ungeladen.
             _checkedAndReloadNeed = true;
             _lastSaveCode = "Fehler";
             return Feedback("Speichervorgang fehlgeschlagen.", true);

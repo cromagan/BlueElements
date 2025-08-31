@@ -28,7 +28,7 @@ public static class MathFormulaParser {
 
     #region Fields
 
-    public static readonly List<string> RechenOperatoren = ["*", "/", "+", "-"];
+    public static readonly List<string> RechenOperatoren = ["^", "*", "/", "+", "-"];
 
     #endregion
 
@@ -38,7 +38,7 @@ public static class MathFormulaParser {
         formel = formel.Replace(" ", string.Empty);
         return string.IsNullOrEmpty(formel)
             ? null
-            : formel != formel.ReduceToChars(Char_Numerals + ".,()+-/*") ? null : ErgebnisCore(formel);
+            : formel != formel.ReduceToChars(Char_Numerals + ".,()+-/*^") ? null : ErgebnisCore(formel);
     }
 
     public static int LastMinusIndex(string formel) {
@@ -49,162 +49,120 @@ public static class MathFormulaParser {
             lastMin = formel.IndexOf("-", lastMin, StringComparison.Ordinal);
             if (lastMin < 1) { break; }
             var vorZ = formel.Substring(lastMin - 1, 1);
-            if (vorZ.IsNumeral()) { okMin = lastMin; }
+            if (vorZ.IsNumeral() || vorZ == ")") { okMin = lastMin; } // FIX: auch schließende Klammer vor Minus zulassen
             lastMin++;
         }
         return okMin;
     }
 
     private static double? ErgebnisCore(string formel) {
-        // var TMP = 0;
-        formel = formel.Trim(KlammernRund);
-        formel = formel.Replace("++", "+");
-        formel = formel.Replace("--", "+");
-        formel = formel.Replace("-+", "-");
-        formel = formel.Replace("+-", "-");
-        formel = formel.TrimStart("+");
+        formel = formel.Trim();
 
-        // Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
+        // Umschließende Klammern nur entfernen, wenn sie wirklich das Ganze umschließen
+        while (HatUmschliessendeKlammern(formel)) {
+            formel = formel.Substring(1, formel.Length - 2).Trim();
+        }
+
+        formel = NormalisiereVorzeichen(formel);
+
+        // Führendes + entfernen
+        if (formel.StartsWith("+")) { formel = formel.Substring(1); }
+
+        // Klammern auflösen
         if (formel.Contains("(")) {
-            // --------------------------------------------------------------------------------------------------------------------------------
-            // --- Eine Klammer auflösen, im Formelstring ersetzen und         mittels Rekursivität die nun einfachere Formel berechnen.
-            // --------------------------------------------------------------------------------------------------------------------------------
             var a = formel.LastIndexOf("(", StringComparison.Ordinal);
             var e = formel.IndexOf(")", a, StringComparison.Ordinal);
-            if (a >= e) { return null; }
-            // if (a > 2 && Formel.IndexOf(",", a) > a && Formel.IndexOf(",", a) < e)
-            // {
-            // // --------------------------------------------------------------------------------------------------------------------------------
-            //    // --- Ok, Funktion kommt, erkannt an den beinhaltenden Kommas.
-            //    // --- Es ist die Letzte Klammer, deswegen KANN in der Funktion keine mehr sein.
-            //    // --- Und die Kommas stellen den Seperator dar.
-            //    // --------------------------------------------------------------------------------------------------------------------------------
-            //    var Att = Formel.Substring(a + 1, e - a - 1).SplitAndCutBy(",");
-            //    var Att2 = new double?[Att.Length];
-            // for (TMP = 0; TMP < Att.Length; TMP++)
-            //    {
-            //        var qq = ErgebnisCore(Att[TMP]);
-            //        if (qq == null) { return null; }
-            //        Att2[TMP] = qq;
-            //    }
-            // Replacer = Att2[0];
-            // switch (Formel.Substring(a - 3, 4))
-            //    {
-            //        case "MIN(":
-            //            for (TMP = 1; TMP < Att2.Length; TMP++)
-            //            {
-            //                if (Att2[TMP] < Replacer) { Replacer = Att2[TMP]; }
-            //            }
-            // break;
-            //        case "MAX(":
-            //            for (TMP = 1; TMP < Att2.Length; TMP++)
-            //            {
-            //                if (Att2[TMP] > Replacer) { Replacer = Att2[TMP]; }
-            //            }
-            // break;
-            //        case "XNT(":
-            //            if (Att2.Length != 2) { return null; }
-            //            Replacer = Math.Floor((double)Att2[1]);
-            // break;
-            //        case "BTW(": // Between. Format: BTW(IsValue, MinValue, MaxValue)
-            //            if (Att2.Length != 3) { return null; }
-            //            if (Att2[0] >= Att2[1] && Att2[0] <= Att2[2])
-            //            {
-            //                Replacer = -1;
-            //            }
-            //            else
-            //            {
-            //                Replacer = 0;
-            //            }
-            // break;
-            //        case "IFF(":
-            //            if (Att2.Length != 3) { return null; }
-            // if (Att2[0] == -1)
-            //            {
-            //                Replacer = Att2[1];
-            //            }
-            //            else
-            //            {
-            //                Replacer = Att2[2];
-            //            }
-            // break;
-            // case "XND(":
-            //            if (Att2.Length != 2) { return null; }
-            //            Replacer = Constants.GlobalRND.NextDouble();
-            //            break;
-            // default:
-            //            return null;
-            //    }
-            // a -= 3;
-            // }
-            // else // Es ist KEINE Funktion, also den Inhalt der Klammer normal berechnen
-            // {
-            var replacer = ErgebnisCore(formel.Substring(a + 1, e - a - 1));
-            // }
+            if (a < 0 || e < 0 || a >= e) { return null; }
+            var inner = formel.Substring(a + 1, e - a - 1);
+            var replacer = ErgebnisCore(inner);
             if (replacer == null) { return null; }
-            formel = formel.Replace(formel.Substring(a, e - a + 1), ((double)replacer).ToString("F99").TrimEnd('0').TrimEnd(',').Replace(",", "."));
+            // Kulturunabhängig mit InvariantCulture (statt Komma/Punkt Turnerei)
+            var repString = ((double)replacer).ToString("0.#############################", System.Globalization.CultureInfo.InvariantCulture);
+            formel = formel.Substring(0, a) + repString + formel.Substring(e + 1);
+            formel = NormalisiereVorzeichen(formel);
             return ErgebnisCore(formel);
-        } // Ende Klammer Vorhanden-----------------------------------------------------------
-        // --------------------------------------------------------------------------------------------------------------------------------
-        // --- Prüfen, ob überhaupt eine Berechnung nötig ist. Z.B. wenn unnötige Klammern aufgelöst wurden. ------------------------------
-        // --------------------------------------------------------------------------------------------------------------------------------
+        }
+
+        // Numerisch?
         if (formel.Replace(".", ",").IsNumeral()) { return DoubleParse(formel.Replace(".", ",")); }
-        // TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
-        var tmp = Math.Max(formel.LastIndexOf("+", StringComparison.Ordinal), LastMinusIndex(formel));
-        if (tmp < 0) { tmp = Math.Max(formel.LastIndexOf("/", StringComparison.Ordinal), formel.LastIndexOf("*", StringComparison.Ordinal)); }
-        if (tmp < 1) { return null; }
-        // --------------------------------------------------------------------------------------------------------------------------------
-        // --- Berechnung nötig, String Splitten berechnen und das Ergebnis zurückgeben
-        // --------------------------------------------------------------------------------------------------------------------------------
-        var seperator = formel.Substring(tmp, 1);
-        // if (Seperator == "<" || Seperator == ">" || Seperator == "=")
-        // {
-        //    if (TMP < 1 || TMP > Formel.Length - 2) { return null; }
-        // var sep2 = Formel.Substring(TMP - 1, 1);
-        //    if (sep2 == "<" || sep2 == ">" || sep2 == "=") { TMP--; }
-        //    sep2 = Formel.Substring(TMP + 1, 1);
-        //    if (sep2 == "<" || sep2 == ">" || sep2 == "=") { Seperator = Formel.Substring(TMP, 2); }
-        // }
-        var w1 = ErgebnisCore(formel.Substring(0, tmp));
-        if (w1 == null) { return null; }
-        var w2 = ErgebnisCore(formel.Substring(tmp + seperator.Length));
-        if (w2 == null) { return null; }
-        switch (seperator) {
-            case "/":
+
+        // Operator-Suche nach Priorität: + - (letztes binäres), dann * /, dann ^ (rechtsassoziativ)
+        int tmp;
+
+        // Ebene 1: + -
+        tmp = Math.Max(formel.LastIndexOf("+", StringComparison.Ordinal), LastMinusIndex(formel));
+        if (tmp > 0) {
+            var sep = formel.Substring(tmp, 1);
+            var w1 = ErgebnisCore(formel.Substring(0, tmp));
+            if (w1 == null) { return null; }
+            var w2 = ErgebnisCore(formel.Substring(tmp + 1));
+            if (w2 == null) { return null; }
+            return sep == "+" ? w1 + w2 : w1 - w2;
+        }
+
+        // Ebene 2: * /
+        var mul = formel.LastIndexOf("*", StringComparison.Ordinal);
+        var div = formel.LastIndexOf("/", StringComparison.Ordinal);
+        tmp = Math.Max(mul, div);
+        if (tmp > 0) {
+            var sep = formel.Substring(tmp, 1);
+            var w1 = ErgebnisCore(formel.Substring(0, tmp));
+            if (w1 == null) { return null; }
+            var w2 = ErgebnisCore(formel.Substring(tmp + 1));
+            if (w2 == null) { return null; }
+            if (sep == "/") {
                 if (w2 == 0) { return null; }
                 return w1 / w2;
-
-            case "*":
-                return w1 * w2;
-
-            case "-":
-                return w1 - w2;
-
-            case "+":
-                return w1 + w2;
-                // case ">":
-                //    if (w1 > w2) { return -1; }
-                //    return 0;
-                // case ">=":
-                // case "=>":
-                //    if (w1 >= w2) { return -1; }
-                //    return 0;
-                // case "<":
-                //    if (w1 < w2) { return -1; }
-                //    return 0;
-                // case "<=":
-                // case "=<":
-                //    if (w1 <= w2) { return -1; }
-                //    return 0;
-                // case "=":
-                //    if (w1 == w2) { return -1; }
-                //    return 0;
-                // case "<>":
-                // case "><":
-                //    if (w1 != w2) { return -1; }
-                //    return 0;
+            }
+            return w1 * w2;
         }
+
+        // Ebene 3: ^ (rechtsassoziativ => wir suchen das erste von rechts, aber splitten so, dass rechts rekursiv weiter aufgelöst wird)
+        var pow = formel.LastIndexOf("^", StringComparison.Ordinal);
+        if (pow > 0) {
+            var w1 = ErgebnisCore(formel.Substring(0, pow));
+            if (w1 == null) { return null; }
+            var w2 = ErgebnisCore(formel.Substring(pow + 1));
+            if (w2 == null) { return null; }
+            return Math.Pow((double)w1, (double)w2); // FIX
+        }
+
+        // Führendes negatives Zahlliteral? (z.B. -3)
+        if (formel.StartsWith("-")) {
+            var rest = formel.Substring(1);
+            if (rest.Replace(".", ",").IsNumeral()) {
+                var parsed = DoubleParse(rest.Replace(".", ","));
+                return parsed == null ? null : -parsed;
+            }
+        }
+
         return null;
+    }
+
+    private static bool HatUmschliessendeKlammern(string f) {
+        if (f.Length < 2) { return false; }
+        if (f[0] != '(' || f[f.Length - 1] != ')') { return false; }
+        var tiefe = 0;
+        for (var i = 0; i < f.Length; i++) {
+            var c = f[i];
+            if (c == '(') { tiefe++; } else if (c == ')') {
+                tiefe--;
+                if (tiefe == 0 && i < f.Length - 1) { return false; }
+            }
+        }
+        return tiefe == 0;
+    }
+
+    private static string NormalisiereVorzeichen(string f) {
+        // Wiederholen bis stabil
+        while (true) {
+            var alt = f;
+            f = f.Replace("++", "+")
+                 .Replace("--", "+")
+                 .Replace("+-", "-")
+                 .Replace("-+", "-");
+            if (f == alt) { return f; }
+        }
     }
 
     #endregion

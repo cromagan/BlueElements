@@ -59,6 +59,8 @@ public abstract class ParsebleItem : IParseable, INotifyPropertyChanged, IClonea
 
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
 
+        if (toParse is "{}" or "{ }") { return null; }
+
         var x = toParse.GetAllTags();
 
         if (x == null) { return null; }

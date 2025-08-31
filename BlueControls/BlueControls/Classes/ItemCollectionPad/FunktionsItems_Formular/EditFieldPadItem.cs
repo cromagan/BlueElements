@@ -169,9 +169,14 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     }
 
     public override string ErrorReason() {
-        if (Column is not { IsDisposed: false }) { return "Spalte fehlt"; }
+        var f = base.ErrorReason();
 
-        return base.ErrorReason();
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+
+
+        if (Column is not { IsDisposed: false }) { return "Spaltenangabe fehlt"; }
+
+        return string.Empty;
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

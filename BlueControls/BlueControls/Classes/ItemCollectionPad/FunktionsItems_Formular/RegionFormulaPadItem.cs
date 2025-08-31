@@ -120,9 +120,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var cl = new List<AbstractListItem>();
-
-        ParentFormula?.AddChilds(cl, ParentFormula.NotAllowedChilds);
+        var cl = ParentFormula?.AllKnownChilds(ParentFormula.NotAllowedChilds);
 
         var u = new List<AbstractListItem>();
         u.AddRange(ItemsOf(typeof(GroupBoxStyle)));

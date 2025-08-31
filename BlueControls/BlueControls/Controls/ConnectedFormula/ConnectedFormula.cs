@@ -172,7 +172,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (Pages == null) { return p; }
 
         foreach (var thisp in Pages) {
-            if (thisp is ItemCollectionPadItem { IsDisposed: false } icp) {
+            if (thisp is ItemCollectionPadItem { IsDisposed: false, HasItems: true } icp) {
                 _ = p.AddIfNotExists(icp.Caption);
             }
         }
@@ -331,12 +331,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public QuickImage SymbolForReadableText() => !string.IsNullOrWhiteSpace(Filename) ? QuickImage.Get(ImageCode.Diskette, 16) : QuickImage.Get(ImageCode.Warnung, 16);
 
     /// <summary>
-    /// Leert die eingehende Liste und fügt alle bekannten Fomulare hinzu - außer die in notAllowedChilds
+    /// Gibt alle bekannten Fomulare zurück - außer die in notAllowedChilds
     /// </summary>
     /// <param name="list"></param>
     /// <param name="notAllowedChilds"></param>
-    internal void AddChilds(List<AbstractListItem> list, ReadOnlyCollection<string> notAllowedChilds) {
-        list.Clear();
+    internal List<AbstractListItem> AllKnownChilds(ReadOnlyCollection<string> notAllowedChilds) {
+        List<AbstractListItem> list = [];
 
         if (File.Exists(Filename)) {
             foreach (var thisf in Directory.GetFiles(Filename.FilePath(), "*.cfo")) {
@@ -356,13 +356,15 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         if (_pages != null) {
             foreach (var thisf in _pages) {
-                if (thisf is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                if (thisf is ItemCollectionPadItem { IsDisposed: false, HasItems: true } icpi) {
                     if (!notAllowedChilds.Contains(icpi.KeyName) && !icpi.IsHead()) {
                         list.Add(ItemOf(icpi));
                     }
                 }
             }
         }
+
+        return list;
     }
 
     internal bool IsEditing() {

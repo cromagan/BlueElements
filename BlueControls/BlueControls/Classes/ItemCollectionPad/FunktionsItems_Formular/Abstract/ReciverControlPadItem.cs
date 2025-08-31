@@ -226,19 +226,35 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public virtual string ErrorReason() {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return "Keiner Ansicht zugeordnet."; }
 
-        if (MustBeInDrawingArea && !IsInDrawingArea(UsedArea, icpi.UsedArea.ToRect())) {
-            return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
-        }
-
         var p = GetFilterFromGet();
 
         if (AllowedInputFilter == AllowedInputFilter.None) {
             if (p.Count > 0) { return "Keine Parents erlaubt."; }
         } else if (AllowedInputFilter == AllowedInputFilter.One) {
-            if (p.Count != 1) { return "Es muss genau ein Parent gewählt werden."; }
+            if (p.Count == 0) { return "Ein Parent muss gewählt werden."; }
+            if (p.Count != 1) { return "Zu viele Parents - es muss genau ein Parent gewählt werden."; }
         } else if (!AllowedInputFilter.HasFlag(AllowedInputFilter.None)) {
             if (p.Count == 0) { return "Parents müssen gewählt werden."; }
         }
+
+        if (MustBeInDrawingArea) {
+            if (!IsInDrawingArea(UsedArea, icpi.UsedArea.ToRect())) {
+                return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
+            }
+
+            if(VisibleFor.Count == 0) {
+                return "Element wird nicht angezeigt, Sichtbarkeitsrechte müssen gefplegt werden.";
+            }
+        }
+
+        if(VisibleFor.Count >1) {
+            if (VisibleFor.Contains(Constants.Everybody)) {
+                return "Element ist für jeden sichtbar, enthält aber weitere oboslete Angaben.";
+            }
+        }
+        
+
+
 
         return string.Empty;
     }
