@@ -70,11 +70,8 @@ public sealed partial class ExportDialog : IHasDatabase {
         } else {
             _zielPfad = Path.GetTempPath();
         }
-        try {
-            if (!DirectoryExists(_zielPfad)) {
-                _ = Directory.CreateDirectory(_zielPfad);
-            }
-        } catch { }
+
+        CreateDirectory(_zielPfad);
 
         BefülleLayoutDropdowns();
         EintragsText();

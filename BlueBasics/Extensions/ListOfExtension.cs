@@ -463,9 +463,7 @@ public static partial class Extensions {
 
     public static bool WriteAllText(this IEnumerable<string> l, string filename, Encoding endcoding, bool executeAfter) {
         var t = l.JoinWith("\r\n").TrimEnd("\r\n");
-        if (!DirectoryExists(filename.FilePath())) {
-            _ = Directory.CreateDirectory(filename.FilePath());
-        }
+        CreateDirectory(filename.FilePath());
         return IO.WriteAllText(filename, t, endcoding, executeAfter);
     }
 

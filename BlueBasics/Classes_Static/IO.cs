@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -83,8 +84,9 @@ public static class IO {
     public static bool CanWriteInDirectory(string directory) {
         if (string.IsNullOrEmpty(directory)) { return false; }
 
-        // Sicherstellen, dass Directory mit einem \ endet
-        if (!directory.EndsWith("\\")) { directory += "\\"; }
+        directory = directory.CheckPath();
+
+        if (!directory.IsFormat(FormatHolder.Filepath)) { return false; }
 
         var dirUpper = directory.ToUpperInvariant();
 
@@ -150,6 +152,13 @@ public static class IO {
 
     public static bool CopyFile(string source, string target, bool abortIfFailed) => ProcessFile(TryCopyFile, abortIfFailed, abortIfFailed ? 60 : 5, source, target) is true;
 
+    /// <summary>
+    /// Erstellt ein Verzeichnis, mit Fehlerbehandlung und Wiederholungsversuchen
+    /// </summary>
+    /// <param name="dir">Das zu erstellende Verzeichnis</param>
+    /// <returns>True, wenn das Verzeichnis (dann) existiert</returns>
+    public static bool CreateDirectory(string dir) { return ProcessFile(TryCreateDirectory, false, 5, dir) is true; }
+
     public static bool DeleteDir(string directory, bool abortIfFailed) => ProcessFile(TryDeleteDir, abortIfFailed, abortIfFailed ? 60 : 5, directory) is true;
 
     /// <summary>
@@ -206,7 +215,7 @@ public static class IO {
     /// </summary>
     /// <param name="file">Die zu prüfende Datei</param>
     /// <returns>True, wenn die Datei existiert</returns>
-    public static bool FileExists(string? file) { return ProcessFile(TryFileExists, false, 5, file ?? string.Empty) is true; ; }
+    public static bool FileExists(string? file) { return ProcessFile(TryFileExists, false, 5, file ?? string.Empty) is true; }
 
     /// <summary>
     /// Gibt den Dateinamen ohne Suffix zurück.
@@ -229,7 +238,6 @@ public static class IO {
         } catch {
             return string.Empty;
         }
-
     }
 
     /// <summary>
@@ -401,7 +409,7 @@ public static class IO {
                 var operation = processMethod.Method.Name.Replace("Try", "").Replace("File", "").Replace("Dir", "");
                 var fileName = args.Length > 0 ? args[0]?.ToString()?.FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
                 var mess = "Keine weiteren Informationen vorhanden";
-                if(returnValue is string m) { mess = m; }
+                if (returnValue is string m) { mess = m; }
 
                 Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... ({mess})", 0);
                 stopw = Stopwatch.StartNew();
@@ -433,7 +441,7 @@ public static class IO {
         if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.UtcNow.ToString6(); }
         var z = -1;
         pfad = pfad.CheckPath();
-        if (TryDirectoryExists(pfad).returnValue is not true) { _ = Directory.CreateDirectory(pfad); }
+        CreateDirectory(pfad);
         wunschname = wunschname.ReduceToChars(Constants.Char_Numerals + " _+-#" + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant());
 
         if (wunschname.Length > 80) { wunschname = wunschname.Substring(0, 80); }
@@ -460,7 +468,7 @@ public static class IO {
             filename = filename.CheckFile();
 
             var pfad = filename.FilePath();
-            if (TryDirectoryExists(pfad).returnValue is not true) { _ = Directory.CreateDirectory(pfad); }
+            if (!CreateDirectory(pfad)) { return false; }
 
             File.WriteAllText(filename, contents, encoding);
             if (executeAfter) { _ = ExecuteFile(filename); }
@@ -601,6 +609,24 @@ public static class IO {
         }
     }
 
+    private static (object? returnValue, bool retry) TryCreateDirectory(params object[] args) {
+        if (args.Length < 1 || args[0] is not string dir) { return (false, false); }
+        dir = dir.CheckPath();
+
+        if (string.IsNullOrEmpty(dir) || !dir.IsFormat(FormatHolder.Filepath)) { return (false, false); }
+
+        if (TryDirectoryExists(dir).returnValue is true) { return (true, false); }
+
+        try {
+            Directory.CreateDirectory(dir);
+            return (true, false);
+        } catch (IOException) {
+            return (false, true);
+        } catch {
+            return (false, false);
+        }
+    }
+
     private static (object? returnValue, bool retry) TryDeleteDir(params object[] args) {
         if (args.Length < 1 || args[0] is not string directory) { return (false, false); }
 
@@ -657,6 +683,8 @@ public static class IO {
 
         var p = pfad.CheckPath();
 
+        if (!p.IsFormat(FormatHolder.Filepath)) { return (false, false); }
+
         try {
             return (Directory.Exists(p), false);
         } catch (IOException) {
@@ -671,7 +699,7 @@ public static class IO {
     private static (object? returnValue, bool retry) TryFileExists(params object[] args) {
         if (args.Length < 1 || args[0] is not string file) { return (false, false); }
 
-        if (string.IsNullOrEmpty(file) || file.ContainsChars(Constants.Char_PfadSonderZeichen)) { return (false, false); }
+        if (string.IsNullOrEmpty(file) || !file.IsFormat(FormatHolder.FilepathAndName)) { return (false, false); }
 
         try {
             return (File.Exists(file), false);
@@ -756,8 +784,8 @@ public static class IO {
         try {
             // Sicherstellen, dass das Zielverzeichnis existiert
             var targetDir = Path.GetDirectoryName(newName);
-            if (!string.IsNullOrEmpty(targetDir) && TryDirectoryExists(targetDir).returnValue is not true) {
-                Directory.CreateDirectory(targetDir);
+            if (!string.IsNullOrEmpty(targetDir)) {
+                CreateDirectory(targetDir);
             }
 
             File.Move(oldName, newName);

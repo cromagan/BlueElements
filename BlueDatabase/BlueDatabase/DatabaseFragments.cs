@@ -232,8 +232,7 @@ public class DatabaseFragments : Database {
 
     protected override bool LoadMainData() {
         if (FileExists(Filename)) {
-            _ = Directory.CreateDirectory(FragmengtsPath());
-            if (!DirectoryExists(FragmengtsPath())) { return false; }
+            if (!CreateDirectory(FragmengtsPath())) { return false; }
         }
 
         return base.LoadMainData();
@@ -271,8 +270,8 @@ public class DatabaseFragments : Database {
     private void CheckPath() {
         if (string.IsNullOrEmpty(Filename)) { return; }
 
-        _ = Directory.CreateDirectory(FragmengtsPath());
-        //Directory.CreateDirectory(OldFragmengtsPath());
+        _ = CreateDirectory(FragmengtsPath());
+        //CreateDirectory(OldFragmengtsPath());
     }
 
     private void CloseWriter() {
