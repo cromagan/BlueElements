@@ -88,7 +88,7 @@ public class Method_CallRow : Method_TableGeneric, IUseableForButton {
 
         var scx = row.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
         if (scx.Failed) {
-            return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen", false, ld);
+            return new DoItFeedback($"'{vs}' bei  '{row.CellFirstString()}' abgebrochen: {scx.FailedReason }", false, ld);
         }
         scx.ConsumeBreakAndReturn();
         return scx;

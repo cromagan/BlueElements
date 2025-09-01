@@ -80,7 +80,7 @@ public class Method_CallFilter : Method_TableGeneric, IUseableForButton {
             if (thisR is { IsDisposed: false }) {
                 var scx = thisR.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
                 if (scx.Failed) {
-                    return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen", false, ld);
+                    return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen", false, ld);
                 }
             }
         }

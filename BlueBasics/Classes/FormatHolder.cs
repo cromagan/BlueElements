@@ -102,7 +102,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
         RegexCheck = @"^[A-Za-z]:\\.*\\$",
-        AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\%()[]{}!&#:.,=+-_ ",
+        AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\!$&'@^%()[]{}!&#°:;.,=+-_ ",
         TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.Path,
         SpellCheckingEnabled = false,
@@ -114,7 +114,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
         RegexCheck = @"^[A-Za-z]:\\.*[.].*$",
-        AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\%()[]{}!&#:.,=+-_ ",
+        AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\!$&'@^%()[]{}!&#°:;.,=+-_ ",
         TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
