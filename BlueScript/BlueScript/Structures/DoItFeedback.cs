@@ -75,7 +75,7 @@ public class DoItFeedback {
 
     public virtual bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
     public string FailedReason { get; private set; } = string.Empty;
-    public bool NeedsScriptFix { get; } = false;
+    public bool NeedsScriptFix { get; private set; } = false;
     public bool ReturnFired { get; private set; } = false;
     public Variable? ReturnValue { get; private set; } = null;
 
@@ -107,11 +107,12 @@ public class DoItFeedback {
 
     public static DoItFeedback WertKonnteNichtGesetztWerden(LogData ld, int atno) => new($"Der Wert das Attributes {atno + 1} konnte nicht gesetzt werden.", true, ld);
 
-    public virtual void ChangeFailedReason(string newfailedReason, LogData? ld) {
+    public virtual void ChangeFailedReason(string newfailedReason, bool needsScriptFix, LogData? ld) {
         if (string.IsNullOrEmpty(newfailedReason)) { newfailedReason = "Allgemeiner Fehler"; }
 
         FailedReason = newfailedReason;
         ld?.AddMessage(newfailedReason);
+        NeedsScriptFix = needsScriptFix;
         ReturnValue = null;
     }
 

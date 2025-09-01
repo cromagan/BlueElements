@@ -74,9 +74,9 @@ public class ScriptEndedFeedback : DoItFeedback {
 
     #region Methods
 
-    public override void ChangeFailedReason(string newfailedReason, LogData? ld) {
+    public override void ChangeFailedReason(string newfailedReason, bool needsScriptFix, LogData? ld) {
         ld?.Protocol.AddRange(Protocol);
-        base.ChangeFailedReason(newfailedReason, ld);
+        base.ChangeFailedReason(newfailedReason, needsScriptFix, ld);
     }
 
     #endregion

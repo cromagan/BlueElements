@@ -165,15 +165,15 @@ public abstract class Method : IReadableTextWithKey {
                 // Wir haben so einen Fall: (true) || (true)
                 var scx = GetVariableByParsing(txt.Substring(1, pose - 1), ld, varCol, scp);
                 if (scx.Failed) {
-                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", ld);
+                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
                     return scx;
                 }
                 if (scx.ReturnValue == null) {
-                    scx.ChangeFailedReason("Allgemeiner Befehls-Berechnungsfehler", ld);
+                    scx.ChangeFailedReason("Allgemeiner Befehls-Berechnungsfehler", true, ld);
                     return scx;
                 }
                 if (!scx.ReturnValue.ToStringPossible) {
-                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, ld);
+                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true, ld);
                     return scx;
                 }
                 return GetVariableByParsing(scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
@@ -201,7 +201,7 @@ public abstract class Method : IReadableTextWithKey {
         if (uu > 0) {
             var scx = GetVariableByParsing(txt.Substring(0, uu), ld, varCol, scp);
             if (scx.Failed || scx.ReturnValue is null or VariableUnknown) {
-                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt.Substring(0, uu)}", ld);
+                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt.Substring(0, uu)}", true, ld);
                 return scx;
             }
 
@@ -241,15 +241,15 @@ public abstract class Method : IReadableTextWithKey {
             if (!string.IsNullOrEmpty(tmptxt)) {
                 var scx = GetVariableByParsing(tmptxt, ld, varCol, scp);
                 if (scx.Failed) {
-                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", ld);
+                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
                     return scx;
                 }
                 if (scx.ReturnValue == null) {
-                    scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()", ld);
+                    scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()", true, ld);
                     return scx;
                 }
                 if (!scx.ReturnValue.ToStringPossible) {
-                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, ld);
+                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true, ld);
                     return scx;
                 }
                 return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);

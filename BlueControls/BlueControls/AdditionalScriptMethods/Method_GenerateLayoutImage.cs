@@ -80,7 +80,7 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
         var scx = l.ReplaceVariables(r);
 
         if (scx.Failed) {
-            scx.ChangeFailedReason("Generierung fehlgeschlagen", ld);
+            scx.ChangeFailedReason("Generierung fehlgeschlagen", scx.NeedsScriptFix, ld);
             return scx;
         }
 

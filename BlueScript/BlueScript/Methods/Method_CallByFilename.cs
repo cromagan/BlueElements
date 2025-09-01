@@ -104,7 +104,7 @@ public class Method_CallByFilename : Method {
         }
 
         if (scx.Failed) {
-            scx.ChangeFailedReason("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", ld);
+            scx.ChangeFailedReason("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", scx.NeedsScriptFix, ld);
             return scx;
         }
 
