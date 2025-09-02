@@ -31,16 +31,18 @@ public interface IInputFormat {
     //public enAlignmentHorizontal Align { get; set; }
     public string AllowedChars { get; set; }
 
-    //public int BildCode_ConstantHeight { get; set; }
-    //public BildTextVerhalten BildTextVerhalten { get; set; }
-    public bool TextFormatingAllowed { get; set; }
-
     public int MaxTextLenght { get; set; }
+
     public bool MultiLine { get; set; }
+
     public string RegexCheck { get; set; }
 
     //public enSortierTyp SortType { get; set; }
     public bool SpellCheckingEnabled { get; set; }
+
+    //public int BildCode_ConstantHeight { get; set; }
+    //public BildTextVerhalten BildTextVerhalten { get; set; }
+    public bool TextFormatingAllowed { get; set; }
 
     #endregion
 
@@ -100,32 +102,25 @@ public static class InputFormatExtensions {
                         break;
 
                     case AdditionalCheck.Integer:
-                        if (!thisString.IsLong()) {
-                            return false;
-                        }
+                        if (!thisString.IsLong()) { return false; }
 
                         break;
 
                     case AdditionalCheck.Float:
-                        if (!thisString.IsDouble()) {
-                            return false;
-                        }
+                        if (!thisString.IsDouble()) { return false; }
 
                         break;
 
                     case AdditionalCheck.DateTime:
-                        if (!thisString.IsDateTime()) {
-                            return false;
-                        }
+                        if (!thisString.IsDateTime()) { return false; }
 
                         break;
 
-                    case AdditionalCheck.Path:
-                        if (thisString.Contains("\\\\")) {
-                            return false;
-                        }
-
-                        break;
+                    //case AdditionalCheck.Path:
+                    //    if (thisString.Contains("\\\\")) {
+                    //        return false;
+                    //    }
+                    //  break;
 
                     default:
                         Develop.DebugPrint(formatToCheck.AdditionalFormatCheck);

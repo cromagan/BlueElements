@@ -51,7 +51,6 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 9
     };
 
-
     public static readonly FormatHolder Date = new("Date") {
         Image = QuickImage.Get(ImageCode.Uhr, 16),
         RegexCheck = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$",
@@ -100,11 +99,11 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public static readonly FormatHolder Filepath = new("Filepath") {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
-        //    https://regex101.com/r/S2CbwM/1
-        RegexCheck = @"^[A-Za-z]:\\.*\\$",
+        // https://regex101.com/r/xuJ7gR/1
+        RegexCheck = @"^([A-Za-z]:|\\\\[^\\\r\n]+\\[^\\\r\n]+)\\([^\\\r\n]+\\)*$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\!$&'@^%()[]{}!&#°:;.,=+-_ ",
         TextFormatingAllowed = false,
-        AdditionalFormatCheck = AdditionalCheck.Path,
+        AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
         MaxTextLenght = 512
@@ -112,8 +111,8 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public static readonly FormatHolder FilepathAndName = new("FilepathAndName") {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
-        //    https://regex101.com/r/S2CbwM/1
-        RegexCheck = @"^[A-Za-z]:\\.*[.].*$",
+        // https://regex101.com/r/5f7WVt/1
+        RegexCheck = @"^([A-Za-z]:|\\\\.+)\\([^\\\r\n]+\\)+[^\\\r\n]+$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\!$&'@^%()[]{}!&#°:;.,=+-_ ",
         TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
@@ -240,13 +239,13 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
-    public bool TextFormatingAllowed { get; set; }
     public QuickImage? Image { get; private set; }
     public int MaxTextLenght { get; set; }
     public bool MultiLine { get; set; }
     public string Name { get; }
     public string RegexCheck { get; set; } = string.Empty;
     public bool SpellCheckingEnabled { get; set; }
+    public bool TextFormatingAllowed { get; set; }
 
     #endregion
 
