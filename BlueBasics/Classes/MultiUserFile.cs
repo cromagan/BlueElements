@@ -474,7 +474,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (_lockCount < 1) {
             if (!LockEditing()) {
-                Develop.DebugPrint(ErrorType.Error, $"Änderungen an der Datei {_filename.FileNameWithoutSuffix()} möglich ({propertyName})!");
+                Develop.DebugPrint(ErrorType.Error, $"Keine Änderungen an der Datei '{_filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
                 return;
             }
         }

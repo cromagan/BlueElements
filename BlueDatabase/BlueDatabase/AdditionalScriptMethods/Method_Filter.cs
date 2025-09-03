@@ -38,10 +38,9 @@ public class Method_Filter : Method_TableGeneric {
     public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
 
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
-                                             "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.\r\n" +
-                                         "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
-        "Bei Between müssen die Werte so Angegeben werden: 50|100\r\n\r\n" +
-                                         "Alternative: FilterInMyDB - erstellt einen Filter der aktuellen Tabelle und kann deswegen in Routinen benutzt werden, die schnell abgehandelt werden müssen.";
+                                          "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.\r\n" +
+                                          "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
+                                          "Bei Between müssen die Werte so Angegeben werden: 50|100";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
