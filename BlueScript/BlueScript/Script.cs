@@ -213,6 +213,7 @@ public class Script {
                 pos++;
                 ld.LineAdd(1);
             } else {
+                var previousPos = pos; // KRITISCHE ÄNDERUNG: Vorherige Position speichern
                 var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, ld);
                 if (scx.Failed) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
@@ -220,6 +221,13 @@ public class Script {
                 }
 
                 pos = scx.Position;
+
+                // KRITISCHE ÄNDERUNG: Fortschrittsvalidierung
+                if (pos <= previousPos) {
+                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] FEHLER - Keine Fortschritt in der Parsing-Position", scp.Stufe);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, "Parsing-Fehler: Position wurde nicht vorwärts bewegt", null);
+                }
+
                 ld.LineAdd(normalizedScriptText.CountChar('¶', pos) + 1 - ld.Line + lineadd);
                 if (scx.BreakFired) {
                     Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
