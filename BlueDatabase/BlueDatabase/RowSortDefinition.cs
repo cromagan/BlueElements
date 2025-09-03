@@ -132,14 +132,16 @@ public sealed class RowSortDefinition : IParseable {
         }
     }
 
+    public List<RowItem> SortetdRows(IEnumerable<RowItem> rows) {
+        var sortedList = rows.OrderBy(item => item.CompareKey(Columns)).ToList();
+
+        if (Reverse) { sortedList.Reverse(); }
+        return sortedList;
+    }
+
     public override string ToString() => ParseableItems().FinishParseable();
 
-    public bool UsedForRowSort(ColumnItem? vcolumn) => Columns.Count != 0 && Columns.Any(thisColumn => thisColumn == vcolumn);
+    public bool UsedForRowSort(ColumnItem? column) => Columns.Count != 0 && Columns.Any(thisColumn => thisColumn == column);
 
     #endregion
-
-    //private void Initialize() {
-    //    Reverse = false;
-    //    Columns.Clear();
-    //}
 }

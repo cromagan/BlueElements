@@ -1315,6 +1315,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
         _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
 
+        var r = SortDefinition?.SortetdRows(this.Row) ?? new RowSortDefinition(this, this.Column.First, false).SortetdRows(this.Row);
+        _ = vars.Add(new VariableListRow("RowsSorted", r, true, "Alle Zeilen in der aktuellen Tabelle. Sortiert nach der Standard Sortierung."));
+
         //if (Column.SysCorrect is { IsDisposed: false } csc && row is { IsDisposed: false }) {
         //    _ = vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));
         //}

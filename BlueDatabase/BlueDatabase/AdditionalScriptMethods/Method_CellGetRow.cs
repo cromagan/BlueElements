@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -37,7 +38,7 @@ public class Method_CellGetRow : Method_TableGeneric {
     public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "CellGetRow(Column, Row)";
 
@@ -77,7 +78,7 @@ public class Method_CellGetRow : Method_TableGeneric {
             return new DoItFeedback("Spaltentyp nicht unterstützt.", true, ld);
         }
 
-        return new DoItFeedback(l);
+        return new DoItFeedback(l.JoinWithCr());
     }
 
     #endregion

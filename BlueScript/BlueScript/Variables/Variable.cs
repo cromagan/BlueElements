@@ -254,6 +254,10 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyN
 
     public string VerschiedeneTypen(Variable var2) => $"Variable '{KeyName}' ist nicht der erwartete Typ {var2.MyClassId}, sondern {MyClassId}";
 
+    /// <summary>
+    /// Wird nur für Parse operationen gebraucht. Z.B. beim Laden von aus dem Dateisystem
+    /// </summary>
+    /// <param name="x"></param>
     protected abstract void SetValue(object? x);
 
     protected abstract bool TryParseValue(string txt, out object? result);
