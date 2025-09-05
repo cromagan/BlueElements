@@ -304,11 +304,18 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private string CheckCode() {
-        if (InvokeRequired) {
-            return (string)Invoke(new Func<string>(CheckCode));
-        }
+        if (IsDisposed) { return string.Empty; }
 
-        return _directory + "?" + Visible + "?" + _filter + "?" + _sort + "?" + FilterInputChangedHandled + "?" + RowsInputChangedHandled;
+        try {
+            if (InvokeRequired) {
+                return (string)Invoke(new Func<string>(CheckCode));
+            }
+
+            return _directory + "?" + Visible + "?" + _filter + "?" + _sort + "?" + FilterInputChangedHandled + "?" + RowsInputChangedHandled;
+        } catch {
+            // Manchmal verworfen
+            return CheckCode();
+        }
     }
 
     private void chkFolder_Tick(object sender, System.EventArgs e) {
@@ -576,6 +583,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
+        if (IsDisposed) { return; }
+
         var newCheckCode = CheckCode();
 
         if (newCheckCode == _workinDir) { return; }
@@ -710,6 +719,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private void ThumbGenerator_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        
         var gb = (List<object>)e.UserState;
 
         var com = ((string)gb[0]).ToLowerInvariant();
