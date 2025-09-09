@@ -37,7 +37,7 @@ internal class Method_Ai : Method {
     public override string Description => "Initialisiert die KI von Claude";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableAi.ShortName_Variable;
     public override string StartSequence => "(";

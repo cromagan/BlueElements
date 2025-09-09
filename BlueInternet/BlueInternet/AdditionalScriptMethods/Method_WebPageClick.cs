@@ -39,7 +39,7 @@ internal class Method_WebPageClick : Method_WebPage {
     public override string Description => "Fügt ein Pad-Item-Symbol einer Collection hinzu";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
@@ -52,7 +52,7 @@ internal class Method_WebPageClick : Method_WebPage {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableWebpage vwb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback( "Keine Webseite geladen", false, ld); }
+        if (vwb.ValueWebpage is not { IsDisposed: false } wb) { return new DoItFeedback("Keine Webseite geladen", false, ld); }
         if (wb.IsLoading) { return new DoItFeedback("Ladeprozess aktiv", false, ld); }
 
         try {
@@ -131,7 +131,7 @@ internal class Method_WebPageClick : Method_WebPage {
 
             #endregion
 
-            return new DoItFeedback( "Fehler beim Klicken des Buttons: " + task.Exception?.Message, false, ld);
+            return new DoItFeedback("Fehler beim Klicken des Buttons: " + task.Exception?.Message, false, ld);
         } catch {
             return new DoItFeedback("Allgemeiner Fehler beim Ausführen des Button-Befehles.", false, ld);
         }
