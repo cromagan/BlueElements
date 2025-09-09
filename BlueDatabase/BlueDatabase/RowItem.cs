@@ -166,6 +166,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 _ = DoubleTryParse(wert, out var f);
                 return new VariableDouble(column.KeyName, f, ro, qi);
 
+            case ScriptType.Numeral_Readonly:
+                _ = DoubleTryParse(wert, out var f2);
+                return new VariableDouble(column.KeyName, f2, true, qi);
+
             case ScriptType.String:
                 return new VariableString(column.KeyName, wert, ro, qi);
 
@@ -843,6 +847,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     internal bool IsMyRow() {
         if (Database is not { IsDisposed: false } db) { return false; }
+        if (!db.MultiUserPossible) { return true; }
         if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
         if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 

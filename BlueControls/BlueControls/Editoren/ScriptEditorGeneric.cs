@@ -78,8 +78,14 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public virtual object? Object { get; set; }
 
     public string Script {
-        get => txtSkript.Text.TrimEnd(" ");
-        set => txtSkript.Text = value.TrimEnd(" ") + "    ";
+        get => txtSkript.Text.TrimEnd(" ").Replace("\r\n", "\r");
+        set {
+            var scr = value.TrimEnd(" ") + "    ";
+
+            if (scr == txtSkript.Text.Replace("\r\n", "\r")) { return; }
+
+            txtSkript.Text = scr;
+        }
     }
 
     #endregion

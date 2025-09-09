@@ -78,6 +78,7 @@
     <Compile Include="AdditionalScriptMethods\Method_AddRows.cs" />
     <Compile Include="AdditionalScriptMethods\Method_CallTable.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ForEachRow2.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_SortedRows.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SumFilter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_TableGeneric.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Execute.cs" />

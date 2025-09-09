@@ -31,12 +31,12 @@ internal class Method_Min : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableDouble.ShortName_Variable, VariableString.ShortName_Variable, VariableListString.ShortName_Variable]];
+    public override List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "min";
     public override List<string> Constants => [];
 
     public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.\r\n" +
-                                            "Ein Text wird wenn möglich als Zahl interpretiert.\r\n" +
+                                            "Ein Text wird - wenn möglich - als Zahl interpretiert.\r\n" +
                                             "Ist das nicht möglich, wird der Text ignoriert.";
 
     public override bool GetCodeBlockAfter => false;

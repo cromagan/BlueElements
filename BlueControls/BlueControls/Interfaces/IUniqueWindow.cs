@@ -89,7 +89,7 @@ public static class IUniqueWindowExtension {
 
     #region Methods
 
-    public static T ShowOrCreate<T>(object o) where T : IUniqueWindow, new() {
+    public static T ShowOrCreate<T>(object o) where T : System.Windows.Forms.Form, IUniqueWindow, new() {
         var windowType = typeof(T);
 
         foreach (var form in FormManager.Forms) {
@@ -105,6 +105,7 @@ public static class IUniqueWindowExtension {
         var newWindow = new T {
             Object = o
         };
+        FormManager.RegisterForm(newWindow);
         newWindow.Show();
         return newWindow;
     }

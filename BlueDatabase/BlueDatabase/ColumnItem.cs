@@ -1395,17 +1395,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
 
         if (_isKeyColumn) {
-            if (_relationship_to_First || _relationType != RelationType.None) {
+            if (_relationship_to_First || (_relationType != RelationType.None && _relationType != RelationType.DropDownValues)) {
                 return "Beziehungen zu anderen Zeilen und Schlüsselspalte nicht kombinierbar.";
             }
 
-            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly) {
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly) {
                 return "Schlüsselspalten müssen im Script als Readonly vorhanden sein.";
             }
         }
 
         if (_value_for_Chunk != ChunkType.None) {
-            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly) {
                 return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
             }
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Der Autofilter-Joker darf bei dieser Spalte nicht gesetzt sein."; }

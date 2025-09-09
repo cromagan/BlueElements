@@ -132,7 +132,9 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
 
         if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { return MethodType.Standard; }
 
-        if (EventTypes == ScriptEventTypes.value_changed && extended) { return MethodType.LongTime; }
+        if (EventTypes == ScriptEventTypes.value_changed && extended) { return MethodType.ManipulatesUser; }
+
+        if (EventTypes == ScriptEventTypes.loaded) { return MethodType.ManipulatesUser; }
 
         return MethodType.LongTime;
     }
