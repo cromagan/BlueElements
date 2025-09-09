@@ -39,7 +39,7 @@ public class Method_SetFailed : Method {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.Database;
+    public override MethodType MethodLevel => MethodType.Standard;
 
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;

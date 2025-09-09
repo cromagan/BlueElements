@@ -48,7 +48,7 @@ public class Method_SetError : Method_TableGeneric {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Special;
+    public override MethodType MethodLevel => MethodType.Special;
 
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;

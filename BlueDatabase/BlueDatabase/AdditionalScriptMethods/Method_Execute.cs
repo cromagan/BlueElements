@@ -48,7 +48,7 @@ internal class Method_Execte : Method, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.GUI;
 
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Einen Befehl an Windows übergeben";

@@ -127,6 +127,16 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
 
     #region Methods
 
+    public MethodType AllowedMethodsMaxLevel(bool extended) {
+        if (EventTypes == ScriptEventTypes.Ohne_Auslöser) { return MethodType.GUI; }
+
+        if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { return MethodType.Standard; }
+
+        if (EventTypes == ScriptEventTypes.value_changed && extended) { return MethodType.LongTime; }
+
+        return MethodType.LongTime;
+    }
+
     public override List<string> Attributes() {
         var s = new List<string>();
         if (!NeedRow) { s.Add("Rowless"); }
@@ -266,23 +276,6 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
         if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
         return QuickImage.Get(symb, 16, c, Color.Transparent, h);
-    }
-
-    internal MethodType AllowedMethods(RowItem? row, bool extended) {
-
-        #region  Erlaubte Methoden ermitteln
-
-        var allowedMethods = MethodType.Standard | MethodType.Database | MethodType.SpecialVariables | MethodType.Math | MethodType.DrawOnBitmap;
-
-        if (row is { IsDisposed: false }) { allowedMethods |= MethodType.MyDatabaseRow; }
-
-        if (EventTypes is ScriptEventTypes.Ohne_Auslöser || extended) {
-            allowedMethods |= MethodType.ManipulatesUser;
-        }
-
-        #endregion
-
-        return allowedMethods;
     }
 
     protected override void Dispose(bool disposing) {

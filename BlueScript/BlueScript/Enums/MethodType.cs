@@ -21,46 +21,35 @@ using System;
 
 namespace BlueScript.Enums;
 
-[Flags]
 public enum MethodType {
 
     /// <summary>
-    /// Methoden, die eine Variable modifizieren oder für den normalen Betrieb benötigt werden.
+    /// Methoden, die eine kurze Laufzeit haben und ohne weitere Bedingen eingesetzt werden können.
     /// </summary>
-    Standard = 1,
+    Standard = 0,
+
+    ///// <summary>
+    ///// Methoden, die längere Laufzeiten haben können. Evtl. Dateizugriffe. Aber Autonom ablaufe, ohne den Bentzer zu stören.
+    ///// </summary>
+    LongTime = 1,
 
     /// <summary>
-    /// Einfache Berechnungen
+    /// Der Befehl stört den Benutzer aktiv. Z.B. wird das Clipboard verändert der ein Programm gestartet.
+    /// Aber die Ausführung des Skriptes wird nicht unterbrochen.
     /// </summary>
-    Math = 2,
+    ManipulatesUser = 2,
 
     /// <summary>
-    /// Methoden, die über einer Tabelle aufgerufen werden müssen.
-    /// Z.B. weil sie die eigene Tabelle brauchen, um andere Tabellen finden zu können.
+    /// Dieser Befehl kann nur aktiv verwendet werden, wenn der Benutzer aktiv vor dem Bildschirm sitzt. 
+    /// Evtl. werden Skripte gestoppt und warten auf Benutzereingaben.
     /// </summary>
-    Database = 4,
+    GUI = 3,
 
     /// <summary>
-    /// Methoden, die sich innerhalb der aktuellen Zeile der Tabelle bewegen. Muss immer gemeinsam mit dem Attribut 'Database' verwendet werden.
+    /// Sehr spezielle Befehle, die nur an einer einzigen Position erlaubt sind
     /// </summary>
-    MyDatabaseRow = 8,
+    Special = 9
 
-    DrawOnBitmap = 16,
 
-    /// <summary>
-    /// Der Befehl stört den Benutzer aktiv. Z.B. wird das Clipbard verändert der ein Programm gestartet.
-    /// Dateioperationen fallen nicht darunter, dafür ist IO zu verwenden.
-    /// </summary>
-    ManipulatesUser = 64,
 
-    /// <summary>
-    /// Dieser Befehl generiert abseits des normalen Weges neue Variablen. Oder, erstellt einen speziellen Rückgabewert, der nicht für Abfragen gedacht ist.
-    /// Z.B. kann dieser Befehl dann nicht in If-Abfragen benutzt werden.
-    /// </summary>
-    SpecialVariables = 128,
-
-    /// <summary>
-    ///  Sehr spezielle Befehle, die nur an einer einzigen Position erlaubt sind
-    /// </summary>
-    Special = 256,
 }

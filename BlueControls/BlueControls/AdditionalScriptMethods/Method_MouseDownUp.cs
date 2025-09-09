@@ -44,7 +44,7 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

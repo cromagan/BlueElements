@@ -25,6 +25,7 @@ using BlueDatabase.AdditionalScriptMethods;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -33,6 +34,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -1372,33 +1374,26 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription? script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
-        var name = script?.KeyName ?? "Allgemein";
+    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         var e = new CanDoScriptEventArgs(extended);
         OnCanDoScript(e);
-        if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, name); }
+        if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, script.KeyName); }
 
         var m = CanWriteMainFile();
-        if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, name); }
+        if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, script.KeyName); }
 
-        if (script == null) {
-            // Wenn keine DatabaseScriptDescription ankommt, hat die Vorroutine entschieden, dass alles ok ist
-            var vars = CreateVariableCollection(row, true, dbVariables, true, false);
-            return new ScriptEndedFeedback(vars, string.Empty);
-        }
+        if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback("Das Skript ist fehlerhaft.", false, true, script.KeyName); }
 
-        if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback("Das Skript ist fehlerhaft.", false, true, name); }
-
-        if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, name); }
+        if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, script.KeyName); }
         if (!script.NeedRow) { row = null; }
 
         if (!ignoreError && row != null && RowCollection.FailedRows.ContainsKey(row) && RowCollection.FailedRows.TryGetValue(row, out var reason)) {
-            return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, name);
+            return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, script.KeyName);
         }
 
         var n = row?.CellFirstString() ?? "ohne Zeile";
 
-        var scriptId = $"{Caption}/{name}/{n}";
+        var scriptId = $"{Caption}/{script.KeyName}/{n}";
 
         ExecutingScript.Add(scriptId);
         ExecutingScriptAnyDatabase.Add(scriptId);
@@ -1413,7 +1408,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var vars = CreateVariableCollection(row, !script.ChangeValuesAllowed, dbVariables, script.VirtalColumns, extended);
 
-            var meth = Method.GetMethods(script.AllowedMethods(row, extended));
+            var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
             if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
 
@@ -1560,6 +1555,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein");
             }
 
+            DatabaseScriptDescription? script = null;
             if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
                 if (!IsThisScriptBroken(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
@@ -1567,18 +1563,20 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 var l = EventScript.Get(ev);
 
-                return l.Count == 1
-                    ? ExecuteScript(l[0], produktivphase, row, attributes, dbVariables, extended, false)
-                    : ExecuteScript(null, produktivphase, row, attributes, dbVariables, extended, false);
+                if (l.Count == 1) {
+                    script = l[0];
+                } else if (l.Count == 0) {
+                    var vars = CreateVariableCollection(row, true, dbVariables, true, false);
+                    return new ScriptEndedFeedback(vars, string.Empty);
+                }
+            } else {
+                script = EventScript.Get(scriptname);
             }
 
-            var script = EventScript.Get(scriptname);
-            if (script == null) {
-                return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname);
-            } else {
-                if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
-                return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, false);
-            }
+            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
+            if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
+
+            return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, false);
         } catch {
             Develop.CheckStackOverflow();
             return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, dbVariables, extended);

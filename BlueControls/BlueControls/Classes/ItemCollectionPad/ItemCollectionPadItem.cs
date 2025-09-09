@@ -957,7 +957,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         _ = vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
 
-        var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap | MethodType.ManipulatesUser);
+        var m = Method.GetMethods(MethodType.ManipulatesUser);
 
         var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, "CreativePad-Generator", "CreativePad-Generator");
 

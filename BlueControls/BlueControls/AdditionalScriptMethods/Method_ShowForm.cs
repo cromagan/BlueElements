@@ -37,7 +37,7 @@ public class Method_ShowForm : Method {
     public override string Description => "Zeigt ein Windows-Fenster mit dem angegebenen Inhalt an";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.GUI;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableDouble.ShortName_Variable;
     public override string StartSequence => "(";

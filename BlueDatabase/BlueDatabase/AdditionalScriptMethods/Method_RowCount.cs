@@ -35,7 +35,7 @@ public class Method_RowCount : Method_TableGeneric {
     public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
     public override string StartSequence => "(";

@@ -43,7 +43,7 @@ public class Method_RowNext : Method_TableGeneric {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
-    public override MethodType MethodType => MethodType.Database | MethodType.MyDatabaseRow;
+    public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableRowItem.ShortName_Variable;
     public override string StartSequence => "(";

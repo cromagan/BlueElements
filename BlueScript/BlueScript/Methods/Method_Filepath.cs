@@ -36,7 +36,7 @@ internal class Method_Filenpath : Method {
     public override string Description => "Gibt den Dateipad eines Dateistrings zurück, mit abschließenden \\.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";

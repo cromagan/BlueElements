@@ -46,7 +46,7 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
-    public override MethodType MethodType => MethodType.SpecialVariables;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Ein Skript einer anderen Tabelle ausführen";
     public override string Returns => VariableString.ShortName_Plain;

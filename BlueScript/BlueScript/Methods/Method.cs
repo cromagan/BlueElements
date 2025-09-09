@@ -83,7 +83,7 @@ public abstract class Method : IReadableTextWithKey {
     /// </summary>
     public abstract int LastArgMinCount { get; }
 
-    public abstract MethodType MethodType { get; }
+    public abstract MethodType MethodLevel { get; }
 
     //TODO: 0 implementieren
     public abstract bool MustUseReturnValue { get; }
@@ -144,11 +144,11 @@ public abstract class Method : IReadableTextWithKey {
         return new GetEndFeedback(pos + which.Length, txtBtw);
     }
 
-    public static List<Method> GetMethods(MethodType allowedMethods) {
+    public static List<Method> GetMethods(MethodType maxLevel) {
         var m = new List<Method>();
 
         foreach (var thism in AllMethods) {
-            if (allowedMethods.HasFlag(thism.MethodType)) {
+            if (thism.MethodLevel <= maxLevel) {
                 m.Add(thism);
             }
         }

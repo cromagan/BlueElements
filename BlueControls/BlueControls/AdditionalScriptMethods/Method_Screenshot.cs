@@ -36,7 +36,7 @@ public class Method_Screenshot : Method {
     public override string Description => "Erstellt einen Screenshot und gibgt diesen zurück.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.DrawOnBitmap;
+    public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";

@@ -35,10 +35,10 @@ internal class Method_ScaledView : Method {
     public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal, FloatVal, StringVal];
     public override string Command => "scaledview";
     public override List<string> Constants => [];
-    public override string Description => "Erstellt eine Skalierte Ansicht - mit den angegebenen JointPoings.";
+    public override string Description => "Erstellt eine Skalierte Ansicht - mit den angegebenen JointPoints.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariablePadItem.ShortName_Variable;
     public override string StartSequence => "(";

@@ -35,7 +35,7 @@ internal class Method_Replace : Method {
     public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";

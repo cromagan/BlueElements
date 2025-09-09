@@ -129,7 +129,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         }
 
-        var m = Method.GetMethods(MethodType.Standard | MethodType.Database | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
+        var m = Method.GetMethods(MethodType.Standard);
 
         var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, "Row-Adder", "Row-Adder");
 

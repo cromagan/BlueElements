@@ -48,7 +48,7 @@ internal class Method_Call : Method_TableGeneric, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.Database | MethodType.SpecialVariables;
+    public override MethodType MethodLevel => MethodType.Standard;
 
     public override bool MustUseReturnValue => false;
 

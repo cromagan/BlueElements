@@ -45,7 +45,7 @@ internal class Method_SetClipboard : Method, IUseableForButton {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
     public string NiceTextForUser => "Text in die Zwischenablage kopieren";

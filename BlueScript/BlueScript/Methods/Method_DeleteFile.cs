@@ -41,7 +41,7 @@ internal class Method_DeleteFile : Method {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.LongTime;
 
     public override bool MustUseReturnValue => false;
 

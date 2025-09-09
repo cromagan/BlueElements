@@ -37,7 +37,7 @@ internal class Method_MovePadItem : Method {
     public override string Description => "Verschiebt das vorhandene PadItem (oder alle Paditems in der Sammlung) um die angegebenen Pixel.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

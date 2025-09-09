@@ -49,8 +49,7 @@ public class Method_RowDelete : Method_TableGeneric, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-    // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
-    public override MethodType MethodType => MethodType.Database;
+    public override MethodType MethodLevel => MethodType.LongTime;
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 

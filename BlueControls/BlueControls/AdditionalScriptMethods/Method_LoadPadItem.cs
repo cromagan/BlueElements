@@ -45,7 +45,7 @@ internal class Method_LoadPadItem : Method {
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariablePadItem.ShortName_Variable;
     public override string StartSequence => "(";

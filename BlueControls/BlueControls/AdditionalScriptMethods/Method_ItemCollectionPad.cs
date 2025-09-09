@@ -34,7 +34,7 @@ public class Method_ItemCollectionPad : Method {
     public override string Description => "Erstellt eine neue Item-Collection. In diese können PadItems geladen werden.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableItemCollectionPad.ShortName_Variable;
     public override string StartSequence => "(";

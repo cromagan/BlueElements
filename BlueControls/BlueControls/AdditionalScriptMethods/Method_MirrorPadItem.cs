@@ -38,7 +38,7 @@ internal class Method_MirrorPadItem : Method {
     public override string Description => "Spiegelt das vorhandene PadItem (oder alle Paditems in der Sammlung) um den angegebenen Punkt.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

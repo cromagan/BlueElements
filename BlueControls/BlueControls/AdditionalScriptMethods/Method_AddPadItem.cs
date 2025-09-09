@@ -36,7 +36,7 @@ internal class Method_AddPadItem : Method {
     public override string Description => "Fügt einer ItemCollectionPadItem ein PadItem hinzu.\r\nAnschließend wird es mit JointPoints ausgerichtet.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

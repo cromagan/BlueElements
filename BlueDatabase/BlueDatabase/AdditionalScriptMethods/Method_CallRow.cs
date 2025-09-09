@@ -47,7 +47,7 @@ public class Method_CallRow : Method_TableGeneric, IUseableForButton {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodType => MethodType.SpecialVariables;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
 

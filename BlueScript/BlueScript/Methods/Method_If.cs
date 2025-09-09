@@ -49,7 +49,7 @@ public class Method_If : Method {
     public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
     public override bool GetCodeBlockAfter => true;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
@@ -60,14 +60,14 @@ public class Method_If : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var m = new List<Method>();
-        foreach (var thism in scp.AllowedMethods) {
-            if (!thism.MethodType.HasFlag(MethodType.SpecialVariables)) {
-                m.Add(thism);
-            }
-        }
+        //var m = new List<Method>();
+        //foreach (var thism in scp.AllowedMethods) {
+        //    if (!thism.MethodType.HasFlag(MethodType.SpecialVariables)) {
+        //        m.Add(thism);
+        //    }
+        //}
 
-        var scpt = new ScriptProperties(scp, m, scp.Stufe + 1, scp.Chain);
+        var scpt = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, scp.Chain);
 
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
         if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, infos.LogData); }

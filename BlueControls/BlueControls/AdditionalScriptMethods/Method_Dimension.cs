@@ -37,7 +37,7 @@ internal class Method_Dimension : Method {
     public override string Description => "Erstellt eine Bemaßung - mit den angegebenen JointPoints.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => VariablePadItem.ShortName_Variable;
     public override string StartSequence => "(";

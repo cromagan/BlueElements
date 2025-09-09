@@ -50,7 +50,7 @@ public class Method_AddRows : Method_TableGeneric {
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
 
-    public override MethodType MethodType => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

@@ -47,7 +47,7 @@ public class Method_CallFilter : Method_TableGeneric, IUseableForButton {
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodType => MethodType.SpecialVariables;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
 

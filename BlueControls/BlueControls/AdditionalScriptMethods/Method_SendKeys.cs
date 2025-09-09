@@ -26,7 +26,7 @@ internal class Method_SendKeys : Method {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodType => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
 

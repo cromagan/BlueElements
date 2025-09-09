@@ -38,7 +38,7 @@ public class Method_CellSetRow : Method_TableGeneric {
     public override int LastArgMinCount => -1;
 
     // Manipulates User deswegen, weil dann der eigene Benutzer gesetzt wird und das Extended bearbeitungen auslösen könnte
-    public override MethodType MethodType => MethodType.Database | MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
