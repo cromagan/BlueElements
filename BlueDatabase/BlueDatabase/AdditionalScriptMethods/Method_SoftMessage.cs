@@ -49,7 +49,7 @@ public class Method_SoftMessage : Method_TableGeneric, IUseableForButton {
 
     public override int LastArgMinCount => -1;
 
-    public override MethodType MethodLevel => MethodType.GUI;
+    public override MethodType MethodLevel => MethodType.Standard;
 
     public override bool MustUseReturnValue => false;
 
