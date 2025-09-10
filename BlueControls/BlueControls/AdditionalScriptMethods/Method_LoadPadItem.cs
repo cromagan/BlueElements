@@ -27,7 +27,7 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
+
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -78,7 +78,7 @@ internal class Method_LoadPadItem : Method {
         }
 
         try {
-            var toparse = File.ReadAllText(filen, BlueBasics.Constants.Win1252);
+            var toparse = System.IO.File.ReadAllText(filen, BlueBasics.Constants.Win1252);
 
             var i = ParsebleItem.NewByParsing<AbstractPadItem>(toparse);
 

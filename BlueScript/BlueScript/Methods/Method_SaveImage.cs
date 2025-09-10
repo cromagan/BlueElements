@@ -24,7 +24,8 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
-using System.IO;
+using static BlueBasics.IO;
+
 using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
@@ -68,10 +69,10 @@ internal class Method_SaveImage : Method {
 
         var pf = filn.PathParent();
         if (string.IsNullOrEmpty(pf)) { return new DoItFeedback($"Dateinamen-Fehler: '{pf}'", true, ld); }
-        if (!Directory.Exists(pf)) { return new DoItFeedback($"Verzeichnis '{pf}' existiert nicht.", true, ld); }
-        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback($"Keine Schreibrechte im ZielVerzeichnis '{pf}'.", true, ld); }
+        if (!DirectoryExists(pf)) { return new DoItFeedback($"Verzeichnis '{pf}' existiert nicht.", true, ld); }
+        if (!CanWriteInDirectory(pf)) { return new DoItFeedback($"Keine Schreibrechte im ZielVerzeichnis '{pf}'.", true, ld); }
 
-        if (File.Exists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
+        if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 
         #endregion
 

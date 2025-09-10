@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueScript.Structures;
-
 namespace BlueBasics.EventArgs;
 
 public class CanDoScriptEventArgs : CancelReasonEventArgs {

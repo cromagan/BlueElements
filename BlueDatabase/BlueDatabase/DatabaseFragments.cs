@@ -23,7 +23,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
+
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -51,7 +51,7 @@ public class DatabaseFragments : Database {
 
     private string _myFragmentsFilename = string.Empty;
 
-    private StreamWriter? _writer;
+    private System.IO.StreamWriter? _writer;
 
     #endregion
 
@@ -212,7 +212,7 @@ public class DatabaseFragments : Database {
                     if (DateTime.UtcNow.Subtract(d2).TotalHours < 1.5) { del = false; }
                     if (del && DateTime.UtcNow.Subtract(d2).TotalHours < 8) {
                         try {
-                            FileInfo fi = new(thisf);
+                            var fi = GetFileInfo(thisf);
                             if (fi.Length > 400) { del = false; }
                         } catch {
                             del = false;
@@ -303,7 +303,7 @@ public class DatabaseFragments : Database {
 
             #region Alle Fragment-Dateien im Verzeichnis ermitteln und eigene Ausfiltern (frgma)
 
-            var frgma = Directory.GetFiles(FragmengtsPath(), TableName.ToUpper() + "-*." + SuffixOfFragments(), SearchOption.TopDirectoryOnly).ToList();
+            var frgma = GetFiles(FragmengtsPath(), TableName.ToUpper() + "-*." + SuffixOfFragments(), System.IO.SearchOption.TopDirectoryOnly).ToList();
             _ = frgma.Remove(_myFragmentsFilename);
 
             #endregion
@@ -313,7 +313,7 @@ public class DatabaseFragments : Database {
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {
-                using var reader = new StreamReader(new FileStream(thisf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Encoding.UTF8);
+                using var reader = new System.IO.StreamReader(new System.IO.FileStream(thisf, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite), Encoding.UTF8);
                 var fil = reader.ReadToEnd();
 
                 var fils = fil.SplitAndCutByCrToList();
@@ -413,10 +413,10 @@ public class DatabaseFragments : Database {
 
         if (Develop.AllReadOnly) { return; }
 
-        FileStream? fileStream = null;
+		System.IO.FileStream? fileStream = null;
         try {
-            fileStream = new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read);
-            _writer = new StreamWriter(fileStream, Encoding.UTF8);
+            fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
+            _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
             fileStream = null; // StreamWriter übernimmt ownership
 
             _writer.AutoFlush = true;

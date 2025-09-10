@@ -22,7 +22,7 @@ using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
+
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -302,9 +302,9 @@ public static partial class Extensions {
             aes.IV = new byte[aes.BlockSize / 8];
             var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-            using var memoryStream = new MemoryStream(buffer);
+            using var memoryStream = new System.IO.MemoryStream(buffer);
             using var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read);
-            using var streamReader = new StreamReader(cryptoStream);
+            using var streamReader = new System.IO.StreamReader(cryptoStream);
             return streamReader.ReadToEnd();
         } catch { return null; }
     }
@@ -326,9 +326,9 @@ public static partial class Extensions {
 
                 var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
-                using var memoryStream = new MemoryStream();
+                using var memoryStream = new System.IO.MemoryStream();
                 using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
-                using (var streamWriter = new StreamWriter(cryptoStream)) {
+                using (var streamWriter = new System.IO.StreamWriter(cryptoStream)) {
                     streamWriter.Write(plainText);
                 }
 

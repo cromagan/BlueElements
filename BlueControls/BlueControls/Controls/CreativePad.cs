@@ -34,7 +34,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
-using System.IO;
+
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
@@ -242,7 +242,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
                         f.Title = "Speichern:";
                         _ = f.ShowDialog();
                         if (string.IsNullOrEmpty(f.FileName)) { return; }
-                        File.WriteAllText(f.FileName, ps.ParseableItems().FinishParseable(), Constants.Win1252);
+                        IO.WriteAllText(f.FileName, ps.ParseableItems().FinishParseable(), Constants.Win1252, false);
                         IO.LastFilePath = f.FileName.FilePath();
                     }
                     return;

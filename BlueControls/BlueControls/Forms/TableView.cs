@@ -32,7 +32,7 @@ using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
+
 using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
@@ -669,7 +669,7 @@ public partial class TableView : FormWithStatusBar, IHasSettings {
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         Database.ForceSaveAll();
         MultiUserFile.SaveAll(false);
-        _ = ExecuteFile(Path.GetTempPath());
+        _ = ExecuteFile(System.IO.Path.GetTempPath());
     }
 
     private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) =>

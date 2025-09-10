@@ -34,7 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
+
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -506,7 +506,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         if (Pad.Items == null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var toparse = File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var toparse = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(toparse);

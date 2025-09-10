@@ -25,7 +25,6 @@ using BlueDatabase.AdditionalScriptMethods;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
-using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -34,9 +33,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
-using System.IO;
+
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -1675,7 +1673,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         foreach (var thisP in path) {
             if (DirectoryExists(thisP)) {
-                var e = Directory.GetFiles(thisP);
+                var e = GetFiles(thisP);
                 foreach (var thisFile in e) {
                     if (thisFile.FileType() is FileFormat.HTML or FileFormat.Textdocument or FileFormat.Visitenkarte or FileFormat.BlueCreativeFile or FileFormat.XMLFile) {
                         r.Add(thisFile);
@@ -2016,10 +2014,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
     }
 
-    public void LoadFromStream(Stream stream) {
+    public void LoadFromStream(System.IO.Stream stream) {
         //OnLoading();
         byte[] bLoaded;
-        using (BinaryReader r = new(stream)) {
+        using (System.IO.BinaryReader r = new(stream)) {
             bLoaded = r.ReadBytes((int)stream.Length);
             r.Close();
         }
@@ -2817,7 +2815,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        return Directory.GetFiles(path, "*." + fx, SearchOption.TopDirectoryOnly).ToList();
+        return GetFiles(path, "*." + fx, System.IO.SearchOption.TopDirectoryOnly).ToList();
     }
 
     private void Checker_Tick(object state) {

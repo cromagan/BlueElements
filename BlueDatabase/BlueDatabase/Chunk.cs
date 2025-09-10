@@ -25,14 +25,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
+
 using System.Linq;
 using System.Threading;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace BlueDatabase;
 
@@ -173,7 +172,7 @@ public class Chunk : IHasKeyName {
         }
 
         if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
-            var nf = GetFileInfo(ChunkFileName, false);
+            var nf = GetFileState(ChunkFileName, false);
             return nf != _fileinfo;
         }
 
@@ -204,7 +203,7 @@ public class Chunk : IHasKeyName {
 
             Develop.SetUserDidSomething();
 
-            using FileStream x = new(filename, FileMode.Create, FileAccess.Write, FileShare.None);
+            using System.IO.FileStream x = new(filename, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.None);
             x.Write(datacompressed, 0, datacompressed.Length);
             x.Flush();
             x.Close();
@@ -395,7 +394,7 @@ public class Chunk : IHasKeyName {
 
         // KRITISCHE ÄNDERUNG: FileInfo der temporären Datei VOR dem Move ermitteln
         // So wissen wir exakt, was wir schreiben und vermeiden Race Conditions
-        var tempFileInfo = GetFileInfo(tempfile, true);
+        var tempFileInfo = GetFileState(tempfile, true);
         if (string.IsNullOrEmpty(tempFileInfo)) {
             DeleteFile(tempfile, false);
             return "Dateiinfo konnte nicht gelesen werden";

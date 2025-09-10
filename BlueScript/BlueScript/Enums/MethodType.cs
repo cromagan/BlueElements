@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using System;
-
 namespace BlueScript.Enums;
 
 public enum MethodType {

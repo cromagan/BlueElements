@@ -25,7 +25,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.IO;
+
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -209,7 +209,7 @@ public class BitmapExt : IDisposableExtended {
         Generic.CollectGarbage();
         Generic.Pause(0.1, true);
         Bitmap? bitmap;
-        using (MemoryStream outStream = new()) {
+        using (System.IO.MemoryStream outStream = new()) {
             BitmapEncoder enc = new BmpBitmapEncoder();
             enc.Frames.Add(BitmapFrame.Create(bitmapsource));
             enc.Save(outStream);
@@ -352,9 +352,9 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
-        //Used: Only BZL
-        // Open a Stream and decode a TIFF image
-        FileStream imageStreamSource = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+		//Used: Only BZL
+		// Open a Stream and decode a TIFF image
+		System.IO.FileStream imageStreamSource = new(fileName, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
         List<Bitmap> l = [];
         var frames = 1;
         try {

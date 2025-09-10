@@ -29,7 +29,7 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
+using static BlueBasics.IO;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -209,8 +209,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
             #region Verfügbare Layouts ermitteln
 
-            if (Directory.Exists(db.AdditionalFilesPathWhole())) {
-                var f = Directory.GetFiles(db.AdditionalFilesPathWhole(), "*.bcr");
+            if (DirectoryExists(db.AdditionalFilesPathWhole())) {
+                var f = GetFiles(db.AdditionalFilesPathWhole(), "*.bcr", System.IO.SearchOption.TopDirectoryOnly);
 
                 layouts.AddRange(ItemsOf(f));
             }
@@ -226,7 +226,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             //}
 
             ////if (Directory.Exists(db.AdditionalFilesPathWhole())) {
-            ////    var f = Directory.GetFiles(db.AdditionalFilesPathWhole(), "*.bcr");
+            ////    var f = GetFiles(db.AdditionalFilesPathWhole(), "*.bcr");
 
             ////    layouts.AddRange(ItemsOf(f));
             ////}

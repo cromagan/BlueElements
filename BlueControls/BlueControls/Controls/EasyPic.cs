@@ -28,7 +28,6 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
@@ -332,8 +331,8 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
         try {
             using var compatibleBitmap = new Bitmap(_bitmap);
 
-            using var fs = new FileStream(_filename, FileMode.Create, FileAccess.Write);
-            using var memory = new MemoryStream();
+            using var fs = new System.IO.FileStream(_filename, System.IO.FileMode.Create, System.IO.FileAccess.Write);
+            using var memory = new System.IO.MemoryStream();
             compatibleBitmap.Save(memory, ImageFormat.Png);
             var bytes = memory.ToArray();
             fs.Write(bytes, 0, bytes.Length);

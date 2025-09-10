@@ -23,7 +23,8 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.IO;
+using static BlueBasics.IO;
+
 using System.Text;
 
 namespace BlueScript.Methods;
@@ -60,10 +61,10 @@ internal class Method_SaveText : Method {
 
         var pf = filn.PathParent();
         if (string.IsNullOrEmpty(pf)) { return new DoItFeedback($"Dateinamen-Fehler: '{pf}'", true, ld); }
-        if (!Directory.Exists(pf)) { return new DoItFeedback($"Verzeichnis '{pf}' existiert nicht.", true, ld); }
-        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback($"Keine Schreibrechte im ZielVerzeichnis '{pf}'.", true, ld); }
+        if (!DirectoryExists(pf)) { return new DoItFeedback($"Verzeichnis '{pf}' existiert nicht.", true, ld); }
+        if (!CanWriteInDirectory(pf)) { return new DoItFeedback($"Keine Schreibrechte im ZielVerzeichnis '{pf}'.", true, ld); }
 
-        if (File.Exists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
+        if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 
         #endregion
 
@@ -71,14 +72,14 @@ internal class Method_SaveText : Method {
 
         switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
             case "UTF8":
-                if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), Encoding.UTF8, false)) {
+                if (!WriteAllText(filn, attvar.ValueStringGet(2), Encoding.UTF8, false)) {
                     return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld);
                 }
 
                 break;
 
             case "WIN1252":
-                if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), BlueBasics.Constants.Win1252, false)) {
+                if (!WriteAllText(filn, attvar.ValueStringGet(2), BlueBasics.Constants.Win1252, false)) {
                     return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld);
                 }
                 break;

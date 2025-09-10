@@ -25,7 +25,8 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.IO;
+using static BlueBasics.IO;
+
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -114,10 +115,10 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
         var pf = filn.PathParent();
         if (string.IsNullOrEmpty(pf)) { return new DoItFeedback($"Dateinamen-Fehler: '{pf}'", true, ld); }
-        if (!Directory.Exists(pf)) { return new DoItFeedback($"Verzeichnis '{pf}' existiert nicht.", true, ld); }
-        if (!IO.CanWriteInDirectory(pf)) { return new DoItFeedback($"Keine Schreibrechte im ZielVerzeichnis '{pf}'.", true, ld); }
+        if (!DirectoryExists(pf)) { return new DoItFeedback($"Verzeichnis '{pf}' existiert nicht.", true, ld); }
+        if (!CanWriteInDirectory(pf)) { return new DoItFeedback($"Keine Schreibrechte im ZielVerzeichnis '{pf}'.", true, ld); }
 
-        if (File.Exists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
+        if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 
         #endregion
 
@@ -137,7 +138,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
                 case "CSV":
                     var t = myDb.Export_CSV(FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
                     if (string.IsNullOrEmpty(t)) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
-                    if (!IO.WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld); }
+                    if (!WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld); }
                     break;
 
                 //case "HTML":

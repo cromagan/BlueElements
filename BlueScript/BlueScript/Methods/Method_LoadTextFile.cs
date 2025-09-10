@@ -23,7 +23,7 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.IO;
+
 using System.Text;
 
 namespace BlueScript.Methods;
@@ -64,11 +64,11 @@ internal class Method_LoadTextFile : Method {
             string importText;
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "UTF8":
-                    importText = File.ReadAllText(filen, Encoding.UTF8);
+                    importText = System.IO.File.ReadAllText(filen, Encoding.UTF8);
                     break;
 
                 case "WIN1252":
-                    importText = File.ReadAllText(filen, BlueBasics.Constants.Win1252);
+                    importText = System.IO.File.ReadAllText(filen, BlueBasics.Constants.Win1252);
                     break;
 
                 default:

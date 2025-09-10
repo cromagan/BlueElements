@@ -25,7 +25,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
+
 using System.Linq;
 using System.Threading;
 using static BlueBasics.Generic;
@@ -269,10 +269,10 @@ public class DatabaseChunk : Database {
 
         if (!DirectoryExists(chunkPath)) { return true; }
 
-        var files = Directory.GetFiles(chunkPath, "*.bdbc");
+        var files = GetFiles(chunkPath, "*.bdbc", System.IO.SearchOption.TopDirectoryOnly);
         var fileQuery = anzahl < 0 || anzahl >= files.Length
             ? files
-            : files.Select(f => new FileInfo(f))
+            : files.Select(f => GetFileInfo(f))
                   .OrderBy(f => f.LastWriteTime)
                   .Take(anzahl)
                   .Select(f => f.FullName)
@@ -436,7 +436,7 @@ public class DatabaseChunk : Database {
         var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
 
         if (DirectoryExists(chunkPath)) {
-            var chunkFiles = Directory.GetFiles(chunkPath, "*.bdbc");
+            var chunkFiles = GetFiles(chunkPath, "*.bdbc", System.IO.SearchOption.TopDirectoryOnly);
 
             foreach (var file in chunkFiles) {
                 _ = DeleteFile(file, false);

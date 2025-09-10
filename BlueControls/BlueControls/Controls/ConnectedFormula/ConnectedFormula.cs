@@ -35,7 +35,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
+
 using System.Linq;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -338,8 +338,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     internal List<AbstractListItem> AllKnownChilds(ReadOnlyCollection<string> notAllowedChilds) {
         List<AbstractListItem> list = [];
 
-        if (File.Exists(Filename)) {
-            foreach (var thisf in Directory.GetFiles(Filename.FilePath(), "*.cfo")) {
+        if (FileExists(Filename)) {
+            foreach (var thisf in GetFiles(Filename.FilePath(), "*.cfo", System.IO.SearchOption.TopDirectoryOnly)) {
                 if (!notAllowedChilds.Contains(thisf)) {
                     list.Add(ItemOf(thisf.FileNameWithoutSuffix(), thisf, ImageCode.Diskette));
                 }

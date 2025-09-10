@@ -19,7 +19,6 @@
 
 using BlueDatabase;
 using BlueDatabase.AdditionalScriptMethods;
-using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;

@@ -28,7 +28,7 @@ using BlueControls.ItemCollectionPad.Temporär;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
+
 using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -197,7 +197,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         if (Pad.Items == null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var x = File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var x = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<AbstractPadItem>(x);

@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
+
 using System.Text;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
@@ -134,7 +134,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {
-            tags = File.ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
+            tags = System.IO.File.ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
         }
         tags.TagSet("ImageFile", pathOfPicture);
         return tags;

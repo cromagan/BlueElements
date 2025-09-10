@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
-using System.IO;
+
 using System.Linq;
 using System.Text;
 using static BlueBasics.Converter;
@@ -118,7 +118,7 @@ public static partial class Extensions {
                 list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
     public static void Load(this List<string> l, string filename, Encoding code) {
-        var t = File.ReadAllText(filename, code);
+        var t = System.IO.File.ReadAllText(filename, code);
         l.Clear();
         l.AddRange(t.SplitAndCutByCr());
     }

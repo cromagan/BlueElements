@@ -21,7 +21,7 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.IO;
+
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
@@ -55,7 +55,7 @@ internal class Method_GetFiles : Method {
         }
 
         try {
-            return new DoItFeedback(Directory.GetFiles(pf, attvar.ValueStringGet(1)));
+            return new DoItFeedback(GetFiles(pf, attvar.ValueStringGet(1), System.IO.SearchOption.TopDirectoryOnly));
         } catch {
             return DoItFeedback.InternerFehler(ld);
         }

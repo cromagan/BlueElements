@@ -38,7 +38,11 @@ public static class IO {
 
     #region Fields
 
+    /// <summary>
+    /// Wird verwendet für File-Dialoge und ist nicht weiter relevant.
+    /// </summary>
     public static string LastFilePath = string.Empty;
+
     private const int _fileExistenceCheckRetryCount = 20;
     private static readonly ConcurrentDictionary<string, (DateTime CheckTime, bool Result)> _canWriteCache = new();
     private static readonly object _fileOperationLock = new();
@@ -150,8 +154,6 @@ public static class IO {
         return CheckPath(pfad);
     }
 
-    public static bool CopyFile(string source, string target, bool abortIfFailed) => ProcessFile(TryCopyFile, abortIfFailed, abortIfFailed ? 60 : 5, source, target) is true;
-
     /// <summary>
     /// Erstellt ein Verzeichnis, mit Fehlerbehandlung und Wiederholungsversuchen
     /// </summary>
@@ -209,6 +211,8 @@ public static class IO {
         }
         return true;
     }
+
+    public static bool FileCopy(string source, string target, bool abortIfFailed) => ProcessFile(TryFileCopy, abortIfFailed, abortIfFailed ? 60 : 5, source, target) is true;
 
     /// <summary>
     /// Prüft, ob eine Datei existiert, mit Fehlerbehandlung und Wiederholungsversuchen
@@ -314,13 +318,25 @@ public static class IO {
         }
     }
 
+    public static string[] GetDirectories(string pfad) => ProcessFile(TryGetDirectories, false, 5, pfad, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
+
+    public static string[] GetDirectories(string pfad, string pattern, SearchOption suchOption) => ProcessFile(TryGetDirectories, false, 5, pfad, pattern, suchOption) as string[] ?? Array.Empty<string>();
+
+    public static FileInfo? GetFileInfo(string datei) => ProcessFile(TryGetFileInfo, false, 5, datei) as FileInfo;
+
+    public static string[] GetFiles(string pfad, string pattern, SearchOption suchOption)
+                    => ProcessFile(TryGetFiles, false, 5, pfad, pattern, suchOption) as string[] ?? Array.Empty<string>();
+
+    public static string[] GetFiles(string pfad)
+                 => ProcessFile(TryGetFiles, false, 5, pfad, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
+
     /// <summary>
     /// Liefert Dateiinformationen mit Fehlerbehandlung und Wiederholungsversuchen
     /// </summary>
     /// <param name="filename">Der Dateiname</param>
     /// <param name="mustDo">True wenn die Funktion auf jeden Fall ein Ergebnis liefern muss</param>
     /// <returns>Dateizeitstempel und -größe als String</returns>
-    public static string GetFileInfo(string filename, bool abortIfFailed) => ProcessFile(TryGetFileInfo, abortIfFailed, abortIfFailed ? 60 : 5, filename) as string ?? string.Empty;
+    public static string GetFileState(string filename, bool abortIfFailed) => ProcessFile(TryGetFileState, abortIfFailed, abortIfFailed ? 60 : 5, filename) as string ?? string.Empty;
 
     /// <summary>
     /// Lädt Bytes aus einer Datei mit automatischer Retry-Logik und Dekomprimierung
@@ -452,6 +468,30 @@ public static class IO {
             filename = z > 0 ? pfad + wunschname + "_" + z.ToStringInt5() + "." + suffix : pfad + wunschname + "." + suffix;
         } while (TryFileExists(filename).returnValue is true);
         return filename;
+    }
+
+    public static (object? returnValue, bool retry) TryGetFileInfo(object?[] args) {
+        if (args.Length < 1) return (null, false);
+        var datei = args[0] as string;
+
+        if (string.IsNullOrWhiteSpace(datei)) { return (null, false); }
+
+        try {
+            //if (!FileExists(datei)) { return (null, false); }
+
+            var fi = new FileInfo(datei);
+            // Zugriff testen (kann IOException / UnauthorizedAccess auslösen)
+            //_ = fi.Length; // leichte Operation zum Validieren
+            return (fi, false);
+        } catch (UnauthorizedAccessException) {
+            return (null, false);
+        } catch (FileNotFoundException) {
+            return (null, false);
+        } catch (DirectoryNotFoundException) {
+            return (null, false);
+        } catch {
+            return (null, true);
+        }
     }
 
     /// <summary>
@@ -591,24 +631,6 @@ public static class IO {
         }
     }
 
-    private static (object? returnValue, bool retry) TryCopyFile(params object[] args) {
-        if (args.Length < 2 || args[0] is not string source || args[1] is not string target) { return (false, false); }
-
-        if (source == target) { return (true, false); }
-        if (TryFileExists(source).returnValue is not true) { return (false, false); }
-        if (TryFileExists(target).returnValue is true) { return (false, false); }
-
-        try {
-            var sourceInfo = new FileInfo(source);
-            File.Copy(source, target);
-
-            // Warten bis die Datei mit korrekter Größe existiert - verwende ProcessFile
-            return (ProcessFile(TryWaitForCopiedFile, false, 60, target, sourceInfo.Length) is true, false);
-        } catch {
-            return (false, true);
-        }
-    }
-
     private static (object? returnValue, bool retry) TryCreateDirectory(params object[] args) {
         if (args.Length < 1 || args[0] is not string dir) { return (false, false); }
         dir = dir.CheckPath();
@@ -696,6 +718,24 @@ public static class IO {
         }
     }
 
+    private static (object? returnValue, bool retry) TryFileCopy(params object[] args) {
+        if (args.Length < 2 || args[0] is not string source || args[1] is not string target) { return (false, false); }
+
+        if (source == target) { return (true, false); }
+        if (TryFileExists(source).returnValue is not true) { return (false, false); }
+        if (TryFileExists(target).returnValue is true) { return (false, false); }
+
+        try {
+            var sourceInfo = new FileInfo(source);
+            File.Copy(source, target);
+
+            // Warten bis die Datei mit korrekter Größe existiert - verwende ProcessFile
+            return (ProcessFile(TryWaitForCopiedFile, false, 60, target, sourceInfo.Length) is true, false);
+        } catch {
+            return (false, true);
+        }
+    }
+
     private static (object? returnValue, bool retry) TryFileExists(params object[] args) {
         if (args.Length < 1 || args[0] is not string file) { return (false, false); }
 
@@ -712,7 +752,52 @@ public static class IO {
         }
     }
 
-    private static (object? returnValue, bool retry) TryGetFileInfo(params object[] args) {
+    private static (object? returnValue, bool retry) TryGetDirectories(object?[] args) {
+        if (args.Length < 3) return (Array.Empty<string>(), false);
+        var pfad = args[0] as string;
+        var pattern = args[1] as string;
+        var option = args[2] is SearchOption so ? so : SearchOption.TopDirectoryOnly;
+
+        if (string.IsNullOrWhiteSpace(pfad)) { return (Array.Empty<string>(), false); }
+
+        try {
+            if (!DirectoryExists(pfad)) { return (Array.Empty<string>(), false); }
+
+            pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
+
+            var dirs = System.IO.Directory.GetDirectories(pfad, pattern, option);
+            return (dirs, false);
+        } catch (UnauthorizedAccessException) {
+            return (Array.Empty<string>(), false);
+        } catch {
+            return (Array.Empty<string>(), true);
+        }
+    }
+
+    private static (object? returnValue, bool retry) TryGetFiles(object?[] args) {
+        if (args.Length < 3) return (Array.Empty<string>(), false);
+        var pfad = args[0] as string;
+        var pattern = args[1] as string;
+        var option = args[2] is SearchOption so ? so : SearchOption.TopDirectoryOnly;
+
+        if (string.IsNullOrWhiteSpace(pfad))
+            return (Array.Empty<string>(), false);
+
+        try {
+            if (!DirectoryExists(pfad)) { return (Array.Empty<string>(), false); }
+
+            pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
+
+            var files = System.IO.Directory.GetFiles(pfad, pattern, option);
+            return (files, false);
+        } catch (UnauthorizedAccessException) {
+            return (Array.Empty<string>(), false);
+        } catch {
+            return (Array.Empty<string>(), true);
+        }
+    }
+
+    private static (object? returnValue, bool retry) TryGetFileState(params object[] args) {
         if (args.Length < 1 || args[0] is not string filename) { return (string.Empty, false); }
 
         try {
@@ -730,7 +815,7 @@ public static class IO {
 
         try {
             // Direkter Aufruf der Try-Methode anstatt GetFileInfo
-            var (fileinfoResult, retry) = TryGetFileInfo(filename);
+            var (fileinfoResult, retry) = TryGetFileState(filename);
             var fileinfo = fileinfoResult as string ?? string.Empty;
 
             if (string.IsNullOrEmpty(fileinfo)) {

@@ -545,7 +545,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
-                _ = Generic.CopytoClipboard(c);
+                _ = CopytoClipboard(c);
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren); }
             } else {
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Zelle nicht möglich."), ImageCode.Warnung); }
@@ -636,14 +636,14 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         e.Add(Everybody);
-        e.Add("#User: " + Generic.UserName);
+        e.Add("#User: " + UserName);
 
         if (mitRowCreator) {
             e.Add("#RowCreator");
         } else {
             e.RemoveString("#RowCreator", false);
         }
-        e.Add(Generic.UserGroup);
+        e.Add(UserGroup);
         e.RemoveString(Administrator, false);
 
         return Database.RepairUserGroups(e);
@@ -1282,7 +1282,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
     }
 
     public void OpenSearchAndReplaceInDBScripts() {
-        if (!Generic.IsAdministrator()) { return; }
+        if (!IsAdministrator()) { return; }
 
         if (_searchAndReplaceInDBScripts is not { IsDisposed: false } || !_searchAndReplaceInDBScripts.Visible) {
             _searchAndReplaceInDBScripts = new SearchAndReplaceInDBScripts();
@@ -2557,7 +2557,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
         }
 
         if (e.Filter?.Column is { IsDisposed: false } col) {
-            col.AddSystemInfo("Filter Clicked", Generic.UserName);
+            col.AddSystemInfo("Filter Clicked", UserName);
         }
 
         OnAutoFilterClicked(new FilterEventArgs(e.Filter));
@@ -2736,22 +2736,22 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
 
         switch (dia) {
             case EditTypeTable.Textfeld:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
                 _ = Cell_Edit_TextBox(ca, viewItem, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
                 break;
 
             case EditTypeTable.Textfeld_mit_Auswahlknopf:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
                 _ = Cell_Edit_TextBox(ca, viewItem, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BCB, 20, 18);
                 break;
 
             case EditTypeTable.Dropdown_Single:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
                 Cell_Edit_Dropdown(ca, viewItem, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow);
                 break;
 
             case EditTypeTable.Farb_Auswahl_Dialog:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
                 if (viewItem.Column != contentHolderCellColumn || cellInThisDatabaseRow?.Row != contentHolderCellRow) {
                     NotEditableInfo("Verlinkte Zellen hier verboten.");
                     return;
@@ -2760,7 +2760,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 break;
 
             case EditTypeTable.Font_AuswahlDialog:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", Generic.UserName);
+                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
                 Develop.DebugPrint_NichtImplementiert(false);
                 //if (cellInThisDatabaseColumn != ContentHolderCellColumn || cellInThisDatabaseRow != ContentHolderCellRow)
                 //{

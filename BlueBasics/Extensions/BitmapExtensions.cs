@@ -21,7 +21,7 @@ using BlueBasics.Enums;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
+
 using System.Reflection;
 using static BlueBasics.IO;
 
@@ -72,7 +72,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(filename)) { return null; }
         if (!FileExists(filename)) { return null; }
         try {
-            using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var fs = new System.IO.FileStream(filename, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
             var im = Image.FromStream(fs);
             fs.Close();
             return im;

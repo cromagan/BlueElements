@@ -31,7 +31,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
+
 using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Generic;
@@ -52,7 +52,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     private string _todel = string.Empty;
     private string _var_directory = string.Empty;
     private string _var_directorymin = string.Empty;
-    private FileSystemWatcher? _watcher;
+    private System.IO.FileSystemWatcher? _watcher;
     private string _workinDir = string.Empty;
 
     #endregion
@@ -238,8 +238,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         ReloadDirectory();
     }
 
-    private static bool AddThis(FileInfo fi) {
-        if (fi.Attributes.HasFlag(FileAttributes.System)) { return false; }
+    private static bool AddThis(System.IO.FileInfo? fi) {
+        if(fi == null) { return false; }
+        if (fi.Attributes.HasFlag(System.IO.FileAttributes.System)) { return false; }
         //if (fi.Attributes.HasFlag(FileAttributes.Hidden)) { return false; }
 
         if (fi.Exists) {
@@ -349,7 +350,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
 
         if (!string.IsNullOrEmpty(_directory) && DirectoryExists(_directory)) {
-            _watcher = new FileSystemWatcher(_directory);
+            _watcher = new System.IO.FileSystemWatcher(_directory);
             _watcher.Changed += Watcher_Changed;
             _watcher.Created += Watcher_Created;
             _watcher.Deleted += Watcher_Deleted;
@@ -386,8 +387,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         switch (e.Item.KeyName) {
             case "Löschen":
-                var I = new FileInfo(it.KeyName);
-                var silent = !I.Attributes.HasFlag(FileAttributes.ReadOnly);
+                var I = GetFileInfo(it.KeyName);
+                var silent = !I.Attributes.HasFlag(System.IO.FileAttributes.ReadOnly);
                 if (FileDialogs.DeleteFile(I.FullName, !silent)) {
                     ReloadDirectory();
                 }
@@ -468,7 +469,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             var f = TempFile(_directory, thisfile.FileNameWithoutSuffix(), thisfile.FileSuffix());
 
             if (tmp == DragDropEffects.Copy) {
-                _ = CopyFile(thisfile, f, true);
+                _ = FileCopy(thisfile, f, true);
             }
 
             if (tmp == DragDropEffects.Move) {
@@ -495,7 +496,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (!DoDefaultHandling) { return; }
 
-        if (File.Exists(e.Item.KeyName)) {
+        if (FileExists(e.Item.KeyName)) {
             switch (e.Item.KeyName.FileType()) {
                 case FileFormat.Link:
                     if (e.Item.Tag is not List<string> tags) { return; }
@@ -608,9 +609,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (DeleteDir && Enabled) {
             if (DirectoryExists(_todel)) {
-                var emd = System.IO.Directory.GetDirectories(_todel, "*", SearchOption.TopDirectoryOnly);
+                var emd = GetDirectories(_todel, "*", System.IO.SearchOption.TopDirectoryOnly);
                 if (emd.Length == 0) {
-                    var emf = System.IO.Directory.GetFiles(_todel, "*", SearchOption.TopDirectoryOnly);
+                    var emf = GetFiles(_todel, "*", System.IO.SearchOption.TopDirectoryOnly);
                     if (emf.Length == 0) {
                         _ = DeleteDir(_todel, false);
                     }
@@ -636,7 +637,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         #endregion
 
-        var allF = System.IO.Directory.GetFiles(dir, _filter, SearchOption.TopDirectoryOnly);
+        var allF = GetFiles(dir, _filter, System.IO.SearchOption.TopDirectoryOnly);
 
         if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
 
@@ -650,7 +651,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         #region  Datei Objekte selbst flott erstellen
 
         foreach (var fileName in allF) {
-            var fi = new FileInfo(fileName);
+            var fi = GetFileInfo(fileName);
 
             if (AddThis(fi)) {
                 if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
@@ -686,9 +687,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         #region Verzeichnis objekte Flott erstellen
 
-        var allD = System.IO.Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly);
+        var allD = GetDirectories(dir, "*", System.IO.SearchOption.TopDirectoryOnly);
         foreach (var thisString in allD) {
-            var fi = new FileInfo(thisString);
+            var fi = GetFileInfo(thisString);
             if (AddThis(fi)) {
                 var tags = new List<string>();
                 var p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
@@ -707,7 +708,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         foreach (var thisString in allF) {
             if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
-            var fi = new FileInfo(thisString);
+            var fi = GetFileInfo(thisString);
             if (AddThis(fi)) {
                 feedBack = ["Image", thisString, WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk)];
                 if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
@@ -767,26 +768,26 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         Directory = txbPfad.Text;
     }
 
-    private void Watcher_Changed(object sender, FileSystemEventArgs e) {
-        var fi = new FileInfo(e.Name);
+    private void Watcher_Changed(object sender, System.IO.FileSystemEventArgs e) {
+        var fi = GetFileInfo(e.Name);
         _ = AddThis(fi);
 
         //if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
         //if(e.ChangeType == WatcherChangeTypes.Changed) { return; }
     }
 
-    private void Watcher_Created(object sender, FileSystemEventArgs e) => ReloadDirectory();
+    private void Watcher_Created(object sender, System.IO.FileSystemEventArgs e) => ReloadDirectory();
 
-    private void Watcher_Deleted(object sender, FileSystemEventArgs e) => ReloadDirectory();
+    private void Watcher_Deleted(object sender, System.IO.FileSystemEventArgs e) => ReloadDirectory();
 
     /// <summary>
     /// Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Watcher_Error(object sender, ErrorEventArgs e) => ReloadDirectory();
+    private void Watcher_Error(object sender, System.IO.ErrorEventArgs e) => ReloadDirectory();
 
-    private void Watcher_Renamed(object sender, RenamedEventArgs e) => ReloadDirectory();
+    private void Watcher_Renamed(object sender, System.IO.RenamedEventArgs e) => ReloadDirectory();
 
     #endregion
 }

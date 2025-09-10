@@ -19,7 +19,7 @@
 
 using BlueBasics;
 using System.Collections.Generic;
-using System.IO;
+
 using System.Text;
 using static BlueBasics.IO;
 
@@ -57,7 +57,7 @@ public static class HasSettings {
         settings.Settings.Clear();
 
         if (FileExists(settings.SettingsFileName())) {
-            var t = File.ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
+            var t = System.IO.File.ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
             t = t.RemoveChars("\n");
             settings.Settings.AddRange(t.SplitAndCutByCr());
 

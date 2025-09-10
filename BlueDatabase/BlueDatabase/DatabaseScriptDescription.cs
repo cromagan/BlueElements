@@ -213,7 +213,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IHasDatabase 
 
         foreach (var script in db.EventScript) {
             if (script != this) {
-                if (string.Equals(script.KeyName, base.KeyName, StringComparison.OrdinalIgnoreCase)) { return $"Skriptname '{script.KeyName}' mehrfach vorhanden"; }
+                if (string.Equals(script.KeyName, KeyName, StringComparison.OrdinalIgnoreCase)) { return $"Skriptname '{script.KeyName}' mehrfach vorhanden"; }
 
                 var gemeinsame = script.EventTypes & EventTypes;
                 if (gemeinsame != 0) { return $"Skript-Typ '{gemeinsame}' mehrfach vorhanden"; }

@@ -222,12 +222,12 @@ public abstract class Method : IReadableTextWithKey {
 
         // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
 
-        var t = Method.ReplaceVariable(txt, varCol, ld);
+        var t = ReplaceVariable(txt, varCol, ld);
         if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", t.NeedsScriptFix, ld); }
         if (t.ReturnValue != null) { return new DoItFeedback(t.ReturnValue); }
         if (txt != t.NormalizedText) { return GetVariableByParsing(t.NormalizedText, ld, varCol, scp); }
 
-        var t2 = Method.ReplaceCommandsAndVars(txt, varCol, ld, scp);
+        var t2 = ReplaceCommandsAndVars(txt, varCol, ld, scp);
         if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", t2.NeedsScriptFix, ld); }
         if (t2.ReturnValue != null) { return new DoItFeedback(t2.ReturnValue); }
         if (txt != t2.NormalizedText) { return GetVariableByParsing(t2.NormalizedText, ld, varCol, scp); }
@@ -256,7 +256,7 @@ public abstract class Method : IReadableTextWithKey {
             }
         }
 
-        if (Method.ParseOperators(txt, varCol, scp, ld) is { } b) { return new DoItFeedback(b); }
+        if (ParseOperators(txt, varCol, scp, ld) is { } b) { return new DoItFeedback(b); }
 
         //if (VarTypes == null) {
         //    return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
@@ -585,7 +585,7 @@ public abstract class Method : IReadableTextWithKey {
     public QuickImage? SymbolForReadableText() => null;
 
     private static bool? ParseOperators(string txt, VariableCollection varCol, ScriptProperties scp, LogData ld) {
-        if (VariableBool.TryParseValue<VariableBool>(txt, out var result) && result is bool b) { return b; }
+        if (Variable.TryParseValue<VariableBool>(txt, out var result) && result is bool b) { return b; }
 
         #region Auf Restliche Boolsche Operationen testen
 

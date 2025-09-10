@@ -22,7 +22,7 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.IO;
+
 using System.Text;
 using static BlueBasics.IO;
 
@@ -119,9 +119,9 @@ public class Method_CallByFilename : Method {
 
         try {
             if (FileExists(vs)) {
-                f = File.ReadAllText(vs, Encoding.UTF8);
+                f = System.IO.File.ReadAllText(vs, Encoding.UTF8);
             } else if (FileExists(addp + vs)) {
-                f = File.ReadAllText(addp + vs, Encoding.UTF8);
+                f = System.IO.File.ReadAllText(addp + vs, Encoding.UTF8);
             } else {
                 return new DoItFeedback("Datei nicht gefunden: " + vs, true, ld);
             }

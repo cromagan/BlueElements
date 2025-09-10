@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
+
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -57,7 +57,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private bool _isSaving;
     private string _lastSaveCode;
     private int _lockCount;
-    private FileSystemWatcher? _watcher;
+    private System.IO.FileSystemWatcher? _watcher;
 
     #endregion
 
@@ -100,7 +100,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             if (string.IsNullOrEmpty(value)) {
                 _filename = string.Empty;
             } else {
-                var tmp = Path.GetFullPath(value);
+                var tmp = System.IO.Path.GetFullPath(value);
                 _filename = tmp;
             }
         }
@@ -124,7 +124,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         get {
             if (string.IsNullOrEmpty(Filename)) { return false; }
             if (_checkedAndReloadNeed) { return true; }
-            if (GetFileInfo(Filename, false) != _lastSaveCode) {
+            if (GetFileState(Filename, false) != _lastSaveCode) {
                 _checkedAndReloadNeed = true;
                 return true;
             }
@@ -142,7 +142,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private double AgeOfBlockDatei {
         get {
             if (!FileExists(Blockdateiname())) { return -1; }
-            FileInfo f = new(Blockdateiname());
+            var f = GetFileInfo(Blockdateiname());
             var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
             return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
         }
@@ -330,7 +330,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
             OnLoaded();
 
-            return !ReloadNeeded; 
+            return !ReloadNeeded;
         } catch {
             return false;
         } finally {
@@ -352,7 +352,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             try {
                 _ = DeleteFile(Blockdateiname(), false);
-                File.WriteAllText(Blockdateiname(), tmpInhalt, Constants.Win1252);
+                WriteAllText(Blockdateiname(), tmpInhalt, Constants.Win1252, false);
                 _inhaltBlockdatei = tmpInhalt;
             } catch {
                 return false;
@@ -449,7 +449,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         string inhalt;
 
         try {
-            inhalt = File.ReadAllText(Blockdateiname(), Constants.Win1252);
+            inhalt = System.IO.File.ReadAllText(Blockdateiname(), Constants.Win1252);
         } catch {
             if (!silent) { _ = MessageBox.Show("Dateisystem Fehler"); }
             return false;
@@ -519,7 +519,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     private void CreateWatcher() {
         if (!string.IsNullOrEmpty(Filename)) {
-            _watcher = new FileSystemWatcher(Filename.FilePath());
+            _watcher = new System.IO.FileSystemWatcher(Filename.FilePath());
             _watcher.Changed += Watcher_Changed;
             _watcher.Created += Watcher_Created;
             _watcher.Deleted += Watcher_Deleted;
@@ -545,9 +545,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             try {
                 if (_initialLoadDone && !ReloadNeeded) { return (string.Empty, string.Empty); } // Problem hat sich aufgelöst
 
-                var tmpFileInfo = GetFileInfo(Filename, true);
-                data = File.ReadAllText(Filename, Constants.Win1252);
-                fileinfo = GetFileInfo(Filename, true);
+                var tmpFileInfo = GetFileState(Filename, true);
+                data = System.IO.File.ReadAllText(Filename, Constants.Win1252);
+                fileinfo = GetFileState(Filename, true);
                 if (tmpFileInfo == fileinfo) { break; }
 
                 if (tim.ElapsedMilliseconds > 20 * 1000) { Develop.DebugPrint(ErrorType.Info, "Datei wurde während des Ladens verändert.\r\n" + Filename); }
@@ -647,19 +647,19 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
-    private void Watcher_Changed(object sender, FileSystemEventArgs e) {
+    private void Watcher_Changed(object sender, System.IO.FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
     }
 
-    private void Watcher_Created(object sender, FileSystemEventArgs e) {
+    private void Watcher_Created(object sender, System.IO.FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
     }
 
-    private void Watcher_Deleted(object sender, FileSystemEventArgs e) {
+    private void Watcher_Deleted(object sender, System.IO.FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
@@ -670,12 +670,12 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Watcher_Error(object sender, ErrorEventArgs e) {
+    private void Watcher_Error(object sender, System.IO.ErrorEventArgs e) {
         if (IsDisposed) { return; }
         _checkedAndReloadNeed = true;
     }
 
-    private void Watcher_Renamed(object sender, RenamedEventArgs e) {
+    private void Watcher_Renamed(object sender, System.IO.RenamedEventArgs e) {
         if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
@@ -701,13 +701,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             var f = EditableErrorReason(EditableErrorReasonType.Save);
             if (!string.IsNullOrEmpty(f)) { }
 
-            fileInfoBeforeSaving = GetFileInfo(Filename, true);
+            fileInfoBeforeSaving = GetFileState(Filename, true);
             dataUncompressed = ParseableItems().FinishParseable();
 
             if (dataUncompressed.Length > 0) {
                 tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
                 try {
-                    File.WriteAllText(tmpFileName, dataUncompressed, Constants.Win1252);
+                    WriteAllText(tmpFileName, dataUncompressed, Constants.Win1252, false);
                     break;
                 } catch {
                     // DeleteFile(TMPFileName, false); Darf nicht gelöscht werden. Datei konnte ja nicht erstell werden. also auch nix zu löschen

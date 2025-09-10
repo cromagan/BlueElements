@@ -20,7 +20,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
+using static BlueBasics.IO;
+
 
 namespace BlueBasics;
 
@@ -76,17 +77,17 @@ public class BackupVerwalter {
         if (string.IsNullOrEmpty(path)) { return "Kein Verzeichnis angebeben."; }
         if (string.IsNullOrEmpty(search)) { return "Kein Suchpattern angebeben."; }
 
-        var fix = Directory.GetFiles(path, search, SearchOption.TopDirectoryOnly);
+        var fix = GetFiles(path, search, System.IO.SearchOption.TopDirectoryOnly);
 
         if (fix.Length == 0) { return string.Empty; }
         try {
             foreach (var thisF in fix) {
-                var fi = new FileInfo(thisF);
+                var fi = GetFileInfo(thisF);
                 AddData(fi.LastWriteTimeUtc, thisF);
             }
 
             foreach (var thisF in Deleteable) {
-                _ = IO.DeleteFile(thisF, false);
+                _ = DeleteFile(thisF, false);
             }
 
             return string.Empty;

@@ -30,7 +30,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.IO;
+
 using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
@@ -68,7 +68,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             _zielPfad = autosaveFile.FilePath();
             _saveTo = autosaveFile;
         } else {
-            _zielPfad = Path.GetTempPath();
+            _zielPfad = System.IO.Path.GetTempPath();
         }
 
         CreateDirectory(_zielPfad);

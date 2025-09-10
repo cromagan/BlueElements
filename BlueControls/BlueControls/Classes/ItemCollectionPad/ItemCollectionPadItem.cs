@@ -42,7 +42,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.IO;
+
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
@@ -95,7 +95,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
         if (IO.FileExists(layoutFileName)) {
-            this.Parse(File.ReadAllText(layoutFileName, Win1252));
+            this.Parse(System.IO.File.ReadAllText(layoutFileName, Win1252));
         }
         IsSaved = true;
     }

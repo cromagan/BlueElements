@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -128,7 +127,7 @@ public static class Generic {
         } catch { }
 
         title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "!.,()+-_ " + Constants.Char_Numerals);
-        using StreamWriter writer = new(TempFile(saveTo.TrimEnd("\\") + "\\" + title + ".url"));
+        using System.IO.StreamWriter writer = new(TempFile(saveTo.TrimEnd("\\") + "\\" + title + ".url"));
         writer.WriteLine("[InternetShortcut]");
         writer.WriteLine("URL=" + linkUrl);
         writer.Flush();
@@ -143,7 +142,7 @@ public static class Generic {
     public static bool CreateShortCut(string saveTo, string linkName) {
         try {
             // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            using StreamWriter writer = new(TempFile(saveTo + linkName + ".url"));
+            using System.IO.StreamWriter writer = new(TempFile(saveTo + linkName + ".url"));
             var app = Assembly.GetExecutingAssembly().Location;
             writer.WriteLine("[InternetShortcut]");
             writer.WriteLine("URL=file:///" + app);
@@ -170,7 +169,7 @@ public static class Generic {
         var response = request.GetResponse();
         var remoteStream = response.GetResponseStream();
         if (remoteStream != null) {
-            StreamReader readStream = new(remoteStream);
+            System.IO.StreamReader readStream = new(remoteStream);
             var img = Image.FromStream(remoteStream);
             response.Close();
             remoteStream.Close();
@@ -182,7 +181,7 @@ public static class Generic {
         return null;
     }
 
-    public static Stream? GetEmmbedResource(Assembly? assembly, string name) {
+    public static System.IO.Stream? GetEmmbedResource(Assembly? assembly, string name) {
         if (assembly == null) { return null; }
         if (string.IsNullOrEmpty(name)) { return null; }
 
@@ -306,7 +305,7 @@ public static class Generic {
 
     public static void LoadAllAssemblies(string assemblyDirectory) {
         // Alle Dateien mit der Erweiterung ".dll" im Verzeichnis abrufen
-        var assemblyFiles = Directory.GetFiles(assemblyDirectory, "*.dll");
+        var assemblyFiles = GetFiles(assemblyDirectory, "*.dll", System.IO.SearchOption.TopDirectoryOnly);
 
         // Alle Assemblys laden und instanziieren
         foreach (var assemblyFile in assemblyFiles) {

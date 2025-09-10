@@ -21,7 +21,7 @@ using BlueBasics.Enums;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
+
 using System.Runtime.InteropServices;
 
 namespace BlueBasics;
@@ -138,7 +138,7 @@ public class WindowsThumbnailProvider {
     }
 
     public static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options) {
-        var hBitmap = GetHBitmap(Path.GetFullPath(fileName), width, height, options);
+        var hBitmap = GetHBitmap(System.IO.Path.GetFullPath(fileName), width, height, options);
 
         if (hBitmap == null) { return null; }
 
