@@ -1014,7 +1014,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 foreach (var t in searchvalue) {
                     bedingungErfüllt = CompareValues(txt, t, typ);
                     if (oder && bedingungErfüllt) { return true; }
-                    if (und && bedingungErfüllt == false) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
+                    if (und && !bedingungErfüllt) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
                 }
                 return bedingungErfüllt;
             }

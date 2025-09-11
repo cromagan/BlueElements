@@ -223,7 +223,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             var conditions = new List<string>();
 
             foreach (var filter in _internal) {
-                if (filter?.IsOk() == true) {
+                if (filter.IsOk()) {
                     var condition = filter.Where;
                     if (!string.IsNullOrEmpty(condition)) {
                         conditions.Add(condition);

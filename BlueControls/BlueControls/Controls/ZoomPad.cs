@@ -247,7 +247,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
             SliderX.Value = ShiftX;
         } else {
             SliderX.Enabled = false;
-            if (MousePressing() == false) {
+            if (!MousePressing()) {
                 SliderX.Minimum = sliderv.X;
                 SliderX.Maximum = sliderv.X;
                 SliderX.Value = sliderv.X;
@@ -261,7 +261,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
             SliderY.Value = ShiftY;
         } else {
             SliderY.Enabled = false;
-            if (MousePressing() == false) {
+            if (!MousePressing()) {
                 SliderY.Minimum = sliderv.Y;
                 SliderY.Maximum = sliderv.Y;
                 SliderY.Value = sliderv.Y;
