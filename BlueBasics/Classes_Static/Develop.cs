@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -83,10 +84,17 @@ public static class Develop {
 
     #region Methods
 
-    public static void AbortExe() {
-        Exited = true;
+    public static void AbortExe(bool endtracelog) {
+
+        try {
+            if (endtracelog) {
+                TraceLogging_End();
+            }
+        } catch { }
+
+            Exited = true;
         // http://geekswithblogs.net/mtreadwell/archive/2004/06/06/6123.aspx
-        Environment.Exit(-1);
+        Environment.Exit(1);
         Application.Exit();
     }
 
@@ -130,7 +138,7 @@ public static class Develop {
         lock (SyncLockObject) {
             try {
                 if (_isTraceLogging) {
-                    if (type == ErrorType.Error) { AbortExe(); }
+                    if (type == ErrorType.Error) { AbortExe(false); }
                     return;
                 }
                 _isTraceLogging = true;
@@ -225,7 +233,7 @@ public static class Develop {
                     }
                     HTML_AddFoot(endl);
                     _ = endl.WriteAllText(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
-                    AbortExe();
+                    AbortExe(false);
                     return;
                 }
                 _isTraceLogging = false;
@@ -425,8 +433,7 @@ public static class Develop {
         if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours > 12) {
             if (IsHostRunning()) { return; }
             DebugPrint(ErrorType.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
-            TraceLogging_End();
-            AbortExe();
+            AbortExe(true);
         }
     }
 

@@ -184,7 +184,7 @@ public static class WindowsRemoteControl {
         };
         _ = Process.Start(psi);
 
-        Develop.AbortExe();
+        Develop.AbortExe(false);
     }
 
     public static void ShiftRelease() => keybd_event((byte)KeyCode.VK_SHIFT, 0, KeyeventfKeyup, 0);
@@ -202,7 +202,7 @@ public static class WindowsRemoteControl {
         };
         _ = Process.Start(psi);
 
-        Develop.AbortExe();
+        Develop.AbortExe(false);
     }
 
     /// <summary>

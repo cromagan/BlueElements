@@ -125,7 +125,7 @@ public class FormManager : ApplicationContext {
             MultiUserFile.UnlockAllHard();
 
             ExitThread();
-            Develop.AbortExe();
+            Develop.AbortExe(true);
         }
     }
 

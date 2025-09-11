@@ -32,11 +32,8 @@ internal static class Program {
         try {
             var ex = (Exception)e.ExceptionObject;
             Develop.DebugPrint(ErrorType.Error, "Allgemeiner unbehandelter Fehler unbekannter Herkunft", ex);
-            Develop.TraceLogging_End();
-        } finally {
-            Develop.AbortExe();
-        }
-        Develop.AbortExe();
+        } catch { }
+        Develop.AbortExe(true);
     }
 
     /// <summary>
