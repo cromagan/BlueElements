@@ -196,6 +196,8 @@ public static class IO {
     /// <returns>True, wenn das Verzeichnis existiert</returns>
     public static bool DirectoryExists(string pfad) => ProcessFile(TryDirectoryExists, false, 5, pfad) is true;
 
+    public static bool DirectoryMove(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveDirectory, abortIfFailed, abortIfFailed ? 60 : 5, oldName, newName) is true;
+
     public static bool ExecuteFile(string fileName, string arguments = "", bool waitForExit = false, bool logException = true) {
         try {
             if (string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(arguments)) { return false; }
@@ -354,8 +356,6 @@ public static class IO {
         return (Array.Empty<byte>(), string.Empty, true);
     }
 
-    public static bool MoveDirectory(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveDirectory, abortIfFailed, abortIfFailed ? 60 : 5, oldName, newName) is true;
-
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist
     /// </summary>
@@ -433,6 +433,17 @@ public static class IO {
 
             Thread.Sleep(200);
         }
+    }
+
+    /// <summary>
+    /// Liest den gesamten Text aus einer Datei mit der angegebenen Kodierung
+    /// </summary>
+    /// <param name="path">Der Pfad zur zu lesenden Datei</param>
+    /// <param name="encoding">Die zu verwendende Kodierung</param>
+    /// <returns>Der gesamte Inhalt der Datei als String</returns>
+    public static string ReadAllText(string path, Encoding encoding) {
+        var result = ProcessFile(TryReadAllText, false, 60, path, encoding);
+        return result as string ?? string.Empty;
     }
 
     public static string TempFile(string newPath, string filename) {
@@ -886,6 +897,29 @@ public static class IO {
             return (TryFileExists(newName).returnValue is true && TryFileExists(oldName).returnValue is not true, false);
         } catch {
             return (false, true);
+        }
+    }
+
+    private static (object? returnValue, bool retry) TryReadAllText(params object[] args) {
+        if (args.Length < 2 || args[0] is not string filename || args[1] is not Encoding encoding) {
+            return (string.Empty, false);
+        }
+
+        if (string.IsNullOrWhiteSpace(filename)) { return (string.Empty, false); }
+
+        try {
+            // Prüfen ob Datei existiert
+            if (TryFileExists(filename).returnValue is not true) { return (string.Empty, false); }
+
+            // Text aus Datei lesen
+            var content = System.IO.File.ReadAllText(filename, encoding);
+            return (content, false);
+        } catch (IOException) {
+            return (string.Empty, true);  // Retry bei IO-Fehlern
+        } catch (UnauthorizedAccessException) {
+            return (string.Empty, false);  // Kein Retry bei Berechtigungsfehlern
+        } catch {
+            return (string.Empty, false); // Keine Retry bei anderen Fehlern
         }
     }
 

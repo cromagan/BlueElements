@@ -119,9 +119,9 @@ public class Method_CallByFilename : Method {
 
         try {
             if (FileExists(vs)) {
-                f = System.IO.File.ReadAllText(vs, Encoding.UTF8);
+                f = ReadAllText(vs, Encoding.UTF8);
             } else if (FileExists(addp + vs)) {
-                f = System.IO.File.ReadAllText(addp + vs, Encoding.UTF8);
+                f = ReadAllText(addp + vs, Encoding.UTF8);
             } else {
                 return new DoItFeedback("Datei nicht gefunden: " + vs, true, ld);
             }

@@ -134,7 +134,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {
-            tags = System.IO.File.ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
+            tags = ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
         }
         tags.TagSet("ImageFile", pathOfPicture);
         return tags;

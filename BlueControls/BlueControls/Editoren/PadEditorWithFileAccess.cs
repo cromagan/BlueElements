@@ -197,7 +197,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         if (Pad.Items == null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var x = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var x = ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<AbstractPadItem>(x);

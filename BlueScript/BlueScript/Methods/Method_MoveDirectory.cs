@@ -63,7 +63,7 @@ internal class Method_MoveDirectory : Method {
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        if (!MoveDirectory(sop, dep, false)) {
+        if (!DirectoryMove(sop, dep, false)) {
             return DoItFeedback.Falsch();
         }
 

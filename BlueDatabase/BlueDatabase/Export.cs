@@ -85,12 +85,12 @@ public static class Export {
     private static string CreateLayout(RowItem row, string loadFile, string saveFile) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
         List<RowItem> tmpList = [row];
-        return InternalCreateLayout(tmpList, System.IO.File.ReadAllText(loadFile, Constants.Win1252), saveFile);
+        return InternalCreateLayout(tmpList, ReadAllText(loadFile, Constants.Win1252), saveFile);
     }
 
     private static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile) => !FileExists(loadFile)
             ? "Datei nicht gefunden."
-            : InternalCreateLayout(rows, System.IO.File.ReadAllText(loadFile, Constants.Win1252), saveFile);
+            : InternalCreateLayout(rows, ReadAllText(loadFile, Constants.Win1252), saveFile);
 
     //Shared Sub SaveAsBitmap(Row As RowItem)
     //    If Row Is Nothing Then

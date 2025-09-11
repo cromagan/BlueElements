@@ -506,7 +506,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         if (Pad.Items == null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
-        var toparse = System.IO.File.ReadAllText(LoadSymbol.FileName, Constants.Win1252);
+        var toparse = ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParsebleItem.NewByParsing<ReciverControlPadItem>(toparse);

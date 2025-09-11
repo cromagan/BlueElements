@@ -118,7 +118,7 @@ public static partial class Extensions {
                 list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
     public static void Load(this List<string> l, string filename, Encoding code) {
-        var t = System.IO.File.ReadAllText(filename, code);
+        var t = ReadAllText(filename, code);
         l.Clear();
         l.AddRange(t.SplitAndCutByCr());
     }

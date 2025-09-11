@@ -78,7 +78,7 @@ internal class Method_LoadPadItem : Method {
         }
 
         try {
-            var toparse = System.IO.File.ReadAllText(filen, BlueBasics.Constants.Win1252);
+            var toparse = IO.ReadAllText(filen, BlueBasics.Constants.Win1252);
 
             var i = ParsebleItem.NewByParsing<AbstractPadItem>(toparse);
 

@@ -95,7 +95,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
         if (IO.FileExists(layoutFileName)) {
-            this.Parse(System.IO.File.ReadAllText(layoutFileName, Win1252));
+            this.Parse(IO.ReadAllText(layoutFileName, Win1252));
         }
         IsSaved = true;
     }

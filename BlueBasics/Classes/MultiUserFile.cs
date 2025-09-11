@@ -449,7 +449,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         string inhalt;
 
         try {
-            inhalt = System.IO.File.ReadAllText(Blockdateiname(), Constants.Win1252);
+            inhalt = ReadAllText(Blockdateiname(), Constants.Win1252);
         } catch {
             if (!silent) { _ = MessageBox.Show("Dateisystem Fehler"); }
             return false;
@@ -546,7 +546,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
                 if (_initialLoadDone && !ReloadNeeded) { return (string.Empty, string.Empty); } // Problem hat sich aufgelöst
 
                 var tmpFileInfo = GetFileState(Filename, true);
-                data = System.IO.File.ReadAllText(Filename, Constants.Win1252);
+                data = ReadAllText(Filename, Constants.Win1252);
                 fileinfo = GetFileState(Filename, true);
                 if (tmpFileInfo == fileinfo) { break; }
 

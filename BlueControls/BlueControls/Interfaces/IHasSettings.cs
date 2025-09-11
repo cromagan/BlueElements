@@ -57,7 +57,7 @@ public static class HasSettings {
         settings.Settings.Clear();
 
         if (FileExists(settings.SettingsFileName())) {
-            var t = System.IO.File.ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
+            var t = ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
             t = t.RemoveChars("\n");
             settings.Settings.AddRange(t.SplitAndCutByCr());
 
