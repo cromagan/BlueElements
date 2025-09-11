@@ -48,6 +48,8 @@ internal class Method_ImportCsv : Method_TableGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
+        if (MyRow != null) { return new DoItFeedback($"Import in einem Zeilenskript nicht möglich.", false, ld); }
+
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
@@ -56,7 +58,7 @@ internal class Method_ImportCsv : Method_TableGeneric {
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        var sx = myDb.ImportCsv(txt, true, true, sep, false, false);
+        var sx = myDb.ImportCsv(txt, true, sep, false, false);
 
         return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(sx, true, ld);
     }

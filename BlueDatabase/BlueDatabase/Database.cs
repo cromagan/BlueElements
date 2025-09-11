@@ -1737,7 +1737,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    public string ImportCsv(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
+    public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
         var f = CanWriteMainFile();
 
         if (!string.IsNullOrEmpty(f)) {
@@ -1777,52 +1777,34 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         #region Spaltenreihenfolge (columns) ermitteln
 
         List<ColumnItem> columns = [];
-        var startZ = 0;
+        var startZ = 1;
 
-        if (spalteZuordnen) {
-            startZ = 1;
-            for (var spaltNo = 0; spaltNo < zeil[0].GetUpperBound(0) + 1; spaltNo++) {
-                if (string.IsNullOrEmpty(zeil[0][spaltNo])) {
-                    DropMessage(ErrorType.Warning, "Abbruch, leerer Spaltenname.");
-                    return "Abbruch,<br>leerer Spaltenname.";
-                }
-                zeil[0][spaltNo] = ColumnItem.MakeValidColumnName(zeil[0][spaltNo]);
-
-                var col = Column[zeil[0][spaltNo]];
-                if (col == null) {
-                    if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
-                        DropMessage(ErrorType.Warning, "Abbruch, ungültiger Spaltenname.");
-                        return "Abbruch,<br>ungültiger Spaltenname.";
-                    }
-
-                    col = Column.GenerateAndAdd(zeil[0][spaltNo]);
-                    if (col != null) {
-                        col.Caption = zeil[0][spaltNo];
-                    }
-                }
-
-                if (col == null) {
-                    DropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
-                    return "Abbruch,<br>Spaltenfehler.";
-                }
-
-                columns.Add(col);
+        for (var spaltNo = 0; spaltNo < zeil[0].GetUpperBound(0) + 1; spaltNo++) {
+            if (string.IsNullOrEmpty(zeil[0][spaltNo])) {
+                DropMessage(ErrorType.Warning, "Abbruch, leerer Spaltenname.");
+                return "Abbruch,<br>leerer Spaltenname.";
             }
-        } else {
-            columns.AddRange(Column.Where(thisColumn => thisColumn != null && !thisColumn.IsSystemColumn()));
-            while (columns.Count < zeil[0].GetUpperBound(0) + 1) {
-                var newc = Column.GenerateAndAdd();
-                if (newc != null) {
-                    newc.Caption = newc.KeyName;
-                    newc.MultiLine = true;
+            zeil[0][spaltNo] = ColumnItem.MakeValidColumnName(zeil[0][spaltNo]);
+
+            var col = Column[zeil[0][spaltNo]];
+            if (col == null) {
+                if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
+                    DropMessage(ErrorType.Warning, "Abbruch, ungültiger Spaltenname.");
+                    return "Abbruch,<br>ungültiger Spaltenname.";
                 }
 
-                if (newc == null) {
-                    DropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
-                    return "Abbruch, Spaltenfehler.";
+                col = Column.GenerateAndAdd(zeil[0][spaltNo]);
+                if (col != null) {
+                    col.Caption = zeil[0][spaltNo];
                 }
-                columns.Add(newc);
             }
+
+            if (col == null) {
+                DropMessage(ErrorType.Warning, "Abbruch, Spaltenfehler.");
+                return "Abbruch,<br>Spaltenfehler.";
+            }
+
+            columns.Add(col);
         }
 
         #endregion

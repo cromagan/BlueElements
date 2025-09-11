@@ -317,7 +317,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabLastError.Padding = new System.Windows.Forms.Padding(3);
             this.tabLastError.Size = new System.Drawing.Size(258, 156);
             this.tabLastError.TabIndex = 1;
-            this.tabLastError.Text = "Letzer Fehler";
+            this.tabLastError.Text = "Letzter Fehler";
             // 
             // btnLeeren
             // 

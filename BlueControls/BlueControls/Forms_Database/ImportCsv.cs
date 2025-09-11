@@ -105,7 +105,7 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasDatabase {
         var m = "Tabellen-Fehler";
 
         if (Database is { IsDisposed: false }) {
-            m = Database.ImportCsv(_originalImportText, optSpalteZuordnen.Checked, optZeilenZuorden.Checked, tr, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
+            m = Database.ImportCsv(_originalImportText, optZeilenZuorden.Checked, tr, chkDoppelteTrennzeichen.Checked, chkTrennzeichenAmAnfang.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {
