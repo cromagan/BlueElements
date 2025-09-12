@@ -157,7 +157,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             lsbStandardFilter.ItemAdd(leere);
             lsbStandardFilter.ItemAdd(nichtleere);
 
-            lsbStandardFilter.ItemAdd(ItemOf("aus der Zwischenablage", "clipboard", QuickImage.Get(ImageCode.Clipboard, 17), _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "05"));
+            lsbStandardFilter.ItemAdd(ItemOf("aus der Zwischenablage", "clipboard", QuickImage.Get(ImageCode.Clipboard, 17), _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) || _column.Value_for_Chunk != ChunkType.None, Constants.FirstSortChar + "05"));
             lsbStandardFilter.ItemAdd(ItemOf("NICHT in der Zwischenablage", "nichtclipboard", QuickImage.Get("Clipboard|17||1"), _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && !_column.MultiLine && string.IsNullOrEmpty(tmp), Constants.FirstSortChar + "06"));
             lsbStandardFilter.ItemAdd(ItemOf("mehrfache UND-Auswahl aktivieren", "ModusMultiUnd", QuickImage.Get(ImageCode.PlusZeichen, 17, Color.Blue, Color.Transparent), _column.MultiLine && _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "07"));
             lsbStandardFilter.ItemAdd(ItemOf("mehrfache ODER-Auswahl aktivieren", "ModusMultiOder", QuickImage.Get(ImageCode.PlusZeichen, 17), _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "08"));

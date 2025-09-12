@@ -291,13 +291,18 @@ public class DatabaseChunk : Database {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="chunkValue"></param>
-    /// <param name="important">Steuert, ob es dringend nötig ist, dass auch auf Aktualität geprüft wird</param>
-    /// <returns>Ob ein Load stattgefunden hat</returns>
+    /// <param name="chunkValue">kann auch mehrere Chunkvalues mit \r\n getrennt enthalten.</param>
+    /// <returns>Ob ein Load aller Chunks stattgefunden hat</returns>
     public override bool BeSureRowIsLoaded(string chunkValue) {
-        var chunkId = GetChunkId(this, DatabaseDataType.UTF8Value_withoutSizeData, chunkValue);
+        var chunkValues = chunkValue.SplitAndCutByCrToList().SortedDistinctList();
 
-        return LoadChunkWithChunkId(chunkId, false, false, false);
+        foreach (var thisvalue in chunkValues) {
+            var chunkId = GetChunkId(this, DatabaseDataType.UTF8Value_withoutSizeData, thisvalue);
+
+            if (!LoadChunkWithChunkId(chunkId, false, false, false)) { return false; }
+        }
+
+        return true;
     }
 
     public override bool BeSureToBeUpToDate() {
@@ -545,7 +550,7 @@ public class DatabaseChunk : Database {
         var chunks = _chunks.Values.ToList();
         foreach (var thisChunk in chunks) {
             if (thisChunk.SaveRequired) {
-                // Prüfen ob Chunk wirklich leer ist. 
+                // Prüfen ob Chunk wirklich leer ist.
                 // Kann passieren, wenn ein Chunk geändert wurde während des Speichervorgangnes.
                 // Dann wird er nicht zum Speichern hzurückgegeben und fälschlicherwerise als Leer erkannt
                 var rowsInChunk = RowsOfChunk(thisChunk);
@@ -553,7 +558,7 @@ public class DatabaseChunk : Database {
                     DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
                     _ = thisChunk.Delete();
                     _ = _chunks.TryRemove(thisChunk.KeyName, out _);
-                } 
+                }
             }
         }
 

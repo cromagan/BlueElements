@@ -2534,7 +2534,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     var searchValue = new List<string>(clipTmp.SplitAndCutByCr()).SortedDistinctList();
 
                     if (searchValue.Count > 0) {
-                        Filter.Add(new FilterItem(e.Column, FilterType.IstGleich_ODER | FilterType.GroßKleinEgal, searchValue));
+                        Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, searchValue));
                     }
                     break;
                 }
@@ -2547,7 +2547,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                     searchValue.RemoveString(clipTmp.SplitAndCutByCrToList().SortedDistinctList(), false);
 
                     if (searchValue.Count > 0) {
-                        Filter.Add(new FilterItem(e.Column, FilterType.IstGleich_ODER | FilterType.GroßKleinEgal, searchValue));
+                        Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, searchValue));
                     }
                     break;
                 }
@@ -3244,7 +3244,7 @@ public partial class Table : GenericControlReciverSender, IContextMenu, ITransla
                 plus = p16;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
             } else {
-                txt = FilterCollection.InitValue(cellInThisDatabaseColumn, false, FilterCombined.ToArray()) ?? string.Empty;
+                txt = FilterCollection.InitValue(cellInThisDatabaseColumn, false, false, FilterCombined.ToArray()) ?? string.Empty;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
             }
 

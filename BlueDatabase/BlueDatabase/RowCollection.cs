@@ -530,7 +530,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisColum in db2.Column) {
             if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
-                var inval = FilterCollection.InitValue(thisColum, true, filter);
+                var inval = FilterCollection.InitValue(thisColum, true, false, filter);
                 if (inval is not { } || string.IsNullOrWhiteSpace(inval)) {
                     return (null, "Initalwert fehlt.", false);
                 }
@@ -865,7 +865,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             _ = orderedColumns.Remove(spc);
             orderedColumns.Insert(0, spc);
-            chunkvalue = FilterCollection.InitValue(spc, true, fc) ?? string.Empty;
+            chunkvalue = FilterCollection.InitValue(spc, true, false, fc) ?? string.Empty;
 
             // Chunk-Wert validieren bevor wir fortfahren
             if (string.IsNullOrEmpty(chunkvalue)) { return (null, "Chunk-Wert konnte nicht ermittelt werden", true); }
@@ -885,7 +885,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var initErrors = new List<string>();
 
         foreach (var thisColumn in orderedColumns) {
-            var val = FilterCollection.InitValue(thisColumn, true, fc);
+            var val = FilterCollection.InitValue(thisColumn, true, false, fc);
             if (val is { } && !string.IsNullOrWhiteSpace(val)) {
                 try {
                     var cellResult = item.Database?.Cell.Set(thisColumn, item, val, "Initialwert neuer Zeile");

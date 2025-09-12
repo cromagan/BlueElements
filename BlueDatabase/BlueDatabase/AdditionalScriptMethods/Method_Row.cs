@@ -99,7 +99,7 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
             //    return new DoItFeedback("Fehler im Filter, ein einzelner Suchwert wird benötigt", true, ld);
             //}
 
-            if (FilterCollection.InitValue(c, true, fic.ToArray()) is not { } l) {
+            if (FilterCollection.InitValue(c, true, false, fic.ToArray()) is not { } l) {
                 return new DoItFeedback("Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.", true, ld);
             }
 
@@ -108,7 +108,7 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
             }
         }
 
-        Develop.Message?.Invoke(ErrorType.DevelopInfo, null,  scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
+        Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
 
         RowItem? newrow;
 

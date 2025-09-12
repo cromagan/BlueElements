@@ -151,7 +151,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public string ChunkVal {
         get {
             if (Database?.Column.ChunkValueColumn is not { IsDisposed: false } cvc) { return string.Empty; }
-            return InitValue(cvc, true, this.ToArray()) ?? string.Empty;
+            return InitValue(cvc, true, false, this.ToArray()) ?? string.Empty;
         }
     }
 
@@ -269,7 +269,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (db == null || db.IsDisposed) { return []; }
 
         if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
-            if (InitValue(spc, true, filter) is { } i) {
+            if (InitValue(spc, true, true, filter) is { } i) {
                 var ok = db.BeSureRowIsLoaded(i);
                 if (!ok) { return []; }
             }
@@ -316,7 +316,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="column"></param>
     /// <returns></returns>
-    public static string? InitValue(ColumnItem column, bool firstToo, params FilterItem[] filter) {
+    public static string? InitValue(ColumnItem column, bool firstToo, bool isForSerach, params FilterItem[] filter) {
         if (filter == null || !filter.Any()) { return null; }
         if (column is not { IsDisposed: false }) { return null; }
         if (column.Database is not { IsDisposed: false } db) { return null; }
@@ -345,6 +345,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 and not FilterType.Istgleich_MultiRowIgnorieren
                 and not FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren)
         }) { return null; }
+
+        if (isForSerach) { return fi.SearchValue.SortedDistinctList().JoinWithCr(); }
 
         if (!column.MultiLine && fi.SearchValue.Count > 1) { return null; }
 

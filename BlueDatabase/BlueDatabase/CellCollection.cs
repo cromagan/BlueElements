@@ -149,7 +149,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
         if (linkedDatabase.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
-            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, fi.ToArray())))
+            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, false, fi.ToArray())))
                 return (null, "Filter des Chunk-Wertes fehlt.");
         }
 
