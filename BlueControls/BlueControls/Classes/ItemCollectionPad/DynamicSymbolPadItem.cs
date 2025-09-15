@@ -19,13 +19,13 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;

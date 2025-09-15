@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Controls;
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 
 namespace BlueControls.ConnectedFormula {
     partial class FlexiControlRowSelector {

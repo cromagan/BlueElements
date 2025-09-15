@@ -21,18 +21,18 @@ using BlueBasics.Interfaces;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueDatabase;
-using BlueDatabase.Interfaces;
+using BlueTable;
+using BlueTable.Interfaces;
 using BlueScript.Structures;
 using System.Windows.Forms;
 
-namespace BlueControls.BlueDatabaseDialogs;
+namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasDatabase {
+public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasTable {
 
     #region Fields
 
-    private Database? _database;
+    private Table? _table;
 
     private CreativePadItem? _item;
 
@@ -49,19 +49,19 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
 
     #region Properties
 
-    public Database? Database {
-        get => _database;
+    public Table? Table {
+        get => _table;
         set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _database) { return; }
+            if (value == _table) { return; }
 
-            if (_database != null) {
-                _database.DisposingEvent -= _database_Disposing;
+            if (_table != null) {
+                _table.DisposingEvent -= _table_Disposing;
             }
-            _database = value;
+            _table = value;
 
-            if (_database != null) {
-                _database.DisposingEvent += _database_Disposing;
+            if (_table != null) {
+                _table.DisposingEvent += _table_Disposing;
             }
         }
     }
@@ -95,7 +95,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
     public RowItem? Row {
         set {
             txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
-            Database = value?.Database;
+            Table = value?.Table;
         }
     }
 
@@ -104,7 +104,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
     #region Methods
 
     public override ScriptEndedFeedback ExecuteScript(bool testmode) {
-        if (IsDisposed || Database is not { IsDisposed: false }) {
+        if (IsDisposed || Table is not { IsDisposed: false }) {
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
 
@@ -118,14 +118,14 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
             return new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
         }
 
-        if (Database.Row.Count == 0) {
+        if (Table.Row.Count == 0) {
             return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
         }
         if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-            txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
+            txbTestZeile.Text = Table?.Row.First()?.CellFirstString() ?? string.Empty;
         }
 
-        var r = Database?.Row[txbTestZeile.Text] ?? Database?.Row.SearchByKey(txbTestZeile.Text); 
+        var r = Table?.Row[txbTestZeile.Text] ?? Table?.Row.SearchByKey(txbTestZeile.Text); 
         if (r is not { IsDisposed: false }) {
             return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         }
@@ -141,7 +141,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
     }
 
     public override void WriteInfosBack() {
-        //if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
+        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table == null || Table.IsDisposed) { return; }
 
         if (_item != null) {
             _item.Script = Script;
@@ -156,12 +156,12 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasD
         Object = null; // erst das Item!
     }
 
-    private void _database_Disposing(object sender, System.EventArgs e) {
-        Database = null;
+    private void _table_Disposing(object sender, System.EventArgs e) {
+        Table = null;
         Close();
     }
 
-    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Database, typeof(DatabaseHeadEditor), false);
+    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
 
     #endregion
 }

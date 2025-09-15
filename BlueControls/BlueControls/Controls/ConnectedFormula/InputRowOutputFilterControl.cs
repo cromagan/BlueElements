@@ -21,8 +21,8 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -104,7 +104,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
         if (_outputcolumn == null) {
             //if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-            FilterOutput.ChangeTo(new FilterItem(FilterInput?.Database, "IO"));
+            FilterOutput.ChangeTo(new FilterItem(FilterInput?.Table, "IO"));
             //} else {
             //    this.Invalidate_FilterOutput();
             //}
@@ -116,19 +116,19 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
             va = lastInputRow.ReplaceVariables(_filterwert, true, lastInputRow.CheckRow()?.Feedback.Variables);
         } else {
             if (FilterInput != null) {
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Database, "IO"));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Table, "IO"));
                 return;
             }
             va = _filterwert;
         }
 
         if (va.Contains("~")) {
-            FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Database, "IO2"));
+            FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Table, "IO2"));
             return;
         }
 
         //if (string.IsNullOrEmpty(va) && _standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-        //    FilterOutput.ChangeTo(new FilterItem(_outputcolumn?.Database, "IO2"));
+        //    FilterOutput.ChangeTo(new FilterItem(_outputcolumn?.Table, "IO2"));
         //    return;
         //}
 
@@ -153,7 +153,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
                 break;
 
             default:
-                f = new FilterItem(_outputcolumn?.Database, "IO3");
+                f = new FilterItem(_outputcolumn?.Table, "IO3");
                 break;
         }
 

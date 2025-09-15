@@ -5,7 +5,7 @@ using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueTableDialogs {
     partial class ColumnArrangementPadEditor {
         /// <summary>
         /// Required designer variable.

@@ -21,7 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.CellRenderer;
 using BlueControls.Enums;
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;

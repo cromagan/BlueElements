@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.BlueDatabaseDialogs;
+namespace BlueControls.BlueTableDialogs;
 
 public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, IContextMenuWithInternalHandling {
 
@@ -128,7 +128,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         var f = ExecuteScript(testmode);
 
         //if (f == null) {
-        //    var m = Method.GetMethods(MethodType.Standard | MethodType.MyDatabaseRow | MethodType.Math | MethodType.DrawOnBitmap);
+        //    var m = Method.GetMethods(MethodType.Standard | MethodType.MyTableRow | MethodType.Math | MethodType.DrawOnBitmap);
 
         //    var scp = new ScriptProperties("Skript-Editor: " + f., m, false, [], null, 0);
         //    var s = new Script(null, scp);
@@ -247,7 +247,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
             var r = grpVariablen.RowOfVariable(hoveredWordnew);
 
-            //foreach (var r in tableVariablen.Database.Row) {
+            //foreach (var r in tableVariablen.Table.Row) {
             if (r is { IsDisposed: false }) {
                 //if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.OrdinalIgnoreCase)) {
                 var inh = r.CellGetString("Inhalt");

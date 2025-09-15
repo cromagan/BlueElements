@@ -25,7 +25,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
+using BlueTable;
 using System.ComponentModel;
 using System.Windows.Forms;
 using static BlueBasics.Develop;
@@ -48,7 +48,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     public ConnectedFormulaForm(string filename, string mode) : this() {
         btnEingehendeTabelle.Enabled = false;
-        btnAusgehendeDatenbank.Enabled = false;
+        btnAusgehendeTabelle.Enabled = false;
 
         CFormula.Mode = mode;
 
@@ -64,16 +64,16 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         CheckButtons();
     }
 
-    private void btnAusgehendeDatenbank_Click(object sender, System.EventArgs e) {
-        if (_lastItem is ReciverSenderControlPadItem { DatabaseOutput: { IsDisposed: false } db }) {
-            var c = new TableView(db, false, true, true);
+    private void btnAusgehendeTabelle_Click(object sender, System.EventArgs e) {
+        if (_lastItem is ReciverSenderControlPadItem { TableOutput: { IsDisposed: false } db }) {
+            var c = new TableViewForm(db, false, true, true);
             _ = c.ShowDialog();
         }
     }
 
     private void btnEingehendeTabelle_Click(object sender, System.EventArgs e) {
-        if (_lastItem is ReciverControlPadItem { DatabaseInput: { IsDisposed: false } db }) {
-            var c = new TableView(db, false, true, true);
+        if (_lastItem is ReciverControlPadItem { TableInput: { IsDisposed: false } db }) {
+            var c = new TableViewForm(db, false, true, true);
             _ = c.ShowDialog();
         }
     }
@@ -85,7 +85,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         if (_lastItem is not { IsDisposed: false } api) { return; }
 
-        Database.ForceSaveAll();
+        Table.ForceSaveAll();
         MultiUserFile.SaveAll(false);
 
         if (!cf.LockEditing()) { return; }
@@ -93,7 +93,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         MultiUserFile.SaveAll(true);
         cf.UnlockEditing();
-        Database.ForceSaveAll();
+        Table.ForceSaveAll();
         CFormula.InvalidateView();
     }
 
@@ -123,7 +123,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        Database.ForceSaveAll();
+        Table.ForceSaveAll();
         _ = LoadTab.ShowDialog();
     }
 
@@ -167,7 +167,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         //var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
 
         //if (oldf == cf &&
-        //    Database == database &&
+        //    Table == table &&
         //    RowKey == rowKey) { return; }
 
         //SuspendLayout();
@@ -188,24 +188,24 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         //    }
         //}
 
-        //if (Database != database) {
-        //    if (Database != null) {
+        //if (Table != table) {
+        //    if (Table != null) {
         //        RemoveRow();
-        //        Database.DisposingEvent -= _database_Disposing;
-        //        Database.Row.RowRemoving -= Row_RowRemoving;
+        //        Table.DisposingEvent -= _table_Disposing;
+        //        Table.Row.RowRemoving -= Row_RowRemoving;
         //    }
         //    InvalidateView();
-        //    Database = database;
+        //    Table = table;
 
-        //    if (Database != null) {
-        //        Database.DisposingEvent += _database_Disposing;
-        //        Database.Row.RowRemoving += Row_RowRemoving;
+        //    if (Table != null) {
+        //        Table.DisposingEvent += _table_Disposing;
+        //        Table.Row.RowRemoving += Row_RowRemoving;
         //    }
         //}
 
-        //if (rowKey != -1 && Database != null && cf != null) {
+        //if (rowKey != -1 && Table != null && cf != null) {
         //    RowKey = rowKey;
-        //    _tmpShowingRow = Database?.Row.SearchByKey(RowKey);
+        //    _tmpShowingRow = Table?.Row.SearchByKey(RowKey);
         //    SetInputRow();
         //} else {
         //    RemoveRow();
@@ -234,7 +234,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         }
 
         btnEingehendeTabelle.Enabled = Generic.IsAdministrator() && _lastItem is ReciverControlPadItem;
-        btnAusgehendeDatenbank.Enabled = Generic.IsAdministrator() && _lastItem is ReciverSenderControlPadItem;
+        btnAusgehendeTabelle.Enabled = Generic.IsAdministrator() && _lastItem is ReciverSenderControlPadItem;
 
         if (_lastItem is ReciverControlPadItem fcpi) {
             capClicked.Text = "<imagecode=Information|16> " + fcpi.MyClassId;

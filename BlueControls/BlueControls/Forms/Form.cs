@@ -20,7 +20,7 @@
 using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.Enums;
-using BlueDatabase;
+using BlueTable;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -131,7 +131,7 @@ public partial class Form : System.Windows.Forms.Form {
         IsClosing = true;
 
         if (this is not FloatingForm and not MessageBox) {
-            Database.ForceSaveAll();
+            Table.ForceSaveAll();
             MultiUserFile.SaveAll(false);
             MultiUserFile.SaveAll(true);
         }

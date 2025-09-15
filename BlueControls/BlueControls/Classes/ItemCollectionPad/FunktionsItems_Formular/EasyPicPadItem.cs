@@ -23,7 +23,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -79,7 +79,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         }
     }
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
 
     public override bool InputMustBeOneRow => true;
@@ -139,7 +139,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     public override string ReadableText() {
         const string txt = "Bild-Editor: ";
 
-        return txt + DatabaseInput?.Caption;
+        return txt + TableInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));

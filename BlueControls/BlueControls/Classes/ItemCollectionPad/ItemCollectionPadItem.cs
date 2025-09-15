@@ -27,7 +27,7 @@ using BlueControls.ItemCollection;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
+using BlueTable;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -856,7 +856,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return script;
     }
 
-    public ScriptEndedFeedback ReplaceVariables(Database database, string rowkey) => ReplaceVariables(database.Row.SearchByKey(rowkey));
+    public ScriptEndedFeedback ReplaceVariables(BlueTable.Table table, string rowkey) => ReplaceVariables(table.Row.SearchByKey(rowkey));
 
     public bool ResetVariables() {
         if (IsDisposed) { return false; }
@@ -926,9 +926,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         l.Add(Everybody);
         l.Add("#User: " + UserName);
 
-        l.AddRange(Table.Permission_AllUsed(false));
+        l.AddRange(TableView.Permission_AllUsed(false));
 
-        return Database.RepairUserGroups(l);
+        return Table.RepairUserGroups(l);
     }
 
     internal string BestCaption() {
@@ -943,7 +943,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     internal ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
-        var vars = rowIn.Database?.CreateVariableCollection(rowIn, true, false, true, false) ?? [];
+        var vars = rowIn.Table?.CreateVariableCollection(rowIn, true, false, true, false) ?? [];
 
         //var vars = new VariableCollection();
         _ = vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));

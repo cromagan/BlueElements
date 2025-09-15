@@ -46,7 +46,7 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Zeigt Änderungen einer Zeile an.";
 
     public override bool InputMustBeOneRow => true;
@@ -78,7 +78,7 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     public override string ReadableText() {
         const string txt = "Monitor: ";
 
-        return txt + DatabaseInput?.Caption;
+        return txt + TableInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Monitor, 16);

@@ -292,8 +292,8 @@ public static class IO {
                             "VCF" => FileFormat.Visitenkarte,
                             "MP3" or "WAV" or "AAC" => FileFormat.Sound,
                             "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-                            "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Database,
-                            "BDBC" => FileFormat.DatabaseChunk,
+                            "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Table,
+                            "BDBC" => FileFormat.TableChunk,
                             "LNK" or "URL" => FileFormat.Link,
                             "BCR" => FileFormat.BlueCreativeFile,
                             "BCS" => FileFormat.BlueCreativeSymbol,
@@ -798,18 +798,18 @@ public static class IO {
 
     private static (object? returnValue, bool retry) TryGetDirectories(object?[] args) {
         if (args.Length < 3) return (Array.Empty<string>(), false);
-        var pfad = args[0] as string;
+        var directory = args[0] as string;
         var pattern = args[1] as string;
         var option = args[2] is SearchOption so ? so : SearchOption.TopDirectoryOnly;
 
-        if (string.IsNullOrWhiteSpace(pfad)) { return (Array.Empty<string>(), false); }
+        if (string.IsNullOrWhiteSpace(directory)) { return (Array.Empty<string>(), false); }
 
         try {
-            if (!DirectoryExists(pfad)) { return (Array.Empty<string>(), false); }
+            if (!DirectoryExists(directory)) { return (Array.Empty<string>(), false); }
 
             pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
 
-            var dirs = Directory.GetDirectories(pfad, pattern, option);
+            var dirs = Directory.GetDirectories(directory, pattern, option);
             return (dirs, false);
         } catch (UnauthorizedAccessException) {
             return (Array.Empty<string>(), false);

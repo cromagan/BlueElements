@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Controls;
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 using Button = BlueControls.Controls.Button;
 
 namespace BluePaint

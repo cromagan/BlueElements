@@ -27,7 +27,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueDatabase.Interfaces;
+using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

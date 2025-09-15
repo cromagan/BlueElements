@@ -20,12 +20,12 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
+using BlueTable;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;
@@ -267,8 +267,8 @@ internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo 
     private void mainButton_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         e.ContextMenu.Add(ItemOf(this));
 
-        if (DatabaseInput is { IsDisposed: false } db) {
-            db.Editor ??= typeof(DatabaseHeadEditor);
+        if (TableInput is { IsDisposed: false } db) {
+            db.Editor ??= typeof(TableHeadEditor);
             e.ContextMenu.Add(ItemOf(db));
         }
     }
@@ -297,7 +297,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo 
         object? ai = null;
         var row = RowSingleOrNull();
 
-        if (row?.Database is { IsDisposed: false } db) {
+        if (row?.Table is { IsDisposed: false } db) {
             vars = db.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
         } else {
             vars = [];
@@ -315,7 +315,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo 
                     fis = fis + nam + ",";
                 }
             }
-            ai = fi.Database;
+            ai = fi.Table;
         }
         fis = fis.TrimEnd(",");
 

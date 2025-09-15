@@ -45,7 +45,7 @@ namespace BlueControls.Forms {
             this.btnScript = new BlueControls.Controls.Button();
             this.btnElementBearbeiten = new BlueControls.Controls.Button();
             this.capClicked = new BlueControls.Controls.Caption();
-            this.btnAusgehendeDatenbank = new BlueControls.Controls.Button();
+            this.btnAusgehendeTabelle = new BlueControls.Controls.Button();
             this.btnEingehendeTabelle = new BlueControls.Controls.Button();
             this.btnFormular = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
@@ -229,7 +229,7 @@ namespace BlueControls.Forms {
             this.grpAdminBearbeiten.Controls.Add(this.btnScript);
             this.grpAdminBearbeiten.Controls.Add(this.btnElementBearbeiten);
             this.grpAdminBearbeiten.Controls.Add(this.capClicked);
-            this.grpAdminBearbeiten.Controls.Add(this.btnAusgehendeDatenbank);
+            this.grpAdminBearbeiten.Controls.Add(this.btnAusgehendeTabelle);
             this.grpAdminBearbeiten.Controls.Add(this.btnEingehendeTabelle);
             this.grpAdminBearbeiten.Controls.Add(this.btnFormular);
             this.grpAdminBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
@@ -273,23 +273,23 @@ namespace BlueControls.Forms {
             this.capClicked.Size = new System.Drawing.Size(176, 22);
             this.capClicked.Text = "-";
             // 
-            // btnAusgehendeDatenbank
+            // btnAusgehendeTabelle
             // 
-            this.btnAusgehendeDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAusgehendeDatenbank.Enabled = false;
-            this.btnAusgehendeDatenbank.ImageCode = "Datenbank|16|||||||||Pfeil_Oben";
-            this.btnAusgehendeDatenbank.Location = new System.Drawing.Point(144, 2);
-            this.btnAusgehendeDatenbank.Name = "btnAusgehendeDatenbank";
-            this.btnAusgehendeDatenbank.Size = new System.Drawing.Size(64, 66);
-            this.btnAusgehendeDatenbank.TabIndex = 46;
-            this.btnAusgehendeDatenbank.Text = "Ausgeh. Tabelle";
-            this.btnAusgehendeDatenbank.Click += new System.EventHandler(this.btnAusgehendeDatenbank_Click);
+            this.btnAusgehendeTabelle.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAusgehendeTabelle.Enabled = false;
+            this.btnAusgehendeTabelle.ImageCode = "Tabelle|16|||||||||Pfeil_Oben";
+            this.btnAusgehendeTabelle.Location = new System.Drawing.Point(144, 2);
+            this.btnAusgehendeTabelle.Name = "btnAusgehendeTabelle";
+            this.btnAusgehendeTabelle.Size = new System.Drawing.Size(64, 66);
+            this.btnAusgehendeTabelle.TabIndex = 46;
+            this.btnAusgehendeTabelle.Text = "Ausgeh. Tabelle";
+            this.btnAusgehendeTabelle.Click += new System.EventHandler(this.btnAusgehendeTabelle_Click);
             // 
             // btnEingehendeTabelle
             // 
             this.btnEingehendeTabelle.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnEingehendeTabelle.Enabled = false;
-            this.btnEingehendeTabelle.ImageCode = "Datenbank|16|||||||||Pfeil_Unten";
+            this.btnEingehendeTabelle.ImageCode = "Tabelle|16|||||||||Pfeil_Unten";
             this.btnEingehendeTabelle.Location = new System.Drawing.Point(80, 2);
             this.btnEingehendeTabelle.Name = "btnEingehendeTabelle";
             this.btnEingehendeTabelle.Size = new System.Drawing.Size(64, 66);
@@ -369,7 +369,7 @@ namespace BlueControls.Forms {
         private Button btnFormular;
         private OpenFileDialog LoadTab;
         protected ConnectedFormulaView CFormula;
-        private Button btnAusgehendeDatenbank;
+        private Button btnAusgehendeTabelle;
         private Button btnEingehendeTabelle;
         private Caption capClicked;
         private Button btnElementBearbeiten;

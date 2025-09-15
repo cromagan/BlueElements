@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;

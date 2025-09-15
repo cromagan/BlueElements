@@ -19,8 +19,8 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using static BlueBasics.IO;
 
 
-namespace BlueDatabase.AdditionalScriptMethods;
+namespace BlueTable.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
 internal class Method_Export : Method_TableGeneric, IUseableForButton {
@@ -68,7 +68,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyDatabase(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
         #region  Filter ermitteln (allfi)
 
@@ -81,7 +81,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
         #region  Tabelle ermitteln (db)
 
-        if (myDb == null || allFi.Database != myDb) {
+        if (myDb == null || allFi.Table != myDb) {
             allFi.Dispose();
             return new DoItFeedback("Tabellenfehler!", true, ld);
         }
@@ -128,7 +128,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "MDB":
                 case "BDB": {
-                        var chunks = DatabaseChunk.GenerateNewChunks(myDb, 100, myDb.FileStateUtcDate, false);
+                        var chunks = TableChunk.GenerateNewChunks(myDb, 100, myDb.FileStateUtcDate, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
                         _ = mainchunk.Save(filn);

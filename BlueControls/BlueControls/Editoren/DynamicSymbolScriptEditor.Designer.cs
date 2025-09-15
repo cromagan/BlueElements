@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueTableDialogs {
     public sealed partial class DynamicSymbolScriptEditor {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

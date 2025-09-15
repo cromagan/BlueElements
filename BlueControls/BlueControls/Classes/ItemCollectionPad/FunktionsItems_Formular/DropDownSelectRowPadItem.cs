@@ -25,8 +25,8 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -53,7 +53,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     public DropDownSelectRowPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public DropDownSelectRowPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public DropDownSelectRowPadItem(string keyName, BlueTable.Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 
@@ -97,7 +97,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         }
     }
 
-    public override bool DatabaseInputMustMatchOutputDatabase => true;
+    public override bool TableInputMustMatchOutputTable => true;
 
     public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann, die durch die Vor-Filter bestimmt wurden.";
     public override bool InputMustBeOneRow => false;
@@ -109,7 +109,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiControlRowSelector(DatabaseOutput, _caption, _anzeige) {
+        var con = new FlexiControlRowSelector(TableOutput, _caption, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition
         };
@@ -176,7 +176,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     public override string ReadableText() {
         const string txt = "Zeilenauswahl: ";
 
-        return txt + DatabaseOutput?.Caption;
+        return txt + TableOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));

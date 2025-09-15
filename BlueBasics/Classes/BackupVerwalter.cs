@@ -83,7 +83,7 @@ public class BackupVerwalter {
         try {
             foreach (var thisF in fix) {
                 var fi = GetFileInfo(thisF);
-                AddData(fi.LastWriteTimeUtc, thisF);
+                AddData(fi?.LastWriteTimeUtc ?? DateTime.UtcNow, thisF);
             }
 
             foreach (var thisF in Deleteable) {

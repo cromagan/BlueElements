@@ -19,8 +19,8 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -66,8 +66,8 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Methods
 
-    public static void AddRowsToDatabase(ColumnItem? originIdColumn, List<string> keysAndInfo, string generatedEntityId, ColumnItem? additionalInfoColumn) {
-        if (originIdColumn?.Database is not { IsDisposed: false } db) { return; }
+    public static void AddRowsToTable(ColumnItem? originIdColumn, List<string> keysAndInfo, string generatedEntityId, ColumnItem? additionalInfoColumn) {
+        if (originIdColumn?.Table is not { IsDisposed: false } db) { return; }
 
         foreach (var thisKeyAndInfo in keysAndInfo) {
             var key = OriginId(thisKeyAndInfo, originIdColumn, generatedEntityId);
@@ -103,8 +103,8 @@ internal class AdderItem : IReadableTextWithKey {
         }
     }
 
-    public static void RemoveRowsFromDatabase(ColumnItem? originIdColumn, string generatedEntityId, string keyName) {
-        if (originIdColumn?.Database is not { IsDisposed: false } db) { return; }
+    public static void RemoveRowsFromTable(ColumnItem? originIdColumn, string generatedEntityId, string keyName) {
+        if (originIdColumn?.Table is not { IsDisposed: false } db) { return; }
 
         var fi = new FilterCollection(db, "Zeilengenerator im Formular");
         var key = OriginId(keyName + "#", originIdColumn, generatedEntityId);
@@ -124,7 +124,7 @@ internal class AdderItem : IReadableTextWithKey {
     public QuickImage? SymbolForReadableText() => null;
 
     private static string OriginId(string keyAndInfos, ColumnItem? originIdColumn, string generatedEntityId) {
-        if (originIdColumn?.Database is not { IsDisposed: false }) { return string.Empty; }
+        if (originIdColumn?.Table is not { IsDisposed: false }) { return string.Empty; }
         return generatedEntityId + "\\" + keyAndInfos.SplitBy("#")[0];
     }
 

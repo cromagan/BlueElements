@@ -19,15 +19,15 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -107,8 +107,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
                 _page.ItemAdded -= _page_ItemAdded;
                 _page.ItemRemoved -= _page_ItemRemoved;
 
-                if (_page.GetRowEntryItem()?.DatabaseOutput is { IsDisposed: false } db1) {
-                    db1.DisposingEvent -= _database_Disposing;
+                if (_page.GetRowEntryItem()?.TableOutput is { IsDisposed: false } db1) {
+                    db1.DisposingEvent -= _table_Disposing;
                 }
             }
             _page = value;
@@ -118,20 +118,20 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
                 _page.PropertyChanged += _page_PropertyChanged;
                 _page.ItemAdded += _page_ItemAdded;
                 _page.ItemRemoved += _page_ItemRemoved;
-                if (_page.GetRowEntryItem()?.DatabaseOutput is { IsDisposed: false } db1) {
-                    db1.DisposingEvent += _database_Disposing;
+                if (_page.GetRowEntryItem()?.TableOutput is { IsDisposed: false } db1) {
+                    db1.DisposingEvent += _table_Disposing;
                 }
             }
 
-            //if (FilterOutput.Database != database) {
-            //    if (FilterOutput.Database is { IsDisposed: false } db1) {
-            //        db1.DisposingEvent -= _database_Disposing;
+            //if (FilterOutput.Table != table) {
+            //    if (FilterOutput.Table is { IsDisposed: false } db1) {
+            //        db1.DisposingEvent -= _table_Disposing;
             //    }
 
-            //    FilterOutput.Database = database;
+            //    FilterOutput.Table = table;
 
-            //    if (FilterOutput.Database is { IsDisposed: false } db2) {
-            //        db2.DisposingEvent += _database_Disposing;
+            //    if (FilterOutput.Table is { IsDisposed: false } db2) {
+            //        db2.DisposingEvent += _table_Disposing;
             //    }
             //}
 
@@ -252,9 +252,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
     //    get => _connectedFormula;
     //    private set {
     //        if (value == _connectedFormula) { return; }
-    public void GetHeadPageFrom(Database? database) {
-        if (database is { IsDisposed: false }) {
-            var f = database.FormulaFileName();
+    public void GetHeadPageFrom(BlueTable.Table? table) {
+        if (table is { IsDisposed: false }) {
+            var f = table.FormulaFileName();
 
             if (f != null) {
                 var tmpFormula = GetByFilename(f);
@@ -309,8 +309,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() => Page?.GetConnectedFormula();
 
-    //        if (FilterOutput.Database is { IsDisposed: false } db2) {
-    //            db2.DisposingEvent += _database_Disposing;
+    //        if (FilterOutput.Table is { IsDisposed: false } db2) {
+    //            db2.DisposingEvent += _table_Disposing;
     //        }
     //    }
     /// <summary>
@@ -328,7 +328,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         base.Dispose(disposing);
     }
 
-    //        FilterOutput.Database = database;
+    //        FilterOutput.Table = table;
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         var s = States.Standard;
@@ -345,9 +345,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         base.DrawControl(gr, state);
     }
 
-    //    if (FilterOutput.Database != database) {
-    //        if (FilterOutput.Database is { IsDisposed: false } db1) {
-    //            db1.DisposingEvent -= _database_Disposing;
+    //    if (FilterOutput.Table != table) {
+    //        if (FilterOutput.Table is { IsDisposed: false } db1) {
+    //            db1.DisposingEvent -= _table_Disposing;
     //        }
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
@@ -355,7 +355,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        DoInputFilter(FilterOutput.Database, false);
+        DoInputFilter(FilterOutput.Table, false);
         DoRows();
 
         if (RowSingleOrNull() is { IsDisposed: false } r) {
@@ -363,11 +363,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
             FilterOutput.ChangeTo(nfc);
 
-            btnScript.Visible = r.Database is { IsDisposed: false } db && db.IsAdministrator() && !string.IsNullOrEmpty(db.CheckScriptError());
+            btnScript.Visible = r.Table is { IsDisposed: false } db && db.IsAdministrator() && !string.IsNullOrEmpty(db.CheckScriptError());
 
             if (btnScript.Visible) { btnScript.BringToFront(); }
         } else {
-            FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
+            FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
         }
     }
 
@@ -381,16 +381,16 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    private void _database_Disposing(object sender, System.EventArgs e) => Page = null;
+    private void _table_Disposing(object sender, System.EventArgs e) => Page = null;
 
     private void _page_ItemAdded(object sender, System.EventArgs e) => InvalidateView();
 
     private void _page_ItemRemoved(object sender, System.EventArgs e) => InvalidateView();
 
-    //    public void InitFormula(ItemCollectionPadItem? page, Database? database) {
+    //    public void InitFormula(ItemCollectionPadItem? page, Table? table) {
     //    if (IsDisposed) { return; }
 
-    //    if (page == _page && FilterOutput.Database == database) { return; }
+    //    if (page == _page && FilterOutput.Table == table) { return; }
 
     //    SuspendLayout();
 
@@ -400,9 +400,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {
-            if (IsDisposed || RowSingleOrNull()?.Database is not { IsDisposed: false } db) { return; }
+            if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } db) { return; }
 
-            _ = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+            _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
         } else {
             MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }

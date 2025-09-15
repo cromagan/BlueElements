@@ -20,7 +20,7 @@
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Drawing;
 
@@ -118,8 +118,8 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
             Skin.StyleDb_Font is not { IsDisposed: false } cf ||
             Skin.StyleDb_Style is not { IsDisposed: false } cs) { return PadStyles.Standard; }
 
-        var f1 = new FilterItem(cf, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
-        var f2 = new FilterItem(cs, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, SheetStyle);
+        var f1 = new FilterItem(cf, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
+        var f2 = new FilterItem(cs, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, SheetStyle);
 
         var r = db.Row[f1, f2];
 

@@ -27,7 +27,7 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

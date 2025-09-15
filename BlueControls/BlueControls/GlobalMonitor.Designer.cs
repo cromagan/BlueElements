@@ -27,7 +27,7 @@ namespace BlueControls {
         /// </summary>
         private void InitializeComponent() {
             this.grpLogal = new BlueControls.Controls.GroupBox();
-            this.tblLog = new BlueControls.Controls.Table();
+            this.tblLog = new BlueControls.Controls.TableView();
             this.btnLeeren = new BlueControls.Controls.Button();
             this.grpLogal.SuspendLayout();
             this.SuspendLayout();
@@ -83,6 +83,6 @@ namespace BlueControls {
         #endregion
         private GroupBox grpLogal;
         private Button btnLeeren;
-        private Table tblLog;
+        private TableView tblLog;
     }
 }

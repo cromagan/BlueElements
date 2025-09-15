@@ -20,15 +20,15 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -84,17 +84,17 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public Database? DatabaseInput {
+    public BlueTable.Table? TableInput {
         get {
-            //if (item.DatabaseInputMustMatchOutputDatabase) {
-            //    return item is ReciverSenderControlPadItem iiss ? iiss.DatabaseOutput : null;
+            //if (item.TableInputMustMatchOutputTable) {
+            //    return item is ReciverSenderControlPadItem iiss ? iiss.TableOutput : null;
             //}
 
             var g = GetFilterFromGet();
 
             if (g.Count > 0) {
-                if (g[0].DatabaseOutput is { IsDisposed: false } db) {
-                    db.Editor ??= typeof(DatabaseHeadEditor);
+                if (g[0].TableOutput is { IsDisposed: false } db) {
+                    db.Editor ??= typeof(TableHeadEditor);
                     return db;
                 }
             }
@@ -102,7 +102,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
     }
 
-    public abstract bool DatabaseInputMustMatchOutputDatabase { get; }
+    public abstract bool TableInputMustMatchOutputTable { get; }
 
     public List<int> InputColorId {
         get {
@@ -160,7 +160,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     public ReadOnlyCollection<string> VisibleFor {
         get => _visibleFor;
         set {
-            var tmp = Database.RepairUserGroups(value);
+            var tmp = Table.RepairUserGroups(value);
             if (!_visibleFor.IsDifferentTo(tmp)) { return; }
 
             ConnectedFormula.ConnectedFormula.Invalidate_VisibleFor_AllUsed();
@@ -395,7 +395,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
                 value = value.Replace("\r", "|");
                 var tmpv = value.FromNonCritical().SplitBy("|").ToList();
                 if (tmpv.Count == 0) { tmpv.Add(Constants.Everybody); }
-                VisibleFor = Database.RepairUserGroups(tmpv).AsReadOnly();
+                VisibleFor = Table.RepairUserGroups(tmpv).AsReadOnly();
                 return true;
 
             case "xlock":

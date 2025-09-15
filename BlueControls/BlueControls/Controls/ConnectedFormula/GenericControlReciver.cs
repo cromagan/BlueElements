@@ -26,8 +26,8 @@ using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
-using BlueDatabase.EventArgs;
+using BlueTable;
+using BlueTable.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -47,7 +47,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private readonly object _rowsInputLock = new object();
     private string? _cachedFilterHash = null;
-    private Database? _databaseInput;
+    private BlueTable.Table? _tableInput;
 
     private FilterCollection? _filterInput;
 
@@ -70,8 +70,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Database? DatabaseInput {
-        get => _databaseInput;
+    public BlueTable.Table? TableInput {
+        get => _tableInput;
 
         private set {
             // Wichtig! Darf nur von HandelChangesNow befüllt werden!
@@ -79,26 +79,26 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
             if (value is { IsDisposed: true }) { value = null; }
 
-            if (value == _databaseInput) { return; }
+            if (value == _tableInput) { return; }
 
-            // Thread-Sicherheit: Sperren Sie den Zugriff auf _databaseInput
+            // Thread-Sicherheit: Sperren Sie den Zugriff auf _tableInput
             lock (_lockObject) {
-                if (_databaseInput is { }) {
-                    _databaseInput.Cell.CellValueChanged -= DatabaseInput_CellValueChanged;
-                    _databaseInput.Column.ColumnPropertyChanged -= DatabaseInput_ColumnPropertyChanged;
-                    _databaseInput.Row.RowChecked -= DatabaseInput_RowChecked;
-                    _databaseInput.Loaded -= DatabaseInput_Loaded;
-                    _databaseInput.Disposed -= DatabaseInput_Disposed;
+                if (_tableInput is { }) {
+                    _tableInput.Cell.CellValueChanged -= TableInput_CellValueChanged;
+                    _tableInput.Column.ColumnPropertyChanged -= TableInput_ColumnPropertyChanged;
+                    _tableInput.Row.RowChecked -= TableInput_RowChecked;
+                    _tableInput.Loaded -= TableInput_Loaded;
+                    _tableInput.Disposed -= TableInput_Disposed;
                 }
 
-                _databaseInput = value;
+                _tableInput = value;
 
-                if (_databaseInput is { IsDisposed: false }) {
-                    _databaseInput.Cell.CellValueChanged += DatabaseInput_CellValueChanged;
-                    _databaseInput.Column.ColumnPropertyChanged += DatabaseInput_ColumnPropertyChanged;
-                    _databaseInput.Row.RowChecked += DatabaseInput_RowChecked;
-                    _databaseInput.Loaded += DatabaseInput_Loaded;
-                    _databaseInput.Disposed += DatabaseInput_Disposed;
+                if (_tableInput is { IsDisposed: false }) {
+                    _tableInput.Cell.CellValueChanged += TableInput_CellValueChanged;
+                    _tableInput.Column.ColumnPropertyChanged += TableInput_ColumnPropertyChanged;
+                    _tableInput.Row.RowChecked += TableInput_RowChecked;
+                    _tableInput.Loaded += TableInput_Loaded;
+                    _tableInput.Disposed += TableInput_Disposed;
                 }
             }
         }
@@ -239,7 +239,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         // Prüfen, ob wir nach der Zuweisung Events registrieren müssen
-        var needRegisterEvents = _databaseInput == null;
+        var needRegisterEvents = _tableInput == null;
 
         // Sicherstellen, dass die manuellen Flags gesetzt sind
         if (!RowsInputManualSeted) {
@@ -251,8 +251,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         // Prüfen, ob die Row zur aktuellen Tabelle gehört
-        if (row != null && _databaseInput is { IsDisposed: false } dbi) {
-            if (row.Database != dbi) {
+        if (row != null && _tableInput is { IsDisposed: false } dbi) {
+            if (row.Table != dbi) {
                 row = null;
             }
         }
@@ -264,13 +264,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         lock (_rowsInputLock) {
             RowsInput = [];
 
-            if (row?.Database is { IsDisposed: false }) {
+            if (row?.Table is { IsDisposed: false }) {
                 RowsInput.Add(row);
             }
         }
 
         // Zusätzliche Verarbeitung außerhalb des Locks
-        if (row?.Database is { IsDisposed: false }) {
+        if (row?.Table is { IsDisposed: false }) {
             _ = row.CheckRow();
 
             if (needRegisterEvents) { RegisterEvents(); }
@@ -279,17 +279,17 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate_RowsInput();
     }
 
-    protected virtual void DatabaseInput_CellValueChanged(object sender, CellEventArgs e) { }
+    protected virtual void TableInput_CellValueChanged(object sender, CellEventArgs e) { }
 
-    protected virtual void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
+    protected virtual void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
 
-    protected void DatabaseInput_Disposed(object sender, System.EventArgs e) {
-        DatabaseInput = null;
+    protected void TableInput_Disposed(object sender, System.EventArgs e) {
+        TableInput = null;
     }
 
-    protected virtual void DatabaseInput_Loaded(object sender, System.EventArgs e) { }
+    protected virtual void TableInput_Loaded(object sender, System.EventArgs e) { }
 
-    protected virtual void DatabaseInput_RowChecked(object sender, RowCheckedEventArgs e) { }
+    protected virtual void TableInput_RowChecked(object sender, RowCheckedEventArgs e) { }
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
@@ -311,9 +311,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <summary>
     /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
     /// </summary>
-    /// <param name="mustbeDatabase"></param>
+    /// <param name="mustbeTable"></param>
     /// <param name="doEmptyFilterToo"></param>
-    protected void DoInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
+    protected void DoInputFilter(BlueTable.Table? mustbeTable, bool doEmptyFilterToo) {
         if (IsDisposed || FilterInputChangedHandled) { return; }
 
         _filterInputChangedHandling = true;
@@ -321,11 +321,11 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         try {
             FilterInputChangedHandled = true;
 
-            FilterInput = GetInputFilter(mustbeDatabase, doEmptyFilterToo);
+            FilterInput = GetInputFilter(mustbeTable, doEmptyFilterToo);
 
-            if (FilterInput is { Database: null }) {
-                FilterInput = new FilterCollection(mustbeDatabase, "Fehlerhafter Filter") {
-                new FilterItem(mustbeDatabase, string.Empty)
+            if (FilterInput is { Table: null }) {
+                FilterInput = new FilterCollection(mustbeTable, "Fehlerhafter Filter") {
+                new FilterItem(mustbeTable, string.Empty)
             };
                 //Develop.DebugPrint(ErrorType.Error, "Tabelle Fehler");
             }
@@ -418,13 +418,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected virtual void HandleChangesNow() {
         if (IsDisposed) {
-            DatabaseInput = null;
-        } else if (RowsInput is { Count: > 0 } ri && ri[0] is { IsDisposed: false } row && row.Database is { IsDisposed: false } db) {
-            DatabaseInput = db;
+            TableInput = null;
+        } else if (RowsInput is { Count: > 0 } ri && ri[0] is { IsDisposed: false } row && row.Table is { IsDisposed: false } db) {
+            TableInput = db;
         } else if (FilterInput is { IsDisposed: false } fc) {
-            DatabaseInput = fc.Database;
+            TableInput = fc.Table;
         } else {
-            DatabaseInput = null;
+            TableInput = null;
         }
     }
 
@@ -478,9 +478,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private void FilterInput_RowsChanged(object sender, System.EventArgs e) => Invalidate_RowsInput();
 
-    private FilterCollection? GetInputFilter(Database? mustbeDatabase, bool doEmptyFilterToo) {
+    private FilterCollection? GetInputFilter(BlueTable.Table? mustbeTable, bool doEmptyFilterToo) {
         if (Parents.Count == 0) {
-            return doEmptyFilterToo && mustbeDatabase != null ? new FilterCollection(mustbeDatabase, "Empty Input Filter") : null;
+            return doEmptyFilterToo && mustbeTable != null ? new FilterCollection(mustbeTable, "Empty Input Filter") : null;
         }
 
         if (Parents.Count == 1) {
@@ -492,8 +492,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             var fc2 = parent.FilterOutput;
             if (fc2.Count == 0) { return null; }
 
-            if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
-                return new FilterCollection(new FilterItem(mustbeDatabase, "Tabellen inkonsistent 1"), "Tabellen inkonsistent");
+            if (mustbeTable != null && fc2.Table != mustbeTable) {
+                return new FilterCollection(new FilterItem(mustbeTable, "Tabellen inkonsistent 1"), "Tabellen inkonsistent");
             }
 
             return fc2;
@@ -503,12 +503,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         foreach (var thiss in Parents) {
             if (thiss is { IsDisposed: false, FilterOutput: { IsDisposed: false } fi }) {
-                if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
+                if (mustbeTable != null && fi.Table != mustbeTable) {
                     fc?.Dispose();
-                    return new FilterCollection(new FilterItem(mustbeDatabase, "Tabellen inkonsistent 2"), "Tabellen inkonsistent");
+                    return new FilterCollection(new FilterItem(mustbeTable, "Tabellen inkonsistent 2"), "Tabellen inkonsistent");
                 }
 
-                fc ??= new FilterCollection(fi.Database, "filterofsender");
+                fc ??= new FilterCollection(fi.Table, "filterofsender");
 
                 foreach (var thifi in fi) {
                     fc.AddIfNotExists(thifi);
@@ -540,7 +540,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         // Dispose durchführen, wenn wir dafür verantwortlich sind
         if (Parents.Count > 1) {
             // Nur bei mehreren Parents sind wir sicher für den Filter verantwortlich
-            filterToDispose.Database = null;
+            filterToDispose.Table = null;
             filterToDispose.Dispose();
         }
     }

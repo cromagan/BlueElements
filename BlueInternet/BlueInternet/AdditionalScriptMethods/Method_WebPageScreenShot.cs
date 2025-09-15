@@ -21,7 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Threading;
 using BlueBasics;
-using BlueDatabase.AdditionalScriptMethods;
+using BlueTable.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;

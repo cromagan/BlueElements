@@ -3,7 +3,7 @@ using BlueBasics.Enums;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Forms;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Threading;
 using static BlueBasics.Extensions;
@@ -36,9 +36,9 @@ public partial class GlobalMonitor : Form {
 
     #region Methods
 
-    public static void GenerateLogTable(Table tblLog) {
+    public static void GenerateLogTable(Controls.TableView tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
-        Database db = new(Database.UniqueKeyValue()) {
+        BlueTable.Table db = new(Table.UniqueKeyValue()) {
             LogUndo = false,
             DropMessages = false
         };
@@ -75,7 +75,7 @@ public partial class GlobalMonitor : Form {
 
         db.ColumnArrangements = tcvc.ToString(false);
 
-        tblLog.DatabaseSet(db, string.Empty);
+        tblLog.TableSet(db, string.Empty);
         tblLog.Arrangement = string.Empty;
         tblLog.SortDefinitionTemporary = new RowSortDefinition(db, az, true);
     }
@@ -141,7 +141,7 @@ public partial class GlobalMonitor : Form {
 
         //lstLog.Refresh();
 
-        var r = tblLog.Database?.Row.GenerateAndAdd(_n.ToString(), "New Undo Item");
+        var r = tblLog.Table?.Row.GenerateAndAdd(_n.ToString(), "New Undo Item");
         if (r == null) { return; }
 
         r.CellSet("symbol", symbol.ToString() + "|16", string.Empty);
@@ -234,7 +234,7 @@ public partial class GlobalMonitor : Form {
     }
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
-        if (tblLog.Database is { IsDisposed: false } db) {
+        if (tblLog.Table is { IsDisposed: false } db) {
             _ = db.Row.Clear("Monitoring-Log geleert");
         }
 

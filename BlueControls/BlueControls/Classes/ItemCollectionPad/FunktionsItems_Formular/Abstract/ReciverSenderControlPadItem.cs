@@ -19,11 +19,11 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueDatabase;
+using BlueTable;
 using System.Collections.Generic;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
@@ -39,11 +39,11 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     #region Fields
 
-    private Database? _databaseOutput;
+    private BlueTable.Table? _tableOutput;
 
-    private bool _databaseOutputLoaded;
+    private bool _tableOutputLoaded;
 
-    private string _databaseOutputName = string.Empty;
+    private string _tableOutputName = string.Empty;
 
     private int _outputColorId = -1;
 
@@ -51,35 +51,35 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     #region Constructors
 
-    protected ReciverSenderControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula, Database? databaseOutput) : base(keyName, parentFormula) => DatabaseOutput = databaseOutput;
+    protected ReciverSenderControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula, BlueTable.Table? tableOutput) : base(keyName, parentFormula) => TableOutput = tableOutput;
 
     #endregion
 
     #region Properties
 
-    public Database? DatabaseOutput {
+    public BlueTable.Table? TableOutput {
         get {
-            if (DatabaseInputMustMatchOutputDatabase && DatabaseInput is { IsDisposed: false }) { return DatabaseInput; }
+            if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false }) { return TableInput; }
 
-            if (_databaseOutputLoaded) { return _databaseOutput; }
+            if (_tableOutputLoaded) { return _tableOutput; }
 
-            _databaseOutput = Database.Get(_databaseOutputName, false, Table.Database_NeedPassword);
+            _tableOutput = Table.Get(_tableOutputName, false, TableView.Table_NeedPassword);
 
-            _databaseOutputLoaded = true;
+            _tableOutputLoaded = true;
 
-            return _databaseOutput;
+            return _tableOutput;
         }
         // ReSharper disable once MemberCanBePrivate.Global -> FlexiCOntrolForProperty!
         set {
             if (IsDisposed) { return; }
 
-            if (DatabaseInputMustMatchOutputDatabase && !AllowedInputFilter.HasFlag(AllowedInputFilter.None)) { return; }
+            if (TableInputMustMatchOutputTable && !AllowedInputFilter.HasFlag(AllowedInputFilter.None)) { return; }
 
-            if (value == DatabaseOutput) { return; }
+            if (value == TableOutput) { return; }
 
-            _databaseOutput = value;
-            _databaseOutputName = value?.KeyName ?? string.Empty;
-            _databaseOutputLoaded = true;
+            _tableOutput = value;
+            _tableOutputName = value?.KeyName ?? string.Empty;
+            _tableOutputLoaded = true;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
@@ -123,8 +123,8 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
     }
 
     public override string ErrorReason() {
-        if (DatabaseOutput is not { IsDisposed: false }) {
-            if (DatabaseInputMustMatchOutputDatabase) {
+        if (TableOutput is not { IsDisposed: false }) {
+            if (TableInputMustMatchOutputTable) {
                 return "Eingehendes Objekt nicht gewählt.";
             }
 
@@ -140,23 +140,23 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         ];
 
         var enableOutput = true;
-        Database? outp = null;
+        BlueTable.Table? outp = null;
 
-        if (DatabaseInputMustMatchOutputDatabase) {
+        if (TableInputMustMatchOutputTable) {
             enableOutput = AllowedInputFilter.HasFlag(AllowedInputFilter.None);
 
-            outp = DatabaseInput;
+            outp = TableInput;
             if (outp is not null) { enableOutput = false; }
         }
         if (!enableOutput) {
             if (outp != null) {
-                outp.Editor = typeof(DatabaseHeadEditor);
-                result.Add(new FlexiControlForDelegate(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Datenbank));
+                outp.Editor = typeof(TableHeadEditor);
+                result.Add(new FlexiControlForDelegate(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Tabelle));
             } else {
-                result.Add(new FlexiControl("<ImageCode=Information|16> Ausgangsdatenbank wird über den Eingang gewählt.", widthOfControl, false));
+                result.Add(new FlexiControl("<ImageCode=Information|16> Ausgangstabelle wird über den Eingang gewählt.", widthOfControl, false));
             }
         } else {
-            result.Add(new FlexiControlForProperty<Database?>(() => DatabaseOutput, AllAvailableTables()));
+            result.Add(new FlexiControlForProperty<BlueTable.Table?>(() => TableOutput, AllAvailableTables()));
         }
 
         return result;
@@ -166,10 +166,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        if (DatabaseInputMustMatchOutputDatabase && DatabaseInput is { IsDisposed: false } db) {
+        if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false } db) {
             result.ParseableAdd("OutputDatabase", db.KeyName);
         } else {
-            result.ParseableAdd("OutputDatabase", _databaseOutputName);
+            result.ParseableAdd("OutputDatabase", _tableOutputName);
         }
 
         //result.ParseableAdd("SentToChildIds", _childIds, false);
@@ -179,10 +179,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
-            case "database":
+            case "table":
             case "outputdatabase":
-                _databaseOutputName = value.FromNonCritical();
-                _databaseOutputLoaded = false;
+                _tableOutputName = value.FromNonCritical();
+                _tableOutputLoaded = false;
 
                 return true;
 

@@ -22,7 +22,7 @@ using BlueScript.Methods;
 using CefSharp;
 using CefSharp.OffScreen;
 
-namespace BlueDatabase.AdditionalScriptMethods;
+namespace BlueTable.AdditionalScriptMethods;
 
 public abstract class Method_WebPage : Method {
 

@@ -20,7 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.ComponentModel;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -58,7 +58,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         get => _lastRow;
 
         set {
-            if (value?.Database == null || value.IsDisposed) { value = null; }
+            if (value?.Table == null || value.IsDisposed) { value = null; }
 
             if (_lastRow == value) { return; }
 

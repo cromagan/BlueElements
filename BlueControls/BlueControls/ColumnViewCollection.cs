@@ -20,11 +20,11 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,9 +32,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using static BlueBasics.Constants;
 
-namespace BlueDatabase;
+namespace BlueTable;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IReadableTextWithKey, IEditable, IStyleable {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable, IStyleable {
 
     #region Fields
 
@@ -46,7 +46,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private int _clientWidth = 16;
 
-    private Database? _database;
+    private Table? _table;
 
     private int? _headSize;
 
@@ -56,13 +56,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Constructors
 
-    public ColumnViewCollection(Database? database, string toParse) {
-        Database = database;
+    public ColumnViewCollection(Table? table, string toParse) {
+        Table = table;
         KeyName = string.Empty;
         this.Parse(toParse);
     }
 
-    public ColumnViewCollection(Database database, string toParse, string newname) : this(database, toParse) => KeyName = newname;
+    public ColumnViewCollection(Table table, string toParse, string newname) : this(table, toParse) => KeyName = newname;
 
     #endregion
 
@@ -90,19 +90,19 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public int Count => _internal.Count;
 
-    public Database? Database {
-        get => _database;
+    public Table? Table {
+        get => _table;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _database) { return; }
+            if (value == _table) { return; }
 
-            if (_database != null) {
-                _database.DisposingEvent -= _database_Disposing;
+            if (_table != null) {
+                _table.DisposingEvent -= _table_Disposing;
             }
-            _database = value;
+            _table = value;
 
-            if (_database != null) {
-                _database.DisposingEvent += _database_Disposing;
+            if (_table != null) {
+                _table.DisposingEvent += _table_Disposing;
             }
         }
     }
@@ -153,7 +153,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Methods
 
-    public static List<ColumnViewCollection> ParseAll(Database db) {
+    public static List<ColumnViewCollection> ParseAll(Table db) {
         var tcvc = new List<ColumnViewCollection>();
         List<string> ca = [.. db.ColumnArrangements.SplitAndCutByCr()];
         foreach (var t in ca) {
@@ -177,7 +177,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <param name="ca"></param>
     /// <param name="number"></param>
     public static void Repair(ColumnViewCollection ca, int number) {
-        if (ca.Database is not { IsDisposed: false } db) { return; }
+        if (ca.Table is not { IsDisposed: false } db) { return; }
 
         #region Ungültige Spalten entfernen
 
@@ -224,7 +224,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
 
-    public object Clone() => new ColumnViewCollection(Database, ParseableItems().FinishParseable());
+    public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
 
     public void ComputeAllColumnPositions() {
         foreach (var thisViewItem in this) {
@@ -263,7 +263,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         // TODO: große Felder auf Null setzen.
         //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
         //PermissionGroups_Show.Clear();
-        Database = null;
+        Table = null;
         //base.Dispose(disposing);
     }
 
@@ -330,9 +330,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string IsNowEditable() {
-        if (Database is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
+        if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
-        return db.GrantWriteAccess(DatabaseDataType.ColumnArrangement, DatabaseChunk.Chunk_Master);
+        return db.GrantWriteAccess(TableDataType.ColumnArrangement, TableChunk.Chunk_Master);
     }
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
@@ -448,7 +448,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void RemoveAt(int z) => _internal.RemoveAt(z);
 
     public void ShowAllColumns() {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
         foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
@@ -464,10 +464,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public void ShowColumns(params string[] columnnames) {
-        if (IsDisposed || Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
         foreach (var thisColumnName in columnnames) {
-            var thisColumn = Database?.Column[thisColumnName];
+            var thisColumn = Table?.Column[thisColumnName];
 
             if (thisColumn != null && this[thisColumn] == null && this[thisColumn] == null && !thisColumn.IsDisposed) {
                 Add(new ColumnViewItem(thisColumn, this));
@@ -487,7 +487,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void OnStyleChanged() {
         Invalidate_HeadSize();

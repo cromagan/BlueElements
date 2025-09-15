@@ -207,8 +207,8 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            //if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= _database_Disposing; }
-            //Database = null;
+            //if (Table != null && !Table.IsDisposed) { Table.DisposingEvent -= _table_Disposing; }
+            //Table = null;
 
             IsDisposed = true;
         }

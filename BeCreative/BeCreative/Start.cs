@@ -19,7 +19,7 @@ using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls;
 using BlueControls.Forms;
-using BlueDatabase;
+using BlueTable;
 using BluePaint;
 using System;
 using static BlueBasics.Develop;
@@ -42,11 +42,11 @@ namespace BeCreative {
             DebugPrint(ErrorType.Info, "Schließe Programm...");
 
             var p = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
-            Database.ForceSaveAll();
+            Table.ForceSaveAll();
             MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
 
             p.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
-            Database.ForceSaveAll();
+            Table.ForceSaveAll();
             MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
 
             DebugPrint(ErrorType.Info, "Schließe Programm, noch ein SaveAll.");
@@ -59,7 +59,7 @@ namespace BeCreative {
 
         private void btnBildEditor_Click(object sender, EventArgs e) => DoForm(new MainWindow(true));
 
-        private void btnDatenbank_Click(object sender, EventArgs e) => DoForm(new TableView(null, true, true, true));
+        private void btnDatenbank_Click(object sender, EventArgs e) => DoForm(new TableViewForm(null, true, true, true));
 
         private void btnFormular_Click(object sender, EventArgs e) => DoForm(new ConnectedFormulaEditor());
 

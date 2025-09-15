@@ -24,7 +24,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace BlueControls.BlueDatabaseDialogs;
+namespace BlueControls.BlueTableDialogs;
 
 public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
 
@@ -90,7 +90,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
     }
 
     public override void WriteInfosBack() {
-        //if (IsDisposed || TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
+        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table == null || Table.IsDisposed) { return; }
 
         if (_item != null) {
             _item.Script = Script;

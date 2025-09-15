@@ -73,7 +73,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         }
     }
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Ein Steuerelement, mit dem ein untergeordnetes Formular angezeigt werden kann.";
 
     public override bool InputMustBeOneRow => true;
@@ -172,7 +172,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override string ReadableText() {
         const string txt = "Unterformular: ";
 
-        return txt + DatabaseInput?.Caption;
+        return txt + TableInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Groupbox);

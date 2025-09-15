@@ -20,8 +20,8 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
-using BlueDatabase;
-using BlueDatabase.EventArgs;
+using BlueTable;
+using BlueTable.EventArgs;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
@@ -38,7 +38,7 @@ public partial class VariableEditor : EditorEasy {
 
     #region Methods
 
-    public override void Clear() => tableVariablen.Database?.Row.Clear("Variablen gelöscht");
+    public override void Clear() => tableVariablen.Table?.Row.Clear("Variablen gelöscht");
 
     public VariableCollection? GetCloneOfCurrent() {
         if (ToEdit is null) { return null; }
@@ -50,7 +50,7 @@ public partial class VariableEditor : EditorEasy {
         }
         var list = new VariableCollection();
 
-        if (tableVariablen.Database is not { IsDisposed: false } db) { return list; }
+        if (tableVariablen.Table is not { IsDisposed: false } db) { return list; }
 
         foreach (var thisr in db.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
@@ -60,12 +60,12 @@ public partial class VariableEditor : EditorEasy {
         return list;
     }
 
-    public RowItem? RowOfVariable(string variable) => tableVariablen?.Database is not { IsDisposed: false } db ? null : db.Row[variable];
+    public RowItem? RowOfVariable(string variable) => tableVariablen?.Table is not { IsDisposed: false } db ? null : db.Row[variable];
 
-    public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Database is not { IsDisposed: false } db ? null : db.Row[variable.KeyName];
+    public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Table is not { IsDisposed: false } db ? null : db.Row[variable.KeyName];
 
     protected override void InitializeComponentDefaultValues() {
-        Database db = new(Database.UniqueKeyValue()) {
+        Table db = new(Table.UniqueKeyValue()) {
             LogUndo = false,
             DropMessages = false
         };
@@ -120,14 +120,14 @@ public partial class VariableEditor : EditorEasy {
 
         db.SortDefinition = new RowSortDefinition(db, na, true);
 
-        tableVariablen.DatabaseSet(db, string.Empty);
+        tableVariablen.TableSet(db, string.Empty);
 
 
         db.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }
 
     protected override bool SetValuesToFormula(IEditable? variables) {
-        if (IsDisposed || tableVariablen?.Database is not { IsDisposed: false } db) { return false; }
+        if (IsDisposed || tableVariablen?.Table is not { IsDisposed: false } db) { return false; }
         if (variables is not VariableCollection vc) { return false; }
 
         foreach (var thisv in vc) {
@@ -151,7 +151,7 @@ public partial class VariableEditor : EditorEasy {
     }
 
     private void TableVariablen_CellValueChanged(object sender, CellEventArgs e) {
-        var c = tableVariablen.Database?.Column.First;
+        var c = tableVariablen.Table?.Column.First;
         if (e.Column == c) {
             if (e.Row.CellIsNullOrEmpty(c)) {
                 _ = RowCollection.Remove(e.Row, "Variable gelöscht");

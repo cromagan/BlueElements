@@ -19,7 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
@@ -81,7 +81,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public bool AutoSizeableHeight => true;
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
 
     public float DefaultCopyScale {
         get => _defaultCopyScale;
@@ -205,7 +205,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var layouts = new List<AbstractListItem>();
 
-        if (DatabaseInput is { IsDisposed: false } db) {
+        if (TableInput is { IsDisposed: false } db) {
 
             #region Verfügbare Layouts ermitteln
 
@@ -329,15 +329,15 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     /// </summary>
     public void Skript_Bearbeiten() {
         var se = IUniqueWindowExtension.ShowOrCreate<CreativePadScriptEditor>(this);
-        se.Database = DatabaseInput;
+        se.Table = TableInput;
     }
 
     /// <summary>
     /// Skripte der Tabelle
     /// </summary>
     public void Skripte_Bearbeiten() {
-        if (DatabaseInput is { IsDisposed: false } db) {
-            TableView.OpenScriptEditor(db);
+        if (TableInput is { IsDisposed: false } db) {
+            TableViewForm.OpenScriptEditor(db);
         }
         OnDoUpdateSideOptionMenu();
     }

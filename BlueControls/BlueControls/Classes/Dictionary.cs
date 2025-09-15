@@ -21,8 +21,8 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -36,7 +36,7 @@ internal static class Dictionary {
 
     public static bool IsSpellChecking;
     internal static readonly object LockSpellChecking = new();
-    private static Database? _dictWords;
+    private static Table? _dictWords;
 
     #endregion
 
@@ -152,7 +152,7 @@ internal static class Dictionary {
     }
 
     private static void Init() {
-        var tmp = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.BDB", "Dictionary", false, false);
+        var tmp = Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.BDB", "Dictionary", false, false);
         if (tmp is { IsDisposed: false } db) { _dictWords = db; }
     }
 

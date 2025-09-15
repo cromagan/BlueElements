@@ -23,7 +23,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -69,7 +69,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         }
     }
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
 
     public string Filter {
@@ -198,7 +198,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
     public override string ReadableText() {
         const string txt = "Dateisystem: ";
 
-        return txt + DatabaseInput?.Caption;
+        return txt + TableInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));

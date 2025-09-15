@@ -7,7 +7,7 @@ using BlueControls.Enums;
 using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueTableDialogs {
     public sealed partial class TimerScriptEditor {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

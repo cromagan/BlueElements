@@ -18,12 +18,12 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
-using BlueDatabase;
-using BlueDatabase.Interfaces;
+using BlueTable;
+using BlueTable.Interfaces;
 
 namespace BlueControls.Editoren;
 
-public partial class RowEditor : EditorEasy, IHasDatabase {
+public partial class RowEditor : EditorEasy, IHasTable {
 
     #region Constructors
 
@@ -33,7 +33,7 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
 
     #region Properties
 
-    public Database? Database => ToEdit is not RowItem { IsDisposed: false } r ? null : r.Database;
+    public Table? Table => ToEdit is not RowItem { IsDisposed: false } r ? null : r.Table;
 
     #endregion
 
@@ -47,7 +47,7 @@ public partial class RowEditor : EditorEasy, IHasDatabase {
         RowItem? row = null;
         if (toEdit is RowItem r) { row = r; }
 
-        formular.GetHeadPageFrom(row?.Database);
+        formular.GetHeadPageFrom(row?.Table);
         formular.SetToRow(row);
 
         return true;

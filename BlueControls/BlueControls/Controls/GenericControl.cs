@@ -205,7 +205,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
             case Forms.Form:
                 return ParentType.Form;
 
-            case Table:
+            case TableView:
                 return ParentType.Table;
 
             case Panel:

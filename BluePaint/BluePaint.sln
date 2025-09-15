@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBasics", "..\BlueBasics
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueControls", "..\BlueControls\BlueControls\BlueControls.csproj", "{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDatabase", "..\BlueDatabase\BlueDatabase\BlueDatabase.csproj", "{CE8BE078-DDAE-47F5-AAA9-685564B898C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueTable", "..\BlueTable\BlueTable\BlueTable.csproj", "{CE8BE078-DDAE-47F5-AAA9-685564B898C9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueScript", "..\BlueScript\BlueScript\BlueScript.csproj", "{3ACC6EE6-B919-4952-8502-F62BAEEEFC60}"
 EndProject

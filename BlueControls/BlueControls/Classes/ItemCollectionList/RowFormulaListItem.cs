@@ -21,7 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.ItemCollectionPad;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Drawing;
 
@@ -73,7 +73,7 @@ public class RowFormulaListItem : AbstractListItem {
 
     public override string QuickInfo {
         get {
-            if (_row?.Database is not { IsDisposed: false } db) { return string.Empty; }
+            if (_row?.Table is not { IsDisposed: false } db) { return string.Empty; }
 
             return !string.IsNullOrEmpty(db.RowQuickInfo)
                 ? _row.QuickInfo.CreateHtmlCodes(true)
@@ -136,7 +136,7 @@ public class RowFormulaListItem : AbstractListItem {
     protected override string GetCompareKey() => _row?.CompareKey() ?? string.Empty;
 
     private void GeneratePic() {
-        if (string.IsNullOrEmpty(_layoutFileName) || !_layoutFileName.StartsWith("#") || Row?.Database is not { IsDisposed: false }) {
+        if (string.IsNullOrEmpty(_layoutFileName) || !_layoutFileName.StartsWith("#") || Row?.Table is not { IsDisposed: false }) {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }

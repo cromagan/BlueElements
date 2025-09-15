@@ -225,11 +225,11 @@
     <Compile Include="Editoren\RowAdderScriptEditor.Designer.cs">
       <DependentUpon>RowAdderScriptEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editoren\DatabaseScriptEditor.cs">
+    <Compile Include="Editoren\TableScriptEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editoren\DatabaseScriptEditor.Designer.cs">
-      <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
+    <Compile Include="Editoren\TableScriptEditor.Designer.cs">
+      <DependentUpon>TableScriptEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Editoren\EditorEasy.cs">
       <SubType>UserControl</SubType>
@@ -244,10 +244,10 @@
       <DependentUpon>RowEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\SteuerelementVerhalten.cs" />
-    <Compile Include="Forms_Database\FlexiFilterControl.cs">
+    <Compile Include="Forms_Table\FlexiFilterControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms_Database\FlexiFilterControl.Designer.cs">
+    <Compile Include="Forms_Table\FlexiFilterControl.Designer.cs">
       <DependentUpon>FlexiFilterControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Editoren\ColumnArrangementPadEditor.cs">
@@ -256,34 +256,34 @@
     <Compile Include="Editoren\ColumnArrangementPadEditor.Designer.cs">
       <DependentUpon>ColumnArrangementPadEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\SearchAndReplaceInDBScripts.cs">
+    <Compile Include="Forms_Table\SearchAndReplaceInDBScripts.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\SearchAndReplaceInDBScripts.designer.cs">
+    <Compile Include="Forms_Table\SearchAndReplaceInDBScripts.designer.cs">
       <DependentUpon>SearchAndReplaceInDBScripts.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\UserInfo.cs">
+    <Compile Include="Forms_Table\UserInfo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\UserInfo.designer.cs">
+    <Compile Include="Forms_Table\UserInfo.designer.cs">
       <DependentUpon>UserInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\RowCleanUp.cs">
+    <Compile Include="Forms_Table\RowCleanUp.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\RowCleanUp.designer.cs">
+    <Compile Include="Forms_Table\RowCleanUp.designer.cs">
       <DependentUpon>RowCleanUp.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\ImportBdb.cs">
+    <Compile Include="Forms_Table\ImportBdb.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\ImportBdb.designer.cs">
+    <Compile Include="Forms_Table\ImportBdb.designer.cs">
       <DependentUpon>ImportBdb.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\Search.cs">
+    <Compile Include="Forms_Table\Search.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\Search.designer.cs">
+    <Compile Include="Forms_Table\Search.designer.cs">
       <DependentUpon>Search.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\BlueFont.cs" />
@@ -426,11 +426,11 @@
     <Compile Include="Forms\InputBoxEditor.Designer.cs">
       <DependentUpon>InputBoxEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TableView.cs">
+    <Compile Include="Forms\TableViewForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\TableView.Designer.cs">
-      <DependentUpon>TableView.cs</DependentUpon>
+    <Compile Include="Forms\TableViewForm.Designer.cs">
+      <DependentUpon>TableViewForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\InputBoxListBoxStyle.cs">
       <SubType>Form</SubType>
@@ -576,10 +576,10 @@
     <Compile Include="Designer Support\ButtonActionList.cs" />
     <Compile Include="Designer Support\ButtonDesigner.cs" />
     <Compile Include="Designer Support\QuickPicSelector.cs" />
-    <Compile Include="Forms_Database\AutoFilter.cs">
+    <Compile Include="Forms_Table\AutoFilter.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\AutoFilter.Designer.cs">
+    <Compile Include="Forms_Table\AutoFilter.Designer.cs">
       <DependentUpon>AutoFilter.cs</DependentUpon>
     </Compile>
     <Compile Include="Editoren\ColumnEditor.cs">
@@ -588,22 +588,22 @@
     <Compile Include="Editoren\ColumnEditor.Designer.cs">
       <DependentUpon>ColumnEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editoren\DatabaseHeadEditor.cs">
+    <Compile Include="Editoren\TableHeadEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editoren\DatabaseHeadEditor.Designer.cs">
-      <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
+    <Compile Include="Editoren\TableHeadEditor.Designer.cs">
+      <DependentUpon>TableHeadEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\ImportCsv.cs">
+    <Compile Include="Forms_Table\ImportCsv.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\ImportCsv.designer.cs">
+    <Compile Include="Forms_Table\ImportCsv.designer.cs">
       <DependentUpon>ImportCsv.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\SearchAndReplaceInCells.cs">
+    <Compile Include="Forms_Table\SearchAndReplaceInCells.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\SearchAndReplaceInCells.designer.cs">
+    <Compile Include="Forms_Table\SearchAndReplaceInCells.designer.cs">
       <DependentUpon>SearchAndReplaceInCells.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\Dictionary.cs" />
@@ -628,10 +628,10 @@
     <Compile Include="Controls\FlexiControlForCell.Designer.cs">
       <DependentUpon>FlexiControlForCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms_Database\ExportDialog.cs">
+    <Compile Include="Forms_Table\ExportDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms_Database\ExportDialog.Designer.cs">
+    <Compile Include="Forms_Table\ExportDialog.Designer.cs">
       <DependentUpon>ExportDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Editoren\FontEditor.cs">
@@ -795,40 +795,40 @@
     <EmbeddedResource Include="Editoren\RowEditor.resx">
       <DependentUpon>RowEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\AutoFilter.resx">
+    <EmbeddedResource Include="Forms_Table\AutoFilter.resx">
       <DependentUpon>AutoFilter.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editoren\DatabaseHeadEditor.resx">
-      <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
+    <EmbeddedResource Include="Editoren\TableHeadEditor.resx">
+      <DependentUpon>TableHeadEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editoren\DatabaseScriptEditor.resx">
-      <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
+    <EmbeddedResource Include="Editoren\TableScriptEditor.resx">
+      <DependentUpon>TableScriptEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\FlexiFilterControl.resx">
+    <EmbeddedResource Include="Forms_Table\FlexiFilterControl.resx">
       <DependentUpon>FlexiFilterControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editoren\ColumnArrangementPadEditor.resx">
       <DependentUpon>ColumnArrangementPadEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\SearchAndReplaceInDBScripts.resx">
+    <EmbeddedResource Include="Forms_Table\SearchAndReplaceInDBScripts.resx">
       <DependentUpon>SearchAndReplaceInDBScripts.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\UserInfo.resx">
+    <EmbeddedResource Include="Forms_Table\UserInfo.resx">
       <DependentUpon>UserInfo.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\RowCleanUp.resx">
+    <EmbeddedResource Include="Forms_Table\RowCleanUp.resx">
       <DependentUpon>RowCleanUp.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\ImportBdb.resx">
+    <EmbeddedResource Include="Forms_Table\ImportBdb.resx">
       <DependentUpon>ImportBdb.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\Search.resx">
+    <EmbeddedResource Include="Forms_Table\Search.resx">
       <DependentUpon>Search.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -844,11 +844,11 @@
       <DependentUpon>ColumnEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\ImportCsv.resx">
+    <EmbeddedResource Include="Forms_Table\ImportCsv.resx">
       <DependentUpon>ImportCsv.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\SearchAndReplaceInCells.resx">
+    <EmbeddedResource Include="Forms_Table\SearchAndReplaceInCells.resx">
       <DependentUpon>SearchAndReplaceInCells.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -905,8 +905,8 @@
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TableView.resx">
-      <DependentUpon>TableView.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\TableViewForm.resx">
+      <DependentUpon>TableViewForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InputBoxListBoxStyle.resx">
       <DependentUpon>InputBoxListBoxStyle.cs</DependentUpon>
@@ -932,7 +932,7 @@
       <DependentUpon>FloatingInputBoxListBoxStyle.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms_Database\ExportDialog.resx">
+    <EmbeddedResource Include="Forms_Table\ExportDialog.resx">
       <DependentUpon>ExportDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -1005,9 +1005,9 @@
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
       <Name>BlueBasics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\BlueDatabase\BlueDatabase\BlueDatabase.csproj">
+    <ProjectReference Include="..\..\BlueTable\BlueTable\BlueTable.csproj">
       <Project>{ce8be078-ddae-47f5-aaa9-685564b898c9}</Project>
-      <Name>BlueDatabase</Name>
+      <Name>BlueTable</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\BlueScript\BlueScript\BlueScript.csproj">
       <Project>{3ACC6EE6-B919-4952-8502-F62BAEEEFC60}</Project>

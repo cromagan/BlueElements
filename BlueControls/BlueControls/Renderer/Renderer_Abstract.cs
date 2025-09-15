@@ -23,7 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

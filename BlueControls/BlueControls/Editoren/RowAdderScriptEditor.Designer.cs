@@ -8,7 +8,7 @@ using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueTableDialogs {
     public sealed partial class RowAdderScriptEditor  {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
@@ -25,7 +25,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RowAdderScriptEditor));
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.cpZeile = new BlueControls.Controls.Caption();
-            this.btnDatenbankKopf = new BlueControls.Controls.Button();
+            this.btnTabelleKopf = new BlueControls.Controls.Button();
             this.grpScripte = new BlueControls.Controls.GroupBox();
             this.caption1 = new BlueControls.Controls.Caption();
             this.capScriptMenu = new BlueControls.Controls.Caption();
@@ -41,10 +41,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // grpInfos
             // 
-            this.grpInfos.Controls.Add(this.btnDatenbankKopf);
+            this.grpInfos.Controls.Add(this.btnTabelleKopf);
             this.grpInfos.Location = new System.Drawing.Point(464, 3);
             this.grpInfos.Size = new System.Drawing.Size(144, 75);
-            this.grpInfos.Controls.SetChildIndex(this.btnDatenbankKopf, 0);
+            this.grpInfos.Controls.SetChildIndex(this.btnTabelleKopf, 0);
             // 
             // grpAusführen
             // 
@@ -81,16 +81,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cpZeile.Size = new System.Drawing.Size(112, 22);
             this.cpZeile.Text = "Betreffende Zeile:";
             // 
-            // btnDatenbankKopf
+            // btnTabelleKopf
             // 
-            this.btnDatenbankKopf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnDatenbankKopf.ImageCode = "Datenbank||||||||||Stift";
-            this.btnDatenbankKopf.Location = new System.Drawing.Point(72, 2);
-            this.btnDatenbankKopf.Name = "btnDatenbankKopf";
-            this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
-            this.btnDatenbankKopf.TabIndex = 46;
-            this.btnDatenbankKopf.Text = "Tabellen-Kopf";
-            this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
+            this.btnTabelleKopf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnTabelleKopf.ImageCode = "Tabelle||||||||||Stift";
+            this.btnTabelleKopf.Location = new System.Drawing.Point(72, 2);
+            this.btnTabelleKopf.Name = "btnTabelleKopf";
+            this.btnTabelleKopf.Size = new System.Drawing.Size(64, 66);
+            this.btnTabelleKopf.TabIndex = 46;
+            this.btnTabelleKopf.Text = "Tabellen-Kopf";
+            this.btnTabelleKopf.Click += new System.EventHandler(this.btnTabelleKopf_Click);
             // 
             // grpScripte
             // 
@@ -203,7 +203,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private TextBox txbTestZeile;
         private Caption cpZeile;
-        private Button btnDatenbankKopf;
+        private Button btnTabelleKopf;
         private GroupBox grpScripte;
         private Button btnScriptBefore;
         private Button btnScriptAfter;

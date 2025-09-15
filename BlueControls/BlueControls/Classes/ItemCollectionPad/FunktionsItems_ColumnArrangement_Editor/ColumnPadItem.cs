@@ -19,13 +19,13 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -46,7 +46,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Constructors
 
-    public ColumnPadItem(ColumnViewItem cvi, Renderer_Abstract renderer) : base(cvi.Column?.Database?.TableName + "|" + cvi.Column?.KeyName) {
+    public ColumnPadItem(ColumnViewItem cvi, Renderer_Abstract renderer) : base(cvi.Column?.Table?.KeyName + "|" + cvi.Column?.KeyName) {
         CVI = cvi;
         Renderer = renderer;
 
@@ -67,7 +67,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public ColumnViewItem? CVI { get; }
 
-    public string Tabelle => IsDisposed || CVI?.Column?.Database is not { IsDisposed: false } db ? "?" : db.TableName;
+    public string Tabelle => IsDisposed || CVI?.Column?.Table is not { IsDisposed: false } db ? "?" : db.KeyName;
 
     public override string Description => string.Empty;
 
@@ -86,14 +86,14 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         if (CVI is not { IsDisposed: false } cvi) { return []; }
         if (cvi.Column is not { IsDisposed: false } col) { return []; }
-        if (col.Database is not { IsDisposed: false } db) { return []; }
+        if (col.Table is not { IsDisposed: false } db) { return []; }
 
-        db.Editor = typeof(DatabaseHeadEditor);
+        db.Editor = typeof(TableHeadEditor);
         col.Editor = typeof(ColumnEditor);
 
         List<GenericControl> result =
         [
-            new FlexiControlForDelegate(db.Edit, "Tabelle: " + db.Caption, ImageCode.Datenbank),
+            new FlexiControlForDelegate(db.Edit, "Tabelle: " + db.Caption, ImageCode.Tabelle),
             new FlexiControlForDelegate(col.Edit, "Spalte: " + col.Caption, ImageCode.Spalte),
             new FlexiControl(),
             new FlexiControlForProperty<bool>(() => cvi.Permanent),
@@ -118,7 +118,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        //result.ParseableAdd("Database", Column?.Database);
+        //result.ParseableAdd("Table", Column?.Table);
         //result.ParseableAdd("ColumnName", Column);
 
         return result;
@@ -181,7 +181,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         gr.DrawLine(Pens.Black, 0, 210, bmp.Width, 210);
 
-        var r = col.Database?.Row.First();
+        var r = col.Table?.Row.First();
         if (r is { IsDisposed: false }) {
             Renderer?.Draw(gr, r.CellGetString(col), new Rectangle(0, 210, bmp.Width, 90), col.DoOpticalTranslation, (Alignment)col.Align, 1f);
         }

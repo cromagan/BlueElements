@@ -20,12 +20,12 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -416,9 +416,9 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 if (Math.Abs(af.Get() - f) > DefaultTolerance) { af.Set(f); }
                 break;
 
-            case Accessor<Database?> adb:
-                var db = Database.Get(Value, false, Table.Database_NeedPassword);
-                if (db != null) { db.Editor = typeof(DatabaseHeadEditor); }
+            case Accessor<BlueTable.Table?> adb:
+                var db = Table.Get(Value, false, TableView.Table_NeedPassword);
+                if (db != null) { db.Editor = typeof(TableHeadEditor); }
 
                 if (adb.Get() != db) {
                     adb.Set(db);
@@ -426,7 +426,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             //case Accessor<IEditable> _:
-            //    //var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
+            //    //var db = Table.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
             //    //if (adb.Get() != db) { adb.Set(db); }
             //    break;
 
@@ -518,12 +518,12 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 ValueSet(co.ToHtmlCode(), true);
                 break;
 
-            case Database db:
-                ValueSet(db.TableName, true);
+            case BlueTable.Table db:
+                ValueSet(db.KeyName, true);
                 break;
 
             case IEditable:
-                //var db = Database.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
+                //var db = Table.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
                 //if (adb.Get() != db) { adb.Set(db); }
                 break;
 

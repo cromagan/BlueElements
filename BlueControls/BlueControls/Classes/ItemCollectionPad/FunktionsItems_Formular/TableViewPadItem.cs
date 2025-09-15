@@ -25,7 +25,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -54,7 +54,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public TableViewPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public TableViewPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public TableViewPadItem(string keyName, BlueTable.Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 
@@ -64,7 +64,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => true;
 
-    public override bool DatabaseInputMustMatchOutputDatabase => true;
+    public override bool TableInputMustMatchOutputTable => true;
 
     public override string Description => "Darstellung einer Tabelle als bearbeitbare und filterbare Tabelle.";
 
@@ -88,7 +88,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     #region Methods
 
-    public static List<AbstractListItem> AllAvailableColumArrangemengts(Database db) {
+    public static List<AbstractListItem> AllAvailableColumArrangemengts(BlueTable.Table db) {
         var tcvc = ColumnViewCollection.ParseAll(db);
         var u2 = new List<AbstractListItem>();
         foreach (var thisC in tcvc) {
@@ -98,8 +98,8 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     }
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new Table();
-        con.DatabaseSet(DatabaseOutput, string.Empty);
+        var con = new Controls.TableView();
+        con.TableSet(TableOutput, string.Empty);
         con.DoDefaultSettings(parent, this, mode);
         con.Arrangement = _defaultArrangement;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
@@ -113,11 +113,11 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
             new FlexiControl("Einstellungen:", widthOfControl, true)
         ];
 
-        if (DatabaseOutput is { IsDisposed: false } db) {
+        if (TableOutput is { IsDisposed: false } db) {
             result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, AllAvailableColumArrangemengts(db)));
         }
 
-        //if (DatabaseOutput is { IsDisposed: false }) {
+        //if (TableOutput is { IsDisposed: false }) {
         //    var u = new List<AbstractListItem>();
         //    u.AddRange(ItemsOf(typeof(Filterausgabe)));
         //    result.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
@@ -147,7 +147,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     public override string ReadableText() {
         const string txt = "Bearbeitbare Tabelle: ";
 
-        return txt + DatabaseOutput?.Caption;
+        return txt + TableOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));

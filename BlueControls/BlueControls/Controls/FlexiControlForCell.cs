@@ -20,7 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -28,9 +28,9 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
+using BlueTable;
+using BlueTable.Enums;
+using BlueTable.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -125,16 +125,16 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     #region Methods
 
     public void OpenScriptEditor() {
-        if (IsDisposed || DatabaseInput is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || TableInput is not { IsDisposed: false } db) { return; }
 
-        var se = IUniqueWindowExtension.ShowOrCreate<DatabaseScriptEditor>(db);
+        var se = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
         se.Row = _lastrow;
     }
 
-    protected override void DatabaseInput_CellValueChanged(object sender, CellEventArgs e) {
+    protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
         try {
             if (InvokeRequired) {
-                _ = Invoke(new Action(() => DatabaseInput_CellValueChanged(sender, e)));
+                _ = Invoke(new Action(() => TableInput_CellValueChanged(sender, e)));
                 return;
             }
 
@@ -144,35 +144,35 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
                 SetValueFromCell(_column, e.Row);
             }
 
-            if (e.Column == _column || e.Column == e.Column.Database?.Column.SysLocked) {
+            if (e.Column == _column || e.Column == e.Column.Table?.Column.SysLocked) {
                 CheckEnabledState(_column, e.Row);
             }
         } catch {
             // Invoke: auf das verworfene Ojekt blah blah
             if (!IsDisposed) {
                 Develop.CheckStackOverflow();
-                DatabaseInput_CellValueChanged(sender, e);
+                TableInput_CellValueChanged(sender, e);
             }
         }
     }
 
-    protected override void DatabaseInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) {
+    protected override void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) {
         if (e.Column == _column) {
             Invalidate_FilterInput();
         }
     }
 
-    protected override void DatabaseInput_Loaded(object sender, System.EventArgs e) {
+    protected override void TableInput_Loaded(object sender, System.EventArgs e) {
         if (Disposing || IsDisposed) { return; }
 
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(() => DatabaseInput_Loaded(sender, e)));
+                _ = Invoke(new Action(() => TableInput_Loaded(sender, e)));
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
                 Develop.CheckStackOverflow();
-                DatabaseInput_Loaded(sender, e); // am Anfang der Routine wird auf disposed geprüft
+                TableInput_Loaded(sender, e); // am Anfang der Routine wird auf disposed geprüft
                 return;
             }
         }
@@ -180,7 +180,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         Invalidate_FilterInput();
     }
 
-    protected override void DatabaseInput_RowChecked(object sender, RowCheckedEventArgs e) {
+    protected override void TableInput_RowChecked(object sender, RowCheckedEventArgs e) {
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
         if (e.Row != _lastrow) { return; }
@@ -234,7 +234,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         CheckEnabledState(_column, _lastrow);
 
         if (_lastrow?.CheckRow() is { } rce) {
-            DatabaseInput_RowChecked(this, rce);
+            TableInput_RowChecked(this, rce);
         }
     }
 
@@ -290,7 +290,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
             return;
         }
 
-        if (row.Database != column.Database) {
+        if (row.Table != column.Table) {
             f.DisabledReason = "Interner Fehler. Admin verständigen.";
             return;
         }
@@ -301,7 +301,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private void F_ControlAdded(object sender, ControlEventArgs e) {
         switch (e.Control) {
             case TextBox textBox:
-                textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
+                textBox.NeedTableOfAdditinalSpecialChars += textBox_NeedTableOfAdditinalSpecialChars;
                 //textBox.GotFocus += GotFocus_TextBox;
                 textBox.TextChanged += TextBox_TextChanged;
                 break;
@@ -330,7 +330,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     private void F_ControlRemoved(object sender, ControlEventArgs e) {
         switch (e.Control) {
             case TextBox textBox:
-                textBox.NeedDatabaseOfAdditinalSpecialChars -= textBox_NeedDatabaseOfAdditinalSpecialChars;
+                textBox.NeedTableOfAdditinalSpecialChars -= textBox_NeedTableOfAdditinalSpecialChars;
                 textBox.TextChanged -= TextBox_TextChanged;
                 break;
 
@@ -374,9 +374,9 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
     private ColumnItem? GetTmpColumn() {
         try {
-            return DatabaseInput is { IsDisposed: false } db ? db.Column[_columnName] : null;
+            return TableInput is { IsDisposed: false } db ? db.Column[_columnName] : null;
         } catch {
-            // Multitasking sei dank kann _database trotzem null sein...
+            // Multitasking sei dank kann _table trotzem null sein...
             Develop.CheckStackOverflow();
             return GetTmpColumn();
         }
@@ -415,7 +415,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     }
 
     private async Task RunMarkerAsync(CancellationToken cancellationToken) {
-        if (IsDisposed || DatabaseInput is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || TableInput is not { IsDisposed: false } db) { return; }
 
         // Thread-sichere TextBox ermitteln
         var txb = f.GetControl<TextBox>();
@@ -511,10 +511,10 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         f.Caption = Caption;
 
         if (realColumn != null) {
-            QuickInfo = Table.QuickInfoText(realColumn, string.Empty);
+            QuickInfo = TableView.QuickInfoText(realColumn, string.Empty);
 
             f.GetStyleFrom(realColumn);
-            if (Table.RendererOf(realColumn, Constants.Win11) is Renderer_TextOneLine r) {
+            if (TableView.RendererOf(realColumn, Constants.Win11) is Renderer_TextOneLine r) {
                 f.Suffix = r.Suffix;
             }
         }
@@ -524,7 +524,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
                 case ComboBox comboBox:
                     var item2 = new List<AbstractListItem>();
                     if (realColumn != null) {
-                        var r = Table.RendererOf(column, Constants.Win11);
+                        var r = TableView.RendererOf(column, Constants.Win11);
                         item2.AddRange(ItemsOf(realColumn, null, 10000, r));
                     }
 
@@ -569,7 +569,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
 
         var item = new List<AbstractListItem>();
         if (column.EditableWithDropdown) {
-            var r = Table.RendererOf(column, Constants.Win11);
+            var r = TableView.RendererOf(column, Constants.Win11);
             item.AddRange(ItemsOf(column, null, 10000, r));
             if (!column.ShowValuesOfOtherCellsInDropdown) {
                 bool again;
@@ -621,7 +621,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         control.SuggestionsClear();
         if (column is not { IsDisposed: false }) { return; }
 
-        var r = Table.RendererOf(column, Constants.Win11);
+        var r = TableView.RendererOf(column, Constants.Win11);
 
         var item = new List<AbstractListItem>();
         item.AddRange(ItemsOf(column, null, 10000, r));
@@ -641,7 +641,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         }
     }
 
-    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, DatabaseFileGiveBackEventArgs e) => e.File = DatabaseInput;
+    private void textBox_NeedTableOfAdditinalSpecialChars(object sender, TableFileGiveBackEventArgs e) => e.File = TableInput;
 
     private void TextBox_TextChanged(object sender, System.EventArgs e) => RestartMarker();
 

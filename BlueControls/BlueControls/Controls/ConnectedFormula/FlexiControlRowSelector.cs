@@ -20,8 +20,8 @@
 using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -38,7 +38,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
 
     #region Constructors
 
-    public FlexiControlRowSelector(Database? database, string caption, string showFormat) : base(false, false, false) {
+    public FlexiControlRowSelector(BlueTable.Table? table, string caption, string showFormat) : base(false, false, false) {
         InitializeComponent();
         f.CaptionPosition = CaptionPosition.Über_dem_Feld;
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
@@ -46,7 +46,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
         f.Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
         _showformat = showFormat;
 
-        if (string.IsNullOrEmpty(_showformat) && database is { Column.Count: > 0 } && database.Column.First is { IsDisposed: false } fc) {
+        if (string.IsNullOrEmpty(_showformat) && table is { Column.Count: > 0 } && table.Column.First is { IsDisposed: false } fc) {
             _showformat = "~" + fc.KeyName + "~";
         }
     }
@@ -81,7 +81,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
 
         if (!f.Allinitialized) { f.CreateSubControls(); }
 
-        DoInputFilter(FilterOutput.Database, true);
+        DoInputFilter(FilterOutput.Table, true);
         DoRows();
 
         #region Combobox suchen

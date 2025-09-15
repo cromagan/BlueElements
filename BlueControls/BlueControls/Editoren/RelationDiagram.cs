@@ -23,8 +23,8 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
-using BlueDatabase;
-using BlueDatabase.Interfaces;
+using BlueTable;
+using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -32,25 +32,25 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-public partial class RelationDiagram : PadEditor, IHasDatabase {
+public partial class RelationDiagram : PadEditor, IHasTable {
 
     #region Fields
 
     private readonly ColumnItem? _column;
 
-    private Database? _database;
+    private BlueTable.Table? _table;
 
     #endregion
 
     #region Constructors
 
-    public RelationDiagram(Database? database) {
+    public RelationDiagram(BlueTable.Table? table) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        Database = database;
+        Table = table;
 
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem is { IsDisposed: false, Relationship_to_First: true }) {
@@ -64,19 +64,19 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     #region Properties
 
-    public Database? Database {
-        get => _database;
+    public Table? Table {
+        get => _table;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _database) { return; }
+            if (value == _table) { return; }
 
-            if (_database != null) {
-                _database.DisposingEvent -= _database_Disposing;
+            if (_table != null) {
+                _table.DisposingEvent -= _table_Disposing;
             }
-            _database = value;
+            _table = value;
 
-            if (_database != null) {
-                _database.DisposingEvent += _database_Disposing;
+            if (_table != null) {
+                _table.DisposingEvent += _table_Disposing;
             }
         }
     }
@@ -88,7 +88,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return null; }
+        if (IsDisposed || Table is not { IsDisposed: false } db) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Items?[what] != null) { return null; }
         var r = db.Row[what];
@@ -119,17 +119,17 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        Database = null;
+        Table = null;
         base.OnFormClosing(e);
     }
 
-    private void _database_Disposing(object sender, System.EventArgs e) {
-        Database = null;
+    private void _table_Disposing(object sender, System.EventArgs e) {
+        Table = null;
         Close();
     }
 
     private void BezPlus(RowFormulaPadItem initialItem) {
-        if (IsDisposed || Database is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
         if (_column == null || initialItem.Row == null || db.Column.First is not { IsDisposed: false } cf) { return; }
 
         // Den Beziehungstext holen
@@ -219,7 +219,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //    //{
     //    //    if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar)
     //    //    {
-    //    //        var l = Database.Cell.GetList(Col, tempVar.Row);
+    //    //        var l = Table.Cell.GetList(Col, tempVar.Row);
     //    //        if (l.Count > 0)
     //    //        {
     //    //            foreach (var thisR in l)
@@ -239,7 +239,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //    //{
     //    //    return;
     //    //}
-    //    //var NachR = Database.Row[NachRelation.Sec];
+    //    //var NachR = Table.Row[NachRelation.Sec];
     //    //if (NachR == null) { return; }
     //    //var nach = ItemOfRow(NachR);
     //    //if (nach == null) { return; }
@@ -292,7 +292,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //            no = no.Replace("__", "_");
     //            var newn = IO.TempFile(fl.SelectedPath, no, "png");
     //            r.GeneratedBitmap.Save(newn, System.Drawing.Imaging.ImageFormat.Png);
-    //            foreach (var thisc in r.Row.Database.Column) {
+    //            foreach (var thisc in r.Row.Table.Column) {
     //                if (thisc.Format == DataFormat.Link_To_Filesystem) {
     //                    var l = r.Row.CellGetList(thisc);
     //                    foreach (var thiss in l) {
@@ -347,7 +347,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
-        if (Database?.Column.First is not { IsDisposed: false } c) { return; }
+        if (Table?.Column.First is not { IsDisposed: false } c) { return; }
 
         var il = new List<AbstractListItem>();
         il.AddRange(ItemsOf(c.Contents()));

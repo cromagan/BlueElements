@@ -20,7 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -120,7 +120,7 @@ public class FormManager : ApplicationContext {
             Running = false;
             ExecuteAtEnd?.Invoke();
 
-            Database.ForceSaveAll();
+            Table.ForceSaveAll();
             MultiUserFile.SaveAll(true);
             MultiUserFile.UnlockAllHard();
 

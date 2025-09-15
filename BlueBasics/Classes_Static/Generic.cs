@@ -128,10 +128,10 @@ public static class Generic {
 
         title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "!.,()+-_ " + Constants.Char_Numerals);
 
-        var fileName = IO.TempFile(saveTo.TrimEnd("\\"), title, "url");
+        var fileName = TempFile(saveTo.TrimEnd("\\"), title, "url");
         var content = "[InternetShortcut]\nURL=" + linkUrl;
 
-        return IO.WriteAllText(fileName, content, Constants.Win1252, false);
+        return WriteAllText(fileName, content, Constants.Win1252, false);
     }
 
     /// <summary>
@@ -151,9 +151,9 @@ public static class Generic {
             IconFile={icon}
             """;
 
-            var fileName = IO.TempFile(saveTo, linkName, "url");
+            var fileName = TempFile(saveTo, linkName, "url");
 
-            if (IO.WriteAllText(fileName, content, Encoding.UTF8, false)) {
+            if (WriteAllText(fileName, content, Encoding.UTF8, false)) {
                 return true;
             } else {
                 Develop.DebugPrint("Fehler beim Shortcut anlegen: WriteAllText fehlgeschlagen");

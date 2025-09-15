@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 
 namespace BlueControls.Controls {
     partial class FlexiControlForCell {

@@ -24,9 +24,9 @@ using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
+using BlueTable;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -36,13 +36,13 @@ using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
 
-namespace BlueControls.BlueDatabaseDialogs;
+namespace BlueControls.BlueTableDialogs;
 
 internal sealed partial class ColumnEditor : IIsEditor {
 
     #region Fields
 
-    private readonly Table? _table;
+    private readonly Controls.TableView? _table;
 
     private ColumnItem? _column;
 
@@ -54,7 +54,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     public ColumnEditor() : this(null, null) { }
 
-    public ColumnEditor(ColumnItem? column, Table? table) : base() {
+    public ColumnEditor(ColumnItem? column, Controls.TableView? table) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         _table = table;
@@ -219,27 +219,27 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void btnSchnellText_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
         _column.GetStyleFrom(ColumnFormatHolder.Text);
         Column_DatenAuslesen();
     }
 
     private void btnSpaltenkopf_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false } db) { return; }
 
-        _ = db.Edit(typeof(DatabaseHeadEditor));
+        _ = db.Edit(typeof(TableHeadEditor));
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
         _column.ResetSystemToDefault(true);
         Column_DatenAuslesen();
     }
 
     private void btnSystemInfo_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
 
         _column.SystemInfoReset(true);
     }
@@ -250,10 +250,10 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(Table.ColumnUsage(_column));
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(TableView.ColumnUsage(_column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
 
         _column = _table?.CurrentArrangement?[_column]?.NextVisible()?.Column ?? _column;
@@ -261,7 +261,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
         _column = _table?.CurrentArrangement?[_column]?.PreviewsVisible()?.Column ?? _column;
         Column_DatenAuslesen();
@@ -273,31 +273,31 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// <param name="sender"></param>
     /// <param name="e"></param>
 
-    private void cbxLinkedDatabase_TextChanged(object? sender, System.EventArgs e) {
+    private void cbxLinkedTable_TextChanged(object? sender, System.EventArgs e) {
         if (_column is not { IsDisposed: false }) { return; }
 
-        _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
+        _column.LinkedTableTableName = cbxLinkedTable.Text;
 
         cbxTargetColumn.ItemClear();
 
-        if (_column.LinkedDatabase != null) {
-            //foreach (var ThisColumn in _Column.Database.Column) {
-            //    if (ThisColumn.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
+        if (_column.LinkedTable != null) {
+            //foreach (var ThisColumn in _Column.Table.Column) {
+            //    if (ThisColumn.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetTable()) {
             //        cbxRowKeyInColumn.ItemAdd(ThisColumn);
             //    }
-            //    //if (ThisColumn.Format == DataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
+            //    //if (ThisColumn.Format == DataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedTable() == _Column.LinkedTable()) {
             //    //    cbxRowKeyInColumn.ItemAdd(ThisColumn);
             //    //}
             //}
-            foreach (var thisLinkedColumn in _column.LinkedDatabase.Column) {
+            foreach (var thisLinkedColumn in _column.LinkedTable.Column) {
                 if (thisLinkedColumn.CanBeCheckedByRules() && thisLinkedColumn.RelationType == RelationType.None) {
                     cbxTargetColumn.ItemAdd(ItemOf(thisLinkedColumn));
                 }
             }
         }
         //cbxTargetColumn.Item.Sort();
-        cbxTargetColumn.Text = _column.ColumnNameOfLinkedDatabase;
-        //SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedDatabase);
+        cbxTargetColumn.Text = _column.ColumnNameOfLinkedTable;
+        //SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedTable);
         cbxTargetColumn.Enabled = cbxTargetColumn.ItemCount > 0;
         capTargetColumn.Enabled = cbxTargetColumn.Enabled;
         if (!cbxTargetColumn.Enabled) {
@@ -331,13 +331,13 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void Column_DatenAuslesen() {
         if (_column is not { IsDisposed: false }) { return; }
 
-        capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database?.TableName);
+        capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Table?.KeyName);
 
-        cbxLinkedDatabase.ItemClear();
+        cbxLinkedTable.ItemClear();
 
         lbxCellEditor.Suggestions.Clear();
 
-        lbxCellEditor.ItemAddRange(Table.Permission_AllUsed(true));
+        lbxCellEditor.ItemAddRange(TableView.Permission_AllUsed(true));
 
         if (_table?.CurrentArrangement is { IsDisposed: false } car) {
             butAktuellZurueck.Enabled = car[_column]?.PreviewsVisible() != null;
@@ -412,9 +412,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
         txbAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         txbQuickinfo.Text = _column.ColumnQuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        cbxLinkedDatabase.Text = _column.LinkedDatabaseTableName;
+        cbxLinkedTable.Text = _column.LinkedTableTableName;
         txbAutoRemove.Text = _column.AutoRemove;
-        cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
+        cbxLinkedTable_TextChanged(null, System.EventArgs.Empty);
     }
 
     /// <summary>
@@ -423,7 +423,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// </summary>
 
     private void Column_DatenZurückschreiben() {
-        if (TableView.EditabelErrorMessage(_column?.Database)) { return; }
+        if (TableViewForm.EditabelErrorMessage(_column?.Table)) { return; }
 
         if (_column is not { IsDisposed: false }) { return; }
         if (IsClosed) { return; }
@@ -496,8 +496,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.AllowedChars = txbAllowedChars.Text;
         _column.MaxTextLenght = IntParse(txbMaxTextLenght.Text);
         _column.MaxCellLenght = IntParse(txbMaxCellLenght.Text);
-        _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
-        _column.ColumnNameOfLinkedDatabase = cbxTargetColumn.Text; // LINKED DATABASE
+        _column.LinkedTableTableName = cbxLinkedTable.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
+        _column.ColumnNameOfLinkedTable = cbxTargetColumn.Text; // LINKED TABLE
         _column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
         _column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
         _column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
@@ -515,23 +515,23 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void GeneratFilterListe() {
-        if (IsDisposed || _column?.Database is not { IsDisposed: false } db2) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false } db2) { return; }
 
-        _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
+        _column.LinkedTableTableName = cbxLinkedTable.Text;
 
-        var linkdb = _column.LinkedDatabase;
+        var linkdb = _column.LinkedTable;
 
-        if (linkdb == null || tblFilterliste.Database != null) { tblFilterliste.DatabaseSet(null, string.Empty); }
+        if (linkdb == null || tblFilterliste.Table != null) { tblFilterliste.TableSet(null, string.Empty); }
 
-        if (tblFilterliste.Database != null &&
-            !string.Equals(tblFilterliste.Database.Tags.TagGet("Filename").FileNameWithoutSuffix(), linkdb?.TableName, StringComparison.OrdinalIgnoreCase)) {
-            tblFilterliste.DatabaseSet(null, string.Empty);
+        if (tblFilterliste.Table != null &&
+            !string.Equals(tblFilterliste.Table.Tags.TagGet("Filename").FileNameWithoutSuffix(), linkdb?.KeyName, StringComparison.OrdinalIgnoreCase)) {
+            tblFilterliste.TableSet(null, string.Empty);
         }
 
         if (linkdb == null) { return; }
 
-        if (tblFilterliste.Database == null) {
-            Database db = new(Database.UniqueKeyValue()) {
+        if (tblFilterliste.Table == null) {
+            BlueTable.Table db = new(Table.UniqueKeyValue()) {
                 LogUndo = false,
                 DropMessages = false
             };
@@ -581,11 +581,11 @@ internal sealed partial class ColumnEditor : IIsEditor {
             db.ColumnArrangements = tcvc.ToString(false);
 
             db.SortDefinition = new RowSortDefinition(db, sp, false);
-            tblFilterliste.DatabaseSet(db, string.Empty);
+            tblFilterliste.TableSet(db, string.Empty);
             //tblFilterliste.Arrangement = 1;
 
             var t = db.Tags.Clone();
-            t.TagSet("Filename", linkdb.TableName);
+            t.TagSet("Filename", linkdb.KeyName);
             db.Tags = t.AsReadOnly();
 
             tblFilterliste?.Filter.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
@@ -596,7 +596,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         var spalteauDb = linkdb.Column[cbxTargetColumn.Text];
 
         foreach (var col in linkdb.Column) {
-            var r = tblFilterliste?.Database?.Row[col.KeyName] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
+            var r = tblFilterliste?.Table?.Row[col.KeyName] ?? tblFilterliste?.Table?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
 
             if (r != null) {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
@@ -619,8 +619,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// </summary>
 
     private void GetLinkedCellFilter() {
-        if (IsDisposed || tblFilterliste.Database is not { IsDisposed: false } db) { return; }
-        if (_column?.Database is not { IsDisposed: false }) { return; }
+        if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } db) { return; }
+        if (_column?.Table is not { IsDisposed: false }) { return; }
 
         var nf = new List<string>();
         foreach (var thisr in db.Row) {
@@ -638,7 +638,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     /// </summary>
 
     private void SetLinkedCellFilter() {
-        if (IsDisposed || tblFilterliste.Database is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } db) { return; }
         if (_column is not { IsDisposed: false }) { return; }
 
         foreach (var thisr in db.Row) {
@@ -661,13 +661,13 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Database is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false } db) { return; }
 
-        if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.ItemCount == 0) {
-            var l = Database.AllAvailableTables();
+        if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedTable.ItemCount == 0) {
+            var l = Table.AllAvailableTables();
 
             foreach (var thisString in l) {
-                if (!string.Equals(thisString.FileNameWithoutSuffix(), db.TableName, StringComparison.OrdinalIgnoreCase)) { cbxLinkedDatabase.ItemAdd(ItemOf(thisString.FileNameWithoutSuffix(), thisString)); }
+                if (!string.Equals(thisString.FileNameWithoutSuffix(), db.KeyName, StringComparison.OrdinalIgnoreCase)) { cbxLinkedTable.ItemAdd(ItemOf(thisString.FileNameWithoutSuffix(), thisString)); }
             }
         }
     }

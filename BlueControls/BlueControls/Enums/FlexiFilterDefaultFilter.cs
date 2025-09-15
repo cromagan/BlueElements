@@ -17,7 +17,7 @@
 
 #nullable enable
 
-using BlueDatabase.Enums;
+using BlueTable.Enums;
 
 namespace BlueControls.Enums;
 

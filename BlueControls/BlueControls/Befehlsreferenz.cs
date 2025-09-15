@@ -18,7 +18,7 @@
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
-using BlueDatabase;
+using BlueTable;
 using BlueScript.Methods;
 using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -45,7 +45,7 @@ public partial class Befehlsreferenz : Form {
     private void GetUses(Method thisc, int max) {
         if (thisc.UsesInDB.Count >= max) { return; }
 
-        foreach (var thisDb in Database.AllFiles) {
+        foreach (var thisDb in Table.AllFiles) {
             if (!thisDb.IsDisposed && !string.IsNullOrEmpty(thisDb.Filename)) {
                 if (thisDb.EventScript.ToString(false).ContainsWord(thisc.KeyName, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) {
                     _ = thisc.UsesInDB.AddIfNotExists("Tabelle: " + thisDb.Caption);

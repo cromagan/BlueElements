@@ -174,8 +174,8 @@ public sealed class QuickImage : IReadableText, IEditable {
             case FileFormat.HelpFile:
                 return ImageCode.Frage;
 
-            case FileFormat.Database:
-                return ImageCode.Datenbank;
+            case FileFormat.Table:
+                return ImageCode.Tabelle;
 
             case FileFormat.XMLFile:
                 return ImageCode.XML;

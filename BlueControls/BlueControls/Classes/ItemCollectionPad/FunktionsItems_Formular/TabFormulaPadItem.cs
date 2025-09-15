@@ -64,7 +64,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
@@ -127,7 +127,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                         GroupBoxStyle = GroupBoxStyle.Nothing
                     };
                     t.Controls.Add(cc);
-                    //cc.InitFormula(thisPage, cc.DatabaseInput);
+                    //cc.InitFormula(thisPage, cc.TableInput);
                     cc.Dock = DockStyle.Fill;
                     cc.DoDefaultSettings(parentView, this, mode);
 
@@ -236,7 +236,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override string ReadableText() {
         const string txt = "Register-Karten: ";
 
-        return txt + DatabaseInput?.Caption;
+        return txt + TableInput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));

@@ -18,7 +18,7 @@
 #nullable enable
 
 using BlueControls.ItemCollectionPad;
-using BlueDatabase.AdditionalScriptMethods;
+using BlueTable.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -53,7 +53,7 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(scp);
-        if (r?.Database is not { IsDisposed: false }) { return new DoItFeedback("Zeilenfehler!", true, ld); }
+        if (r?.Table is not { IsDisposed: false }) { return new DoItFeedback("Zeilenfehler!", true, ld); }
 
         #endregion
 

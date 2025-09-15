@@ -24,8 +24,8 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -55,7 +55,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public OutputFilterPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public OutputFilterPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public OutputFilterPadItem(string keyName, BlueTable.Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 
@@ -77,7 +77,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public ColumnItem? Column {
         get {
-            var c = DatabaseOutput?.Column[_columnName];
+            var c = TableOutput?.Column[_columnName];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
@@ -93,7 +93,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         }
     }
 
-    public override bool DatabaseInputMustMatchOutputDatabase => true;
+    public override bool TableInputMustMatchOutputTable => true;
 
     public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.";
 
@@ -151,7 +151,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             new FlexiControl("Einstellungen:", widthOfControl, true)
         ];
 
-        if (DatabaseOutput is { IsDisposed: false } db) {
+        if (TableOutput is { IsDisposed: false } db) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(db.Column, true));
 
@@ -223,7 +223,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     public override string ReadableText() {
         const string txt = "Filter-Auswahl: ";
 
-        return txt + DatabaseOutput?.Caption;
+        return txt + TableOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Trichter, 16);

@@ -19,15 +19,15 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -85,7 +85,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
     public string EntityID { get; internal set; } = string.Empty;
 
     /// <summary>
-    /// Eine Spalte in der Ziel-Datenbank.
+    /// Eine Spalte in der Ziel-Tabelle.
     /// In diese wird die generierte ID des klickbaren Elements gespeichert.
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
@@ -129,7 +129,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         }
 
-        var m = Method.GetMethods(MethodType.LongTime); // Ja, Longtime... andere Datenbanken müssen geladen werden.
+        var m = Method.GetMethods(MethodType.LongTime); // Ja, Longtime... andere Tabellen müssen geladen werden.
 
         var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, "Row-Adder", "Row-Adder");
 
@@ -147,7 +147,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     generatedentityID,
                     //"Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
                     //"Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
-                    //"Tabelle: " + Database.Caption,
+                    //"Tabelle: " + Table.Caption,
                     " ",
                     " ",
                     //"Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
@@ -389,7 +389,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         FloatingForm.Close(this);
 
         if (e.Item is ReadableListItem { Item: AdderItem ai }) {
-            AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
+            AdderItem.AddRowsToTable(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
         }
 
         _mustUpdate = true;
@@ -412,9 +412,9 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
         if (e.Item is ReadableListItem { Item: AdderItem ai } rli) {
             if (f.Checked.Contains(rli.KeyName)) {
-                AdderItem.AddRowsToDatabase(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
+                AdderItem.AddRowsToTable(OriginIDColumn, ai.KeysAndInfo, _lastGeneratedEntityId, AdditionalInfoColumn);
             } else {
-                AdderItem.RemoveRowsFromDatabase(OriginIDColumn, _lastGeneratedEntityId, ai.KeyName);
+                AdderItem.RemoveRowsFromTable(OriginIDColumn, _lastGeneratedEntityId, ai.KeyName);
             }
             //FillListBox();
             _mustUpdate = true;

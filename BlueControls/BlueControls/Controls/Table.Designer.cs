@@ -3,11 +3,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Enums;
-using BlueDatabase.EventArgs;
+using BlueTable.EventArgs;
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls {
-    public partial class Table {
+    public partial class TableView {
 
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
@@ -40,7 +40,7 @@ namespace BlueControls.Controls {
             this.BCB.Esc += new EventHandler(this.BB_ESC);
             this.BCB.Tab += new EventHandler(this.BB_TAB);
             this.BCB.LostFocus += new EventHandler(this.BB_LostFocus);
-            this.BCB.NeedDatabaseOfAdditinalSpecialChars += new EventHandler<DatabaseFileGiveBackEventArgs>(this.BB_NeedDatabaseOfAdditinalSpecialChars);
+            this.BCB.NeedTableOfAdditinalSpecialChars += new EventHandler<TableFileGiveBackEventArgs>(this.BB_NeedTableOfAdditinalSpecialChars);
             // 
             // BTB
             // 
@@ -55,7 +55,7 @@ namespace BlueControls.Controls {
             this.BTB.Esc += new EventHandler(this.BB_ESC);
             this.BTB.Tab += new EventHandler(this.BB_TAB);
             this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
-            this.BTB.NeedDatabaseOfAdditinalSpecialChars += new EventHandler<DatabaseFileGiveBackEventArgs>(this.BB_NeedDatabaseOfAdditinalSpecialChars);
+            this.BTB.NeedTableOfAdditinalSpecialChars += new EventHandler<TableFileGiveBackEventArgs>(this.BB_NeedTableOfAdditinalSpecialChars);
             // 
             // SliderX
             // 

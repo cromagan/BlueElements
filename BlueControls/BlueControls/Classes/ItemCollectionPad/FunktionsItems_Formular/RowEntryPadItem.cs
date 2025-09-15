@@ -22,7 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
+using BlueTable;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -39,7 +39,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
     public RowEntryPadItem() : this(string.Empty, null, null) { }
 
-    public RowEntryPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public RowEntryPadItem(string keyName, Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 
@@ -48,7 +48,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
     public static string ClassId => "FI-RowEntryElement";
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None;
 
-    public override bool DatabaseInputMustMatchOutputDatabase => true;
+    public override bool TableInputMustMatchOutputTable => true;
 
     public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
     public new List<int> InputColorId => [OutputColorId];
@@ -80,7 +80,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
     public override string ReadableText() {
         const string txt = "Eingangs-Zeile: ";
 
-        return txt + DatabaseOutput?.Caption;
+        return txt + TableOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));

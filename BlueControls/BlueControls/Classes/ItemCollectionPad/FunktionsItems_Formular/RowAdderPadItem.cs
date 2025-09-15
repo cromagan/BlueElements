@@ -20,13 +20,13 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
+using BlueTable;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -71,7 +71,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public RowAdderPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public RowAdderPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public RowAdderPadItem(string keyName, BlueTable.Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 
@@ -81,7 +81,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public ColumnItem? AdditionalInfoColumn {
         get {
-            if (DatabaseOutput is not { IsDisposed: false } dbout) { return null; }
+            if (TableOutput is not { IsDisposed: false } dbout) { return null; }
 
             var c = dbout.Column[_additinalInfoColumnName];
             return c is not { IsDisposed: false } ? null : c;
@@ -103,7 +103,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
 
     public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann.\r\n" +
                                           "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangsdatenbank benutzt.\r\n" +
@@ -129,14 +129,14 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public override bool MustBeInDrawingArea => true;
 
     /// <summary>
-    /// Eine Spalte in der Ziel-Datenbank.
+    /// Eine Spalte in der Ziel-Tabelle.
     /// In diese wird die generierte ID des klickbaren Elements gespeichert.
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
     public ColumnItem? OriginIDColumn {
         get {
-            if (DatabaseOutput is not { IsDisposed: false } dbout) { return null; }
+            if (TableOutput is not { IsDisposed: false } dbout) { return null; }
 
             var c = dbout.Column[_originIdColumnName];
             return c is not { IsDisposed: false } ? null : c;
@@ -144,7 +144,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     }
 
     /// <summary>
-    /// Eine Spalte in der Ziel-Datenbank.
+    /// Eine Spalte in der Ziel-Tabelle.
     /// In diese wird die generierte ID des klickbaren Elements gespeichert.
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
@@ -245,12 +245,12 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         ];
 
         var inr = GetFilterFromGet();
-        if (inr.Count > 0 && inr[0].DatabaseOutput is { IsDisposed: false }) {
+        if (inr.Count > 0 && inr[0].TableOutput is { IsDisposed: false }) {
             result.Add(new FlexiControlForProperty<string>(() => EntityID));
             result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
         }
 
-        if (DatabaseOutput is { IsDisposed: false } dbout) {
+        if (TableOutput is { IsDisposed: false } dbout) {
             var lst = new List<AbstractListItem>();
             lst.AddRange(ItemsOf(dbout.Column, true));
 
@@ -306,7 +306,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public override string ReadableText() {
         const string txt = "Zeilengenerator: ";
 
-        return txt + DatabaseOutput?.Caption;
+        return txt + TableOutput?.Caption;
     }
 
     /// <summary>
@@ -314,7 +314,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// </summary>
     public void Skript_Bearbeiten() {
         var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(this);
-        se.Database = DatabaseInput;
+        se.Table = TableInput;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));

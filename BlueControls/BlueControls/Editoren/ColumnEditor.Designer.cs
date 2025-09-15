@@ -16,7 +16,7 @@ using TabControl = BlueControls.Controls.TabControl;
 using TabPage = System.Windows.Forms.TabPage;
 using TextBox = BlueControls.Controls.TextBox;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueTableDialogs {
     internal sealed partial class ColumnEditor : Form {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
@@ -116,8 +116,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capRegex = new BlueControls.Controls.Caption();
             this.txbAllowedChars = new BlueControls.Controls.TextBox();
             this.Caption13 = new BlueControls.Controls.Caption();
-            this.cbxLinkedDatabase = new BlueControls.Controls.ComboBox();
-            this.capLinkedDatabase = new BlueControls.Controls.Caption();
+            this.cbxLinkedTable = new BlueControls.Controls.ComboBox();
+            this.capLinkedTable = new BlueControls.Controls.Caption();
             this.BlueFrame1 = new BlueControls.Controls.GroupBox();
             this.btnSystemInfo = new BlueControls.Controls.Button();
             this.btnVerwendung = new BlueControls.Controls.Button();
@@ -147,7 +147,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSchnellGleitkommazahl = new BlueControls.Controls.Button();
             this.btnSchnellGanzzahl = new BlueControls.Controls.Button();
             this.tabSpaltenVerlinkung = new System.Windows.Forms.TabPage();
-            this.tblFilterliste = new BlueControls.Controls.Table();
+            this.tblFilterliste = new BlueControls.Controls.TableView();
             this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
             this.capTargetColumn = new BlueControls.Controls.Caption();
             this.caption5 = new BlueControls.Controls.Caption();
@@ -1053,25 +1053,25 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption13.Text = "Folgende Zeichen können vom Benutzer eingegeben werden:";
             this.Caption13.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // cbxLinkedDatabase
+            // cbxLinkedTable
             // 
-            this.cbxLinkedDatabase.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxLinkedTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxLinkedDatabase.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxLinkedDatabase.Location = new System.Drawing.Point(248, 48);
-            this.cbxLinkedDatabase.Name = "cbxLinkedDatabase";
-            this.cbxLinkedDatabase.RegexCheck = null;
-            this.cbxLinkedDatabase.Size = new System.Drawing.Size(833, 24);
-            this.cbxLinkedDatabase.TabIndex = 38;
-            this.cbxLinkedDatabase.TextChanged += new System.EventHandler(this.cbxLinkedDatabase_TextChanged);
+            this.cbxLinkedTable.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxLinkedTable.Location = new System.Drawing.Point(248, 48);
+            this.cbxLinkedTable.Name = "cbxLinkedTable";
+            this.cbxLinkedTable.RegexCheck = null;
+            this.cbxLinkedTable.Size = new System.Drawing.Size(833, 24);
+            this.cbxLinkedTable.TabIndex = 38;
+            this.cbxLinkedTable.TextChanged += new System.EventHandler(this.cbxLinkedTable_TextChanged);
             // 
-            // capLinkedDatabase
+            // capLinkedTable
             // 
-            this.capLinkedDatabase.CausesValidation = false;
-            this.capLinkedDatabase.Location = new System.Drawing.Point(8, 48);
-            this.capLinkedDatabase.Name = "capLinkedDatabase";
-            this.capLinkedDatabase.Size = new System.Drawing.Size(152, 16);
-            this.capLinkedDatabase.Text = "Vernküpfte Tabelle:";
+            this.capLinkedTable.CausesValidation = false;
+            this.capLinkedTable.Location = new System.Drawing.Point(8, 48);
+            this.capLinkedTable.Name = "capLinkedTable";
+            this.capLinkedTable.Size = new System.Drawing.Size(152, 16);
+            this.capLinkedTable.Text = "Vernküpfte Tabelle:";
             // 
             // BlueFrame1
             // 
@@ -1409,9 +1409,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSpaltenVerlinkung.Controls.Add(this.caption1);
             this.tabSpaltenVerlinkung.Controls.Add(this.tblFilterliste);
             this.tabSpaltenVerlinkung.Controls.Add(this.cbxTargetColumn);
-            this.tabSpaltenVerlinkung.Controls.Add(this.capLinkedDatabase);
+            this.tabSpaltenVerlinkung.Controls.Add(this.capLinkedTable);
             this.tabSpaltenVerlinkung.Controls.Add(this.capTargetColumn);
-            this.tabSpaltenVerlinkung.Controls.Add(this.cbxLinkedDatabase);
+            this.tabSpaltenVerlinkung.Controls.Add(this.cbxLinkedTable);
             this.tabSpaltenVerlinkung.Location = new System.Drawing.Point(4, 25);
             this.tabSpaltenVerlinkung.Name = "tabSpaltenVerlinkung";
             this.tabSpaltenVerlinkung.Size = new System.Drawing.Size(1098, 594);
@@ -1615,8 +1615,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbRunden;
         private Caption capNachkommastellen;
         private Button btnAutoEditAutoSort;
-        private ComboBox cbxLinkedDatabase;
-        private Caption capLinkedDatabase;
+        private ComboBox cbxLinkedTable;
+        private Caption capLinkedTable;
         private ComboBox cbxTargetColumn;
         private Caption capTargetColumn;
         private Caption capUeberschrift3;
@@ -1665,7 +1665,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TabPage tabDatenFormat;
         private GroupBox grpSchnellformat;
         private TabPage tabSpaltenVerlinkung;
-        private Table tblFilterliste;
+        private TableView tblFilterliste;
         private TextBox txbMaxCellLenght;
         private Caption capMaxCellLenght;
         private Button btnCalculateMaxCellLenght;

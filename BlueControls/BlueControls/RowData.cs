@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace BlueDatabase;
+namespace BlueTable;
 
 public static class RowDrawDataExtensions {
 

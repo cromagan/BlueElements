@@ -20,11 +20,11 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Forms;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -37,7 +37,7 @@ public static class AbstractListItemExtension {
     #region Methods
 
     public static List<AbstractListItem> AllAvailableTables() {
-        var ld = Database.AllAvailableTables();
+        var ld = Table.AllAvailableTables();
         var ld2 = new List<AbstractListItem>();
         foreach (var thisd in ld) {
             ld2.Add(ItemOf(thisd.FileNameWithoutSuffix(), thisd));
@@ -123,12 +123,12 @@ public static class AbstractListItemExtension {
         if (column.ShowValuesOfOtherCellsInDropdown) { l.AddRange(column.Contents()); }
 
         if (column.RelationType == RelationType.DropDownValues) {
-            var db2 = column.LinkedDatabase;
+            var db2 = column.LinkedTable;
             if (db2 == null) { Notification.Show("Verknüpfte Tabelle nicht vorhanden", ImageCode.Information); return []; }
 
             // Spalte aus der Ziel-Tabelle ermitteln
-            var targetColumn = db2.Column[column.ColumnNameOfLinkedDatabase];
-            if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return []; }
+            var targetColumn = db2.Column[column.ColumnNameOfLinkedTable];
+            if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieltabelle nicht vorhanden."); return []; }
 
             var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow, null);
             if (!string.IsNullOrEmpty(info)) {
@@ -147,7 +147,7 @@ public static class AbstractListItemExtension {
             }
         }
 
-        if (checkedItemsAtRow?.Database is { IsDisposed: false }) {
+        if (checkedItemsAtRow?.Table is { IsDisposed: false }) {
             l.AddRange(checkedItemsAtRow.CellGetList(column));
             l = l.SortedDistinctList();
         }

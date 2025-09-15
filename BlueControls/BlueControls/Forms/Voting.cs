@@ -19,7 +19,7 @@
 
 using BlueBasics;
 using BlueControls.ItemCollectionPad;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Collections.Generic;
 
@@ -53,7 +53,7 @@ public partial class Voting : System.Windows.Forms.Form {
 
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
-        ExportDialog.AddLayoutsOff(cbxStil, _column.Database);
+        ExportDialog.AddLayoutsOff(cbxStil, _column.Table);
         Generate();
     }
 
@@ -82,7 +82,7 @@ public partial class Voting : System.Windows.Forms.Form {
         Change(v1, -2, [_fr1, _fr2]);
 
         Generate();
-        Database.ForceSaveAll();
+        Table.ForceSaveAll();
     }
 
     private void btn2_Click(object? sender, System.EventArgs e) {
@@ -99,7 +99,7 @@ public partial class Voting : System.Windows.Forms.Form {
         Change(v2, -2, [_fr1, _fr2]);
 
         Generate();
-        Database.ForceSaveAll();
+        Table.ForceSaveAll();
     }
 
     private void cbxStil_TextChanged(object sender, System.EventArgs e) {
@@ -112,7 +112,7 @@ public partial class Voting : System.Windows.Forms.Form {
     }
 
     private void Change(double v, int value, List<RowItem> notallowed) {
-        var f = new FilterCollection(_column.Database, "ChangeFilter") {
+        var f = new FilterCollection(_column.Table, "ChangeFilter") {
             new(_column, v - 3, v + 3)
         };
 
@@ -164,7 +164,7 @@ public partial class Voting : System.Windows.Forms.Form {
         if (_done.TryGetValue(key, out var value)) {
             //Pad1.Refresh();
             //Pad2.Refresh();
-            //Database.ForceSaveAll();
+            //Table.ForceSaveAll();
             if (value) {
                 btn2_Click(null, System.EventArgs.Empty);
             } else {

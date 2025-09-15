@@ -4,7 +4,7 @@ using BlueControls.Controls;
 using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueTableDialogs {
     public partial class ScriptEditorGeneric {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

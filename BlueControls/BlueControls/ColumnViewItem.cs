@@ -25,8 +25,8 @@ using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
+using BlueTable.Enums;
+using BlueTable.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,7 +35,7 @@ using System.Runtime.CompilerServices;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
-namespace BlueDatabase;
+namespace BlueTable;
 
 public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable, INotifyPropertyChanged {
 
@@ -294,7 +294,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public static int CalculateContentWith(ColumnItem? column, Renderer_Abstract renderer) {
         if (column is not { IsDisposed: false }) { return 16; }
-        if (column.Database is not { IsDisposed: false } db) { return 16; }
+        if (column.Table is not { IsDisposed: false } db) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
 
         var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
@@ -403,7 +403,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public Renderer_Abstract GetRenderer(string style) {
         if (_renderer != null) { return _renderer; }
 
-        _renderer = Table.RendererOf(this, style);
+        _renderer = TableView.RendererOf(this, style);
         return _renderer;
     }
 
@@ -457,7 +457,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
-        if (Parent?.Database is not { IsDisposed: false } db) {
+        if (Parent?.Table is not { IsDisposed: false } db) {
             Develop.DebugPrint(ErrorType.Error, "Tabelle unbekannt");
             return false;
         }
@@ -569,7 +569,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (_column != null) {
             _column.PropertyChanged += _column_PropertyChanged;
 
-            if (_column.Database is { IsDisposed: false } db) {
+            if (_column.Table is { IsDisposed: false } db) {
                 db.Cell.CellValueChanged += Cell_CellValueChanged;
             }
         }
@@ -578,7 +578,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private void UnRegisterEvents() {
         if (_column != null) {
             _column.PropertyChanged -= _column_PropertyChanged;
-            if (_column.Database is { IsDisposed: false } db) {
+            if (_column.Table is { IsDisposed: false } db) {
                 db.Cell.CellValueChanged -= Cell_CellValueChanged;
             }
         }

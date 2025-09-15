@@ -20,7 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -67,7 +67,7 @@ public class GenericControlReciverSender : GenericControlReciver {
     #region Methods
 
     public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverSenderControlPadItem source, string mode) {
-        FilterOutput.Database = source.DatabaseOutput;
+        FilterOutput.Table = source.TableOutput;
         base.DoDefaultSettings(parentFormula, source, mode);
     }
 
@@ -116,7 +116,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
         FilterOutput.PropertyChanged -= FilterOutput_PropertyChanged;
         FilterOutput.DisposingEvent -= FilterOutput_DisposingEvent;
-        FilterOutput.Database = null;
+        FilterOutput.Table = null;
     }
 
     private void FilterOutput_PropertyChanged(object sender, PropertyChangedEventArgs e) {

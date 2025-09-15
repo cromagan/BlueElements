@@ -27,7 +27,7 @@ using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueDatabase.EventArgs;
+using BlueTable.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -97,7 +97,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     public event EventHandler? Esc;
 
-    public event EventHandler<DatabaseFileGiveBackEventArgs>? NeedDatabaseOfAdditinalSpecialChars;
+    public event EventHandler<TableFileGiveBackEventArgs>? NeedTableOfAdditinalSpecialChars;
 
     public event EventHandler? Tab;
 
@@ -819,8 +819,8 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     private void AddSpecialChar() {
         var x = _cursorCharPos;
-        DatabaseFileGiveBackEventArgs e = new();
-        OnNeedDatabaseOfAdditinalSpecialChars(e);
+        TableFileGiveBackEventArgs e = new();
+        OnNeedTableOfAdditinalSpecialChars(e);
         List<AbstractListItem> i =
         [
             ItemOf("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)),
@@ -1052,7 +1052,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     private void OnESC() => Esc?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnNeedDatabaseOfAdditinalSpecialChars(DatabaseFileGiveBackEventArgs e) => NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
+    private void OnNeedTableOfAdditinalSpecialChars(TableFileGiveBackEventArgs e) => NeedTableOfAdditinalSpecialChars?.Invoke(this, e);
 
     private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
 

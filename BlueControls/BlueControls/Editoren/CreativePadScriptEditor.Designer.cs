@@ -7,7 +7,7 @@ using BlueControls.Enums;
 using Button = BlueControls.Controls.Button;
 using TextBox = BlueControls.Controls.TextBox;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueTableDialogs {
     public sealed partial class CreativePadScriptEditor {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
@@ -21,7 +21,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.btnDatenbankKopf = new BlueControls.Controls.Button();
+            this.btnTabelleKopf = new BlueControls.Controls.Button();
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.cpad = new BlueControls.Controls.CreativePad();
@@ -41,16 +41,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.pnlStatusBar.Size = new System.Drawing.Size(327, 24);
             // 
-            // btnDatenbankKopf
+            // btnTabelleKopf
             // 
-            this.btnDatenbankKopf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnDatenbankKopf.ImageCode = "Datenbank||||||||||Stift";
-            this.btnDatenbankKopf.Location = new System.Drawing.Point(8, 2);
-            this.btnDatenbankKopf.Name = "btnDatenbankKopf";
-            this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
-            this.btnDatenbankKopf.TabIndex = 46;
-            this.btnDatenbankKopf.Text = "Tabellen-Kopf";
-            this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
+            this.btnTabelleKopf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnTabelleKopf.ImageCode = "Tabelle||||||||||Stift";
+            this.btnTabelleKopf.Location = new System.Drawing.Point(8, 2);
+            this.btnTabelleKopf.Name = "btnTabelleKopf";
+            this.btnTabelleKopf.Size = new System.Drawing.Size(64, 66);
+            this.btnTabelleKopf.TabIndex = 46;
+            this.btnTabelleKopf.Text = "Tabellen-Kopf";
+            this.btnTabelleKopf.Click += new System.EventHandler(this.btnTabelleKopf_Click);
             // 
             // txbTestZeile
             // 
@@ -101,7 +101,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private TextBox txbTestZeile;
         private Caption cpZeile;
-        private Button btnDatenbankKopf;
+        private Button btnTabelleKopf;
         private CreativePad cpad;
     }
 }

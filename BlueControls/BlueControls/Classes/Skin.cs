@@ -23,7 +23,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -837,7 +837,7 @@ public static class Skin {
     public const int Padding = 9;
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2, MidpointRounding.AwayFromZero);
-    public static Database? StyleDb;
+    public static BlueTable.Table? StyleDb;
 
     public static ColumnItem? StyleDb_Font;
     public static ColumnItem? StyleDb_Name;
@@ -1216,8 +1216,8 @@ public static class Skin {
             StyleDb_Name is not { IsDisposed: false } cn ||
             StyleDb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
 
-        var f1 = new FilterItem(cn, BlueDatabase.Enums.FilterType.Istgleich_GroﬂKleinEgal, style);
-        var f2 = new FilterItem(cs, BlueDatabase.Enums.FilterType.Istgleich, ((int)format).ToString());
+        var f1 = new FilterItem(cn, BlueTable.Enums.FilterType.Istgleich_GroﬂKleinEgal, style);
+        var f2 = new FilterItem(cs, BlueTable.Enums.FilterType.Istgleich, ((int)format).ToString());
 
         var r = db.Row[f1, f2];
 
@@ -1327,7 +1327,7 @@ public static class Skin {
     }
 
     public static void InitStyles() {
-        StyleDb ??= Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
+        StyleDb ??= Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
 
         StyleDb_Name = StyleDb?.Column["Name"];
         StyleDb_Style = StyleDb?.Column["Style"];

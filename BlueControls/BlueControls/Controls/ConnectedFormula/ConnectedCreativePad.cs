@@ -19,13 +19,13 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -85,7 +85,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         get => _lastRow;
 
         set {
-            if (value?.Database == null || value.IsDisposed) { value = null; }
+            if (value?.Table == null || value.IsDisposed) { value = null; }
 
             if (_lastRow == value) { return; }
 

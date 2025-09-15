@@ -19,7 +19,7 @@
 
 using BlueBasics;
 using BlueControls.Controls;
-using BlueDatabase;
+using BlueTable;
 using System;
 using System.Collections.Specialized;
 
@@ -56,23 +56,23 @@ public static class Allgemein {
     public static void StartGlobalService() {
         if (_serviceStarted) { return; }
         _serviceStarted = true;
-        Database.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
+        Table.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
         ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
     }
 
     private static void AllFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
-                if (thisit is Database db) {
-                    db.AdditionalRepair += Table.Database_AdditionalRepair;
+                if (thisit is BlueTable.Table db) {
+                    db.AdditionalRepair += TableView.Table_AdditionalRepair;
                 }
             }
         }
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-                if (thisit is Database db) {
-                    db.AdditionalRepair += Table.Database_AdditionalRepair;
+                if (thisit is BlueTable.Table db) {
+                    db.AdditionalRepair += TableView.Table_AdditionalRepair;
                 }
             }
         }
@@ -87,9 +87,9 @@ public static class Allgemein {
     //private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
     //    if (e.Handled) { return; }
     //    e.Handled = true;
-    //    if (e?.Row?.Database is not Database db) { return; }
+    //    if (e?.Row?.Table is not Table db) { return; }
 
-    //    var pad = new ItemCollectionPadItem(e.LayoutId, e.Row.Database, e.Row.Key);
+    //    var pad = new ItemCollectionPadItem(e.LayoutId, e.Row.Table, e.Row.Key);
     //    pad.SaveAsBitmap(e.Filename);
     //}
 }

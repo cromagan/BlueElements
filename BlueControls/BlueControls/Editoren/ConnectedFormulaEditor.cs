@@ -79,7 +79,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         _ = FormulaSet(filename, notAllowedchilds);
 
         //MultiUserFile.SaveAll(false);
-        //Database.ForceSaveAll();
+        //Table.ForceSaveAll();
     }
 
     public ConnectedFormulaEditor() : this(string.Empty, null) { }
@@ -178,11 +178,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
 
         //if (x is ReciverSenderControlPadItem isr2) {
-        //    isr2.Datenbank_wählen();
+        //    isr2.Tabelle_wählen();
         //}
 
         //if (x is ReciverSenderControlPadItem isf2) {
-        //    isf2.Datenbank_wählen();
+        //    isf2.Tabelle_wählen();
         //}
 
         //if (x is ReciverControlPadItem iaf2 && iaf2.Parents.Count == 0) {
@@ -263,7 +263,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
         //if (sender == btnNeuDB) {
-        //    FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Database zu finden
+        //    FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Table zu finden
         //}
         //if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
 
@@ -309,13 +309,13 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         Pad.Items = p;
         Formula?.Repair();
 
-        //it.Datenbank_wählen();
+        //it.Tabelle_wählen();
 
         //it.Bei_Export_sichtbar = false;
 
         //Pad.AddCentered(it);
 
-        //ChooseDatabaseAndId(it);
+        //ChooseTableAndId(it);
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.SaveAll(true);

@@ -572,7 +572,7 @@ public abstract class Method : IReadableTextWithKey {
 
         if (UsesInDB.Count > 0) {
             co += "\r\n";
-            co += "Aktuelle Verwendung in DATENBANK-Skripten:\r\n";
+            co += "Aktuelle Verwendung in TABELLEN-Skripten:\r\n";
             co += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n";
             co += UsesInDB.JoinWithCr();
         }

@@ -24,7 +24,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
+using BlueTable;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -51,7 +51,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     public FilterConverterElementPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public FilterConverterElementPadItem(string keyName, Database? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public FilterConverterElementPadItem(string keyName, BlueTable.Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 
@@ -61,7 +61,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => false;
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
 
     public override string Description => "Erstellt einen Filter.\r\nEs kann eine Zeile empfangen. Dann können die Variablen der eingehenden Zeile benutzt werden, um den Filter-Wert zu berechnen.\r\n\r\nDas Element kann auch zur Anzeige benutzt werden und zeigt an, was gerade gefiltert wird.";
 
@@ -145,7 +145,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var o = DatabaseOutput?.Column[_filterSpalte];
+        var o = TableOutput?.Column[_filterSpalte];
         var con = new InputRowOutputFilterControl(_filterwert, o, _filtertype) {
             ErrorText = _fehlerText
         };
@@ -155,7 +155,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     }
 
     public override string ErrorReason() {
-        if (DatabaseOutput?.Column[_filterSpalte] == null) {
+        if (TableOutput?.Column[_filterSpalte] == null) {
             return "Die Spalte, in der gefiltert werden soll, fehlt.";
         }
 
@@ -169,14 +169,14 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
             new FlexiControl("Einstellungen:", widthOfControl, true)
         ];
 
-        //if (DatabaseInput is Database dbin && !dbin.IsDisposed) {
+        //if (TableInput is Table dbin && !dbin.IsDisposed) {
         //    var u2 = new List<AbstractListItem>();
         //    u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
         //    l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
         //}
 
         //var inr = GetFilterFromGet();
-        if (DatabaseOutput is { IsDisposed: false } dbout) {
+        if (TableOutput is { IsDisposed: false } dbout) {
             var ic = new List<AbstractListItem>();
             ic.AddRange(ItemsOf(dbout.Column, true));
             result.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
@@ -203,7 +203,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         result.ParseableAdd("Filter", _filtertype);
         result.ParseableAdd("errortext", _fehlerText);
 
-        //if (DatabaseInput is not Database dbin || dbin.IsDisposed) {
+        //if (TableInput is not Table dbin || dbin.IsDisposed) {
         //    _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
         //}
 
@@ -248,7 +248,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     public override string ReadableText() {
         const string txt = "Filter-Generator: ";
 
-        return txt + DatabaseOutput?.Caption;
+        return txt + TableOutput?.Caption;
     }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));

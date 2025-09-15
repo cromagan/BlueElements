@@ -19,7 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;

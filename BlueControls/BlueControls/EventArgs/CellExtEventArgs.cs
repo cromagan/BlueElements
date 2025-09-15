@@ -17,7 +17,7 @@
 
 #nullable enable
 
-using BlueDatabase;
+using BlueTable;
 
 namespace BlueControls.EventArgs;
 

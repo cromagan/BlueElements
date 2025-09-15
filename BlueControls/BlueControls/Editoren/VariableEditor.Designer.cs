@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.BlueDatabaseDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 
 namespace BlueControls {
@@ -29,7 +29,7 @@ namespace BlueControls {
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.tableVariablen = new Table();
+            this.tableVariablen = new TableView();
             this.SuspendLayout();
             // 
             // tableVariablen
@@ -53,6 +53,6 @@ namespace BlueControls {
         }
 
         #endregion
-        private Table tableVariablen;
+        private TableView tableVariablen;
     }
 }

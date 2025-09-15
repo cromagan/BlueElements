@@ -24,8 +24,8 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueDatabase;
-using BlueDatabase.Enums;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -103,7 +103,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     public ColumnItem? Column {
         get {
-            var c = DatabaseInput?.Column[_columnName];
+            var c = TableInput?.Column[_columnName];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
@@ -119,7 +119,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         }
     }
 
-    public override bool DatabaseInputMustMatchOutputDatabase => false;
+    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
@@ -182,7 +182,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        if (DatabaseInput is not { IsDisposed: false } db) { return result; }
+        if (TableInput is not { IsDisposed: false } db) { return result; }
 
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
@@ -219,7 +219,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "column":
-                //Column = GetRowFrom?.Database?.Column.SearchByKey(LongParse(value));
+                //Column = GetRowFrom?.Table?.Column.SearchByKey(LongParse(value));
                 return true;
 
             case "columnname":
