@@ -222,6 +222,17 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             }
         }
 
+
+        if (az is { IsDisposed: false }){
+            var o = new Renderer_DateTime {
+                  UTCToLocal = true,
+                  ShowSymbol = true
+            };
+            az.DefaultRenderer = o.MyClassId;
+            az.RendererSettings = o.ParseableItems().FinishParseable();
+        }
+
+
         if (db.Column["Symbol"] is { IsDisposed: false } c) {
             var o = new Renderer_ImageAndText {
                 Text_anzeigen = false,

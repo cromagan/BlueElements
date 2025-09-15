@@ -281,17 +281,20 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             _headSize = 0;
             return 0;
         }
-        _headSize = 16;
+        var tmpheadSize = 16;
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                _headSize = Math.Max((int)_headSize, (int)thisViewItem.ColumnHead_Size().Height);
+                tmpheadSize = Math.Max(tmpheadSize, (int)thisViewItem.ColumnHead_Size().Height);
             }
         }
 
-        _headSize += 8;
-        _headSize += ColumnViewItem.AutoFilterSize;
-        return (int)_headSize;
+        tmpheadSize += 8;
+        tmpheadSize += ColumnViewItem.AutoFilterSize;
+
+        _headSize = tmpheadSize;
+
+        return tmpheadSize;
     }
 
     public void HideSystemColumns() {
