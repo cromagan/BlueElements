@@ -313,8 +313,8 @@ public class DatabaseFragments : Database {
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {
-                using var reader = new System.IO.StreamReader(new System.IO.FileStream(thisf, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite), Encoding.UTF8);
-                var fil = reader.ReadToEnd();
+
+                var fil = IO.ReadAllText(thisf, System.IO.FileShare.ReadWrite , Encoding.UTF8); 
 
                 var fils = fil.SplitAndCutByCrToList();
 

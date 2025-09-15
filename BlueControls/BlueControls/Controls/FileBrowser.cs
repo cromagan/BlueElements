@@ -239,7 +239,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private static bool AddThis(System.IO.FileInfo? fi) {
-        if(fi == null) { return false; }
+        if (fi == null) { return false; }
         if (fi.Attributes.HasFlag(System.IO.FileAttributes.System)) { return false; }
         //if (fi.Attributes.HasFlag(FileAttributes.Hidden)) { return false; }
 
@@ -388,6 +388,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         switch (e.Item.KeyName) {
             case "Löschen":
                 var I = GetFileInfo(it.KeyName);
+                if (I == null) {
+                    ReloadDirectory();
+                    return;
+                }
+
                 var silent = !I.Attributes.HasFlag(System.IO.FileAttributes.ReadOnly);
                 if (FileDialogs.DeleteFile(I.FullName, !silent)) {
                     ReloadDirectory();
@@ -721,7 +726,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     private void ThumbGenerator_ProgressChanged(object sender, ProgressChangedEventArgs e) {
         if (IsDisposed) { return; }
-        
+
         var gb = (List<object>)e.UserState;
 
         var com = ((string)gb[0]).ToLowerInvariant();

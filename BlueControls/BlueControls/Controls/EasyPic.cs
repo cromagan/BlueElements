@@ -320,22 +320,13 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     }
 
     private void SaveNewPicToDisc() {
-        //if (!HasFileName()) { return; }
-
-        //if (_bitmap == null) { return; }
-        //using var fs = new FileStream(_filename, FileMode.Create, FileAccess.Write);
-        //_bitmap.Save(fs, ImageFormat.Png);
-
         if (!HasFileName() || _bitmap == null || !_editable) { return; }
 
         try {
             using var compatibleBitmap = new Bitmap(_bitmap);
-
-            using var fs = new System.IO.FileStream(_filename, System.IO.FileMode.Create, System.IO.FileAccess.Write);
             using var memory = new System.IO.MemoryStream();
             compatibleBitmap.Save(memory, ImageFormat.Png);
-            var bytes = memory.ToArray();
-            fs.Write(bytes, 0, bytes.Length);
+            WriteAllBytes(_filename, memory.ToArray());
         } catch (Exception ex) {
             _ = System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
         }

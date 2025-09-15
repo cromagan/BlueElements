@@ -127,11 +127,11 @@ public static class Generic {
         } catch { }
 
         title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "!.,()+-_ " + Constants.Char_Numerals);
-        using System.IO.StreamWriter writer = new(TempFile(saveTo.TrimEnd("\\") + "\\" + title + ".url"));
-        writer.WriteLine("[InternetShortcut]");
-        writer.WriteLine("URL=" + linkUrl);
-        writer.Flush();
-        return true;
+
+        var fileName = IO.TempFile(saveTo.TrimEnd("\\"), title, "url");
+        var content = "[InternetShortcut]\nURL=" + linkUrl;
+
+        return IO.WriteAllText(fileName, content, Constants.Win1252, false);
     }
 
     /// <summary>
@@ -141,16 +141,24 @@ public static class Generic {
     // ReSharper disable once UnusedMember.Global
     public static bool CreateShortCut(string saveTo, string linkName) {
         try {
-            // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            using System.IO.StreamWriter writer = new(TempFile(saveTo + linkName + ".url"));
             var app = Assembly.GetExecutingAssembly().Location;
-            writer.WriteLine("[InternetShortcut]");
-            writer.WriteLine("URL=file:///" + app);
-            writer.WriteLine("IconIndex=0");
             var icon = app.Replace('\\', '/');
-            writer.WriteLine("IconFile=" + icon);
-            writer.Flush();
-            return true;
+
+            var content = $"""
+            [InternetShortcut]
+            URL=file:///{app}
+            IconIndex=0
+            IconFile={icon}
+            """;
+
+            var fileName = IO.TempFile(saveTo, linkName, "url");
+
+            if (IO.WriteAllText(fileName, content, Encoding.UTF8, false)) {
+                return true;
+            } else {
+                Develop.DebugPrint("Fehler beim Shortcut anlegen: WriteAllText fehlgeschlagen");
+                return false;
+            }
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim Shortcut anlegen", ex);
             return false;
@@ -169,7 +177,7 @@ public static class Generic {
         var response = request.GetResponse();
         var remoteStream = response.GetResponseStream();
         if (remoteStream != null) {
-            System.IO.StreamReader readStream = new(remoteStream);
+            var readStream = new System.IO.StreamReader(remoteStream);
             var img = Image.FromStream(remoteStream);
             response.Close();
             remoteStream.Close();

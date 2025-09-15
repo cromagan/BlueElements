@@ -272,33 +272,33 @@ public static class IO {
     }
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
-                    ? FileFormat.Unknown
-                    : filename.FileSuffix().ToUpperInvariant() switch {
-                        "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
-                        "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
-                        "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
-                        "CSV" => FileFormat.CSV,
-                        "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
-                        "MSG" or "EML" => FileFormat.EMail,
-                        "PDF" => FileFormat.Pdf,
-                        "HTM" or "HTML" => FileFormat.HTML,
-                        "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
-                        "ICO" => FileFormat.Icon,
-                        "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
-                        "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
-                        "EXE" or "BAT" or "SCR" => FileFormat.Executable,
-                        "CHM" => FileFormat.HelpFile,
-                        "XML" => FileFormat.XMLFile,
-                        "VCF" => FileFormat.Visitenkarte,
-                        "MP3" or "WAV" or "AAC" => FileFormat.Sound,
-                        "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-                        "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Database,
-                        "BDBC" => FileFormat.DatabaseChunk,
-                        "LNK" or "URL" => FileFormat.Link,
-                        "BCR" => FileFormat.BlueCreativeFile,
-                        "BCS" => FileFormat.BlueCreativeSymbol,
-                        _ => FileFormat.Unknown
-                    };
+                        ? FileFormat.Unknown
+                        : filename.FileSuffix().ToUpperInvariant() switch {
+                            "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
+                            "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
+                            "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+                            "CSV" => FileFormat.CSV,
+                            "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
+                            "MSG" or "EML" => FileFormat.EMail,
+                            "PDF" => FileFormat.Pdf,
+                            "HTM" or "HTML" => FileFormat.HTML,
+                            "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
+                            "ICO" => FileFormat.Icon,
+                            "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
+                            "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
+                            "EXE" or "BAT" or "SCR" => FileFormat.Executable,
+                            "CHM" => FileFormat.HelpFile,
+                            "XML" => FileFormat.XMLFile,
+                            "VCF" => FileFormat.Visitenkarte,
+                            "MP3" or "WAV" or "AAC" => FileFormat.Sound,
+                            "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
+                            "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Database,
+                            "BDBC" => FileFormat.DatabaseChunk,
+                            "LNK" or "URL" => FileFormat.Link,
+                            "BCR" => FileFormat.BlueCreativeFile,
+                            "BCS" => FileFormat.BlueCreativeSymbol,
+                            _ => FileFormat.Unknown
+                        };
 
     /// <summary>
     /// Gibt von einem Pfad den letzten Ordner zurück
@@ -327,10 +327,10 @@ public static class IO {
     public static FileInfo? GetFileInfo(string datei) => ProcessFile(TryGetFileInfo, false, 5, datei) as FileInfo;
 
     public static string[] GetFiles(string pfad, string pattern, SearchOption suchOption)
-                    => ProcessFile(TryGetFiles, false, 5, pfad, pattern, suchOption) as string[] ?? Array.Empty<string>();
+                        => ProcessFile(TryGetFiles, false, 5, pfad, pattern, suchOption) as string[] ?? Array.Empty<string>();
 
     public static string[] GetFiles(string pfad)
-                 => ProcessFile(TryGetFiles, false, 5, pfad, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
+                     => ProcessFile(TryGetFiles, false, 5, pfad, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
 
     /// <summary>
     /// Liefert Dateiinformationen mit Fehlerbehandlung und Wiederholungsversuchen
@@ -341,12 +341,22 @@ public static class IO {
     public static string GetFileState(string filename, bool abortIfFailed) => ProcessFile(TryGetFileState, abortIfFailed, abortIfFailed ? 60 : 5, filename) as string ?? string.Empty;
 
     /// <summary>
+    /// Lädt alle Bytes aus einer Datei mit automatischer Retry-Logik
+    /// </summary>
+    /// <param name="filename">Der Pfad zur zu ladenden Datei</param>
+    /// <returns>Die geladenen Bytes oder ein leeres Array bei Fehler</returns>
+    public static byte[] LoadAllBytes(string filename) {
+        var result = ProcessFile(TryLoadAllBytes, false, 60, filename);
+        return result as byte[] ?? Array.Empty<byte>();
+    }
+
+    /// <summary>
     /// Lädt Bytes aus einer Datei mit automatischer Retry-Logik und Dekomprimierung
     /// </summary>
-    public static (byte[] bytes, string fileinfo, bool failed) LoadBytesFromDisk(string filename, bool autoDecompress) {
+    public static (byte[] bytes, string fileinfo, bool failed) LoadAndUnzipAllBytes(string filename) {
         if (string.IsNullOrEmpty(filename)) { return (Array.Empty<byte>(), string.Empty, true); }
 
-        var result = ProcessFile(TryLoadBytesFromDisk, false, 60, filename, autoDecompress);
+        var result = ProcessFile(TryLoadAndUnzipAllBytes, false, 60, filename);
 
         // Rückgabe ist ein object, das wir zu unserem Tupel casten müssen
         if (result is not null and ValueTuple<byte[], string, bool> loadResult) {
@@ -441,10 +451,16 @@ public static class IO {
     /// <param name="path">Der Pfad zur zu lesenden Datei</param>
     /// <param name="encoding">Die zu verwendende Kodierung</param>
     /// <returns>Der gesamte Inhalt der Datei als String</returns>
-    public static string ReadAllText(string path, Encoding encoding) {
-        var result = ProcessFile(TryReadAllText, false, 60, path, encoding);
+    public static string ReadAllText(string path, FileShare share, Encoding encoding) {
+        var result = ProcessFile(TryReadAllText, false, 60, path, share, encoding);
         return result as string ?? string.Empty;
     }
+
+    public static string ReadAllText(string path, Encoding encoding) {
+        var result = ProcessFile(TryReadAllText, false, 60, path, FileShare.Read, encoding);
+        return result as string ?? string.Empty;
+    }
+
 
     public static string TempFile(string newPath, string filename) {
         var dn = filename.FileNameWithoutSuffix();
@@ -504,6 +520,23 @@ public static class IO {
             return (null, true);
         }
     }
+
+    /// <summary>
+    /// Speichert alle Bytes in eine Datei (Overload ohne abortIfFailed)
+    /// </summary>
+    /// <param name="filename">Zieldatei</param>
+    /// <param name="bytes">Zu speichernde Bytes</param>
+    /// <returns>True bei Erfolg</returns>
+    public static bool WriteAllBytes(string filename, byte[] bytes) => WriteAllBytes(filename, bytes, false);
+
+    /// <summary>
+    /// Speichert alle Bytes in eine Datei mit automatischer Retry-Logik und Verzeichniserstellung
+    /// </summary>
+    /// <param name="filename">Zieldatei</param>
+    /// <param name="bytes">Zu speichernde Bytes</param>
+    /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
+    /// <returns>True bei Erfolg</returns>
+    public static bool WriteAllBytes(string filename, byte[] bytes, bool abortIfFailed) => ProcessFile(TryWriteAllBytes, abortIfFailed, abortIfFailed ? 60 : 5, filename, bytes) is true;
 
     /// <summary>
     /// Speichert den Text in einer Datei.
@@ -776,7 +809,7 @@ public static class IO {
 
             pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
 
-            var dirs = System.IO.Directory.GetDirectories(pfad, pattern, option);
+            var dirs = Directory.GetDirectories(pfad, pattern, option);
             return (dirs, false);
         } catch (UnauthorizedAccessException) {
             return (Array.Empty<string>(), false);
@@ -799,7 +832,7 @@ public static class IO {
 
             pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
 
-            var files = System.IO.Directory.GetFiles(pfad, pattern, option);
+            var files = Directory.GetFiles(pfad, pattern, option);
             return (files, false);
         } catch (UnauthorizedAccessException) {
             return (Array.Empty<string>(), false);
@@ -819,8 +852,35 @@ public static class IO {
         }
     }
 
-    private static (object? returnValue, bool retry) TryLoadBytesFromDisk(params object[] args) {
-        if (args.Length < 2 || args[0] is not string filename || args[1] is not bool autoDecompress) {
+    private static (object? returnValue, bool retry) TryLoadAllBytes(params object[] args) {
+        if (args.Length < 1 || args[0] is not string filename) {
+            return (Array.Empty<byte>(), false);
+        }
+
+        if (string.IsNullOrWhiteSpace(filename)) {
+            return (Array.Empty<byte>(), false);
+        }
+
+        try {
+            // Prüfen ob Datei existiert
+            if (TryFileExists(filename).returnValue is not true) {
+                return (Array.Empty<byte>(), false);
+            }
+
+            // Bytes laden
+            var bytes = File.ReadAllBytes(filename);
+            return (bytes, false);
+        } catch (IOException) {
+            return (Array.Empty<byte>(), true);  // Retry bei I/O-Fehlern
+        } catch (UnauthorizedAccessException) {
+            return (Array.Empty<byte>(), false); // Kein Retry bei Berechtigungsfehlern
+        } catch {
+            return (Array.Empty<byte>(), false); // Keine Retry bei anderen Fehlern
+        }
+    }
+
+    private static (object? returnValue, bool retry) TryLoadAndUnzipAllBytes(params object[] args) {
+        if (args.Length < 1 || args[0] is not string filename) {
             return ((Array.Empty<byte>(), string.Empty, true), false);
         }
 
@@ -835,7 +895,7 @@ public static class IO {
 
             var bLoaded = File.ReadAllBytes(filename);
 
-            if (autoDecompress && bLoaded.IsZipped()) {
+            if (bLoaded.IsZipped()) {
                 bLoaded = bLoaded.UnzipIt() ?? bLoaded;
             }
 
@@ -901,7 +961,7 @@ public static class IO {
     }
 
     private static (object? returnValue, bool retry) TryReadAllText(params object[] args) {
-        if (args.Length < 2 || args[0] is not string filename || args[1] is not Encoding encoding) {
+        if (args.Length < 3 || args[0] is not string filename || args[1] is not FileShare share || args[2] is not Encoding encoding) {
             return (string.Empty, false);
         }
 
@@ -911,8 +971,11 @@ public static class IO {
             // Prüfen ob Datei existiert
             if (TryFileExists(filename).returnValue is not true) { return (string.Empty, false); }
 
-            // Text aus Datei lesen
-            var content = System.IO.File.ReadAllText(filename, encoding);
+            //// Text aus Datei lesen
+            //var content = File.ReadAllText(filename, encoding);
+            using var reader = new StreamReader(new FileStream(filename, FileMode.Open, FileAccess.Read, share), encoding);
+            var content = reader.ReadToEnd();
+
             return (content, false);
         } catch (IOException) {
             return (string.Empty, true);  // Retry bei IO-Fehlern
@@ -937,6 +1000,41 @@ public static class IO {
             }
         }
         return (false, true);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args">Filename, Byte[]</param>
+    /// <returns></returns>
+    private static (object? returnValue, bool retry) TryWriteAllBytes(params object[] args) {
+        if (args.Length < 2 || args[0] is not string filename || args[1] is not byte[] bytes) {
+            return (false, false);
+        }
+
+        try {
+            if (Develop.AllReadOnly) { return (true, false); }
+
+            filename = filename.CheckFile();
+
+            var pfad = filename.FilePath();
+            if (!CreateDirectory(pfad)) { return (false, false); }
+
+            // Prüfen ob wir schreiben können
+            if (!CanWrite(filename)) { return (false, false); }
+
+            using FileStream fs = new(filename, FileMode.Create, FileAccess.Write, FileShare.None);
+            fs.Write(bytes, 0, bytes.Length);
+            fs.Flush();
+            fs.Close();
+
+            //File.WriteAllBytes(filename, bytes);
+            return (true, false);
+        } catch (UnauthorizedAccessException) {
+            return (false, false); // Kein Retry bei Berechtigungsfehlern
+        } catch {
+            return (false, true);  // Retry bei anderen Fehlern
+        }
     }
 
     #endregion

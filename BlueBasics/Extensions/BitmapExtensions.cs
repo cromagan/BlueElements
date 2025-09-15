@@ -62,21 +62,19 @@ public static partial class Extensions {
         }
     }
 
-    /// <summary>
-    /// Diese Routine ist genau so schnell wie Image.fromFile, setzt aber KEINEN Datei-Lock.
-    /// </summary>
-    /// <param name="filename"></param>
-    /// <returns></returns>
-    /// <remarks></remarks>
+
+
+
     public static Image? Image_FromFile(string filename) {
         if (string.IsNullOrEmpty(filename)) { return null; }
         if (!FileExists(filename)) { return null; }
         try {
-            using var fs = new System.IO.FileStream(filename, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
-            var im = Image.FromStream(fs);
-            fs.Close();
+            var bytes = LoadAllBytes(filename);
+            if (bytes == null) { return null; }
+            using var ms = new System.IO.MemoryStream(bytes);
+            var im = Image.FromStream(ms);
             return im;
-        } catch (Exception) {
+        } catch {
             return null;
         }
     }

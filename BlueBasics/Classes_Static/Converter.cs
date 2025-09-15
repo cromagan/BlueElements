@@ -32,7 +32,7 @@ public static class Converter {
 
     public static Bitmap? Base64ToBitmap(string base64) {
         try {
-            using System.IO.MemoryStream memory = new(Convert.FromBase64String(base64));
+            using var memory = new System.IO.MemoryStream(Convert.FromBase64String(base64));
             Bitmap oBitmap = new(memory);
             memory.Close();
             return oBitmap;
@@ -45,7 +45,7 @@ public static class Converter {
         if (bMp == null) { return string.Empty; }
         if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
         if (bMp == null) { return string.Empty; }
-        System.IO.MemoryStream memory = new();
+        var memory = new System.IO.MemoryStream();
         bMp.Save(memory, bFormat);
         var base64 = Convert.ToBase64String(memory.ToArray());
         memory.Close();

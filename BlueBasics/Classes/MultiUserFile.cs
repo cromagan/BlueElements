@@ -100,8 +100,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             if (string.IsNullOrEmpty(value)) {
                 _filename = string.Empty;
             } else {
-                var tmp = System.IO.Path.GetFullPath(value);
-                _filename = tmp;
+                _filename = IO.CheckFile(value);
             }
         }
     }

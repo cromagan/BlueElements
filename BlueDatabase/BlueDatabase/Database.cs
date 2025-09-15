@@ -1999,7 +1999,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public void LoadFromStream(System.IO.Stream stream) {
         //OnLoading();
         byte[] bLoaded;
-        using (System.IO.BinaryReader r = new(stream)) {
+        using (var r = new System.IO.BinaryReader(stream)) {
             bLoaded = r.ReadBytes((int)stream.Length);
             r.Close();
         }
@@ -2437,7 +2437,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected virtual bool LoadMainData() {
-        var (bytes, _, failed) = LoadBytesFromDisk(Filename, true);
+        var (bytes, _, failed) = LoadAndUnzipAllBytes(Filename);
 
         if (failed) {
             Freeze("Laden fehlgeschlagen!");

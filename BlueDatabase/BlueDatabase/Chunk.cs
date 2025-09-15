@@ -142,7 +142,7 @@ public class Chunk : IHasKeyName {
         _lastcheck = DateTime.UtcNow;
 
         byte[] bytes;
-        (bytes, _fileinfo, LoadFailed) = IO.LoadBytesFromDisk(c, true);
+        (bytes, _fileinfo, LoadFailed) = IO.LoadAndUnzipAllBytes(c);
 
         if (LoadFailed) { return; }
 
@@ -203,10 +203,11 @@ public class Chunk : IHasKeyName {
 
             Develop.SetUserDidSomething();
 
-            using System.IO.FileStream x = new(filename, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.None);
-            x.Write(datacompressed, 0, datacompressed.Length);
-            x.Flush();
-            x.Close();
+            if(!IO.WriteAllBytes(filename, datacompressed)) {
+                return "Speichern fehlgeschlagen";
+            }
+
+
 
             _minBytes = (int)(contentBytes.Count * 0.1);
 

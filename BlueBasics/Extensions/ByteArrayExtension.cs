@@ -43,12 +43,12 @@ public static partial class Extensions {
 
     public static byte[]? UnzipIt(this byte[] data) {
         try {
-            using System.IO.MemoryStream originalFileStream = new(data);
+            using var originalFileStream = new System.IO.MemoryStream(data);
             using ZipArchive zipArchive = new(originalFileStream);
             var entry = zipArchive.GetEntry("Main.bin");
             if (entry != null) {
                 using var stream = entry.Open();
-                using System.IO.MemoryStream ms = new();
+                using var ms = new System.IO.MemoryStream();
                 stream.CopyTo(ms);
                 return ms.ToArray();
             }
@@ -65,13 +65,13 @@ public static partial class Extensions {
     public static byte[]? ZipIt(this byte[] data) {
         try {
             // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
-            using System.IO.MemoryStream compressedFileStream = new();
+            using var compressedFileStream = new System.IO.MemoryStream();
             // Create an archive and store the stream in memory.
             using (ZipArchive zipArchive = new(compressedFileStream, ZipArchiveMode.Create, false)) {
                 // Create a zip entry for each attachment
                 var zipEntry = zipArchive.CreateEntry("Main.bin");
                 // Get the stream of the attachment
-                using System.IO.MemoryStream originalFileStream = new(data);
+                using var originalFileStream = new System.IO.MemoryStream(data);
                 using var zipEntryStream = zipEntry.Open();
                 // Copy the attachment stream to the zip entry stream
                 originalFileStream.CopyTo(zipEntryStream);
