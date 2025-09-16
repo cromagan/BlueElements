@@ -80,7 +80,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string CaptionForEditor => "Zeile";
 
-    public string ChunkValue => Table?.Column.ChunkValueColumn is not { IsDisposed: false } spc ? string.Empty : Table.Cell.GetStringCore(spc, this);
+    public string ChunkValue {
+        get {
+
+            if (Table is not TableChunk) { return string.Empty; }
+
+            if (Table?.Column.ChunkValueColumn is { IsDisposed: false } spc) { return Table.Cell.GetStringCore(spc, this); }
+            return string.Empty;
+
+        }
+    }
 
     public Table? Table {
         get => _table;

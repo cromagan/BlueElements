@@ -98,9 +98,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private string _columnSystemInfo;
 
-    //private string _cellInitValue;
-    private Table? _table;
-
     private string _defaultRenderer;
 
     private TranslationType _doOpticalTranslation;
@@ -122,9 +119,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private bool _ignoreAtRowFilter;
 
     private bool _isFirst;
+
     private bool _isKeyColumn;
+
     private string _keyName;
+
     private ColumnLineStyle _lineStyleLeft;
+
     private ColumnLineStyle _lineStyleRight;
 
     /// <summary>
@@ -133,20 +134,36 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private Table? _linkedTable;
 
     private string _linkedTableTableName;
+
     private int _maxCellLenght;
+
     private int _maxTextLenght;
+
     private bool _multiLine;
+
     private string _regexCheck = string.Empty;
+
     private bool _relationship_to_First;
+
     private RelationType _relationType;
 
     private string _rendererSettings;
+
     private int _roundAfterEdit;
+
     private bool _saveContent;
+
     private ScriptType _scriptType;
+
     private bool _showValuesOfOtherCellsInDropdown;
+
     private SortierTyp _sortType;
+
     private bool _spellCheckingEnabled;
+
+    //private string _cellInitValue;
+    private Table? _table;
+
     private bool _textFormatingAllowed;
     private ChunkType _value_for_Chunk;
 
@@ -503,23 +520,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             _ = Table?.ChangeData(TableDataType.ColumnTags, this, _columnTags.JoinWithCr(), value.JoinWithCr());
             OnPropertyChanged();
-        }
-    }
-
-    public Table? Table {
-        get => _table;
-        private set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
-
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
-            }
-            _table = value;
-
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
-            }
         }
     }
 
@@ -935,6 +935,23 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             _ = Table?.ChangeData(TableDataType.SpellCheckingEnabled, this, _spellCheckingEnabled.ToPlusMinus(), value.ToPlusMinus());
             OnPropertyChanged();
+        }
+    }
+
+    public Table? Table {
+        get => _table;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _table) { return; }
+
+            if (_table != null) {
+                _table.DisposingEvent -= _table_Disposing;
+            }
+            _table = value;
+
+            if (_table != null) {
+                _table.DisposingEvent += _table_Disposing;
+            }
         }
     }
 
@@ -1405,6 +1422,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
 
         if (_value_for_Chunk != ChunkType.None) {
+            if (Table is not TableChunk) {
+                return "Chunk-Spalten nur in Tabellen des Typs CBCB erlaubt.";
+            }
+
             if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly) {
                 return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
             }

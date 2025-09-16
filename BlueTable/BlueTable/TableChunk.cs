@@ -35,7 +35,7 @@ namespace BlueTable;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class TableChunk : Table {
+public class TableChunk : TableFile {
 
     #region Fields
 

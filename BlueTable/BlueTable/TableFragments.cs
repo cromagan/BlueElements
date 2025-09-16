@@ -35,7 +35,7 @@ namespace BlueTable;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class TableFragments : Table {
+public class TableFragments : TableFile {
 
     #region Fields
 
