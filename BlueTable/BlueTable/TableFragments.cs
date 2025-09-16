@@ -136,15 +136,18 @@ public class TableFragments : TableFile {
         return string.Empty;
     }
 
-    public override bool Save() {
-        if (_writer == null) { return true; }
+
+    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+
+        if (_writer == null) { return "Writer Fehler"; }
 
         try {
             lock (_writer) {
                 _writer.Flush();
             }
-            return true;
-        } catch { return false; }
+            return string.Empty;
+        } catch { return "Allgemeiner Fehler"; }
+
     }
 
     protected override void Dispose(bool disposing) {
@@ -159,7 +162,7 @@ public class TableFragments : TableFile {
 
     protected override void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc, DateTime endTimeUtc) {
         base.DoWorkAfterLastChanges(files, startTimeUtc, endTimeUtc);
-        if (ReadOnly) { return; }
+        if (IsFreezed) { return; }
         if (files is not { Count: >= 1 }) { return; }
 
         _masterNeeded = files.Count > 8 || ChangesNotIncluded.Count > 40 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12;
@@ -238,13 +241,12 @@ public class TableFragments : TableFile {
         return base.LoadMainData();
     }
 
-    protected override bool SaveRequired() => true;
 
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (ReadOnly) { return "Tabelle schreibgeschützt!"; } // Sicherheitshalber!
+        if (IsFreezed) { return "Tabelle schreibgeschützt!"; } // Sicherheitshalber!
 
         if (Develop.AllReadOnly) { return string.Empty; }
 

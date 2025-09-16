@@ -449,7 +449,7 @@ public class Chunk : IHasKeyName {
 
         if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
 
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 1.5) {
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
             f = CanSaveFile(ChunkFileName, 5);
             if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
@@ -469,7 +469,7 @@ public class Chunk : IHasKeyName {
 
         if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
 
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 2) {
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 10) {
             if (LastEditUser != UserName) {
                 return $"Aktueller Bearbeiter: {LastEditUser}";
             } else {

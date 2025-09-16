@@ -63,7 +63,7 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
         if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false } db) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
         if (db == myDb) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 
-        var m = db.CanWriteMainFile();
+        var m = db.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Tabellesperre: {m}", false, ld); }
 
         StackTrace stackTrace = new();
@@ -89,7 +89,7 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) {
-        var db = Table.Get(args[0], false, null);
+        var db = Table.Get(args[0], null);
         var vdb = new VariableTable(db);
        return vdb.ValueForReplace + "," + args[1] + "," + args[2];
     }

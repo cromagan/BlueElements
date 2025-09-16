@@ -457,9 +457,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
-        if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        var m = db.CanWriteMainFile();
+        var m = tb.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(m)) { return m; }
 
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
@@ -479,18 +479,21 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 var w = rows[0].CellFirstString();
                 rows.Clear();
                 Table.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
-                Develop.Message?.Invoke(ErrorType.Warning, db, "Table", ImageCode.Skript, "Skript fehlerhaft bei " + w, 0);
+                Develop.Message?.Invoke(ErrorType.Warning, tb, "Table", ImageCode.Skript, "Skript fehlerhaft bei " + w, 0);
                 return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol[0];
             }
 
             rows.RemoveAt(0);
 
             if (DateTime.UtcNow.Subtract(start).TotalMinutes > 1) {
-                _ = db.Save();
+
+                if(tb is TableFile tbf) { tbf.Save(); }
+
+              
                 start = DateTime.UtcNow;
             }
         }
-        _ = db.Save();
+        if (tb is TableFile tbf2) { tbf2.Save(); }
         Table.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
         return string.Empty;
     }
@@ -522,7 +525,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
-        var f = db2.CanWriteMainFile();
+        var f = db2.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(f)) { return (null, "In der Tabelle sind keine neuen Zeilen möglich: " + f, true); }
 
         var s = db2.NextRowKey();
@@ -852,7 +855,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } db) { return (null, "Tabelle verworfen!", true); }
 
-        var f = db.CanWriteMainFile();
+        var f = db.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(f)) { return (null, "Neue Zeilen nicht möglich: " + f, true); }
 
         var item = SearchByKey(key);

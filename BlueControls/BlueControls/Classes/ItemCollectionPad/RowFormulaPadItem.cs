@@ -37,7 +37,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
     #region Fields
 
-    private BlueTable.Table? _table;
+    private Table? _table;
     private string _lastQuickInfo = string.Empty;
     private string _layoutFileName;
     private string _rowKey;
@@ -154,7 +154,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
                 return true;
 
             case "table":
-                Table = Table.Get(value.FromNonCritical(), false, TableView.Table_NeedPassword);
+                Table = Table.Get(value.FromNonCritical(), TableView.Table_NeedPassword);
                 return true;
 
             case "rowid": // TODO: alt

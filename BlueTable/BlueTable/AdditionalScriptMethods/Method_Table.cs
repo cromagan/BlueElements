@@ -53,7 +53,7 @@ internal class Method_Table : Method {
 
         //if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
 
-        if (Table.Get(filn, false, null) is { IsDisposed: false } db) {
+        if (Table.Get(filn, null) is { IsDisposed: false } db) {
             return new DoItFeedback(new VariableTable(db));
         }
 

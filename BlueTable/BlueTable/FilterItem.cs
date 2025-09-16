@@ -401,7 +401,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 return true;
 
             case "table":
-                Table = Table.Get(value.FromNonCritical(), false, null);
+                Table = Table.Get(value.FromNonCritical(), null);
                 return true;
 
             case "type":

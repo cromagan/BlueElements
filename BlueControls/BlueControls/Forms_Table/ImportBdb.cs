@@ -151,8 +151,8 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
 
         var m = "Tabellen-Fehler";
 
-        if (Table is { IsDisposed: false }) {
-            m = Table.ImportBdb(_files, _table.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);
+        if (Table is  TableFile { IsDisposed: false } tbf) {
+            m = tbf.ImportBdb(_files, _table.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {

@@ -45,7 +45,7 @@ public sealed partial class UserInfo : FormWithStatusBar {
         TableHeadEditor.GenerateUndoTabelle(tblUndo);
 
         foreach (var thisDb in Table.AllFiles) {
-            if (!string.IsNullOrEmpty(thisDb.Filename)) {
+            if (thisDb is TableFile) {
                 TableHeadEditor.AddUndosToTable(tblUndo, thisDb, 0.5f);
             }
         }

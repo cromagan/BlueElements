@@ -109,7 +109,7 @@ public class VariableTable : Variable {
 
             if (t == "?") { return true; }
 
-            if (Table.Get(t, false, null) is not { IsDisposed: false } db) { return false; }
+            if (Table.Get(t, null) is not { IsDisposed: false } db) { return false; }
 
             result = db;
             return true;

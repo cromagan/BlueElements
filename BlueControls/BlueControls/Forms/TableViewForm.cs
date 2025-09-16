@@ -118,7 +118,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     public static bool EditabelErrorMessage(BlueTable.Table? table) {
         if (table == null) { return false; }
 
-        var m = table.CanWriteMainFile();
+        var m = table.AreAllDataCorrect();
         if (string.IsNullOrEmpty(m)) { return false; }
 
         MessageBox.Show("Aktion nicht möglich:<br>" + m);
@@ -130,7 +130,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
 
     public static void OpenLayoutEditor(BlueTable.Table db, string layoutToOpen) {
-        var x = db.CanWriteMainFile();
+        var x = db.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(x)) {
             MessageBox.Show(x);
             return;
@@ -247,7 +247,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         btnOeffnen.Enabled = true;
         btnDrucken.Enabled = tableFound;
 
-        btnTabellenSpeicherort.Enabled = Table.Table is { IsDisposed: false } db && !string.IsNullOrEmpty(db.Filename);
+        btnTabellenSpeicherort.Enabled = Table.Table is TableFile  { IsFreezed: false } tbf && !string.IsNullOrEmpty(tbf.Filename);
 
         btnZeileLöschen.Enabled = tableFound;
         lstAufgaben.Enabled = tableFound;
@@ -382,18 +382,18 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         #endregion
 
-        if (BlueTable.Table.Get(tablename, false, TableView.Table_NeedPassword) is { IsDisposed: false } db) {
-            if (btnLetzteDateien.Parent.Parent.Visible) {
-                if (!string.IsNullOrEmpty(db.Filename)) {
-                    btnLetzteDateien.AddFileName(db.Filename, db.KeyName);
-                    LoadTab.FileName = db.Filename;
+        if (BlueTable.Table.Get(tablename, TableView.Table_NeedPassword) is { IsDisposed: false } tb) {
+            if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
+                if (!string.IsNullOrEmpty(tbf.Filename)) {
+                    btnLetzteDateien.AddFileName(tbf.Filename, tb.KeyName);
+                    LoadTab.FileName = tbf.Filename;
                 } else {
-                    btnLetzteDateien.AddFileName(db.Filename, db.KeyName);
+                    btnLetzteDateien.AddFileName(tbf.Filename, tbf.KeyName);
                 }
             }
-            tabPage.Text = db.KeyName.ToTitleCase();
-            UpdateScripts(db);
-            TableSet(db, (string)s[1]);
+            tabPage.Text = tb.KeyName.ToTitleCase();
+            UpdateScripts(tb);
+            TableSet(tb, (string)s[1]);
         } else {
             tabPage.Text = "FEHLER";
             UpdateScripts(null);
@@ -411,7 +411,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         BlueTable.Table.ForceSaveAll();
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            _ = BlueTable.Table.Get(tablename, false, TableView.Table_NeedPassword);
+            _ = BlueTable.Table.Get(tablename, TableView.Table_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -547,8 +547,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         BlueTable.Table.ForceSaveAll();
         MultiUserFile.SaveAll(false);
 
-        if (Table.Table is { IsDisposed: false } db) {
-            _ = ExecuteFile(db.Filename.FilePath());
+        if (Table.Table is TableFile { IsDisposed: false } tbf) {
+            _ = ExecuteFile(tbf.Filename.FilePath());
         }
     }
 
@@ -603,7 +603,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             _ = DeleteFile(SaveTab.FileName, true);
         }
 
-        var db = new BlueTable.Table(SaveTab.FileName.FileNameWithoutSuffix());
+        var db = new TableFile(SaveTab.FileName.FileNameWithoutSuffix());
         db.SaveAsAndChangeTo(SaveTab.FileName);
         _ = SwitchTabToTable(SaveTab.FileName);
     }
@@ -625,8 +625,9 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         MultiUserFile.SaveAll(false);
         BlueTable.Table.ForceSaveAll();
 
-        if (Table.Table is { IsDisposed: false } db) {
-            if (db.ReadOnly) { return; }
+        if (Table.Table is TableFile { IsDisposed: false } tbf) {
+            if (tbf.IsFreezed) { return; }
+
             _ = SaveTab.ShowDialog();
             if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
 
@@ -636,7 +637,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                 _ = DeleteFile(SaveTab.FileName, true);
             }
 
-            db.SaveAsAndChangeTo(SaveTab.FileName);
+            tbf.SaveAsAndChangeTo(SaveTab.FileName);
             _ = SwitchTabToTable(SaveTab.FileName);
         }
     }
@@ -712,7 +713,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             return; // Weitere funktionen benötigen sicher eine Tabelle um keine Null Exception auszulösen
         }
 
-        var m = db.CanWriteMainFile();
+        var m = db.AreAllDataCorrect();
 
         grpAdminAllgemein.Enabled = string.IsNullOrEmpty(m);
         grpImport.Enabled = string.IsNullOrEmpty(m);

@@ -1204,8 +1204,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
-        if (Table is not { IsDisposed: false } db) { return; }
-        if (!string.IsNullOrEmpty(db.CanWriteMainFile())) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (!string.IsNullOrEmpty(tb.AreAllDataCorrect())) { return; }
 
         if (source.Table != null) { source.Repair(); }
 
@@ -1620,8 +1620,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public void Repair() {
-        if (Table is not { IsDisposed: false } db) { return; }
-        if (!string.IsNullOrEmpty(db.CanWriteMainFile())) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (!string.IsNullOrEmpty(tb.AreAllDataCorrect())) { return; }
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (IsDisposed) { return; }
@@ -2550,7 +2550,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        var newTable = Get(_linkedTableTableName, false, null);
+        var newTable = Get(_linkedTableTableName, null);
 
         if (newTable != null) {
             // Event-Registrierung vor dem Lock

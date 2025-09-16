@@ -70,11 +70,13 @@ public class TableChunk : TableFile {
 
     public override bool MultiUserPossible => true;
 
+    private bool SaveRequired => _chunks.Values.Any(chunk => chunk.SaveRequired);
+
     #endregion
 
     #region Methods
 
-    public static List<Chunk>? GenerateNewChunks(Table db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
+    public static List<Chunk>? GenerateNewChunks(TableFile db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
         var chunks = new List<Chunk>();
 
         chunksAllowed = chunksAllowed && db.Column.ChunkValueColumn != null;
@@ -455,7 +457,7 @@ public class TableChunk : TableFile {
 
     public override void RepairAfterParse() {
         base.RepairAfterParse();
-        if (!string.IsNullOrEmpty(CanWriteMainFile())) { return; }
+        if (!string.IsNullOrEmpty(AreAllDataCorrect())) { return; }
 
         FileStateUtcDate = new DateTime(2000, 1, 1);
     }
@@ -491,7 +493,9 @@ public class TableChunk : TableFile {
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true, true);
 
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
-        var f = CanWriteMainFile();
+        if (!SaveRequired) { return string.Empty; }
+
+        var f = CanSaveMainChunk();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         Develop.SetUserDidSomething();
@@ -568,17 +572,14 @@ public class TableChunk : TableFile {
         return string.Empty;
     }
 
-    protected override bool SaveRequired() => _chunks.Values.Any(chunk => chunk.SaveRequired);
-
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         newChunkId = newChunkId.ToLower();
         oldChunkId = oldChunkId.ToLower();
 
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
-
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (ReadOnly) { return "Tabelle schreibgeschützt!"; } // Sicherheitshalber!
+        if (IsFreezed) { return "Tabelle schreibgeschützt!"; } // Sicherheitshalber!
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
@@ -588,11 +589,11 @@ public class TableChunk : TableFile {
         return string.Empty;
     }
 
-    private static Chunk GetOrMakechunk(List<Chunk> chunks, Table db, string chunkId) {
+    private static Chunk GetOrMakechunk(List<Chunk> chunks, TableFile tbf, string chunkId) {
         var rowchunk = chunks.Get(chunkId);
 
         if (rowchunk == null) {
-            rowchunk = new Chunk(db.Filename, chunkId);
+            rowchunk = new Chunk(tbf.Filename, chunkId);
             rowchunk.InitByteList();
             chunks.Add(rowchunk);
         }

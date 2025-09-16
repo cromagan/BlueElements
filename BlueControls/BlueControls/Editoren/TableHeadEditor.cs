@@ -379,15 +379,17 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     private void GenerateInfoText() {
-        if (IsDisposed || Table is not { IsDisposed: false }) {
+        if (IsDisposed || Table is not { IsDisposed: false } tbl) {
             capInfo.Text = "Tabellen-Fehler";
             return;
         }
 
-        var t = "<b>Tabelle:</b> <tab>" + Table.KeyName + "<br>";
-        t += "<b>Zeilen:</b> <tab>" + (Table.Row.Count() - 1) + "<br>";
-        t += "<b>Temporärer Master:</b>  <tab>" + Table.TemporaryTableMasterTimeUtc + " " + Table.TemporaryTableMasterUser + "<br>";
-        t += "<b>Letzte Komplettierung:</b> <tab>" + Table.FileStateUtcDate.ToString7() + " UTC<br>";
+        var t = "<b>Tabelle:</b> <tab>" + tbl.KeyName + "<br>";
+        t += "<b>Zeilen:</b> <tab>" + (tbl.Row.Count() - 1) + "<br>";
+        t += "<b>Temporärer Master:</b>  <tab>" + tbl.TemporaryTableMasterTimeUtc + " " + Table.TemporaryTableMasterUser + "<br>";
+        t += "<b>Letzte Komplettierung:</b> <tab>" + tbl.FileStateUtcDate.ToString7() + " UTC<br>";
+    
+
         capInfo.Text = t.TrimEnd("<br>");
     }
 

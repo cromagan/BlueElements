@@ -1222,7 +1222,7 @@ public static class Skin {
         var r = db.Row[f1, f2];
 
         if (r == null) {
-            if (!db.ReadOnly) {
+            if (!db.IsFreezed) {
                 var fc = new FilterItem[] { f1, f2 };
                 _ = db.Row.GenerateAndAdd(fc, "Unbekannter Stil");
             }
@@ -1232,7 +1232,7 @@ public static class Skin {
 
         var font = GetBlueFont(r);
 
-        if (!db.ReadOnly) {
+        if (!db.IsFreezed) {
             r.CellSet(cf, font.ParseableItems().FinishParseable(), "Automatische Korrektur");
         }
 

@@ -27,7 +27,6 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.IO;
 
-
 namespace BlueTable.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
@@ -68,11 +67,11 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
 
         #region  Filter ermitteln (allfi)
 
-        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myDb, scp.ScriptName, true);
+        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myTb, scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
         #endregion
@@ -81,14 +80,14 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
         #region  Tabelle ermitteln (db)
 
-        if (myDb == null || allFi.Table != myDb) {
+        if (myTb == null || allFi.Table != myTb) {
             allFi.Dispose();
             return new DoItFeedback("Tabellenfehler!", true, ld);
         }
 
         allFi.Dispose();
 
-        if (!myDb.BeSureAllDataLoaded(-1)) {
+        if (!myTb.BeSureAllDataLoaded(-1)) {
             return new DoItFeedback("Tabelle konnte nicht aktualisiert werden.", true, ld);
         }
 
@@ -96,7 +95,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
         #region  Ansicht ermitteln (cu)
 
-        var tcvc = ColumnViewCollection.ParseAll(myDb);
+        var tcvc = ColumnViewCollection.ParseAll(myTb);
 
         var cu = tcvc.Get(attvar.ValueStringGet(2));
         if (string.IsNullOrEmpty(attvar.ValueStringGet(2)) || cu == null) {
@@ -128,7 +127,11 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
                 case "MDB":
                 case "BDB": {
-                        var chunks = TableChunk.GenerateNewChunks(myDb, 100, myDb.FileStateUtcDate, false);
+                        if (myTb is not TableFile tbf) {
+                            return new DoItFeedback("nur bei Dateibasierten Tabellen möglich.", true, ld);
+                        }
+
+                        var chunks = TableChunk.GenerateNewChunks(tbf, 100, myTb.FileStateUtcDate, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
                         _ = mainchunk.Save(filn);
@@ -136,7 +139,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
                     }
 
                 case "CSV":
-                    var t = myDb.Export_CSV(FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
+                    var t = myTb.Export_CSV(FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
                     if (string.IsNullOrEmpty(t)) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
                     if (!WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld); }
                     break;

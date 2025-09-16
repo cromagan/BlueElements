@@ -357,7 +357,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    return -1;
     //}
     public void Repair() {
-        if (Table is not { IsDisposed: false } db || !string.IsNullOrEmpty(db.CanWriteMainFile())) { return; }
+        if (Table is not { IsDisposed: false } db || !string.IsNullOrEmpty(db.AreAllDataCorrect())) { return; }
 
         GetSystems();
         //for (var s1 = 0; s1 < Count; s1++) {

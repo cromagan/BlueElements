@@ -288,7 +288,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
         }
 
-        var f = db.CanWriteMainFile();
+        var f = db.AreAllDataCorrect();
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (column.RelationType == RelationType.CellValues) {
@@ -643,7 +643,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         try {
             if (column?.Table is not { IsDisposed: false } db) { return ("Es ist keine Spalte ausgewählt.", false); }
 
-            var f = db.CanWriteMainFile();
+            var f = db.AreAllDataCorrect();
             if (!string.IsNullOrEmpty(f)) { return (f, true); }
 
             f = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);

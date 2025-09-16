@@ -3582,14 +3582,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void Draw_TableStatus(Graphics gr, BlueTable.Table db, ColumnViewCollection ca, int filterHeight) {
         // Zeige Stifte-Symbol bei ausstehenden Änderungen
-        if (db.ReadOnly) {
+        if (db.IsFreezed) {
             gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, filterHeight + 8);
             if (!string.IsNullOrEmpty(db.FreezedReason)) {
                 ca.Font_RowChapter.DrawString(gr, db.FreezedReason, 52, filterHeight + 12);
             }
         }
 
-        if (db.IsAdministrator() && !db.ReadOnly) {
+        if (db.IsAdministrator() && !db.IsFreezed) {
             // Skripte-Status anzeigen
             if (!string.IsNullOrEmpty(db.CheckScriptError())) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);

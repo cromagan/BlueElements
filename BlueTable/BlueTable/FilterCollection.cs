@@ -812,7 +812,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             tableName = tableName.Trim('[', ']', '"', '\'');
 
             var validTableName = Table.MakeValidTableName(tableName);
-            return Table.Get(validTableName, false, null);
+            return Table.Get(validTableName, null);
         }
 
         return null;

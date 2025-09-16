@@ -417,7 +417,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<BlueTable.Table?> adb:
-                var db = Table.Get(Value, false, TableView.Table_NeedPassword);
+                var db = Table.Get(Value, TableView.Table_NeedPassword);
                 if (db != null) { db.Editor = typeof(TableHeadEditor); }
 
                 if (adb.Get() != db) {

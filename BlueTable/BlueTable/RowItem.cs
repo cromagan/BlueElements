@@ -456,21 +456,21 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         } while (true);
     }
 
-    public string Hash() {
-        if (Table is not { IsDisposed: false } db) { return string.Empty; }
+    //public string Hash() {
+    //    if (Table is not TableFile { IsDisposed: false } tbf) { return string.Empty; }
 
-        var thisss = "Table=" + db.Caption + ";File=" + db.Filename + ";";
+    //    var thisss = "Table=" + tbf.Caption + ";File=" + tbf.Filename + ";";
 
-        foreach (var thisColumnItem in db.Column) {
-            if (thisColumnItem.IsDisposed) { return string.Empty; }
+    //    foreach (var thisColumnItem in tbf.Column) {
+    //        if (thisColumnItem.IsDisposed) { return string.Empty; }
 
-            if (thisColumnItem.IsSystemColumn()) { continue; }
+    //        if (thisColumnItem.IsSystemColumn()) { continue; }
 
-            thisss = thisss + thisColumnItem.KeyName + "=" + CellGetString(thisColumnItem) + ";";
-        }
+    //        thisss = thisss + thisColumnItem.KeyName + "=" + CellGetString(thisColumnItem) + ";";
+    //    }
 
-        return thisss.GetHashString();
-    }
+    //    return thisss.GetHashString();
+    //}
 
     public string Infotext() {
         if (!string.IsNullOrEmpty(QuickInfo)) { return QuickInfo; }
@@ -732,7 +732,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        var m = Table?.CanWriteMainFile() ?? "Keine Tabelle angekommen";
+        var m = Table?.AreAllDataCorrect() ?? "Keine Tabelle angekommen";
         if (!string.IsNullOrEmpty(m) || Table is not { IsDisposed: false } || column == null) { return; }
 
         var columnVar = vars.Get(column.KeyName);

@@ -112,7 +112,7 @@ public class VariableRowItem : Variable {
             var tx = t.SplitBy(";");
             if (tx.Length != 2) { return false; }
 
-            if (Table.Get(tx[0], false, null) is not { IsDisposed: false } db) { return false; }
+            if (Table.Get(tx[0], null) is not { IsDisposed: false } db) { return false; }
 
             if (db.Row.SearchByKey(tx[1]) is not { IsDisposed: false } row) { return false; }
 

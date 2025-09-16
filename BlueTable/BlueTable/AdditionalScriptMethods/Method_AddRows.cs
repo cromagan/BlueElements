@@ -67,7 +67,7 @@ public class Method_AddRows : Method_TableGeneric {
 
         if (!db.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
-        var m = db.CanWriteMainFile();
+        var m = db.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Tabellesperre: {m}", false, ld); }
 
         var keys = attvar.ValueListStringGet(2);

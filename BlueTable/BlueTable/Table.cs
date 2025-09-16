@@ -34,7 +34,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -79,22 +78,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     protected NeedPassword? _needPassword;
 
-    private static readonly object _timerLock = new object();
-
-    private static int _activeTableCount = 0;
-
     private static List<string> _allavailableTables = [];
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
-    /// <summary>
-    /// Der Globale Timer, der die Tabellen regelmäßig updated
-    /// </summary>
-    private static Timer? _tableUpdateTimer;
-
     private readonly List<string> _permissionGroupsNewRow = [];
-    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
+
     private readonly List<string> _tableAdmin = [];
+
     private readonly List<string> _tags = [];
 
     private readonly List<Variable> _variables = [];
@@ -107,8 +98,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private Timer? _checker;
 
-    private int _checkerTickCount = -5;
-
     private string _columnArrangements = string.Empty;
 
     private string _createDate;
@@ -117,21 +106,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
 
-    //private ReadOnlyCollection<TableScriptDescription> _eventScriptEdited = new ReadOnlyCollection<TableScriptDescription>([]);
-
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
     private string _globalShowPass = string.Empty;
 
-    private bool _isInSave;
-
     private DateTime _powerEditTime = DateTime.MinValue;
 
-    private bool _readOnly;
-
     private string _rowQuickInfo = string.Empty;
-
-    private bool _saveRequired = false;
 
     private RowSortDefinition? _sortDefinition;
 
@@ -196,7 +177,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Tabelle finden können.
         // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
         AllFiles.Add(this);
-        GenerateTableUpdateTimer();
     }
 
     #endregion
@@ -343,17 +323,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     //}
     public List<string> ExecutingScript { get; } = [];
 
-    //        var eventScriptEditedOld = _eventScriptEdited.ToString(false);
-    //        var eventScriptEditedNew = l.ToString(false);
-    public string Filename { get; protected set; } = string.Empty;
-
-    //public ReadOnlyCollection<TableScriptDescription> EventScriptEdited {
-    //    get => new(_eventScriptEdited);
-    //    set {
-    //        var l = new List<TableScriptDescription>();
-    //        l.AddRange(value);
-    //        l.Sort();
-    /// <summary>
     /// Der Wert wird im System verankert und gespeichert.
     /// Bei Tabellen, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
     /// Kann hier nur gelesen werden! Da eine Änderung über die Property die Datei wieder auf ungespeichert setzen würde, würde hier eine
@@ -377,6 +346,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool IsDisposed { get; private set; }
+
+    public bool IsFreezed {
+        get => IsDisposed || !string.IsNullOrEmpty(FreezedReason);
+    }
 
     public string KeyName { get; }
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
@@ -402,14 +375,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             _powerEditTime = value ? DateTime.UtcNow.AddSeconds(300) : DateTime.UtcNow.AddSeconds(-1);
             OnInvalidateView();
         }
-    }
-
-    /// <summary>
-    /// Prüft auch den FreezedReason
-    /// </summary>
-    public bool ReadOnly {
-        get => _readOnly || !string.IsNullOrEmpty(FreezedReason);
-        private set => _readOnly = value;
     }
 
     public RowCollection Row { get; }
@@ -509,7 +474,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     protected DateTime IsInCache { get; set; } = new(0);
 
     protected string LoadedVersion { get; private set; }
-
     private string? _additionalFilesPathTemp { get; set; }
 
     #endregion
@@ -536,22 +500,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (possibletables != null) {
                 _allavailableTables.AddRange(possibletables);
-                //foreach (var thistable in possibletables) {
-                ////    var canadd = true;
-
-                ////    #region prüfen, ob schon vorhanden, z.b. Table.AllFiles
-
-                ////    foreach (var checkme in AllavailableTables) {
-                ////        if (string.Equals(checkme.FileNameWithoutSuffix(), thistable.TableName, StringComparison.InvariantCultureIgnoreCase)) {
-                ////            canadd = false;
-                ////            break;
-                ////        }
-                ////    }
-
-                ////    #endregion
-
-                ////    if (canadd) { AllavailableTables.Add(thistable); }
-                //}
             }
         }
         _allavailableTables = _allavailableTables.SortedDistinctList();
@@ -562,19 +510,21 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static void BeSureToBeUpToDate(ObservableCollection<Table> ofTables) {
         List<Table> l = [.. ofTables];
 
-        foreach (var db in l) {
-            _ = db.BeSureToBeUpToDate();
+        foreach (var tbl in l) {
+            _ = tbl.BeSureToBeUpToDate();
         }
     }
 
     public static void ForceSaveAll() {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
-            _ = thisFile?.Save();
-            if (x != AllFiles.Count) {
-                // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                ForceSaveAll();
-                return;
+            if (thisFile is TableFile tbf) {
+                _ = tbf.Save();
+                if (x != AllFiles.Count) {
+                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                    ForceSaveAll();
+                    return;
+                }
             }
         }
     }
@@ -591,7 +541,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public static Table? Get(string fileOrTableName, bool readOnly, NeedPassword? needPassword) {
+    public static Table? Get(string fileOrTableName, NeedPassword? needPassword) {
         try {
             if (fileOrTableName.Contains("|")) {
                 var t = fileOrTableName.SplitBy("|");
@@ -631,8 +581,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     return thisFile;
                 }
 
-                if (thisFile.Filename.IsFormat(FormatHolder.FilepathAndName)) {
-                    _ = folder.AddIfNotExists(thisFile.Filename.FilePath());
+                if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder.FilepathAndName)) {
+                    _ = folder.AddIfNotExists(tbf.Filename.FilePath());
                 }
             }
 
@@ -643,21 +593,21 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 if (FileExists(f + ".cbdb")) {
                     var db = new TableChunk(fileOrTableName);
-                    db.LoadFromFile(f + ".cbdb", false, needPassword, string.Empty, readOnly);
+                    db.LoadFromFile(f + ".cbdb", false, needPassword, string.Empty);
                     db.WaitInitialDone();
                     return db;
                 }
 
                 if (FileExists(f + ".mbdb")) {
                     var db = new TableFragments(fileOrTableName);
-                    db.LoadFromFile(f + ".mbdb", false, needPassword, string.Empty, readOnly);
+                    db.LoadFromFile(f + ".mbdb", false, needPassword, string.Empty);
                     db.WaitInitialDone();
                     return db;
                 }
 
                 if (FileExists(f + ".bdb")) {
-                    var db = new Table(fileOrTableName);
-                    db.LoadFromFile(f + ".bdb", false, needPassword, string.Empty, readOnly);
+                    var db = new TableFile(fileOrTableName);
+                    db.LoadFromFile(f + ".bdb", false, needPassword, string.Empty);
                     db.WaitInitialDone();
                     return db;
                 }
@@ -666,7 +616,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return null;
         } catch {
             Develop.CheckStackOverflow();
-            return Get(fileOrTableName, readOnly, needPassword);
+            return Get(fileOrTableName, needPassword);
         }
     }
 
@@ -743,9 +693,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         break;
                 }
                 if (FileExists(pf)) {
-                    var db = new Table(name);
+                    var db = new TableFile(name);
                     db.DropMessages = false;
-                    db.LoadFromFile(pf, false, null, string.Empty, false);
+                    db.LoadFromFile(pf, false, null, string.Empty);
                     return db;
                 }
             } while (pf != string.Empty);
@@ -1041,7 +991,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {
         if (script?.Table is not { IsDisposed: false } db) { return false; }
 
-        if (!string.IsNullOrEmpty(db.CanWriteMainFile())) { return false; }
+        if (!string.IsNullOrEmpty(db.AreAllDataCorrect())) { return false; }
 
         var found = false;
 
@@ -1111,8 +1061,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        if (!string.IsNullOrEmpty(Filename)) {
-            var t = (Filename.FilePath() + "AdditionalFiles\\").CheckPath();
+        if (this is TableFile tbf && !string.IsNullOrEmpty(tbf.Filename)) {
+            var t = (tbf.Filename.FilePath() + "AdditionalFiles\\").CheckPath();
             if (DirectoryExists(t)) {
                 _additionalFilesPathTemp = t;
                 return t;
@@ -1121,6 +1071,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _additionalFilesPathTemp = string.Empty;
         return string.Empty;
     }
+
+    public virtual List<string>? AllAvailableTables(List<Table>? allreadychecked) => null;
 
     /// <summary>
     ///
@@ -1161,6 +1113,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public virtual string AreAllDataCorrect() {
         if (IsDisposed) { return "Tabelle verworfen."; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
+
+        if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(TableVersion.Replace(".", string.Empty))) {
+            return "Diese Programm kann nur Tabellen bis Version " + TableVersion + " bearbeiten.";
+        }
+
         return string.Empty;
     }
 
@@ -1174,46 +1131,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool CanDoValueChangedScript(bool returnValueCount0) => IsRowScriptPossible() && IsThisScriptBroken(ScriptEventTypes.value_changed, returnValueCount0);
-
-    /// <summary>
-    /// Konkrete Prüfung, ob jetzt gespeichert werden kann
-    /// </summary>
-    /// <returns></returns>
-    public string CanSaveMainChunk() {
-        var f = CanWriteMainFile();
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
-
-        if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
-
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
-
-        //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-
-        var fileSaveResult = CanSaveFile(Filename, 5);
-        return fileSaveResult;
-    }
-
-    /// <summary>
-    /// Allgemeine Prüfung, ob es generell möglich ist, eine Bearbeitung auszuführen.
-    /// </summary>
-    /// <returns></returns>
-    public string CanWriteMainFile() {
-        var f = AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (ReadOnly) { return "Tabelle schreibgeschützt!"; }
-
-        if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(TableVersion.Replace(".", string.Empty))) {
-            return "Diese Programm kann nur Tabellen bis Version " + TableVersion + " speichern.";
-        }
-
-        if (!string.IsNullOrEmpty(Filename)) {
-            if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
-        }
-        return string.Empty;
-    }
 
     public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, string.Empty, string.Empty);
 
@@ -1235,7 +1152,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        _saveRequired = true;
+
 
         var colName = column?.KeyName ?? string.Empty;
 
@@ -1249,7 +1166,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         // DANN Festplatte schreiben (nur bei nicht ReadOnly)
-        if (!ReadOnly) {
+        if (!IsFreezed) {
             var newChunkId = TableChunk.GetChunkId(this, type, newchunkvalue);
             var oldChunkId = newChunkId;
 
@@ -1309,8 +1226,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _ = vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Tabelle ist."));
         _ = vars.Add(new VariableString("Tablename", KeyName, true, "Der aktuelle Tabellenname."));
         _ = vars.Add(new VariableTable("CurrentTable", this, true, "Die aktuelle Tabelle"));
-        _ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
-        _ = vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
+        //_ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
+        _ = vars.Add(new VariableBool("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
         _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
 
         //var r = SortDefinition?.SortetdRows(this.Row) ?? new RowSortDefinition(this, this.Column.First, false).SortetdRows(this.Row);
@@ -1375,7 +1292,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         OnCanDoScript(e);
         if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, script.KeyName); }
 
-        var m = CanWriteMainFile();
+        var m = AreAllDataCorrect();
         if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, script.KeyName); }
 
         if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback("Das Skript ist fehlerhaft.", false, true, script.KeyName); }
@@ -1651,7 +1568,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     /// <param name="reason"></param>
     public virtual void Freeze(string reason) {
-        SetReadOnly();
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
 
         if (string.IsNullOrEmpty(FreezedReason)) {
@@ -1682,61 +1598,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return r;
     }
 
-    public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) {
-        var f = CanWriteMainFile();
-        if (!string.IsNullOrWhiteSpace(f)) { return f; }
-
-        return string.Empty;
-    }
-
-    public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
-        foreach (var thisFile in files) {
-            var db = Get(thisFile, true, null);
-            if (db == null) {
-                return thisFile + " konnte nicht geladen werden.";
-            }
-
-            foreach (var thisr in db.Row) {
-                var r = Row.GenerateAndAdd("Dummy", "BDB Import");
-
-                if (r == null) { return "Zeile konnte nicht generiert werden."; }
-
-                foreach (var thisc in db.Column) {
-                    if (thisc != colForFilename) {
-                        var c = Column[thisc.KeyName];
-                        if (c == null) {
-                            c = Column.GenerateAndAdd(thisc.KeyName, thisc.Caption, null, string.Empty);
-                            if (c == null) { return "Spalte konnte nicht generiert werden."; }
-                            c.CloneFrom(thisc, false);
-                        }
-
-                        var w = thisr.CellGetString(thisc);
-                        r.CellSet(c, w, "Import von " + thisFile);
-                        if (r.CellGetString(c) != w) { return "Setzungsfehler!"; }
-                    }
-                }
-
-                if (colForFilename != null) {
-                    r.CellSet(colForFilename, thisFile, "Dateiname, Import von " + thisFile);
-
-                    if (r.CellGetString(colForFilename) != thisFile) { return "Setzungsfehler!"; }
-                }
-            }
-
-            if (deleteImportet) {
-                var ok = Save();
-                if (!ok) { return "Speicher-Fehler!"; }
-                db.Dispose();
-                var d = DeleteFile(thisFile, false);
-                if (!d) { return "Lösch-Fehler!"; }
-            }
-        }
-
-        return string.Empty;
-    }
+    public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) => AreAllDataCorrect();
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
-        var f = CanWriteMainFile();
+        var f = AreAllDataCorrect();
 
         if (!string.IsNullOrEmpty(f)) {
             DropMessage(ErrorType.Warning, "Abbruch, " + f);
@@ -1843,7 +1708,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         #region Der eigentliche Import
 
-        var d1 = DateTime.Now;
+        //var d1 = DateTime.Now;
         var d2 = DateTime.Now;
 
         var no = 0;
@@ -1890,11 +1755,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #region Speichern und Ausgabe
 
-            if (DateTime.Now.Subtract(d1).TotalMinutes > 5) {
-                DropMessage(ErrorType.Info, "Import: Zwischenspeichern der Tabelle");
-                _ = Save();
-                d1 = DateTime.Now;
-            }
+            //if (DateTime.Now.Subtract(d1).TotalMinutes > 5) {
+            //    DropMessage(ErrorType.Info, "Import: Zwischenspeichern der Tabelle");
+            //    _ = Save();
+            //    d1 = DateTime.Now;
+            //}
 
             if (DateTime.Now.Subtract(d2).TotalSeconds > 4.5) {
                 DropMessage(ErrorType.Info, "Import: Zeile " + no + " von " + zeil.Count);
@@ -1907,7 +1772,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         #endregion
 
-        _ = Save();
+        //_ = Save();
         DropMessage(ErrorType.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
         return string.Empty;
     }
@@ -1940,60 +1805,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return l[0].IsOk();
     }
 
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
-        if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
-
-        if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
-        if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
-
-        if (!FileExists(fileNameToLoad)) {
-            if (createWhenNotExisting) {
-                if (ReadOnly) {
-                    Develop.DebugPrint(ErrorType.Error, "Readonly kann keine Datei erzeugen<br>" + fileNameToLoad);
-                    return;
-                }
-                SaveAsAndChangeTo(fileNameToLoad);
-            } else {
-                Freeze("Datei existiert nicht");
-                DropMessage(ErrorType.Warning, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}");
-                return;
-            }
-        }
-
-        _needPassword = needPassword;
-        Filename = fileNameToLoad;
-        //ReCreateWatcher();
-        // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-        if (string.IsNullOrEmpty(Filename)) { return; }
-
-        OnLoading();
-
-        LoadMainData();
-
-        if (FileStateUtcDate.Year < 2000) {
-            FileStateUtcDate = new DateTime(2000, 1, 1);
-        }
-        _saveRequired = false;
-        IsInCache = FileStateUtcDate;
-
-        _ = BeSureToBeUpToDate();
-
-        RepairAfterParse();
-
-        if (ronly) { SetReadOnly(); }
-        if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
-        OnLoaded(true);
-
-        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
-
-        CreateWatcher();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
-
-        DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
-    }
-
     public void LoadFromStream(System.IO.Stream stream) {
         //OnLoading();
         byte[] bLoaded;
@@ -2008,7 +1819,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _ = Parse(bLoaded, true, "Stream");
         RepairAfterParse();
         Freeze("Stream-Tabelle");
-        _saveRequired = false;
         OnLoaded(true);
     }
 
@@ -2230,15 +2040,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public virtual void RepairAfterParse() {
         // Nicht IsInCache setzen, weil ansonsten TableFragments nicht mehr funktioniert
 
-        if (!string.IsNullOrEmpty(CanWriteMainFile())) { return; }
-
         Column.Repair();
-
-        if (!string.IsNullOrEmpty(Filename)) {
-            if (!string.Equals(KeyName, MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
-                Develop.DebugPrint(ErrorType.Warning, "Tabellenname stimmt nicht: " + Filename);
-            }
-        }
 
         Row.Repair();
 
@@ -2248,44 +2050,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         TableAdmin = RepairUserGroups(TableAdmin).AsReadOnly();
 
         OnAdditionalRepair();
-    }
-
-    public virtual bool Save() {
-        if (string.IsNullOrEmpty(Filename)) { return true; }
-
-        // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
-        if (!_saveSemaphore.Wait(0)) {
-            return false;
-        }
-
-        try {
-            if (!SaveRequired()) { return true; }
-
-            var result = SaveInternal(FileStateUtcDate);
-            OnInvalidateView();
-            return string.IsNullOrEmpty(result);
-        } finally {
-            _saveSemaphore.Release();
-        }
-    }
-
-    public void SaveAsAndChangeTo(string newFileName) {
-        if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!"); }
-        _ = Save(); // Original-Datei speichern, die ist ja dann weg.
-        // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
-        // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
-
-        Filename = newFileName;
-        var currentTime = DateTime.UtcNow;
-        var chunks = TableChunk.GenerateNewChunks(this, 100, currentTime, false);
-
-        if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return; }
-
-        _ = mainchunk.Save(newFileName);
-
-        // IsInCache auf FileStateUtcDate setzen, damit WaitInitialDone() nicht wartet
-        FileStateUtcDate = currentTime;
-        IsInCache = currentTime;
     }
 
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + KeyName;
@@ -2327,7 +2091,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Develop.DebugPrint(ErrorType.Warning, t);
     }
 
-    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) => CanWriteMainFile();
+    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) => AreAllDataCorrect();
 
     //public void Variables_RemoveAll(bool isLoading) {
     //    //while (_variables.Count > 0) {
@@ -2359,8 +2123,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunkValue));
     }
 
+    protected virtual void Checker_Tick(object state) {
+        // Grundlegende Überprüfungen
+        if (IsDisposed || !string.IsNullOrEmpty(FreezedReason)) { return; }
+
+        // Script-Überprüfung
+        var e = new CanDoScriptEventArgs(false);
+        OnCanDoScript(e);
+        if (!e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
+    }
+
     protected void CreateWatcher() {
-        if (string.IsNullOrEmpty(CanWriteMainFile())) {
+        if (!IsFreezed) {
             _checker?.Dispose();
 
             _checker = new Timer(Checker_Tick);
@@ -2373,7 +2147,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (disposing) {
             try {
-                _saveSemaphore?.Dispose();
+                //_saveSemaphore?.Dispose();
                 OnDisposingEvent();
                 UnregisterEvents();
 
@@ -2381,18 +2155,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (_checker != null) {
                     _checker.Dispose();
                     _checker = null;
-                }
-
-                // LÖSUNG: Static Timer verwalten basierend auf aktiven Table-Instanzen
-                lock (_timerLock) {
-                    _activeTableCount--;
-                    if (_activeTableCount <= 0) {
-                        _activeTableCount = 0;
-                        if (_tableUpdateTimer != null) {
-                            _tableUpdateTimer.Dispose();
-                            _tableUpdateTimer = null;
-                        }
-                    }
                 }
 
                 // Dann Collections disposen
@@ -2434,24 +2196,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Develop.Message?.Invoke(type, this, Caption, ImageCode.Tabelle, message, 0);
     }
 
-    protected virtual bool LoadMainData() {
-        var (bytes, _, failed) = LoadAndUnzipAllBytes(Filename);
-
-        if (failed) {
-            Freeze("Laden fehlgeschlagen!");
-            return false;
-        }
-
-        var ok = Parse(bytes, true, Filename);
-
-        if (!ok) {
-            Freeze("Parsen fehlgeschlagen!");
-            return false;
-        }
-
-        return true;
-    }
-
     protected void OnAdditionalRepair() {
         if (IsDisposed) { return; }
         //IsInCache = FileStateUTCDate;
@@ -2469,26 +2213,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Loading?.Invoke(this, System.EventArgs.Empty);
     }
 
-    protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
-        var f = CanSaveMainChunk();
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        Develop.SetUserDidSomething();
-
-        var chunksnew = TableChunk.GenerateNewChunks(this, 1200, setfileStateUtcDateTo, false);
-        if (chunksnew == null || chunksnew.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
-
-        f = chunksnew[0].DoExtendedSave();
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        _saveRequired = false;
-        FileStateUtcDate = setfileStateUtcDateTo;
-        return string.Empty;
-    }
-
-    protected virtual bool SaveRequired() => _saveRequired;
-
-    protected void SetReadOnly() => ReadOnly = true;
 
     /// <summary>
     /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Commands aus.
@@ -2574,7 +2298,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 default:
                     if (LoadedVersion == TableVersion) {
                         Freeze("Ladefehler der Tabelle");
-                        if (!ReadOnly) {
+                        if (!IsFreezed) {
                             Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + KeyName);
                         }
                     }
@@ -2732,7 +2456,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 // Variable type
                 if (LoadedVersion == TableVersion) {
                     Freeze("Ladefehler der Tabelle");
-                    if (!ReadOnly) {
+                    if (!IsFreezed) {
                         Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + KeyName);
                     }
                 }
@@ -2742,23 +2466,39 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
+    /// <summary>
+    /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgeführt wurde
+    /// </summary>
+    protected void WaitInitialDone() {
+        var t = Stopwatch.StartNew();
+
+        var lastMessageTime = 0L;
+
+        while (IsInCache.Year < 2000) {
+            Thread.Sleep(1);
+            if (t.ElapsedMilliseconds > 120 * 1000) {
+                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {KeyName} wurde nicht richtig initialisiert");
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(FreezedReason)) {
+                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {KeyName} eingefrohren {FreezedReason}");
+                return;
+            }
+
+            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
+                lastMessageTime = t.ElapsedMilliseconds;
+                DropMessage(ErrorType.DevelopInfo, $"Warte auf Abschluss der Initialsierung von {KeyName}");
+            }
+        }
+    }
+
     protected virtual string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
 
         return string.Empty;
-    }
-
-    private static bool CriticalState() {
-        foreach (var thisDb in AllFiles) {
-            if (thisDb is { IsDisposed: false, IsInCache.Year: < 2000 }) {
-                //if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
-                if (!string.IsNullOrEmpty(thisDb.Filename)) { return true; } // Irgend eine Tabelle wird aktuell geladen
-            }
-        }
-
-        return false;
     }
 
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
@@ -2773,67 +2513,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);
         }
         return nu;
-    }
-
-    private static void TableUpdater(object state) {
-        if (CriticalState()) { return; }
-        BeSureToBeUpToDate(AllFiles);
-    }
-
-    private List<string>? AllAvailableTables(List<Table>? allreadychecked) {
-        if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Tabelle
-
-        var path = Filename.FilePath();
-        var fx = Filename.FileSuffix();
-
-        if (allreadychecked != null) {
-            foreach (var thisa in allreadychecked) {
-                if (thisa is { IsDisposed: false } db) {
-                    if (string.Equals(db.Filename.FilePath(), path) &&
-                        string.Equals(db.Filename.FileSuffix(), fx)) { return null; }
-                }
-            }
-        }
-
-        return GetFiles(path, "*." + fx, System.IO.SearchOption.TopDirectoryOnly).ToList();
-    }
-
-    private void Checker_Tick(object state) {
-        // Grundlegende Überprüfungen
-        if (IsDisposed || !string.IsNullOrEmpty(FreezedReason)) { return; }
-
-        // Script-Überprüfung
-        var e = new CanDoScriptEventArgs(false);
-        OnCanDoScript(e);
-        if (!e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
-
-        if (!SaveRequired() || !LogUndo) {
-            _checkerTickCount = 0;
-            return;
-        }
-
-        _checkerTickCount++;
-        _checkerTickCount = Math.Min(_checkerTickCount, 5000);
-
-        // Zeitliche Bedingungen prüfen
-        //var timeSinceLastChange = DateTime.UtcNow.Subtract(LastChange).TotalSeconds;
-        var timeSinceLastAction = DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds;
-
-        // Bestimme ob gespeichert werden muss
-        var mustSave = (_checkerTickCount > 20 && timeSinceLastAction > 20) ||
-                         _checkerTickCount > 110 ||
-                         (Column.ChunkValueColumn != null && _checkerTickCount > 50);
-
-        if (_checkerTickCount < 200) {
-            // 200 * 2 Sekunden = 6,7 Minuten
-            if (e.Cancel && mustSave) { mustSave = false; }
-            if (mustSave && RowCollection.InvalidatedRowsManager.PendingRowsCount > 0) { mustSave = false; }
-        }
-
-        // Speichern wenn nötig
-        if (mustSave && Save()) {
-            _checkerTickCount = 0;
-        }
     }
 
     private void Column_ColumnDisposed(object sender, ColumnEventArgs e) {
@@ -2860,32 +2539,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    private void GenerateTableUpdateTimer() {
-        lock (_timerLock) {
-            _activeTableCount++;
-
-            if (_tableUpdateTimer != null) { return; }
-
-            _tableUpdateTimer = new Timer(TableUpdater, null, 10000, 3 * 60 * 1000);
-        }
-    }
-
-    private bool IsFileAllowedToLoad(string fileName) {
-        foreach (var thisFile in AllFiles) {
-            if (thisFile is { IsDisposed: false } db) {
-                if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    _ = thisFile.Save();
-                    Develop.DebugPrint(ErrorType.Warning, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     private bool NewMasterPossible() {
-        if (ReadOnly) { return false; }
+        if (IsFreezed) { return false; }
         if (!IsAdministrator()) { return false; }
 
         if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
@@ -2979,33 +2634,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             _columnArrangements = updatedArrangements;
             // Speichern ohne ChangeData aufzurufen (würde Endlosschleife verursachen)
             _ = WriteValueToDiscOrServer(TableDataType.ColumnArrangement, _columnArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
-        }
-    }
-
-    /// <summary>
-    /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgeführt wurde
-    /// </summary>
-    private void WaitInitialDone() {
-        var t = Stopwatch.StartNew();
-
-        var lastMessageTime = 0L;
-
-        while (IsInCache.Year < 2000) {
-            Thread.Sleep(1);
-            if (t.ElapsedMilliseconds > 120 * 1000) {
-                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {Filename.FileNameWithSuffix()} wurde nicht richtig initialisiert");
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(FreezedReason)) {
-                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {Filename.FileNameWithSuffix()} eingefrohren {FreezedReason}");
-                return;
-            }
-
-            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
-                lastMessageTime = t.ElapsedMilliseconds;
-                DropMessage(ErrorType.DevelopInfo, $"Warte auf Abschluss der Initialsierung von {KeyName}\\{Filename.FileNameWithSuffix()}");
-            }
         }
     }
 
