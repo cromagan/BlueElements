@@ -106,7 +106,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public override bool TableInputMustMatchOutputTable => false;
 
     public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann.\r\n" +
-                                          "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangsdatenbank benutzt.\r\n" +
+                                          "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangstabelle benutzt.\r\n" +
                                             "Diese ID wird auch aus Ausgangsfilter weitergegeben.";
 
     /// <summary>

@@ -224,6 +224,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 Pages = tmpPages;
                 return true;
 
+            case "databasefiles":
             case "tablefiles":
             case "lastusedid":
             case "events":

@@ -523,7 +523,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (db2 is not { IsDisposed: false }) { return (null, "Tabellen verworfen", true); }
 
-        if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
+        //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
         var f = db2.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(f)) { return (null, "In der Tabelle sind keine neuen Zeilen möglich: " + f, true); }

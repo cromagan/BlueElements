@@ -167,9 +167,9 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         List<string> result = [.. base.ParseableItems()];
 
         if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false } db) {
-            result.ParseableAdd("OutputDatabase", db.KeyName);
+            result.ParseableAdd("OutputTable", db.KeyName);
         } else {
-            result.ParseableAdd("OutputDatabase", _tableOutputName);
+            result.ParseableAdd("OutputTable", _tableOutputName);
         }
 
         //result.ParseableAdd("SentToChildIds", _childIds, false);
@@ -181,6 +181,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         switch (key) {
             case "table":
             case "outputdatabase":
+            case "outputtable":
                 _tableOutputName = value.FromNonCritical();
                 _tableOutputLoaded = false;
 
