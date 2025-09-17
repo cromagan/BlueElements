@@ -35,7 +35,7 @@ internal class Method_ForEachRow : Method_TableGeneric {
     public override List<List<string>> Args => [[VariableUnknown.ShortName_Plain], FilterVar];
     public override string Command => "foreachrow";
     public override List<string> Constants => [];
-    public override string Description => "Führt den Codeblock für jede gefundene Zeile aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
+    public override string Description => "Führt den Codeblock für jede gefundene Zeile aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
     public override bool GetCodeBlockAfter => true;
     public override int LastArgMinCount => 1;
     public override MethodType MethodLevel => MethodType.LongTime;
@@ -75,10 +75,13 @@ internal class Method_ForEachRow : Method_TableGeneric {
         ScriptEndedFeedback? scx = null;
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
-        foreach (var thisl in r) {
-            var nv = new VariableRowItem(varnam, thisl, true, "Iterations-Variable");
+        for (var index = 0; index < r.Count; index++) {
+            var addme = new List<Variable>() {
+             new VariableRowItem(varnam, r[index], true, "Iterations-Variable"),
+            new VariableDouble("Index", index, true, "Iterations-Variable")
+            };
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEachRow-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, nv, null, "ForEachRow", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEachRow-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 

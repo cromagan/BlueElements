@@ -71,7 +71,7 @@ public class Method_ImportLinked : Method_TableGeneric {
             //if (!linkedTable.AreScriptsExecutable()) { return new DoItFeedback("In der Tabelle '" + linkedTable.Caption + "' sind die Skripte defekt", false, ld); }
 
             var targetColumn = linkedTable.Column[thisColumn.ColumnNameOfLinkedTable];
-            if (targetColumn == null) { return new DoItFeedback("Die Spalte ist in der Zieltabelle nicht vorhanden.", true, ld); }
+            if (targetColumn == null) { return new DoItFeedback($"Die verlinkte Spalte {thisColumn.ColumnNameOfLinkedTable} ist in der Zieltabelle {linkedTable.Caption} nicht vorhanden. Auslösende Spalte: {thisColumn.KeyName}", true, ld); }
 
             var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedTable, thisColumn, r, varCol);
             if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback("Berechnungsfehler im Tabellekopf der verlinkten Zellen: " + info, true, ld); }

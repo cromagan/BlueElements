@@ -72,7 +72,7 @@ public class Method_CallByFilename : Method {
     /// <param name="varCol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, int lineadd, string subname, Variable? addMe, List<string>? attributes, string chainlog, LogData ld) {
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, int lineadd, string subname, List< Variable>? addMe, List<string>? attributes, string chainlog, LogData ld) {
         ScriptEndedFeedback scx;
 
         if (scp.Stufe > 10) {
@@ -83,7 +83,12 @@ public class Method_CallByFilename : Method {
 
         var tmpv = new VariableCollection();
         _ = tmpv.AddRange(varCol);
-        if (addMe != null) { _ = tmpv.Add(addMe); }
+        if (addMe != null) { 
+            foreach(var thisV in addMe) {
+                tmpv.Remove(thisV.KeyName);
+                tmpv.Add(thisV);
+            }
+          }
 
         scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes);
 

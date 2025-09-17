@@ -1497,7 +1497,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public string Export_CSV(FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
-        BeSureAllDataLoaded(-1);
+        //BeSureAllDataLoaded(-1);
 
         var columnListtmp = columnList?.ToList();
         columnListtmp ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();

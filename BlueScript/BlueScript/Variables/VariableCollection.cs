@@ -260,6 +260,14 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         return false;
     }
 
+    public bool Remove(string keyName) {
+        if (ReadOnly) { return false; }
+
+        _internal.Remove(keyName);
+
+        return true;
+    }
+
     public bool Remove(Variable v) => !ReadOnly && _internal.Remove(v);
 
     public void RemoveWithComment(string comment) {
