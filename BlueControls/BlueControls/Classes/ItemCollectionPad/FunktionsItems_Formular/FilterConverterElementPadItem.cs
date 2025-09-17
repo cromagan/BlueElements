@@ -51,7 +51,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     public FilterConverterElementPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public FilterConverterElementPadItem(string keyName, BlueTable.Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public FilterConverterElementPadItem(string keyName, Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 

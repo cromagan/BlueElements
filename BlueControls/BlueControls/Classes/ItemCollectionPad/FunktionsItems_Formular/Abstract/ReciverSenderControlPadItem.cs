@@ -39,25 +39,37 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     #region Fields
 
-    private BlueTable.Table? _tableOutput;
+    private int _outputColorId = -1;
+    private Table? _tableOutput;
 
     private bool _tableOutputLoaded;
 
     private string _tableOutputName = string.Empty;
 
-    private int _outputColorId = -1;
-
     #endregion
 
     #region Constructors
 
-    protected ReciverSenderControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula, BlueTable.Table? tableOutput) : base(keyName, parentFormula) => TableOutput = tableOutput;
+    protected ReciverSenderControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula, Table? tableOutput) : base(keyName, parentFormula) => TableOutput = tableOutput;
 
     #endregion
 
     #region Properties
 
-    public BlueTable.Table? TableOutput {
+    public int OutputColorId {
+        get => _outputColorId;
+
+        private set {
+            if (IsDisposed) { return; }
+
+            if (_outputColorId == value) { return; }
+
+            _outputColorId = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Table? TableOutput {
         get {
             if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false }) { return TableInput; }
 
@@ -82,19 +94,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             _tableOutputLoaded = true;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
-        }
-    }
-
-    public int OutputColorId {
-        get => _outputColorId;
-
-        private set {
-            if (IsDisposed) { return; }
-
-            if (_outputColorId == value) { return; }
-
-            _outputColorId = value;
-            OnPropertyChanged();
         }
     }
 
@@ -140,7 +139,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         ];
 
         var enableOutput = true;
-        BlueTable.Table? outp = null;
+        Table? outp = null;
 
         if (TableInputMustMatchOutputTable) {
             enableOutput = AllowedInputFilter.HasFlag(AllowedInputFilter.None);
@@ -156,7 +155,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
                 result.Add(new FlexiControl("<ImageCode=Information|16> Ausgangstabelle wird über den Eingang gewählt.", widthOfControl, false));
             }
         } else {
-            result.Add(new FlexiControlForProperty<BlueTable.Table?>(() => TableOutput, AllAvailableTables()));
+            result.Add(new FlexiControlForProperty<Table?>(() => TableOutput, AllAvailableTables()));
         }
 
         return result;

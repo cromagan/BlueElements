@@ -49,7 +49,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
     private string _arrangement = string.Empty;
 
-    private BlueTable.Table? _table;
+    private Table? _table;
 
     #endregion
 
@@ -61,7 +61,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
     #region Properties
 
-    public BlueTable.Table? Table {
+    public Table? Table {
         get => _table;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }

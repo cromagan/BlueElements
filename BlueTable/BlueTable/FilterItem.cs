@@ -138,6 +138,14 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     public ColumnItem? Column { get; private set; }
 
+    public FilterType FilterType { get; private set; }
+
+    public string Origin { get; private set; }
+
+    public string QuickInfo => ReadableText();
+
+    public ReadOnlyCollection<string> SearchValue { get; private set; }
+
     /// <summary>
     /// Der Edit-Dialog braucht die Tabelle, um mit Texten die Spalte zu suchen.
     /// </summary>
@@ -157,14 +165,6 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             }
         }
     }
-
-    public FilterType FilterType { get; private set; }
-
-    public string Origin { get; private set; }
-
-    public string QuickInfo => ReadableText();
-
-    public ReadOnlyCollection<string> SearchValue { get; private set; }
 
     public string Where {
         get {
@@ -400,6 +400,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 }
                 return true;
 
+            case "database":
             case "table":
                 Table = Table.Get(value.FromNonCritical(), null);
                 return true;

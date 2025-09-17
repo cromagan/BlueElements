@@ -42,7 +42,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     #region Fields
 
     public bool UndoDone;
-    private BlueTable.Table? _table;
+    private Table? _table;
     private bool _frmHeadEditorFormClosingIsin;
 
     #endregion
@@ -59,7 +59,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     #region Properties
 
-    public BlueTable.Table? Table {
+    public Table? Table {
         get => _table;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
@@ -78,9 +78,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public IEditable? ToEdit {
         set {
-            BlueTable.Table? db = null;
+            Table? db = null;
 
-            if (value is BlueTable.Table dbx) {
+            if (value is Table dbx) {
                 db = dbx;
             }
 
@@ -92,7 +92,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     #region Methods
 
-    public static void AddUndosToTable(Controls.TableView tblUndo, BlueTable.Table? table, float maxAgeInDays) {
+    public static void AddUndosToTable(TableView tblUndo, Table? table, float maxAgeInDays) {
         if (table is { IsDisposed: false } db) {
             Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{db.Caption}'", 0);
 
@@ -104,7 +104,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    public static void AddUndoToTable(Controls.TableView tblUndo, UndoItem work, BlueTable.Table db, float maxAgeInDays) {
+    public static void AddUndoToTable(TableView tblUndo, UndoItem work, Table db, float maxAgeInDays) {
         if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
         var r = tblUndo.Table?.Row.GenerateAndAdd(work.ParseableItems().FinishParseable(), "New Undo Item");
         if (r == null) { return; }
@@ -192,8 +192,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         r.CellSet("Wertneu", neu, string.Empty);
     }
 
-    public static void GenerateUndoTabelle(Controls.TableView tblUndo) {
-        BlueTable.Table db = new(Table.UniqueKeyValue()) {
+    public static void GenerateUndoTabelle(TableView tblUndo) {
+        Table db = new(Table.UniqueKeyValue()) {
             LogUndo = false,
             DropMessages = false
         };

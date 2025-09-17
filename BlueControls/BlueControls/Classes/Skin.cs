@@ -837,7 +837,7 @@ public static class Skin {
     public const int Padding = 9;
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2, MidpointRounding.AwayFromZero);
-    public static BlueTable.Table? StyleDb;
+    public static Table? StyleDb;
 
     public static ColumnItem? StyleDb_Font;
     public static ColumnItem? StyleDb_Name;

@@ -47,7 +47,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
     private bool _allowTemporay;
 
-    private BlueTable.Table? _table;
+    private Table? _table;
 
     private TableScriptDescription? _item;
 
@@ -69,7 +69,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
     #region Properties
 
-    public BlueTable.Table? Table {
+    public Table? Table {
         get => _table;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }

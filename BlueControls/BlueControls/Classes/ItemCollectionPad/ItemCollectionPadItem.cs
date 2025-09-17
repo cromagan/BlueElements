@@ -856,7 +856,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return script;
     }
 
-    public ScriptEndedFeedback ReplaceVariables(BlueTable.Table table, string rowkey) => ReplaceVariables(table.Row.SearchByKey(rowkey));
+    public ScriptEndedFeedback ReplaceVariables(Table table, string rowkey) => ReplaceVariables(table.Row.SearchByKey(rowkey));
 
     public bool ResetVariables() {
         if (IsDisposed) { return false; }

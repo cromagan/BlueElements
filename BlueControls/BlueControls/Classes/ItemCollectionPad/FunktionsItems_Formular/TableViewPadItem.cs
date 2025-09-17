@@ -54,7 +54,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public TableViewPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public TableViewPadItem(string keyName, BlueTable.Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public TableViewPadItem(string keyName, Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 
@@ -88,7 +88,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     #region Methods
 
-    public static List<AbstractListItem> AllAvailableColumArrangemengts(BlueTable.Table db) {
+    public static List<AbstractListItem> AllAvailableColumArrangemengts(Table db) {
         var tcvc = ColumnViewCollection.ParseAll(db);
         var u2 = new List<AbstractListItem>();
         foreach (var thisC in tcvc) {
@@ -98,7 +98,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     }
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new Controls.TableView();
+        var con = new TableView();
         con.TableSet(TableOutput, string.Empty);
         con.DoDefaultSettings(parent, this, mode);
         con.Arrangement = _defaultArrangement;

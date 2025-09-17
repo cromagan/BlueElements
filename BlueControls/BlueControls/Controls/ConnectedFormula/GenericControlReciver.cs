@@ -47,7 +47,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private readonly object _rowsInputLock = new object();
     private string? _cachedFilterHash = null;
-    private BlueTable.Table? _tableInput;
+    private Table? _tableInput;
 
     private FilterCollection? _filterInput;
 
@@ -70,7 +70,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public BlueTable.Table? TableInput {
+    public Table? TableInput {
         get => _tableInput;
 
         private set {
@@ -313,7 +313,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// </summary>
     /// <param name="mustbeTable"></param>
     /// <param name="doEmptyFilterToo"></param>
-    protected void DoInputFilter(BlueTable.Table? mustbeTable, bool doEmptyFilterToo) {
+    protected void DoInputFilter(Table? mustbeTable, bool doEmptyFilterToo) {
         if (IsDisposed || FilterInputChangedHandled) { return; }
 
         _filterInputChangedHandling = true;
@@ -478,7 +478,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private void FilterInput_RowsChanged(object sender, System.EventArgs e) => Invalidate_RowsInput();
 
-    private FilterCollection? GetInputFilter(BlueTable.Table? mustbeTable, bool doEmptyFilterToo) {
+    private FilterCollection? GetInputFilter(Table? mustbeTable, bool doEmptyFilterToo) {
         if (Parents.Count == 0) {
             return doEmptyFilterToo && mustbeTable != null ? new FilterCollection(mustbeTable, "Empty Input Filter") : null;
         }

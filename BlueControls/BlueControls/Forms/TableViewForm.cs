@@ -55,7 +55,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     public TableViewForm() : this(null, true, true, true) { }
 
-    public TableViewForm(BlueTable.Table? table, bool loadTabVisible, bool adminTabVisible, bool usesSettings) : base() {
+    public TableViewForm(Table? table, bool loadTabVisible, bool adminTabVisible, bool usesSettings) : base() {
         InitializeComponent();
 
         UsesSettings = usesSettings;
@@ -115,7 +115,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// <param name="table"></param>
     ///
     /// <returns></returns>
-    public static bool EditabelErrorMessage(BlueTable.Table? table) {
+    public static bool EditabelErrorMessage(Table? table) {
         if (table == null) { return false; }
 
         var m = table.AreAllDataCorrect();
@@ -129,7 +129,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
 
 
-    public static void OpenLayoutEditor(BlueTable.Table db, string layoutToOpen) {
+    public static void OpenLayoutEditor(Table db, string layoutToOpen) {
         var x = db.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(x)) {
             MessageBox.Show(x);
@@ -145,7 +145,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         _ = w.ShowDialog();
     }
 
-    public static void OpenScriptEditor(BlueTable.Table? db) {
+    public static void OpenScriptEditor(Table? db) {
         if (db is not { IsDisposed: false }) { return; }
 
         _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
@@ -264,7 +264,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         btnSuchenUndErsetzen.Enabled = tableFound;
     }
 
-    protected virtual void TableSet(BlueTable.Table? db, string toParse) {
+    protected virtual void TableSet(Table? db, string toParse) {
         if (db is { IsDisposed: false }) {
             DropMessages = db.IsAdministrator();
             cbxColumnArr.ItemEditAllowed = db.IsAdministrator();
@@ -443,7 +443,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
     /// </summary>
     /// <returns></returns>
-    protected bool SwitchTabToTable(BlueTable.Table? table) => table is not null && !table.IsDisposed && SwitchTabToTable(table.KeyName);
+    protected bool SwitchTabToTable(Table? table) => table is not null && !table.IsDisposed && SwitchTabToTable(table.KeyName);
 
     protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {   }
 
@@ -887,7 +887,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// <param name="e"></param>
     private void tbcTableSelector_Selected(object? sender, TabControlEventArgs e) => ShowTab(e.TabPage);
 
-    private void UpdateScripts(BlueTable.Table? db) {
+    private void UpdateScripts(Table? db) {
         Table.Invalidate();
         lstAufgaben.ItemClear();
 

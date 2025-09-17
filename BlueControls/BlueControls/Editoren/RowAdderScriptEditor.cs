@@ -32,7 +32,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     #region Fields
 
-    private BlueTable.Table? _table;
+    private Table? _table;
 
     private RowAdderPadItem? _item;
 
@@ -56,7 +56,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     #region Properties
 
-    public BlueTable.Table? Table {
+    public Table? Table {
         get => _table;
         set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }

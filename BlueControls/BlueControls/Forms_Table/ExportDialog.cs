@@ -47,18 +47,18 @@ public sealed partial class ExportDialog : IHasTable {
     private readonly List<RowItem>? _rowsForExport;
     private readonly string _saveTo = string.Empty;
     private readonly string _zielPfad;
-    private BlueTable.Table? _table;
+    private Table? _table;
     private int _itemNrForPrint;
 
     #endregion
 
     #region Constructors
 
-    public ExportDialog(BlueTable.Table db, string autosaveFile) : this(db, null, autosaveFile) { }
+    public ExportDialog(Table db, string autosaveFile) : this(db, null, autosaveFile) { }
 
-    public ExportDialog(BlueTable.Table db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
+    public ExportDialog(Table db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
 
-    public ExportDialog(BlueTable.Table db, List<RowItem>? rows, string autosaveFile) {
+    public ExportDialog(Table db, List<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -82,7 +82,7 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Properties
 
-    public BlueTable.Table? Table {
+    public Table? Table {
         get => _table;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
@@ -103,7 +103,7 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Methods
 
-    public static void AddLayoutsOff(ComboBox addHere, BlueTable.Table? db) {
+    public static void AddLayoutsOff(ComboBox addHere, Table? db) {
         if (db is null || db.IsDisposed) { return; }
         var r = db.GetAllLayoutsFileNames();
 

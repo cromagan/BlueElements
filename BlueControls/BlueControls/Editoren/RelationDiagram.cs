@@ -38,13 +38,13 @@ public partial class RelationDiagram : PadEditor, IHasTable {
 
     private readonly ColumnItem? _column;
 
-    private BlueTable.Table? _table;
+    private Table? _table;
 
     #endregion
 
     #region Constructors
 
-    public RelationDiagram(BlueTable.Table? table) {
+    public RelationDiagram(Table? table) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

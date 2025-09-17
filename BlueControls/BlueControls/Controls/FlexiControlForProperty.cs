@@ -416,7 +416,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 if (Math.Abs(af.Get() - f) > DefaultTolerance) { af.Set(f); }
                 break;
 
-            case Accessor<BlueTable.Table?> adb:
+            case Accessor<Table?> adb:
                 var db = Table.Get(Value, TableView.Table_NeedPassword);
                 if (db != null) { db.Editor = typeof(TableHeadEditor); }
 
@@ -518,7 +518,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 ValueSet(co.ToHtmlCode(), true);
                 break;
 
-            case BlueTable.Table db:
+            case Table db:
                 ValueSet(db.KeyName, true);
                 break;
 

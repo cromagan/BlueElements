@@ -42,7 +42,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     #region Fields
 
-    private readonly Controls.TableView? _table;
+    private readonly TableView? _table;
 
     private ColumnItem? _column;
 
@@ -54,7 +54,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     public ColumnEditor() : this(null, null) { }
 
-    public ColumnEditor(ColumnItem? column, Controls.TableView? table) : base() {
+    public ColumnEditor(ColumnItem? column, TableView? table) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         _table = table;
@@ -531,7 +531,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (linkdb == null) { return; }
 
         if (tblFilterliste.Table == null) {
-            BlueTable.Table db = new(Table.UniqueKeyValue()) {
+            Table db = new(Table.UniqueKeyValue()) {
                 LogUndo = false,
                 DropMessages = false
             };

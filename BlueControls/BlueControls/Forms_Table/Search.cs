@@ -32,7 +32,7 @@ public sealed partial class Search : Form {
 
     #region Fields
 
-    private readonly BlueControls.Controls.TableView _tableView;
+    private readonly TableView _tableView;
     private ColumnViewItem? _col;
     private RowData? _row;
 
@@ -40,7 +40,7 @@ public sealed partial class Search : Form {
 
     #region Constructors
 
-    public Search(Controls.TableView table) {
+    public Search(TableView table) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

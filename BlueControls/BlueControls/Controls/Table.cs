@@ -79,7 +79,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private AutoFilter? _autoFilter;
     private bool _controlPressing;
     private ColumnViewCollection? _currentArrangement;
-    private DateTime? _tableDrawError;
     private bool _editButton;
     private int _filterleisteZeilen = 1;
     private bool _isFilling;
@@ -101,21 +100,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private RowData? _mouseOverRow;
     private string _newRowsAllowed = string.Empty;
     private Progressbar? _pg;
-
     private List<RowData>? _rowsFilteredAndPinned;
-
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
-
     private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
-
     private string _sheetStyle = Win11;
-
     private bool _showNumber;
-
     private RowSortDefinition? _sortDefinitionTemporary;
-
     private string _storedView = string.Empty;
-
+    private DateTime? _tableDrawError;
     private Rectangle _tmpCursorRect = Rectangle.Empty;
 
     private RowItem? _unterschiede;
@@ -149,8 +141,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler? TableChanged;
-
     public new event EventHandler<CellExtEventArgs>? DoubleClick;
 
     public event EventHandler? FilterCombinedChanged;
@@ -160,6 +150,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
     public event EventHandler<RowNullableEventArgs>? SelectedRowChanged;
+
+    public event EventHandler? TableChanged;
 
     public event EventHandler? ViewChanged;
 
@@ -235,14 +227,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowData? CursorPosRow { get; private set; }
-
-    /// <summary>
-    /// Tabellen können mit TableSet gesetzt werden.
-    /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public BlueTable.Table? Table { get; private set; }
 
     [DefaultValue(false)]
     public bool EditButton {
@@ -349,6 +333,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
+    /// <summary>
+    /// Tabellen können mit TableSet gesetzt werden.
+    /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Table? Table { get; private set; }
+
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
@@ -398,7 +390,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     #region Methods
 
-    public static (List<RowData> rows, long visiblerowcount) CalculateSortedRows(BlueTable.Table db, IEnumerable<RowItem> filteredRows, IEnumerable<RowItem>? pinnedRows, RowSortDefinition? sortused) {
+    public static (List<RowData> rows, long visiblerowcount) CalculateSortedRows(Table db, IEnumerable<RowItem> filteredRows, IEnumerable<RowItem>? pinnedRows, RowSortDefinition? sortused) {
         if (db.IsDisposed) { return ([], 0); }
 
         var vrc = 0;
@@ -519,9 +511,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (cola) { t += " - Spalten-Anordnungen<br>"; }
         if (column.UsedInScript()) { t += " - Skripte<br>"; }
         if (db.RowQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
-		//if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Tabellen-Tags<br>"; }
+        //if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Tabellen-Tags<br>"; }
 
-		if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
+        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
 
         if (!string.IsNullOrEmpty(column.ColumnSystemInfo)) {
             t += "<br><br><b>Gesammelte Infos:</b><br>";
@@ -555,22 +547,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    //    return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
-    //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
-    //}
-    public static void Table_AdditionalRepair(object sender, System.EventArgs e) {
-        if (sender is not BlueTable.Table db) { return; }
-
-        _ = RepairColumnArrangements(db);
-    }
-
-    //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Tabellex) {
-    //        var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
-    //        return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
-    //            : new Size(16, 16);
-    //    }
-    public static string Table_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolder.Text);
-
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column is not { IsDisposed: false }) { return; }
         if (row is not { IsDisposed: false }) { return; }
@@ -594,12 +570,12 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         //row.Table?.Row.ExecuteValueChangedEvent(true);
     }
 
-    public static void ImportBdb(BlueTable.Table table) {
+    public static void ImportBdb(Table table) {
         using ImportBdb x = new(table);
         _ = x.ShowDialog();
     }
 
-    public static void ImportCsv(BlueTable.Table table, string csvtxt) {
+    public static void ImportCsv(Table table, string csvtxt) {
         using ImportCsv x = new(table, csvtxt);
         _ = x.ShowDialog();
     }
@@ -616,7 +592,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return Table.RepairUserGroups(l);
     }
 
-    public static List<string> Permission_AllUsedInThisDB(BlueTable.Table db, bool mitRowCreator) {
+    public static List<string> Permission_AllUsedInThisDB(Table db, bool mitRowCreator) {
         List<string> e = [];
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem != null) {
@@ -773,7 +749,23 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         } while (true);
     }
 
-    public static List<AbstractListItem> UndoItems(BlueTable.Table? db, string cellkey) {
+    //    return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
+    //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+    //}
+    public static void Table_AdditionalRepair(object sender, System.EventArgs e) {
+        if (sender is not Table db) { return; }
+
+        _ = RepairColumnArrangements(db);
+    }
+
+    //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Tabellex) {
+    //        var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
+    //        return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
+    //            : new Size(16, 16);
+    //    }
+    public static string Table_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolder.Text);
+
+    public static List<AbstractListItem> UndoItems(Table? db, string cellkey) {
         List<AbstractListItem> i = [];
 
         if (db is { IsDisposed: false }) {
@@ -811,7 +803,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return i;
     }
 
-    public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, BlueTable.Table? table, string showingKey) {
+    public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Table? table, string showingKey) {
         if (columnArrangementSelector is not { IsDisposed: false }) { return; }
 
         columnArrangementSelector.AutoSort = false;
@@ -894,76 +886,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
             DoFilterOutput();
         }
-    }
-
-    public void TableSet(BlueTable.Table? db, string viewCode) {
-        if (Table == db && string.IsNullOrEmpty(viewCode)) { return; }
-
-        CloseAllComponents();
-
-        if (Table is { IsDisposed: false } db1) {
-            // auch Disposed Tabellen die Bezüge entfernen!
-            db1.Cell.CellValueChanged -= _Table_CellValueChanged;
-            db1.Loaded -= _Table_TableLoaded;
-            db1.Loading -= _Table_StoreView;
-            db1.ViewChanged -= _Table_ViewChanged;
-            db1.SortParameterChanged -= _Table_SortParameterChanged;
-            db1.Row.RowRemoving -= Row_RowRemoving;
-            db1.Row.RowRemoved -= Row_RowRemoved;
-            db1.Column.ColumnRemoving -= Column_ItemRemoving;
-            db1.Column.ColumnRemoved -= _Table_ViewChanged;
-            db1.Column.ColumnAdded -= _Table_ViewChanged;
-            db1.ProgressbarInfo -= _Table_ProgressbarInfo;
-            db1.DisposingEvent -= _table_Disposing;
-            db1.InvalidateView -= Table_InvalidateView;
-            Table.ForceSaveAll();
-            MultiUserFile.SaveAll(false);
-        }
-        ShowWaitScreen = true;
-        Refresh(); // um die Uhr anzuzeigen
-        Table = db;
-        Invalidate_CurrentArrangement();
-        Invalidate_SortedRowData();
-        Filter.Table = db;
-        FilterCombined.Table = db;
-
-        _tableDrawError = null;
-        //InitializeSkin(); // Neue Schriftgrößen
-        if (Table is { IsDisposed: false } db2) {
-            _ = RepairColumnArrangements(db2);
-            FilterOutput.Table = db2;
-
-            db2.Cell.CellValueChanged += _Table_CellValueChanged;
-            db2.Loaded += _Table_TableLoaded;
-            db2.Loading += _Table_StoreView;
-            db2.ViewChanged += _Table_ViewChanged;
-            db2.SortParameterChanged += _Table_SortParameterChanged;
-            db2.Row.RowRemoving += Row_RowRemoving;
-            db2.Row.RowRemoved += Row_RowRemoved;
-            db2.Column.ColumnAdded += _Table_ViewChanged;
-            db2.Column.ColumnRemoving += Column_ItemRemoving;
-            db2.Column.ColumnRemoved += _Table_ViewChanged;
-            db2.ProgressbarInfo += _Table_ProgressbarInfo;
-            db2.DisposingEvent += _table_Disposing;
-            db2.InvalidateView += Table_InvalidateView;
-        }
-
-        ParseView(viewCode);
-
-        ShowWaitScreen = false;
-
-        // Nach dem vorhandenen Code, vor ShowWaitScreen = false:
-        if (FilterleisteZeilen > 0) {
-            GetÄhnlich();
-            FillFilters();
-            UpdateFilterleisteVisibility();
-            RepositionControls();
-        }
-
-        // Aktualisiere den Status der Steuerelemente
-        OnEnabledChanged(System.EventArgs.Empty);
-
-        OnTableChanged();
     }
 
     public void DoZoom(bool zoomIn) {
@@ -1446,6 +1368,76 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return l.ToList();
     }
 
+    public void TableSet(Table? db, string viewCode) {
+        if (Table == db && string.IsNullOrEmpty(viewCode)) { return; }
+
+        CloseAllComponents();
+
+        if (Table is { IsDisposed: false } db1) {
+            // auch Disposed Tabellen die Bezüge entfernen!
+            db1.Cell.CellValueChanged -= _Table_CellValueChanged;
+            db1.Loaded -= _Table_TableLoaded;
+            db1.Loading -= _Table_StoreView;
+            db1.ViewChanged -= _Table_ViewChanged;
+            db1.SortParameterChanged -= _Table_SortParameterChanged;
+            db1.Row.RowRemoving -= Row_RowRemoving;
+            db1.Row.RowRemoved -= Row_RowRemoved;
+            db1.Column.ColumnRemoving -= Column_ItemRemoving;
+            db1.Column.ColumnRemoved -= _Table_ViewChanged;
+            db1.Column.ColumnAdded -= _Table_ViewChanged;
+            db1.ProgressbarInfo -= _Table_ProgressbarInfo;
+            db1.DisposingEvent -= _table_Disposing;
+            db1.InvalidateView -= Table_InvalidateView;
+            Table.ForceSaveAll();
+            MultiUserFile.SaveAll(false);
+        }
+        ShowWaitScreen = true;
+        Refresh(); // um die Uhr anzuzeigen
+        Table = db;
+        Invalidate_CurrentArrangement();
+        Invalidate_SortedRowData();
+        Filter.Table = db;
+        FilterCombined.Table = db;
+
+        _tableDrawError = null;
+        //InitializeSkin(); // Neue Schriftgrößen
+        if (Table is { IsDisposed: false } db2) {
+            _ = RepairColumnArrangements(db2);
+            FilterOutput.Table = db2;
+
+            db2.Cell.CellValueChanged += _Table_CellValueChanged;
+            db2.Loaded += _Table_TableLoaded;
+            db2.Loading += _Table_StoreView;
+            db2.ViewChanged += _Table_ViewChanged;
+            db2.SortParameterChanged += _Table_SortParameterChanged;
+            db2.Row.RowRemoving += Row_RowRemoving;
+            db2.Row.RowRemoved += Row_RowRemoved;
+            db2.Column.ColumnAdded += _Table_ViewChanged;
+            db2.Column.ColumnRemoving += Column_ItemRemoving;
+            db2.Column.ColumnRemoved += _Table_ViewChanged;
+            db2.ProgressbarInfo += _Table_ProgressbarInfo;
+            db2.DisposingEvent += _table_Disposing;
+            db2.InvalidateView += Table_InvalidateView;
+        }
+
+        ParseView(viewCode);
+
+        ShowWaitScreen = false;
+
+        // Nach dem vorhandenen Code, vor ShowWaitScreen = false:
+        if (FilterleisteZeilen > 0) {
+            GetÄhnlich();
+            FillFilters();
+            UpdateFilterleisteVisibility();
+            RepositionControls();
+        }
+
+        // Aktualisiere den Status der Steuerelemente
+        OnEnabledChanged(System.EventArgs.Empty);
+
+        OnTableChanged();
+    }
+
     public ColumnViewItem? View_ColumnFirst() => IsDisposed || Table is not { IsDisposed: false } ? null : CurrentArrangement is { Count: not 0 } ca ? ca[0] : null;
 
     public RowData? View_NextRow(RowData? row) {
@@ -1506,7 +1498,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return RendererOf(columnViewItem.Column, style);
     }
 
-    internal static bool RepairColumnArrangements(BlueTable.Table db) {
+    internal static bool RepairColumnArrangements(Table db) {
         if (db.IsDisposed) { return false; }
         if (!string.IsNullOrEmpty(db.FreezedReason)) { return false; }
 
@@ -2387,6 +2379,27 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Invalidate();
     }
 
+    private void _table_Disposing(object sender, System.EventArgs e) => TableSet(null, string.Empty);
+
+    private void _Table_ProgressbarInfo(object sender, ProgressbarEventArgs e) {
+        if (IsDisposed) { return; }
+        if (e.Ends) {
+            _pg?.Close();
+            return;
+        }
+        if (e.Beginns) {
+            _pg = Progressbar.Show(e.Name, e.Count);
+            return;
+        }
+        _pg?.Update(e.Current);
+    }
+
+    private void _Table_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
+
+    private void _Table_StoreView(object sender, System.EventArgs e) =>
+                //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
+                _storedView = ViewToString();
+
     private void _Table_TableLoaded(object sender, FirstEventArgs e) {
         if (IsDisposed) { return; }
         // Wird auch bei einem Reload ausgeführt.
@@ -2422,27 +2435,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             CheckView();
         }
     }
-
-    private void _table_Disposing(object sender, System.EventArgs e) => TableSet(null, string.Empty);
-
-    private void _Table_ProgressbarInfo(object sender, ProgressbarEventArgs e) {
-        if (IsDisposed) { return; }
-        if (e.Ends) {
-            _pg?.Close();
-            return;
-        }
-        if (e.Beginns) {
-            _pg = Progressbar.Show(e.Name, e.Count);
-            return;
-        }
-        _pg?.Update(e.Current);
-    }
-
-    private void _Table_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
-
-    private void _Table_StoreView(object sender, System.EventArgs e) =>
-                //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
-                _storedView = ViewToString();
 
     private void _Table_ViewChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
@@ -3080,11 +3072,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
 
-    private void Table_InvalidateView(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-    }
-
     private Rectangle DisplayRectangleWithoutSlider() => new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top + FilterleisteHeight, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height - FilterleisteHeight);
 
     private void DoÄhnlich() {
@@ -3580,40 +3567,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private void Draw_TableStatus(Graphics gr, BlueTable.Table db, ColumnViewCollection ca, int filterHeight) {
-        // Zeige Stifte-Symbol bei ausstehenden Änderungen
-        if (db.IsFreezed) {
-            gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, filterHeight + 8);
-            if (!string.IsNullOrEmpty(db.FreezedReason)) {
-                ca.Font_RowChapter.DrawString(gr, db.FreezedReason, 52, filterHeight + 12);
-            }
-        }
-
-        if (db.IsAdministrator() && !db.IsFreezed) {
-            // Skripte-Status anzeigen
-            if (!string.IsNullOrEmpty(db.CheckScriptError())) {
-                gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
-                ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, filterHeight + 12);
-            } else {
-                // Verknüpfte Tabellen überprüfen
-                foreach (var thisColumn in db.Column) {
-                    if (thisColumn.LinkedTable is { IsDisposed: false } linkedDb && !string.IsNullOrEmpty(linkedDb.CheckScriptError())) {
-                        gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
-                        ca.Font_RowChapter.DrawString(gr, $"Skripte von {linkedDb.Caption} müssen repariert werden", 90, filterHeight + 12);
-                        break; // Nur die erste fehlerhafte Tabelle anzeigen
-                    }
-                }
-            }
-        }
-
-        // Master-Status anzeigen
-        if (db.AmITemporaryMaster(5, 55)) {
-            gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, filterHeight);
-        } else if (db.AmITemporaryMaster(0, 55)) {
-            gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, filterHeight);
-        }
-    }
-
     private void Draw_Table_Std(Graphics gr, List<RowData> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
         try {
             if (IsDisposed || Table is not { IsDisposed: false } db || ca == null) { return; }
@@ -3680,6 +3633,40 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 }
                 firstOnScreen = false;
             }
+        }
+    }
+
+    private void Draw_TableStatus(Graphics gr, Table db, ColumnViewCollection ca, int filterHeight) {
+        // Zeige Stifte-Symbol bei ausstehenden Änderungen
+        if (db.IsFreezed) {
+            gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, filterHeight + 8);
+            if (!string.IsNullOrEmpty(db.FreezedReason)) {
+                ca.Font_RowChapter.DrawString(gr, db.FreezedReason, 52, filterHeight + 12);
+            }
+        }
+
+        if (db.IsAdministrator() && !db.IsFreezed) {
+            // Skripte-Status anzeigen
+            if (!string.IsNullOrEmpty(db.CheckScriptError())) {
+                gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
+                ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, filterHeight + 12);
+            } else {
+                // Verknüpfte Tabellen überprüfen
+                foreach (var thisColumn in db.Column) {
+                    if (thisColumn.LinkedTable is { IsDisposed: false } linkedDb && !string.IsNullOrEmpty(linkedDb.CheckScriptError())) {
+                        gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
+                        ca.Font_RowChapter.DrawString(gr, $"Skripte von {linkedDb.Caption} müssen repariert werden", 90, filterHeight + 12);
+                        break; // Nur die erste fehlerhafte Tabelle anzeigen
+                    }
+                }
+            }
+        }
+
+        // Master-Status anzeigen
+        if (db.AmITemporaryMaster(5, 55)) {
+            gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, filterHeight);
+        } else if (db.AmITemporaryMaster(0, 55)) {
+            gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, filterHeight);
         }
     }
 
@@ -3950,8 +3937,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
-    private void OnTableChanged() => TableChanged?.Invoke(this, System.EventArgs.Empty);
-
     private void OnFilterCombinedChanged() {
         // Bestehenden Code belassen
         FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
@@ -3973,6 +3958,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 
     private void OnSelectedRowChanged(RowNullableEventArgs e) => SelectedRowChanged?.Invoke(this, e);
+
+    private void OnTableChanged() => TableChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnViewChanged() {
         Invalidate_CurrentArrangement();
@@ -4165,6 +4152,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private RowSortDefinition? SortUsed() => _sortDefinitionTemporary?.Columns != null
             ? _sortDefinitionTemporary
             : Table?.SortDefinition?.Columns != null ? Table.SortDefinition : null;
+
+    private void Table_InvalidateView(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate();
+    }
 
     private void txbZeilenFilter_Enter(object sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
 

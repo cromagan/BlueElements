@@ -34,8 +34,8 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
     #region Fields
 
-    private BlueTable.Table? _table;
-    private BlueControls.Controls.TableView? _tableview;
+    private Table? _table;
+    private Controls.TableView? _tableview;
 
     #endregion
 
@@ -70,7 +70,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
     #region Properties
 
-    public BlueTable.Table? Table {
+    public Table? Table {
         get => _table;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
@@ -87,7 +87,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         }
     }
 
-    public BlueControls.Controls.TableView? TableView {
+    public Controls.TableView? TableView {
         get => _tableview;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }

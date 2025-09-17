@@ -44,7 +44,6 @@ public static class Allgemein {
             if (availableMemoryGB > Math.Min(totalSystemMemoryGB * 0.2, 8)) {
                 BlueFont.TrimAllCaches(1000, 100);
                 Generic.CollectGarbage();
-
             }
         } catch {
             // Fallback, wenn Speicherabfrage fehlschlägt
@@ -63,7 +62,7 @@ public static class Allgemein {
     private static void AllFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
-                if (thisit is BlueTable.Table db) {
+                if (thisit is Table db) {
                     db.AdditionalRepair += TableView.Table_AdditionalRepair;
                 }
             }
@@ -71,7 +70,7 @@ public static class Allgemein {
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-                if (thisit is BlueTable.Table db) {
+                if (thisit is Table db) {
                     db.AdditionalRepair += TableView.Table_AdditionalRepair;
                 }
             }

@@ -37,10 +37,10 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
     #region Fields
 
-    private Table? _table;
     private string _lastQuickInfo = string.Empty;
     private string _layoutFileName;
     private string _rowKey;
+    private Table? _table;
     private string _tmpQuickInfo = string.Empty;
 
     #endregion
@@ -49,9 +49,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
     public RowFormulaPadItem() : this(string.Empty, null, string.Empty, string.Empty) { }
 
-    public RowFormulaPadItem(BlueTable.Table table, string rowkey, string layoutId) : this(string.Empty, table, rowkey, layoutId) { }
+    public RowFormulaPadItem(Table table, string rowkey, string layoutId) : this(string.Empty, table, rowkey, layoutId) { }
 
-    public RowFormulaPadItem(string keyName, BlueTable.Table? table, string rowkey, string layoutFileName) : base(keyName) {
+    public RowFormulaPadItem(string keyName, Table? table, string rowkey, string layoutFileName) : base(keyName) {
         Table = table;
         _rowKey = rowkey;
         _layoutFileName = layoutFileName;
@@ -80,23 +80,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         }
     }
 
-    public BlueTable.Table? Table {
-        get => _table;
-        private set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
-
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
-            }
-            _table = value;
-
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
-            }
-        }
-    }
-
     public override string Description => string.Empty;
 
     /// <summary>
@@ -114,6 +97,23 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public RowItem? Row => Table?.Row.SearchByKey(_rowKey);
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
+
+    public Table? Table {
+        get => _table;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _table) { return; }
+
+            if (_table != null) {
+                _table.DisposingEvent -= _table_Disposing;
+            }
+            _table = value;
+
+            if (_table != null) {
+                _table.DisposingEvent += _table_Disposing;
+            }
+        }
+    }
 
     protected override int SaveOrder => 999;
 
@@ -153,6 +153,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
                 _layoutFileName = value.FromNonCritical();
                 return true;
 
+            case "database":
             case "table":
                 Table = Table.Get(value.FromNonCritical(), TableView.Table_NeedPassword);
                 return true;

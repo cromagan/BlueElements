@@ -38,7 +38,7 @@ public partial class FlexiControlRowSelector : GenericControlReciverSender, IHas
 
     #region Constructors
 
-    public FlexiControlRowSelector(BlueTable.Table? table, string caption, string showFormat) : base(false, false, false) {
+    public FlexiControlRowSelector(Table? table, string caption, string showFormat) : base(false, false, false) {
         InitializeComponent();
         f.CaptionPosition = CaptionPosition.Über_dem_Feld;
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;

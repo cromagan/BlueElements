@@ -84,7 +84,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public BlueTable.Table? TableInput {
+    public Table? TableInput {
         get {
             //if (item.TableInputMustMatchOutputTable) {
             //    return item is ReciverSenderControlPadItem iiss ? iiss.TableOutput : null;

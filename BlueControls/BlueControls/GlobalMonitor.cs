@@ -37,7 +37,7 @@ public partial class GlobalMonitor : Form {
 
     public static void GenerateLogTable(Controls.TableView tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
-        BlueTable.Table db = new(Table.UniqueKeyValue()) {
+        Table db = new(Table.UniqueKeyValue()) {
             LogUndo = false,
             DropMessages = false
         };

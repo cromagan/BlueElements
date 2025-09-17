@@ -252,7 +252,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
     //    get => _connectedFormula;
     //    private set {
     //        if (value == _connectedFormula) { return; }
-    public void GetHeadPageFrom(BlueTable.Table? table) {
+    public void GetHeadPageFrom(Table? table) {
         if (table is { IsDisposed: false }) {
             var f = table.FormulaFileName();
 

@@ -97,6 +97,10 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         }
     }
 
+    public ScriptEventTypes EventTypes { get; private set; } = 0;
+
+    public bool NeedRow { get; private set; }
+
     public Table? Table {
         get => _table;
         private set {
@@ -113,10 +117,6 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             }
         }
     }
-
-    public ScriptEventTypes EventTypes { get; private set; } = 0;
-
-    public bool NeedRow { get; private set; }
 
     /// <summary>
     /// Nichtspeicherbare Spalten werden bei FormularVorbereiten benötigt.
@@ -246,6 +246,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
                 EventTypes = (ScriptEventTypes)IntParse(value);
                 return true;
 
+            case "database":
             case "table":
                 //Table = Table.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
                 return true;
