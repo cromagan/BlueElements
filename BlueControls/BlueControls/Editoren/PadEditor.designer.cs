@@ -423,7 +423,7 @@ namespace BlueControls.Forms {
             this.btnArbeitsbreichSetup.Name = "btnArbeitsbreichSetup";
             this.btnArbeitsbreichSetup.Size = new Size(96, 66);
             this.btnArbeitsbreichSetup.TabIndex = 13;
-            this.btnArbeitsbreichSetup.Text = "Arbeitsbereich einreichten";
+            this.btnArbeitsbreichSetup.Text = "Arbeitsbereich einrichten";
             this.btnArbeitsbreichSetup.Click += new EventHandler(this.btnArbeitsbreichSetup_Click);
             // 
             // PadDesign

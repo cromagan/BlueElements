@@ -1305,7 +1305,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public bool CopyAble() {
-        if (_relationType == RelationType.DropDownValues) { return false; }
+        //if (_relationType == RelationType.DropDownValues) { return false; }
         return true;
     }
 

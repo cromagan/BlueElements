@@ -190,14 +190,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-
     /// <summary>
     /// Gibt zurück, ob die Collection Items enthält.
     /// Die Collection "Head" gibt immer true zurück.
     /// </summary>
-    public bool HasItems { 
-        get { 
-            if(string.Equals(_caption,"Head", StringComparison.OrdinalIgnoreCase)) { return true; }
+    public bool HasItems {
+        get {
+            if (string.Equals(_caption, "Head", StringComparison.OrdinalIgnoreCase)) { return true; }
 
             return _internal.Count > 0;
         }

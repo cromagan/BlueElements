@@ -339,6 +339,25 @@ public static partial class Extensions {
         } catch { return null; }
     }
 
+    public static string EscapeUnicode(this string input) {
+        if (string.IsNullOrEmpty(input)) { return input; }
+
+        try {
+            StringBuilder result = new StringBuilder();
+            foreach (char c in input) {
+                if (c > 127) { // Nicht-ASCII Zeichen
+                    result.Append($"\\u{(int)c:X4}");
+                } else {
+                    result.Append(c);
+                }
+            }
+            return result.ToString();
+        } catch (Exception ex) {
+            Develop.DebugPrint("Fehler beim Konvertieren", ex);
+            return input;
+        }
+    }
+
     public static string FromNonCritical(this string txt) {
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
         if (txt.Length < 3) { return txt; }
@@ -357,12 +376,15 @@ public static partial class Extensions {
                     case 'A':
                         result.Add(';');
                         break;
+
                     case 'B':
                         result.Add('<');
                         break;
+
                     case 'C':
                         result.Add('>');
                         break;
+
                     case 'D':
                         result.Add('\r');
                         result.Add('\n');
@@ -371,36 +393,47 @@ public static partial class Extensions {
                     case 'E':
                         result.Add('\r');
                         break;
+
                     case 'F':
                         result.Add('\n');
                         break;
+
                     case 'G':
                         result.Add('|');
                         break;
+
                     case 'H':
                         result.Add('}');
                         break;
+
                     case 'I':
                         result.Add('{');
                         break;
+
                     case 'J':
                         result.Add('=');
                         break;
+
                     case 'K':
                         result.Add(',');
                         break;
+
                     case 'L':
                         result.Add('&');
                         break;
+
                     case 'M':
                         result.Add('/');
                         break;
+
                     case 'N':
                         result.Add('"');
                         break;
+
                     case 'Z':
                         result.Add('[');
                         break;
+
                     default:
                         // Kein bekanntes Pattern, original Zeichen beibehalten
                         result.Add(txt[i]);
@@ -1130,45 +1163,59 @@ public static partial class Extensions {
                 case '[':
                     result.AddRange("[Z]");
                     break;
+
                 case ';':
                     result.AddRange("[A]");
                     break;
+
                 case '<':
                     result.AddRange("[B]");
                     break;
+
                 case '>':
                     result.AddRange("[C]");
                     break;
+
                 case '\r':
                     result.AddRange("[E]");
                     break;
+
                 case '\n':
                     result.AddRange("[F]");
                     break;
+
                 case '|':
                     result.AddRange("[G]");
                     break;
+
                 case '}':
                     result.AddRange("[H]");
                     break;
+
                 case '{':
                     result.AddRange("[I]");
                     break;
+
                 case '=':
                     result.AddRange("[J]");
                     break;
+
                 case ',':
                     result.AddRange("[K]");
                     break;
+
                 case '&':
                     result.AddRange("[L]");
                     break;
+
                 case '/':
                     result.AddRange("[M]");
                     break;
+
                 case '"':
                     result.AddRange("[N]");
                     break;
+
                 default:
                     result.Add(c);
                     break;
@@ -1246,6 +1293,31 @@ public static partial class Extensions {
             tXt = tXt.Remove(0, was.Length);
         }
         return tXt;
+    }
+
+    public static string UnEscapeUnicode(this string input) {
+        if (string.IsNullOrEmpty(input)) { return input; }
+
+        try {
+            StringBuilder result = new StringBuilder();
+            for (int i = 0; i < input.Length; i++) {
+                if (i <= input.Length - 6 && input[i] == '\\' && input[i + 1] == 'u') {
+                    string hexCode = input.Substring(i + 2, 4);
+                    if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out int unicodeValue)) {
+                        result.Append((char)unicodeValue);
+                        i += 5; // Überspringe die nächsten 5 Zeichen (\u + 4 Hex-Zeichen)
+                    } else {
+                        result.Append(input[i]);
+                    }
+                } else {
+                    result.Append(input[i]);
+                }
+            }
+            return result.ToString();
+        } catch (Exception ex) {
+            Develop.DebugPrint("Fehler beim Rückkonvertieren", ex);
+            return input;
+        }
     }
 
     public static byte[] UTF8_ToByte(this string? tXt) => tXt == null || string.IsNullOrEmpty(tXt) ? ([]) : Encoding.UTF8.GetBytes(tXt);

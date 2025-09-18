@@ -163,7 +163,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("ReadableText", _textOriginal);
+        result.ParseableAdd("ReadableText", _textOriginal.EscapeUnicode());
         result.ParseableAdd("Alignment", _ausrichtung);
         result.ParseableAdd("AdditionalScale", _textScale);
         result.ParseableAdd("Style", _style);
@@ -178,7 +178,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "readabletext":
-                _textReplaced = value.FromNonCritical();
+                _textReplaced = value.FromNonCritical().UnEscapeUnicode();
                 _textOriginal = _textReplaced;
                 return true;
 
