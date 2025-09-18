@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using BlueScript.Structures;
 using CefSharp.OffScreen;
 
 namespace BlueScript.Variables;

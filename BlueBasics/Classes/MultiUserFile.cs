@@ -282,7 +282,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return true;
     }
 
-    public void Load(string fileNameToLoad, bool createWhenNotExisting) {
+    public void Load(string fileNameToLoad) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }

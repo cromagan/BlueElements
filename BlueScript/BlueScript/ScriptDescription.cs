@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using static BlueBasics.Constants;
 
@@ -171,7 +172,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
                 return true;
 
             case "usergroups":
-                UserGroups = value.FromNonCritical().SplitAndCutByCrToList().SortedDistinctList().AsReadOnly();
+                UserGroups = value.FromNonCritical().SplitBy("|").ToList().SortedDistinctList().AsReadOnly();
                 return true;
 
             case "changevalues": // Todo: 08.10.2024

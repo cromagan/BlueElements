@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-
 using System.Linq;
 using System.Threading;
 using static BlueBasics.Converter;
@@ -203,11 +202,9 @@ public class Chunk : IHasKeyName {
 
             Develop.SetUserDidSomething();
 
-            if(!WriteAllBytes(filename, datacompressed)) {
+            if (!WriteAllBytes(filename, datacompressed)) {
                 return "Speichern fehlgeschlagen";
             }
-
-
 
             _minBytes = (int)(contentBytes.Count * 0.1);
 

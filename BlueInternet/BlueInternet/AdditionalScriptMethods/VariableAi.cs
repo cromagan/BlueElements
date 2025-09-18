@@ -19,7 +19,6 @@
 
 using System.Collections.Generic;
 using Anthropic.SDK;
-using BlueScript.Structures;
 
 namespace BlueScript.Variables;
 

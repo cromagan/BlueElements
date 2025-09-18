@@ -70,7 +70,7 @@ public class TableChunk : TableFile {
 
     public override bool MultiUserPossible => true;
 
-    private bool SaveRequired => _chunks.Values.Any(chunk => chunk.SaveRequired);
+    protected override bool SaveRequired => _chunks.Values.Any(chunk => chunk.SaveRequired);
 
     #endregion
 
@@ -274,10 +274,10 @@ public class TableChunk : TableFile {
         var files = GetFiles(chunkPath, "*.bdbc", System.IO.SearchOption.TopDirectoryOnly);
         var fileQuery = anzahl < 0 || anzahl >= files.Length
             ? files
-            : files.Select(f => GetFileInfo(f))
-                  .OrderBy(f => f.LastWriteTime)
+            : files.Select(GetFileInfo)
+                  .OrderBy(f => f?.LastWriteTime ?? DateTime.Now)
                   .Take(anzahl)
-                  .Select(f => f.FullName)
+                  .Select(f => f?.FullName ?? string.Empty)
                   .ToArray();
 
         foreach (var file in fileQuery) {

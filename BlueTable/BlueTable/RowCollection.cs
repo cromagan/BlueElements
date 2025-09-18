@@ -82,6 +82,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public int Count => _internal.Count;
 
+    public bool IsDisposed { get; private set; }
+
     public Table? Table {
         get => _table;
         private set {
@@ -98,8 +100,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
     }
-
-    public bool IsDisposed { get; private set; }
 
     #endregion
 
@@ -486,10 +486,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             rows.RemoveAt(0);
 
             if (DateTime.UtcNow.Subtract(start).TotalMinutes > 1) {
+                if (tb is TableFile tbf) { tbf.Save(); }
 
-                if(tb is TableFile tbf) { tbf.Save(); }
-
-              
                 start = DateTime.UtcNow;
             }
         }

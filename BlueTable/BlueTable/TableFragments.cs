@@ -42,6 +42,11 @@ public class TableFragments : TableFile {
     private static volatile bool _isInFragmentLoader;
 
     /// <summary>
+    /// So viele Änderungen sind seit dem letzten erstellen der Komplett-Tabelle erstellen auf Festplatte gezählt worden
+    /// </summary>
+    private readonly List<UndoItem> _changesNotIncluded = [];
+
+    /// <summary>
     /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemacht werden.
     /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
     /// </summary>
@@ -75,6 +80,8 @@ public class TableFragments : TableFile {
     public override bool MasterNeeded => _masterNeeded;
 
     public override bool MultiUserPossible => true;
+
+    protected override bool SaveRequired => false;
 
     #endregion
 
@@ -136,20 +143,6 @@ public class TableFragments : TableFile {
         return string.Empty;
     }
 
-
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
-
-        if (_writer == null) { return "Writer Fehler"; }
-
-        try {
-            lock (_writer) {
-                _writer.Flush();
-            }
-            return string.Empty;
-        } catch { return "Allgemeiner Fehler"; }
-
-    }
-
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
@@ -165,14 +158,14 @@ public class TableFragments : TableFile {
         if (IsFreezed) { return; }
         if (files is not { Count: >= 1 }) { return; }
 
-        _masterNeeded = files.Count > 8 || ChangesNotIncluded.Count > 40 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12;
+        _masterNeeded = files.Count > 8 || _changesNotIncluded.Count > 40 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12;
 
         #region Bei Bedarf neue Komplett-Tabelle erstellen
 
         if (_masterNeeded && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
             DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
 
-            var f = SaveInternal(IsInCache);
+            var f = SaveMainFile(this, IsInCache);
 
             if (!string.IsNullOrEmpty(f)) {
                 DropMessage(ErrorType.Info, "Komplettierung von {Caption} fehlgeschlagen: {f}");
@@ -181,7 +174,7 @@ public class TableFragments : TableFile {
             }
             _masterNeeded = false;
             OnInvalidateView();
-            ChangesNotIncluded.Clear();
+            _changesNotIncluded.Clear();
         }
 
         #endregion
@@ -190,8 +183,8 @@ public class TableFragments : TableFile {
 
         #region Dateien, mit zu jungen Änderungen entfernen
 
-        if (ChangesNotIncluded.Any()) {
-            foreach (var thisch in ChangesNotIncluded) {
+        if (_changesNotIncluded.Any()) {
+            foreach (var thisch in _changesNotIncluded) {
                 //if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalHours < 12) {
                 _ = files.Remove(thisch.Container);
                 //}
@@ -212,11 +205,11 @@ public class TableFragments : TableFile {
                 var da = f.Substring(f.Length - 19);
 
                 if (DateTimeTryParse(da, out var d2)) {
-                    if (DateTime.UtcNow.Subtract(d2).TotalHours < 1.5) { del = false; }
-                    if (del && DateTime.UtcNow.Subtract(d2).TotalHours < 8) {
+                    if (DateTime.UtcNow.Subtract(d2).TotalHours < 3) { del = false; }
+                    if (del && DateTime.UtcNow.Subtract(d2).TotalHours < 12) {
                         try {
                             var fi = GetFileInfo(thisf);
-                            if (fi.Length > 400) { del = false; }
+                            if (fi == null || fi.Length > 400) { del = false; }
                         } catch {
                             del = false;
                         }
@@ -241,6 +234,16 @@ public class TableFragments : TableFile {
         return base.LoadMainData();
     }
 
+    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (_writer == null) { return "Writer Fehler"; }
+
+        try {
+            lock (_writer) {
+                _writer.Flush();
+            }
+            return string.Empty;
+        } catch { return "Allgemeiner Fehler"; }
+    }
 
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
@@ -315,8 +318,7 @@ public class TableFragments : TableFile {
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {
-
-                var fil = ReadAllText(thisf, System.IO.FileShare.ReadWrite , Encoding.UTF8); 
+                var fil = ReadAllText(thisf, System.IO.FileShare.ReadWrite, Encoding.UTF8);
 
                 var fils = fil.SplitAndCutByCrToList();
 
@@ -378,7 +380,7 @@ public class TableFragments : TableFile {
                 foreach (var thisWork in data) {
                     if (KeyName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
                         Undo.Add(thisWork);
-                        ChangesNotIncluded.Add(thisWork);
+                        _changesNotIncluded.Add(thisWork);
 
                         var c = Column[thisWork.ColName];
                         var r = Row.SearchByKey(thisWork.RowKey);
@@ -415,7 +417,7 @@ public class TableFragments : TableFile {
 
         if (Develop.AllReadOnly) { return; }
 
-		System.IO.FileStream? fileStream = null;
+        System.IO.FileStream? fileStream = null;
         try {
             fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
             _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);

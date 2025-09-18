@@ -65,7 +65,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         AllFiles.Add(this);
 
         if (FileExists(filename)) {
-            Load(filename, true);
+            Load(filename);
         }
 
         if (_pages != null) {
