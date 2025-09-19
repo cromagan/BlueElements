@@ -40,11 +40,10 @@ public class Chunk : IHasKeyName {
     #region Fields
 
     public readonly string MainFileName = string.Empty;
+    private DateTime _bytesloaded = DateTime.MinValue;
     private string _fileinfo = string.Empty;
 
     private string _keyname = string.Empty;
-    private DateTime _lastcheck = DateTime.MinValue;
-
     private int _minBytes = 0;
 
     #endregion
@@ -124,11 +123,15 @@ public class Chunk : IHasKeyName {
     public void InitByteList() {
         LoadFailed = false;
 
-        _lastcheck = DateTime.UtcNow;
+        _bytesloaded = DateTime.UtcNow;
 
         Bytes = [];
     }
 
+    /// <summary>
+    /// Lädt die Bytes und holt sich NUR die Lock-Daten.
+    /// Ansonsten wird nichts geparsed.
+    /// </summary>
     public void LoadBytesFromDisk() {
         var c = ChunkFileName;
         _minBytes = 0;
@@ -138,12 +141,15 @@ public class Chunk : IHasKeyName {
             return;
         }
 
-        _lastcheck = DateTime.UtcNow;
+        var tmp = DateTime.UtcNow;
 
         byte[] bytes;
         (bytes, _fileinfo, LoadFailed) = LoadAndUnzipAllBytes(c);
 
-        if (LoadFailed) { return; }
+        if (LoadFailed) {
+            _bytesloaded = tmp;
+            return;
+        }
 
         if (RemoveHeaderDataTypes(bytes) is { } b) {
             _minBytes = (int)(b.Count * 0.1);
@@ -151,6 +157,8 @@ public class Chunk : IHasKeyName {
 
         Bytes.Clear();
         Bytes = [.. bytes];
+
+        _bytesloaded = tmp;
 
         ParseLockData();
     }
@@ -170,7 +178,7 @@ public class Chunk : IHasKeyName {
             return Bytes.Count > 0; // Nur neu laden, wenn wir Daten haben, die "verschwunden" sind
         }
 
-        if (DateTime.UtcNow.Subtract(_lastcheck).TotalMinutes > 3 || important) {
+        if (DateTime.UtcNow.Subtract(_bytesloaded).TotalMinutes > 6 || important) {
             var nf = GetFileState(ChunkFileName, false);
             return nf != _fileinfo;
         }
@@ -181,7 +189,7 @@ public class Chunk : IHasKeyName {
     public string Save(string filename) {
         if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
         if (Bytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
-        if (_lastcheck.Year < 2000) { return "Chunk noch nicht geladen"; }
+        if (_bytesloaded.Year < 2000) { return "Chunk noch nicht geladen"; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
@@ -343,11 +351,11 @@ public class Chunk : IHasKeyName {
     /// Wartet bis zu 120 Sekunden, bis die Initialladung ausgeführt wurde
     /// </summary>
     /// <returns>True, wenn die Initialisierung erfolgreich abgeschlossen wurde, sonst False</returns>
-    public bool WaitInitialDone() {
+    public bool WaitBytesLoaded() {
         var t = Stopwatch.StartNew();
         var lastMessageTime = 0L;
 
-        while (_lastcheck.Year < 2000) {
+        while (_bytesloaded.Year < 2000) {
             Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
 
             if (t.ElapsedMilliseconds > 120 * 1000) {
@@ -416,7 +424,7 @@ public class Chunk : IHasKeyName {
             if (MoveFile(tempfile, filename, false)) {
                 // Thread-sichere Aktualisierung in einer logischen Einheit
                 lock (this) {
-                    _lastcheck = updateTime;
+                    _bytesloaded = updateTime;
                     _fileinfo = tempFileInfo;
                 }
 
@@ -473,9 +481,13 @@ public class Chunk : IHasKeyName {
                 if (LastEditApp != Develop.AppExe()) {
                     return $"Anderes Programm bearbeitet: {LastEditApp}";
                 } else {
-                    if (LastEditMachineName != Environment.MachineName || LastEditID != MyId) {
-                        return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditID}";
+                    if (LastEditMachineName != Environment.MachineName) {
+                        return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser}";
                     }
+                    if (LastEditID != MyId) {
+                        return $"Ein andere Prozess auf diesem PC bearbeitet gerade.";
+                    }
+
                 }
             }
         }

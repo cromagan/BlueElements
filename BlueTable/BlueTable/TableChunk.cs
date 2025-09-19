@@ -354,61 +354,52 @@ public class TableChunk : TableFile {
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
     public bool LoadChunkWithChunkId(string chunkId, bool important, bool mustExist, bool isFirst) {
-        if (string.IsNullOrEmpty(Filename)) { return true; } // Temporäre Tabellen
-
         if (string.IsNullOrEmpty(chunkId)) { return false; }
-
-        var t = Stopwatch.StartNew();
-        var lastMessageTime = 0L;
-
         chunkId = chunkId.ToLower();
 
-        do {
-            Chunk? chkToWait = null;
+        while (chunksBeingSaved.Count > 10) {
+            DropMessage(ErrorType.Info, $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
+            Pause(1000, true);
+        }
 
-            // Kurzer Lock nur für die kritischen Prüfungen - Race Condition vermeiden
-            lock (chunksBeingSaved) {
-                _chunks.TryGetValue(chunkId, out chkToWait);
+        bool ok;
+        bool parsed;
+        Chunk? chunk = null;
 
-                if (chkToWait == null && chunksBeingSaved.Count == 0) { break; }
-            }
+        // Kurzer Lock nur für die kritischen Prüfungen - Race Condition vermeiden
+        lock (chunksBeingSaved) {
+            _chunks.TryGetValue(chunkId, out chunk);
+        }
 
-            // WaitInitialDone außerhalb des Locks um Deadlock zu vermeiden
-            if (chkToWait != null) {
-                chkToWait.WaitInitialDone();
-                if (chkToWait.LoadFailed) { return false; }
-                if (!chkToWait.NeedsReload(important)) { return true; }
-                Develop.CheckStackOverflow();
-                chkToWait.LoadBytesFromDisk();
-            }
+        if (chunk == null) {
+            DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
+            chunk = new Chunk(Filename, chunkId);
+            parsed = false;
+        } else {
+            parsed = !chunk.LoadFailed && !chunk.NeedsReload(important);
+        }
 
-            if (t.ElapsedMilliseconds > 150 * 1000) {
-                DropMessage(ErrorType.DevelopInfo, $"Abbruch, {chunksBeingSaved.Count} Chunks wurden noch nicht gespeichert.");
+        if (!parsed) {
+            Develop.CheckStackOverflow();
+            chunk.LoadBytesFromDisk();
+            chunk.WaitBytesLoaded();
+            if (chunk.LoadFailed || chunk.NeedsReload(important)) {
+                //Freeze($"Chunk {chunkId} Laden fehlgeschlagen");
                 return false;
             }
 
-            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
-                lastMessageTime = t.ElapsedMilliseconds;
-                DropMessage(ErrorType.Info, $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
-                Develop.DoEvents();
+            WaitChunkIsSaved(chunkId);
+            OnLoading();
+            ok = Parse(chunk);
+
+            if (ok) {
+                _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
             }
 
-            Thread.Sleep(1000);
-        } while (true);
-
-        DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
-
-        var chunk = new Chunk(Filename, chunkId);
-        chunk.LoadBytesFromDisk();
-
-        if (chunk.LoadFailed) {
-            Freeze($"Chunk {chunk.KeyName} Laden fehlgeschlagen");
-            return false;
+            OnLoaded(isFirst);
+        } else {
+            ok = true;
         }
-        OnLoading();
-        var ok = Parse(chunk);
-
-        OnLoaded(isFirst);
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
         // Kurzer Lock um Race Condition zu vermeiden
@@ -463,6 +454,31 @@ public class TableChunk : TableFile {
     }
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName).ToList();
+
+    /// <summary>
+    /// Wartet bis zu 120 Sekunden, bis die Speicherung ausgeführt wurde
+    /// </summary>
+    /// <returns>True, wenn die Speicherung erfolgreich abgeschlossen wurde, sonst False</returns>
+    public bool WaitChunkIsSaved(string chunkid) {
+        var t = Stopwatch.StartNew();
+        var lastMessageTime = 0L;
+
+        while (chunksBeingSaved.ContainsKey(chunkid)) {
+            Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
+
+            if (t.ElapsedMilliseconds > 120 * 1000) {
+                Develop.Message?.Invoke(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
+                return false; // Explizit false zurückgeben, wenn die Initialisierung fehlschlägt
+            }
+
+            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
+                lastMessageTime = t.ElapsedMilliseconds;
+                Develop.Message?.Invoke(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Warte auf Abschluss der Speicherung des Chunks {chunkid}", 0);
+            }
+        }
+
+        return true; // Explizit true zurückgeben, wenn die Initialisierung erfolgreich ist
+    }
 
     internal override string IsValueEditable(TableDataType type, string? chunkValue) {
         var f = base.IsValueEditable(type, chunkValue);
@@ -623,11 +639,7 @@ public class TableChunk : TableFile {
             Cell.Clear();
         }
 
-        if (chunk.Bytes.Count == 0) {
-            // Bei leerer Datei trotzdem in Dictionary einfügen
-            _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
-            return true;
-        }
+        if (chunk.Bytes.Count == 0) { return true; }
 
         // Zuerst parsen, bevor der Chunk in die Dictionary kommt
         var parseSuccessful = Parse(chunk.Bytes.ToArray(), chunk.IsMain, chunk.ChunkFileName);
@@ -638,10 +650,6 @@ public class TableChunk : TableFile {
             // Fehlerhaften Chunk nicht in die Dictionary einfügen
             return false;
         }
-
-        // Nur erfolgreich geparste Chunks werden zur Dictionary hinzugefügt
-        _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
-
         return true;
     }
 
