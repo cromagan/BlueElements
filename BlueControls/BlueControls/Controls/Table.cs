@@ -2344,7 +2344,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
             if (contentHolderCellColumn.SaveContent) {
-                _ = contentHolderCellRow.UpdateRow(true, true, "Nach Benutzereingabe");
+                _ = contentHolderCellRow.UpdateRow(true, "Nach Benutzereingabe");
             } else {
                 // Variablen sind en nicht im Script enthalten, also nur die schnelle Berechnung
                 contentHolderCellRow.InvalidateCheckData();
@@ -2964,7 +2964,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private void ContextMenu_DataValidation(AbstractListItem item) {
         if (item.Tag is not RowItem row || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
         row.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-        _ = row.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
+        _ = row.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
         RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true, null);
         MessageBox.Show("Datenüberprüfung:\r\n" + row.CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
     }

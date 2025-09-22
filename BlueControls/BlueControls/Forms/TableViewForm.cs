@@ -104,11 +104,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     #region Methods
 
-   
-
-
-    
-
     /// <summary>
     /// Gibt TRUE zuück, wenn eine Fehlernachricht angezeigt wurde.
     /// </summary>
@@ -124,10 +119,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         MessageBox.Show("Aktion nicht möglich:<br>" + m);
         return true;
     }
-
- 
-
-
 
     public static void OpenLayoutEditor(Table db, string layoutToOpen) {
         var x = db.AreAllDataCorrect();
@@ -247,7 +238,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         btnOeffnen.Enabled = true;
         btnDrucken.Enabled = tableFound;
 
-        btnTabellenSpeicherort.Enabled = Table.Table is TableFile  { IsFreezed: false } tbf && !string.IsNullOrEmpty(tbf.Filename);
+        btnTabellenSpeicherort.Enabled = Table.Table is TableFile { IsFreezed: false } tbf && !string.IsNullOrEmpty(tbf.Filename);
 
         btnZeileLöschen.Enabled = tableFound;
         lstAufgaben.Enabled = tableFound;
@@ -262,59 +253,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         btnSuchenUndErsetzen.Enabled = tableFound;
-    }
-
-    protected virtual void TableSet(Table? db, string toParse) {
-        if (db is { IsDisposed: false }) {
-            DropMessages = db.IsAdministrator();
-            cbxColumnArr.ItemEditAllowed = db.IsAdministrator();
-        }
-
-        if (Table.Table != db) {
-            CFO.Page = null;
-        }
-
-        var did = false;
-
-        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
-            foreach (var pair in x) {
-                switch (pair.Key) {
-                    case "tableview":
-                        Table.TableSet(db, pair.Value.FromNonCritical());
-                        did = true;
-                        break;
-
-                    case "maintab":
-                        ribMain.SelectedIndex = IntParse(pair.Value);
-                        break;
-
-                    case "splitterx":
-                        SplitContainer1.SplitterDistance = IntParse(pair.Value);
-                        break;
-
-                    case "windowstate":
-                        //WindowState = (FormWindowState)IntParse(pair.Value);
-                        break;
-
-                    default:
-                        DebugPrint(ErrorType.Warning, "Tag unbekannt: " + pair.Key);
-                        break;
-                }
-            }
-        }
-
-        if (!did) {
-            Table.TableSet(db, string.Empty);
-            if (Table.View_RowFirst() != null && db != null) {
-                Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
-            }
-        }
-
-        Check_OrderButtons();
-
-        Table.ShowWaitScreen = false;
-        tbcTableSelector.Enabled = true;
-        Table.Enabled = true;
     }
 
     protected virtual void FillFormula(RowItem? r) {
@@ -445,14 +383,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// <returns></returns>
     protected bool SwitchTabToTable(Table? table) => table is not null && !table.IsDisposed && SwitchTabToTable(table.KeyName);
 
-    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {   }
-
-
-    protected virtual void Table_TableChanged(object sender, System.EventArgs e) {
-        TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
-        Check_OrderButtons();
-        CheckButtons();
-    }
+    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) { }
 
     protected void Table_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
 
@@ -479,6 +410,12 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         FillFormula(e.Row);
     }
 
+    protected virtual void Table_TableChanged(object sender, System.EventArgs e) {
+        TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
+        Check_OrderButtons();
+        CheckButtons();
+    }
+
     protected void Table_ViewChanged(object sender, System.EventArgs e) =>
         TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
 
@@ -500,6 +437,59 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         capZeilen1.Refresh(); // Backgroundworker lassen wenig luft
         capZeilen2.Text = capZeilen1.Text;
         capZeilen2.Refresh();
+    }
+
+    protected virtual void TableSet(Table? db, string toParse) {
+        if (db is { IsDisposed: false }) {
+            DropMessages = db.IsAdministrator();
+            cbxColumnArr.ItemEditAllowed = db.IsAdministrator();
+        }
+
+        if (Table.Table != db) {
+            CFO.Page = null;
+        }
+
+        var did = false;
+
+        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
+            foreach (var pair in x) {
+                switch (pair.Key) {
+                    case "tableview":
+                        Table.TableSet(db, pair.Value.FromNonCritical());
+                        did = true;
+                        break;
+
+                    case "maintab":
+                        ribMain.SelectedIndex = IntParse(pair.Value);
+                        break;
+
+                    case "splitterx":
+                        SplitContainer1.SplitterDistance = IntParse(pair.Value);
+                        break;
+
+                    case "windowstate":
+                        //WindowState = (FormWindowState)IntParse(pair.Value);
+                        break;
+
+                    default:
+                        DebugPrint(ErrorType.Warning, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+            }
+        }
+
+        if (!did) {
+            Table.TableSet(db, string.Empty);
+            if (Table.View_RowFirst() != null && db != null) {
+                Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
+            }
+        }
+
+        Check_OrderButtons();
+
+        Table.ShowWaitScreen = false;
+        tbcTableSelector.Enabled = true;
+        Table.Enabled = true;
     }
 
     protected virtual string ViewToString() {
@@ -542,17 +532,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         Table.ImportClipboard();
     }
-
-    private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
-        BlueTable.Table.ForceSaveAll();
-        MultiUserFile.SaveAll(false);
-
-        if (Table.Table is TableFile { IsDisposed: false } tbf) {
-            _ = ExecuteFile(tbf.Filename.FilePath());
-        }
-    }
-
-    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table.Table, typeof(TableHeadEditor), false);
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
@@ -666,6 +645,17 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInDBScripts();
+
+    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table.Table, typeof(TableHeadEditor), false);
+
+    private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
+        BlueTable.Table.ForceSaveAll();
+        MultiUserFile.SaveAll(false);
+
+        if (Table.Table is TableFile { IsDisposed: false } tbf) {
+            _ = ExecuteFile(tbf.Filename.FilePath());
+        }
+    }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         BlueTable.Table.ForceSaveAll();
@@ -817,7 +807,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
                     foreach (var thisR in rows) {
                         thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-                        _ = thisR.UpdateRow(true, true, "TableView, Kontextmenü, Datenüberprüfung");
+                        _ = thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
                     }
 
                     RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);

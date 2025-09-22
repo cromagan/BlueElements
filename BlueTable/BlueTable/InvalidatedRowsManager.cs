@@ -221,9 +221,9 @@ public class InvalidatedRowsManager {
         masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {db.Caption} / {row.CellFirstString()}");
 
         if (masterRow?.Table != null) {
-            _ = row.UpdateRow(extendedAllowed, true, "Update von " + masterRow?.CellFirstString());
+            _ = row.UpdateRow(extendedAllowed, "Update von " + masterRow?.CellFirstString());
         } else {
-            _ = row.UpdateRow(extendedAllowed, true, "Normales Update");
+            _ = row.UpdateRow(extendedAllowed, "Normales Update");
         }
     }
 

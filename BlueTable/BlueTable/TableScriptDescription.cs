@@ -32,7 +32,7 @@ using static BlueBasics.Converter;
 
 namespace BlueTable;
 
-public static class EventScriptExtension {
+public static class TableScriptDescriptionExtension {
 
     #region Methods
 

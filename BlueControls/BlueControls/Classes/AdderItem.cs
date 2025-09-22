@@ -97,7 +97,7 @@ internal class AdderItem : IReadableTextWithKey {
                         additionalInfoColumn.AdminInfo = "Diese Spalte wird für Zusatzinfos de Textgenerators benutzt.";
                         r.CellSet(additionalInfoColumn, info, "Zeilengenerator im Formular");
                     }
-                    _ = r.UpdateRow(true, true, "Zeile erstellt");
+                    _ = r.UpdateRow(true, "Zeile erstellt");
                 }
             }
         }

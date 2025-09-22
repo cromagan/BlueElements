@@ -44,10 +44,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Fields
 
-    private Table? _table;
-
     private RowCheckedEventArgs? _lastCheckedEventArgs;
-
+    private Table? _table;
     private string? _tmpQuickInfo;
 
     #endregion
@@ -82,12 +80,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string ChunkValue {
         get {
-
             if (Table is not TableChunk) { return string.Empty; }
 
             if (Table?.Column.ChunkValueColumn is { IsDisposed: false } spc) { return Table.Cell.GetStringCore(spc, this); }
             return string.Empty;
+        }
+    }
 
+    public Type? Editor { get; set; }
+
+    public bool IsDisposed { get; private set; }
+
+    public string KeyName { get; private set; }
+
+    public string QuickInfo {
+        get {
+            if (_tmpQuickInfo != null) { return _tmpQuickInfo; }
+            GenerateQuickInfo();
+            return _tmpQuickInfo!;
         }
     }
 
@@ -107,20 +117,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 _table.DisposingEvent += _table_Disposing;
                 _table.Cell.CellValueChanged += Cell_CellValueChanged;
             }
-        }
-    }
-
-    public Type? Editor { get; set; }
-
-    public bool IsDisposed { get; private set; }
-
-    public string KeyName { get; private set; }
-
-    public string QuickInfo {
-        get {
-            if (_tmpQuickInfo != null) { return _tmpQuickInfo; }
-            GenerateQuickInfo();
-            return _tmpQuickInfo!;
         }
     }
 
@@ -678,26 +674,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="onlyIfQuick"></param>
     /// <returns>Wenn alles in Ordung ist</returns>
-    public ScriptEndedFeedback UpdateRow(bool extendedAllowed, bool important, string reason) {
+    public ScriptEndedFeedback UpdateRow(bool extendedAllowed, string reason) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
 
-        if (!important && Table.ExecutingScriptAnyTable.Count > 0) { return new ScriptEndedFeedback("Andere Skripte werden ausgeführt", false, false, "Allgemein"); }
+        if (!db.CanDoValueChangedScript(true)) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
-        if (important) {
-            var tim = Stopwatch.StartNew();
-
-            while (db.ExecutingScript.Count > 0) {
-                if (tim.Elapsed.TotalSeconds > 10) {
-                    break;
-                }
-            }
-        }
+        Table.WaitScriptsDone();
 
         if (db.Column.SysRowState is not { IsDisposed: false } srs) {
             return new ScriptEndedFeedback([], RepairAllLinks());
         }
-
-        if (!db.CanDoValueChangedScript(true)) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
         var mustBeExtended = string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
 
