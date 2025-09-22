@@ -2294,7 +2294,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.GrantWriteAccess(cellInThisTableColumn, null, newChunkVal, 10);
+            var fe = table.GrantWriteAccess(cellInThisTableColumn, null, newChunkVal, 2);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
             var (newrow, message, _) = db.Row.GenerateAndAdd(filterColNewRow.ToArray(), "Neue Zeile über Tabellen-Ansicht");
@@ -2338,7 +2338,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 newChunkVal = newValue;
             }
 
-            var check1 = table.GrantWriteAccess(cellInThisTableColumn, cellInThisTableRow, newChunkVal, 10);
+            var check1 = table.GrantWriteAccess(cellInThisTableColumn, cellInThisTableRow, newChunkVal, 2);
             if (!string.IsNullOrEmpty(check1)) { return check1; }
 
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");

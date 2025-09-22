@@ -1299,6 +1299,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
+        // Vorab-Prüfungen
         var e = new CanDoScriptEventArgs(extended);
         OnCanDoScript(e);
         if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, script.KeyName); }
@@ -1315,22 +1316,22 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, script.KeyName);
         }
 
-        var n = row?.CellFirstString() ?? "ohne Zeile";
+        // Script-Ausführung vorbereiten
 
+        var n = row?.CellFirstString() ?? "ohne Zeile";
         var scriptId = $"{Caption}/{script.KeyName}/{n}";
 
         ExecutingScriptAnyTable.Add(scriptId);
         try {
             var rowstamp = string.Empty;
-
             object addinfo = this;
+
             if (row is { IsDisposed: false }) {
                 rowstamp = row.RowStamp();
                 addinfo = row;
             }
 
             var vars = CreateVariableCollection(row, !script.ChangeValuesAllowed, dbVariables, script.VirtalColumns, extended);
-
             var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
             if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
@@ -1355,9 +1356,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (scf.NeedsScriptFix && string.IsNullOrEmpty(script.FailedReason)) {
                 var t = "Tabelle: " + Caption + "\r\n" +
-                                  "Benutzer: " + UserName + "\r\n" +
-                                  "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
-                                  "Extended: " + extended + "\r\n";
+                       "Benutzer: " + UserName + "\r\n" +
+                       "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
+                       "Extended: " + extended + "\r\n";
 
                 if (row is { IsDisposed: false } r) {
                     t = t + "Zeile: " + r.CellFirstString() + "\r\n";
@@ -1377,31 +1378,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (row != null) { _ = RowCollection.FailedRows.TryAdd(row, scf.FailedReason); }
 
                 DropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
-                _ = ExecutingScriptAnyTable.Remove(scriptId);
                 return scf;
             }
 
             if (row != null) {
-                if (row.IsDisposed) {
-                    _ = ExecutingScriptAnyTable.Remove(scriptId);
-                    return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, script.KeyName);
-                }
-
-                if (Column.SysRowChangeDate is null) {
-                    _ = ExecutingScriptAnyTable.Remove(scriptId);
-                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName);
-                }
-
-                if (row.RowStamp() != rowstamp) {
-                    _ = ExecutingScriptAnyTable.Remove(scriptId);
-                    return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName);
-                }
+                if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, script.KeyName); }
+                if (Column.SysRowChangeDate is null) { return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName); }
+                if (row.RowStamp() != rowstamp) { return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName); }
             }
 
-            if (!produktivphase) {
-                _ = ExecutingScriptAnyTable.Remove(scriptId);
-                return scf;
-            }
+            if (!produktivphase) { return scf; }
 
             #endregion
 
@@ -1430,7 +1416,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #endregion
 
-            _ = ExecutingScriptAnyTable.Remove(scriptId);
+            //  Erfolgreicher Abschluss
 
             if (ExecutingScriptAnyTable.Count == 0) {
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, extended, null);
@@ -1439,14 +1425,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return scf;
         } catch {
             Develop.CheckStackOverflow();
-            _ = ExecutingScriptAnyTable.Remove(scriptId);
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, ignoreError);
+        } finally {
+            //  ExecutingScriptAnyTable wird IMMER aufgeräumt - egal was passiert
+            _ = ExecutingScriptAnyTable.Remove(scriptId);
         }
     }
 
-    //public void CloneFrom(Table sourceTable, bool cellDataToo, bool tagsToo) {
-    //    // Used: Only BZL
-    //    _ = sourceTable.Save();
     /// <summary>
     ///
     /// </summary>

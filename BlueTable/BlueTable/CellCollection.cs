@@ -65,6 +65,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Properties
 
+    public bool IsDisposed { get; private set; }
+
     public Table? Table {
         get => _table;
         private set {
@@ -81,8 +83,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
     }
-
-    public bool IsDisposed { get; private set; }
 
     #endregion
 
@@ -388,7 +388,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
                     if (oldvalue != newvalue) {
                         var chunkValue = inputRow.ChunkValue;
-                        var editableError = GrantWriteAccess(inputColumn, inputRow, chunkValue, 20, true);
+                        var editableError = GrantWriteAccess(inputColumn, inputRow, chunkValue, 2, true);
 
                         if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
                         //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
@@ -647,11 +647,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (!string.IsNullOrEmpty(f)) { return (f, true); }
 
             f = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
-            if (!string.IsNullOrEmpty(f)) { return (f, true); }
+            if (!string.IsNullOrEmpty(f)) { return (f, waitforseconds > 20); }
 
             if (row != null) {
                 f = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-                if (!string.IsNullOrEmpty(f)) { return (f, true); }
+                if (!string.IsNullOrEmpty(f)) { return (f, waitforseconds > 20); }
             }
 
             if (onlyTopLevel) { return (string.Empty, false); }
@@ -668,7 +668,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     waitforseconds = Math.Max(1, waitforseconds / 2);
 
                     var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
-                    if (!string.IsNullOrEmpty(tmp)) { return ("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, true); }
+                    if (!string.IsNullOrEmpty(tmp)) { return ("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, waitforseconds > 10); }
                     return (string.Empty, false);
                 }
 

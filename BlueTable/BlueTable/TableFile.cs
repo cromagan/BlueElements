@@ -112,7 +112,7 @@ public class TableFile : Table {
 
         if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
 
-        if (ExecutingScript.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
+        if (ExecutingScriptAnyTable.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
 
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
 
