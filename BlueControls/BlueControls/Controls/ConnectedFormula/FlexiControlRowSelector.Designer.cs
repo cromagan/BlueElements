@@ -10,7 +10,7 @@ namespace BlueControls.ConnectedFormula {
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>
-        private IContainer components = null;
+        private IContainer components;
 
 
         #region Vom Komponenten-Designer generierter Code
