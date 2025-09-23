@@ -220,7 +220,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     #region Properties
 
-    public static List<string> ExecutingScriptAnyTable { get; } = [];
+    public static List<string> ExecutingScriptThreadsAnyTable { get; } = [];
 
     public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
@@ -1039,13 +1039,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static void WaitScriptsDone() {
         var sw = Stopwatch.StartNew();
-        var runTimeID = ExecutingScriptAnyTable.JoinWithCr();
+        var runTimeID = ExecutingScriptThreadsAnyTable.JoinWithCr();
 
-        while (ExecutingScriptAnyTable.Count > 0) {
+        var myThread = Thread.CurrentThread.ManagedThreadId.ToStringInt10();
+
+        while (HasActiveThreadsExcept(myThread)) {
             try {
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
                 Pause(1, true);
-                var newRunTimeID = ExecutingScriptAnyTable.JoinWithCr();
+                var newRunTimeID = ExecutingScriptThreadsAnyTable.JoinWithCr();
 
                 if (runTimeID != newRunTimeID) {
                     // Aktivität erkannt - Timer zurücksetzen
@@ -1318,10 +1320,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         // Script-Ausführung vorbereiten
 
-        var n = row?.CellFirstString() ?? "ohne Zeile";
-        var scriptId = $"{Caption}/{script.KeyName}/{n}";
+        var isNewId = false;
+        var scriptThreadId = Thread.CurrentThread.ManagedThreadId.ToStringInt10();
+        if (!ExecutingScriptThreadsAnyTable.Contains(scriptThreadId)) {
+            ExecutingScriptThreadsAnyTable.Add(scriptThreadId);
+            isNewId = true;
+        }
 
-        ExecutingScriptAnyTable.Add(scriptId);
+        WaitScriptsDone();
+
         try {
             var rowstamp = string.Empty;
             object addinfo = this;
@@ -1417,8 +1424,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             #endregion
 
             //  Erfolgreicher Abschluss
-
-            if (ExecutingScriptAnyTable.Count == 0) {
+            if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
+            if (ExecutingScriptThreadsAnyTable.Count == 0) {
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, extended, null);
             }
 
@@ -1428,7 +1435,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, ignoreError);
         } finally {
             //  ExecutingScriptAnyTable wird IMMER aufgeräumt - egal was passiert
-            _ = ExecutingScriptAnyTable.Remove(scriptId);
+            if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
         }
     }
 
@@ -2486,6 +2493,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
 
         return string.Empty;
+    }
+
+    private static bool HasActiveThreadsExcept(string excludeThreadId) {
+        try {
+            return ExecutingScriptThreadsAnyTable.Any(thread => thread != excludeThreadId);
+        } catch {
+            Develop.CheckStackOverflow();
+            return HasActiveThreadsExcept(excludeThreadId);
+        }
     }
 
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];

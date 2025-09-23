@@ -75,7 +75,7 @@ public static class UseableForButton {
         var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, "Button", "Button");
         _ = ufb.DoIt(varCol, cdw, scp);
 
-        return cdw.LogData.Protocol.JoinWithCr();
+        return cdw.LogData?.Protocol.JoinWithCr() ?? string.Empty;
     }
 
     #endregion

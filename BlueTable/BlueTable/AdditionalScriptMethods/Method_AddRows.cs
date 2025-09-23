@@ -63,7 +63,7 @@ public class Method_AddRows : Method_TableGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false} db  ) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
+        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false } db) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
 
         if (!db.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
@@ -102,7 +102,7 @@ public class Method_AddRows : Method_TableGeneric {
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
-            var scx = Method_Row.UniqueRow(allFi, d, $"Script-Befehl: 'AddRows' der Tabelle {myDb.Caption}, Skript {scp.ScriptName}", scp, ld);
+            var scx = Method_Row.UniqueRow(allFi, d, $"Skript-Befehl: 'AddRows' der Tabelle {myDb.Caption}, Skript {scp.ScriptName}", scp, ld);
             allFi.Dispose();
             if (scx.Failed) { return scx; }
         }

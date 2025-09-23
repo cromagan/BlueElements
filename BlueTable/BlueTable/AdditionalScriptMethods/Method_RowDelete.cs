@@ -53,7 +53,7 @@ public class Method_RowDelete : Method_TableGeneric, IUseableForButton {
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
-    public string NiceTextForUser => "Die gefunden Zeilen löschen";
+    public string NiceTextForUser => "Die gefundenen Zeilen löschen";
 
     public override string Returns => VariableBool.ShortName_Plain;
 

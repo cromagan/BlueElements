@@ -66,6 +66,47 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public ColumnItem? ChunkValueColumn { get; private set; }
     public int Count => _internal.Count;
 
+    public ColumnItem? First { get; private set; }
+
+    ///// <summary>
+    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
+    ///// </summary>
+    ///// <param name="column"></param>
+    ///// <returns></returns>
+    //public void AddFromParser(ColumnItem? column) {
+    //    if (column.Table != Table) { Develop.DebugPrint(ErrorType.Error, "Parent-Tabellen unterschiedlich!"); }
+    //    if (Contains(column)) { Develop.DebugPrint(ErrorType.Error, "Spalte bereits vorhanden!"); }
+    //    base.GenerateAndAdd(column);
+    //}
+    //    /// <summary>
+    //    /// Gib erste Spalte des ersten Arrangements zurück, die nicht mit "SYS_" beginnt
+    //    /// </summary>
+    //    /// <returns></returns>
+    public bool IsDisposed { get; private set; }
+
+    public ColumnItem? SysChapter { get; private set; }
+
+    public ColumnItem? SysCorrect { get; private set; }
+
+    public ColumnItem? SysLocked { get; private set; }
+
+    /// <summary>
+    /// Wichtige Spalte auch für Zeilenskripte:
+    /// Vor einem Zeilenskript wird der Status der Zeile geloggt. Wird die Zeile während es Skriptes
+    /// verändert, wird das Skript abgebrochen
+    /// </summary>
+    public ColumnItem? SysRowChangeDate { get; private set; }
+
+    public ColumnItem? SysRowChanger { get; private set; }
+
+    public ColumnItem? SysRowColor { get; private set; }
+
+    public ColumnItem? SysRowCreateDate { get; private set; }
+
+    public ColumnItem? SysRowCreator { get; private set; }
+
+    public ColumnItem? SysRowState { get; private set; }
+
     public Table? Table {
         get => _table;
         private set {
@@ -82,40 +123,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             }
         }
     }
-
-    ///// <summary>
-    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
-    ///// </summary>
-    ///// <param name="column"></param>
-    ///// <returns></returns>
-    //public void AddFromParser(ColumnItem? column) {
-    //    if (column.Table != Table) { Develop.DebugPrint(ErrorType.Error, "Parent-Tabellen unterschiedlich!"); }
-    //    if (Contains(column)) { Develop.DebugPrint(ErrorType.Error, "Spalte bereits vorhanden!"); }
-    //    base.GenerateAndAdd(column);
-    //}
-    //    /// <summary>
-    //    /// Gib erste Spalte des ersten Arrangements zurück, die nicht mit "SYS_" beginnt
-    //    /// </summary>
-    //    /// <returns></returns>
-
-    public ColumnItem? First { get; private set; }
-    public bool IsDisposed { get; private set; }
-    public ColumnItem? SysChapter { get; private set; }
-    public ColumnItem? SysCorrect { get; private set; }
-    public ColumnItem? SysLocked { get; private set; }
-
-    /// <summary>
-    /// Wichtige Spalte auch für Zeilenskripte:
-    /// Vor einem Zeilenskript wird der Status der Zeile geloggt. Wird die Zeile während es Skriptes
-    /// verändert, wird das Skript abgebrochen
-    /// </summary>
-    public ColumnItem? SysRowChangeDate { get; private set; }
-
-    public ColumnItem? SysRowChanger { get; private set; }
-    public ColumnItem? SysRowColor { get; private set; }
-    public ColumnItem? SysRowCreateDate { get; private set; }
-    public ColumnItem? SysRowCreator { get; private set; }
-    public ColumnItem? SysRowState { get; private set; }
 
     #endregion
 
@@ -428,12 +435,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return string.Empty;
     }
 
-    /// <summary>
-    /// Setzt die fest vermerkten Spalten zurück und durchsucht die Spalten nach dem Identifier.
-    /// Es werden nur die gefunden Spalten gemerkt - keine neuen erstellt!
-    /// </summary>
-    //public int IndexOf(ColumnItem? column) {
-    //    if (column == null || column.IsDisposed || Table?.Column == null || Table.IsDisposed) { return -1; }
     internal void CloneFrom(Table sourceTable) {
         // Spalten, die zu viel sind, löschen
         var names = new List<ColumnItem>();

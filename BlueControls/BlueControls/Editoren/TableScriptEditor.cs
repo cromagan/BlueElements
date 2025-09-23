@@ -47,10 +47,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
     private bool _allowTemporay;
 
-    private Table? _table;
-
     private TableScriptDescription? _item;
-
+    private Table? _table;
     private bool didMessage = false;
 
     private bool loaded = false;
@@ -68,34 +66,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
     #endregion
 
     #region Properties
-
-    public Table? Table {
-        get => _table;
-        private set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
-
-            WriteInfosBack();
-            lstEventScripts.UncheckAll();
-
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
-                _table.CanDoScript -= Table_CanDoScript;
-            }
-            _table = value;
-
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
-                _table.CanDoScript += Table_CanDoScript;
-
-                tbcScriptEigenschaften.Enabled = true;
-            } else {
-                tbcScriptEigenschaften.Enabled = false;
-            }
-
-            UpdateList();
-        }
-    }
 
     public TableScriptDescription? Item {
         get => IsDisposed || Table is not { IsDisposed: false } ? null : _item;
@@ -178,6 +148,34 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         }
     }
 
+    public Table? Table {
+        get => _table;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _table) { return; }
+
+            WriteInfosBack();
+            lstEventScripts.UncheckAll();
+
+            if (_table != null) {
+                _table.DisposingEvent -= _table_Disposing;
+                _table.CanDoScript -= Table_CanDoScript;
+            }
+            _table = value;
+
+            if (_table != null) {
+                _table.DisposingEvent += _table_Disposing;
+                _table.CanDoScript += Table_CanDoScript;
+
+                tbcScriptEigenschaften.Enabled = true;
+            } else {
+                tbcScriptEigenschaften.Enabled = false;
+            }
+
+            UpdateList();
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -243,9 +241,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         db.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed);
         UpdateList();
 
-
         Item = db.EventScript.Get(tmpname);
-
     }
 
     public override void WriteInfosBack() => UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason);
@@ -270,9 +266,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         Close();
     }
 
-    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
-
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
+
+    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
 
     private void btnTest_Click(object sender, System.EventArgs e) {
         if (!loaded && _table != null && _table.Row.Count == 0) {
@@ -365,11 +361,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         txbTestZeile.Enabled = chkZeile.Checked;
     }
 
-    private void Table_CanDoScript(object sender, CanDoScriptEventArgs e) {
-        if (_allowTemporay) { return; }
-        e.CancelReason = "Skript-Editor geöffnet";
-    }
-
     private bool EnableScript() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return false; }
 
@@ -429,7 +420,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
         if (dsd != _item) { WriteInfosBack(); }
 
-
         //lstEventScripts.UncheckAll();
 
         var toDel = db.EventScript.Get(toDelete);
@@ -441,6 +431,11 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
     }
 
     private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) => UpdateSelectedItem(userGroups: lstPermissionExecute.Checked.ToList().AsReadOnly());
+
+    private void Table_CanDoScript(object sender, CanDoScriptEventArgs e) {
+        if (_allowTemporay) { return; }
+        e.CancelReason = "Skript-Editor geöffnet";
+    }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }

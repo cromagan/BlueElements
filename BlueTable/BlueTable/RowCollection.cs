@@ -186,7 +186,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                     if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 5 + WaitDelay) { break; }
                 }
 
-                if (Table.ExecutingScriptAnyTable.Count > 0) { break; }
+                if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
 
                 WaitDelay = Pendingworker.Count * 5;
                 if (Pendingworker.Count > 2) { break; }
@@ -198,7 +198,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (e.Cancel) { break; }
 
                 Develop.SetUserDidSomething();
-                if (Table.ExecutingScriptAnyTable.Count > 0) { break; }
+                if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
                 _ = row.UpdateRow(true, "Allgemeines Update (User Idle)");
                 Develop.SetUserDidSomething();
                 if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
@@ -803,6 +803,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    }
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }
+        if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { return; }
+
         _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, 10, null, true, false);
     }
 

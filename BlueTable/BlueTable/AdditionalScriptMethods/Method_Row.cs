@@ -19,18 +19,31 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
 namespace BlueTable.AdditionalScriptMethods;
+
+public static class Method_Row_Extension {
+
+    #region Methods
+
+    public static RowItem? ValueRowGet(this SplittedAttributesFeedback attvar, int varno) {
+        if (varno < 0 || varno >= attvar.Attributes.Count) { return null; }
+
+        return attvar.Attributes[varno] is VariableRowItem vro ? vro.RowItem : null;
+    }
+
+    #endregion
+}
 
 // ReSharper disable once UnusedMember.Global
 public class Method_Row : Method_TableGeneric, IUseableForButton {
@@ -75,8 +88,6 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
     #endregion
 
     #region Methods
-
-    public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
 
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
@@ -158,7 +169,7 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
 
         var d = attvar.ValueNumGet(0);
 
-        var fb = UniqueRow(allFi, d, $"Script-Befehl: 'Row' der Tabelle {myDb.Caption}, Skript {scp.ScriptName}", scp, ld);
+        var fb = UniqueRow(allFi, d, $"Skript-Befehl: 'Row' der Tabelle {myDb.Caption}, Skript {scp.ScriptName}", scp, ld);
         allFi.Dispose();
 
         return fb;

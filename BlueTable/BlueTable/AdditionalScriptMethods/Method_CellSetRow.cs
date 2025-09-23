@@ -51,7 +51,7 @@ public class Method_CellSetRow : Method_TableGeneric {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
-        var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
+        var row = attvar.ValueRowGet(2);
         if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row?.Table is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
         if (db != myDb && !db.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.value_changed, true)) { return new DoItFeedback($"In der Tabelle '{db.Caption}' sind die Skripte defekt", false, ld); }

@@ -66,7 +66,7 @@ public class Method_CallRow : Method_TableGeneric, IUseableForButton {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
+        var row = attvar.ValueRowGet(1);
         if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         //if (row?.Table is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
         //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{db.Caption}' sind die Skripte defekt", false, ld); }
@@ -88,7 +88,7 @@ public class Method_CallRow : Method_TableGeneric, IUseableForButton {
 
         var scx = row.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
         if (scx.Failed) {
-            return new DoItFeedback($"'{vs}' bei  '{row.CellFirstString()}' abgebrochen: {scx.FailedReason }", false, ld);
+            return new DoItFeedback($"'{vs}' bei  '{row.CellFirstString()}' abgebrochen: {scx.FailedReason}", false, ld);
         }
         scx.ConsumeBreakAndReturn();
         return scx;

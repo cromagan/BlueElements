@@ -514,6 +514,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 return nam + ": von " + SearchValue[0].Replace("|", " bis ");
 
             case FilterType.BeginntMit:
+            case FilterType.BeginntMit_GroﬂKleinEgal:
                 return nam + " beginnt mit '" + SearchValue[0] + "'";
 
             case FilterType.AlwaysFalse:

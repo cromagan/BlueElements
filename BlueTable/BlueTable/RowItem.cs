@@ -29,7 +29,6 @@ using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -669,11 +668,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return erg;
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="onlyIfQuick"></param>
-    /// <returns>Wenn alles in Ordung ist</returns>
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, string reason) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
 
