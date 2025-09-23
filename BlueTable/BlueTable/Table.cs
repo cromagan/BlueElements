@@ -1044,7 +1044,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         while (ExecutingScriptAnyTable.Count > 0) {
             try {
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-                Thread.Sleep(1000);
+                Pause(1, true);
                 var newRunTimeID = ExecutingScriptAnyTable.JoinWithCr();
 
                 if (runTimeID != newRunTimeID) {
@@ -1307,7 +1307,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var m = AreAllDataCorrect();
         if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, script.KeyName); }
 
-        if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback("Das Skript ist fehlerhaft.", false, true, script.KeyName); }
+        if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback($"Das Skript ist fehlerhaft: {script.ErrorReason()}", false, true, script.KeyName); }
 
         if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, script.KeyName); }
         if (!script.NeedRow) { row = null; }
