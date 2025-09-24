@@ -661,7 +661,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumn in db.Column) {
             if (thisColumn is { IsDisposed: false }) {
                 if (thisColumn.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { continue; }
-
                 erg += CellGetString(thisColumn) + "|";
             }
         }
@@ -815,12 +814,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowState is { IsDisposed: false } srs && srs != column && column.SaveContent) {
             InvalidateCheckData();
 
-            if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                //if (reason != Reason.UpdateChanges)
-                //{
-                //    RowCollection.InvalidatedRows.AddIfNotExists(this);
-                //}
-
+            if (column.ScriptType != ScriptType.Nicht_vorhanden || column.IsKeyColumn) {
                 RowCollection.WaitDelay = 0;
 
                 if (column.IsKeyColumn) {
@@ -907,11 +901,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
 
             if (reason == Reason.SetCommand) {
-                if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                    if (column.IsKeyColumn) {
-                        if (db.Column.SysRowState is { IsDisposed: false } srs) {
-                            _ = SetValueInternal(srs, string.Empty, reason);
-                        }
+                if (column.IsKeyColumn) {
+                    if (db.Column.SysRowState is { IsDisposed: false } srs) {
+                        _ = SetValueInternal(srs, string.Empty, reason);
                     }
                 }
 

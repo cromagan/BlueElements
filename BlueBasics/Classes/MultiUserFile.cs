@@ -40,17 +40,13 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     private static readonly List<MultiUserFile> AllFiles = [];
     private readonly Timer _checker;
+    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
     private string _canWriteError = string.Empty;
     private bool _checkedAndReloadNeed;
     private int _checkerTickCount = -5;
     private string _filename = string.Empty;
     private string _inhaltBlockdatei = string.Empty;
     private bool _initialLoadDone;
-
-    /// <summary>
-    /// Ab aktuell die "Save" Routine vom Code aufgerufen wird, und diese auf einen erfolgreichen Speichervorgang abwartet
-    /// </summary>
-    private bool _isInSaveingLoop;
 
     private bool _isLoading;
     private bool _isSaved = true;
@@ -239,7 +235,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         //----------EditAcut, EditCurrently ----------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.EditAcut) || mode.HasFlag(EditableErrorReasonType.EditCurrently)) {
             if (!AmIBlocker(true)) { return "Ein anderer Benutzer bearbeitet aktuell die Datei."; }
-            if (_isInSaveingLoop) { return "Aktuell werden Daten gespeichert."; }
+            //if (_isInSaveingLoop) { return "Aktuell werden Daten gespeichert."; }
             if (_isLoading) { return "Aktuell werden Daten geladen."; }
         }
 
@@ -404,31 +400,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// Dadurch ist evtl. ein Reload nötig. Ein Reload wird nur bei Pending Changes ausgelöst!
     /// </summary>
     /// <param name="mustSave"></param>
-    public void Save(bool mustSave) {
-        if (Develop.AllReadOnly) { _isSaved = true; return; }
-
-        if (_isInSaveingLoop) { return; }
-        if (string.IsNullOrEmpty(Filename)) { return; }
-
-        var tim = Stopwatch.StartNew();
-
-        while (!_isSaved) {
-            _isInSaveingLoop = true;
-
-            var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk();
-            var f = SaveRoutine(tmpFileName, fileInfoBeforeSaving, dataUncompressed);
-
-            if (string.IsNullOrEmpty(f) || !mustSave) { break; }
-
-            if (tim.ElapsedMilliseconds > 40 * 1000) {
-                Develop.DebugPrint(ErrorType.Warning, "Datei nicht gespeichert: " + Filename + " " + f);
-                break;
-            }
-        }
-
-        tim.Stop();
-        _isInSaveingLoop = false;
-    }
+    public bool Save(bool mustSave) => ProcessFile(TrySave, false, mustSave ? 120 : 10) is true;
 
     public void UnlockEditing() {
         if (!AmIBlocker(false)) { return; }
@@ -636,6 +608,28 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             _ = DeleteFile(tmpFileName, false);
             if (removeSaving) { _isSaving = false; }
             return txt;
+        }
+    }
+
+    private (object? returnValue, bool retry) TrySave(params object[] args) {
+        if (Develop.AllReadOnly) { return (true, false); }
+
+        if (_isSaved) { return (true, false); }
+
+        if (string.IsNullOrEmpty(Filename)) { return (false, false); }
+
+        // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
+        if (!_saveSemaphore.Wait(0)) { return (false, true); }
+
+        try {
+            var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk();
+            var f = SaveRoutine(tmpFileName, fileInfoBeforeSaving, dataUncompressed);
+
+            var ok = string.IsNullOrEmpty(f);
+
+            return (ok, !ok);
+        } finally {
+            _saveSemaphore.Release();
         }
     }
 

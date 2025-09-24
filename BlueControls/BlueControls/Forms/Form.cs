@@ -72,7 +72,7 @@ public partial class Form : System.Windows.Forms.Form {
         set => base.AutoSize = false;
     }
 
-    public sealed override Color BackColor {
+    public override sealed Color BackColor {
         get => base.BackColor;
         // ReSharper disable once ValueParameterNotUsed
         set => base.BackColor = value;
@@ -131,8 +131,9 @@ public partial class Form : System.Windows.Forms.Form {
         IsClosing = true;
 
         if (this is not FloatingForm and not MessageBox) {
-            Table.ForceSaveAll();
+            Table.SaveAll(false);
             MultiUserFile.SaveAll(false);
+            Table.SaveAll(true);
             MultiUserFile.SaveAll(true);
         }
 

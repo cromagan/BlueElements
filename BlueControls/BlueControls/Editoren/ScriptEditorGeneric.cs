@@ -190,6 +190,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         WriteInfosBack();
         MultiUserFile.SaveAll(false);
+        BlueTable.Table.SaveAll(false);
+        //BlueTable.Table.BeSureToBeUpToDate(BlueTable.Table.AllFiles);
 
         btnSaveLoad.Enabled = true;
     }

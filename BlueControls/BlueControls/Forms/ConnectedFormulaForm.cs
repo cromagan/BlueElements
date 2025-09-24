@@ -85,7 +85,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         if (_lastItem is not { IsDisposed: false } api) { return; }
 
-        Table.ForceSaveAll();
+        Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
 
         if (!cf.LockEditing()) { return; }
@@ -93,7 +93,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         MultiUserFile.SaveAll(true);
         cf.UnlockEditing();
-        Table.ForceSaveAll();
+        Table.SaveAll(false);
         CFormula.InvalidateView();
     }
 
@@ -123,7 +123,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        Table.ForceSaveAll();
+        Table.SaveAll(false);
         _ = LoadTab.ShowDialog();
     }
 

@@ -1412,11 +1412,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
 
         if (_isKeyColumn) {
-            if (_relationship_to_First || (_relationType != RelationType.None && _relationType != RelationType.DropDownValues)) {
+            if (_relationship_to_First ) {
                 return "Beziehungen zu anderen Zeilen und Schlüsselspalte nicht kombinierbar.";
             }
 
-            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly) {
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly &&
+                _relationType != RelationType.CellValues) {
                 return "Schlüsselspalten müssen im Script als Readonly vorhanden sein.";
             }
         }

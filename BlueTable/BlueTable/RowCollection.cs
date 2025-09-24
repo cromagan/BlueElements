@@ -487,12 +487,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             rows.RemoveAt(0);
 
             if (DateTime.UtcNow.Subtract(start).TotalMinutes > 1) {
-                if (tb is TableFile tbf) { tbf.Save(); }
+                if (tb is TableFile tbf) { tbf.Save(true); }
 
                 start = DateTime.UtcNow;
             }
         }
-        if (tb is TableFile tbf2) { tbf2.Save(); }
+        if (tb is TableFile tbf2) { tbf2.Save(true); }
         Table.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
         return string.Empty;
     }

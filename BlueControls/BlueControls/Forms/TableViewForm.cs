@@ -179,7 +179,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(false);
         if (IsDisposed || Table.Table is not { IsDisposed: false } db) { return; }
 
         switch (e.Item.KeyName) {
@@ -271,7 +271,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         TableSet(null, string.Empty);
         MultiUserFile.SaveAll(true);
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(true);
     }
 
     protected override void OnLoad(System.EventArgs e) {
@@ -295,7 +295,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         Table.Enabled = false;
         Table.Refresh();
 
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
 
         var s = (List<object>)tabPage.Tag;
@@ -346,7 +346,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// <returns></returns>
     protected bool SwitchTabToTable(string tablename) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(false);
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
             _ = BlueTable.Table.Get(tablename, TableView.Table_NeedPassword);
@@ -567,7 +567,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(false);
 
         _ = SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) {
@@ -591,7 +591,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(false);
         _ = LoadTab.ShowDialog();
     }
 
@@ -602,7 +602,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(false);
 
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
             if (tbf.IsFreezed) { return; }
@@ -623,7 +623,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(true);
         BlueTable.Table.BeSureToBeUpToDate(BlueTable.Table.AllFiles);
     }
 
@@ -649,7 +649,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table.Table, typeof(TableHeadEditor), false);
 
     private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
 
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
@@ -658,7 +658,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
-        BlueTable.Table.ForceSaveAll();
+        BlueTable.Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
         _ = ExecuteFile(System.IO.Path.GetTempPath());
     }

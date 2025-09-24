@@ -1388,7 +1388,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             db1.ProgressbarInfo -= _Table_ProgressbarInfo;
             db1.DisposingEvent -= _table_Disposing;
             db1.InvalidateView -= Table_InvalidateView;
-            Table.ForceSaveAll();
+            Table.SaveAll(false);
             MultiUserFile.SaveAll(false);
         }
         ShowWaitScreen = true;

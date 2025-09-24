@@ -82,7 +82,7 @@ public partial class Voting : System.Windows.Forms.Form {
         Change(v1, -2, [_fr1, _fr2]);
 
         Generate();
-        Table.ForceSaveAll();
+        Table.SaveAll(false);
     }
 
     private void btn2_Click(object? sender, System.EventArgs e) {
@@ -99,7 +99,7 @@ public partial class Voting : System.Windows.Forms.Form {
         Change(v2, -2, [_fr1, _fr2]);
 
         Generate();
-        Table.ForceSaveAll();
+        Table.SaveAll(false);
     }
 
     private void cbxStil_TextChanged(object sender, System.EventArgs e) {

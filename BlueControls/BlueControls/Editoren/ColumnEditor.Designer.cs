@@ -1506,6 +1506,7 @@ namespace BlueControls.BlueTableDialogs {
             this.chkRelation.Location = new System.Drawing.Point(312, 40);
             this.chkRelation.Name = "chkRelation";
             this.chkRelation.Size = new System.Drawing.Size(336, 16);
+            this.chkRelation.QuickInfo = "Ist in den Einträgen der Spalte ein Wert, der in ein der ersten Spalte wiederzufinden ist, werden die Einträge in beiden Feldern dieser Spalte dupliziert.";
             this.chkRelation.TabIndex = 51;
             this.chkRelation.Text = "Beziehungen automatisch mit erster Spalte abgleichen";
             // 

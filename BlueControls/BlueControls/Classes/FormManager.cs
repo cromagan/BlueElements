@@ -120,9 +120,24 @@ public class FormManager : ApplicationContext {
             Running = false;
             ExecuteAtEnd?.Invoke();
 
-            Table.ForceSaveAll();
-            MultiUserFile.SaveAll(true);
+            Develop.DebugPrint(ErrorType.Info, "Schließe Programm...");
+            //var p = BlueControls.Forms.Progressbar.Show("Beenden eingeleitet\r\nBitte warten, Daten werden gespeichert.");
+
+            Table.SaveAll(false);
+            MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
+
+            Table.SaveAll(true);
+            MultiUserFile.SaveAll(true); // Nun aber
+
             MultiUserFile.UnlockAllHard();
+
+            List<Table> l = [.. Table.AllFiles];
+            foreach (var f in l) {
+                f.Freeze("Beenden...");
+            }
+
+            //p.Close();
+            Develop.TraceLogging_End();
 
             ExitThread();
             Develop.AbortExe(true);

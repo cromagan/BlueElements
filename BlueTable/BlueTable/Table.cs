@@ -506,20 +506,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public static void ForceSaveAll() {
-        var x = AllFiles.Count;
-        foreach (var thisFile in AllFiles) {
-            if (thisFile is TableFile tbf) {
-                _ = tbf.Save();
-                if (x != AllFiles.Count) {
-                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                    ForceSaveAll();
-                    return;
-                }
-            }
-        }
-    }
-
     public static void FreezeAll(string reason) {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
@@ -939,6 +925,26 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return l.SortedDistinctList();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blokiert ist.</param>
+    public static void SaveAll(bool mustSave) {
+        if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
+
+        var x = AllFiles.Count;
+        foreach (var thisFile in AllFiles) {
+            if (thisFile is TableFile tbf) {
+                _ = tbf.Save(mustSave);
+                if (x != AllFiles.Count) {
+                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                    SaveAll(mustSave);
+                    return;
+                }
+            }
+        }
+    }
+
     public static string UndoText(ColumnItem? column, RowItem? row) {
         if (column?.Table is not { IsDisposed: false } db) { return string.Empty; }
 
@@ -1318,16 +1324,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, script.KeyName);
         }
 
-        // Script-Ausführung vorbereiten
-
         var isNewId = false;
         var scriptThreadId = Thread.CurrentThread.ManagedThreadId.ToStringInt10();
-        if (!ExecutingScriptThreadsAnyTable.Contains(scriptThreadId)) {
-            ExecutingScriptThreadsAnyTable.Add(scriptThreadId);
-            isNewId = true;
-        }
+        if (script.ChangeValuesAllowed) {
+            WaitScriptsDone();
 
-        WaitScriptsDone();
+            if (!ExecutingScriptThreadsAnyTable.Contains(scriptThreadId)) {
+                ExecutingScriptThreadsAnyTable.Add(scriptThreadId);
+                isNewId = true;
+            }
+        }
 
         try {
             var rowstamp = string.Empty;

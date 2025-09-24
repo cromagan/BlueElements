@@ -15,11 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Enums;
-using BlueBasics.MultiUserFile;
 using BlueControls;
 using BlueControls.Forms;
-using BlueTable;
 using BluePaint;
 using System;
 using static BlueBasics.Develop;
@@ -37,25 +34,6 @@ namespace BeCreative {
         #endregion
 
         #region Methods
-
-        public static void Ende() {
-            DebugPrint(ErrorType.Info, "Schließe Programm...");
-
-            var p = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
-            Table.ForceSaveAll();
-            MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
-
-            p.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
-            Table.ForceSaveAll();
-            MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
-
-            DebugPrint(ErrorType.Info, "Schließe Programm, noch ein SaveAll.");
-            p.Update("Programm wird beendet<br><i>Fast geschafft!");
-            MultiUserFile.SaveAll(true); // Nun aber
-
-            p.Close();
-            TraceLogging_End();
-        }
 
         private void btnBildEditor_Click(object sender, EventArgs e) => DoForm(new MainWindow(true));
 

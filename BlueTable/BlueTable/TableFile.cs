@@ -112,7 +112,7 @@ public class TableFile : Table {
 
         if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
 
-        if (ExecutingScriptThreadsAnyTable.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
+        //if (ExecutingScriptThreadsAnyTable.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
 
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
 
@@ -163,7 +163,7 @@ public class TableFile : Table {
             }
 
             if (deleteImportet) {
-                var ok = Save();
+                var ok = Save(true);
                 if (!ok) { return "Speicher-Fehler!"; }
                 db.Dispose();
                 var d = DeleteFile(thisFile, false);
@@ -240,26 +240,11 @@ public class TableFile : Table {
         base.RepairAfterParse();
     }
 
-    public bool Save() {
-        if (!SaveRequired) { return true; }
-
-        // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
-        if (!_saveSemaphore.Wait(0)) {
-            return false;
-        }
-
-        try {
-            var result = SaveInternal(FileStateUtcDate);
-            OnInvalidateView();
-            return string.IsNullOrEmpty(result);
-        } finally {
-            _saveSemaphore.Release();
-        }
-    }
+    public bool Save(bool mustSave) => ProcessFile(TrySave, false, mustSave ? 120 : 10) is true;
 
     public void SaveAsAndChangeTo(string newFileName) {
         if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!"); }
-        Save(); // Original-Datei speichern, die ist ja dann weg.
+        Save(true); // Original-Datei speichern, die ist ja dann weg.
         // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
         // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
 
@@ -321,7 +306,7 @@ public class TableFile : Table {
         }
 
         // Speichern wenn nötig
-        if (mustSave) { Save(); }
+        if (mustSave) { Save(false); }
 
         if (!SaveRequired) { _checkerTickCount = 0; }
     }
@@ -421,7 +406,7 @@ public class TableFile : Table {
         foreach (var thisFile in AllFiles) {
             if (thisFile is TableFile { IsDisposed: false } tbf) {
                 if (string.Equals(tbf.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    tbf.Save();
+                    tbf.Save(false);
                     Develop.DebugPrint(ErrorType.Warning, "Doppletes Laden von " + fileName);
                     return false;
                 }
@@ -429,6 +414,26 @@ public class TableFile : Table {
         }
 
         return true;
+    }
+
+    private (object? returnValue, bool retry) TrySave(params object[] args) {
+        if (Develop.AllReadOnly) { return (true, false); }
+
+        if (!SaveRequired) { return (true, false); }
+
+        // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
+        if (!_saveSemaphore.Wait(0)) { return (false, true); }
+
+        try {
+            var result = SaveInternal(FileStateUtcDate);
+            OnInvalidateView();
+
+            var ok = string.IsNullOrEmpty(result);
+
+            return (ok, !ok);
+        } finally {
+            _saveSemaphore.Release();
+        }
     }
 
     #endregion
