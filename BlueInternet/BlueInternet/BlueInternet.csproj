@@ -120,22 +120,22 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Anthropic.SDK">
-      <Version>5.5.1</Version>
+      <Version>5.5.2</Version>
     </PackageReference>
     <PackageReference Include="CefSharp.Common">
-      <Version>139.0.280</Version>
+      <Version>140.1.140</Version>
     </PackageReference>
     <PackageReference Include="CefSharp.OffScreen">
-      <Version>139.0.280</Version>
+      <Version>140.1.140</Version>
     </PackageReference>
     <PackageReference Include="CefSharp.WinForms">
-      <Version>139.0.280</Version>
+      <Version>140.1.140</Version>
     </PackageReference>
     <PackageReference Include="chromiumembeddedframework.runtime.win-x64">
-      <Version>139.0.28</Version>
+      <Version>140.1.14</Version>
     </PackageReference>
     <PackageReference Include="chromiumembeddedframework.runtime.win-x86">
-      <Version>139.0.28</Version>
+      <Version>140.1.14</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

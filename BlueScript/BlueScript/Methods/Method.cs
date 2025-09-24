@@ -496,10 +496,14 @@ public abstract class Method : IReadableTextWithKey {
     }
 
     public virtual DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        return attvar.Failed
-            ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
-            : DoIt(varCol, attvar, scp, infos.LogData);
+        try {
+            var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+            return attvar.Failed
+                ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
+                : DoIt(varCol, attvar, scp, infos.LogData);
+        } catch (Exception ex) {
+            return new DoItFeedback("Interner Programmfehler: " + ex.Message, true, infos.LogData);
+        }
     }
 
     public abstract DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld);

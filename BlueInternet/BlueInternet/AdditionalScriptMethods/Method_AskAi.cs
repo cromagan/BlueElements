@@ -66,7 +66,7 @@ internal class Method_AskAi : Method {
                 var parameters = new MessageParameters {
                     Messages = messages,
                     MaxTokens = 1024,
-                    Model = AnthropicModels.Claude35Sonnet,
+                    Model = AnthropicModels.Claude4Opus,
                     Stream = false,
                     Temperature = 1.0m,
                 };
