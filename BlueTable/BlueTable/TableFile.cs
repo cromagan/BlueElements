@@ -416,13 +416,13 @@ public class TableFile : Table {
         return true;
     }
 
-    private (object? returnValue, bool retry) TrySave(params object[] args) {
-        if (Develop.AllReadOnly) { return (true, false); }
+    private FileOperationResult TrySave(params object[] args) {
+        if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
 
-        if (!SaveRequired) { return (true, false); }
+        if (!SaveRequired) { return FileOperationResult.ValueTrue; }
 
         // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
-        if (!_saveSemaphore.Wait(0)) { return (false, true); }
+        if (!_saveSemaphore.Wait(0)) { return FileOperationResult.DoRetry; }
 
         try {
             var result = SaveInternal(FileStateUtcDate);
@@ -430,7 +430,7 @@ public class TableFile : Table {
 
             var ok = string.IsNullOrEmpty(result);
 
-            return (ok, !ok);
+            return new(ok, !ok);
         } finally {
             _saveSemaphore.Release();
         }

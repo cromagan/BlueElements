@@ -630,37 +630,37 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    private static (object? returnValue, bool retry) TryGrantWriteAccess(params object[] args) {
+    private static FileOperationResult TryGrantWriteAccess(params object[] args) {
         if (args.Length < 5 ||
             args[0] is not string newChunkValue ||
             args[1] is not ColumnItem column ||
             args[2] is not RowItem row ||
             args[3] is not int waitforseconds ||
              args[4] is not bool onlyTopLevel) {
-            return ("Ungültige Parameter.", false);
+            return new("Ungültige Parameter.");
         }
 
         try {
-            if (column?.Table is not { IsDisposed: false } db) { return ("Es ist keine Spalte ausgewählt.", false); }
+            if (column?.Table is not { IsDisposed: false } db) { return new("Es ist keine Spalte ausgewählt."); }
 
             var f = db.AreAllDataCorrect();
-            if (!string.IsNullOrEmpty(f)) { return (f, true); }
+            if (!string.IsNullOrEmpty(f)) { return new(f); }
 
             f = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
-            if (!string.IsNullOrEmpty(f)) { return (f, waitforseconds > 20); }
+            if (!string.IsNullOrEmpty(f)) { return new(f, waitforseconds > 20); }
 
             if (row != null) {
                 f = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-                if (!string.IsNullOrEmpty(f)) { return (f, waitforseconds > 20); }
+                if (!string.IsNullOrEmpty(f)) { return new(f, waitforseconds > 20); }
             }
 
-            if (onlyTopLevel) { return (string.Empty, false); }
+            if (onlyTopLevel) { return new(string.Empty); }
 
             if (column.RelationType == RelationType.CellValues) {
                 var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
-                if (!string.IsNullOrEmpty(info) && !canrepair) { return (info, true); }
+                if (!string.IsNullOrEmpty(info) && !canrepair) { return new(f); }
 
-                if (lcolumn?.Table is not { IsDisposed: false } db2) { return ("Verknüpfte Tabelle verworfen.", false); }
+                if (lcolumn?.Table is not { IsDisposed: false } db2) { return new("Verknüpfte Tabelle verworfen."); }
 
                 db2.PowerEdit = db.PowerEdit;
 
@@ -668,16 +668,16 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     waitforseconds = Math.Max(1, waitforseconds / 2);
 
                     var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
-                    if (!string.IsNullOrEmpty(tmp)) { return ("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, waitforseconds > 10); }
-                    return (string.Empty, false);
+                    if (!string.IsNullOrEmpty(tmp)) { return new("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, waitforseconds > 10); }
+                    return new(string.Empty);
                 }
 
-                return ("Allgemeiner Fehler.", false);
+                return new("Allgemeiner Fehler.");
             }
 
-            return (string.Empty, false);
+            return new(string.Empty);
         } catch (Exception) {
-            return ("Allgemeiner Fehler", true); // Retry bei Exceptions
+            return FileOperationResult.DoRetry; // Retry bei Exceptions
         }
     }
 

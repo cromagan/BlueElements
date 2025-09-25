@@ -611,15 +611,15 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
-    private (object? returnValue, bool retry) TrySave(params object[] args) {
-        if (Develop.AllReadOnly) { return (true, false); }
+    private FileOperationResult TrySave(params object[] args) {
+        if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
 
-        if (_isSaved) { return (true, false); }
+        if (_isSaved) { return FileOperationResult.ValueTrue; }
 
-        if (string.IsNullOrEmpty(Filename)) { return (false, false); }
+        if (string.IsNullOrEmpty(Filename)) { return FileOperationResult.ValueFalse; }
 
         // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
-        if (!_saveSemaphore.Wait(0)) { return (false, true); }
+        if (!_saveSemaphore.Wait(0)) { return FileOperationResult.DoRetry; }
 
         try {
             var (tmpFileName, fileInfoBeforeSaving, dataUncompressed) = WriteTempFileToDisk();
@@ -627,7 +627,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
             var ok = string.IsNullOrEmpty(f);
 
-            return (ok, !ok);
+            return new(ok, !ok);
         } finally {
             _saveSemaphore.Release();
         }
