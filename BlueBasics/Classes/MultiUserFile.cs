@@ -627,7 +627,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
             var ok = string.IsNullOrEmpty(f);
 
-            return new(ok, !ok);
+            return new(ok, !ok, false);
         } finally {
             _saveSemaphore.Release();
         }

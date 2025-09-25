@@ -418,7 +418,10 @@ public static class IO {
 
         while (true) {
             var result = processMethod(args); // Jetzt FileOperationResult statt Tuple
-            if (!result.Retry) { return result.ReturnValue; }
+            if (!result.Retry) {
+                if (result.Failed) { return null; }
+                return result.ReturnValue;
+            }
 
             // Bei abortIfFailed=true weiter versuchen, aber nach 60 Sekunden eine Fehlermeldung ausgeben
             if (startTime.ElapsedMilliseconds > trySeconds * 1000) {
@@ -428,7 +431,7 @@ public static class IO {
                     Develop.DebugPrint(ErrorType.Error, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + argsStr);
                 }
 
-                return result.ReturnValue;
+                return null;
             }
 
             if (stopw.ElapsedMilliseconds > 5000) {
@@ -497,22 +500,20 @@ public static class IO {
     }
 
     public static FileOperationResult TryGetFileInfo(object?[] args) {
-        if (args.Length < 1) { return FileOperationResult.SuccessNull; }
+        if (args.Length < 1) { return FileOperationResult.ValueFailed; }
         var datei = args[0] as string;
 
-        if (string.IsNullOrWhiteSpace(datei)) { return FileOperationResult.SuccessNull; }
+        if (string.IsNullOrWhiteSpace(datei)) { return FileOperationResult.ValueFailed; }
 
         try {
             var fi = new FileInfo(datei);
-            // Zugriff testen (kann IOException / UnauthorizedAccess auslösen)
-            //_ = fi.Length; // leichte Operation zum Validieren
             return new(fi);
         } catch (UnauthorizedAccessException) {
-            return FileOperationResult.SuccessNull;
+            return FileOperationResult.ValueFailed;
         } catch (FileNotFoundException) {
-            return FileOperationResult.SuccessNull;
+            return FileOperationResult.ValueFailed;
         } catch (DirectoryNotFoundException) {
-            return FileOperationResult.SuccessNull;
+            return FileOperationResult.ValueFailed;
         } catch {
             return FileOperationResult.DoRetry;
         }
@@ -753,7 +754,7 @@ public static class IO {
         } catch (IOException) {
             return FileOperationResult.DoRetry;  // Netzwerk-IO-Fehler
         } catch (UnauthorizedAccessException) {
-            return FileOperationResult.DoRetry;  // Berechtigungsfehler
+            return FileOperationResult.ValueFalse;  // Berechtigungsfehler
         } catch {
             return FileOperationResult.ValueFalse; // Andere Fehler
         }
@@ -787,7 +788,7 @@ public static class IO {
         } catch (IOException) {
             return FileOperationResult.DoRetry;
         } catch (UnauthorizedAccessException) {
-            return FileOperationResult.DoRetry;
+            return FileOperationResult.ValueFalse;
         } catch {
             return FileOperationResult.ValueFalse;
         }
@@ -809,7 +810,7 @@ public static class IO {
             var dirs = Directory.GetDirectories(directory, pattern, option);
             return new(dirs);
         } catch (UnauthorizedAccessException) {
-            return new(Array.Empty<string>());
+            return FileOperationResult.ValueFailed;
         } catch {
             return FileOperationResult.DoRetry;
         }
@@ -832,7 +833,7 @@ public static class IO {
             var files = Directory.GetFiles(pfad, pattern, option);
             return new(files);
         } catch (UnauthorizedAccessException) {
-            return new(Array.Empty<string>());
+            return FileOperationResult.ValueFailed;
         } catch {
             return FileOperationResult.DoRetry;
         }
@@ -844,25 +845,21 @@ public static class IO {
         try {
             FileInfo f = new(filename);
             return new(f.LastWriteTimeUtc.ToString1() + "-" + f.Length);
+        } catch (UnauthorizedAccessException) {
+            return FileOperationResult.ValueFailed;
         } catch {
             return FileOperationResult.DoRetry;
         }
     }
 
     private static FileOperationResult TryLoadAllBytes(params object[] args) {
-        if (args.Length < 1 || args[0] is not string filename) {
-            return new(Array.Empty<byte>());
-        }
+        if (args.Length < 1 || args[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
-        if (string.IsNullOrWhiteSpace(filename)) {
-            return new(Array.Empty<byte>());
-        }
+        if (string.IsNullOrWhiteSpace(filename)) { return FileOperationResult.ValueFailed; }
 
         try {
             // Prüfen ob Datei existiert
-            if (TryFileExists(filename).ReturnValue is not true) {
-                return new(Array.Empty<byte>());
-            }
+            if (TryFileExists(filename).ReturnValue is not true) { return FileOperationResult.ValueFailed; }
 
             // Bytes laden
             var bytes = File.ReadAllBytes(filename);
@@ -870,16 +867,14 @@ public static class IO {
         } catch (IOException) {
             return FileOperationResult.DoRetry;  // Retry bei I/O-Fehlern
         } catch (UnauthorizedAccessException) {
-            return new(Array.Empty<byte>()); // Kein Retry bei Berechtigungsfehlern
+            return FileOperationResult.ValueFailed;
         } catch {
-            return new(Array.Empty<byte>()); // Keine Retry bei anderen Fehlern
+            return FileOperationResult.DoRetry;
         }
     }
 
     private static FileOperationResult TryLoadAndUnzipAllBytes(params object[] args) {
-        if (args.Length < 1 || args[0] is not string filename) {
-            return new((Array.Empty<byte>(), string.Empty, true));
-        }
+        if (args.Length < 1 || args[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
         try {
             // Direkter Aufruf der Try-Methode anstatt GetFileInfo
@@ -887,7 +882,7 @@ public static class IO {
             var fileinfo = result.ReturnValue as string ?? string.Empty;
 
             if (string.IsNullOrEmpty(fileinfo)) {
-                return new((Array.Empty<byte>(), string.Empty, true), result.Retry);
+                return new(null, result.Retry, true);
             }
 
             var bLoaded = File.ReadAllBytes(filename);
@@ -899,8 +894,10 @@ public static class IO {
             return new((bLoaded, fileinfo, false));
         } catch (IOException) {
             return FileOperationResult.DoRetry;  // Retry bei IO-Fehlern
+        } catch (UnauthorizedAccessException) {
+            return FileOperationResult.ValueFailed;
         } catch {
-            return new((Array.Empty<byte>(), string.Empty, true)); // Keine Retry bei anderen Fehlern
+            return FileOperationResult.DoRetry;
         }
     }
 
@@ -977,9 +974,9 @@ public static class IO {
         } catch (IOException) {
             return FileOperationResult.DoRetry;  // Retry bei IO-Fehlern
         } catch (UnauthorizedAccessException) {
-            return new(string.Empty);  // Kein Retry bei Berechtigungsfehlern
+            return FileOperationResult.ValueFailed;
         } catch {
-            return new(string.Empty); // Keine Retry bei anderen Fehlern
+            return FileOperationResult.DoRetry;
         }
     }
 

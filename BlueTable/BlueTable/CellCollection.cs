@@ -647,11 +647,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (!string.IsNullOrEmpty(f)) { return new(f); }
 
             f = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
-            if (!string.IsNullOrEmpty(f)) { return new(f, waitforseconds > 20); }
+            if (!string.IsNullOrEmpty(f)) { return new(f, waitforseconds > 20, false); }
 
             if (row != null) {
                 f = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-                if (!string.IsNullOrEmpty(f)) { return new(f, waitforseconds > 20); }
+                if (!string.IsNullOrEmpty(f)) { return new(f, waitforseconds > 20, false); }
             }
 
             if (onlyTopLevel) { return new(string.Empty); }
@@ -668,7 +668,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                     waitforseconds = Math.Max(1, waitforseconds / 2);
 
                     var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
-                    if (!string.IsNullOrEmpty(tmp)) { return new("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, waitforseconds > 10); }
+                    if (!string.IsNullOrEmpty(tmp)) { return new("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, waitforseconds > 10, false); }
                     return new(string.Empty);
                 }
 

@@ -33,23 +33,24 @@ public readonly struct FileOperationResult {
     /// <summary>
     /// Signalisiert, dass die Operation wiederholt werden soll
     /// </summary>
-    public static readonly FileOperationResult DoRetry = new(null, true);
+    public static readonly FileOperationResult DoRetry = new(null, true, true);
 
     /// <summary>
-    /// Erstellt ein erfolgreiches Ergebnis mit 'null' als Wert
+    /// Signalisiert, dass die Operation fehlgeschlagen ist, mit keiner Aussicht auf Erfolg
     /// </summary>
-    public static readonly FileOperationResult SuccessNull = new(null, false);
+    public static readonly FileOperationResult ValueFailed = new(null, false, true);
 
     /// <summary>
     /// Erfolgreiche Operation mit Rückgabewert 'false'
     /// </summary>
-    public static readonly FileOperationResult ValueFalse = new(false, false);
+    public static readonly FileOperationResult ValueFalse = new(false, false, false);
 
     /// <summary>
     /// Erfolgreiche Operation mit Rückgabewert 'true'
     /// </summary>
-    public static readonly FileOperationResult ValueTrue = new(true, false);
+    public static readonly FileOperationResult ValueTrue = new(true, false, false);
 
+    public readonly bool Failed;
     public readonly bool Retry;
     public readonly object? ReturnValue;
 
@@ -57,14 +58,16 @@ public readonly struct FileOperationResult {
 
     #region Constructors
 
-    public FileOperationResult(object? returnValue, bool retry) {
+    public FileOperationResult(object? returnValue, bool retry, bool failed) {
         ReturnValue = returnValue;
         Retry = retry;
+        Failed = failed;
     }
 
     public FileOperationResult(object? returnValue) {
         ReturnValue = returnValue;
         Retry = false;
+        Failed = false;
     }
 
     #endregion

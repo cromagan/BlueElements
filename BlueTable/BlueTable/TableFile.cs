@@ -430,7 +430,7 @@ public class TableFile : Table {
 
             var ok = string.IsNullOrEmpty(result);
 
-            return new(ok, !ok);
+            return new(ok, !ok, false);
         } finally {
             _saveSemaphore.Release();
         }
