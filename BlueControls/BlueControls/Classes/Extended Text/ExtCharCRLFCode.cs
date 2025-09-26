@@ -44,7 +44,7 @@ internal class ExtCharCrlfCode : ExtChar {
 
     public override bool IsSpace() => false;
 
-    public override bool IsWordSeperator() => true;
+    public override bool IsWordSeparator() => true;
 
     public override string PlainText() => "\r\n";
 

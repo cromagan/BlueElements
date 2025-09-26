@@ -496,8 +496,8 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
         }
         try {
             if (position + word.Length > _eTxt.Count + 1) { return false; }
-            if (position > 0 && !_eTxt[position - 1].IsWordSeperator()) { return false; }
-            if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeperator()) { return false; }
+            if (position > 0 && !_eTxt[position - 1].IsWordSeparator()) { return false; }
+            if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeparator()) { return false; }
             var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
             return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
         } catch {

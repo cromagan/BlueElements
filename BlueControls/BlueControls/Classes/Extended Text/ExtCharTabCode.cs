@@ -42,7 +42,7 @@ internal class ExtCharTabCode : ExtChar {
 
     public override bool IsSpace() => true;
 
-    public override bool IsWordSeperator() => true;
+    public override bool IsWordSeparator() => true;
 
     public override string PlainText() => "\t";
 

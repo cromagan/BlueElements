@@ -28,60 +28,69 @@ public class ExtCharAscii : ExtChar {
 
     #region Fields
 
+    private readonly SizeF _calculatedSize;
     private readonly char _char;
+    private readonly int _charInt;
+    private readonly string _charString;
+    private readonly string _htmlText;
+    private readonly bool _isLineBreak;
+    private readonly bool _isPossibleLineBreak;
+    private readonly bool _isSpace;
+    private readonly bool _isWordSeparator;
 
     #endregion
 
     #region Constructors
 
-    internal ExtCharAscii(ExtText parent, PadStyles style, BlueFont font, char charcode) : base(parent, style, font) => _char = charcode;
+    internal ExtCharAscii(ExtText parent, PadStyles style, BlueFont font, char charcode) : base(parent, style, font) {
+        _char = charcode;
+        _charInt = (int)charcode;
+        _charString = charcode.ToString();
+        _htmlText = _charString.CreateHtmlCodes(false);
+        _isLineBreak = _charInt is 11 or 13;
+        _isPossibleLineBreak = Constants.PossibleLineBreaks.Contains(_char);
+        _isSpace = _charInt is 32 or 0 or 9;
+        _isWordSeparator = Constants.WordSeparators.Contains(_char);
+        _calculatedSize = CalculateSize();
+    }
 
-    internal ExtCharAscii(ExtText parent, int styleFromPos, char charcode) : base(parent, styleFromPos) => _char = charcode;
-
-    #endregion
-
-    #region Properties
-
-    public int Char => _char;
+    internal ExtCharAscii(ExtText parent, int styleFromPos, char charcode) : base(parent, styleFromPos) {
+        _char = charcode;
+        _charInt = (int)charcode;
+        _charString = charcode.ToString();
+        _htmlText = _charString.CreateHtmlCodes(false);
+        _isLineBreak = _charInt is 11 or 13;
+        _isPossibleLineBreak = Constants.PossibleLineBreaks.Contains(_char);
+        _isSpace = _charInt is 32 or 0 or 9;
+        _isWordSeparator = Constants.WordSeparators.Contains(_char);
+        _calculatedSize = CalculateSize();
+    }
 
     #endregion
 
     #region Methods
 
     public override void Draw(Graphics gr, Point posModificator, float zoom) {
-        if (_char < 20) { return; }
+        if (_charInt < 20) { return; }
         var drawX = (Pos.X * zoom) + posModificator.X;
         var drawY = (Pos.Y * zoom) + posModificator.Y;
 
         try {
-            this.GetFont().DrawString(gr, _char.ToString(), drawX, drawY, zoom, StringFormat.GenericTypographic);
+            this.GetFont().DrawString(gr, _charString, drawX, drawY, zoom, StringFormat.GenericTypographic);
         } catch { }
-
-        //if (Math.Abs(zoom - 1) < DefaultTolerance) {
-        //    var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
-        //    if (BNR == null) { return; }
-        //    // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
-        //    gr.DrawImage(BNR, (int)DrawX, (int)DrawY);
-        //} else {
-        //    var l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
-        //    if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
-        //    if (l.Width > 0) {
-        //        gr.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * zoom)), (int)DrawX, (int)DrawY);
-        //    }
-        //}
     }
 
-    public override string HtmlText() => _char.ToString().CreateHtmlCodes(false);
+    public override string HtmlText() => _htmlText;
 
-    public override bool IsLineBreak() => (int)_char is 11 or 13;
+    public override bool IsLineBreak() => _isLineBreak;
 
-    public override bool IsPossibleLineBreak() => Constants.PossibleLineBreaks.Contains(_char);
+    public override bool IsPossibleLineBreak() => _isPossibleLineBreak;
 
-    public override bool IsSpace() => (int)_char is 32 or 0 or 9;
+    public override bool IsSpace() => _isSpace;
 
-    public override bool IsWordSeperator() => Constants.WordSeparators.Contains(_char);
+    public override bool IsWordSeparator() => _isWordSeparator;
 
-    public override string PlainText() => _char.ToString();
+    public override string PlainText() => _charString;
 
     protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
 

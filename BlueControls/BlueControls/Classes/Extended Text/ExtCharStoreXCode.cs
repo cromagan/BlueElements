@@ -42,7 +42,7 @@ internal class ExtCharStoreXCode : ExtChar {
 
     public override bool IsSpace() => false;
 
-    public override bool IsWordSeperator() => false;
+    public override bool IsWordSeparator() => false;
 
     public override string PlainText() => string.Empty;
 

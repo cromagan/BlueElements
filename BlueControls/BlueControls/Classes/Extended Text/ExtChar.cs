@@ -159,7 +159,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     //     && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
     //     && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
 
-    public abstract bool IsWordSeperator();
+    public abstract bool IsWordSeparator();
 
     public abstract string PlainText();
 

@@ -394,13 +394,13 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     internal int WordEnd(int pos) {
         // Frühe Validierung und Abbruch
-        if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeperator()) {
+        if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeparator()) {
             return -1;
         }
 
         // Direkte Suche ohne while-Schleife
         while (++pos < Count) {
-            if (this[pos].IsWordSeperator()) {
+            if (this[pos].IsWordSeparator()) {
                 return pos;
             }
         }
@@ -410,13 +410,13 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     internal int WordStart(int pos) {
         // Frühe Validierung und Abbruch
-        if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeperator()) {
+        if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeparator()) {
             return -1;
         }
 
         // Direkte Suche ohne while-Schleife
         while (--pos >= 0) {
-            if (this[pos].IsWordSeperator()) {
+            if (this[pos].IsWordSeparator()) {
                 return pos + 1;
             }
         }

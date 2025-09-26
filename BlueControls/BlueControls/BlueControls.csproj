@@ -125,6 +125,7 @@
     <Compile Include="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
     <Compile Include="AdditionalScriptMethods\VariablePadItem.cs" />
     <Compile Include="Allgemein.cs" />
+    <Compile Include="Classes\Extended Text\ExtCharLinkCell.cs" />
     <Compile Include="GlobalMonitor.cs">
       <SubType>Form</SubType>
     </Compile>
