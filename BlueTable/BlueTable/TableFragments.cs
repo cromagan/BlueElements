@@ -362,7 +362,7 @@ public class TableFragments : TableFile {
             return;
         }
 
-        data = data.OrderBy(obj => obj.DateTimeUtc).ToList();
+        var dataSorted = data.Where(obj => obj?.DateTimeUtc != null).OrderBy(obj => obj.DateTimeUtc);
 
         try {
             List<string> myfiles = [];
@@ -377,7 +377,7 @@ public class TableFragments : TableFile {
 
             Interlocked.Increment(ref _doingChanges);
             try {
-                foreach (var thisWork in data) {
+                foreach (var thisWork in dataSorted) {
                     if (KeyName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
                         Undo.Add(thisWork);
                         _changesNotIncluded.Add(thisWork);
