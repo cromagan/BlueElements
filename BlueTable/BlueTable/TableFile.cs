@@ -341,14 +341,14 @@ public class TableFile : Table {
         base.DoWorkAfterLastChanges(files, starttimeUtc, endTimeUtc);
 
     protected virtual bool LoadMainData() {
-        var bytes = LoadAndUnzipAllBytes(Filename);
+        var byteData = LoadAndUnzipAllBytes(Filename);
 
-        if (bytes is null) {
+        if (byteData is null) {
             Freeze("Laden fehlgeschlagen!");
             return false;
         }
 
-        var ok = Parse(bytes, true, Filename);
+        var ok = Parse(byteData.Bytes, true, Filename);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");

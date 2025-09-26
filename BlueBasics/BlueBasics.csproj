@@ -110,6 +110,7 @@
     <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Contrast.cs" />
     <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Gamma.cs" />
     <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Invert.cs" />
+    <Compile Include="Classes\ByteData.cs" />
     <Compile Include="Classes\FileOperationResult.cs" />
     <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\MouseEventFlags.cs" />

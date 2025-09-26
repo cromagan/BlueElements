@@ -146,36 +146,18 @@ public class Chunk : IHasKeyName {
             return;
         }
 
-        #region Filstate vor Laden
-
-        var st1 = GetFileState(c, false);
-        if (string.IsNullOrEmpty(st1)) { LoadFailed = true; return; }
-
-        #endregion
-
-        var bytes = LoadAndUnzipAllBytes(c);
+        var byteData = LoadAndUnzipAllBytes(c);
         var tmp = DateTime.UtcNow;
-        if (bytes is null) { LoadFailed = true; return; }
+        if (byteData is null) { LoadFailed = true; return; }
 
-        #region Filestate nach Laden
+        _fileinfo = byteData.FileInfo;
 
-        var st2 = GetFileState(c, false);
-        if (st1 != st2) {
-            Develop.CheckStackOverflow();
-            LoadBytesFromDisk(mustexist);
-            return;
-        }
-
-        #endregion
-
-        _fileinfo = st1;
-
-        if (RemoveHeaderDataTypes(bytes) is { } b) {
+        if (RemoveHeaderDataTypes(byteData.Bytes) is { } b) {
             _minBytes = (int)(b.Count * 0.1);
         }
 
         Bytes.Clear();
-        Bytes = [.. bytes];
+        Bytes = [.. byteData.Bytes];
 
         _bytesloaded = tmp;
 
