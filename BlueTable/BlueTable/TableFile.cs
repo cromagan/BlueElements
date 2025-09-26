@@ -341,9 +341,9 @@ public class TableFile : Table {
         base.DoWorkAfterLastChanges(files, starttimeUtc, endTimeUtc);
 
     protected virtual bool LoadMainData() {
-        var (bytes, _, failed) = LoadAndUnzipAllBytes(Filename);
+        var bytes = LoadAndUnzipAllBytes(Filename);
 
-        if (failed) {
+        if (bytes is null) {
             Freeze("Laden fehlgeschlagen!");
             return false;
         }

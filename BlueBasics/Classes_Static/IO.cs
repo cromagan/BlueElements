@@ -353,18 +353,7 @@ public static class IO {
     /// <summary>
     /// Lädt Bytes aus einer Datei mit automatischer Retry-Logik und Dekomprimierung
     /// </summary>
-    public static (byte[] bytes, string fileinfo, bool failed) LoadAndUnzipAllBytes(string filename) {
-        if (string.IsNullOrEmpty(filename)) { return (Array.Empty<byte>(), string.Empty, true); }
-
-        var result = ProcessFile(TryLoadAndUnzipAllBytes, false, 60, filename);
-
-        // Rückgabe ist ein object, das wir zu unserem Tupel casten müssen
-        if (result is not null and ValueTuple<byte[], string, bool> loadResult) {
-            return loadResult;
-        }
-
-        return (Array.Empty<byte>(), string.Empty, true);
-    }
+    public static byte[]? LoadAndUnzipAllBytes(string filename) => ProcessFile(TryLoadAndUnzipAllBytes, false, 60, filename) as byte[];
 
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist
@@ -879,19 +868,17 @@ public static class IO {
         try {
             // Direkter Aufruf der Try-Methode anstatt GetFileInfo
             var result = TryGetFileState(filename);
-            var fileinfo = result.ReturnValue as string ?? string.Empty;
-
-            if (string.IsNullOrEmpty(fileinfo)) {
-                return new(null, result.Retry, true);
-            }
+            if (result.Retry) { return FileOperationResult.DoRetry; }
+            if (result.Failed) { return FileOperationResult.ValueFailed; }
+            if (result.ReturnValue is not string fileinfo || string.IsNullOrEmpty(fileinfo)) { return FileOperationResult.DoRetry; }
 
             var bLoaded = File.ReadAllBytes(filename);
 
-            if (bLoaded.IsZipped()) {
-                bLoaded = bLoaded.UnzipIt() ?? bLoaded;
-            }
+            if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt(); }
 
-            return new((bLoaded, fileinfo, false));
+            if (bLoaded == null) { return FileOperationResult.ValueFailed; }
+
+            return new(bLoaded);
         } catch (IOException) {
             return FileOperationResult.DoRetry;  // Retry bei IO-Fehlern
         } catch (UnauthorizedAccessException) {

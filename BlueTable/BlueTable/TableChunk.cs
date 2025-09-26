@@ -381,7 +381,7 @@ public class TableChunk : TableFile {
 
         if (!parsed) {
             Develop.CheckStackOverflow();
-            chunk.LoadBytesFromDisk();
+            chunk.LoadBytesFromDisk(mustExist);
             chunk.WaitBytesLoaded();
             if (chunk.LoadFailed || chunk.NeedsReload(important)) {
                 //Freeze($"Chunk {chunkId} Laden fehlgeschlagen");

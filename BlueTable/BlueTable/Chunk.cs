@@ -132,24 +132,43 @@ public class Chunk : IHasKeyName {
     /// Lädt die Bytes und holt sich NUR die Lock-Daten.
     /// Ansonsten wird nichts geparsed.
     /// </summary>
-    public void LoadBytesFromDisk() {
+    public void LoadBytesFromDisk(bool mustexist) {
         var c = ChunkFileName;
-        _minBytes = 0;
 
         if (!FileExists(c)) {
+            if (mustexist) {
+                LoadFailed = true;
+                return;
+            }
+
+            _minBytes = 0;
             InitByteList();
             return;
         }
 
+        #region Filstate vor Laden
+
+        var st1 = GetFileState(c, false);
+        if (string.IsNullOrEmpty(st1)) { LoadFailed = true; return; }
+
+        #endregion
+
+        var bytes = LoadAndUnzipAllBytes(c);
         var tmp = DateTime.UtcNow;
+        if (bytes is null) { LoadFailed = true; return; }
 
-        byte[] bytes;
-        (bytes, _fileinfo, LoadFailed) = LoadAndUnzipAllBytes(c);
+        #region Filestate nach Laden
 
-        if (LoadFailed) {
-            _bytesloaded = tmp;
+        var st2 = GetFileState(c, false);
+        if (st1 != st2) {
+            Develop.CheckStackOverflow();
+            LoadBytesFromDisk(mustexist);
             return;
         }
+
+        #endregion
+
+        _fileinfo = st1;
 
         if (RemoveHeaderDataTypes(bytes) is { } b) {
             _minBytes = (int)(b.Count * 0.1);
@@ -434,7 +453,7 @@ public class Chunk : IHasKeyName {
             // Paralleler Prozess hat gespeichert?
             if (FileExists(filename)) {
                 DeleteFile(tempfile, false);
-                LoadBytesFromDisk();
+                LoadBytesFromDisk(true);
                 return "Dateien wurden zwischenzeitlich verändert";
             }
 
@@ -487,7 +506,6 @@ public class Chunk : IHasKeyName {
                     if (LastEditID != MyId) {
                         return $"Ein andere Prozess auf diesem PC bearbeitet gerade.";
                     }
-
                 }
             }
         }
