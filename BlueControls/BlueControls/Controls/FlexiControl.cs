@@ -869,13 +869,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             txt = string.Empty;
             symbol = string.Empty;
         } else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_infoText)) {
-            symbol = "  <ImageCode=Schloss|10|||||150||20>";
+            symbol = "  <imagecode=Schloss|10|||||150||20>";
             txt = disabledReason;
         } else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_infoText)) {
-            symbol = "<ImageCode=Warnung|16>";
+            symbol = "<imagecode=Warnung|16>";
             txt = _infoText;
         } else {
-            symbol = "<ImageCode=Information|16>";
+            symbol = "<imagecode=Information|16>";
             txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _infoText;
         }
         if (!_showInfoWhenDisabled && !string.IsNullOrEmpty(disabledReason)) { txt = string.Empty; }

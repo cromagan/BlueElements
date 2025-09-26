@@ -34,7 +34,7 @@ internal class ExtCharTopCode : ExtChar {
 
     public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-    public override string HtmlText() => "<TOP>";
+    public override string HtmlText() => "<top>";
 
     public override bool IsLineBreak() => true;
 

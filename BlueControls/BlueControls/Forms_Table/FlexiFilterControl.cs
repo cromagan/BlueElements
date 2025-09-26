@@ -306,9 +306,9 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         if (filterSingle != null) {
             if (string.IsNullOrEmpty(qi)) {
-                QuickInfo = "<b><u>Filter:</u></b><br>" + filterSingle.ReadableText().CreateHtmlCodes(false);
+                QuickInfo = "<b><u>Filter:</u></b><br>" + filterSingle.ReadableText().CreateHtmlCodes();
             } else {
-                QuickInfo = "<b><u>Filter:</u></b><br>" + filterSingle.ReadableText().CreateHtmlCodes(false) +
+                QuickInfo = "<b><u>Filter:</u></b><br>" + filterSingle.ReadableText().CreateHtmlCodes() +
                             "<br><br><b>Info:</b><br>" + qi;
             }
         } else {

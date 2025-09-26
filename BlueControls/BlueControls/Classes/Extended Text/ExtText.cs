@@ -144,6 +144,12 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             if (IsDisposed) { return; }
             if (HtmlText == value) { return; }
             ConvertTextToChar(value, true);
+
+            if (ConvertCharToHtmlText() != value) {
+                _tmpHtmlText = _tmpHtmlText;
+                //Develop.DebugPrint("Fehler!");
+            }
+
             OnPropertyChanged();
         }
     }
@@ -443,15 +449,36 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         return position + 1;
     }
 
-    private string AppendStyle(PadStyles ls, ExtChar newStufe) {
-        if (ls == newStufe.Style) { return string.Empty; }
+    private string AppendStyle(ExtChar ls, ExtChar newStufe) {
+        if (newStufe.Style == PadStyles.Undefiniert) {
+            if (ls.Font == null || ls.Font == newStufe.Font || newStufe.Font == null) { return string.Empty; }
 
-        if (ls == PadStyles.Standard && newStufe.Style == PadStyles.Überschrift) { return "<h3>"; }
-        if (ls == PadStyles.Überschrift && newStufe.Style == PadStyles.Standard) { return "</h3>"; }
-        if (ls == PadStyles.Standard && newStufe.Style == PadStyles.Hervorgehoben) { return "<strong>"; }
-        if (ls == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
-        if (ls == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Überschrift) { return "</strong><h3>"; }
-        if (ls == PadStyles.Überschrift && newStufe.Style == PadStyles.Hervorgehoben) { return "</h3><strong>"; }
+            var t = string.Empty;
+
+            if (newStufe.Font.Bold != ls.Font.Bold && newStufe.Font.Bold) { t += "<b>"; }
+            if (newStufe.Font.Bold != ls.Font.Bold && !newStufe.Font.Bold) { t += "</b>"; }
+            if (newStufe.Font.Italic != ls.Font.Italic && newStufe.Font.Italic) { t += "<i>"; }
+            if (newStufe.Font.Italic != ls.Font.Italic && !newStufe.Font.Italic) { t += "</i>"; }
+            if (newStufe.Font.Underline != ls.Font.Underline && newStufe.Font.Underline) { t += "<u>"; }
+            if (newStufe.Font.Underline != ls.Font.Underline && !newStufe.Font.Underline) { t += "</u>"; }
+
+            return t;
+        }
+
+        if (ls.Style == newStufe.Style) { return string.Empty; }
+
+        if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Überschrift) { return "<h3>"; }
+        if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Standard) { return "</h3>"; }
+        if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Hervorgehoben) { return "<strong>"; }
+        if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Kapitel) { return "<strong>"; }
+
+        if (ls.Style == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
+        if (ls.Style == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Überschrift) { return "</strong><h3>"; }
+        if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
+        if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Überschrift) { return "</strong><h3>"; }
+
+
+        if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Hervorgehoben) { return "</h3><strong>"; }
 
         return string.Empty;
     }
@@ -462,13 +489,13 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         // Ungefähre Größe vorallokieren - reduziert Reallokationen
         var _stringBuilder = new StringBuilder(Count * 3);
 
-        var lastStufe = PadStyles.Standard;
+        ExtChar lastStufe = new ExtCharAscii(this, PadStyles.Standard, Skin.GetBlueFont(string.Empty, PadStyles.Standard), 'x');
 
         for (var z = 0; z < Count; z++) {
             var s = AppendStyle(lastStufe, this[z]);
             if (!string.IsNullOrEmpty(s)) { _stringBuilder.Append(s); }
 
-            lastStufe = this[z].Style;
+            lastStufe = this[z];
             _stringBuilder.Append(this[z].HtmlText());
         }
         return _stringBuilder.ToString();

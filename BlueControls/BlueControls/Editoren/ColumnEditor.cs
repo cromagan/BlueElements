@@ -156,7 +156,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         Close();
     }
 
-    private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(txbQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + txbAdminInfo.Text.Replace("\r", "<BR>"));
+    private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(txbQuickinfo.Text.Replace("\r", "<br>") + "<br><br><br>" + txbAdminInfo.Text.Replace("\r", "<br>"));
 
     private void btnSchnellAuswahloptionen_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
@@ -433,8 +433,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
 
         _column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
-        _column.ColumnQuickInfo = txbQuickinfo.Text.Replace("\r", "<BR>");
-        _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<BR>");
+        _column.ColumnQuickInfo = txbQuickinfo.Text.Replace("\r", "<br>");
+        _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<br>");
         _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.White;
         _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo ?? Color.White;
         _column.LineStyleLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);

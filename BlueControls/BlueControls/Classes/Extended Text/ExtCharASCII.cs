@@ -46,7 +46,7 @@ public class ExtCharAscii : ExtChar {
         _char = charcode;
         _charInt = (int)charcode;
         _charString = charcode.ToString();
-        _htmlText = _charString.CreateHtmlCodes(false);
+        _htmlText = _charString.CreateHtmlCodes();
         _isLineBreak = _charInt is 11 or 13;
         _isPossibleLineBreak = Constants.PossibleLineBreaks.Contains(_char);
         _isSpace = _charInt is 32 or 0 or 9;
@@ -58,7 +58,7 @@ public class ExtCharAscii : ExtChar {
         _char = charcode;
         _charInt = (int)charcode;
         _charString = charcode.ToString();
-        _htmlText = _charString.CreateHtmlCodes(false);
+        _htmlText = _charString.CreateHtmlCodes();
         _isLineBreak = _charInt is 11 or 13;
         _isPossibleLineBreak = Constants.PossibleLineBreaks.Contains(_char);
         _isSpace = _charInt is 32 or 0 or 9;

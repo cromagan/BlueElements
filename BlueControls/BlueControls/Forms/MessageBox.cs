@@ -53,7 +53,7 @@ public partial class MessageBox : Form {
         InitializeComponent();
         Text = Develop.AppName();
         capText.Text = pic is { } im
-            ? "<ImageCode=" + QuickImage.Get(im, 32) + "> <zbx_store><top>" + LanguageTool.DoTranslate(txt, false)
+            ? "<imagecode=" + QuickImage.Get(im, 32) + "> <zbx_store><top>" + LanguageTool.DoTranslate(txt, false)
             : LanguageTool.DoTranslate(txt, false);
         Size = new Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
         if (buttons.Length == 0) { buttons = ["OK"]; }

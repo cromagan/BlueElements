@@ -187,7 +187,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         } else if (buttontype is not Design.OptionButton_TextStyle and not Design.CheckBox_TextStyle) {
             Skin.Draw_FormatedText(gr, text, qi, align, displayRectangle, design, control, false, translate);
         } else if (etxt is { }) {
-            var tt = "<ImageCode=" + design.Image + "> <zbx_store><top>" + LanguageTool.DoTranslate(text, translate);
+            var tt = "<imagecode=" + design.Image + "> <zbx_store><top>" + LanguageTool.DoTranslate(text, translate);
             var sh = Skin.DesignOf(buttontype, state);
             etxt.SheetStyle = sh.SheetStyle;
             //etxt.ChangeStyle(sh.Stil);

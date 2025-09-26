@@ -43,19 +43,20 @@ public static class Constants {
     public const string Everybody = "#Everybody";
     public const char FirstSortChar = '+';
     public const char SecondSortChar = '-';
-    public const char TempBold = '\uE000';
-    public const char TempGreaterThan = '\uE010';
-    public const char TempH1 = '\uE001';
-    public const char TempH2 = '\uE002';
-    public const char TempH3 = '\uE003';
-    public const char TempH4 = '\uE004';
+    //public const char TempBold = '\uE000';
+    //public const char TempGreaterThan = '\uE010';
+    //public const char TempH1 = '\uE001';
+    //public const char TempH2 = '\uE002';
+    //public const char TempH3 = '\uE003';
+    //public const char TempH4 = '\uE004';
 
     //public const char TempH5 = '\uE005';
     //public const char TempH6 = '\uE006';
-    public const char TempH7 = '\uE007';
+    //public const char TempH7 = '\uE007';
 
-    public const char TempLessThan = '\uE011';
+    //public const char TempLessThan = '\uE011';
     public const string Win11 = "Windows 11";
+
     public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
     public static readonly string Char_NotFromClip = (char)3 + ((char)22).ToString() + (char)24 + "\n";
@@ -94,7 +95,7 @@ public static class Constants {
         {'ß', "&szlig;"}, {'"', "&quot;"}, {'&', "&amp;"},
         {'<', "&lt;"}, {'>', "&gt;"}, {'Ø', "&Oslash;"},
         {'ø', "&oslash;"}, {'•', "&bull;"}, {'é', "&eacute;"},
-        {'É', "&Eacute;"}, {'€', "&euro;"}
+        {'É', "&Eacute;"}, {'€', "&euro;"},  {'\r', "<br>"},  {'\n', string.Empty}
     };
 
     //public static double FineTolerance = 0.0000001d; // Es werden nur 5 Nachkommastellen auf Festplatte gespeichert
@@ -166,7 +167,8 @@ public static class Constants {
     {"&bull;", '•'},
     {"&eacute;", 'é'},
     {"&Eacute;", 'É'},
-    {"&euro;", '€'}
+    {"&euro;", '€'},
+    {"<br>", '\r'}
 };
 
     public static readonly Encoding Win1252 = Encoding.GetEncoding(1252);

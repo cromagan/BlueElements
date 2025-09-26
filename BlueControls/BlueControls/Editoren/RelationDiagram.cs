@@ -93,7 +93,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         if (Pad?.Items?[what] != null) { return null; }
         var r = db.Row[what];
         if (r is not { IsDisposed: false }) {
-            MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
+            MessageBox.Show("<b>" + what + "</b> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }
         if (ItemOfRow(r) != null) { return null; }

@@ -426,7 +426,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         if (Table.Table != null) {
-            capZeilen1.Text = "<IMAGECODE=Information|16> " + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " +
+            capZeilen1.Text = "<imagecode=Information|16> " + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " +
                               Table.VisibleRowCount + " " + LanguageTool.DoTranslate("St.");
         } else {
             {

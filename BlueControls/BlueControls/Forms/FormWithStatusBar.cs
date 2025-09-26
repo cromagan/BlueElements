@@ -134,7 +134,7 @@ public partial class FormWithStatusBar : Form {
             message = message.Replace("\r\n", "; ");
             message = message.Replace("\r", "; ");
             message = message.Replace("\n", "; ");
-            message = message.Replace("<BR>", "; ", RegexOptions.IgnoreCase);
+            message = message.Replace("<br>", "; ", RegexOptions.IgnoreCase);
             message = message.Replace("; ; ", "; ");
             message = message.TrimEnd("; ");
 

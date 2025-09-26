@@ -50,7 +50,7 @@ public class CellLikeListItem : AbstractListItem {
 
     #region Properties
 
-    public override string QuickInfo => KeyName.CreateHtmlCodes(true);
+    public override string QuickInfo => KeyName.CreateHtmlCodes();
 
     #endregion
 

@@ -70,7 +70,10 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     #region Properties
 
     public BlueFont? Font {
-        get => _font;
+        get {
+            _font ??= Skin.GetBlueFont(SheetStyle, Style);
+            return _font;
+        }
         set {
             if (_font != value) {
                 _font = value;

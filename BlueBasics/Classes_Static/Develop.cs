@@ -201,13 +201,13 @@ public static class Develop {
                 for (var z = 0; z <= Math.Min(nr + 2, strace.FrameCount - 2); z++) {
                     if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint")) {
                         if (first) { Trace.WriteLine("<font color =0000FF>"); }
-                        Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes(true) + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes(true).TrimStart("Void ") + "<br>");
-                        l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes(true) + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes(true).TrimStart("Void ") + "<br>");
+                        Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
+                        l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
                         if (first) { Trace.WriteLine("<font color =000000>"); }
                         first = false;
                     }
                 }
-                message = message.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes(true);
+                message = message.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes();
                 Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + message + "</th>");
                 Trace.WriteLine("</tr>");
                 if (type == ErrorType.Error) {

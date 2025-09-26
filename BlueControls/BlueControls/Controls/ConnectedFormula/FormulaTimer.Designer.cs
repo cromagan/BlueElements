@@ -54,7 +54,7 @@ namespace BlueControls.Controls {
             this.capUhr.Location = new System.Drawing.Point(0, 0);
             this.capUhr.Name = "capUhr";
             this.capUhr.Size = new System.Drawing.Size(72, 76);
-            this.capUhr.Text = "<ImageCode=Uhr|64>";
+            this.capUhr.Text = "<imagecode=Uhr|64>";
             // 
             // FormulaTimer
             // 

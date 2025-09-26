@@ -30,7 +30,7 @@ internal class Method_StringAsciiToHTML : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, BoolVal];
+    public override List<List<string>> Args => [StringVal];
     public override string Command => "stringasciitohtml";
     public override List<string> Constants => [];
     public override string Description => "Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &auml;  Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
@@ -40,13 +40,13 @@ internal class Method_StringAsciiToHTML : Method {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "StringAsciiToHTML(String, IgnoreBRbool)";
+    public override string Syntax => "StringAsciiToHTML(String)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).CreateHtmlCodes(!attvar.ValueBoolGet(1)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).CreateHtmlCodes());
 
     #endregion
 }

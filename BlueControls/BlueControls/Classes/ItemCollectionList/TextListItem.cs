@@ -47,7 +47,7 @@ public class TextListItem : AbstractListItem {
 
     #region Properties
 
-    public override string QuickInfo => Text.CreateHtmlCodes(true);
+    public override string QuickInfo => Text.CreateHtmlCodes();
 
     public QuickImage? Symbol {
         get => _symbol;

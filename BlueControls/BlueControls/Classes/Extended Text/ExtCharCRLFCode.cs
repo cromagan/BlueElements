@@ -36,7 +36,7 @@ internal class ExtCharCrlfCode : ExtChar {
 
     public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-    public override string HtmlText() => "<BR>";
+    public override string HtmlText() => "<br>";
 
     public override bool IsLineBreak() => true;
 

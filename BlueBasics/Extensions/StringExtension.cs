@@ -197,16 +197,16 @@ public static partial class Extensions {
         return count;
     }
 
-    public static string CreateHtmlCodes(this string tXt, bool crlftoo) {
-        if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
+    public static string CreateHtmlCodes(this string text) {
+        if (string.IsNullOrEmpty(text)) { return string.Empty; }
 
-        var result = new StringBuilder(tXt.Length * 2); // Geschätzte Größe für HTML-Entitäten
+        var result = new StringBuilder(text.Length * 2); // Geschätzte Größe für HTML-Entitäten
 
-        for (var i = 0; i < tXt.Length; i++) {
-            var currentChar = tXt[i];
+        for (var i = 0; i < text.Length; i++) {
+            var currentChar = text[i];
 
             // Handle \r\n first (multi-character sequence)
-            if (crlftoo && currentChar == '\r' && i + 1 < tXt.Length && tXt[i + 1] == '\n') {
+            if (currentChar == '\r' && i + 1 < text.Length && text[i + 1] == '\n') {
                 result.Append("<br>");
                 i++; // Skip the \n
                 continue;
@@ -215,38 +215,6 @@ public static partial class Extensions {
             // Handle single characters
             if (HtmlEntities.TryGetValue(currentChar, out var entity)) {
                 result.Append(entity);
-            } else if (crlftoo) {
-                // Handle additional characters for crlftoo mode
-                switch (currentChar) {
-                    case '\r':
-                    case '\n':
-                        result.Append("<br>");
-                        break;
-
-                    case TempH7:
-                        result.Append("<H7>");
-                        break;
-
-                    case TempH4:
-                        result.Append("<H4>");
-                        break;
-
-                    case TempH3:
-                        result.Append("<H3>");
-                        break;
-
-                    case TempLessThan:
-                        result.Append("<");
-                        break;
-
-                    case TempGreaterThan:
-                        result.Append(">");
-                        break;
-
-                    default:
-                        result.Append(currentChar);
-                        break;
-                }
             } else {
                 result.Append(currentChar);
             }
@@ -555,38 +523,38 @@ public static partial class Extensions {
                 }
             }
 
-            // Special character mappings
-            else if (!foundEntity) {
-                switch (tXt[i]) {
-                    case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H7>", StringComparison.Ordinal):
-                        result.Append(TempH7);
-                        i += 3;
-                        foundEntity = true;
-                        break;
+            //// Special character mappings
+            //else if (!foundEntity) {
+            //    switch (tXt[i]) {
+            //        case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H7>", StringComparison.Ordinal):
+            //            result.Append(TempH7);
+            //            i += 3;
+            //            foundEntity = true;
+            //            break;
 
-                    case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H4>", StringComparison.Ordinal):
-                        result.Append(TempH4);
-                        i += 3;
-                        foundEntity = true;
-                        break;
+            //        case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H4>", StringComparison.Ordinal):
+            //            result.Append(TempH4);
+            //            i += 3;
+            //            foundEntity = true;
+            //            break;
 
-                    case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H3>", StringComparison.Ordinal):
-                        result.Append(TempH3);
-                        i += 3;
-                        foundEntity = true;
-                        break;
+            //        case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H3>", StringComparison.Ordinal):
+            //            result.Append(TempH3);
+            //            i += 3;
+            //            foundEntity = true;
+            //            break;
 
-                    case '<':
-                        result.Append(TempLessThan);
-                        foundEntity = true;
-                        break;
+            //        case '<':
+            //            result.Append(TempLessThan);
+            //            foundEntity = true;
+            //            break;
 
-                    case '>':
-                        result.Append(TempGreaterThan);
-                        foundEntity = true;
-                        break;
-                }
-            }
+            //        case '>':
+            //            result.Append(TempGreaterThan);
+            //            foundEntity = true;
+            //            break;
+            //    }
+            //}
 
             if (!foundEntity) {
                 result.Append(tXt[i]);

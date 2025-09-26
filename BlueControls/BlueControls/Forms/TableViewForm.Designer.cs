@@ -413,7 +413,7 @@ namespace BlueControls.Forms {
             this.capZeilen1.Margin = new System.Windows.Forms.Padding(4);
             this.capZeilen1.Name = "capZeilen1";
             this.capZeilen1.Size = new System.Drawing.Size(200, 22);
-            this.capZeilen1.Text = "<ImageCode=Information|16>";
+            this.capZeilen1.Text = "<imagecode=Information|16>";
             this.capZeilen1.Translate = false;
             // 
             // cbxColumnArr

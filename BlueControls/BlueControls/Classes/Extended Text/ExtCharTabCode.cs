@@ -34,7 +34,7 @@ internal class ExtCharTabCode : ExtChar {
 
     public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-    public override string HtmlText() => "<TAB>";
+    public override string HtmlText() => "<tab>";
 
     public override bool IsLineBreak() => false;
 

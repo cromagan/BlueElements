@@ -58,7 +58,7 @@ internal class ExtCharImageCode : ExtChar {
         } catch { }
     }
 
-    public override string HtmlText() => _qi == null ? string.Empty : "<IMAGECODE=" + _qi.Code + ">";
+    public override string HtmlText() => _qi == null ? string.Empty : "<imagecode=" + _qi.Code + ">";
 
     public override bool IsLineBreak() => false;
 

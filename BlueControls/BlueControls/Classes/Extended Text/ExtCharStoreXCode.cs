@@ -34,7 +34,7 @@ internal class ExtCharStoreXCode : ExtChar {
 
     public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-    public override string HtmlText() => "<ZBX_STORE>";
+    public override string HtmlText() => "<zbx_store>";
 
     public override bool IsLineBreak() => false;
 
