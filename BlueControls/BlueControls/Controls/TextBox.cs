@@ -862,22 +862,36 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
     private void Clipboard_Copy() {
         if (_markStart < 0 || _markEnd < 0) { return; }
         Selection_Repair(true);
-        var tt = _eTxt.ConvertCharToPlainText(_markStart, _markEnd - 1);
-        if (string.IsNullOrEmpty(tt)) { return; }
-        tt = tt.Replace("\n", string.Empty);
-        tt = tt.Replace("\r", "\r\n");
-        _ = Generic.CopytoClipboard(tt);
+
+        // ExtChar-Liste für den markierten Bereich erstellen
+        var extChars = new List<ExtChar>();
+        for (int i = _markStart; i < _markEnd; i++) {
+            if (i < _eTxt.Count) {
+                extChars.Add(_eTxt[i]);
+            }
+        }
+
+        // ExtChar-Format ins Clipboard kopieren
+        ExtTextClipboardHelper.CopyExtCharsToClipboard(extChars);
     }
 
     private void Clipboard_Paste() {
-        // VORSICHT!
-        // Seltsames Verhalten von VB.NET
-        // Anscheinend wird bei den Clipboard operationen ein DoEvents ausgelöst.
-        // Dadurch kommt es zum Refresh des übergeordneten Steuerelementes, warscheinlich der Textbox.
-        // Deshalb  muss 'Char_DelBereich' NACH den Clipboard-Operationen stattfinden.
-        if (!Clipboard.ContainsText()) { return; }
+        if (!ExtTextClipboardHelper.CanPasteExtChars()) { return; }
+
         Char_DelBereich(-1, -1);
-        InsertText(Clipboard.GetText());
+
+        // ExtChar-Objekte aus Clipboard einfügen
+        var extChars = ExtTextClipboardHelper.PasteExtCharsFromClipboard(_eTxt);
+        if (extChars == null || extChars.Count == 0) { return; }
+
+        foreach (var extChar in extChars) {
+            if (_eTxt.Count < _maxTextLenght) {
+                _eTxt.Insert(_cursorCharPos, extChar);
+                _cursorCharPos++;
+            }
+        }
+
+        RaiseEventIfTextChanged(false);
     }
 
     /// <summary>

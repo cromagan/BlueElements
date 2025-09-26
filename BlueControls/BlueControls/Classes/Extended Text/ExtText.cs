@@ -443,18 +443,32 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         return position + 1;
     }
 
+    private string AppendStyle(PadStyles ls, ExtChar newStufe) {
+        if (ls == newStufe.Style) { return string.Empty; }
+
+        if (ls == PadStyles.Standard && newStufe.Style == PadStyles.Überschrift) { return "<h3>"; }
+        if (ls == PadStyles.Überschrift && newStufe.Style == PadStyles.Standard) { return "</h3>"; }
+        if (ls == PadStyles.Standard && newStufe.Style == PadStyles.Hervorgehoben) { return "<strong>"; }
+        if (ls == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
+        if (ls == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Überschrift) { return "</strong><h3>"; }
+        if (ls == PadStyles.Überschrift && newStufe.Style == PadStyles.Hervorgehoben) { return "</h3><strong>"; }
+
+        return string.Empty;
+    }
+
     private string ConvertCharToHtmlText() {
         if (Count == 0) { return string.Empty; }
 
         // Ungefähre Größe vorallokieren - reduziert Reallokationen
         var _stringBuilder = new StringBuilder(Count * 3);
-        var lastStufe = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
+
+        var lastStufe = PadStyles.Standard;
 
         for (var z = 0; z < Count; z++) {
-            if (lastStufe != this[z].Font) {
-                _stringBuilder.Append("<H").Append(this[z].GetStyle()).Append('>');
-                lastStufe = this[z].Font;
-            }
+            var s = AppendStyle(lastStufe, this[z]);
+            if (!string.IsNullOrEmpty(s)) { _stringBuilder.Append(s); }
+
+            lastStufe = this[z].Style;
             _stringBuilder.Append(this[z].HtmlText());
         }
         return _stringBuilder.ToString();
@@ -607,7 +621,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
             case "FONTCOLOR":
                 style = PadStyles.Undefiniert;
-                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, ColorParse( attribut), font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, ColorParse(attribut), font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
                 break;
 
             case "COLOROUTLINE":
@@ -663,6 +677,14 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                 font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
+            case "STRONG":
+                style = PadStyles.Hervorgehoben;
+                font = Skin.GetBlueFont(_sheetStyle, style);
+                break;
+
+            case "/STRONG":
+            case "/H3":
+            case "P":
             case "H0":
             case "H4":
                 style = PadStyles.Standard;
