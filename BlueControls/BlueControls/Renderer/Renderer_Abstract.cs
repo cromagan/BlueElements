@@ -32,7 +32,7 @@ using System.Runtime.CompilerServices;
 
 namespace BlueControls.CellRenderer;
 
-public abstract class Renderer_Abstract : ParsebleItem, IReadableText, ISimpleEditor, IStyleableOne {
+public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleEditor, IStyleableOne {
 
     #region Fields
 

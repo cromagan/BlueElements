@@ -28,6 +28,14 @@ internal class ExtCharStoreXCode : ExtChar {
 
     public ExtCharStoreXCode(ExtText parent, PadStyles style, BlueFont font) : base(parent, style, font) { }
 
+    public ExtCharStoreXCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "ExtCharStoreXCode";
+
     #endregion
 
     #region Methods

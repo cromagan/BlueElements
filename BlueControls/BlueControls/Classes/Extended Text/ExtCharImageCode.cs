@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueControls.Enums;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Constants;
 
@@ -29,22 +30,31 @@ internal class ExtCharImageCode : ExtChar {
 
     #region Fields
 
-    private readonly QuickImage? _qi;
+    private QuickImage? _qi;
 
     #endregion
 
     #region Constructors
 
+    public ExtCharImageCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+
     public ExtCharImageCode(ExtText parent, PadStyles style, BlueFont font, QuickImage? qi) : base(parent, style, font) => _qi = qi;
 
-    public ExtCharImageCode(ExtText parent, PadStyles style, BlueFont font, string imagecode) : base(parent, style, font) => _qi = QuickImage.Get(imagecode);
-
-    internal ExtCharImageCode(ExtText parent, int styleFromPos, string imagecode) : base(parent, styleFromPos) => _qi = QuickImage.Get(imagecode);
+    public ExtCharImageCode(ExtText parent, int styleFromPos, QuickImage? qi) : base(parent, styleFromPos) => _qi = qi;
 
     #endregion
 
+    #region Properties
+
+    public static string ClassId => "ExtCharImageCode";
+
+    #endregion
+
+    //public ExtCharImageCode(ExtText parent, PadStyles style, BlueFont font, string imagecode) : base(parent, style, font) => _qi = QuickImage.Get(imagecode);
+
     #region Methods
 
+    //internal ExtCharImageCode(ExtText parent, int styleFromPos, string imagecode) : base(parent, styleFromPos) => _qi = QuickImage.Get(imagecode);
     public override void Draw(Graphics gr, Point posModificator, float zoom) {
         // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
 
@@ -67,6 +77,23 @@ internal class ExtCharImageCode : ExtChar {
     public override bool IsSpace() => false;
 
     public override bool IsWordSeparator() => true;
+
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Image", _qi?.ToString() ?? string.Empty);
+
+        return result;
+    }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
+            case "image":
+                _qi = QuickImage.Get(value.FromNonCritical());
+                return true;
+        }
+        return base.ParseThis(key, value);
+    }
 
     public override string PlainText() => string.Empty;
 

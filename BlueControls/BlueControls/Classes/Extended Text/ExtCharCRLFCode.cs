@@ -26,9 +26,15 @@ internal class ExtCharCrlfCode : ExtChar {
 
     #region Constructors
 
+    public ExtCharCrlfCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+
     internal ExtCharCrlfCode(ExtText parent, PadStyles style, BlueFont font) : base(parent, style, font) { }
 
-    internal ExtCharCrlfCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "ExtCharCrlfCode";
 
     #endregion
 

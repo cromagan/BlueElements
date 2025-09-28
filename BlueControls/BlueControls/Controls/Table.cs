@@ -531,13 +531,26 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return t;
     }
 
-    public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
+	public static string CellDataFormat = "BlueElements.CellLink";
+
+
+	public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
-            if (row != null && column != null && column.CopyAble()) {
+            if (row != null && column != null && column.CopyAble() && column.Table is { } tb) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
-                _ = CopytoClipboard(c);
+
+
+				var dataObject = new DataObject();
+				dataObject.SetData(CellDataFormat, $"{tb.KeyName}\r{column.KeyName}\r{row.KeyName}" );// 1. Als ExtChar-Format (für interne Verwendung)
+				dataObject.SetText(c);// 2. Als Plain Text (für externe Anwendungen)
+				Clipboard.SetDataObject(dataObject, true);
+
+
+
+
+				//_ = CopytoClipboard(c);
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren); }
             } else {
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Zelle nicht möglich."), ImageCode.Warnung); }
@@ -645,7 +658,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     public static Renderer_Abstract RendererOf(ColumnItem? column, string style) {
         if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return Renderer_Abstract.Default; }
 
-        var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
+        var renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
         if (renderer == null) { return Renderer_Abstract.Default; }
 
         if (!renderer.Parse(column.RendererSettings)) { return Renderer_Abstract.Default; }
@@ -1487,7 +1500,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     internal static Renderer_Abstract RendererOf(ColumnViewItem columnViewItem, string style) {
         if (!string.IsNullOrEmpty(columnViewItem.Renderer)) {
-            var renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
+            var renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(columnViewItem.Renderer);
             if (renderer == null) { return RendererOf(columnViewItem.Column, style); }
 
             renderer.Parse(columnViewItem.RendererSettings);

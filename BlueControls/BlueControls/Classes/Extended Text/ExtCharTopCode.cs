@@ -28,6 +28,14 @@ internal class ExtCharTopCode : ExtChar {
 
     public ExtCharTopCode(ExtText parent, PadStyles style, BlueFont font) : base(parent, style, font) { }
 
+    public ExtCharTopCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "ExtCharTopCode";
+
     #endregion
 
     #region Methods

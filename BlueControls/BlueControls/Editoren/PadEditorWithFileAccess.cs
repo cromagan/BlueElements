@@ -200,7 +200,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         var x = ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
-        var i = ParsebleItem.NewByParsing<AbstractPadItem>(x);
+        var i = ParseableItem.NewByParsing<AbstractPadItem>(x);
         if (i is not { }) { return; }
         i.GetNewIdsForEverything();
         Pad.Items.Add(i);

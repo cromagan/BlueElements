@@ -313,7 +313,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
 
         if (_column != null && !string.IsNullOrEmpty(cbxRenderer.Text)) {
-            _renderer = ParsebleItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text);
+            _renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text);
             _renderer?.Parse(_column.RendererSettings);
         } else {
             _renderer = null;

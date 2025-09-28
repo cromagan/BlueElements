@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Extended_Text;
@@ -28,43 +29,36 @@ public class ExtCharAscii : ExtChar {
 
     #region Fields
 
-    private readonly SizeF _calculatedSize;
-    private readonly char _char;
-    private readonly int _charInt;
-    private readonly string _charString;
-    private readonly string _htmlText;
-    private readonly bool _isLineBreak;
-    private readonly bool _isPossibleLineBreak;
-    private readonly bool _isSpace;
-    private readonly bool _isWordSeparator;
+    private char _char;
+    private int _charInt;
+    private string _charString;
+    private string _htmlText;
+    private bool _isLineBreak;
+    private bool _isPossibleLineBreak;
+    private bool _isSpace;
+    private bool _isWordSeparator;
 
     #endregion
 
     #region Constructors
 
+    public ExtCharAscii(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+
     internal ExtCharAscii(ExtText parent, PadStyles style, BlueFont font, char charcode) : base(parent, style, font) {
         _char = charcode;
-        _charInt = (int)charcode;
-        _charString = charcode.ToString();
-        _htmlText = _charString.CreateHtmlCodes();
-        _isLineBreak = _charInt is 11 or 13;
-        _isPossibleLineBreak = Constants.PossibleLineBreaks.Contains(_char);
-        _isSpace = _charInt is 32 or 0 or 9;
-        _isWordSeparator = Constants.WordSeparators.Contains(_char);
-        _calculatedSize = CalculateSize();
+        InitVales();
     }
 
     internal ExtCharAscii(ExtText parent, int styleFromPos, char charcode) : base(parent, styleFromPos) {
         _char = charcode;
-        _charInt = (int)charcode;
-        _charString = charcode.ToString();
-        _htmlText = _charString.CreateHtmlCodes();
-        _isLineBreak = _charInt is 11 or 13;
-        _isPossibleLineBreak = Constants.PossibleLineBreaks.Contains(_char);
-        _isSpace = _charInt is 32 or 0 or 9;
-        _isWordSeparator = Constants.WordSeparators.Contains(_char);
-        _calculatedSize = CalculateSize();
+        InitVales();
     }
+
+    #endregion
+
+    #region Properties
+
+    public static string ClassId => "ExtCharAscii";
 
     #endregion
 
@@ -90,9 +84,49 @@ public class ExtCharAscii : ExtChar {
 
     public override bool IsWordSeparator() => _isWordSeparator;
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Char", _charString);
+
+        return result;
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        InitVales();
+    }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
+            case "char":
+
+                var s = value.FromNonCritical();
+
+                if (string.IsNullOrEmpty(s)) {
+                    _char = '?';
+                } else {
+                    _char = s[0];
+                }
+
+                return true;
+        }
+        return base.ParseThis(key, value);
+    }
+
     public override string PlainText() => _charString;
 
     protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
+
+    private void InitVales() {
+        _charInt = (int)_char;
+        _charString = _char.ToString();
+        _htmlText = _charString.CreateHtmlCodes();
+        _isLineBreak = _charInt is 11 or 13;
+        _isPossibleLineBreak = Constants.PossibleLineBreaks.Contains(_char);
+        _isSpace = _charInt is 32 or 0 or 9;
+        _isWordSeparator = Constants.WordSeparators.Contains(_char);
+    }
 
     #endregion
 }

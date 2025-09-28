@@ -17,9 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueTable;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Extended_Text;
@@ -28,36 +30,39 @@ public class ExtCharLinkCell : ExtChar {
 
     #region Fields
 
-    private readonly string _displayText;
-    private readonly string _htmlText;
+    private string _displayText;
+    private string _htmlText;
 
     #endregion
 
     #region Constructors
 
+    public ExtCharLinkCell(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+
     internal ExtCharLinkCell(ExtText parent, PadStyles style, BlueFont font, string tableName, string columnKey, string rowKey) : base(parent, style, font) {
         TableName = tableName;
         ColumnKey = columnKey;
         RowKey = rowKey;
-        _htmlText = $"<LINKCELL tableName=\"{tableName}\" columnKey=\"{columnKey}\" rowKey=\"{rowKey}\"></LINKCELL>";
-        _displayText = GetCellValue();
+        InitValues();
     }
 
     internal ExtCharLinkCell(ExtText parent, int styleFromPos, string tableName, string columnKey, string rowKey) : base(parent, styleFromPos) {
         TableName = tableName;
         ColumnKey = columnKey;
         RowKey = rowKey;
-        _htmlText = $"<LINKCELL tableName=\"{tableName}\" columnKey=\"{columnKey}\" rowKey=\"{rowKey}\"></LINKCELL>";
-        _displayText = GetCellValue();
+        InitValues();
     }
 
     #endregion
 
     #region Properties
 
-    public string ColumnKey { get; }
-    public string RowKey { get; }
-    public string TableName { get; }
+    public static string ClassId => "ExtCharLinkCell";
+    public string ColumnKey { get; private set; }
+
+    public string RowKey { get; private set; }
+
+    public string TableName { get; private set; }
 
     #endregion
 
@@ -84,6 +89,37 @@ public class ExtCharLinkCell : ExtChar {
 
     public override bool IsWordSeparator() => false;
 
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Table", TableName);
+        result.ParseableAdd("Column", ColumnKey);
+        result.ParseableAdd("Row", RowKey);
+        return result;
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        InitValues();
+    }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
+            case "table":
+                TableName = value.FromNonCritical();
+                return true;
+
+            case "Column":
+                ColumnKey = value.FromNonCritical();
+                return true;
+
+            case "Row":
+                RowKey = value.FromNonCritical();
+                return true;
+        }
+        return base.ParseThis(key, value);
+    }
+
     public override string PlainText() => _displayText;
 
     protected override SizeF CalculateSize() {
@@ -101,13 +137,18 @@ public class ExtCharLinkCell : ExtChar {
             var c = tb.Column[ColumnKey];
             if (c == null) { return $"[Column '{ColumnKey}' not found]"; }
 
-            var r = tb.Row[RowKey];
+            var r = tb.Row.SearchByKey(RowKey);
             if (r == null) { return $"[Row '{RowKey}' not found]"; }
 
             return r.CellGetString(c);
         } catch (System.Exception ex) {
             return $"[Error: {ex.Message}]";
         }
+    }
+
+    private void InitValues() {
+        _htmlText = $"<LINKCELL tableName=\"{TableName}\" columnKey=\"{ColumnKey}\" rowKey=\"{RowKey}\">";
+        _displayText = GetCellValue();
     }
 
     #endregion

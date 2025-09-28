@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -45,6 +46,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     #region Fields
 
+    private const string ExtCharFormat = "BlueElements.ExtChar";
     private readonly ExtText _eTxt;
 
     private string _allowedChars = string.Empty;
@@ -811,6 +813,43 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
         base.OnVisibleChanged(e);
     }
 
+    private static List<ExtChar> DeserializeParseableItems(string serializedData, params object[] constructorArgs) {
+        var result = new List<ExtChar>();
+        var lines = serializedData.Split('\n');
+        var currentItemData = new StringBuilder();
+        var inItem = false;
+
+        foreach (var line in lines) {
+            var trimmedLine = line.Trim();
+
+            if (trimmedLine == "{") {
+                inItem = true;
+                currentItemData.Clear();
+                currentItemData.AppendLine(trimmedLine);
+                continue;
+            }
+
+            if (trimmedLine == "}") {
+                inItem = false;
+                currentItemData.AppendLine(trimmedLine);
+
+                // Item verarbeiten
+                var itemString = currentItemData.ToString();
+                var newItem = ParseableItem.NewByParsing<ExtChar>(itemString, constructorArgs);
+                if (newItem != null) {
+                    result.Add(newItem);
+                }
+                continue;
+            }
+
+            if (inItem) {
+                currentItemData.AppendLine(trimmedLine);
+            }
+        }
+
+        return result;
+    }
+
     private void _eTxt_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
 
     private void AbortSpellChecking() {
@@ -835,7 +874,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
         if (r is not { Count: 1 }) { return; }
         Char_DelBereich(-1, -1);
 
-        if (_eTxt.InsertImage(r[0], _cursorCharPos)) { _cursorCharPos++; }
+        if (_eTxt.InsertImage(QuickImage.Get(r[0]), _cursorCharPos)) { _cursorCharPos++; }
         RaiseEventIfTextChanged(false);
     }
 
@@ -863,35 +902,68 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
         if (_markStart < 0 || _markEnd < 0) { return; }
         Selection_Repair(true);
 
-        // ExtChar-Liste für den markierten Bereich erstellen
-        var extChars = new List<ExtChar>();
-        for (int i = _markStart; i < _markEnd; i++) {
-            if (i < _eTxt.Count) {
-                extChars.Add(_eTxt[i]);
+        var l = new List<string>();
+        try {
+            for (int i = _markStart; i < _markEnd; i++) {
+                l.Add(_eTxt[i].ToString());
             }
-        }
+        } catch { }
 
-        // ExtChar-Format ins Clipboard kopieren
-        ExtTextClipboardHelper.CopyExtCharsToClipboard(extChars);
+        var dataObject = new DataObject();
+        dataObject.SetData(ExtCharFormat, l.JoinWithCr());// 1. Als ExtChar-Format (für interne Verwendung)
+        dataObject.SetText(_eTxt.ConvertCharToPlainText(_markStart, _markEnd));// 2. Als Plain Text (für externe Anwendungen)
+        Clipboard.SetDataObject(dataObject, true);
     }
 
     private void Clipboard_Paste() {
-        if (!ExtTextClipboardHelper.CanPasteExtChars()) { return; }
-
         Char_DelBereich(-1, -1);
 
-        // ExtChar-Objekte aus Clipboard einfügen
-        var extChars = ExtTextClipboardHelper.PasteExtCharsFromClipboard(_eTxt);
-        if (extChars == null || extChars.Count == 0) { return; }
+        if (_formatierungErlaubt) {
+            if (Clipboard.ContainsData(ExtCharFormat)) {
+                if (Clipboard.GetData(ExtCharFormat) is not string sd || string.IsNullOrEmpty(sd)) { return; }
 
-        foreach (var extChar in extChars) {
-            if (_eTxt.Count < _maxTextLenght) {
-                _eTxt.Insert(_cursorCharPos, extChar);
-                _cursorCharPos++;
+                foreach (var thiss in sd.SplitByCr()) {
+                    if (_eTxt.Count < _maxTextLenght) {
+                        var extChar = ParseableItem.NewByParsing<ExtChar>(thiss, _eTxt as ExtText, _cursorCharPos);
+
+                        if (extChar != null) {
+                            _eTxt.Insert(_cursorCharPos, extChar);
+                            _cursorCharPos++;
+                        }
+                    }
+                }
+
+                RaiseEventIfTextChanged(false);
+                return;
+            }
+
+            if (Clipboard.ContainsData(TableView.CellDataFormat)) {
+                if (Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
+                    if (BlueControls.Forms.MessageBox.Show("Als Link oder als Text?", ImageCode.Stern, "Link", "Text") == 0) {
+                        var t = sd.SplitByCr();
+                        var c = new ExtCharLinkCell(_eTxt, _cursorCharPos, t[0], t[1], t[2]);
+                        _eTxt.Insert(_cursorCharPos, c);
+                        _cursorCharPos++;
+                        RaiseEventIfTextChanged(false);
+                        return;
+                    }
+                }
             }
         }
 
-        RaiseEventIfTextChanged(false);
+        if (Clipboard.ContainsText()) {
+            InsertText(Clipboard.GetText());
+            //if (nt == null) { return; }
+            ////nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
+            //nt = nt.RemoveChars(Constants.Char_NotFromClip);
+            //if (!MultiLine) { nt = nt.RemoveChars("\r\n"); }
+
+            //foreach (var t in nt) {
+            //    if (_eTxt.InsertChar((AsciiKey)t, _cursorCharPos)) { _cursorCharPos++; }
+            //}
+
+            //RaiseEventIfTextChanged(false);
+        }
     }
 
     /// <summary>

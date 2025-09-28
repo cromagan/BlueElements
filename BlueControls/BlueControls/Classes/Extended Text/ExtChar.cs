@@ -17,16 +17,19 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueTable;
 using System;
 using System.Drawing;
+using static BlueBasics.Converter;
+using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Extended_Text;
 
-public abstract class ExtChar : IStyleableOne, IDisposableExtended {
+public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtended {
 
     #region Fields
 
@@ -69,6 +72,9 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
 
     #region Properties
 
+
+   
+
     public BlueFont? Font {
         get {
             _font ??= Skin.GetBlueFont(SheetStyle, Style);
@@ -83,6 +89,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     }
 
     public bool IsDisposed { get; private set; }
+
     public MarkState Marking { get; set; }
 
     public string SheetStyle => _parent is IStyleable ist ? ist.SheetStyle : string.Empty;
@@ -115,20 +122,6 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
 
     public abstract void Draw(Graphics gr, Point posModificator, float zoom);
 
-    //public PadStyles GetStyle() {
-    //    if (Font == null ||
-    //        Skin.StyleDb is not { IsDisposed: false } db ||
-    //        Skin.StyleDb_Font is not { IsDisposed: false } cf ||
-    //        Skin.StyleDb_Style is not { IsDisposed: false } cs) { return PadStyles.Standard; }
-
-    //    var f1 = new FilterItem(cf, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, Font.KeyName);
-    //    var f2 = new FilterItem(cs, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, SheetStyle);
-
-    //    var r = db.Row[f1, f2];
-
-    //    return r == null ? PadStyles.Standard : (PadStyles)r.CellGetInteger("Style");
-    //}
-
     public abstract string HtmlText();
 
     public abstract bool IsLineBreak();
@@ -150,6 +143,48 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
                py + (Size.Height * zoom) >= area.Top;
     }
 
+    public abstract bool IsWordSeparator();
+
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
+        result.ParseableAdd("Style", _style);
+        result.ParseableAdd("Font", _font as IStringable);
+
+        return result;
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+
+        //if (_parent != null) {
+        //    _parent.StyleChanged -= _parent_StyleChanged;
+        //    _parent = null;
+        //}
+
+        //Pos = PointF.Empty;
+        //_font = null;
+        //_parent = null;
+        //_size = new Size(0, 0);
+    }
+
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
+            case "classid":
+                return value.ToNonCritical() == MyClassId;
+
+            case "style":
+                _style = (PadStyles)(IntParse(value.FromNonCritical()));
+                return true;
+
+            case "font":
+                _font = BlueFont.Get(value.FromNonCritical());
+                return true;
+
+        }
+        return false;
+    }
+
     ///// <summary>
     /////
     ///// </summary>
@@ -161,9 +196,6 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     //     && (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
     //     && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
     //     && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
-
-    public abstract bool IsWordSeparator();
-
     public abstract string PlainText();
 
     protected abstract SizeF CalculateSize();

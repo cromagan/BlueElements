@@ -248,7 +248,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public bool ParseThis(string key, string value) {
         switch (key) {
             case "variable":
-                var v = ParsebleItem.NewByParsing<Variable>(value);
+                var v = ParseableItem.NewByParsing<Variable>(value);
                 Add(v);
                 return true;
 

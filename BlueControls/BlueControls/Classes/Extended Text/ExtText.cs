@@ -57,12 +57,14 @@ using Pen = System.Drawing.Pen;
 
 namespace BlueControls.Extended_Text;
 
-public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposableExtended, IStyleable {
+public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyleable {
 
     #region Fields
 
     private int? _height;
+    private List<ExtChar> _internal = [];
     private string _sheetStyle = string.Empty;
+
     private Size _textDimensions;
 
     private string? _tmpHtmlText;
@@ -118,6 +120,8 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     public string AllowedChars { get; set; }    // Todo: Implementieren
     public Alignment Ausrichtung { get; set; }
 
+    public int Count => _internal.Count;
+
     /// <summary>
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
     /// </summary>
@@ -144,12 +148,6 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             if (IsDisposed) { return; }
             if (HtmlText == value) { return; }
             ConvertTextToChar(value, true);
-
-            if (ConvertCharToHtmlText() != value) {
-                _tmpHtmlText = _tmpHtmlText;
-                //Develop.DebugPrint("Fehler!");
-            }
-
             OnPropertyChanged();
         }
     }
@@ -163,7 +161,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     public string PlainText {
         get {
             if (IsDisposed) { return string.Empty; }
-            _tmpPlainText ??= ConvertCharToPlainText(0, Count - 1);
+            _tmpPlainText ??= ConvertCharToPlainText(0, _internal.Count - 1);
             return _tmpPlainText;
         }
         set {
@@ -221,13 +219,19 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     #endregion
 
+    #region Indexers
+
+    public ExtChar this[int nr] => _internal[nr];
+
+    #endregion
+
     #region Methods
 
     public void ChangeStyle(int first, int last, PadStyles style) {
         var changed = false;
-        for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {
-            if (this[cc].Style != style) {
-                this[cc].Style = style;
+        for (var cc = first; cc <= Math.Min(last, _internal.Count - 1); cc++) {
+            if (_internal[cc].Style != style) {
+                _internal[cc].Style = style;
                 changed = true;
             }
         }
@@ -252,22 +256,22 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
         do {
             cZ++;
-            if (cZ > Count - 1) { break; }// Das Ende des Textes
-            if (this[cZ].Size.Width > 0) {
-                var matchX = pixX >= DrawingPos.X + this[cZ].Pos.X && pixX <= DrawingPos.X + this[cZ].Pos.X + this[cZ].Size.Width;
-                var matchY = pixY >= DrawingPos.Y + this[cZ].Pos.Y && pixY <= DrawingPos.Y + this[cZ].Pos.Y + this[cZ].Size.Height;
+            if (cZ > _internal.Count - 1) { break; }// Das Ende des Textes
+            if (_internal[cZ].Size.Width > 0) {
+                var matchX = pixX >= DrawingPos.X + _internal[cZ].Pos.X && pixX <= DrawingPos.X + _internal[cZ].Pos.X + _internal[cZ].Size.Width;
+                var matchY = pixY >= DrawingPos.Y + _internal[cZ].Pos.Y && pixY <= DrawingPos.Y + _internal[cZ].Pos.Y + _internal[cZ].Size.Height;
 
                 if (matchX && matchY) { return cZ; }
 
                 double tmpDi;
                 if (!matchX && matchY) {
-                    tmpDi = Math.Abs(pixX - (DrawingPos.X + this[cZ].Pos.X + (this[cZ].Size.Width / 2.0)));
+                    tmpDi = Math.Abs(pixX - (DrawingPos.X + _internal[cZ].Pos.X + (_internal[cZ].Size.Width / 2.0)));
                     if (tmpDi < xDi) {
                         xNr = cZ;
                         xDi = tmpDi;
                     }
                 } else if (matchX && !matchY) {
-                    tmpDi = Math.Abs(pixY - (DrawingPos.Y + this[cZ].Pos.Y + (this[cZ].Size.Height / 2.0)));
+                    tmpDi = Math.Abs(pixY - (DrawingPos.Y + _internal[cZ].Pos.Y + (_internal[cZ].Size.Height / 2.0)));
                     if (tmpDi < yDi) {
                         yNr = cZ;
                         yDi = tmpDi;
@@ -283,29 +287,29 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     public Rectangle CursorPixelPosX(int charPos) {
         EnsurePositions();
 
-        if (charPos > Count + 1) { charPos = Count + 1; }
-        if (Count > 0 && charPos < 0) { charPos = 0; }
+        if (charPos > _internal.Count + 1) { charPos = _internal.Count + 1; }
+        if (_internal.Count > 0 && charPos < 0) { charPos = 0; }
 
         float x = 0;
         float y = 0;
         float he = 14;
 
-        if (Count == 0) {
+        if (_internal.Count == 0) {
             // Kein Text vorhanden
-        } else if (charPos < Count) {
+        } else if (charPos < _internal.Count) {
             // Cursor vor einem Zeichen
-            x = this[charPos].Pos.X;
-            y = this[charPos].Pos.Y;
-            he = this[charPos].Size.Height;
-        } else if (charPos > 0 && charPos < Count + 1 && this[charPos - 1].IsLineBreak()) {
+            x = _internal[charPos].Pos.X;
+            y = _internal[charPos].Pos.Y;
+            he = _internal[charPos].Size.Height;
+        } else if (charPos > 0 && charPos < _internal.Count + 1 && _internal[charPos - 1].IsLineBreak()) {
             // Vorzeichen = Zeilenumbruch
-            y = this[charPos - 1].Pos.Y + this[charPos - 1].Size.Height;
-            he = this[charPos - 1].Size.Height;
-        } else if (charPos > 0 && charPos < Count + 1) {
+            y = _internal[charPos - 1].Pos.Y + _internal[charPos - 1].Size.Height;
+            he = _internal[charPos - 1].Size.Height;
+        } else if (charPos > 0 && charPos < _internal.Count + 1) {
             // Vorzeichen = Echtes Char
-            x = this[charPos - 1].Pos.X + this[charPos - 1].Size.Width;
-            y = this[charPos - 1].Pos.Y;
-            he = this[charPos - 1].Size.Height;
+            x = _internal[charPos - 1].Pos.X + _internal[charPos - 1].Size.Width;
+            y = _internal[charPos - 1].Pos.Y;
+            he = _internal[charPos - 1].Size.Height;
         }
         return new Rectangle((int)x, (int)(y - 1), 0, (int)(he + 2));
     }
@@ -313,8 +317,8 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     public void Delete(int first, int last) {
         var tempVar = last - first;
         for (var z = 1; z <= tempVar; z++) {
-            if (first < Count) {
-                RemoveAt(first);
+            if (first < _internal.Count) {
+                _internal.RemoveAt(first);
             }
         }
         ResetPosition(true);
@@ -326,11 +330,19 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         EnsurePositions();
         DrawStates(gr, zoom);
 
-        foreach (var t in this) {
+        foreach (var t in _internal) {
             if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
                 t.Draw(gr, DrawingPos, zoom);
             }
         }
+    }
+
+    public void Insert(int position, ExtChar c) {
+        if (position < 0) { position = 0; }
+        if (position > _internal.Count) { position = _internal.Count; }
+
+        _internal.Insert(position, c);
+        ResetPosition(true);
     }
 
     public bool InsertChar(AsciiKey ascii, int position) {
@@ -340,9 +352,9 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         return true;
     }
 
-    public bool InsertImage(string imagecode, int position) {
-        if (string.IsNullOrEmpty(imagecode)) { return false; }
-        var c = new ExtCharImageCode(this, position, imagecode);
+    public bool InsertImage(QuickImage? qi, int position) {
+        if (qi == null) { return false; }
+        var c = new ExtCharImageCode(this, position, qi);
         Insert(position, c);
         return true;
     }
@@ -365,12 +377,12 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     internal string ConvertCharToPlainText(int first, int last) {
         try {
             var _stringBuilder = new StringBuilder(1024);
-            for (var cZ = first; cZ <= Math.Min(last, Count - 1); cZ++) {
-                _stringBuilder.Append(this[cZ].PlainText());
+            for (var cZ = first; cZ <= Math.Min(last, _internal.Count - 1); cZ++) {
+                _stringBuilder.Append(_internal[cZ].PlainText());
             }
             return _stringBuilder.ToString().Replace("\n", string.Empty);
         } catch {
-            // Wenn Chars geändert wird (und dann der Count nimmer stimmt)
+            // Wenn Chars geändert wird (und dann der _internal.Count nimmer stimmt)
             Develop.CheckStackOverflow();
             return ConvertCharToPlainText(first, last);
         }
@@ -380,9 +392,9 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     internal void Mark(MarkState markstate, int first, int last) {
         try {
-            for (var z = first; z <= Math.Min(last, Count - 1); z++) {
-                if (!this[z].Marking.HasFlag(markstate)) {
-                    this[z].Marking |= markstate;
+            for (var z = first; z <= Math.Min(last, _internal.Count - 1); z++) {
+                if (!_internal[z].Marking.HasFlag(markstate)) {
+                    _internal[z].Marking |= markstate;
                 }
             }
         } catch {
@@ -391,7 +403,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     internal void Unmark(MarkState markstate) {
-        foreach (var t in this) {
+        foreach (var t in _internal) {
             if (t.Marking.HasFlag(markstate)) {
                 t.Marking ^= markstate;
             }
@@ -400,29 +412,29 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     internal int WordEnd(int pos) {
         // Frühe Validierung und Abbruch
-        if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeparator()) {
+        if (_internal.Count == 0 || pos < 0 || pos >= _internal.Count || _internal[pos].IsWordSeparator()) {
             return -1;
         }
 
         // Direkte Suche ohne while-Schleife
-        while (++pos < Count) {
-            if (this[pos].IsWordSeparator()) {
+        while (++pos < _internal.Count) {
+            if (_internal[pos].IsWordSeparator()) {
                 return pos;
             }
         }
 
-        return Count;
+        return _internal.Count;
     }
 
     internal int WordStart(int pos) {
         // Frühe Validierung und Abbruch
-        if (Count == 0 || pos < 0 || pos >= Count || this[pos].IsWordSeparator()) {
+        if (_internal.Count == 0 || pos < 0 || pos >= _internal.Count || _internal[pos].IsWordSeparator()) {
             return -1;
         }
 
         // Direkte Suche ohne while-Schleife
         while (--pos >= 0) {
-            if (this[pos].IsWordSeparator()) {
+            if (_internal[pos].IsWordSeparator()) {
                 return pos + 1;
             }
         }
@@ -434,18 +446,18 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         var endpos = htmltext.IndexOf(';', position + 1);
 
         if (endpos <= position || endpos > position + 10) {
-            Add(new ExtCharAscii(this, style, font, '&'));
+            _internal.Add(new ExtCharAscii(this, style, font, '&'));
             return position + 1;
         }
 
         var entity = htmltext.Substring(position, endpos - position + 1);
         if (Constants.ReverseHtmlEntities.TryGetValue(entity, out var c)) {
-            Add(new ExtCharAscii(this, style, font, c));
+            _internal.Add(new ExtCharAscii(this, style, font, c));
             return endpos;
         }
 
         Develop.DebugPrint(ErrorType.Info, "Unbekannter Code: " + entity);
-        Add(new ExtCharAscii(this, style, font, '&'));
+        _internal.Add(new ExtCharAscii(this, style, font, '&'));
         return position + 1;
     }
 
@@ -477,33 +489,32 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
         if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Überschrift) { return "</strong><h3>"; }
 
-
         if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Hervorgehoben) { return "</h3><strong>"; }
 
         return string.Empty;
     }
 
     private string ConvertCharToHtmlText() {
-        if (Count == 0) { return string.Empty; }
+        if (_internal.Count == 0) { return string.Empty; }
 
         // Ungefähre Größe vorallokieren - reduziert Reallokationen
-        var _stringBuilder = new StringBuilder(Count * 3);
+        var _stringBuilder = new StringBuilder(_internal.Count * 3);
 
         ExtChar lastStufe = new ExtCharAscii(this, PadStyles.Standard, Skin.GetBlueFont(string.Empty, PadStyles.Standard), 'x');
 
-        for (var z = 0; z < Count; z++) {
-            var s = AppendStyle(lastStufe, this[z]);
+        for (var z = 0; z < _internal.Count; z++) {
+            var s = AppendStyle(lastStufe, _internal[z]);
             if (!string.IsNullOrEmpty(s)) { _stringBuilder.Append(s); }
 
-            lastStufe = this[z];
-            _stringBuilder.Append(this[z].HtmlText());
+            lastStufe = _internal[z];
+            _stringBuilder.Append(_internal[z].HtmlText());
         }
         return _stringBuilder.ToString();
     }
 
     private void ConvertTextToChar(string cactext, bool isRich) {
         if (string.IsNullOrEmpty(cactext)) {
-            Clear();
+            _internal.Clear();
             ResetPosition(true);
             return;
         }
@@ -511,8 +522,8 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         // Vorverarbeitung des Texts
         cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
 
-        Clear();
-        Capacity = Math.Max(Capacity, cactext.Length); // Pre-allocate capacity
+        _internal.Clear();
+        _internal.Capacity = Math.Max(_internal.Capacity, cactext.Length); // Pre-allocate capacity
         ResetPosition(true);
         var style = StyleBeginns;
         var font = Skin.GetBlueFont(SheetStyle, StyleBeginns);
@@ -530,7 +541,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                     case '<':
                         if (temp.Length > 0) {
                             zeichen++;
-                            Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
+                            _internal.Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
                             temp.Clear();
                         }
                         // HTML-Code verarbeiten
@@ -543,7 +554,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                     case '&':
                         if (temp.Length > 0) {
                             zeichen++;
-                            Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
+                            _internal.Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
                             temp.Clear();
                         }
                         pos = AddSpecialEntities(cactext, pos, style, font);
@@ -552,12 +563,12 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
                     default:
                         zeichen++;
-                        Add(new ExtCharAscii(this, style, font, ch));
+                        _internal.Add(new ExtCharAscii(this, style, font, ch));
                         break;
                 }
             } else {
                 zeichen++;
-                Add(new ExtCharAscii(this, style, font, ch));
+                _internal.Add(new ExtCharAscii(this, style, font, ch));
             }
             pos++;
         }
@@ -665,28 +676,28 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             //    break;
             case "BR":
                 position++;
-                Add(new ExtCharCrlfCode(this, style, font));
+                _internal.Add(new ExtCharCrlfCode(this, style, font));
                 break;
 
             case "TAB":
                 position++;
-                Add(new ExtCharTabCode(this, style, font));
+                _internal.Add(new ExtCharTabCode(this, style, font));
                 break;
 
             case "ZBX_STORE":
                 position++;
-                Add(new ExtCharStoreXCode(this, style, font));
+                _internal.Add(new ExtCharStoreXCode(this, style, font));
                 break;
 
             case "TOP":
                 position++;
-                Add(new ExtCharTopCode(this, style, font));
+                _internal.Add(new ExtCharTopCode(this, style, font));
                 break;
 
             case "IMAGECODE":
                 var x = !attribut.Contains("|") ? QuickImage.Get(attribut, (int)font.Oberlänge(1)) : QuickImage.Get(attribut);
                 position++;
-                Add(new ExtCharImageCode(this, style, font, x));
+                _internal.Add(new ExtCharImageCode(this, style, font, x));
                 break;
 
             case "H7":
@@ -747,7 +758,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         var last = PadStyles.Undefiniert;
         var f = BlueFont.DefaultFont;
 
-        foreach (var thisChar in this) {
+        foreach (var thisChar in _internal) {
             if (thisChar.Style != last) {
                 last = thisChar.Style;
                 f = thisChar.Font;
@@ -759,15 +770,15 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
     private void DrawState(Graphics gr, float scale, MarkState state) {
         var tmas = -1;
-        for (var pos = 0; pos < Count; pos++) {
-            var tempVar = this[pos];
+        for (var pos = 0; pos < _internal.Count; pos++) {
+            var tempVar = _internal[pos];
             var marked = tempVar.Marking.HasFlag(state);
 
             if (marked && tmas < 0) { tmas = pos; }
 
-            if (!marked || pos == Count - 1) {
+            if (!marked || pos == _internal.Count - 1) {
                 if (tmas > -1) {
-                    if (pos == Count - 1) {
+                    if (pos == _internal.Count - 1) {
                         DrawZone(gr, scale, state, tmas, pos);
                     } else {
                         DrawZone(gr, scale, state, tmas, pos - 1);
@@ -786,10 +797,10 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     }
 
     private void DrawZone(Graphics gr, float scale, MarkState thisState, int markStart, int markEnd) {
-        var startX = (this[markStart].Pos.X * scale) + DrawingPos.X;
-        var startY = (this[markStart].Pos.Y * scale) + DrawingPos.Y;
-        var endX = (this[markEnd].Pos.X * scale) + DrawingPos.X + (this[markEnd].Size.Width * scale);
-        var endy = (this[markEnd].Pos.Y * scale) + DrawingPos.Y + (this[markEnd].Size.Height * scale);
+        var startX = (_internal[markStart].Pos.X * scale) + DrawingPos.X;
+        var startY = (_internal[markStart].Pos.Y * scale) + DrawingPos.Y;
+        var endX = (_internal[markEnd].Pos.X * scale) + DrawingPos.X + (_internal[markEnd].Size.Width * scale);
+        var endy = (_internal[markEnd].Pos.Y * scale) + DrawingPos.Y + (_internal[markEnd].Size.Height * scale);
 
         switch (thisState) {
             case MarkState.None:
@@ -797,7 +808,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
             case MarkState.Ringelchen:
                 using (var pen = new Pen(Color.Red, 3 * scale)) {
-                    gr.DrawLine(pen, startX, (int)(startY + (this[markStart].Size.Height * scale * 0.9)), endX, (int)(startY + (this[markStart].Size.Height * scale * 0.9)));
+                    gr.DrawLine(pen, startX, (int)(startY + (_internal[markStart].Size.Height * scale * 0.9)), endX, (int)(startY + (_internal[markStart].Size.Height * scale * 0.9)));
                 }
                 break;
 
@@ -831,14 +842,6 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
         }
     }
 
-    private new void Insert(int position, ExtChar c) {
-        if (position < 0) { position = 0; }
-        if (position > Count) { position = Count; }
-
-        base.Insert(position, c);
-        ResetPosition(true);
-    }
-
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
@@ -849,9 +852,9 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     private void ReBreak() {
         _width = 0;
         _height = 0;
-        if (Count == 0) { return; }
+        if (_internal.Count == 0) { return; }
 
-        var estimatedRows = Count / 50; // Geschätzte Zeilenanzahl
+        var estimatedRows = _internal.Count / 50; // Geschätzte Zeilenanzahl
         var ri = new List<string>(estimatedRows);
         var vZbxPixel = 0f;
         var isX = 0f;
@@ -861,21 +864,21 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
 
         do {
             akt++;
-            if (akt > Count - 1) {
+            if (akt > _internal.Count - 1) {
                 _ = Row_SetOnLine(zbChar, akt - 1);
                 ri.Add(zbChar + ";" + (akt - 1));
                 break;
             }
 
-            if (this[akt] is ExtCharStoreXCode) {
+            if (_internal[akt] is ExtCharStoreXCode) {
                 vZbxPixel = isX;
-            } else if (this[akt] is ExtCharTopCode) {
+            } else if (_internal[akt] is ExtCharTopCode) {
                 isY = 0;
             }
 
-            if (!this[akt].IsSpace()) {
+            if (!_internal[akt].IsSpace()) {
                 if (akt > zbChar && _textDimensions.Width > 0) {
-                    if (isX + this[akt].Size.Width + 0.5 > _textDimensions.Width) {
+                    if (isX + _internal[akt].Size.Width + 0.5 > _textDimensions.Width) {
                         akt = WordBreaker(akt, zbChar);
                         isX = vZbxPixel;
                         isY += Row_SetOnLine(zbChar, akt - 1) * _zeilenabstand;
@@ -883,19 +886,19 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                         zbChar = akt;
                     }
                 }
-                _width = Math.Max((int)_width, (int)(isX + this[akt].Size.Width + 0.5));
-                _height = Math.Max((int)_height, (int)(isY + this[akt].Size.Height + 0.5));
+                _width = Math.Max((int)_width, (int)(isX + _internal[akt].Size.Width + 0.5));
+                _height = Math.Max((int)_height, (int)(isY + _internal[akt].Size.Height + 0.5));
             }
 
-            this[akt].Pos.X = isX;
-            this[akt].Pos.Y = isY;
+            _internal[akt].Pos.X = isX;
+            _internal[akt].Pos.Y = isY;
 
             // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
-            isX = (float)(isX + Math.Truncate(this[akt].Size.Width + 0.5));
+            isX = (float)(isX + Math.Truncate(_internal[akt].Size.Width + 0.5));
 
-            if (this[akt].IsLineBreak()) {
+            if (_internal[akt].IsLineBreak()) {
                 isX = vZbxPixel;
-                if (this[akt] is ExtCharTopCode) {
+                if (_internal[akt] is ExtCharTopCode) {
                     _ = Row_SetOnLine(zbChar, akt);
                     ri.Add(zbChar + ";" + akt);
                 } else {
@@ -917,11 +920,11 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
                 var z1 = IntParse(o[0]);
                 var z2 = IntParse(o[1]);
                 float kx = 0;
-                if (Ausrichtung.HasFlag(Alignment.Right)) { kx = _textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width; }
-                if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) { kx = (_textDimensions.Width - this[z2].Pos.X - this[z2].Size.Width) / 2; }
+                if (Ausrichtung.HasFlag(Alignment.Right)) { kx = _textDimensions.Width - _internal[z2].Pos.X - _internal[z2].Size.Width; }
+                if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) { kx = (_textDimensions.Width - _internal[z2].Pos.X - _internal[z2].Size.Width) / 2; }
                 for (var z3 = z1; z3 <= z2; z3++) {
-                    this[z3].Pos.X += kx;
-                    this[z3].Pos.Y += ky;
+                    _internal[z3].Pos.X += kx;
+                    _internal[z3].Pos.Y += ky;
                 }
             }
         }
@@ -944,28 +947,28 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
     private float Row_SetOnLine(int first, int last) {
         float abstand = 0;
         for (var z = first; z <= last; z++) {
-            abstand = Math.Max(abstand, this[z].Size.Height);
+            abstand = Math.Max(abstand, _internal[z].Size.Height);
         }
         for (var z = first; z <= last; z++) {
-            if (this[z] is ExtCharTopCode) {
-                this[z].Pos.Y = this[z].Pos.Y + abstand - this[z].Size.Height;
+            if (_internal[z] is ExtCharTopCode) {
+                _internal[z].Pos.Y = _internal[z].Pos.Y + abstand - _internal[z].Size.Height;
             }
         }
         return abstand;
     }
 
     private int WordBreaker(int augZeichen, int minZeichen) {
-        if (Count == 1) { return 0; }
+        if (_internal.Count == 1) { return 0; }
         if (minZeichen < 0) { minZeichen = 0; }
-        if (augZeichen > Count - 1) { augZeichen = Count - 1; }
+        if (augZeichen > _internal.Count - 1) { augZeichen = _internal.Count - 1; }
         if (augZeichen < minZeichen + 1) { augZeichen = minZeichen + 1; }
         // AusnahmeFall auschließen:
         // Space-Zeichen - Dann Buchstabe
-        if (this[augZeichen - 1].IsSpace() && !this[augZeichen].IsPossibleLineBreak()) { return augZeichen; }
+        if (_internal[augZeichen - 1].IsSpace() && !_internal[augZeichen].IsPossibleLineBreak()) { return augZeichen; }
         var started = augZeichen;
         // Das Letzte Zeichen Search, das kein Trennzeichen ist
         do {
-            if (this[augZeichen].IsPossibleLineBreak()) {
+            if (_internal[augZeichen].IsPossibleLineBreak()) {
                 augZeichen--;
             } else {
                 break;
@@ -973,7 +976,7 @@ public sealed class ExtText : List<ExtChar>, INotifyPropertyChanged, IDisposable
             if (augZeichen <= minZeichen) { return started; }
         } while (true);
         do {
-            if (this[augZeichen].IsPossibleLineBreak()) { return augZeichen + 1; }
+            if (_internal[augZeichen].IsPossibleLineBreak()) { return augZeichen + 1; }
             augZeichen--;
             if (augZeichen <= minZeichen) { return started; }
         } while (true);

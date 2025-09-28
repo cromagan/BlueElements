@@ -30,7 +30,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 
-public abstract class Variable : ParsebleItem, IComparable, IParseable, IHasKeyName {
+public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKeyName {
 
     #region Fields
 
