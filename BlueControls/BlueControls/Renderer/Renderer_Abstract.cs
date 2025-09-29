@@ -27,6 +27,7 @@ using BlueTable.Enums;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 
@@ -58,6 +59,8 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     #region Events
 
     public event EventHandler? DoUpdateSideOptionMenu;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -154,9 +157,9 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
-    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         _lastCode = ParseableItems().FinishParseable();
-        base.OnPropertyChanged(propertyName);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>

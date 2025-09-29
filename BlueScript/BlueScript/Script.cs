@@ -24,6 +24,7 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BlueScript;
 
@@ -56,6 +57,12 @@ public class Script {
 
         Properties = scp;
     }
+
+    #endregion
+
+    #region Delegates
+
+    public delegate string AbortReason();
 
     #endregion
 
@@ -109,10 +116,8 @@ public class Script {
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
                     return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, canDoResult.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
                 }
-
             }
             return new DoItWithEndedPosFeedback(firstResult?.NeedsScriptFix ?? true, pos, firstResult?.BreakFired ?? false, firstResult?.ReturnFired ?? false, firstResult?.FailedReason ?? "Interner Fehler", firstResult?.ReturnValue, null);
-
         }
 
         #endregion
@@ -166,8 +171,6 @@ public class Script {
 
         foreach (var thisC in Method.AllMethods) {
             var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-            //if (f.ScriptNeedFix) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
-
             if (string.IsNullOrEmpty(f.FailedReason)) {
                 return new DoItWithEndedPosFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", true, ld);
             }
@@ -182,7 +185,7 @@ public class Script {
 
     public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
-    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? attributes) {
+    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? attributes, AbortReason? abort) {
         var pos = 0;
 
         var ld = new LogData(subname, lineadd + 1);
@@ -201,6 +204,8 @@ public class Script {
         }
 
         Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
+
+        var t = Stopwatch.StartNew();
 
         do {
             if (pos >= normalizedScriptText.Length) {
@@ -239,15 +244,25 @@ public class Script {
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue);
                 }
             }
+
+            if (t.ElapsedMilliseconds > 2000) {
+                t.Restart();
+                var f = abort?.Invoke() ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(f)) {
+                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Abbruch: {f}", scp.Stufe);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, f, null);
+                }
+            }
         } while (true);
     }
 
-    public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes) {
+    public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes, AbortReason? abort) {
         (NormalizedScriptText, var error) = NormalizedText(ScriptText);
 
         return !string.IsNullOrEmpty(error)
             ? new ScriptEndedFeedback(error, false, true, subname)
-            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, attributes);
+            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, attributes, abort);
     }
 
     #endregion

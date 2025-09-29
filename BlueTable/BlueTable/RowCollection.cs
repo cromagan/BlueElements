@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
@@ -180,7 +179,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var tim = Stopwatch.StartNew();
 
             while (NextRowToCeck() is { IsDisposed: false } row) {
-                if (row.IsDisposed || row.Table is not { IsDisposed: false } db) { break; }
+                if (row.IsDisposed || row.Table is not { IsDisposed: false } tbl) { break; }
 
                 if (row.Table != l[0]) {
                     if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 5 + WaitDelay) { break; }
@@ -191,11 +190,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 WaitDelay = Pendingworker.Count * 5;
                 if (Pendingworker.Count > 2) { break; }
 
-                if (!db.CanDoValueChangedScript(true)) { break; }
+                if (!tbl.CanDoValueChangedScript(true)) { break; }
 
-                var e = new CanDoScriptEventArgs(true);
-                db.OnCanDoScript(e);
-                if (e.Cancel) { break; }
+                var f = tbl.ExternalAbortScriptReasonExtended();
+                if (!string.IsNullOrEmpty(f)) { return; }
 
                 Develop.SetUserDidSomething();
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }

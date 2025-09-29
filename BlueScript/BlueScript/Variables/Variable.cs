@@ -86,7 +86,6 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         set {
             if (_comment == value) { return; }
             _comment = value;
-            OnPropertyChanged();
         }
     }
 
@@ -101,7 +100,6 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         set {
             if (_keyName == value) { return; }
             _keyName = value;
-            OnPropertyChanged();
         }
     }
 
@@ -112,7 +110,6 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         set {
             if (_readOnly == value) { return; }
             _readOnly = value;
-            OnPropertyChanged();
         }
     }
 

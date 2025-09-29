@@ -21,19 +21,10 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace BlueBasics;
 
-public abstract class ParseableItem : IParseable, INotifyPropertyChanged, ICloneable {
-
-    #region Events
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    #endregion
-
+public abstract class ParseableItem : IParseable, ICloneable {
     //public abstract string MyClassId { get; }
 
     #region Properties
@@ -131,8 +122,6 @@ public abstract class ParseableItem : IParseable, INotifyPropertyChanged, IClone
     public abstract bool ParseThis(string key, string value);
 
     public override string ToString() => ParseableItems().FinishParseable();
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

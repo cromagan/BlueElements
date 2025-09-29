@@ -26,13 +26,13 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueTable;
-using BlueTable.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,6 +40,7 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueScript.Script;
 
 namespace BlueControls.Controls;
 
@@ -136,7 +137,9 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        var scf = sc.Parse(0, "Main", null);
+
+        AbortReason? abr = rowIn.Table is { } tbl ? tbl.ExternalAbortScriptReason : null;
+        var scf = sc.Parse(0, "Main", null, abr);
 
         if (scf.Failed) {
             if (Generic.UserGroup == Constants.Administrator) {

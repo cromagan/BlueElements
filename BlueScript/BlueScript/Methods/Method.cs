@@ -232,29 +232,29 @@ public abstract class Method : IReadableTextWithKey {
         if (t2.ReturnValue != null) { return new DoItFeedback(t2.ReturnValue); }
         if (txt != t2.NormalizedText) { return GetVariableByParsing(t2.NormalizedText, ld, varCol, scp); }
 
-        var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
-        if (posa > -1) {
-            var (pose, _) = NextText(txt, posa, KlammerRundZu, false, false, KlammernAlle);
-            if (pose <= posa) { return DoItFeedback.KlammerFehler(ld); }
+        //var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
+        //if (posa > -1) {
+        //    var (pose, _) = NextText(txt, posa, KlammerRundZu, false, false, KlammernAlle);
+        //    if (pose <= posa) { return DoItFeedback.KlammerFehler(ld); }
 
-            var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
-            if (!string.IsNullOrEmpty(tmptxt)) {
-                var scx = GetVariableByParsing(tmptxt, ld, varCol, scp);
-                if (scx.Failed) {
-                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
-                    return scx;
-                }
-                if (scx.ReturnValue == null) {
-                    scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()", true, ld);
-                    return scx;
-                }
-                if (!scx.ReturnValue.ToStringPossible) {
-                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true, ld);
-                    return scx;
-                }
-                return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
-            }
-        }
+        //    var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
+        //    if (!string.IsNullOrEmpty(tmptxt)) {
+        //        var scx = GetVariableByParsing(tmptxt, ld, varCol, scp);
+        //        if (scx.Failed) {
+        //            scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
+        //            return scx;
+        //        }
+        //        if (scx.ReturnValue == null) {
+        //            scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()", true, ld);
+        //            return scx;
+        //        }
+        //        if (!scx.ReturnValue.ToStringPossible) {
+        //            scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true, ld);
+        //            return scx;
+        //        }
+        //        return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
+        //    }
+        //}
 
         if (ParseOperators(txt, varCol, scp, ld) is { } b) { return new DoItFeedback(b); }
 
@@ -381,6 +381,15 @@ public abstract class Method : IReadableTextWithKey {
                 var tmp2 = GetVariableByParsing(attributes[n], ld, varcol, scp);
                 if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Berechnungsfehler bei Attribut {n + 1} {tmp2.FailedReason}", tmp2.NeedsScriptFix); }
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
+
+                if (tmp2.ReturnValue is VariableUnknown) {
+                    foreach (var thisC in Method.AllMethods) {
+                        var f = thisC.CanDo(attributes[n], 0, false, ld);
+                        if (string.IsNullOrEmpty(f.FailedReason)) {
+                            return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Dieser Befehl kann in diesen Skript nicht verwendet werden.", true);
+                        }
+                    }
+                }
 
                 v = tmp2.ReturnValue;
             }

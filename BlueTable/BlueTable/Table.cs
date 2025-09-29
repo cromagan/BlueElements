@@ -21,13 +21,13 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueTable.AdditionalScriptMethods;
-using BlueTable.Enums;
-using BlueTable.EventArgs;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.AdditionalScriptMethods;
+using BlueTable.Enums;
+using BlueTable.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -45,6 +45,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
+using static BlueScript.Script;
 using Timer = System.Threading.Timer;
 
 namespace BlueTable;
@@ -1308,9 +1309,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         // Vorab-Prüfungen
-        var e = new CanDoScriptEventArgs(extended);
-        OnCanDoScript(e);
-        if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, script.KeyName); }
+        var f = ExternalAbortScriptReason(extended);
+        if (!string.IsNullOrEmpty(f)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + f, false, false, script.KeyName); }
 
         var m = AreAllDataCorrect();
         if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, script.KeyName); }
@@ -1361,7 +1361,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 ScriptText = script.Script
             };
 
-            var scf = sc.Parse(0, script.KeyName, attributes);
+            AbortReason abr = extended ? ExternalAbortScriptReasonExtended : ExternalAbortScriptReason;
+            var scf = sc.Parse(0, script.KeyName, attributes, abr);
 
             #endregion
 
@@ -1555,6 +1556,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
         return sb.ToString().TrimEnd("\r\n");
     }
+
+    public string ExternalAbortScriptReason() => ExternalAbortScriptReason(false);
+
+    public string ExternalAbortScriptReasonExtended() => ExternalAbortScriptReason(true);
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
@@ -2546,6 +2551,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!string.IsNullOrEmpty(AdditionalFilesPathWhole())) { return AdditionalFilesPathWhole() + "Forms\\"; }
         //if (!string.IsNullOrEmpty(Filename)) { return Filename.FilePath() + "Forms\\"; }
         return string.Empty;
+    }
+
+    private string ExternalAbortScriptReason(bool extended) {
+        var e = new CanDoScriptEventArgs(extended);
+        OnCanDoScript(e);
+        return e.CancelReason;
     }
 
     private bool NewMasterPossible() {

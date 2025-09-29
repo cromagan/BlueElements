@@ -127,7 +127,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(0, "Main", null);
+        return sc.Parse(0, "Main", null, null);
     }
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {

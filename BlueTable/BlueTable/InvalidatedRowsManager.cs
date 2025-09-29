@@ -153,6 +153,14 @@ public class InvalidatedRowsManager {
 
                 // Verarbeite alle Zeilen
                 foreach (var key in keysToProcess) {
+                    if (_invalidatedRows.TryGetValue(key, out var rowx) && rowx?.Table is { } tbl) {
+                        var f = tbl.ExternalAbortScriptReasonExtended();
+                        if (!string.IsNullOrEmpty(f)) {
+                            Develop.Message?.Invoke(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen abgebrochen: {f}", 0);
+                            return;
+                        }
+                    }
+
                     // Versuche, die Zeile zu entfernen und zu verarbeiten
                     if (_invalidatedRows.TryRemove(key, out var row) && row != null) {
                         // Verarbeite die Zeile

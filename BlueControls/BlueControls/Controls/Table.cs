@@ -52,6 +52,7 @@ using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
+using BlueBasics.EventArgs;
 
 namespace BlueControls.Controls;
 
@@ -63,6 +64,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     #region Fields
 
+    public static string CellDataFormat = "BlueElements.CellLink";
     public readonly FilterCollection Filter = new("DefaultTableFilter");
     public readonly FilterCollection FilterCombined = new("TableFilterCombined");
 
@@ -531,26 +533,19 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return t;
     }
 
-	public static string CellDataFormat = "BlueElements.CellLink";
-
-
-	public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
+    public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
             if (row != null && column != null && column.CopyAble() && column.Table is { } tb) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
 
+                var dataObject = new DataObject();
+                dataObject.SetData(CellDataFormat, $"{tb.KeyName}\r{column.KeyName}\r{row.KeyName}");// 1. Als ExtChar-Format (für interne Verwendung)
+                dataObject.SetText(c);// 2. Als Plain Text (für externe Anwendungen)
+                Clipboard.SetDataObject(dataObject, true);
 
-				var dataObject = new DataObject();
-				dataObject.SetData(CellDataFormat, $"{tb.KeyName}\r{column.KeyName}\r{row.KeyName}" );// 1. Als ExtChar-Format (für interne Verwendung)
-				dataObject.SetText(c);// 2. Als Plain Text (für externe Anwendungen)
-				Clipboard.SetDataObject(dataObject, true);
-
-
-
-
-				//_ = CopytoClipboard(c);
+                //_ = CopytoClipboard(c);
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren); }
             } else {
                 if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Zelle nicht möglich."), ImageCode.Warnung); }
@@ -766,9 +761,21 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
     //}
     public static void Table_AdditionalRepair(object sender, System.EventArgs e) {
-        if (sender is not Table db) { return; }
+        if (sender is not Table tbl) { return; }
 
-        _ = RepairColumnArrangements(db);
+        _ = RepairColumnArrangements(tbl);
+    }
+
+    public static void Table_CanDoScript(object sender, CanDoScriptEventArgs e) {
+        if (!string.IsNullOrEmpty(e.CancelReason)) { return; }
+
+        if (sender is not Table tbl) { return; }
+        if (!FormManager.Running) { e.CancelReason = "Programm wird beendet"; return; }
+
+        foreach (var thisf in FormManager.Forms) {
+            if (thisf is TableHeadEditor) { e.CancelReason = "Head Editor geöffnet"; return; }
+            if (thisf is TableScriptEditor tbs && tbs.Table != tbl) { e.CancelReason = "Fremder Skript Editor geöffnet"; return; }
+        }
     }
 
     //    if (column.Function == ColumnFunction.Verknüpfung_zu_anderer_Tabellex) {
@@ -1038,12 +1045,12 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column2, row2, row2?.ChunkValue));
 
                 e.ContextMenu.Add(ItemOf("Zelle", true));
-                e.ContextMenu.Add(ItemOf("Inhalt Kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, new { Column = column2, Row = row2 }, column2.CanBeChangedByRules()));
-                e.ContextMenu.Add(ItemOf("Inhalt Einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, null, editable && column2.CanBeChangedByRules()));
+                e.ContextMenu.Add(ItemOf("Inhalt kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, new { Column = column2, Row = row2 }, column2.CanBeChangedByRules()));
+                e.ContextMenu.Add(ItemOf("Inhalt einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, null, editable && column2.CanBeChangedByRules()));
                 e.ContextMenu.Add(ItemOf("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, new { Column = column2, Row = row2 }, editable && column2.CanBeChangedByRules()));
                 e.ContextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, new { Column = column2, Row = row2 }, editable && column2.CanBeChangedByRules() && column2.SaveContent));
-                e.ContextMenu.Add(ItemOf("Suchen und Ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, null, db.IsAdministrator()));
-                e.ContextMenu.Add(ItemOf("Zeilenschlüssel Kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, row2, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, null, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, row2, db.IsAdministrator()));
             }
 
             #endregion
@@ -2650,7 +2657,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         CloseAllComponents();
     }
 
-    private void BB_NeedTableOfAdditinalSpecialChars(object sender, TableFileGiveBackEventArgs e) => e.File = Table;
+    private void BB_NeedTableOfAdditinalSpecialChars(object sender, TableFileGiveBackEventArgs e) => e.Table = Table;
 
     private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
 

@@ -131,6 +131,44 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         se.Row = _lastrow;
     }
 
+    /// <summary>
+    /// Verwendete Ressourcen bereinigen.
+    /// </summary>
+    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            _markerCancellation?.Cancel();
+            _markerCancellation?.Dispose();
+            f.Dispose();
+            components?.Dispose();
+            RestartMarker(); // Restart beendet den Marker und starten ihn bei Bedarf
+        }
+
+        base.Dispose(disposing);
+    }
+
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
+        if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+
+        if (!f.Allinitialized) { return; }
+
+        DoInputFilter(null, false);
+        DoRows();
+
+        _lastrow = RowSingleOrNull();
+        _column ??= GetTmpColumn();
+
+        StyleControls(_column, _lastrow);
+        SetValueFromCell(_column, _lastrow);
+        CheckEnabledState(_column, _lastrow);
+
+        if (_lastrow?.CheckRow() is { } rce) {
+            TableInput_RowChecked(this, rce);
+        }
+    }
+
     protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
         try {
             if (InvokeRequired) {
@@ -198,44 +236,6 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
             }
         }
         f.InfoText = newT;
-    }
-
-    /// <summary>
-    /// Verwendete Ressourcen bereinigen.
-    /// </summary>
-    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            _markerCancellation?.Cancel();
-            _markerCancellation?.Dispose();
-            f.Dispose();
-            components?.Dispose();
-            RestartMarker(); // Restart beendet den Marker und starten ihn bei Bedarf
-        }
-
-        base.Dispose(disposing);
-    }
-
-    protected override void HandleChangesNow() {
-        base.HandleChangesNow();
-        if (IsDisposed) { return; }
-        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
-
-        if (!f.Allinitialized) { return; }
-
-        DoInputFilter(null, false);
-        DoRows();
-
-        _lastrow = RowSingleOrNull();
-        _column ??= GetTmpColumn();
-
-        StyleControls(_column, _lastrow);
-        SetValueFromCell(_column, _lastrow);
-        CheckEnabledState(_column, _lastrow);
-
-        if (_lastrow?.CheckRow() is { } rce) {
-            TableInput_RowChecked(this, rce);
-        }
     }
 
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -641,7 +641,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         }
     }
 
-    private void textBox_NeedTableOfAdditinalSpecialChars(object sender, TableFileGiveBackEventArgs e) => e.File = TableInput;
+    private void textBox_NeedTableOfAdditinalSpecialChars(object sender, TableFileGiveBackEventArgs e) => e.Table = TableInput;
 
     private void TextBox_TextChanged(object sender, System.EventArgs e) => RestartMarker();
 

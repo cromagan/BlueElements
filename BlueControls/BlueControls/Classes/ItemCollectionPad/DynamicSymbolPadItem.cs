@@ -128,7 +128,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(0, "Main", null);
+        return sc.Parse(0, "Main", null, null);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

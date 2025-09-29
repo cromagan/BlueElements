@@ -506,6 +506,12 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.RendererSettings = _renderer?.ParseableItems().FinishParseable() ?? string.Empty;
         _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
         _column.AutoRemove = txbAutoRemove.Text;
+
+        if (_column.Value_for_Chunk == ChunkType.None) {
+            _column.LinkedTableTableName = string.Empty;
+            _column.ColumnNameOfLinkedTable = string.Empty;
+        }
+
         _column.Invalidate_ColumAndContent();
         GetLinkedCellFilter();
 
@@ -542,7 +548,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             if (vis is not { IsDisposed: false }) { return; }
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
             if (sp is not { IsDisposed: false }) { return; }
-     
+
             sp.Align = AlignmentHorizontal.Rechts;
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);

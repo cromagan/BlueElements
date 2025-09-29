@@ -23,7 +23,7 @@ public class TableFileGiveBackEventArgs : System.EventArgs {
 
     #region Properties
 
-    public Table? File { get; set; }
+    public Table? Table { get; set; }
 
     #endregion
 }

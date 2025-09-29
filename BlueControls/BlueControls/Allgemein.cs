@@ -64,17 +64,18 @@ public static class Allgemein {
             foreach (var thisit in e.NewItems) {
                 if (thisit is Table db) {
                     db.AdditionalRepair += TableView.Table_AdditionalRepair;
+                    db.CanDoScript += TableView.Table_CanDoScript;
                 }
             }
         }
 
-        if (e.OldItems != null) {
-            foreach (var thisit in e.OldItems) {
-                if (thisit is Table db) {
-                    db.AdditionalRepair += TableView.Table_AdditionalRepair;
-                }
-            }
-        }
+        //if (e.OldItems != null) {
+        //    foreach (var thisit in e.OldItems) {
+        //        if (thisit is Table db) {
+        //            db.AdditionalRepair += TableView.Table_AdditionalRepair;
+        //        }
+        //    }
+        //}
 
         if (e.Action == NotifyCollectionChangedAction.Reset) {
             Develop.DebugPrint_NichtImplementiert(true);

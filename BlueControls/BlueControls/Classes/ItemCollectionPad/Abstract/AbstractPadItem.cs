@@ -92,6 +92,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
 
     public event EventHandler? ParentChanging;
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     #endregion
 
     #region Properties
@@ -647,9 +649,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
     /// <summary>
     /// Invalidiert UsedArea und löst das Ereignis Changed aus
     /// </summary>
-    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         _usedArea = default;
-        base.OnPropertyChanged(propertyName);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     private void JointMiddle_Moved(object sender, MoveEventArgs e) {
