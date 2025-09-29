@@ -331,7 +331,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         if (RowCollection.FailedRows.TryGetValue(this, out var reason)) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, $"Zeilenstatus unbekannt, da temporäre Fehler aufgetreten sind: {reason}");
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, reason);
             return _lastCheckedEventArgs;
         }
 

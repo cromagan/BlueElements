@@ -744,6 +744,14 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
+
+            case "CELLLINK":
+                var xl = (attribut + "|||").SplitBy("|");
+                position++;
+                _internal.Add(new ExtCharLinkCell(this, style, font, xl[0], xl[1], xl[2]));
+
+                break;
+
             //case "MARKSTATE":
             //    markState = (MarkState)IntParse(attribut);
             //    break;

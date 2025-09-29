@@ -147,7 +147,7 @@ public class ExtCharLinkCell : ExtChar {
     }
 
     private void InitValues() {
-        _htmlText = $"<LINKCELL tableName=\"{TableName}\" columnKey=\"{ColumnKey}\" rowKey=\"{RowKey}\">";
+        _htmlText = $"<CELLLINK={TableName}|{ColumnKey}|{RowKey}>";
         _displayText = GetCellValue();
     }
 

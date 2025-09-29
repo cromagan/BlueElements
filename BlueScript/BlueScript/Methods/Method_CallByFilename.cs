@@ -106,10 +106,9 @@ public class Method_CallByFilename : Method {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
             varCol.Clear();
             _ = varCol.AddRange(tmpv);
-        }
+            ld?.Protocol.AddRange(scx.Protocol);
 
-        if (scx.Failed) {
-            scx.ChangeFailedReason("'" + aufgerufenVon + "' wegen vorheriger Fehler abgebrochen", scx.NeedsScriptFix, ld);
+            //scx.ChangeFailedReason(scx.FailedReason, scx.NeedsScriptFix, ld);
             return scx;
         }
 

@@ -228,7 +228,7 @@ public abstract class Method : IReadableTextWithKey {
         if (txt != t.NormalizedText) { return GetVariableByParsing(t.NormalizedText, ld, varCol, scp); }
 
         var t2 = ReplaceCommandsAndVars(txt, varCol, ld, scp);
-        if (t2.Failed) { return new DoItFeedback($"Befehls-Berechnungsfehler: {t2.FailedReason}", t2.NeedsScriptFix, ld); }
+        if (t2.Failed) { return new DoItFeedback(t2.FailedReason, t2.NeedsScriptFix, ld); }
         if (t2.ReturnValue != null) { return new DoItFeedback(t2.ReturnValue); }
         if (txt != t2.NormalizedText) { return GetVariableByParsing(t2.NormalizedText, ld, varCol, scp); }
 
@@ -302,7 +302,7 @@ public abstract class Method : IReadableTextWithKey {
             var scx = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
             if (scx.Failed) {
                 Develop.Message?.Invoke(BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Skript-Fehler: " + scx.FailedReason, scp.Stufe);
-                return new GetEndFeedback($"Durch Befehl abgebrochen: {txt} -> {scx.FailedReason}", scx.NeedsScriptFix, ld);
+                return new GetEndFeedback(scx.FailedReason, scx.NeedsScriptFix, ld);
             }
 
             if (pos == 0 && txt.Length == scx.Position) { return new GetEndFeedback(scx.ReturnValue); }
@@ -379,7 +379,7 @@ public abstract class Method : IReadableTextWithKey {
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
             } else {
                 var tmp2 = GetVariableByParsing(attributes[n], ld, varcol, scp);
-                if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Berechnungsfehler bei Attribut {n + 1} {tmp2.FailedReason}", tmp2.NeedsScriptFix); }
+                if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen,tmp2.FailedReason, tmp2.NeedsScriptFix); }
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
                 if (tmp2.ReturnValue is VariableUnknown) {
@@ -443,7 +443,7 @@ public abstract class Method : IReadableTextWithKey {
 
         var attvar = SplitAttributeToVars(varCol, value, sargs, 0, ld, scp);
 
-        if (attvar.Failed) { return new DoItFeedback("Der Wert nach dem '=' konnte nicht berechnet werden: " + attvar.FailedReason, attvar.NeedsScriptFix, ld); }
+        if (attvar.Failed) { return new DoItFeedback(attvar.FailedReason, attvar.NeedsScriptFix, ld); }
 
         if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback("Variable unbekannt", true, ld); }
 

@@ -1498,65 +1498,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public string Export_CSV(FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
-        //BeSureAllDataLoaded(-1);
-
-        var columnListtmp = columnList?.ToList();
-        columnListtmp ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
-
-        StringBuilder sb = new();
-        switch (firstRow) {
-            case FirstRow.Without:
-                break;
-
-            case FirstRow.ColumnCaption:
-                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
-                    if (columnListtmp[colNr] != null) {
-                        var tmp = columnListtmp[colNr].ReadableText();
-                        tmp = tmp.Replace(";", "|");
-                        tmp = tmp.Replace(" |", "|");
-                        tmp = tmp.Replace("| ", "|");
-                        _ = sb.Append(tmp);
-                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(";"); }
-                    }
-                }
-                _ = sb.Append("\r\n");
-                break;
-
-            case FirstRow.ColumnInternalName:
-                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
-                    if (columnListtmp[colNr] != null) {
-                        _ = sb.Append(columnListtmp[colNr].KeyName);
-                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(';'); }
-                    }
-                }
-                _ = sb.Append("\r\n");
-                break;
-
-            default:
-                Develop.DebugPrint(firstRow);
-                break;
-        }
-
-        foreach (var thisRow in sortedRows) {
-            if (thisRow is { IsDisposed: false }) {
-                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
-                    if (columnListtmp[colNr] != null) {
-                        var tmp = Cell.GetString(columnListtmp[colNr], thisRow);
-                        tmp = tmp.Replace("\r\n", "|");
-                        tmp = tmp.Replace("\r", "|");
-                        tmp = tmp.Replace("\n", "|");
-                        tmp = tmp.Replace(";", "<sk>");
-                        _ = sb.Append(tmp);
-                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(';'); }
-                    }
-                }
-                _ = sb.Append("\r\n");
-            }
-        }
-        return sb.ToString().TrimEnd("\r\n");
-    }
-
     public string ExternalAbortScriptReason() => ExternalAbortScriptReason(false);
 
     public string ExternalAbortScriptReasonExtended() => ExternalAbortScriptReason(true);

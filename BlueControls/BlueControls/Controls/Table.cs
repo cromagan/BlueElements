@@ -53,6 +53,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
 using BlueBasics.EventArgs;
+using System.Text;
 
 namespace BlueControls.Controls;
 
@@ -578,6 +579,71 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         //row.Table?.Row.ExecuteValueChangedEvent(true);
     }
 
+    public static string Export_CSV(Table tbl, FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
+        //BeSureAllDataLoaded(-1);
+
+        var columnListtmp = columnList?.ToList();
+        columnListtmp ??= tbl.Column.Where(thisColumnItem => thisColumnItem != null).ToList();
+
+        StringBuilder sb = new();
+        switch (firstRow) {
+            case FirstRow.Without:
+                break;
+
+            case FirstRow.ColumnCaption:
+                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
+                    if (columnListtmp[colNr] != null) {
+                        var tmp = columnListtmp[colNr].ReadableText();
+                        tmp = tmp.Replace(";", "|");
+                        tmp = tmp.Replace(" |", "|");
+                        tmp = tmp.Replace("| ", "|");
+                        _ = sb.Append(tmp);
+                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(";"); }
+                    }
+                }
+                _ = sb.Append("\r\n");
+                break;
+
+            case FirstRow.ColumnInternalName:
+                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
+                    if (columnListtmp[colNr] != null) {
+                        _ = sb.Append(columnListtmp[colNr].KeyName);
+                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(';'); }
+                    }
+                }
+                _ = sb.Append("\r\n");
+                break;
+
+            default:
+                Develop.DebugPrint(firstRow);
+                break;
+        }
+
+        foreach (var thisRow in sortedRows) {
+            if (thisRow is { IsDisposed: false }) {
+                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
+                    if (columnListtmp[colNr] != null) {
+                        var tmp = tbl.Cell.GetString(columnListtmp[colNr], thisRow);
+
+                        if (columnListtmp[colNr].TextFormatingAllowed) {
+                           using var t = new ExtText() { HtmlText = tmp };
+                            tmp = t.PlainText;
+                        }
+
+                        tmp = tmp.Replace("\r\n", "|");
+                        tmp = tmp.Replace("\r", "|");
+                        tmp = tmp.Replace("\n", "|");
+                        tmp = tmp.Replace(";", "<sk>");
+                        _ = sb.Append(tmp);
+                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(';'); }
+                    }
+                }
+                _ = sb.Append("\r\n");
+            }
+        }
+        return sb.ToString().TrimEnd("\r\n");
+    }
+
     public static void ImportBdb(Table table) {
         using ImportBdb x = new(table);
         _ = x.ShowDialog();
@@ -932,12 +998,12 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Invalidate_SortedRowData();
     }
 
-    public string Export_CSV(FirstRow firstRow) => Table == null ? string.Empty : Table.Export_CSV(firstRow, CurrentArrangement?.ListOfUsedColumn(), RowsVisibleUnique());
+    public string Export_CSV(FirstRow firstRow) => Table == null ? string.Empty : Export_CSV(Table, firstRow, CurrentArrangement?.ListOfUsedColumn(), RowsVisibleUnique());
 
     public string Export_CSV(FirstRow firstRow, ColumnItem onlyColumn) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return string.Empty; }
         List<ColumnItem> l = [onlyColumn];
-        return Table.Export_CSV(firstRow, l, RowsVisibleUnique());
+        return Export_CSV(Table, firstRow, l, RowsVisibleUnique());
     }
 
     public void Export_HTML(string filename = "", bool execute = true) {
