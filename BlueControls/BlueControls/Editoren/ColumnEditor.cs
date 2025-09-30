@@ -507,7 +507,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
         _column.AutoRemove = txbAutoRemove.Text;
 
-        if (_column.Value_for_Chunk == ChunkType.None) {
+        if (_column.RelationType == RelationType.None) {
             _column.LinkedTableTableName = string.Empty;
             _column.ColumnNameOfLinkedTable = string.Empty;
         }
