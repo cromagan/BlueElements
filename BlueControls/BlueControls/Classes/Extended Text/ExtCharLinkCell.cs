@@ -109,11 +109,11 @@ public class ExtCharLinkCell : ExtChar {
                 TableName = value.FromNonCritical();
                 return true;
 
-            case "Column":
+            case "column":
                 ColumnKey = value.FromNonCritical();
                 return true;
 
-            case "Row":
+            case "row":
                 RowKey = value.FromNonCritical();
                 return true;
         }
