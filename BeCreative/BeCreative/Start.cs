@@ -17,13 +17,14 @@
 
 using BlueControls;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BluePaint;
 using System;
 using static BlueBasics.Develop;
 
 namespace BeCreative {
 
-    public partial class Start : Form {
+    public partial class Start : Form, IIsStandalone {
 
         #region Constructors
 
@@ -59,5 +60,9 @@ namespace BeCreative {
         }
 
         #endregion
+
+        private void btnTextEditor_Click(object sender, EventArgs e) {
+
+        }
     }
 }

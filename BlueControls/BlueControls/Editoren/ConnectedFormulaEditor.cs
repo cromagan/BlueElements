@@ -43,7 +43,7 @@ using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
-public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
+public partial class ConnectedFormulaEditor : PadEditor, IIsEditor, IIsStandalone {
 
     #region Fields
 

@@ -77,6 +77,7 @@ namespace BeCreative {
             this.btnTextEditor.Size = new System.Drawing.Size(64, 80);
             this.btnTextEditor.TabIndex = 3;
             this.btnTextEditor.Text = "Text-Editor";
+            this.btnTextEditor.Click += new System.EventHandler(this.btnTextEditor_Click);
             // 
             // btnBildEditor
             // 
@@ -114,7 +115,6 @@ namespace BeCreative {
             // 
             // Start
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(347, 200);
             this.Controls.Add(this.btnFormularAnsicht);

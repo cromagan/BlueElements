@@ -43,7 +43,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-public partial class TableViewForm : FormWithStatusBar, IHasSettings {
+public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandalone {
 
     #region Fields
 

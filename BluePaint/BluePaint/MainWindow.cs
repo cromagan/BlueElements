@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BluePaint.EventArgs;
 using System;
 using System.ComponentModel;
@@ -33,13 +34,16 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
 
-public partial class MainWindow {
+public partial class MainWindow : BlueControls.Forms.Form, IIsStandalone {
 
     #region Fields
 
     private GenericTool? _currentTool;
+
     private string _filename = string.Empty;
+
     private bool _isSaved = true;
+
     private Bitmap? _picUndo;
 
     #endregion

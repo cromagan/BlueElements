@@ -33,11 +33,12 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-public partial class ConnectedFormulaForm : FormWithStatusBar {
+public partial class ConnectedFormulaForm : FormWithStatusBar, IIsStandalone {
 
     #region Fields
 
     private AbstractPadItem? _lastItem;
+
     private IOpenScriptEditor? _lastObject;
 
     #endregion
@@ -59,12 +60,26 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     #region Methods
 
+    protected void FormulaSet(string? filename) {
+        if (filename == null || !FileExists(filename)) {
+            FormulaSet(null as ItemCollectionPadItem);
+            return;
+        }
+
+        btnLastFormulas.AddFileName(filename, string.Empty);
+        LoadTab.FileName = filename;
+        var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        if (tmpFormula == null) { return; }
+        FormulaSet(tmpFormula.GetPage("Head"));
+    }
+
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
         CheckButtons();
     }
 
     private void btnAusgehendeTabelle_Click(object sender, System.EventArgs e) {
+        if (!Generic.IsAdministrator()) { return; }
         if (_lastItem is ReciverSenderControlPadItem { TableOutput: { IsDisposed: false } db }) {
             var c = new TableViewForm(db, false, true, true);
             _ = c.ShowDialog();
@@ -72,6 +87,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     }
 
     private void btnEingehendeTabelle_Click(object sender, System.EventArgs e) {
+        if (!Generic.IsAdministrator()) { return; }
         if (_lastItem is ReciverControlPadItem { TableInput: { IsDisposed: false } db }) {
             var c = new TableViewForm(db, false, true, true);
             _ = c.ShowDialog();
@@ -141,19 +157,6 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void CFormula_ChildGotFocus(object sender, ControlEventArgs e) => SetItem(e.Control);
 
     private void CheckButtons() => btnFormular.Enabled = CFormula.Page != null;
-
-    private void FormulaSet(string? filename) {
-        if (filename == null || !FileExists(filename)) {
-            FormulaSet(null as ItemCollectionPadItem);
-            return;
-        }
-
-        btnLastFormulas.AddFileName(filename, string.Empty);
-        LoadTab.FileName = filename;
-        var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
-        if (tmpFormula == null) { return; }
-        FormulaSet(tmpFormula.GetPage("Head"));
-    }
 
     private void FormulaSet(ItemCollectionPadItem? page) {
         if (IsDisposed) { return; }

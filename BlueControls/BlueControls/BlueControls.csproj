@@ -169,6 +169,7 @@
     <Compile Include="Enums\XPosition.cs" />
     <Compile Include="Interfaces\IComandBuilder.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />
+    <Compile Include="Interfaces\IIsStandalone.cs" />
     <Compile Include="Interfaces\ISupportsTextScale.cs" />
     <Compile Include="Interfaces\IStyleableOne.cs" />
     <Compile Include="Interfaces\IStyleable.cs" />

@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
@@ -35,7 +36,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-public partial class PadEditorWithFileAccess : PadEditor {
+public partial class PadEditorWithFileAccess : PadEditor, IIsStandalone {
 
     #region Fields
 

@@ -1,15 +1,15 @@
-﻿using System.ComponentModel;
-using System.Windows.Forms;
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
+using System.ComponentModel;
+using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
 using Form = BlueControls.Forms.Form;
 using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BluePaint
 {
-    partial class MainWindow : Form
-    {
+    partial class MainWindow  {
         /// <summary>
         /// Required designer variable.
         /// </summary>
