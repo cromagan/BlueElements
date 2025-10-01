@@ -43,6 +43,7 @@ using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
+[StandaloneInfo("Formular-Editor", ImageCode.Anwendung)]
 public partial class ConnectedFormulaEditor : PadEditor, IIsEditor, IIsStandalone {
 
     #region Fields

@@ -141,7 +141,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
                     }
 
                 case "CSV":
-                    var t = BlueControls.Controls.TableView.Export_CSV(myTb, FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
+                    var t = Controls.TableView.Export_CSV(myTb, FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
                     if (string.IsNullOrEmpty(t)) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
                     if (!WriteAllText(filn, t, BlueBasics.Constants.Win1252, false)) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld); }
                     break;

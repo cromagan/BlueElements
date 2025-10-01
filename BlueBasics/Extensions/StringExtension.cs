@@ -1271,7 +1271,7 @@ public static partial class Extensions {
             for (int i = 0; i < input.Length; i++) {
                 if (i <= input.Length - 6 && input[i] == '\\' && input[i + 1] == 'u') {
                     string hexCode = input.Substring(i + 2, 4);
-                    if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out int unicodeValue)) {
+                    if (int.TryParse(hexCode, NumberStyles.HexNumber, null, out int unicodeValue)) {
                         result.Append((char)unicodeValue);
                         i += 5; // Überspringe die nächsten 5 Zeichen (\u + 4 Hex-Zeichen)
                     } else {

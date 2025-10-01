@@ -383,7 +383,7 @@ public abstract class Method : IReadableTextWithKey {
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
                 if (tmp2.ReturnValue is VariableUnknown) {
-                    foreach (var thisC in Method.AllMethods) {
+                    foreach (var thisC in AllMethods) {
                         var f = thisC.CanDo(attributes[n], 0, false, ld);
                         if (string.IsNullOrEmpty(f.FailedReason)) {
                             return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Dieser Befehl kann in diesen Skript nicht verwendet werden.", true);

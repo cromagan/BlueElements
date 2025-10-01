@@ -939,7 +939,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
             if (Clipboard.ContainsData(TableView.CellDataFormat)) {
                 if (Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
-                    if (BlueControls.Forms.MessageBox.Show("Als Link oder als Text?", ImageCode.Stern, "Link", "Text") == 0) {
+                    if (Forms.MessageBox.Show("Als Link oder als Text?", ImageCode.Stern, "Link", "Text") == 0) {
                         var t = sd.SplitByCr();
                         var c = new ExtCharLinkCell(_eTxt, _cursorCharPos, t[0], t[1], t[2]);
                         _eTxt.Insert(_cursorCharPos, c);

@@ -34,6 +34,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
 
+[BlueControls.StandaloneInfo("Bildbearbeitung", ImageCode.Bild)]
 public partial class MainWindow : BlueControls.Forms.Form, IIsStandalone {
 
     #region Fields
@@ -59,7 +60,7 @@ public partial class MainWindow : BlueControls.Forms.Form, IIsStandalone {
 
     public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) => LoadFromDisk(filename);
 
-    private MainWindow() : this(true) { }
+    public MainWindow() : this(true) { }
 
     #endregion
 

@@ -26,104 +26,36 @@ namespace BeCreative {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.btnDatenbank = new BlueControls.Controls.Button();
-            this.btnFormular = new BlueControls.Controls.Button();
-            this.btnLayout = new BlueControls.Controls.Button();
-            this.btnTextEditor = new BlueControls.Controls.Button();
-            this.btnBildEditor = new BlueControls.Controls.Button();
-            this.btnHierachie = new BlueControls.Controls.Button();
-            this.btnFormularAnsicht = new BlueControls.Controls.Button();
+            this.Forms = new BlueControls.Controls.ListBox();
+            this.capApp = new BlueControls.Controls.Caption();
             this.SuspendLayout();
             // 
-            // btnDatenbank
+            // Forms
             // 
-            this.btnDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnDatenbank.ImageCode = "Tabelle|16";
-            this.btnDatenbank.Location = new System.Drawing.Point(80, 16);
-            this.btnDatenbank.Name = "btnDatenbank";
-            this.btnDatenbank.Size = new System.Drawing.Size(64, 80);
-            this.btnDatenbank.TabIndex = 0;
-            this.btnDatenbank.Text = "Tabellen-Ansicht";
-            this.btnDatenbank.Click += new System.EventHandler(this.btnDatenbank_Click);
+            this.Forms.AddAllowed = BlueControls.Enums.AddType.None;
+            this.Forms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Forms.Location = new System.Drawing.Point(8, 32);
+            this.Forms.Name = "Forms";
+            this.Forms.Size = new System.Drawing.Size(240, 328);
+            this.Forms.TabIndex = 7;
+            this.Forms.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.Forms_ItemClicked);
             // 
-            // btnFormular
+            // capApp
             // 
-            this.btnFormular.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnFormular.ImageCode = "Anwendung";
-            this.btnFormular.Location = new System.Drawing.Point(272, 104);
-            this.btnFormular.Name = "btnFormular";
-            this.btnFormular.Size = new System.Drawing.Size(64, 80);
-            this.btnFormular.TabIndex = 1;
-            this.btnFormular.Text = "Formular-Editor";
-            this.btnFormular.Click += new System.EventHandler(this.btnFormular_Click);
-            // 
-            // btnLayout
-            // 
-            this.btnLayout.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnLayout.ImageCode = "Layout|16";
-            this.btnLayout.Location = new System.Drawing.Point(208, 104);
-            this.btnLayout.Name = "btnLayout";
-            this.btnLayout.Size = new System.Drawing.Size(64, 80);
-            this.btnLayout.TabIndex = 2;
-            this.btnLayout.Text = "Layout-Editor";
-            this.btnLayout.Click += new System.EventHandler(this.btnLayout_Click);
-            // 
-            // btnTextEditor
-            // 
-            this.btnTextEditor.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnTextEditor.ImageCode = "Textdatei|16";
-            this.btnTextEditor.Location = new System.Drawing.Point(16, 104);
-            this.btnTextEditor.Name = "btnTextEditor";
-            this.btnTextEditor.Size = new System.Drawing.Size(64, 80);
-            this.btnTextEditor.TabIndex = 3;
-            this.btnTextEditor.Text = "Text-Editor";
-            this.btnTextEditor.Click += new System.EventHandler(this.btnTextEditor_Click);
-            // 
-            // btnBildEditor
-            // 
-            this.btnBildEditor.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnBildEditor.ImageCode = "Bild|16";
-            this.btnBildEditor.Location = new System.Drawing.Point(80, 104);
-            this.btnBildEditor.Name = "btnBildEditor";
-            this.btnBildEditor.Size = new System.Drawing.Size(64, 80);
-            this.btnBildEditor.TabIndex = 4;
-            this.btnBildEditor.Text = "Bild-Editor";
-            this.btnBildEditor.Click += new System.EventHandler(this.btnBildEditor_Click);
-            // 
-            // btnHierachie
-            // 
-            this.btnHierachie.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnHierachie.ImageCode = "Hierarchie|16";
-            this.btnHierachie.Location = new System.Drawing.Point(144, 104);
-            this.btnHierachie.Name = "btnHierachie";
-            this.btnHierachie.Size = new System.Drawing.Size(64, 80);
-            this.btnHierachie.TabIndex = 5;
-            this.btnHierachie.Text = "Hierachie-Editor";
-            this.btnHierachie.Click += new System.EventHandler(this.btnHierachie_Click);
-            // 
-            // btnFormularAnsicht
-            // 
-            this.btnFormularAnsicht.AllowDrop = true;
-            this.btnFormularAnsicht.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
-            this.btnFormularAnsicht.ImageCode = "Anwendung";
-            this.btnFormularAnsicht.Location = new System.Drawing.Point(16, 16);
-            this.btnFormularAnsicht.Name = "btnFormularAnsicht";
-            this.btnFormularAnsicht.Size = new System.Drawing.Size(64, 80);
-            this.btnFormularAnsicht.TabIndex = 6;
-            this.btnFormularAnsicht.Text = "Formular-Ansicht";
-            this.btnFormularAnsicht.Click += new System.EventHandler(this.btnFormularAnsicht_Click);
+            this.capApp.CausesValidation = false;
+            this.capApp.Location = new System.Drawing.Point(8, 8);
+            this.capApp.Name = "capApp";
+            this.capApp.Size = new System.Drawing.Size(208, 24);
+            this.capApp.Text = "Applikation wählen:";
             // 
             // Start
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(347, 200);
-            this.Controls.Add(this.btnFormularAnsicht);
-            this.Controls.Add(this.btnHierachie);
-            this.Controls.Add(this.btnBildEditor);
-            this.Controls.Add(this.btnTextEditor);
-            this.Controls.Add(this.btnLayout);
-            this.Controls.Add(this.btnFormular);
-            this.Controls.Add(this.btnDatenbank);
+            this.ClientSize = new System.Drawing.Size(257, 367);
+            this.Controls.Add(this.capApp);
+            this.Controls.Add(this.Forms);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -133,13 +65,7 @@ namespace BeCreative {
         }
 
         #endregion
-
-        private Button btnDatenbank;
-        private Button btnFormular;
-        private Button btnLayout;
-        private Button btnTextEditor;
-        private Button btnBildEditor;
-        private Button btnHierachie;
-        private Button btnFormularAnsicht;
+        private ListBox Forms;
+        private Caption capApp;
     }
 }

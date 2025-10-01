@@ -15,54 +15,63 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BluePaint;
+using BlueControls.ItemCollectionList;
 using System;
-using static BlueBasics.Develop;
+using System.Reflection;
+
+#nullable enable
 
 namespace BeCreative {
 
+    [StandaloneInfo("Auswahl-Fenster", ImageCode.Stern)]
     public partial class Start : Form, IIsStandalone {
 
         #region Constructors
 
         public Start() {
             InitializeComponent();
+
+            var types = Generic.GetTypesOfType<IIsStandalone>();
+
+            foreach (var thisType in types) {
+                var name = thisType.Name;
+                ImageCode i = ImageCode.Fragezeichen;
+
+                var attr = thisType.GetCustomAttribute<StandaloneInfoAttribute>();
+                if (attr != null) {
+                    name = attr.Name;
+                    i = attr.Symbol;
+                }
+
+                var p = new TextListItem(name, name, QuickImage.Get(i, 24), false, true, name) {
+                    Tag = thisType
+                };
+                Forms.ItemAdd(p);
+            }
         }
 
         #endregion
 
         #region Methods
 
-        private void btnBildEditor_Click(object sender, EventArgs e) => DoForm(new MainWindow(true));
+        private void Forms_ItemClicked(object sender, BlueControls.EventArgs.AbstractListItemEventArgs e) {
+            if (e.Item.Tag is not Type t) { return; }
 
-        private void btnDatenbank_Click(object sender, EventArgs e) => DoForm(new TableViewForm(null, true, true, true));
+            var instance = (IIsStandalone)Activator.CreateInstance(t);
 
-        private void btnFormular_Click(object sender, EventArgs e) => DoForm(new ConnectedFormulaEditor());
-
-        private void btnFormularAnsicht_Click(object sender, EventArgs e) => DoForm(new ConnectedFormulaForm());
-
-        private void btnHierachie_Click(object sender, EventArgs e) => DoForm(new RelationDiagram(null));
-
-        private void btnLayout_Click(object sender, EventArgs e) => DoForm(new PadEditorWithFileAccess());
-
-        private void DoForm(System.Windows.Forms.Form frm) {
-            if (frm.IsDisposed) {
-                DebugPrint("Fenster verworfen!");
-                return;
+            if (instance is System.Windows.Forms.Form frm) {
+                FormManager.RegisterForm(frm);
+                frm.Show();
+                Close();
+                frm.BringToFront();
             }
-            FormManager.RegisterForm(frm);
-            frm.Show();
-            Close();
-            frm.BringToFront();
         }
 
         #endregion
-
-        private void btnTextEditor_Click(object sender, EventArgs e) {
-
-        }
     }
 }

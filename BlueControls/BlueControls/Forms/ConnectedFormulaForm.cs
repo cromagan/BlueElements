@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
@@ -33,6 +34,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
+[StandaloneInfo("Formular-Ansicht", ImageCode.Anwendung)]
 public partial class ConnectedFormulaForm : FormWithStatusBar, IIsStandalone {
 
     #region Fields

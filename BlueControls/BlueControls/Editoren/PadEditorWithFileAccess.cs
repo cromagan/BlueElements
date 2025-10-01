@@ -36,6 +36,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
+[StandaloneInfo("Layout-Editor", ImageCode.Layout)]
 public partial class PadEditorWithFileAccess : PadEditor, IIsStandalone {
 
     #region Fields

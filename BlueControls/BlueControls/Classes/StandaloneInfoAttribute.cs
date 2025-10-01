@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -17,12 +17,27 @@
 
 #nullable enable
 
-namespace BlueControls.Interfaces;
+using BlueBasics.Enums;
+using System;
 
-/// <summary>
-/// Interface für Fenster, die als Standalone-Anwendungen lauffähig sind
-/// Benötigen eine Beschreibung wie z.B.:
-/// [BlueControls.StandaloneInfo("Bildbearbeitung", ImageCode.Bild)]
-/// </summary>
-public interface IIsStandalone {
+namespace BlueControls;
+
+[AttributeUsage(AttributeTargets.Class)]
+public class StandaloneInfoAttribute : Attribute {
+
+    #region Constructors
+
+    public StandaloneInfoAttribute(string name, ImageCode symbol) {
+        Name = name;
+        Symbol = symbol;
+    }
+
+    #endregion
+
+    #region Properties
+
+    public string Name { get; }
+    public ImageCode Symbol { get; }
+
+    #endregion
 }

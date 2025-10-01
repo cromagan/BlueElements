@@ -6,7 +6,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F357F648-987A-4442-93A9-BFC421561DD2}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BluePaint</RootNamespace>
     <AssemblyName>BluePaint</AssemblyName>
@@ -88,7 +88,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>BluePaint.Program</StartupObject>
+    <StartupObject>
+    </StartupObject>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>

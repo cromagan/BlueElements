@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -244,6 +245,24 @@ public static class Generic {
         } catch {
             Develop.CheckStackOverflow();
             return GetInstaceOfType<T>(constructorArgs);
+        }
+    }
+
+    public static List<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {
+        try {
+            List<Type> l = [];
+            foreach (var thisType in AllTypes) {
+                if (typeof(T).IsAssignableFrom(thisType) &&
+                    thisType.IsClass &&
+                    !thisType.IsAbstract &&
+                    HasMatchingConstructor(thisType, constructorArgTypes)) {
+                    l.Add(thisType);
+                }
+            }
+            return l;
+        } catch {
+            Develop.CheckStackOverflow();
+            return GetTypesOfType<T>(constructorArgTypes);
         }
     }
 

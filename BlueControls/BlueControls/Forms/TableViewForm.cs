@@ -43,6 +43,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
+[StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle)]
 public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandalone {
 
     #region Fields
@@ -90,6 +91,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandal
     #region Properties
 
     public static bool SettingsLoadedStatic { get; set; }
+
     public static List<string> SettingsStatic { get; set; } = [];
 
     public List<string> Settings { get => SettingsStatic; set => SettingsStatic = value; }
@@ -142,6 +144,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandal
         _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
     }
 
+    public string ReadableText() => "Tabellen Ansicht";
+
     /// <summary>
     /// Setzt von allen Reitern die Ansichts- und Filtereinstellungen zurück
     /// </summary>
@@ -154,6 +158,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandal
             }
         }
     }
+
+    public QuickImage? SymbolForReadableText() => QuickImage.Get("Tabelle|32");
 
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Tabelle laden zu können - lädt die Tabelle aber selbst nicht.
