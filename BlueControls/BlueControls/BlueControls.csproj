@@ -127,6 +127,12 @@
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\Extended Text\ExtCharLinkCell.cs" />
     <Compile Include="Classes\StandaloneInfoAttribute.cs" />
+    <Compile Include="Forms\Start.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Start.Designer.cs">
+      <DependentUpon>Start.cs</DependentUpon>
+    </Compile>
     <Compile Include="GlobalMonitor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -750,6 +756,9 @@
     <Compile Include="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\Start.resx">
+      <DependentUpon>Start.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GlobalMonitor.resx">
       <DependentUpon>GlobalMonitor.cs</DependentUpon>
     </EmbeddedResource>
