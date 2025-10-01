@@ -26,7 +26,7 @@ using System.Drawing;
 
 namespace BlueControls.Extended_Text;
 
-public class ExtCharLinkCell : ExtChar {
+public class ExtCharCellLink : ExtChar {
 
     #region Fields
 
@@ -37,16 +37,16 @@ public class ExtCharLinkCell : ExtChar {
 
     #region Constructors
 
-    public ExtCharLinkCell(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+    public ExtCharCellLink(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
 
-    internal ExtCharLinkCell(ExtText parent, PadStyles style, BlueFont font, string tableName, string columnKey, string rowKey) : base(parent, style, font) {
+    internal ExtCharCellLink(ExtText parent, PadStyles style, BlueFont font, string tableName, string columnKey, string rowKey) : base(parent, style, font) {
         TableName = tableName;
         ColumnKey = columnKey;
         RowKey = rowKey;
         InitValues();
     }
 
-    internal ExtCharLinkCell(ExtText parent, int styleFromPos, string tableName, string columnKey, string rowKey) : base(parent, styleFromPos) {
+    internal ExtCharCellLink(ExtText parent, int styleFromPos, string tableName, string columnKey, string rowKey) : base(parent, styleFromPos) {
         TableName = tableName;
         ColumnKey = columnKey;
         RowKey = rowKey;
@@ -57,7 +57,7 @@ public class ExtCharLinkCell : ExtChar {
 
     #region Properties
 
-    public static string ClassId => "ExtCharLinkCell";
+    public static string ClassId => "ExtCharCellLink";
     public string ColumnKey { get; private set; }
 
     public string RowKey { get; private set; }
@@ -75,7 +75,7 @@ public class ExtCharLinkCell : ExtChar {
         var drawY = (Pos.Y * zoom) + posModificator.Y;
 
         try {
-            this.GetFont().DrawString(gr, _displayText, drawX, drawY, zoom, StringFormat.GenericTypographic);
+            this.GetFont().DrawString(gr, _displayText, drawX, drawY, zoom);
         } catch { }
     }
 

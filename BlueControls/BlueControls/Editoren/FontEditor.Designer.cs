@@ -39,11 +39,8 @@ namespace BlueControls.Forms
             this.capSize = new BlueControls.Controls.Caption();
             this.listSize = new BlueControls.Controls.ListBox();
             this.frmStyle = new BlueControls.Controls.GroupBox();
-            this.chkOnlyUpper = new BlueControls.Controls.Button();
-            this.chkOnlyLow = new BlueControls.Controls.Button();
             this.chkOutline = new BlueControls.Controls.Button();
             this.chkDurchgestrichen = new BlueControls.Controls.Button();
-            this.chkKap = new BlueControls.Controls.Button();
             this.chkUnterstrichen = new BlueControls.Controls.Button();
             this.chkKursiv = new BlueControls.Controls.Button();
             this.chkFett = new BlueControls.Controls.Button();
@@ -105,11 +102,8 @@ namespace BlueControls.Forms
             this.frmStyle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.frmStyle.CausesValidation = false;
-            this.frmStyle.Controls.Add(this.chkOnlyUpper);
-            this.frmStyle.Controls.Add(this.chkOnlyLow);
             this.frmStyle.Controls.Add(this.chkOutline);
             this.frmStyle.Controls.Add(this.chkDurchgestrichen);
-            this.frmStyle.Controls.Add(this.chkKap);
             this.frmStyle.Controls.Add(this.chkUnterstrichen);
             this.frmStyle.Controls.Add(this.chkKursiv);
             this.frmStyle.Controls.Add(this.chkFett);
@@ -119,26 +113,6 @@ namespace BlueControls.Forms
             this.frmStyle.TabIndex = 5;
             this.frmStyle.TabStop = false;
             this.frmStyle.Text = "Style";
-            // 
-            // chkOnlyUpper
-            // 
-            this.chkOnlyUpper.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkOnlyUpper.Location = new System.Drawing.Point(8, 136);
-            this.chkOnlyUpper.Name = "chkOnlyUpper";
-            this.chkOnlyUpper.Size = new System.Drawing.Size(120, 16);
-            this.chkOnlyUpper.TabIndex = 7;
-            this.chkOnlyUpper.Text = "Großbuchstaben";
-            this.chkOnlyUpper.CheckedChanged += new System.EventHandler(this.style_CheckedChanged);
-            // 
-            // chkOnlyLow
-            // 
-            this.chkOnlyLow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkOnlyLow.Location = new System.Drawing.Point(8, 120);
-            this.chkOnlyLow.Name = "chkOnlyLow";
-            this.chkOnlyLow.Size = new System.Drawing.Size(120, 16);
-            this.chkOnlyLow.TabIndex = 6;
-            this.chkOnlyLow.Text = "Kleinbuchstaben";
-            this.chkOnlyLow.CheckedChanged += new System.EventHandler(this.style_CheckedChanged);
             // 
             // chkOutline
             // 
@@ -158,16 +132,6 @@ namespace BlueControls.Forms
             this.chkDurchgestrichen.TabIndex = 4;
             this.chkDurchgestrichen.Text = "Durchgestrichen";
             this.chkDurchgestrichen.CheckedChanged += new System.EventHandler(this.style_CheckedChanged);
-            // 
-            // chkKap
-            // 
-            this.chkKap.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkKap.Location = new System.Drawing.Point(8, 72);
-            this.chkKap.Name = "chkKap";
-            this.chkKap.Size = new System.Drawing.Size(120, 16);
-            this.chkKap.TabIndex = 3;
-            this.chkKap.Text = "Kapitälchen";
-            this.chkKap.CheckedChanged += new System.EventHandler(this.style_CheckedChanged);
             // 
             // chkUnterstrichen
             // 
@@ -281,7 +245,6 @@ namespace BlueControls.Forms
 			internal GroupBox frmStyle;
 			internal Button chkOutline;
 			internal Button chkDurchgestrichen;
-			internal Button chkKap;
 			internal Button chkUnterstrichen;
 			internal Button chkKursiv;
 			internal Button chkFett;
@@ -290,8 +253,6 @@ namespace BlueControls.Forms
 			internal GroupBox frmPreview;
 			internal PictureBox preview;
 			internal ColorDialog ColorDia;
-			internal Button chkOnlyUpper;
-			internal Button chkOnlyLow;
         internal Button btnBackColor;
     }
 	}

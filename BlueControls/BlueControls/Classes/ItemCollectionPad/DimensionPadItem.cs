@@ -379,14 +379,14 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             gr.TranslateTransform(mitte1.X, mitte1.Y);
             gr.RotateTransform(-textWinkel);
             gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
-            f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), 1f, StringFormat.GenericDefault);
+            f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), 1f);
             gr.Restore(x);
             PointM mitte2 = new(mitte, (float)(sz2.Height / 2.1), textWinkel - 90);
             x = gr.Save();
             gr.TranslateTransform(mitte2.X, mitte2.Y);
             gr.RotateTransform(-textWinkel);
             gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz2.Width * 0.9 / 2), (int)(-sz2.Height * 0.8 / 2), (int)(sz2.Width * 0.9), (int)(sz2.Height * 0.8)));
-            f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), 1f, StringFormat.GenericDefault);
+            f.DrawString(gr, Text_Unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), 1f);
             gr.Restore(x);
         }
     }

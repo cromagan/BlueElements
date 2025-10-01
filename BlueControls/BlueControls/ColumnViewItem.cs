@@ -168,7 +168,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             if (_font_Head_Colored == null) {
                 if (_column != null) {
                     var baseFont = Font_Head_Default;
-                    _font_Head_Colored = BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, FontColor_Caption, Color.Transparent, baseFont.Kapitälchen, baseFont.OnlyLower, baseFont.OnlyLower, Color.Transparent);
+                    _font_Head_Colored = BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, FontColor_Caption, Color.Transparent, Color.Transparent);
                 } else {
                     _font_Head_Colored = Font_Head_Default;
                 }
@@ -185,7 +185,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             if (_font_Numbers == null) {
                 var baseFont = Font_Head_Default;
-                _font_Numbers = BlueFont.Get(baseFont.FontName, baseFont.Size, false, false, false, false, Color.Black, Color.White, false, false, false, Color.Transparent);
+                _font_Numbers = BlueFont.Get(baseFont.FontName, baseFont.Size, false, false, false, false, Color.Black, Color.White, Color.Transparent);
             }
             return _font_Numbers;
         }
@@ -196,7 +196,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             if (IsDisposed) { return BlueFont.DefaultFont; }
             if (_font_TextInFilter == null) {
                 var baseFont = Font_Head_Default;
-                _font_TextInFilter = BlueFont.Get(baseFont.FontName, baseFont.Size - 2, true, false, false, false, Color.White, Color.Red, false, false, false, Color.Transparent);
+                _font_TextInFilter = BlueFont.Get(baseFont.FontName, baseFont.Size - 2, true, false, false, false, Color.White, Color.Red, Color.Transparent);
             }
             return _font_TextInFilter;
         }

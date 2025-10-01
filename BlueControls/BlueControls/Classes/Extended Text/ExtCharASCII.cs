@@ -70,7 +70,7 @@ public class ExtCharAscii : ExtChar {
         var drawY = (Pos.Y * zoom) + posModificator.Y;
 
         try {
-            this.GetFont().DrawString(gr, _charString, drawX, drawY, zoom, StringFormat.GenericTypographic);
+            this.GetFont().DrawString(gr, _charString, drawX, drawY, zoom);
         } catch { }
     }
 

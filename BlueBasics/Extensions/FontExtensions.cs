@@ -60,9 +60,7 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static SizeF MeasureString(this Font font, string text) => font.MeasureString(text, StringFormat.GenericDefault);
-
-    public static SizeF MeasureString(this Font font, string text, StringFormat stringFormat) {
+    public static SizeF MeasureString(this Font font, string text) {
         if (string.IsNullOrEmpty(text)) {
             return SizeF.Empty;
         }
@@ -75,13 +73,13 @@ public static partial class Extensions {
             // Prüfen auf Leerzeichen am Ende
             if (text.EndsWith(" ")) {
                 // Wir messen den Text mit einem zusätzlichen x am Ende
-                var withX = g.MeasureString(text + 'x', font, 9999, stringFormat);
-                var x = g.MeasureString("x", font, 9999, stringFormat);
+                var withX = g.MeasureString(text + 'x', font, 9999, StringFormat.GenericTypographic);
+                var x = g.MeasureString("x", font, 9999, StringFormat.GenericTypographic);
 
                 return new SizeF(withX.Width - x.Width, withX.Height);
             }
 
-            return g.MeasureString(text, font, 9999, stringFormat);
+            return g.MeasureString(text, font, 9999, StringFormat.GenericTypographic);
         } catch {
             return SizeF.Empty;
         }

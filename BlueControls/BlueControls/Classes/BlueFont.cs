@@ -66,8 +66,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     /// </summary>
     private Font _fontOl = new("Arial", 9);
 
-    private float _kapitälchenPlus = -1;
-
     private QuickImage? _nameInStyleSym;
 
     private float _oberlänge = -1;
@@ -112,13 +110,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public bool Italic { get; private set; }
 
-    public bool Kapitälchen { get; private set; }
-
     public string KeyName { get; private set; } = string.Empty;
-
-    public bool OnlyLower { get; private set; }
-
-    public bool OnlyUpper { get; private set; }
 
     public bool Outline => ColorOutline.A > 0;
 
@@ -134,24 +126,22 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     #region Methods
 
-    public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y) => DrawString(gr, text, font, brush, x, y, StringFormat.GenericDefault);
-
-    public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y, StringFormat stringFormat) {
+    public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y) {
         try {
             lock (brush) {
                 SetTextRenderingHint(gr, font);
-                gr.DrawString(text, font, brush, x, y, stringFormat);
+                gr.DrawString(text, font, brush, x, y, StringFormat.GenericTypographic);
             }
         } catch {
             // Wird bereits an anderer Stelle verwendet... Multitasking, wenn mehrere items auf einmal generiert werden.
             Develop.CheckStackOverflow();
-            DrawString(gr, text, font, brush, x, y, stringFormat);
+            DrawString(gr, text, font, brush, x, y);
         }
     }
 
-    public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, Color.Black, Color.Transparent, false, false, false, Color.Transparent);
+    public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, Color.Black, Color.Transparent, Color.Transparent);
 
-    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower, Color colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower, colorBack).FinishParseable());
+    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, colorMain, colorOutline, colorBack).FinishParseable());
 
     public static BlueFont Get(string toParse) {
         if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{") || _blueFontCache == null) {
@@ -160,14 +150,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         // Erst den String vorverarbeiten
         toParse = toParse.Replace(",", ", "); // TODO: vor 01.10.2021 Entferen wenn inv bei den exports repariert wurde
-
-        //// String für späteren Gebrauch zwischenspeichern
-        //var parsedString = toParse;
-
-        //// Einen temporären Font erstellen um den korrekten Key zu erhalten
-        //var tempFont = new BlueFont();
-        //tempFont.Parse(parsedString);
-        //var key = tempFont.KeyName;
 
         // GetOrAdd mit einer Factory, die bei Bedarf einen neuen Font erstellt
         return _blueFontCache.GetOrAdd(toParse.ToUpperInvariant(), _ => {
@@ -294,7 +276,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
     }
 
-    // font.SizeOk(font.Size) ? font._font : new Font("Arial", font._fontOl.Size, font._font.Style, font._font.Unit);
     public static string TrimByWidth(Font font, string txt, float maxWidth) {
         var tSize = font.MeasureString(txt);
         if (tSize.Width - 1 > maxWidth && txt.Length > 1) {
@@ -325,32 +306,61 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 
-    public void DrawString(Graphics gr, string text, float x, float y) => DrawString(gr, text, x, y, 1f, StringFormat.GenericDefault);
+    public void DrawString(Graphics gr, string text, float x, float y) => DrawString(gr, text, x, y, 1);
 
-    public void DrawString(Graphics gr, string text, float x, float y, float scale, StringFormat stringFormat) {
-        if (string.IsNullOrEmpty(text)) {
-            return;
+    public void DrawString(Graphics gr, string text, float x, float y, float scale) {
+        var font = FontWithoutLines(scale);
+
+        var size = SizeF.Empty;
+        if (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent()) {
+            size = (text.Length == 1) ? CharSize(text[0]) : MeasureString(text);
         }
 
-        // Schnelle Prüfung, ob überhaupt eine Transformation nötig ist
-        if (!OnlyUpper && !OnlyLower && !Kapitälchen) {
-            DrawString(gr, text, false, x, y, scale, stringFormat);
-            return;
+        var actualY = y;
+
+        // Hintergrund
+        if (!ColorBack.IsMagentaOrTransparent()) {
+            using var brush = new SolidBrush(ColorBack);
+            gr.FillRectangle(brush, x, y, size.Width, size.Height);
         }
 
-        // Transformation nur wenn nötig aus dem Cache holen
-        var transformedText = _transformCache.GetOrAdd(text, t => {
-            if (OnlyUpper || (Kapitälchen && t != t.ToUpperInvariant())) {
-                return t.ToUpperInvariant();
-            }
-            if (OnlyLower) {
-                return t.ToLowerInvariant();
-            }
-            return t;
-        });
+        // Outline
+        if (Outline) {
+            var outlineBrush = GetOutlineBrush();
+            const int outlineSize = 1;
+            for (var px = -outlineSize; px <= outlineSize; px++) {
+                for (var py = -outlineSize; py <= outlineSize; py++) {
+                    if (px == 0 && py == 0) {
+                        continue; // Überspringen der Mitte
+                    }
 
-        var isCapital = Kapitälchen && text != transformedText;
-        DrawString(gr, transformedText, isCapital, x, y, scale, stringFormat);
+                    var dx = x + (px * scale);
+                    var dy = actualY + (py * scale);
+                    DrawString(gr, text, font, outlineBrush, dx, dy);
+                }
+            }
+        }
+
+        var mainBrush = GetMainBrush();
+
+        // Haupttext
+
+        DrawString(gr, text, font, mainBrush, x, actualY);
+
+        // Linien
+        if (Underline || StrikeOut) {
+            var lineWidth = CalculateLineWidth(scale);
+            using var scaledPen = new Pen(ColorMain, lineWidth);
+
+            if (Underline) {
+                var underlineY = y + Oberlänge(scale) + lineWidth + scale + 0.5f;
+                gr.DrawLine(scaledPen, x, (int)underlineY, x + ((1 + size.Width) * scale), (int)underlineY);
+            }
+            if (StrikeOut) {
+                var strikeY = y + (size.Height * 0.55f);
+                gr.DrawLine(scaledPen, x - 1, (int)strikeY, (int)(x + 1 + size.Width), (int)strikeY);
+            }
+        }
     }
 
     public Font Font(float scale) {
@@ -389,18 +399,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         );
     }
 
-    public Font FontWithoutLinesForCapitals(float scale) {
-        var emSize = _fontOl.Size * scale * 0.8F / Skin.Scale;
-
-        return GetFont(
-            _fontOl.Name,
-            emSize,
-            _fontOl.Style,
-            _fontOl.Unit,
-            () => new Font(_fontOl.Name, emSize, _fontOl.Style, _fontOl.Unit)
-        );
-    }
-
     public Size FormatedText_NeededSize(string text, QuickImage? qi, int minSize) {
         try {
             var pSize = SizeF.Empty;
@@ -434,16 +432,13 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public string IsNowEditable() => string.Empty;
 
-    public SizeF MeasureString(string text) => _fontOl.MeasureString(text);
-
-    public SizeF MeasureString(string text, StringFormat stringFormat) {
-        // Für sehr kurze Strings lohnt sich das Caching nicht
-        if (text.Length <= 2) {
-            return _fontOl.MeasureString(text, stringFormat);
-        }
-
-        var key = $"{text}_{stringFormat.FormatFlags}";
-        return _stringSizeCache.GetOrAdd(key, _ => _fontOl.MeasureString(text, stringFormat));
+    public SizeF MeasureString(string text) {
+        return _stringSizeCache.GetOrAdd(text, _ => {
+            using Bitmap bmp = new Bitmap(1, 1);
+            using Graphics g = Graphics.FromImage(bmp);
+            SetTextRenderingHint(g, _fontOl);
+            return g.MeasureString(text, _fontOl, PointF.Empty, StringFormat.GenericTypographic);
+        });
     }
 
     public QuickImage? NameInStyle() {
@@ -456,7 +451,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _nameInStyleSym;
     }
 
-    public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower, ColorBack);
+    public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain, ColorOutline, ColorBack);
 
     public void ParseFinished(string parsed) {
         // StringBuilder ist bei vielen Replace-Operationen schneller,
@@ -525,15 +520,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
             if (du == 0) {
                 _oberlänge = miny / multi;
-                if (!Kapitälchen) {
-                    break;
-                }
-            } else {
-                _kapitälchenPlus = _oberlänge - (miny / multi);
+
+                break;
             }
         }
 
-        _widthOf2Points = MeasureString("..", StringFormat.GenericTypographic).Width;
+        _widthOf2Points = MeasureString("..").Width;
         //http://www.vb-helper.com/howto_net_rainbow_text.html
         //https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
         //http://www.typo-info.de/schriftgrad.htm
@@ -578,11 +570,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                 Underline = true;
                 return true;
 
-            case "capitals":
-                Kapitälchen = true;
-                needsCacheReset = true;
-                break;
-
             case "strikeout":
                 StrikeOut = true;
                 return true;
@@ -594,16 +581,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             case "outlinecolor":
                 ColorOutline = ColorParse(value);
                 return true;
-
-            case "onlylower":
-                OnlyLower = true;
-                needsCacheReset = true;
-                break;
-
-            case "onlyupper":
-                OnlyUpper = true;
-                needsCacheReset = true;
-                break;
         }
 
         if (needsCacheReset) {
@@ -623,7 +600,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     // Optional: Batch-Verarbeitung für Performancegewinn bei vielen Zeichen
     public void PreloadCommonChars() {
-        const string commonChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-_+/*()[]{}|\\@#$%&";
+        const string commonChars = " abcdefghijklmnopqrstuvwxyzäöüéßABCDEFGHIJKLMNOPQRSTUVWXYÄÖÜZ0123456789.,!?-_+/*()[]{}|\\@#$%&";
 
         // Parallele Vorberechnung der häufigsten Zeichen
         _ = Parallel.ForEach(commonChars, c => {
@@ -637,10 +614,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (Italic) { t += "I"; }
         if (Underline) { t += "U"; }
         if (StrikeOut) { t += "S"; }
-        if (Kapitälchen) { t += "C"; }
         if (Outline) { t += "O"; }
-        if (OnlyLower) { t += "L"; }
-        if (OnlyUpper) { t += "U"; }
         return t.TrimEnd(", ");
     }
 
@@ -655,7 +629,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             return this;
 
         return Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, ColorMain,
-                   ColorOutline, Kapitälchen, OnlyUpper, OnlyLower, ColorBack);
+                   ColorOutline, ColorBack);
     }
 
     public QuickImage? SymbolForReadableText() {
@@ -715,15 +689,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         var transformedChar = c;
         var isSmallCaps = false;
 
-        if (OnlyUpper || (Kapitälchen && char.IsLower(c))) {
-            transformedChar = char.ToUpper(c);
-            isSmallCaps = Kapitälchen && c != transformedChar;
-        } else if (OnlyLower) {
-            transformedChar = char.ToLower(c);
-        }
-
         // Messung über StringFormat.GenericTypographic für präzisere Ergebnisse
-        var s = _fontOl.MeasureString($".{transformedChar}.", StringFormat.GenericTypographic);
+        var s = _fontOl.MeasureString($".{transformedChar}.");
 
         return new SizeF(
             (isSmallCaps ? (s.Width * 0.8f) : s.Width) - _widthOf2Points,
@@ -731,11 +698,9 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         );
     });
 
-    internal float KapitälchenPlus(float scale) => _kapitälchenPlus * scale;
-
     internal float Oberlänge(float scale) => _oberlänge * scale;
 
-    private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, bool capitals, bool onlyupper, bool onlylower, Color colorBack) {
+    private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) {
         List<string> result = [];
 
         result.ParseableAdd("Name", fontName);
@@ -744,73 +709,10 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (italic) { result.ParseableAdd("Italic", italic); }
         if (underline) { result.ParseableAdd("Underline", underline); }
         if (strikeout) { result.ParseableAdd("Strikeout", strikeout); }
-        if (capitals) { result.ParseableAdd("Capitals", capitals); }
-        if (onlyupper) { result.ParseableAdd("OnlyUpper", onlyupper); }
-        if (onlylower) { result.ParseableAdd("OnlyLower", onlylower); }
         if (colorOutline.A > 0) { result.ParseableAdd("OutlineColor", colorOutline.ToHtmlCode()); }
         if (colorMain.ToArgb() != Color.Black.ToArgb()) { result.ParseableAdd("Color", colorMain.ToHtmlCode()); }
         if (colorBack.A > 0) { result.ParseableAdd("BackColor", colorBack.ToHtmlCode()); }
         return result;
-    }
-
-    private void DrawString(Graphics gr, string text, bool isCapital, float x, float y, float scale, StringFormat stringFormat) {
-        var font = isCapital ? FontWithoutLinesForCapitals(scale) : FontWithoutLines(scale);
-
-        var size = SizeF.Empty;
-        if (Underline || StrikeOut || !ColorBack.IsMagentaOrTransparent()) {
-            size = (text.Length == 1) ? CharSize(text[0]) : MeasureString(text, stringFormat);
-        }
-
-        var actualY = y;
-        if (isCapital) {
-            actualY += KapitälchenPlus(scale);
-        }
-
-        // Hintergrund
-        if (!ColorBack.IsMagentaOrTransparent()) {
-            using var brush = new SolidBrush(ColorBack);
-            gr.FillRectangle(brush, x, y, size.Width, size.Height);
-        }
-
-        // Outline
-        if (Outline) {
-            var outlineBrush = GetOutlineBrush();
-            const int outlineSize = 1;
-            for (var px = -outlineSize; px <= outlineSize; px++) {
-                for (var py = -outlineSize; py <= outlineSize; py++) {
-                    if (px == 0 && py == 0) {
-                        continue; // Überspringen der Mitte
-                    }
-
-                    var dx = x + (px * scale);
-                    var dy = actualY + (py * scale);
-                    DrawString(gr, text, font, outlineBrush, dx, dy, stringFormat);
-                }
-            }
-        }
-
-        var mainBrush = GetMainBrush();
-
-        // Haupttext
-        if (isCapital) {
-            DrawString(gr, text, font, mainBrush, x + (0.3F * scale), actualY, stringFormat);
-        }
-        DrawString(gr, text, font, mainBrush, x, actualY, stringFormat);
-
-        // Linien
-        if (Underline || StrikeOut) {
-            var lineWidth = CalculateLineWidth(scale);
-            using var scaledPen = new Pen(ColorMain, lineWidth);
-
-            if (Underline) {
-                var underlineY = y + Oberlänge(scale) + lineWidth + scale + 0.5f;
-                gr.DrawLine(scaledPen, x, (int)underlineY, x + ((1 + size.Width) * scale), (int)underlineY);
-            }
-            if (StrikeOut) {
-                var strikeY = y + (size.Height * 0.55f);
-                gr.DrawLine(scaledPen, x - 1, (int)strikeY, (int)(x + 1 + size.Width), (int)strikeY);
-            }
-        }
     }
 
     private Pen GeneratePen(float additionalScale) => new Pen(ColorMain, CalculateLineWidth(additionalScale));

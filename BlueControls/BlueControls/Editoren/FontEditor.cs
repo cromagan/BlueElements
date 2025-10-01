@@ -53,11 +53,8 @@ public partial class FontEditor : EditorEasy {
         chkFett.Checked = false;
         chkKursiv.Checked = false;
         chkUnterstrichen.Checked = false;
-        chkKap.Checked = false;
         chkDurchgestrichen.Checked = false;
         chkOutline.Checked = false;
-        chkOnlyLow.Checked = false;
-        chkOnlyUpper.Checked = false;
         btnFontColor.ImageCode = string.Empty;
         btnOutlineColor.ImageCode = string.Empty;
         preview.Image = null;
@@ -124,9 +121,6 @@ public partial class FontEditor : EditorEasy {
         chkOutline.Checked = bf.ColorOutline.A > 0;
         btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorMain).Code;
         btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorOutline).Code;
-        chkKap.Checked = bf.Kapitälchen;
-        chkOnlyLow.Checked = bf.OnlyLower;
-        chkOnlyUpper.Checked = bf.OnlyUpper;
 
         return true;
     }
@@ -154,9 +148,6 @@ public partial class FontEditor : EditorEasy {
                               chkDurchgestrichen.Checked,
                               QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo ?? Color.Transparent,
                               QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent,
-                              chkKap.Checked,
-                              chkOnlyUpper.Checked,
-                              chkOnlyLow.Checked,
                               QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.Transparent);
 
         UpdateSampleText();

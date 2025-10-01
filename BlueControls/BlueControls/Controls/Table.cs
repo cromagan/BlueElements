@@ -626,7 +626,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         var tmp = tbl.Cell.GetString(columnListtmp[colNr], thisRow);
 
                         if (columnListtmp[colNr].TextFormatingAllowed) {
-                           using var t = new ExtText() { HtmlText = tmp };
+                            using var t = new ExtText() { HtmlText = tmp };
                             tmp = t.PlainText;
                         }
 
@@ -2949,11 +2949,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         var realHead = viewItem.RealHead(_zoom, SliderX.Value);
 
+        box.GetStyleFrom(contentHolderCellColumn);
+
         if (contentHolderCellRow != null) {
             var h = cellInThisTableRow?.DrawHeight ?? 18;// Row_DrawHeight(cellInThisTableRow, DisplayRectangle);
             if (isHeight > 0) { h = isHeight; }
             box.Location = new Point(realHead.X, DrawY(ca, cellInThisTableRow));
             box.Size = new Size(realHead.Width + addWith, GetPix(h));
+
             box.Text = contentHolderCellRow.CellGetString(contentHolderCellColumn);
         } else {
             // Neue Zeile...
@@ -2961,8 +2964,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             box.Size = new Size(realHead.Width + addWith, GetPix(18));
             box.Text = string.Empty;
         }
-
-        box.GetStyleFrom(contentHolderCellColumn);
 
         box.Tag = (List<object?>)[viewItem, cellInThisTableRow];
 
@@ -3518,7 +3519,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         if (!string.IsNullOrEmpty(trichterText)) {
-            var s = viewItem.Font_TextInFilter.Scale(_zoom).MeasureString(trichterText, StringFormat.GenericDefault);
+            var s = viewItem.Font_TextInFilter.Scale(_zoom).MeasureString(trichterText);
 
             viewItem.Font_TextInFilter.Scale(_zoom).DrawString(gr, trichterText,
                 origAutoFilterLocation.Left + ((paf - s.Width) / 2),

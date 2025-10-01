@@ -941,7 +941,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                 if (Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
                     if (Forms.MessageBox.Show("Als Link oder als Text?", ImageCode.Stern, "Link", "Text") == 0) {
                         var t = sd.SplitByCr();
-                        var c = new ExtCharLinkCell(_eTxt, _cursorCharPos, t[0], t[1], t[2]);
+                        var c = new ExtCharCellLink(_eTxt, _cursorCharPos, t[0], t[1], t[2]);
                         _eTxt.Insert(_cursorCharPos, c);
                         _cursorCharPos++;
                         RaiseEventIfTextChanged(false);
