@@ -34,7 +34,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
 
-[BlueControls.StandaloneInfo("Bildbearbeitung", ImageCode.Bild)]
+[BlueControls.StandaloneInfo("Bildbearbeitung", ImageCode.Bild, "Allgemein", 90)]
 public partial class MainWindow : BlueControls.Forms.Form, IIsStandalone {
 
     #region Fields

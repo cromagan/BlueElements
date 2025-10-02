@@ -34,7 +34,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -43,7 +42,7 @@ using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
-[StandaloneInfo("Formular-Editor", ImageCode.Anwendung)]
+[StandaloneInfo("Formular-Editor", ImageCode.Anwendung, "Admin", 100)]
 public partial class ConnectedFormulaEditor : PadEditor, IIsEditor, IIsStandalone {
 
     #region Fields
@@ -249,28 +248,31 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor, IIsStandalon
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-        //MultiUserFile.SaveAll(true);
+        BlueTable.Table.SaveAll(false);
+        MultiUserFile.SaveAll(false);
+        BlueTable.Table.SaveAll(true);
+        MultiUserFile.SaveAll(false);
 
-        //if (sender == btnSaveAs) {
-        //    if (Formula == null) { return; }
-        //}
+        ConnectedFormula.ConnectedFormula? tmpf = null;
 
-        //if (sender == btnNeuDB) {
-        //    if (Formula != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
-        //}
+        if (sender == btnSaveAs) { tmpf = Formula; }
 
-        //_ = SaveTab.ShowDialog();
-        //if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
-        //if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+        if (sender == btnNeuDB) { tmpf = new ConnectedFormula.ConnectedFormula(); }
 
-        //if (sender == btnNeuDB) {
-        //    FormulaSet(new ConnectedFormula.ConnectedFormula(), null); // Ab jetzt in der Variable _Table zu finden
-        //}
-        //if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
+        if (tmpf == null) {
+            MessageBox.Show("Kein Formular zum Speichern vorhanden");
+            return;
+        }
 
-        //Formula?.SaveAsAndChangeTo(SaveTab.FileName);
+        _ = SaveTab.ShowDialog();
+        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
+        if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        //FormulaSet(SaveTab.FileName, null);
+        if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
+
+        tmpf.SaveAs(SaveTab.FileName);
+
+        FormulaSet(SaveTab.FileName, null);
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
@@ -296,27 +298,10 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor, IIsStandalon
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        var p = new ItemCollectionPadItem {
-            Caption = n,
-            Breite = 100,
-            Höhe = 100
-        };
-
-        var it = new RowEntryPadItem();
-        p.Add(it);
-
-        cf.Pages.Add(p);
-
-        Pad.Items = p;
+        if (cf.AddPage(n) is { } p) {
+            Pad.Items = p;
+        }
         Formula?.Repair();
-
-        //it.Tabelle_wählen();
-
-        //it.Bei_Export_sichtbar = false;
-
-        //Pad.AddCentered(it);
-
-        //ChooseTableAndId(it);
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.SaveAll(true);

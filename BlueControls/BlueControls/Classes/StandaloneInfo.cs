@@ -23,20 +23,24 @@ using System;
 namespace BlueControls;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class StandaloneInfoAttribute : Attribute {
+public class StandaloneInfo : Attribute {
 
     #region Constructors
 
-    public StandaloneInfoAttribute(string name, ImageCode symbol) {
+    public StandaloneInfo(string name, ImageCode symbol, string kategorie, int sort) {
         Name = name;
         Symbol = symbol;
+        Kategorie = kategorie;
+        Sort = sort;
     }
 
     #endregion
 
     #region Properties
 
+    public string Kategorie { get; }
     public string Name { get; }
+    public int Sort { get; }
     public ImageCode Symbol { get; }
 
     #endregion

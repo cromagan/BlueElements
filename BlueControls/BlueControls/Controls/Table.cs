@@ -1265,7 +1265,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         column.Repair();
 
-        using ColumnEditor w = new(column, this);
+        using ColumnEditor w = new(bearbColumn, this);
         _ = w.ShowDialog();
 
         bearbColumn.Repair();

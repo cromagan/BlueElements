@@ -40,7 +40,7 @@ namespace BlueControls.Forms {
             this.btnDropdownmenu = new BlueControls.Controls.Button();
             this.btnFilterConverter = new BlueControls.Controls.Button();
             this.btnBenutzerFilterWahl = new BlueControls.Controls.Button();
-            this.grpArbeitsbereich = new BlueControls.Controls.GroupBox();
+            this.grpAllgemein = new BlueControls.Controls.GroupBox();
             this.btnArbeitsbereich = new BlueControls.Controls.Button();
             this.tabFile = new System.Windows.Forms.TabPage();
             this.grpDatei = new BlueControls.Controls.GroupBox();
@@ -65,7 +65,7 @@ namespace BlueControls.Forms {
             this.grpFelder.SuspendLayout();
             this.grpOptik.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.grpArbeitsbereich.SuspendLayout();
+            this.grpAllgemein.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpDatei.SuspendLayout();
             this.tabSeiten.SuspendLayout();
@@ -73,6 +73,9 @@ namespace BlueControls.Forms {
             // 
             // Pad
             // 
+            this.Pad.Location = new System.Drawing.Point(0, 136);
+            this.Pad.ShiftX = -137.5F;
+            this.Pad.ShiftY = -132F;
             this.Pad.Size = new System.Drawing.Size(412, 401);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             // 
@@ -96,6 +99,10 @@ namespace BlueControls.Forms {
             // 
             this.tabStart.Size = new System.Drawing.Size(776, 81);
             // 
+            // tabExport
+            // 
+            this.tabExport.Size = new System.Drawing.Size(776, 81);
+            // 
             // grpAssistent
             // 
             this.grpAssistent.Visible = false;
@@ -107,6 +114,10 @@ namespace BlueControls.Forms {
             // grpKomponenteHinzufügen
             // 
             this.grpKomponenteHinzufügen.Visible = false;
+            // 
+            // tabHintergrund
+            // 
+            this.tabHintergrund.Size = new System.Drawing.Size(776, 81);
             // 
             // grpDesign
             // 
@@ -120,6 +131,7 @@ namespace BlueControls.Forms {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(412, 24);
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -133,11 +145,11 @@ namespace BlueControls.Forms {
             this.tabEditorStd.Controls.Add(this.grpFelder);
             this.tabEditorStd.Controls.Add(this.grpOptik);
             this.tabEditorStd.Controls.Add(this.groupBox1);
-            this.tabEditorStd.Controls.Add(this.grpArbeitsbereich);
+            this.tabEditorStd.Controls.Add(this.grpAllgemein);
             this.tabEditorStd.Location = new System.Drawing.Point(4, 25);
             this.tabEditorStd.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditorStd.Name = "tabEditorStd";
-            this.tabEditorStd.Size = new System.Drawing.Size(876, 81);
+            this.tabEditorStd.Size = new System.Drawing.Size(776, 81);
             this.tabEditorStd.TabIndex = 4;
             this.tabEditorStd.Text = "Editor-Std.";
             // 
@@ -357,22 +369,22 @@ namespace BlueControls.Forms {
             this.btnBenutzerFilterWahl.Text = "Benutzer-Filter Wahl";
             this.btnBenutzerFilterWahl.Click += new System.EventHandler(this.btnBenutzerFilterWahl_Click);
             // 
-            // grpArbeitsbereich
+            // grpAllgemein
             // 
-            this.grpArbeitsbereich.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpArbeitsbereich.Controls.Add(this.btnArbeitsbereich);
-            this.grpArbeitsbereich.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpArbeitsbereich.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpArbeitsbereich.Location = new System.Drawing.Point(0, 0);
-            this.grpArbeitsbereich.Name = "grpArbeitsbereich";
-            this.grpArbeitsbereich.Size = new System.Drawing.Size(72, 81);
-            this.grpArbeitsbereich.TabIndex = 4;
-            this.grpArbeitsbereich.TabStop = false;
-            this.grpArbeitsbereich.Text = "Vorschau";
+            this.grpAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAllgemein.Controls.Add(this.btnArbeitsbereich);
+            this.grpAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpAllgemein.Location = new System.Drawing.Point(0, 0);
+            this.grpAllgemein.Name = "grpAllgemein";
+            this.grpAllgemein.Size = new System.Drawing.Size(72, 81);
+            this.grpAllgemein.TabIndex = 4;
+            this.grpAllgemein.TabStop = false;
+            this.grpAllgemein.Text = "Allgemein";
             // 
             // btnArbeitsbereich
             // 
-            this.btnArbeitsbereich.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
+            this.btnArbeitsbereich.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnArbeitsbereich.ImageCode = "SeiteEinrichten";
             this.btnArbeitsbereich.Location = new System.Drawing.Point(8, 2);
             this.btnArbeitsbereich.Name = "btnArbeitsbereich";
@@ -388,7 +400,7 @@ namespace BlueControls.Forms {
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(876, 81);
+            this.tabFile.Size = new System.Drawing.Size(776, 81);
             this.tabFile.TabIndex = 5;
             this.tabFile.Text = "Datei";
             // 
@@ -514,7 +526,6 @@ namespace BlueControls.Forms {
             // 
             // ConnectedFormulaEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.tabSeiten);
@@ -537,7 +548,7 @@ namespace BlueControls.Forms {
             this.grpFelder.ResumeLayout(false);
             this.grpOptik.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            this.grpArbeitsbereich.ResumeLayout(false);
+            this.grpAllgemein.ResumeLayout(false);
             this.tabFile.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
             this.tabSeiten.ResumeLayout(false);
@@ -574,7 +585,7 @@ namespace BlueControls.Forms {
         private Button btnDropdownmenu;
         private Button btnFilterConverter;
         private Button btnBenutzerFilterWahl;
-        private GroupBox grpArbeitsbereich;
+        private GroupBox grpAllgemein;
         private Button btnArbeitsbereich;
         private Button btnRegionAdd;
         private Button btnWeitereCF;

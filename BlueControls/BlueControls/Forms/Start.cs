@@ -38,14 +38,23 @@ namespace BlueControls.Forms {
             foreach (var thisType in types) {
                 var name = thisType.Name;
                 ImageCode i = ImageCode.Fragezeichen;
+                string kat = "Sonstiges";
+                int sort = 200;
 
-                var attr = thisType.GetCustomAttribute<StandaloneInfoAttribute>();
+                var attr = thisType.GetCustomAttribute<StandaloneInfo>();
                 if (attr != null) {
                     name = attr.Name;
                     i = attr.Symbol;
+                    kat = attr.Kategorie;
+                    sort = attr.Sort;
                 }
 
-                var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, name) {
+                if (Forms[kat] == null) {
+                    var pk = new TextListItem(kat, kat, null, true, true, sort.ToStringInt10() + "0");
+                    Forms.ItemAdd(pk);
+                }
+
+                var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToStringInt10() + "1" + name) {
                     Tag = thisType
                 };
                 Forms.ItemAdd(p);

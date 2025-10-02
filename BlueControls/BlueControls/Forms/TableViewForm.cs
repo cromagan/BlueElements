@@ -43,7 +43,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-[StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle)]
+[StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", 90)]
 public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandalone {
 
     #region Fields

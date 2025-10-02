@@ -73,9 +73,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         }
     }
 
-    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Ein Steuerelement, mit dem ein untergeordnetes Formular angezeigt werden kann.";
-
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
 
@@ -89,6 +87,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         }
     }
 
+    public override bool TableInputMustMatchOutputTable => false;
     protected override int SaveOrder => 1000;
 
     #endregion

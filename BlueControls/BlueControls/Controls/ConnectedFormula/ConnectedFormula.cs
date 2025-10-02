@@ -68,6 +68,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             Load(filename);
         }
 
+        Repair();
+
         if (_pages != null) {
             foreach (var page in _pages) {
                 if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
@@ -76,7 +78,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 }
             }
         }
-        Repair();
     }
 
     #endregion
@@ -167,6 +168,22 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return _visibleFor_AllUsed;
     }
 
+    public ItemCollectionPadItem? AddPage(string headname) {
+        if (Pages is not { IsDisposed: false }) { return null; }
+
+        var p = new ItemCollectionPadItem {
+            Caption = headname,
+            Breite = 100,
+            Höhe = 100
+        };
+
+        var it = new RowEntryPadItem();
+        p.Add(it);
+        Pages.Add(p);
+
+        return p;
+    }
+
     public List<string> AllPages() {
         var p = new List<string>();
         if (Pages == null) { return p; }
@@ -248,6 +265,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             Pages = [];
             Pages.Breite = 100;
             Pages.Höhe = 100;
+
+            AddPage("Head");
         }
 
         Pages.Parent = this;
@@ -275,7 +294,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         #endregion
 
-        #region Items, die irgendwie in den Pages waren, zum der richtigen Page schieben
+        #region Items, die irgendwie in den Pages waren, zu der richtigen Page schieben
 
         foreach (var thisIt in moveToOtherPage) {
 

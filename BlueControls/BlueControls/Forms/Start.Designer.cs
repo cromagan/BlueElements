@@ -46,6 +46,7 @@ namespace BlueControls.Forms {
             this.Forms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.Forms.AutoSort = true;
             this.Forms.Location = new System.Drawing.Point(8, 32);
             this.Forms.Name = "Forms";
             this.Forms.Size = new System.Drawing.Size(240, 304);

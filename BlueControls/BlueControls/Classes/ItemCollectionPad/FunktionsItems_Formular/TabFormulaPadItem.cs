@@ -64,11 +64,10 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-
+    public override bool TableInputMustMatchOutputTable => false;
     protected override int SaveOrder => 1000;
 
     #endregion

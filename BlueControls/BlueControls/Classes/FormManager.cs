@@ -36,10 +36,11 @@ public class FormManager : ApplicationContext {
     public static readonly List<Form> Forms = [];
     public static DExecuteAtEnd? ExecuteAtEnd = null;
 
+    public static Type? FormBeforeEnd;
+
     //public static dNewModeSelectionForm? NewModeSelectionForm = null;
     private static FormManager? _current;
 
-    private static Type? _lastWindow;
     private Form? _lastStartForm;
 
     #endregion
@@ -85,7 +86,7 @@ public class FormManager : ApplicationContext {
         if (_current != null) { Develop.DebugPrint(ErrorType.Error, "Doppelter Start"); }
 
         var tmp = new FormManager(); // temporär! Weil ansonsten startet true gilt und bei initialisieren der Fenster unerwartete Effekte auftreten können
-        _lastWindow = lastWindow;
+        FormBeforeEnd = lastWindow;
         Running = true;
         tmp._lastStartForm = CreateForm(startform, tmp);
         _current = tmp;
@@ -113,7 +114,7 @@ public class FormManager : ApplicationContext {
         _ = Forms.Remove((Form)sender);
         if (!Forms.Any()) {
             if (sender != _lastStartForm) {
-                _lastStartForm = CreateForm(_lastWindow, _current);
+                _lastStartForm = CreateForm(FormBeforeEnd, _current);
                 if (_lastStartForm != null) { return; }
             }
 

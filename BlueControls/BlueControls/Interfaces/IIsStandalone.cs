@@ -22,7 +22,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Interface für Fenster, die als Standalone-Anwendungen lauffähig sind
 /// Benötigen eine Beschreibung wie z.B.:
-/// [BlueControls.StandaloneInfo("Bildbearbeitung", ImageCode.Bild)]
+/// [BlueControls.StandaloneInfo("Bildbearbeitung", ImageCode.Bild, "Allgemein", 90)]
 /// </summary>
 public interface IIsStandalone {
 }

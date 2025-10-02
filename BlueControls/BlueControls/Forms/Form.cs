@@ -130,7 +130,7 @@ public partial class Form : System.Windows.Forms.Form {
 
         IsClosing = true;
 
-        if (this is not FloatingForm and not MessageBox) {
+        if (this is not FloatingForm and not MessageBox and not InputBox) {
             Table.SaveAll(false);
             MultiUserFile.SaveAll(false);
             Table.SaveAll(true);

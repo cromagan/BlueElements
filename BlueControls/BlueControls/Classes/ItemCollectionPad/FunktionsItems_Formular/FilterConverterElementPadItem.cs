@@ -61,8 +61,6 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => false;
 
-    public override bool TableInputMustMatchOutputTable => false;
-
     public override string Description => "Erstellt einen Filter.\r\nEs kann eine Zeile empfangen. Dann können die Variablen der eingehenden Zeile benutzt werden, um den Filter-Wert zu berechnen.\r\n\r\nDas Element kann auch zur Anzeige benutzt werden und zeigt an, was gerade gefiltert wird.";
 
     [Description("Text, der angezeigt wird, wenn kein Filter generiert werden kann")]
@@ -127,7 +125,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => false;
-
+    public override bool TableInputMustMatchOutputTable => false;
     //public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
     //    get => _standard_bei_keiner_Eingabe;
     //    set {
@@ -155,11 +153,14 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     }
 
     public override string ErrorReason() {
+        var f = base.ErrorReason();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
         if (TableOutput?.Column[_filterSpalte] == null) {
             return "Die Spalte, in der gefiltert werden soll, fehlt.";
         }
 
-        return base.ErrorReason();
+        return string.Empty;
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
