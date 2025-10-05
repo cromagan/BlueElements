@@ -108,7 +108,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiControlRowSelector(TableOutput, _caption, _anzeige) {
+        var con = new FlexilRowSelectorControl(TableOutput, _caption, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition
         };

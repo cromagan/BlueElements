@@ -133,7 +133,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
-        [new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript),
+        [new FlexiDelegateControl(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript),
         .. base.GetProperties(widthOfControl),
         ];
         return result;

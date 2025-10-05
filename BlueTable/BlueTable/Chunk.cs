@@ -295,10 +295,10 @@ public class Chunk : IHasKeyName {
         SaveToByteList(TableDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
         SaveToByteList(TableDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
         SaveToByteList(TableDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.RoundAfterEdit, c.RoundAfterEdit.ToString(), name);
+        SaveToByteList(TableDataType.AfterEditRound, c.AfterEditRound.ToString(), name);
         SaveToByteList(TableDataType.MaxCellLenght, c.MaxCellLenght.ToString(), name);
         SaveToByteList(TableDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
-        SaveToByteList(TableDataType.AutoRemoveCharAfterEdit, c.AutoRemove, name);
+        SaveToByteList(TableDataType.AfterEditAutoRemoveChar, c.AfterEditAutoRemoveChar, name);
         SaveToByteList(TableDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
         SaveToByteList(TableDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);
         SaveToByteList(TableDataType.AutoFilterJoker, c.AutoFilterJoker, name);

@@ -150,7 +150,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         if (!enableOutput) {
             if (outp != null) {
                 outp.Editor = typeof(TableHeadEditor);
-                result.Add(new FlexiControlForDelegate(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Tabelle));
+                result.Add(new FlexiDelegateControl(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Tabelle));
             } else {
                 result.Add(new FlexiControl("<imagecode=Information|16> Ausgangstabelle wird über den Eingang gewählt.", widthOfControl, false));
             }

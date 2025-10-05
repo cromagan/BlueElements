@@ -131,8 +131,6 @@
     <Compile Include="Methods\Method_Join.cs" />
     <Compile Include="Methods\Method_Int.cs" />
     <Compile Include="Methods\Method_Replace.cs" />
-    <Compile Include="Methods\Method_StringAsciiToHTML.cs" />
-    <Compile Include="Methods\Method_StringHTMLToAscii.cs" />
     <Compile Include="Methods\Method_StringShortenWord.cs" />
     <Compile Include="Methods\Method_Substring.cs" />
     <Compile Include="Methods\Method_Split.cs" />

@@ -157,7 +157,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         //var ff = parent.SearchOrGenerate(rfw2);
 
-        var con = new FlexiControlForCell {
+        var con = new FlexiCellControl {
             ColumnName = _columnName,
             EditType = EditType,
             CaptionPosition = CaptionPosition

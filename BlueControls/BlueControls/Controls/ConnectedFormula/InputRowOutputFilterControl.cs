@@ -144,7 +144,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
                 break;
 
             case FilterTypeRowInputItem.Ist_eines_der_Wörter_schreibungsneutral:
-                var list = va.HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
+                var list = va.AllWords().SortedDistinctList();
                 f = new FilterItem(_outputcolumn, FilterType.Istgleich_ODER_GroßKleinEgal, list);
                 break;
 

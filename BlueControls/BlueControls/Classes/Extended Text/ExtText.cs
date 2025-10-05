@@ -62,7 +62,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     #region Fields
 
     private int? _height;
+
     private List<ExtChar> _internal = [];
+
     private string _sheetStyle = string.Empty;
 
     private Size _textDimensions;
@@ -117,7 +119,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     #region Properties
 
-    public string AllowedChars { get; set; }    // Todo: Implementieren
+    public string AllowedChars { get; set; }
+
+    // Todo: Implementieren
     public Alignment Ausrichtung { get; set; }
 
     public int Count => _internal.Count;

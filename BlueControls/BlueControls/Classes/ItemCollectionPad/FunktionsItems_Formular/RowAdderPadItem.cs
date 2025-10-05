@@ -247,7 +247,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         var inr = GetFilterFromGet();
         if (inr.Count > 0 && inr[0].TableOutput is { IsDisposed: false }) {
             result.Add(new FlexiControlForProperty<string>(() => EntityID));
-            result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
+            result.Add(new FlexiDelegateControl(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
         }
 
         if (TableOutput is { IsDisposed: false } dbout) {

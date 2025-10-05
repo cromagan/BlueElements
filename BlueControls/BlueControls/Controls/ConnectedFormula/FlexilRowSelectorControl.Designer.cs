@@ -6,7 +6,7 @@ using BlueControls.Controls;
 using BlueTable.Enums;
 
 namespace BlueControls.ConnectedFormula {
-    partial class FlexiControlRowSelector {
+    partial class FlexilRowSelectorControl {
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>

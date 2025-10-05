@@ -238,9 +238,9 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             //}
 
             if (TextEntryAllowed()) {
-                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false);
+                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false, 1);
             } else {
-                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDownList, false);
+                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDownList, false, 1);
             }
 
             cbx.DropDownShowing += Cbx_DropDownShowing;

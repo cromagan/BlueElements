@@ -382,15 +382,15 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
         ];
 
         if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
-            result.Add(new FlexiControlForDelegate(Verbindungspunkt_hinzu, "Verbindungspunkt hinzu", ImageCode.PlusZeichen));
+            result.Add(new FlexiDelegateControl(Verbindungspunkt_hinzu, "Verbindungspunkt hinzu", ImageCode.PlusZeichen));
 
             //new FlexiControl("Verbindungspunkte:", widthOfControl, true),
             //d
         }
 
         if (this is IMirrorable) {
-            result.Add(new FlexiControlForDelegate(Spiegeln_Vertikal, "Vertikal", ImageCode.SpiegelnVertikal));
-            result.Add(new FlexiControlForDelegate(Spiegeln_Horizontal, "Horizontal", ImageCode.SpiegelnHorizontal));
+            result.Add(new FlexiDelegateControl(Spiegeln_Vertikal, "Vertikal", ImageCode.SpiegelnVertikal));
+            result.Add(new FlexiDelegateControl(Spiegeln_Horizontal, "Horizontal", ImageCode.SpiegelnHorizontal));
         }
 
         return result;

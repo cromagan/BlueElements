@@ -154,9 +154,9 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
         List<GenericControl> result =
         [
-            new FlexiControlForDelegate(Bildschirmbereich_wählen, "Bildschirmbereich wählen", ImageCode.Bild),
+            new FlexiDelegateControl(Bildschirmbereich_wählen, "Bildschirmbereich wählen", ImageCode.Bild),
 
-            new FlexiControlForDelegate(Datei_laden, "Bild laden", ImageCode.Ordner),
+            new FlexiDelegateControl(Datei_laden, "Bild laden", ImageCode.Ordner),
 
             new FlexiControl(),
 

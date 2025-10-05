@@ -197,6 +197,12 @@ public static partial class Extensions {
         return count;
     }
 
+    /// <summary>
+    /// Primitive Methode. Erswetzt nur Umlaute und \r
+    /// Besser: Siehe MethodStringAsciiToHTML
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     public static string CreateHtmlCodes(this string text) {
         if (string.IsNullOrEmpty(text)) { return string.Empty; }
 
@@ -488,80 +494,6 @@ public static partial class Extensions {
         }
         while (noarunde);
         return result;
-    }
-
-    public static string HtmlSpecialToNormalChar(this string tXt, bool ignoreBr) {
-        if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-
-        var result = new StringBuilder(tXt.Length);
-
-        for (var i = 0; i < tXt.Length; i++) {
-            var foundEntity = false;
-
-            // Check for HTML entities (longest first to avoid conflicts)
-            if (tXt[i] == '&') {
-                foreach (var kvp in ReverseHtmlEntities) {
-                    var entity = kvp.Key;
-                    var character = kvp.Value;
-
-                    if (i + entity.Length <= tXt.Length &&
-                        string.Equals(tXt.Substring(i, entity.Length), entity, StringComparison.Ordinal)) {
-                        result.Append(character);
-                        i += entity.Length - 1; // -1 because the loop will increment
-                        foundEntity = true;
-                        break;
-                    }
-                }
-            }
-
-            // Special handling for <br> tags
-            else if (!ignoreBr && tXt[i] == '<' && i + 3 < tXt.Length) {
-                if (string.Equals(tXt.Substring(i, 4), "<br>", StringComparison.OrdinalIgnoreCase)) {
-                    result.Append('\r');
-                    i += 3; // Skip the remaining characters of <br>
-                    foundEntity = true;
-                }
-            }
-
-            //// Special character mappings
-            //else if (!foundEntity) {
-            //    switch (tXt[i]) {
-            //        case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H7>", StringComparison.Ordinal):
-            //            result.Append(TempH7);
-            //            i += 3;
-            //            foundEntity = true;
-            //            break;
-
-            //        case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H4>", StringComparison.Ordinal):
-            //            result.Append(TempH4);
-            //            i += 3;
-            //            foundEntity = true;
-            //            break;
-
-            //        case '<' when i + 3 < tXt.Length && string.Equals(tXt.Substring(i, 4), "<H3>", StringComparison.Ordinal):
-            //            result.Append(TempH3);
-            //            i += 3;
-            //            foundEntity = true;
-            //            break;
-
-            //        case '<':
-            //            result.Append(TempLessThan);
-            //            foundEntity = true;
-            //            break;
-
-            //        case '>':
-            //            result.Append(TempGreaterThan);
-            //            foundEntity = true;
-            //            break;
-            //    }
-            //}
-
-            if (!foundEntity) {
-                result.Append(tXt[i]);
-            }
-        }
-
-        return result.ToString();
     }
 
     public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {

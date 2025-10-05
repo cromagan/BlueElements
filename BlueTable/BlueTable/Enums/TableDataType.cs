@@ -31,8 +31,6 @@ public static class TableDataTypeExtension {
 
     //public static bool IsTableTag(this TableDataType type) => (int)type is < 100 or >= 249;
 
-    public static bool IsObsolete(this TableDataType type) => (int)type is 0 or 2 or 3 or 16 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 64 or 65 or 67 or 70 or 73 or 79 or 81 or 103 or 134 or 151 or 153 or 155 or 178 or 185 or 191 or 249;
-
     public static bool IsHeaderType(this TableDataType type) => type is TableDataType.Version or
                                                                            TableDataType.Werbung or
                                                                            TableDataType.LastEditTimeUTC or
@@ -41,6 +39,7 @@ public static class TableDataTypeExtension {
                                                                            TableDataType.LastEditMachineName or
                                                                            TableDataType.LastEditID;
 
+    public static bool IsObsolete(this TableDataType type) => (int)type is 0 or 2 or 3 or 16 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 64 or 65 or 67 or 70 or 73 or 79 or 81 or 103 or 134 or 151 or 153 or 155 or 178 or 185 or 191 or 249;
 
     #endregion
 
@@ -150,16 +149,20 @@ public enum TableDataType : byte {
     LastEditApp = 76,
     LastEditMachineName = 77,
     LastEditTimeUTC = 78,
+
     //EventScriptEdited = 79,
     LastEditID = 80,
+
     //RowColorRules = 81,
 
     ColumnName = 100,
 
     ColumnCaption = 101,
     MultiLine = 102,
+
     //ColumnFunction = 103,
     ForeColor = 104,
+
     BackColor = 105,
     AdditionalFormatCheck = 106,
     ScriptType = 107,
@@ -180,12 +183,12 @@ public enum TableDataType : byte {
 
     IsFirst = 119, // co_SteuerelementName = 119
     Relationship_to_First = 120, // co_BezugsSpalte = 120
-    DefaultRenderer = 121, 
+    DefaultRenderer = 121,
 
     RendererSettings = 122,     // co_ReplaceAnsicht = 122
 
     RelationType = 123, // co_CellUBound = 123
-    Value_for_Chunk= 124,// co_GetFilesAufruf = 124
+    Value_for_Chunk = 124,// co_GetFilesAufruf = 124
     PermissionGroupsChangeCell = 125,
 
     ColumnTags = 126,
@@ -224,6 +227,7 @@ public enum TableDataType : byte {
     //ShowMultiLineInOneLine = 153,
 
     EditAllowedDespiteLock = 154,
+
     //ShowUndo = 155,
     SpellCheckingEnabled = 156,
 
@@ -235,7 +239,7 @@ public enum TableDataType : byte {
     DoUcaseAfterEdit = 161,
     AutoCorrectAfterEdit = 162,
     AutoFilterJoker = 163,
-    RoundAfterEdit = 164,
+    AfterEditRound = 164,
 
     //co_AutoFilterJokerModus = 165
     //co_ID = 166
@@ -271,7 +275,7 @@ public enum TableDataType : byte {
     SortType = 188,
 
     //co_ZellenZusammenfassen = 189,
-    AutoRemoveCharAfterEdit = 190,
+    AfterEditAutoRemoveChar = 190,
 
     //SaveContent = 191,
     //co_AutoFilter_Dauerfilter = 192,

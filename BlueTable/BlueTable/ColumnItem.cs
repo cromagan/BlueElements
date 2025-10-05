@@ -65,18 +65,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private bool _afterEditAutoCorrect;
 
+    private string _afterEditAutoRemoveChar;
     private bool _afterEditDoUCase;
 
     private bool _afterEditQuickSortRemoveDouble;
 
+    private int _afterEditRound;
     private AlignmentHorizontal _align;
 
     private string _allowedChars;
 
     private string _autoFilterJoker;
-
-    private string _autoRemove;
-
     private Color _backColor;
 
     private string _caption;
@@ -148,9 +147,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private RelationType _relationType;
 
     private string _rendererSettings;
-
-    private int _roundAfterEdit;
-
     private bool _saveContent;
 
     private ScriptType _scriptType;
@@ -230,14 +226,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _editableWithTextInput = false;
         _showValuesOfOtherCellsInDropdown = false;
         _afterEditQuickSortRemoveDouble = false;
-        _roundAfterEdit = -1;
+        _afterEditRound = -1;
         _fixedColumnWidth = 0;
         _afterEditAutoCorrect = false;
         _afterEditDoUCase = false;
         _textFormatingAllowed = false;
         _additionalFormatCheck = AdditionalCheck.None;
         _scriptType = ScriptType.undefiniert;
-        _autoRemove = string.Empty;
+        _afterEditAutoRemoveChar = string.Empty;
         _autoFilterJoker = string.Empty;
         _saveContent = true;
         //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
@@ -311,6 +307,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
+    public string AfterEditAutoRemoveChar {
+        get => _afterEditAutoRemoveChar;
+        set {
+            if (IsDisposed) { return; }
+            if (_afterEditAutoRemoveChar == value) { return; }
+
+            _ = Table?.ChangeData(TableDataType.AfterEditAutoRemoveChar, this, _afterEditAutoRemoveChar, value);
+            OnPropertyChanged();
+        }
+    }
+
     //    #region Standard-Werte
     public ReadOnlyCollection<string> AfterEditAutoReplace {
         get => new(_afterEditAutoReplace);
@@ -350,6 +357,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
+    public int AfterEditRound {
+        get => _afterEditRound;
+        set {
+            if (IsDisposed) { return; }
+            if (_afterEditRound == value) { return; }
+
+            _ = Table?.ChangeData(TableDataType.AfterEditRound, this, _afterEditRound.ToString(), value.ToString());
+            OnPropertyChanged();
+        }
+    }
+
     public AlignmentHorizontal Align {
         get => _align;
         set {
@@ -381,17 +399,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (_autoFilterJoker == value) { return; }
 
             _ = Table?.ChangeData(TableDataType.AutoFilterJoker, this, _autoFilterJoker, value);
-            OnPropertyChanged();
-        }
-    }
-
-    public string AutoRemove {
-        get => _autoRemove;
-        set {
-            if (IsDisposed) { return; }
-            if (_autoRemove == value) { return; }
-
-            _ = Table?.ChangeData(TableDataType.AutoRemoveCharAfterEdit, this, _autoRemove, value);
             OnPropertyChanged();
         }
     }
@@ -634,6 +641,21 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
+    public bool HasAutoRepair {
+        get {
+            if (_afterEditQuickSortRemoveDouble) { return true; }
+            if (_afterEditAutoCorrect) { return true; }
+            if (_afterEditAutoReplace.Count > 0) { return true; }
+            if (_afterEditDoUCase) { return true; }
+            if (!string.IsNullOrEmpty(_afterEditAutoRemoveChar)) { return true; }
+            if (_afterEditRound > -1) { return true; }
+
+            // _maxCellLenght wird absichtlich ignoriert
+
+            return false;
+        }
+    }
+
     public bool IgnoreAtRowFilter {
         get => !IsAutofilterPossible() || _ignoreAtRowFilter;
         set {
@@ -873,17 +895,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    public int RoundAfterEdit {
-        get => _roundAfterEdit;
-        set {
-            if (IsDisposed) { return; }
-            if (_roundAfterEdit == value) { return; }
-
-            _ = Table?.ChangeData(TableDataType.RoundAfterEdit, this, _roundAfterEdit.ToString(), value.ToString());
-            OnPropertyChanged();
-        }
-    }
-
     public bool SaveContent {
         get => _saveContent;
         set {
@@ -1094,7 +1105,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (_afterEditDoUCase) { value = value.ToUpperInvariant(); }
 
-        if (!string.IsNullOrEmpty(_autoRemove)) { value = value.RemoveChars(_autoRemove); }
+        if (!string.IsNullOrEmpty(_afterEditAutoRemoveChar)) { value = value.RemoveChars(_afterEditAutoRemoveChar); }
 
         if (_afterEditAutoReplace.Count > 0) {
             List<string> l = [.. value.SplitAndCutByCr()];
@@ -1120,8 +1131,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (_afterEditAutoCorrect) { value = KleineFehlerCorrect(value); }
 
-        if (_roundAfterEdit > -1 && DoubleTryParse(value, out var erg)) {
-            erg = Math.Round(erg, _roundAfterEdit, MidpointRounding.AwayFromZero);
+        if (_afterEditRound > -1 && DoubleTryParse(value, out var erg)) {
+            erg = Math.Round(erg, _afterEditRound, MidpointRounding.AwayFromZero);
             value = erg.ToStringFloat();
         }
 
@@ -1238,12 +1249,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         SpellCheckingEnabled = source.SpellCheckingEnabled;
         ShowValuesOfOtherCellsInDropdown = source.ShowValuesOfOtherCellsInDropdown;
         AfterEditQuickSortRemoveDouble = source.AfterEditQuickSortRemoveDouble;
-        RoundAfterEdit = source.RoundAfterEdit;
+        AfterEditRound = source.AfterEditRound;
         MaxCellLenght = source.MaxCellLenght;
         FixedColumnWidth = source.FixedColumnWidth;
         AfterEditDoUCase = source.AfterEditDoUCase;
         AfterEditAutoCorrect = source.AfterEditAutoCorrect;
-        AutoRemove = source.AutoRemove;
+        AfterEditAutoRemoveChar = source.AfterEditAutoRemoveChar;
         AutoFilterJoker = source.AutoFilterJoker;
         ColumnNameOfLinkedTable = source.ColumnNameOfLinkedTable;
         Align = source.Align;
@@ -1458,7 +1469,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (_multiLine) {
             if (!MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
-            if (_roundAfterEdit != -1) { return "Runden nur bei einzeiligen Texten möglich"; }
+            if (_afterEditRound != -1) { return "Runden nur bei einzeiligen Texten möglich"; }
         } else {
             if (_afterEditQuickSortRemoveDouble) { return "Sortierung kann nur bei mehrzeiligen Feldern erfolgen."; }
         }
@@ -1496,14 +1507,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
         if (_dropDownItems.Count > 0 && !DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
 
-        if (_roundAfterEdit > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
+        if (_afterEditRound > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
         if (_filterOptions == FilterOptions.None) {
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
         }
 
         if (_relationType == RelationType.DropDownValues ||
             _scriptType == ScriptType.Row) {
-            if (_roundAfterEdit != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
+            if (_afterEditRound != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
                 return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben, Erlaubte Zeichen oder Sortierung.";
             }
         }
@@ -2360,8 +2371,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _afterEditQuickSortRemoveDouble = newvalue.FromPlusMinus();
                 break;
 
-            case TableDataType.RoundAfterEdit:
-                _roundAfterEdit = IntParse(newvalue);
+            case TableDataType.AfterEditRound:
+                _afterEditRound = IntParse(newvalue);
                 break;
 
             case TableDataType.FixedColumnWidth:
@@ -2380,8 +2391,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _afterEditAutoCorrect = newvalue.FromPlusMinus();
                 break;
 
-            case TableDataType.AutoRemoveCharAfterEdit:
-                _autoRemove = newvalue;
+            case TableDataType.AfterEditAutoRemoveChar:
+                _afterEditAutoRemoveChar = newvalue;
                 break;
 
             case TableDataType.ColumnAdminInfo:

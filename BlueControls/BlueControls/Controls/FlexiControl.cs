@@ -535,11 +535,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public void StyleComboBox(ComboBox? control, List<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+    public void StyleComboBox(ComboBox? control, List<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists, int raiseChangeDelayinSec) {
         if (control == null) { return; }
 
         //control.Enabled = Enabled;
         control.GetStyleFrom(this);
+        control.RaiseChangeDelay = raiseChangeDelayinSec;
         control.DropDownStyle = style;
         control.ItemClear();
         control.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
@@ -554,10 +555,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public void StyleTextBox(TextBox? control) {
+    public void StyleTextBox(TextBox? control, int raiseChangeDelayinSec) {
         if (control == null) { return; }
         //control.Enabled = Enabled;
         control.GetStyleFrom(this);
+        control.RaiseChangeDelay = raiseChangeDelayinSec;
         control.Verhalten = _multiLine || Height > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
@@ -806,9 +808,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private ComboBox Control_Create_ComboBox() {
         ComboBox control = new();
-        StyleComboBox(control, null, ComboBoxStyle.DropDownList, false);
+        StyleComboBox(control, null, ComboBoxStyle.DropDownList, false, 1);
         control.TextChanged += ValueChanged_ComboBox;
-        control.RaiseChangeDelay = 1;
         return control;
     }
 
@@ -851,9 +852,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private TextBox Control_Create_TextBox() {
         TextBox control = new();
-        StyleTextBox(control);
+        StyleTextBox(control, 1);
         control.TextChanged += ValueChanged_TextBox;
-        control.RaiseChangeDelay = 1;
         return control;
     }
 

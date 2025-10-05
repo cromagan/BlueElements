@@ -123,6 +123,8 @@
     <Compile Include="AdditionalScriptMethods\Method_GenerateLayoutImage.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetClipboard.cs" />
     <Compile Include="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_StringAsciiToHTML.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_StringHTMLToAscii.cs" />
     <Compile Include="AdditionalScriptMethods\VariablePadItem.cs" />
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\Extended Text\ExtCharCellLink.cs" />
@@ -214,8 +216,8 @@
     <Compile Include="Controls\ConnectedFormula\Monitor.Designer.cs">
       <DependentUpon>Monitor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ConnectedFormula\FlexiControlRowSelector.Designer.cs">
-      <DependentUpon>FlexiControlRowSelector.cs</DependentUpon>
+    <Compile Include="Controls\ConnectedFormula\FlexilRowSelectorControl.Designer.cs">
+      <DependentUpon>FlexilRowSelectorControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\ConnectedFormula\GenericControlReciver.cs">
       <SubType>Component</SubType>
@@ -300,10 +302,10 @@
     <Compile Include="Controls\ConnectedFormula\InputRowOutputFilterControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ConnectedFormula\FlexiControlRowSelector.cs">
+    <Compile Include="Controls\ConnectedFormula\FlexilRowSelectorControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FlexiControlForDelegate.cs">
+    <Compile Include="Controls\FlexiDelegateControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaButton.cs">
@@ -358,7 +360,7 @@
     <Compile Include="Controls\FileBrowser.Designer.cs">
       <DependentUpon>FileBrowser.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\FlexiControlForProperty.cs">
+    <Compile Include="Controls\FlexiPropertyControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\TabControl.cs">
@@ -632,11 +634,11 @@
     <Compile Include="Controls\FlexiControl.Designer.cs">
       <DependentUpon>FlexiControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\FlexiControlForCell.cs">
+    <Compile Include="Controls\FlexiCellControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FlexiControlForCell.Designer.cs">
-      <DependentUpon>FlexiControlForCell.cs</DependentUpon>
+    <Compile Include="Controls\FlexiCellControl.Designer.cs">
+      <DependentUpon>FlexiCellControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms_Table\ExportDialog.cs">
       <SubType>Form</SubType>
@@ -876,16 +878,16 @@
       <DependentUpon>FlexiControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\FlexiControlForCell.resx">
-      <DependentUpon>FlexiControlForCell.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\FlexiCellControl.resx">
+      <DependentUpon>FlexiCellControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\FlexiControlForDelegate.resx">
-      <DependentUpon>FlexiControlForDelegate.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\FlexiDelegateControl.resx">
+      <DependentUpon>FlexiDelegateControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\FlexiControlForProperty.resx">
-      <DependentUpon>FlexiControlForProperty.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\FlexiPropertyControl.resx">
+      <DependentUpon>FlexiPropertyControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SwapListBox.resx">

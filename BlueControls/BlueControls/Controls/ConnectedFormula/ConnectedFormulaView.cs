@@ -195,7 +195,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
 
         var l = ItemCollectionPadItem.ResizeControls(_page, Width - x1 - x2, Height - y1 - y2, Mode);
-        var autoc = new List<FlexiControlForCell>();
+        var autoc = new List<FlexiCellControl>();
 
         foreach (var thisit in _page) {
             if (thisit is IItemToControl thisitco) {
@@ -225,7 +225,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
                         tabItem.CreateTabs((TabControl)con, this, Mode);
                     }
 
-                    if (con.Visible && con is FlexiControlForCell fo &&
+                    if (con.Visible && con is FlexiCellControl fo &&
                         thisit is EditFieldPadItem {
                             AutoX: true, CaptionPosition: CaptionPosition.Links_neben_dem_Feld or
                             CaptionPosition.Links_neben_dem_Feld_unsichtbar
@@ -409,11 +409,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         Invalidate_FilterInput();
     }
 
-    private void DoAutoX(List<FlexiControlForCell> autoc) {
+    private void DoAutoX(List<FlexiCellControl> autoc) {
         if (autoc.Count == 0) { return; }
 
-        var undone = new List<FlexiControlForCell>();
-        var dohere = new List<FlexiControlForCell>();
+        var undone = new List<FlexiCellControl>();
+        var dohere = new List<FlexiCellControl>();
 
         var left = autoc[0];
 

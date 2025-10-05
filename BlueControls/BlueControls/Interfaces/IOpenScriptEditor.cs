@@ -19,6 +19,9 @@
 
 namespace BlueControls.Interfaces;
 
+/// <summary>
+/// Einfaches Interface, dass den Befehl OpenScriptEditor zur Verfügung stellt
+/// </summary>
 public interface IOpenScriptEditor {
 
     #region Methods

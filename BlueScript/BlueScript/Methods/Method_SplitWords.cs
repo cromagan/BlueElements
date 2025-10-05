@@ -49,7 +49,7 @@ internal class Method_SplitWords : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
 
-        var list = txt.HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
+        var list = txt.AllWords().SortedDistinctList();
 
         list.Sort((s1, s2) => s2.Length.CompareTo(s1.Length));
 

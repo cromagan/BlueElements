@@ -387,7 +387,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnEditableDropdown.Checked = _column.EditableWithDropdown;
         btnCanBeEmpty.Checked = _column.DropdownDeselectAllAllowed;
         btnAutoEditAutoSort.Checked = _column.AfterEditQuickSortRemoveDouble;
-        txbRunden.Text = _column.RoundAfterEdit is > -1 and < 7 ? _column.RoundAfterEdit.ToString() : string.Empty;
+        txbRunden.Text = _column.AfterEditRound is > -1 and < 7 ? _column.AfterEditRound.ToString() : string.Empty;
         txbFixedColumnWidth.Text = _column.FixedColumnWidth > 0 ? _column.FixedColumnWidth.ToString() : string.Empty;
         btnAutoEditToUpper.Checked = _column.AfterEditDoUCase;
         btnAutoEditKleineFehler.Checked = _column.AfterEditAutoCorrect;
@@ -413,7 +413,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         txbAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         txbQuickinfo.Text = _column.ColumnQuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         cbxLinkedTable.Text = _column.LinkedTableTableName;
-        txbAutoRemove.Text = _column.AutoRemove;
+        txbAutoRemove.Text = _column.AfterEditAutoRemoveChar;
         cbxLinkedTable_TextChanged(null, System.EventArgs.Empty);
     }
 
@@ -449,9 +449,9 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (txbRunden.Text.IsLong()) {
             var zahl = Math.Max(IntParse(txbRunden.Text), -1);
             zahl = Math.Min(zahl, 7);
-            _column.RoundAfterEdit = zahl;
+            _column.AfterEditRound = zahl;
         } else {
-            _column.RoundAfterEdit = -1;
+            _column.AfterEditRound = -1;
         }
 
         if (txbFixedColumnWidth.Text.IsLong()) {
@@ -505,7 +505,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.DefaultRenderer = cbxRenderer.Text;
         _column.RendererSettings = _renderer?.ParseableItems().FinishParseable() ?? string.Empty;
         _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
-        _column.AutoRemove = txbAutoRemove.Text;
+        _column.AfterEditAutoRemoveChar = txbAutoRemove.Text;
 
         if (_column.RelationType == RelationType.None) {
             _column.LinkedTableTableName = string.Empty;
