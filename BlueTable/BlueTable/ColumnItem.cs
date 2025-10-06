@@ -778,14 +778,23 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (string.IsNullOrEmpty(_linkedTableTableName)) { return null; }
 
             lock (_linkedTableLock) {
-                if (_linkedTable is { IsDisposed: false }) {
-                    return _linkedTable;
-                }
+                if (_linkedTable is { IsDisposed: false }) { return _linkedTable; }
             }
 
-            GetLinkedTable(); // Außerhalb des Locks um Deadlock zu vermeiden
+            // Außerhalb des Locks um Deadlock zu vermeiden
+
+            Invalidate_LinkedTable(); // Events sicher abmelden
+
+            var newTable = Get(_linkedTableTableName, null);
+
+            if (newTable != null) {
+                // Event-Registrierung vor dem Lock
+                newTable.Cell.CellValueChanged += LinkedTable_CellValueChanged;
+                newTable.DisposingEvent += LinkedTable_Disposing;
+            }
 
             lock (_linkedTableLock) {
+                _linkedTable = newTable; // Atomic assignment
                 return _linkedTable; // Final read mit Lock
             }
         }
@@ -2494,26 +2503,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    private void _TMP_Linked_table_Disposing(object sender, System.EventArgs e) => Invalidate_LinkedTable();
-
-    private void _TMP_LinkedTable_Cell_CellValueChanged(object sender, CellEventArgs e) {
-        if (e.Column.KeyName != ColumnNameOfLinkedTable) { return; }
-
-        if (_relationType == RelationType.CellValues && LinkedTable != null) {
-            var (fc, info) = CellCollection.GetFilterReverse(this, e.Column, e.Row);
-            var val = e.Row.CellGetString(e.Column);
-
-            if (fc != null && string.IsNullOrWhiteSpace(info)) {
-                foreach (var thisRow in fc.Rows) {
-                    if (thisRow.CellGetString(this) != val) {
-                        _ = CellCollection.LinkedCellData(this, thisRow, true, false);
-                    }
-                }
-                fc.Dispose();
-            }
-        }
-    }
-
     private void CheckIfIAmAKeyColumn() {
         Am_A_Key_For_Other_Column = string.Empty;
 
@@ -2557,24 +2546,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    private void GetLinkedTable() {
-        Invalidate_LinkedTable(); // Events sicher abmelden
-
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-
-        var newTable = Get(_linkedTableTableName, null);
-
-        if (newTable != null) {
-            // Event-Registrierung vor dem Lock
-            newTable.Cell.CellValueChanged += _TMP_LinkedTable_Cell_CellValueChanged;
-            newTable.DisposingEvent += _TMP_Linked_table_Disposing;
-        }
-
-        lock (_linkedTableLock) {
-            _linkedTable = newTable; // Atomic assignment
-        }
-    }
-
     private void Invalidate_LinkedTable() {
         Table? tableToCleanup = null;
 
@@ -2586,16 +2557,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         // Event-Abmeldung außerhalb des Locks um Deadlocks zu vermeiden
         if (tableToCleanup != null) {
             try {
-                tableToCleanup.Cell.CellValueChanged -= _TMP_LinkedTable_Cell_CellValueChanged;
-            } catch (Exception) {
-                // Events können bereits abgemeldet sein - ignorieren
-            }
+                tableToCleanup.Cell.CellValueChanged -= LinkedTable_CellValueChanged;
+            } catch { }
 
             try {
-                tableToCleanup.DisposingEvent -= _TMP_Linked_table_Disposing;
-            } catch (Exception) {
-                // Events können bereits abgemeldet sein - ignorieren
-            }
+                tableToCleanup.DisposingEvent -= LinkedTable_Disposing;
+            } catch { }
         }
     }
 
@@ -2669,6 +2636,25 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //}
         return txt;
     }
+
+    private void LinkedTable_CellValueChanged(object sender, CellEventArgs e) {
+        if (e.Column.KeyName != ColumnNameOfLinkedTable) { return; }
+        if (_relationType != RelationType.CellValues) { return; }
+
+        var (fc, info) = CellCollection.GetFilterReverse(this, e.Column, e.Row);
+        var val = e.Row.CellGetString(e.Column);
+
+        if (fc != null && string.IsNullOrWhiteSpace(info)) {
+            foreach (var thisRow in fc.Rows) {
+                if (thisRow.CellGetString(this) != val) {
+                    _ = CellCollection.LinkedCellData(this, thisRow, true, false);
+                }
+            }
+            fc.Dispose();
+        }
+    }
+
+    private void LinkedTable_Disposing(object sender, System.EventArgs e) => Invalidate_LinkedTable();
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 

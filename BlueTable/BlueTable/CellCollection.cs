@@ -166,7 +166,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (mycolumn.Table is not { IsDisposed: false } db) { return (null, "Tabelle verworfen."); }
 
-        var fi = new List<FilterItem>();
+        var fc = new FilterCollection(db, "cell get reverse filter");
 
         foreach (var thisFi in mycolumn.LinkedCellFilter) {
             if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
@@ -182,15 +182,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             foreach (var thisColumn in db.Column) {
                 if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
-                    fi.Add(new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, linkedrow.CellGetList(c)));
+                    var l = linkedrow.CellGetList(c);
+                    if (l.Count == 0) { l.Add(string.Empty); }
+                    fc.Add(new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, l));
                 }
             }
         }
 
-        //if (fi.Count == 0 && column.Function != ColumnFunction.Werte_aus_anderer_Tabelle_als_DropDownItemsx) { return (null, "Keine gültigen Suchkriterien definiert."); }
-
-        var fc = new FilterCollection(db, "cell get reverse filter");
-        fc.AddIfNotExists(fi);
+        var er = fc.ErrorReason();
+        if (!string.IsNullOrEmpty(er)) {
+            fc.Dispose();
+            return (null, er);
+        }
 
         if (fc.Count == 0) {
             fc.Add(new FilterItem(db, "Reverse Filter"));

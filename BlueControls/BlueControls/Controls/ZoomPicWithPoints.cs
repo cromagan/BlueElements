@@ -388,16 +388,6 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
     }
 
-    //private void PrintInfoText(Graphics gr) {
-    //    Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
-    //    Brush bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
-    //    Font fn = new("Arial", DrawSize, FontStyle.Bold);
-    //    var f = gr.MeasureString(_infoText, fn);
-    //    var yPos = MousePos11.Y > f.Height + 50 ? 0 : (int)(Height - f.Height - 5);
-    //    gr.FillRectangle(bs, 0, yPos - 5, Width, f.Height + 10);
-    //    BlueFont.DrawString(gr, _infoText, fn, bf, 2, yPos + 2);
-    //}
-
     private void PrintInfoText(Graphics gr) {
         if (string.IsNullOrEmpty(_infoText)) { return; }
 
@@ -418,7 +408,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             var controlPoint = PointToClient(new Point(screenBounds.X, screenBounds.Y));
 
             // Berechne die Position für diesen Bildschirm
-            var textSize = gr.MeasureString(_infoText, fn);
+            var textSize = fn.MeasureString(_infoText);
 
             // Prüfe ob die Maus auf diesem Bildschirm ist
             var mouseScreenPoint = PointToScreen(new Point(MousePos11.X, MousePos11.Y));

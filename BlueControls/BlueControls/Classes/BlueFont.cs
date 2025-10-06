@@ -434,10 +434,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public SizeF MeasureString(string text) {
         return _stringSizeCache.GetOrAdd(text, _ => {
-            using Bitmap bmp = new Bitmap(1, 1);
-            using Graphics g = Graphics.FromImage(bmp);
-            SetTextRenderingHint(g, _fontOl);
-            return g.MeasureString(text, _fontOl, PointF.Empty, StringFormat.GenericTypographic);
+            return _fontOl.MeasureString(text);
         });
     }
 
@@ -728,7 +725,13 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (sizeToCheck <= _sizeTestedAndOk) { return true; }
         if (sizeToCheck >= _sizeTestedAndFailed) { return false; }
         try {
-            _ = new Font(_font.Name, sizeToCheck / Skin.Scale, _font.Style, _font.Unit).MeasureString("x");
+            var s = new Font(_font.Name, sizeToCheck / Skin.Scale, _font.Style, _font.Unit).MeasureString("x");
+
+            if (s.IsEmpty) {
+                _sizeTestedAndFailed = sizeToCheck;
+                return false;
+            }
+
             _sizeTestedAndOk = sizeToCheck;
             return true;
         } catch {

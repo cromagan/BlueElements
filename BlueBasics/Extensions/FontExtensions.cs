@@ -24,62 +24,33 @@ using System.Drawing.Text;
 namespace BlueBasics;
 
 public static partial class Extensions {
-    //public static Size FormatedText_NeededSize(this Font font, string text, QuickImage? qi, int minSize) {
-    //    try {
-    //        var pSize = SizeF.Empty;
-    //        var tSize = SizeF.Empty;
-    //        //if (font == null) { return new Size(3, 3); }
 
-    //        if (qi != null) {
-    //            lock (qi) {
-    //                pSize = ((Bitmap)qi).Size;
-    //            }
-    //        }
-    //        if (!string.IsNullOrEmpty(text)) { tSize = font.MeasureString(text); }
+    #region Fields
 
-    //        if (!string.IsNullOrEmpty(text)) {
-    //            if (qi == null) {
-    //                return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSize));
-    //            }
+    private static readonly StringFormat DefaultWithTrailingSpaces = new StringFormat(StringFormat.GenericDefault) {
+        FormatFlags = StringFormat.GenericDefault.FormatFlags | StringFormatFlags.MeasureTrailingSpaces
+    };
 
-    //            return new Size((int)(tSize.Width + 2 + pSize.Width + 1),
-    //                Math.Max((int)tSize.Height, (int)pSize.Height));
-    //        }
-
-    //        if (qi != null) {
-    //            return new Size((int)pSize.Width, (int)pSize.Height);
-    //        }
-
-    //        return new Size(minSize, minSize);
-    //    } catch {
-    //        // tmpImageCode wird an anderer Stelle verwendet
-    //        Develop.CheckStackForOverflow();
-    //        return FormatedText_NeededSize(font, text, qi, minSize);
-    //    }
-    //}
+    #endregion
 
     #region Methods
 
     public static SizeF MeasureString(this Font font, string text) {
-        if (string.IsNullOrEmpty(text)) {
-            return SizeF.Empty;
-        }
+        if (string.IsNullOrEmpty(text)) { return SizeF.Empty; }
 
         try {
-            // Graphics-Objekt wiederverwendbar machen über static
-            using var g = Graphics.FromHwnd(IntPtr.Zero);
-            SetTextRenderingHint(g, font);
+            using var gr = Graphics.FromHwnd(IntPtr.Zero);
+            SetTextRenderingHint(gr, font);
 
-            // Prüfen auf Leerzeichen am Ende
-            if (text.EndsWith(" ")) {
-                // Wir messen den Text mit einem zusätzlichen x am Ende
-                var withX = g.MeasureString(text + 'x', font, 9999, StringFormat.GenericTypographic);
-                var x = g.MeasureString("x", font, 9999, StringFormat.GenericTypographic);
+            //// Prüfen auf Leerzeichen am Ende
+            //if (text.EndsWith(" ")) {
+            //    // Wir messen den Text mit einem zusätzlichen x am Ende
+            //    var withX = gr.MeasureString(text + 'x', font, 9999, StringFormat.GenericTypographic);
+            //    var x = gr.MeasureString("x", font, 9999, StringFormat.GenericTypographic);
 
-                return new SizeF(withX.Width - x.Width, withX.Height);
-            }
-
-            return g.MeasureString(text, font, 9999, StringFormat.GenericTypographic);
+            //    return new SizeF(withX.Width - x.Width, withX.Height);
+            //}
+            return gr.MeasureString(text, font, int.MaxValue, DefaultWithTrailingSpaces);
         } catch {
             return SizeF.Empty;
         }

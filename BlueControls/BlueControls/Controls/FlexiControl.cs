@@ -90,11 +90,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _caption = captionText;
         _captionPosition = CaptionPosition.Links_neben_dem_Feld;
 
-        //var s = ExtText.MeasureString(_caption, Design.Caption, States.Standard, width - 2);
-
-        //var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
-        //  Size = new Size(s.Width + 2, s.Height + 2);
-
         Size = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Scrollen_mit_Textumbruch, Design.Caption, null, Translate, width);
     }
 
@@ -945,8 +940,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             default:
                 var s2 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
-
-                //var s = MeasureStringOfCaption(_caption).ToSize();
                 control.Left = 0;
                 control.Top = Math.Max(_controlX, s2.Height);
                 control.Width = Width;
