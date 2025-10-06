@@ -155,7 +155,6 @@
     <Compile Include="EventArgs\RowCheckedEventArgs.cs" />
     <Compile Include="EventArgs\ProgressbarEventArgs.cs" />
     <Compile Include="EventArgs\RowEventArgs.cs" />
-    <Compile Include="Export.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterItem.cs" />
     <Compile Include="Interfaces\IUseableForButton.cs" />

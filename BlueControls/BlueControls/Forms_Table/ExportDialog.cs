@@ -47,8 +47,8 @@ public sealed partial class ExportDialog : IHasTable {
     private readonly List<RowItem>? _rowsForExport;
     private readonly string _saveTo = string.Empty;
     private readonly string _zielPfad;
-    private Table? _table;
     private int _itemNrForPrint;
+    private Table? _table;
 
     #endregion
 
@@ -133,6 +133,7 @@ public sealed partial class ExportDialog : IHasTable {
         _ = tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (scx.Failed) { return -1; }
+        tmp.ForPrinting = true;
 
         var oneItem = tmp.UsedArea;
         pad.Items.SheetStyle = tmp.SheetStyle;
@@ -153,6 +154,7 @@ public sealed partial class ExportDialog : IHasTable {
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
                 var it = new ItemCollectionPadItem(layoutFileName);
+                it.ForPrinting = true;
 
                 //if (it._internal is { }) {
                 _ = it.ReplaceVariables(rowsForExport[startNr]);
@@ -209,7 +211,7 @@ public sealed partial class ExportDialog : IHasTable {
     private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();
 
     private void btnEinstellung_Click(object sender, System.EventArgs e) {
-        switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "Cricut Maker", "A4 Printer", "Abbrechen")) {
+        switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "A4 Printer", "Abbrechen")) {
             case 0:
                 flxBreite.ValueSet("210", true);
                 flxHöhe.ValueSet("297", true);
@@ -217,12 +219,6 @@ public sealed partial class ExportDialog : IHasTable {
                 break;
 
             case 1:
-                flxBreite.ValueSet("171,1", true);
-                flxHöhe.ValueSet("234,9", true);
-                flxAbstand.ValueSet("2", true);
-                break;
-
-            case 2:
                 flxBreite.ValueSet("190", true);
                 flxHöhe.ValueSet("277", true);
                 flxAbstand.ValueSet("1", true);
@@ -250,6 +246,7 @@ public sealed partial class ExportDialog : IHasTable {
 
             var x = TempFile(_zielPfad, _rowsForExport[0].Table.Caption + "_" + b + "x" + h + "_" + ab, "png");
             padSchachteln.Items.BackColor = Color.Transparent;
+            padSchachteln.ShowInPrintMode = true;
             padSchachteln.Items.SaveAsBitmap(x);
             l.Add(x);
             if (nr == _itemNrForPrint) { break; }

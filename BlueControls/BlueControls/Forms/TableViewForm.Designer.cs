@@ -729,6 +729,7 @@ namespace BlueControls.Forms {
             // 
             // btnDrucken
             // 
+            this.btnDrucken.AutoSort = false;
             this.btnDrucken.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.btnDrucken.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
             this.btnDrucken.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;

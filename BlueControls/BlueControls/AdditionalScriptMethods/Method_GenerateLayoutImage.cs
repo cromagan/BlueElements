@@ -73,6 +73,7 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
         #endregion
 
         var l = new ItemCollectionPadItem(ind);
+        l.ForPrinting = true;
 
         if (!l.Any()) { return new DoItFeedback("Layout nicht gefunden oder fehlerhaft.", true, ld); }
 

@@ -193,7 +193,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandal
                 Visible = false;
                 var selectedRows = Table.RowsVisibleUnique();
 
-                using (ExportDialog l = new(db, selectedRows)) {
+                using (var l = new ExportDialog(db, selectedRows)) {
                     _ = l.ShowDialog();
                 }
 

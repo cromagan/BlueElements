@@ -129,6 +129,7 @@
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\Extended Text\ExtCharCellLink.cs" />
     <Compile Include="Classes\StandaloneInfo.cs" />
+    <Compile Include="Export.cs" />
     <Compile Include="Forms\Start.cs">
       <SubType>Form</SubType>
     </Compile>
