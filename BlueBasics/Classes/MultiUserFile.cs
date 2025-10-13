@@ -370,7 +370,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (!LockEditing()) { return false; }
 
-        var t = ProcessFile(TrySave, false, mustSave ? 120 : 3, _filename) is true;
+        var t = ProcessFile(TrySave, [_filename], false, mustSave ? 120 : 3) is true;
 
         if (t) {
             _isSaved = true;
@@ -381,7 +381,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return t;
     }
 
-    public bool SaveAs(string filename) => ProcessFile(TrySave, false, 120, filename) is true;
+    public bool SaveAs(string filename) => ProcessFile(TrySave, [filename], false, 120) is true;
 
     public void UnlockEditing() {
         if (!AmIBlocker(false)) { return; }
@@ -512,11 +512,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         } catch { }
     }
 
-    private FileOperationResult TrySave(params object[] args) {
+    private FileOperationResult TrySave(List<string> affectingFiles, params object?[] args) {
         if (IsDisposed) { return FileOperationResult.ValueFailed; }
         if (Develop.AllReadOnly) { return FileOperationResult.ValueFailed; }
 
-        if (args.Length < 1 || args[0] is not string filename) { return FileOperationResult.ValueFalse; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFalse; }
 
         if (string.IsNullOrEmpty(filename)) { return FileOperationResult.ValueFalse; }
 

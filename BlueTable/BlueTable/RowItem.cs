@@ -259,13 +259,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public int CellGetInteger(ColumnItem? column) => IntParse(Table?.Cell.GetString(column, this));
 
     public List<string> CellGetList(ColumnItem? column) {
-        if(column?.Table is not { IsDisposed: false} tb) { return []; }
+        if (column?.Table is not { IsDisposed: false } tb) { return []; }
 
-        if(column.TextFormatingAllowed) {
+        if (column.TextFormatingAllowed) {
             return tb.Cell.GetString(column, this).SplitAndCutBy("<br>").ToList();
         }
 
-       return  tb.Cell.GetString(column, this).SplitAndCutByCrToList() ;
+        return tb.Cell.GetString(column, this).SplitAndCutByCrToList();
     }
 
     public List<string> CellGetList(string columnName) => CellGetList(Table?.Column[columnName]);
@@ -364,13 +364,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (Table?.Column.SysCorrect is { IsDisposed: false } sc) {
             //CellSet(sc, cols.Count == 0, "Fehlerprüfung");
             if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(sc)) {
-                CellSet(sc, cols.Count == 0, "Fehlerprüfung");
-
-                //var erg2 = ExecuteScript(ScriptEventTypes.correct_changed, string.Empty, true, 3, null, true, false);
-
-                //if (erg2.Failed) {
-                //    m += $"Berechnung fehlgeschlagen: {erg2.FailedReason}";
-                //}
+                if (string.IsNullOrEmpty(Table.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) {
+                    CellSet(sc, cols.Count == 0, "Fehlerprüfung");
+                }
             }
         }
 
@@ -876,6 +872,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     internal string SetValueInternal(ColumnItem column, string value, Reason reason) {
         var tries = 0;
         var startTime = DateTime.UtcNow;
+
+        //if (reason == Reason.SetCommand) {
+        //    var r = Table?.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue) ?? string.Empty;
+        //    if (!string.IsNullOrEmpty(r)) { return r; }
+        //}
 
         while (true) {
             tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures

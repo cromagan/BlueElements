@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using BlueTable;
 using BlueTable.AdditionalScriptMethods;
 using static BlueBasics.IO;
+using System;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -133,7 +134,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
                             return new DoItFeedback("nur bei Dateibasierten Tabellen möglich.", true, ld);
                         }
 
-                        var chunks = TableChunk.GenerateNewChunks(tbf, 100, myTb.FileStateUtcDate, false);
+                        var chunks = TableChunk.GenerateNewChunks(tbf, 100, DateTime.UtcNow, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
                         _ = mainchunk.Save(filn);

@@ -143,7 +143,7 @@ public enum TableDataType : byte {
     /// <summary>
     /// Datum/Uhrzeit, bis zu dem die Undos engelesen und fest verankert wurden.
     /// </summary>
-    FileStateUTCDate = 74,
+    LastSaveMainFileUtcDate = 74,
 
     LastEditUser = 75,
     LastEditApp = 76,

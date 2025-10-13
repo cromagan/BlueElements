@@ -43,15 +43,18 @@ public static class IO {
     /// </summary>
     public static string LastFilePath = string.Empty;
 
-    private const int _fileExistenceCheckRetryCount = 20;
     private static readonly ConcurrentDictionary<string, (DateTime CheckTime, bool Result)> _canWriteCache = new();
     private static readonly object _fileOperationLock = new();
+
+    private static int _retryCount = 20;
+
+    private static int _retrySleep = 100;
 
     #endregion
 
     #region Delegates
 
-    public delegate FileOperationResult DoThis(params object[] args);
+    public delegate FileOperationResult DoThis(List<string> affectingFiles, params object?[] args);
 
     #endregion
 
@@ -72,7 +75,7 @@ public static class IO {
         if (recentWriteThresholdSeconds > 0) {
             // Prüfen ob kürzlich geschrieben wurde
             try {
-                FileInfo fileInfo = new(filename);
+                var fileInfo = new FileInfo(filename);
                 if (DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc).TotalSeconds < recentWriteThresholdSeconds) {
                     return "Anderer Speichervorgang noch nicht abgeschlossen.";
                 }
@@ -83,7 +86,7 @@ public static class IO {
         return string.Empty;
     }
 
-    public static bool CanWrite(string filename) => ProcessFile(TryCanWrite, false, 5, filename) is true;
+    public static bool CanWrite(string filename) => ProcessFile(TryCanWrite, [filename], false, 5) is true;
 
     public static bool CanWriteInDirectory(string directory) {
         if (string.IsNullOrEmpty(directory)) { return false; }
@@ -157,11 +160,11 @@ public static class IO {
     /// <summary>
     /// Erstellt ein Verzeichnis, mit Fehlerbehandlung und Wiederholungsversuchen
     /// </summary>
-    /// <param name="dir">Das zu erstellende Verzeichnis</param>
+    /// <param name="directory">Das zu erstellende Verzeichnis</param>
     /// <returns>True, wenn das Verzeichnis (dann) existiert</returns>
-    public static bool CreateDirectory(string dir) { return ProcessFile(TryCreateDirectory, false, 5, dir) is true; }
+    public static bool CreateDirectory(string directory) { return ProcessFile(TryCreateDirectory, [directory], false, 5) is true; }
 
-    public static bool DeleteDir(string directory, bool abortIfFailed) => ProcessFile(TryDeleteDir, abortIfFailed, abortIfFailed ? 60 : 5, directory) is true;
+    public static bool DeleteDir(string directory, bool abortIfFailed) => ProcessFile(TryDeleteDir, [directory], abortIfFailed, abortIfFailed ? 60 : 5) is true;
 
     /// <summary>
     /// Löscht eine Liste von Dateien
@@ -175,7 +178,7 @@ public static class IO {
         var did = false;
 
         _ = Parallel.ForEach(filelist, thisf => {
-            if (TryFileExists(thisf).ReturnValue is true) {
+            if (FileExists(thisf)) {
                 if (DeleteFile(thisf, false)) {
                     lock (lockMe) {
                         did = true;
@@ -187,16 +190,16 @@ public static class IO {
         return did;
     }
 
-    public static bool DeleteFile(string file, bool abortIfFailed) => ProcessFile(TryDeleteFile, abortIfFailed, abortIfFailed ? 60 : 5, file) is true;
+    public static bool DeleteFile(string filename, bool abortIfFailed) => ProcessFile(TryDeleteFile, [filename], abortIfFailed, abortIfFailed ? 60 : 5) is true;
 
     /// <summary>
     /// Prüft, ob ein Verzeichnis existiert, mit zusätzlichen Prüfungen und Fehlerbehandlung
     /// </summary>
-    /// <param name="pfad">Der zu prüfende Pfad</param>
+    /// <param name="directory">Der zu prüfende Pfad</param>
     /// <returns>True, wenn das Verzeichnis existiert</returns>
-    public static bool DirectoryExists(string pfad) => ProcessFile(TryDirectoryExists, false, 5, pfad) is true;
+    public static bool DirectoryExists(string directory) => ProcessFile(TryDirectoryExists, [directory], false, 5) is true;
 
-    public static bool DirectoryMove(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveDirectory, abortIfFailed, abortIfFailed ? 60 : 5, oldName, newName) is true;
+    public static bool DirectoryMove(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveDirectory, [oldName, newName], abortIfFailed, abortIfFailed ? 60 : 5) is true;
 
     public static bool ExecuteFile(string fileName, string arguments = "", bool waitForExit = false, bool logException = true) {
         try {
@@ -214,14 +217,14 @@ public static class IO {
         return true;
     }
 
-    public static bool FileCopy(string source, string target, bool abortIfFailed) => ProcessFile(TryFileCopy, abortIfFailed, abortIfFailed ? 60 : 5, source, target) is true;
+    public static bool FileCopy(string source, string target, bool abortIfFailed) => ProcessFile(TryFileCopy, [source, target], abortIfFailed, abortIfFailed ? 60 : 5) is true;
 
     /// <summary>
     /// Prüft, ob eine Datei existiert, mit Fehlerbehandlung und Wiederholungsversuchen
     /// </summary>
     /// <param name="file">Die zu prüfende Datei</param>
     /// <returns>True, wenn die Datei existiert</returns>
-    public static bool FileExists(string? file) { return ProcessFile(TryFileExists, false, 5, file ?? string.Empty) is true; }
+    public static bool FileExists(string? file) { return ProcessFile(TryFileExists, [file ?? string.Empty], false, 5) is true; }
 
     /// <summary>
     /// Gibt den Dateinamen ohne Suffix zurück.
@@ -320,17 +323,17 @@ public static class IO {
         }
     }
 
-    public static string[] GetDirectories(string pfad) => ProcessFile(TryGetDirectories, false, 5, pfad, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
+    public static string[] GetDirectories(string directory) => ProcessFile(TryGetDirectories, [directory], false, 5, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
 
-    public static string[] GetDirectories(string pfad, string pattern, SearchOption suchOption) => ProcessFile(TryGetDirectories, false, 5, pfad, pattern, suchOption) as string[] ?? Array.Empty<string>();
+    public static string[] GetDirectories(string directory, string pattern, SearchOption suchOption) => ProcessFile(TryGetDirectories, [directory], false, 5, pattern, suchOption) as string[] ?? Array.Empty<string>();
 
-    public static FileInfo? GetFileInfo(string datei) => ProcessFile(TryGetFileInfo, false, 5, datei) as FileInfo;
+    public static FileInfo? GetFileInfo(string filename) => ProcessFile(TryGetFileInfo, [filename], false, 5) as FileInfo;
 
-    public static string[] GetFiles(string pfad, string pattern, SearchOption suchOption)
-                        => ProcessFile(TryGetFiles, false, 5, pfad, pattern, suchOption) as string[] ?? Array.Empty<string>();
+    public static string[] GetFiles(string directory, string pattern, SearchOption suchOption)
+                        => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption) as string[] ?? Array.Empty<string>();
 
-    public static string[] GetFiles(string pfad)
-                     => ProcessFile(TryGetFiles, false, 5, pfad, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
+    public static string[] GetFiles(string directory)
+                     => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
 
     /// <summary>
     /// Liefert Dateiinformationen mit Fehlerbehandlung und Wiederholungsversuchen
@@ -338,7 +341,7 @@ public static class IO {
     /// <param name="filename">Der Dateiname</param>
     /// <param name="mustDo">True wenn die Funktion auf jeden Fall ein Ergebnis liefern muss</param>
     /// <returns>Dateizeitstempel und -größe als String</returns>
-    public static string GetFileState(string filename, bool abortIfFailed) => ProcessFile(TryGetFileState, abortIfFailed, abortIfFailed ? 60 : 5, filename) as string ?? string.Empty;
+    public static string GetFileState(string filename, bool abortIfFailed) => ProcessFile(TryGetFileState, [filename], abortIfFailed, abortIfFailed ? 60 : 5) as string ?? string.Empty;
 
     /// <summary>
     /// Lädt alle Bytes aus einer Datei mit automatischer Retry-Logik
@@ -346,14 +349,14 @@ public static class IO {
     /// <param name="filename">Der Pfad zur zu ladenden Datei</param>
     /// <returns>Die geladenen Bytes oder ein leeres Array bei Fehler</returns>
     public static byte[] LoadAllBytes(string filename) {
-        var result = ProcessFile(TryLoadAllBytes, false, 60, filename);
+        var result = ProcessFile(TryLoadAllBytes, [filename], false, 60);
         return result as byte[] ?? Array.Empty<byte>();
     }
 
     /// <summary>
     /// Lädt Bytes aus einer Datei mit automatischer Retry-Logik und Dekomprimierung
     /// </summary>
-    public static ByteData? LoadAndUnzipAllBytes(string filename) => ProcessFile(TryLoadAndUnzipAllBytes, false, 60, filename) as ByteData;
+    public static ByteData? LoadAndUnzipAllBytes(string filename) => ProcessFile(TryLoadAndUnzipAllBytes, [filename], false, 60) as ByteData;
 
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist
@@ -362,34 +365,34 @@ public static class IO {
     /// <param name="newName">Zielpfad</param>
     /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <returns>True bei Erfolg</returns>
-    public static bool MoveFile(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveFile, abortIfFailed, abortIfFailed ? 60 : 5, oldName, newName) is true;
+    public static bool MoveFile(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveFile, [oldName, newName], abortIfFailed, abortIfFailed ? 60 : 5) is true;
 
     /// <summary>
     /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
     /// </summary>
-    /// <param name="pfad"></param>
+    /// <param name="directory"></param>
     /// <param name="anzahlParents"></param>
     /// <returns></returns>
-    public static string PathParent(this string pfad, int anzahlParents) {
+    public static string PathParent(this string directory, int anzahlParents) {
         for (var z = 1; z <= anzahlParents; z++) {
-            pfad = pfad.PathParent();
+            directory = directory.PathParent();
         }
-        return pfad;
+        return directory;
     }
 
     /// <summary>
     /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
     /// </summary>
-    /// <param name="pfad"></param>
-    public static string PathParent(this string? pfad) {
-        if (pfad is not { }) { return string.Empty; }
+    /// <param name="directory"></param>
+    public static string PathParent(this string? directory) {
+        if (directory is not { }) { return string.Empty; }
 
-        var z = pfad.Length;
+        var z = directory.Length;
 
         while (true) {
             z--;
             if (z <= 1) { return string.Empty; }
-            if (pfad.Substring(z - 1, 1) == "\\") { return pfad.Substring(0, z); }
+            if (directory.Substring(z - 1, 1) == "\\") { return directory.Substring(0, z); }
         }
     }
 
@@ -399,14 +402,14 @@ public static class IO {
     /// <param name="processMethod">Die auszuführende Methode</param>
     /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <param name="args">Variable Parameter</param>
-    public static object? ProcessFile(DoThis processMethod, bool abortIfFailed, int trySeconds, params object[] args) {
+    public static object? ProcessFile(DoThis processMethod, List<string> affectingFiles, bool abortIfFailed, int trySeconds, params object?[] args) {
         if (Develop.AllReadOnly) { return true; }
 
         var startTime = Stopwatch.StartNew();
         var stopw = Stopwatch.StartNew();
 
         while (true) {
-            var result = processMethod(args); // Jetzt FileOperationResult statt Tuple
+            var result = processMethod(affectingFiles, args);
             if (!result.Retry) {
                 if (result.Failed) { return null; }
                 return result.ReturnValue;
@@ -425,11 +428,11 @@ public static class IO {
 
             if (stopw.ElapsedMilliseconds > 5000) {
                 var operation = processMethod.Method.Name.Replace("Try", "").Replace("File", "").Replace("Dir", "");
-                var fileName = args.Length > 0 ? args[0]?.ToString()?.FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
-                var mess = "Keine weiteren Informationen vorhanden";
-                if (result.ReturnValue is string m) { mess = m; }
+                var fileName = affectingFiles.Count > 0 ? affectingFiles[0].FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
+                var mess = string.Empty;
+                if (result.ReturnValue is string m) { mess = $"({m})"; }
 
-                Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... ({mess})", 0);
+                Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... {mess}", 0);
                 stopw = Stopwatch.StartNew();
             }
 
@@ -440,16 +443,16 @@ public static class IO {
     /// <summary>
     /// Liest den gesamten Text aus einer Datei mit der angegebenen Kodierung
     /// </summary>
-    /// <param name="path">Der Pfad zur zu lesenden Datei</param>
+    /// <param name="filename">Der Pfad zur zu lesenden Datei</param>
     /// <param name="encoding">Die zu verwendende Kodierung</param>
     /// <returns>Der gesamte Inhalt der Datei als String</returns>
-    public static string ReadAllText(string path, FileShare share, Encoding encoding) {
-        var result = ProcessFile(TryReadAllText, false, 60, path, share, encoding);
+    public static string ReadAllText(string filename, FileShare share, Encoding encoding) {
+        var result = ProcessFile(TryReadAllText, [filename], false, 60, share, encoding);
         return result as string ?? string.Empty;
     }
 
-    public static string ReadAllText(string path, Encoding encoding) {
-        var result = ProcessFile(TryReadAllText, false, 60, path, FileShare.Read, encoding);
+    public static string ReadAllText(string filename, Encoding encoding) {
+        var result = ProcessFile(TryReadAllText, [filename], false, 60, FileShare.Read, encoding);
         return result as string ?? string.Empty;
     }
 
@@ -469,33 +472,32 @@ public static class IO {
     /// <summary>
     /// Erstellt einen eindeutigen temporären Dateinamen mit Berücksichtigung von Multithread-Zugriffen
     /// </summary>
-    public static string TempFile(string pfad, string wunschname, string suffix) {
-        if (string.IsNullOrEmpty(pfad)) { pfad = Path.GetTempPath(); }
+    public static string TempFile(string directory, string preferedfilename, string suffix) {
+        if (string.IsNullOrEmpty(directory)) { directory = Path.GetTempPath(); }
         if (string.IsNullOrEmpty(suffix)) { suffix = "tmp"; }
-        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.UtcNow.ToString6(); }
+        if (string.IsNullOrEmpty(preferedfilename)) { preferedfilename = UserName + DateTime.UtcNow.ToString6(); }
         var z = -1;
-        pfad = pfad.CheckPath();
-        CreateDirectory(pfad);
-        wunschname = wunschname.ReduceToChars(Constants.Char_Numerals + " _+-#" + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant());
+        directory = directory.CheckPath();
+        TryCreateDirectory([directory]);
+        preferedfilename = preferedfilename.ReduceToChars(Constants.Char_Numerals + " _+-#" + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant());
 
-        if (wunschname.Length > 80) { wunschname = wunschname.Substring(0, 80); }
+        if (preferedfilename.Length > 80) { preferedfilename = preferedfilename.Substring(0, 80); }
 
         string? filename;
         do {
             z++;
-            filename = z > 0 ? pfad + wunschname + "_" + z.ToStringInt5() + "." + suffix : pfad + wunschname + "." + suffix;
-        } while (TryFileExists(filename).ReturnValue is true);
+            filename = z > 0 ? directory + preferedfilename + "_" + z.ToStringInt5() + "." + suffix : directory + preferedfilename + "." + suffix;
+        } while (TryFileExists([filename]).ReturnValue is true);
         return filename;
     }
 
-    public static FileOperationResult TryGetFileInfo(object?[] args) {
-        if (args.Length < 1) { return FileOperationResult.ValueFailed; }
-        var datei = args[0] as string;
+    public static FileOperationResult TryGetFileInfo(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
-        if (string.IsNullOrWhiteSpace(datei)) { return FileOperationResult.ValueFailed; }
+        if (string.IsNullOrWhiteSpace(filename)) { return FileOperationResult.ValueFailed; }
 
         try {
-            var fi = new FileInfo(datei);
+            var fi = new FileInfo(filename);
             return new(fi);
         } catch (UnauthorizedAccessException) {
             return FileOperationResult.ValueFailed;
@@ -523,7 +525,7 @@ public static class IO {
     /// <param name="bytes">Zu speichernde Bytes</param>
     /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <returns>True bei Erfolg</returns>
-    public static bool WriteAllBytes(string filename, byte[] bytes, bool abortIfFailed) => ProcessFile(TryWriteAllBytes, abortIfFailed, abortIfFailed ? 60 : 5, filename, bytes) is true;
+    public static bool WriteAllBytes(string filename, byte[] bytes, bool abortIfFailed) => ProcessFile(TryWriteAllBytes, [filename], abortIfFailed, abortIfFailed ? 60 : 5, bytes) is true;
 
     /// <summary>
     /// Speichert den Text in einer Datei.
@@ -561,9 +563,7 @@ public static class IO {
         lock (_fileOperationLock) {
             try {
                 // Wenn zwischenzeitlich aufgeräumt wurde, nichts tun
-                if (_canWriteCache.Count < 1000) {
-                    return;
-                }
+                if (_canWriteCache.Count < 1000) { return; }
 
                 // Aktuelle Zeit für Altersprüfung
                 var now = DateTime.UtcNow;
@@ -620,13 +620,15 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryCanWrite(params object[] args) {
-        if (args.Length < 1 || args[0] is not string file) { return FileOperationResult.ValueFalse; }
+    private static FileOperationResult TryCanWrite(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+
+        filename = filename.CheckFile();
 
         lock (_fileOperationLock) {
-            if (!CanWriteInDirectory(file.FilePath())) { return FileOperationResult.ValueFalse; }
+            if (!CanWriteInDirectory(filename.FilePath())) { return FileOperationResult.ValueFalse; }
 
-            var fileUpper = file.ToUpperInvariant();
+            var fileUpper = filename.ToUpperInvariant();
 
             // Prüfen, ob wir für diese Datei bereits ein Ergebnis haben und ob es noch gültig ist
             if (_canWriteCache.TryGetValue(fileUpper, out var cacheEntry) &&
@@ -640,10 +642,10 @@ public static class IO {
             // Wenn kein gültiges Ergebnis vorliegt, führe die Prüfung durch
             var result = false;
 
-            if (TryFileExists(file).ReturnValue is true) {
+            if (TryFileExists(affectingFiles).ReturnValue is true) {
                 try {
                     // Versuch, Datei EXKLUSIV zu öffnen
-                    using (FileStream obFi = new(file, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) {
+                    using (FileStream obFi = new(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) {
                         obFi.Close();
                     }
                     result = true;
@@ -662,16 +664,16 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryCreateDirectory(params object[] args) {
-        if (args.Length < 1 || args[0] is not string dir) { return FileOperationResult.ValueFalse; }
-        dir = dir.CheckPath();
+    private static FileOperationResult TryCreateDirectory(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
+        directory = directory.CheckPath();
 
-        if (string.IsNullOrEmpty(dir) || !dir.IsFormat(FormatHolder.Filepath)) { return FileOperationResult.ValueFalse; }
+        if (string.IsNullOrEmpty(directory) || !directory.IsFormat(FormatHolder.Filepath)) { return FileOperationResult.ValueFalse; }
 
-        if (TryDirectoryExists(dir).ReturnValue is true) { return FileOperationResult.ValueTrue; }
+        if (TryDirectoryExists(affectingFiles).ReturnValue is true) { return FileOperationResult.ValueTrue; }
 
         try {
-            Directory.CreateDirectory(dir);
+            Directory.CreateDirectory(directory);
             return FileOperationResult.ValueTrue;
         } catch (IOException) {
             return FileOperationResult.DoRetry;
@@ -680,61 +682,69 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryDeleteDir(params object[] args) {
-        if (args.Length < 1 || args[0] is not string directory) { return FileOperationResult.ValueFalse; }
+    private static FileOperationResult TryDeleteDir(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
 
         directory = directory.CheckPath();
-        if (TryDirectoryExists(directory).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
+        if (TryDirectoryExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
 
         try {
             Directory.Delete(directory, true);
             RemoveFromCanWriteCache(directory);
 
-            // Warten bis das Verzeichnis gelöscht ist - verwende TryDirectoryExists negiert
-            return new(ProcessFile(TryDirectoryExists, false, 60, directory) is not true);
+            // Warten, bis die Datei wirklich gelöscht ist
+            var count = 0;
+            do {
+                if (TryDirectoryExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
+                if (count++ > _retryCount) { return FileOperationResult.ValueFalse; }
+                Thread.Sleep(_retrySleep);
+            } while (true);
         } catch {
             return FileOperationResult.DoRetry;
         }
     }
 
-    private static FileOperationResult TryDeleteFile(params object[] args) {
-        if (args.Length < 1 || args[0] is not string file) { return FileOperationResult.ValueFalse; }
+    private static FileOperationResult TryDeleteFile(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
-        if (TryFileExists(file).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
+        if (TryFileExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
+
+        filename = filename.CheckFile();
 
         // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
         try {
-            if (File.GetAttributes(file).HasFlag(FileAttributes.ReadOnly)) {
-                File.SetAttributes(file, FileAttributes.Normal);
+            if (File.GetAttributes(filename).HasFlag(FileAttributes.ReadOnly)) {
+                File.SetAttributes(filename, FileAttributes.Normal);
             }
         } catch {
             // Fehler ignorieren - wir probieren trotzdem zu löschen
         }
 
         try {
-            RemoveFromCanWriteCache(file);
-            if (!CanWrite(file)) { return FileOperationResult.ValueFalse; }
+            RemoveFromCanWriteCache(filename);
+            if (TryCanWrite(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
 
-            File.Delete(file);
-            RemoveFromCanWriteCache(file);
+            File.Delete(filename);
+            RemoveFromCanWriteCache(filename);
 
             // Warten, bis die Datei wirklich gelöscht ist
-            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
-                if (TryFileExists(file).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
-                Thread.Sleep(200);
-            }
-            return new(TryFileExists(file).ReturnValue is not true);
+            var count = 0;
+            do {
+                if (TryFileExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
+                if (count++ > _retryCount) { return FileOperationResult.ValueFalse; }
+                Thread.Sleep(_retrySleep);
+            } while (true);
         } catch {
             return FileOperationResult.DoRetry;
         }
     }
 
-    private static FileOperationResult TryDirectoryExists(params object[] args) {
-        if (args.Length < 1 || args[0] is not string pfad) { return FileOperationResult.ValueFalse; }
+    private static FileOperationResult TryDirectoryExists(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
 
-        if (pfad.Length < 3) { return FileOperationResult.ValueFalse; }
+        if (directory.Length < 3) { return FileOperationResult.ValueFalse; }
 
-        var p = pfad.CheckPath();
+        var p = directory.CheckPath();
 
         if (!p.IsFormat(FormatHolder.Filepath)) { return FileOperationResult.ValueFalse; }
 
@@ -749,31 +759,43 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryFileCopy(params object[] args) {
-        if (args.Length < 2 || args[0] is not string source || args[1] is not string target) { return FileOperationResult.ValueFalse; }
+    private static FileOperationResult TryFileCopy(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 2 || affectingFiles[0] is not string source || affectingFiles[1] is not string target) { return FileOperationResult.ValueFalse; }
+
+        source = source.CheckFile();
+        target = target.CheckFile();
 
         if (source == target) { return FileOperationResult.ValueTrue; }
-        if (TryFileExists(source).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
-        if (TryFileExists(target).ReturnValue is true) { return FileOperationResult.ValueFalse; }
+        if (TryFileExists([source]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
+        if (TryFileExists([target]).ReturnValue is true) { return FileOperationResult.ValueFalse; }
+
+        if (TryGetFileInfo([source]).ReturnValue is not FileInfo sourceInfo) { return FileOperationResult.ValueFalse; }
 
         try {
-            var sourceInfo = new FileInfo(source);
             File.Copy(source, target);
 
-            // Warten bis die Datei mit korrekter Größe existiert - verwende ProcessFile
-            return new(ProcessFile(TryWaitForCopiedFile, false, 60, target, sourceInfo.Length) is true);
+            // Warten, bis die Datei wirklich gelöscht ist
+            var count = 0;
+            do {
+                if (TryFileExists([target]).ReturnValue is true &&
+                    TryGetFileInfo([target]).ReturnValue is FileInfo targetFileInfo &&
+                    targetFileInfo.Length == sourceInfo.Length) { return FileOperationResult.ValueTrue; }
+
+                if (count++ > _retryCount) { return FileOperationResult.ValueFalse; }
+                Thread.Sleep(_retrySleep);
+            } while (true);
         } catch {
             return FileOperationResult.DoRetry;
         }
     }
 
-    private static FileOperationResult TryFileExists(params object[] args) {
-        if (args.Length < 1 || args[0] is not string file) { return FileOperationResult.ValueFalse; }
+    private static FileOperationResult TryFileExists(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
-        if (string.IsNullOrEmpty(file) || !file.IsFormat(FormatHolder.FilepathAndName)) { return FileOperationResult.ValueFalse; }
+        if (string.IsNullOrEmpty(filename) || !filename.IsFormat(FormatHolder.FilepathAndName)) { return FileOperationResult.ValueFalse; }
 
         try {
-            return new(File.Exists(file));
+            return new(File.Exists(filename));
         } catch (IOException) {
             return FileOperationResult.DoRetry;
         } catch (UnauthorizedAccessException) {
@@ -783,21 +805,19 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryGetDirectories(object?[] args) {
-        if (args.Length < 3) { return new(Array.Empty<string>()); }
-        var directory = args[0] as string;
-        var pattern = args[1] as string;
-        var option = args[2] is SearchOption so ? so : SearchOption.TopDirectoryOnly;
+    private static FileOperationResult TryGetDirectories(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
 
-        if (string.IsNullOrWhiteSpace(directory)) { return new(Array.Empty<string>()); }
+        if (args.Length < 2) { return FileOperationResult.ValueFailed; }
+        var pattern = args[0] as string;
+        var option = args[1] is SearchOption so ? so : SearchOption.TopDirectoryOnly;
+
+        if (TryDirectoryExists([directory]).ReturnValue is not true) { return new(Array.Empty<string>()); }
+
+        pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
 
         try {
-            if (!DirectoryExists(directory)) { return new(Array.Empty<string>()); }
-
-            pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
-
-            var dirs = Directory.GetDirectories(directory, pattern, option);
-            return new(dirs);
+            return new(Directory.GetDirectories(directory, pattern, option));
         } catch (UnauthorizedAccessException) {
             return FileOperationResult.ValueFailed;
         } catch {
@@ -805,22 +825,19 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryGetFiles(object?[] args) {
-        if (args.Length < 3) { return new(Array.Empty<string>()); }
-        var pfad = args[0] as string;
-        var pattern = args[1] as string;
-        var option = args[2] is SearchOption so ? so : SearchOption.TopDirectoryOnly;
+    private static FileOperationResult TryGetFiles(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
 
-        if (string.IsNullOrWhiteSpace(pfad))
-            return new(Array.Empty<string>());
+        if (args.Length < 2) { return FileOperationResult.ValueFailed; }
+        var pattern = args[0] as string;
+        var option = args[1] is SearchOption so ? so : SearchOption.TopDirectoryOnly;
+
+        if (TryDirectoryExists([directory]).ReturnValue is not true) { return new(Array.Empty<string>()); }
+
+        pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
 
         try {
-            if (!DirectoryExists(pfad)) { return new(Array.Empty<string>()); }
-
-            pattern = string.IsNullOrWhiteSpace(pattern) ? "*" : pattern;
-
-            var files = Directory.GetFiles(pfad, pattern, option);
-            return new(files);
+            return new(Directory.GetFiles(directory, pattern, option));
         } catch (UnauthorizedAccessException) {
             return FileOperationResult.ValueFailed;
         } catch {
@@ -828,8 +845,8 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryGetFileState(params object[] args) {
-        if (args.Length < 1 || args[0] is not string filename) { return new(string.Empty); }
+    private static FileOperationResult TryGetFileState(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
         try {
             FileInfo f = new(filename);
@@ -841,14 +858,14 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryLoadAllBytes(params object[] args) {
-        if (args.Length < 1 || args[0] is not string filename) { return FileOperationResult.ValueFailed; }
+    private static FileOperationResult TryLoadAllBytes(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
         if (string.IsNullOrWhiteSpace(filename)) { return FileOperationResult.ValueFailed; }
 
         try {
             // Prüfen ob Datei existiert
-            if (TryFileExists(filename).ReturnValue is not true) { return FileOperationResult.ValueFailed; }
+            if (TryFileExists([filename]).ReturnValue is not true) { return FileOperationResult.ValueFailed; }
 
             // Bytes laden
             var bytes = File.ReadAllBytes(filename);
@@ -862,12 +879,12 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryLoadAndUnzipAllBytes(params object[] args) {
-        if (args.Length < 1 || args[0] is not string filename) { return FileOperationResult.ValueFailed; }
+    private static FileOperationResult TryLoadAndUnzipAllBytes(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
         try {
             // Direkter Aufruf der Try-Methode anstatt GetFileInfo
-            var state1 = TryGetFileState(filename);
+            var state1 = TryGetFileState([filename]);
             if (state1.Retry) { return FileOperationResult.DoRetry; }
             if (state1.Failed) { return FileOperationResult.ValueFailed; }
             if (state1.ReturnValue is not string fileinfo1 || string.IsNullOrEmpty(fileinfo1)) { return FileOperationResult.DoRetry; }
@@ -876,7 +893,7 @@ public static class IO {
             if (bytes.IsZipped()) { bytes = bytes.UnzipIt(); }
             if (bytes == null) { return FileOperationResult.ValueFailed; }
 
-            var state2 = TryGetFileState(filename);
+            var state2 = TryGetFileState([filename]);
             if (state2.ReturnValue is not string fileinfo2 || fileinfo1 != fileinfo2) { return FileOperationResult.DoRetry; }
 
             return new(new ByteData(bytes, fileinfo1));
@@ -889,69 +906,78 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryMoveDirectory(params object[] args) {
-        if (args.Length < 2 || args[0] is not string oldName || args[1] is not string newName) { return FileOperationResult.ValueFalse; }
+    private static FileOperationResult TryMoveDirectory(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count < 2 || affectingFiles[0] is not string oldName || affectingFiles[1] is not string newName) { return FileOperationResult.ValueFalse; }
+
+        oldName = oldName.CheckPath();
+        newName = newName.CheckPath();
 
         if (oldName == newName) { return FileOperationResult.ValueTrue; }
-        if (TryDirectoryExists(oldName).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
-        if (TryDirectoryExists(newName).ReturnValue is true) { return FileOperationResult.ValueFalse; }
+        if (TryDirectoryExists([oldName]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
+        if (TryDirectoryExists([newName]).ReturnValue is true) { return FileOperationResult.ValueFalse; }
 
         try {
             Directory.Move(oldName, newName);
             RemoveFromCanWriteCache(oldName);
             RemoveFromCanWriteCache(newName);
 
-            // Warten, bis das Verzeichnis am neuen Ort existiert
-            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
-                if (TryDirectoryExists(newName).ReturnValue is true && TryDirectoryExists(oldName).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
-                Thread.Sleep(200);
-            }
-            return new(TryDirectoryExists(newName).ReturnValue is true && TryDirectoryExists(oldName).ReturnValue is not true);
+            // Warten, bis das Verzeichnis wirklich verschoben ist
+            var count = 0;
+            do {
+                if (TryDirectoryExists([newName]).ReturnValue is true &&
+                    TryDirectoryExists([oldName]).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
+
+                if (count++ > _retryCount) { return FileOperationResult.ValueFalse; }
+                Thread.Sleep(_retrySleep);
+            } while (true);
         } catch {
             return FileOperationResult.DoRetry;
         }
     }
 
-    private static FileOperationResult TryMoveFile(params object[] args) {
-        if (args.Length < 2 || args[0] is not string oldName || args[1] is not string newName) { return FileOperationResult.ValueFalse; }
+    private static FileOperationResult TryMoveFile(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count < 2 || affectingFiles[0] is not string oldName || affectingFiles[1] is not string newName) { return FileOperationResult.ValueFalse; }
+
+        oldName = oldName.CheckFile();
+        newName = newName.CheckFile();
 
         if (oldName == newName) { return FileOperationResult.ValueTrue; }
-        if (TryFileExists(oldName).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
-        if (TryFileExists(newName).ReturnValue is true) { return FileOperationResult.ValueFalse; }
+        if (TryFileExists([oldName]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
+        if (TryFileExists([newName]).ReturnValue is true) { return FileOperationResult.ValueFalse; }
 
         try {
             // Sicherstellen, dass das Zielverzeichnis existiert
             var targetDir = Path.GetDirectoryName(newName);
-            if (!string.IsNullOrEmpty(targetDir)) {
-                CreateDirectory(targetDir);
-            }
+            if (!string.IsNullOrEmpty(targetDir)) { TryCreateDirectory([targetDir]); }
 
             File.Move(oldName, newName);
             RemoveFromCanWriteCache(oldName);
             RemoveFromCanWriteCache(newName);
 
-            // Warten, bis die Datei am neuen Ort existiert und an der alten Position verschwunden ist
-            for (var i = 0; i < _fileExistenceCheckRetryCount; i++) {
-                if (TryFileExists(newName).ReturnValue is true && TryFileExists(oldName).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
-                Thread.Sleep(200);
-            }
+            // Warten, bis die Datei wirklich verschoben ist
+            var count = 0;
+            do {
+                if (TryFileExists([newName]).ReturnValue is true &&
+                    TryFileExists([oldName]).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
 
-            return new(TryFileExists(newName).ReturnValue is true && TryFileExists(oldName).ReturnValue is not true);
+                if (count++ > _retryCount) { return FileOperationResult.ValueFalse; }
+                Thread.Sleep(_retrySleep);
+            } while (true);
         } catch {
             return FileOperationResult.DoRetry;
         }
     }
 
-    private static FileOperationResult TryReadAllText(params object[] args) {
-        if (args.Length < 3 || args[0] is not string filename || args[1] is not FileShare share || args[2] is not Encoding encoding) {
-            return new(string.Empty);
-        }
+    private static FileOperationResult TryReadAllText(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+
+        if (args.Length < 2 || args[0] is not FileShare share || args[1] is not Encoding encoding) { return FileOperationResult.ValueFailed; }
 
         if (string.IsNullOrWhiteSpace(filename)) { return new(string.Empty); }
 
         try {
             // Prüfen ob Datei existiert
-            if (TryFileExists(filename).ReturnValue is not true) { return new(string.Empty); }
+            if (TryFileExists([filename]).ReturnValue is not true) { return new(string.Empty); }
 
             //// Text aus Datei lesen
             //var content = File.ReadAllText(filename, encoding);
@@ -968,42 +994,26 @@ public static class IO {
         }
     }
 
-    private static FileOperationResult TryWaitForCopiedFile(params object[] args) {
-        if (args.Length < 2 || args[0] is not string targetFile || args[1] is not long expectedSize) { return FileOperationResult.ValueFalse; }
-
-        if (TryFileExists(targetFile).ReturnValue is true) {
-            try {
-                var targetInfo = new FileInfo(targetFile);
-                if (targetInfo.Length == expectedSize) {
-                    return FileOperationResult.ValueTrue;
-                }
-            } catch {
-                // Bei Fehler beim Dateizugriff retry
-            }
-        }
-        return FileOperationResult.DoRetry;
-    }
-
     /// <summary>
     ///
     /// </summary>
     /// <param name="args">Filename, Byte[]</param>
     /// <returns></returns>
-    private static FileOperationResult TryWriteAllBytes(params object[] args) {
-        if (args.Length < 2 || args[0] is not string filename || args[1] is not byte[] bytes) {
-            return FileOperationResult.ValueFalse;
-        }
+    private static FileOperationResult TryWriteAllBytes(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFalse; }
+
+        if (args.Length != 1 || args[0] is not byte[] bytes) { return FileOperationResult.ValueFalse; }
 
         try {
             if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
 
             filename = filename.CheckFile();
 
-            var pfad = filename.FilePath();
-            if (!CreateDirectory(pfad)) { return FileOperationResult.ValueFalse; }
+            var directory = filename.FilePath();
+            if (TryCreateDirectory([directory]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
 
             // Prüfen ob wir schreiben können
-            if (!CanWrite(filename)) { return FileOperationResult.ValueFalse; }
+            if (TryCanWrite([filename]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
 
             using FileStream fs = new(filename, FileMode.Create, FileAccess.Write, FileShare.None);
             fs.Write(bytes, 0, bytes.Length);

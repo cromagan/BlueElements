@@ -83,9 +83,24 @@ public class TableFragments : TableFile {
 
     protected override bool SaveRequired => false;
 
+    /// <summary>
+    /// Letzter Lade-Stand der Daten.
+    /// </summary>
+    private DateTime IsInCache { get; set; } = new(0);
+
     #endregion
 
     #region Methods
+
+    public override bool AmITemporaryMaster(int ranges, int rangee) {
+        if (IsInCache.Year < 2000) { return false; }
+
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) {
+            if (!BeSureToBeUpToDate(false)) { return false; }
+        }
+
+        return base.AmITemporaryMaster(ranges, rangee);
+    }
 
     public override string AreAllDataCorrect() {
         var f = base.AreAllDataCorrect();
@@ -96,13 +111,17 @@ public class TableFragments : TableFile {
         return string.Empty;
     }
 
-    public override bool BeSureToBeUpToDate() {
-        if (!base.BeSureToBeUpToDate()) { return false; }
+    public override bool BeSureToBeUpToDate(bool firstTime) {
+        if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
         if (_isInFragmentLoader) { return false; }
         _isInFragmentLoader = true;
+
+        if (firstTime) {
+            IsInCache = LastSaveMainFileUtcDate;
+        }
 
         try {
             DropMessage(ErrorType.Info, "Lade Fragmente von '" + KeyName + "'");
@@ -143,6 +162,11 @@ public class TableFragments : TableFile {
         return string.Empty;
     }
 
+    public override void TryToSetMeTemporaryMaster() {
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 1) { return; }
+        base.TryToSetMeTemporaryMaster();
+    }
+
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
@@ -151,79 +175,6 @@ public class TableFragments : TableFile {
         CloseWriter();
 
         base.Dispose(disposing);
-    }
-
-    protected override void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc, DateTime endTimeUtc) {
-        base.DoWorkAfterLastChanges(files, startTimeUtc, endTimeUtc);
-        if (IsFreezed) { return; }
-        if (files is not { Count: >= 1 }) { return; }
-
-        _masterNeeded = files.Count > 8 || _changesNotIncluded.Count > 40 || DateTime.UtcNow.Subtract(FileStateUtcDate).TotalHours > 12;
-
-        #region Bei Bedarf neue Komplett-Tabelle erstellen
-
-        if (_masterNeeded && DateTime.UtcNow.Subtract(FileStateUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
-            DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
-
-            var f = SaveMainFile(this, IsInCache);
-
-            if (!string.IsNullOrEmpty(f)) {
-                DropMessage(ErrorType.Info, "Komplettierung von {Caption} fehlgeschlagen: {f}");
-                //Develop.DebugPrint(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
-                return;
-            }
-            _masterNeeded = false;
-            OnInvalidateView();
-            _changesNotIncluded.Clear();
-        }
-
-        #endregion
-
-        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { return; }
-
-        #region Dateien, mit zu jungen Änderungen entfernen
-
-        if (_changesNotIncluded.Any()) {
-            foreach (var thisch in _changesNotIncluded) {
-                //if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalHours < 12) {
-                _ = files.Remove(thisch.Container);
-                //}
-            }
-        }
-
-        #endregion
-
-        //var pf = OldFragmengtsPath();
-
-        files.Shuffle();
-
-        foreach (var thisf in files) {
-            var del = true;
-
-            var f = thisf.FileNameWithoutSuffix();
-            if (f.Length > 19) {
-                var da = f.Substring(f.Length - 19);
-
-                if (DateTimeTryParse(da, out var d2)) {
-                    if (DateTime.UtcNow.Subtract(d2).TotalHours < 3) { del = false; }
-                    if (del && DateTime.UtcNow.Subtract(d2).TotalHours < 12) {
-                        try {
-                            var fi = GetFileInfo(thisf);
-                            if (fi == null || fi.Length > 400) { del = false; }
-                        } catch {
-                            del = false;
-                        }
-                    }
-                }
-            }
-
-            if (del) {
-                DropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-                _ = DeleteFile(thisf, false);
-                //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
-                if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { break; }
-            }
-        }
     }
 
     protected override bool LoadMainData() {
@@ -295,6 +246,79 @@ public class TableFragments : TableFile {
         }
     }
 
+    private void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc, DateTime endTimeUtc) {
+        if (IsFreezed) { return; }
+        if (!InitialLoadDone) { return; }
+        if (files is not { Count: >= 1 }) { return; }
+
+        _masterNeeded = files.Count > 8 || _changesNotIncluded.Count > 40 || DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalHours > 12;
+
+        #region Bei Bedarf neue Komplett-Tabelle erstellen
+
+        if (_masterNeeded && DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
+            DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
+
+            var f = SaveMainFile(this, IsInCache);
+
+            if (!string.IsNullOrEmpty(f)) {
+                DropMessage(ErrorType.Info, "Komplettierung von {Caption} fehlgeschlagen: {f}");
+                //Develop.DebugPrint(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
+                return;
+            }
+            _masterNeeded = false;
+            OnInvalidateView();
+            _changesNotIncluded.Clear();
+        }
+
+        #endregion
+
+        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { return; }
+
+        #region Dateien, mit zu jungen Änderungen entfernen
+
+        if (_changesNotIncluded.Any()) {
+            foreach (var thisch in _changesNotIncluded) {
+                //if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalHours < 12) {
+                _ = files.Remove(thisch.Container);
+                //}
+            }
+        }
+
+        #endregion
+
+        //var pf = OldFragmengtsPath();
+
+        files.Shuffle();
+
+        foreach (var thisf in files) {
+            var del = true;
+
+            var f = thisf.FileNameWithoutSuffix();
+            if (f.Length > 19) {
+                var da = f.Substring(f.Length - 19);
+
+                if (DateTimeTryParse(da, out var d2)) {
+                    if (DateTime.UtcNow.Subtract(d2).TotalHours < 3) { del = false; }
+                    if (del && DateTime.UtcNow.Subtract(d2).TotalHours < 12) {
+                        try {
+                            var fi = GetFileInfo(thisf);
+                            if (fi == null || fi.Length > 400) { del = false; }
+                        } catch {
+                            del = false;
+                        }
+                    }
+                }
+            }
+
+            if (del) {
+                DropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
+                _ = DeleteFile(thisf, false);
+                //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
+                if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > 20) { break; }
+            }
+        }
+    }
+
     private string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
 
     private (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(DateTime endTimeUtc) {
@@ -357,7 +381,7 @@ public class TableFragments : TableFile {
             return;
         }
 
-        if (!string.IsNullOrEmpty(Filename) && IsInCache.Year < 2000) {
+        if (!string.IsNullOrEmpty(Filename) && !InitialLoadDone) {
             Develop.DebugPrint(ErrorType.Error, "Tabelle noch nicht korrekt geladen!");
             return;
         }

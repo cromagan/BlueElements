@@ -89,6 +89,8 @@ public class TableFile : Table {
         return GetFiles(path, "*." + fx, System.IO.SearchOption.TopDirectoryOnly).ToList();
     }
 
+    public override bool AmITemporaryMaster(int ranges, int rangee) => base.AmITemporaryMaster(ranges, rangee);
+
     public override string AreAllDataCorrect() {
         if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
         if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
@@ -100,7 +102,7 @@ public class TableFile : Table {
 
     public override bool BeSureRowIsLoaded(string chunkValue) => base.BeSureRowIsLoaded(chunkValue);
 
-    public override bool BeSureToBeUpToDate() => base.BeSureToBeUpToDate();
+    public override bool BeSureToBeUpToDate(bool firstTime) => base.BeSureToBeUpToDate(firstTime);
 
     /// <summary>
     /// Konkrete Prüfung, ob jetzt gespeichert werden kann
@@ -110,6 +112,8 @@ public class TableFile : Table {
         var f = AreAllDataCorrect();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
+        if (!InitialLoadDone) { return "Tabelle noch nicht geladen."; }
+
         if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
 
         //if (ExecutingScriptThreadsAnyTable.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
@@ -118,8 +122,7 @@ public class TableFile : Table {
 
         //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
-        var fileSaveResult = CanSaveFile(Filename, 5);
-        return fileSaveResult;
+        return CanSaveFile(Filename, 5);
     }
 
     public override void Freeze(string reason) => base.Freeze(reason);
@@ -201,13 +204,9 @@ public class TableFile : Table {
 
         LoadMainData();
 
-        if (FileStateUtcDate.Year < 2000) {
-            FileStateUtcDate = new DateTime(2000, 1, 1);
-        }
         _saveRequired_File = false;
-        IsInCache = FileStateUtcDate;
-
-        _ = BeSureToBeUpToDate();
+        InitialLoadDone = true;
+        _ = BeSureToBeUpToDate(true);
 
         RepairAfterParse();
 
@@ -219,17 +218,15 @@ public class TableFile : Table {
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
         CreateWatcher();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
 
         DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
     }
 
     public override void ReorganizeChunks() => base.ReorganizeChunks();
 
     public override void RepairAfterParse() {
         // Nicht IsInCache setzen, weil ansonsten TableFragments nicht mehr funktioniert
-
-        if (!string.IsNullOrEmpty(AreAllDataCorrect())) { return; }
 
         if (!string.IsNullOrEmpty(Filename)) {
             if (!string.Equals(KeyName, MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
@@ -240,7 +237,7 @@ public class TableFile : Table {
         base.RepairAfterParse();
     }
 
-    public bool Save(bool mustSave) => ProcessFile(TrySave, false, mustSave ? 120 : 10) is true;
+    public bool Save(bool mustSave) => ProcessFile(TrySave, [Filename], false, mustSave ? 120 : 10) is true;
 
     public void SaveAsAndChangeTo(string newFileName) {
         if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!"); }
@@ -256,12 +253,12 @@ public class TableFile : Table {
 
         _ = mainchunk.Save(newFileName);
 
-        // IsInCache auf FileStateUtcDate setzen, damit WaitInitialDone() nicht wartet
-        FileStateUtcDate = currentTime;
-        IsInCache = currentTime;
+        InitialLoadDone = true;
     }
 
     public override string ToString() => base.ToString();
+
+    public override void TryToSetMeTemporaryMaster() => base.TryToSetMeTemporaryMaster();
 
     protected static string SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.CanSaveMainChunk();
@@ -275,7 +272,7 @@ public class TableFile : Table {
         f = chunksnew[0].DoExtendedSave();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        tbf.FileStateUtcDate = setfileStateUtcDateTo;
+        tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         return string.Empty;
     }
 
@@ -337,9 +334,6 @@ public class TableFile : Table {
         base.Dispose(disposing);
     }
 
-    protected override void DoWorkAfterLastChanges(List<string>? files, DateTime starttimeUtc, DateTime endTimeUtc) =>
-        base.DoWorkAfterLastChanges(files, starttimeUtc, endTimeUtc);
-
     protected virtual bool LoadMainData() {
         var byteData = LoadAndUnzipAllBytes(Filename);
 
@@ -348,7 +342,7 @@ public class TableFile : Table {
             return false;
         }
 
-        var ok = Parse(byteData.Bytes, true, Filename);
+        var ok = Parse(byteData.Bytes, true);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");
@@ -360,7 +354,7 @@ public class TableFile : Table {
 
     protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
         try {
-            var result = SaveMainFile(this, FileStateUtcDate);
+            var result = SaveMainFile(this, DateTime.UtcNow);
 
             _saveRequired_File = !string.IsNullOrEmpty(result);
 
@@ -383,10 +377,12 @@ public class TableFile : Table {
 
     private static void TableUpdater(object state) {
         foreach (var thisTbl in AllFiles) {
-            if (thisTbl is TableFile { IsDisposed: false, IsInCache.Year: < 2000 } tbf) {
+            if (thisTbl is TableFile { IsDisposed: false } tbf) {
                 //if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
                 if (!string.IsNullOrEmpty(tbf.Filename)) { return; } // Irgend eine Tabelle wird aktuell geladen
             }
+
+            if (!thisTbl.InitialLoadDone) { return; }
         }
 
         BeSureToBeUpToDate(AllFiles);
@@ -416,7 +412,11 @@ public class TableFile : Table {
         return true;
     }
 
-    private FileOperationResult TrySave(params object[] args) {
+    private FileOperationResult TrySave(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+
+        if (!string.Equals(filename, Filename, StringComparison.OrdinalIgnoreCase)) { return FileOperationResult.ValueFailed; }
+
         if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
 
         if (!SaveRequired) { return FileOperationResult.ValueTrue; }
@@ -425,7 +425,7 @@ public class TableFile : Table {
         if (!_saveSemaphore.Wait(0)) { return FileOperationResult.DoRetry; }
 
         try {
-            var result = SaveInternal(FileStateUtcDate);
+            var result = SaveInternal(DateTime.UtcNow);
             OnInvalidateView();
 
             var ok = string.IsNullOrEmpty(result);

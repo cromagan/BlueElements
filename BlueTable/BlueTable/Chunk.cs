@@ -68,7 +68,7 @@ public class Chunk : IHasKeyName {
             var folder = MainFileName.FilePath();
             var tablename = MainFileName.FileNameWithoutSuffix();
 
-            return $"{folder}{tablename}\\{KeyName}.bdbc";
+            return $"{ChunkFolder()}{KeyName}.bdbc";
         }
     }
 
@@ -82,7 +82,9 @@ public class Chunk : IHasKeyName {
     }
 
     public string LastEditApp { get; private set; } = string.Empty;
+
     public string LastEditID { get; private set; } = string.Empty;
+
     public string LastEditMachineName { get; private set; } = string.Empty;
 
     public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
@@ -115,6 +117,13 @@ public class Chunk : IHasKeyName {
             bytes.Add(mu);
             numberToAdd %= te;
         } while (byteCount > 0);
+    }
+
+    public string ChunkFolder() {
+        var folder = MainFileName.FilePath();
+        var tablename = MainFileName.FileNameWithoutSuffix();
+
+        return $"{folder}{tablename}\\";
     }
 
     /// <summary>
@@ -486,7 +495,7 @@ public class Chunk : IHasKeyName {
                         return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser}";
                     }
                     if (LastEditID != MyId) {
-                        return $"Ein andere Prozess auf diesem PC bearbeitet gerade.";
+                        return $"Ein anderer Prozess auf diesem PC bearbeitet gerade.";
                     }
                 }
             }
@@ -539,7 +548,7 @@ public class Chunk : IHasKeyName {
         var filename = ChunkFileName;
 
         while (pointer < data.Length) {
-            var (newPointer, type, value, _, _) = Table.Parse(data, pointer, filename);
+            var (newPointer, type, value, _, _) = Table.Parse(data, pointer);
             pointer = newPointer;
 
             switch (type) {
@@ -585,7 +594,7 @@ public class Chunk : IHasKeyName {
         // Durch alle Datensätze gehen
         while (pointer < bytes.Length) {
             var startPointer = pointer;
-            var (newPointer, type, _, _, _) = Table.Parse(bytes, pointer, filename);
+            var (newPointer, type, _, _, _) = Table.Parse(bytes, pointer);
 
             // Wenn Parse keine Fortschritte macht, abbrechen um Endlosschleife zu vermeiden
             if (newPointer <= startPointer) {

@@ -156,7 +156,11 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     }
 
     public override string ErrorReason() {
-        if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
+        if (Table is not { IsDisposed: false } tbl) { return "Tabelle verworfen"; }
+
+        if (tbl is TableChunk tblc) {
+            if (!NeedRow && ChangeValuesAllowed && EventTypes != ScriptEventTypes.Ohne_Auslöser) { return "Gechunkte Tabellen unterstütze nur Zeilenskripte."; }
+        }
 
         if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
             //if (ChangeValuesAllowed) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
@@ -211,7 +215,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
         if (EventTypes.ToString() == ((int)EventTypes).ToString()) { return "Skripte öffnen und neu speichern."; }
 
-        foreach (var script in db.EventScript) {
+        foreach (var script in tbl.EventScript) {
             if (script != this) {
                 if (string.Equals(script.KeyName, KeyName, StringComparison.OrdinalIgnoreCase)) { return $"Skriptname '{script.KeyName}' mehrfach vorhanden"; }
 

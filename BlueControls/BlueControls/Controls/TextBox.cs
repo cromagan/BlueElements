@@ -32,7 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -874,7 +873,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
         var dataObject = new DataObject();
         dataObject.SetData(ExtCharFormat, l.JoinWithCr());// 1. Als ExtChar-Format (für interne Verwendung)
-        dataObject.SetText(_eTxt.ConvertCharToPlainText(_markStart, _markEnd-1));// 2. Als Plain Text (für externe Anwendungen)
+        dataObject.SetText(_eTxt.ConvertCharToPlainText(_markStart, _markEnd - 1));// 2. Als Plain Text (für externe Anwendungen)
         Clipboard.SetDataObject(dataObject, true);
     }
 

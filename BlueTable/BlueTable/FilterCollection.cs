@@ -44,9 +44,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private readonly List<FilterItem> _internal = [];
 
-    private Table? _table;
-
     private List<RowItem>? _rows;
+    private Table? _table;
 
     #endregion
 
@@ -157,27 +156,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public int Count => IsDisposed ? 0 : _internal.Count;
 
-    public Table? Table {
-        get => _table;
-        set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (_table == value) { return; }
-
-            lock (_internal) {
-                if (IsDisposed) { return; }
-                OnChanging();
-                UnRegisterTableEvents();
-
-                _table = value;
-                _internal.Clear();
-
-                RegisterTableEvents();
-                Invalidate_FilteredRows();
-            }
-            OnPropertyChanged();
-        }
-    }
-
     public Type? Editor { get; set; }
 
     public bool IsDisposed { get; private set; }
@@ -213,6 +191,27 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
             _rows ??= CalculateFilteredRows(_table, _internal.ToArray());
             return _rows.Count != 1 ? null : _rows[0];
+        }
+    }
+
+    public Table? Table {
+        get => _table;
+        set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (_table == value) { return; }
+
+            lock (_internal) {
+                if (IsDisposed) { return; }
+                OnChanging();
+                UnRegisterTableEvents();
+
+                _table = value;
+                _internal.Clear();
+
+                RegisterTableEvents();
+                Invalidate_FilteredRows();
+            }
+            OnPropertyChanged();
         }
     }
 

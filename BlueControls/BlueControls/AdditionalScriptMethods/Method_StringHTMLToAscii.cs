@@ -21,16 +21,8 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
-using BlueControls.Forms;
-
-using BlueScript.Enums;
 
 using BlueScript.Methods;
-
-using BlueScript.Structures;
-using BlueScript.Variables;
-using System.Collections.Generic;
 
 using BlueControls.Extended_Text;
 

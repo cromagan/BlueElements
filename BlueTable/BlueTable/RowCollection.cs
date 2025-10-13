@@ -458,6 +458,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
+        if (!tb.InitialLoadDone) { return "Tabelle noch nicht geladen."; }
+
         var m = tb.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(m)) { return m; }
 

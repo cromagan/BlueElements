@@ -42,8 +42,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     #region Fields
 
     public bool UndoDone;
-    private Table? _table;
     private bool _frmHeadEditorFormClosingIsin;
+    private Table? _table;
 
     #endregion
 
@@ -222,16 +222,14 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             }
         }
 
-
-        if (az is { IsDisposed: false }){
+        if (az is { IsDisposed: false }) {
             var o = new Renderer_DateTime {
-                  UTCToLocal = true,
-                  ShowSymbol = true
+                UTCToLocal = true,
+                ShowSymbol = true
             };
             az.DefaultRenderer = o.MyClassId;
             az.RendererSettings = o.ParseableItems().FinishParseable();
         }
-
 
         if (db.Column["Symbol"] is { IsDisposed: false } c) {
             var o = new Renderer_ImageAndText {
@@ -330,7 +328,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         db.TemporaryTableMasterUser = Table.MyMasterCode;
         db.TemporaryTableMasterTimeUtc = DateTime.UtcNow.ToString5();
-        db.BeSureToBeUpToDate();
+        db.BeSureToBeUpToDate(false);
         Close();
     }
 
@@ -367,7 +365,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (db.AmITemporaryMaster(0, 60)) {
             db.TemporaryTableMasterUser = "Unset: " + Generic.UserName;
             db.TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
-            db.BeSureToBeUpToDate();
+            db.BeSureToBeUpToDate(false);
             Close();
         }
     }
@@ -387,8 +385,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         var t = "<b>Tabelle:</b> <tab>" + tbl.KeyName + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (tbl.Row.Count() - 1) + "<br>";
         t += "<b>Temporärer Master:</b>  <tab>" + tbl.TemporaryTableMasterTimeUtc + " " + Table.TemporaryTableMasterUser + "<br>";
-        t += "<b>Letzte Komplettierung:</b> <tab>" + tbl.FileStateUtcDate.ToString7() + " UTC<br>";
-    
+
+        t += "<b>Letzte Speicherung der Hauptdatei:</b> <tab>" + tbl.LastSaveMainFileUtcDate.ToString7() + " UTC<br>";
 
         capInfo.Text = t.TrimEnd("<br>");
     }
