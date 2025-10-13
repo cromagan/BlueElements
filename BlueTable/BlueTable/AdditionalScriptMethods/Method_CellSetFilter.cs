@@ -82,6 +82,11 @@ public class Method_CellSetFilter : Method_TableGeneric {
 
         value = columnToSet.AutoCorrect(value, true);
 
+        if (!scp.ProduktivPhase) {
+            if (r[0].CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }
+            return DoItFeedback.Wahr();
+        }
+
         r[0].CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + db.Caption + "'");
 
         columnToSet.AddSystemInfo("Edit with Script", db, scp.ScriptName);

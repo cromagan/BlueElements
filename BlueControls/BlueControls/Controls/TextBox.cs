@@ -813,43 +813,6 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
         base.OnVisibleChanged(e);
     }
 
-    private static List<ExtChar> DeserializeParseableItems(string serializedData, params object[] constructorArgs) {
-        var result = new List<ExtChar>();
-        var lines = serializedData.Split('\n');
-        var currentItemData = new StringBuilder();
-        var inItem = false;
-
-        foreach (var line in lines) {
-            var trimmedLine = line.Trim();
-
-            if (trimmedLine == "{") {
-                inItem = true;
-                currentItemData.Clear();
-                currentItemData.AppendLine(trimmedLine);
-                continue;
-            }
-
-            if (trimmedLine == "}") {
-                inItem = false;
-                currentItemData.AppendLine(trimmedLine);
-
-                // Item verarbeiten
-                var itemString = currentItemData.ToString();
-                var newItem = ParseableItem.NewByParsing<ExtChar>(itemString, constructorArgs);
-                if (newItem != null) {
-                    result.Add(newItem);
-                }
-                continue;
-            }
-
-            if (inItem) {
-                currentItemData.AppendLine(trimmedLine);
-            }
-        }
-
-        return result;
-    }
-
     private void _eTxt_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
 
     private void AbortSpellChecking() {
@@ -911,7 +874,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
         var dataObject = new DataObject();
         dataObject.SetData(ExtCharFormat, l.JoinWithCr());// 1. Als ExtChar-Format (für interne Verwendung)
-        dataObject.SetText(_eTxt.ConvertCharToPlainText(_markStart, _markEnd));// 2. Als Plain Text (für externe Anwendungen)
+        dataObject.SetText(_eTxt.ConvertCharToPlainText(_markStart, _markEnd-1));// 2. Als Plain Text (für externe Anwendungen)
         Clipboard.SetDataObject(dataObject, true);
     }
 

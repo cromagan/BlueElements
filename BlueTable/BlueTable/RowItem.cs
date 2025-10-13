@@ -258,7 +258,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns>0 bei Fehlern</returns>
     public int CellGetInteger(ColumnItem? column) => IntParse(Table?.Cell.GetString(column, this));
 
-    public List<string> CellGetList(ColumnItem? column) => Table?.Cell.GetString(column, this).SplitAndCutByCrToList() ?? [];
+    public List<string> CellGetList(ColumnItem? column) {
+        if(column?.Table is not { IsDisposed: false} tb) { return []; }
+
+        if(column.TextFormatingAllowed) {
+            return tb.Cell.GetString(column, this).SplitAndCutBy("<br>").ToList();
+        }
+
+       return  tb.Cell.GetString(column, this).SplitAndCutByCrToList() ;
+    }
 
     public List<string> CellGetList(string columnName) => CellGetList(Table?.Column[columnName]);
 
