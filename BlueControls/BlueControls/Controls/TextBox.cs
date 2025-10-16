@@ -218,6 +218,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                 _eTxt.PlainText = value;
             }
 
+            _mustCheck = true;
             Invalidate();
             RaiseEventIfTextChanged(true);  // Wichtig, z.B: für ComboBox
         }
@@ -1114,7 +1115,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
             return;
         }
 
-        if (Dictionary.DictionaryRunning(!DesignMode)) { _mustCheck = true; }
+        //if (Dictionary.DictionaryRunning(!DesignMode)) { _mustCheck = true; }
 
         if (doChangeNow || !Blinker.Enabled || _blinkCount >= _raiseChangeDelay) {
             _lastCheckedText = newtext;
