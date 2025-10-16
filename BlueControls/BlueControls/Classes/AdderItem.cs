@@ -78,7 +78,7 @@ internal class AdderItem : IReadableTextWithKey {
                 var r = db.Row.GenerateAndAdd(key, "Zeilengenerator im Formular");
 
                 if (r != null) {
-                    originIdColumn.MaxCellLenght = Math.Max(originIdColumn.MaxCellLenght, key.Length);
+                    originIdColumn.MaxCellLength = Math.Max(originIdColumn.MaxCellLength, key.Length);
                     originIdColumn.MultiLine = false;
                     originIdColumn.AfterEditAutoCorrect = false;
                     originIdColumn.AfterEditQuickSortRemoveDouble = false;
@@ -89,7 +89,7 @@ internal class AdderItem : IReadableTextWithKey {
                     if (additionalInfoColumn != null) {
                         var info = thisKeyAndInfo.SplitBy("#")[1];
 
-                        additionalInfoColumn.MaxCellLenght = Math.Max(additionalInfoColumn.MaxCellLenght, info.Length);
+                        additionalInfoColumn.MaxCellLength = Math.Max(additionalInfoColumn.MaxCellLength, info.Length);
                         additionalInfoColumn.MultiLine = false;
                         additionalInfoColumn.AfterEditAutoCorrect = false;
                         additionalInfoColumn.AfterEditQuickSortRemoveDouble = false;

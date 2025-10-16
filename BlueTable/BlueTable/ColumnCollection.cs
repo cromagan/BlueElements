@@ -273,7 +273,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 foreach (var thisFormat in FormatHolder.AllFormats) {
                     if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.Name; }
                 }
-                da.CellAdd(name + " (" + thisColumnItem.MaxCellLenght + " Char)");
+                da.CellAdd(name + " (" + thisColumnItem.MaxCellLength + " Char)");
                 da.CellAdd(thisColumnItem.ColumnQuickInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.ColumnTags.JoinWith("<br>"));

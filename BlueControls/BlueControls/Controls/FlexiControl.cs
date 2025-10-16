@@ -56,7 +56,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private bool _formatierungErlaubt;
     private Caption? _infoCaption;
     private string _infoText = string.Empty;
-    private int _maxTextLenght = 4000;
+    private int _maxTextLength = 4000;
     private bool _multiLine;
     private string _regexCheck = string.Empty;
     private bool _showInfoWhenDisabled;
@@ -275,17 +275,17 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public bool Initializing { get; private set; }
 
     [DefaultValue(4000)]
-    public int MaxTextLenght {
-        get => _maxTextLenght;
+    public int MaxTextLength {
+        get => _maxTextLength;
         set {
-            if (_maxTextLenght == value) { return; }
+            if (_maxTextLength == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => MaxTextLenght = value));
+                Invoke(new Action(() => MaxTextLength = value));
                 return;
             }
 
-            _maxTextLenght = value;
+            _maxTextLength = value;
             UpdateControls();
         }
     }

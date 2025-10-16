@@ -68,7 +68,7 @@ public class Method_CellGetFilter : Method_TableGeneric {
         if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(2)); }
 
         var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
-        if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte {returncolumn.KeyName} 'im Skript vorhanden'?", true, ld); }
+        if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte '{returncolumn.KeyName} 'im Skript vorhanden'?", true, ld); }
 
         return new DoItFeedback(r[0].CellGetString(returncolumn));
     }

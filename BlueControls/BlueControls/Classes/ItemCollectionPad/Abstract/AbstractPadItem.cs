@@ -233,7 +233,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }
 
         var p = new PointM(name, x, y);
-        p.Distance = GetLenght(JointMiddle, p);
+        p.Distance = GetLength(JointMiddle, p);
         p.Angle = GetAngle(JointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
         p.Parent = this;
         JointPoints.Add(p);
@@ -284,7 +284,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
     public void DoJointPoint(PointM p) {
         if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
             if (JointPoints.Contains(p)) {
-                p.Distance = GetLenght(JointMiddle, p);
+                p.Distance = GetLength(JointMiddle, p);
                 p.Angle = GetAngle(JointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
             }
         }
@@ -343,7 +343,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
                                 var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(scale, shiftX, shiftY);
                                 var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(scale, shiftX, shiftY);
 
-                                if (GetLenght(t1, t2) > 1) {
+                                if (GetLength(t1, t2) > 1) {
                                     gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
                                     var wi = GetAngle(t1, t2);
                                     if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, scale * 20); }

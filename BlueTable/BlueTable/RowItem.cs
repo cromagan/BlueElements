@@ -494,7 +494,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         InvalidateCheckData();
         _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
-        if (CellIsNullOrEmpty(srs) && IsMyRow()) {
+        if (CellIsNullOrEmpty(srs) && IsMyRow(5)) {
             DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} ist bereits invalidiert");
             return;
         }
@@ -832,7 +832,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    internal bool IsMyRow() {
+    internal bool IsMyRow(double maxminutes) {
         if (Table is not { IsDisposed: false } db) { return false; }
         if (!db.MultiUserPossible) { return true; }
         if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
@@ -843,7 +843,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
-        return t is { TotalSeconds: > 3, TotalMinutes: < 15 }; // 3 Sekunde deswegen, weil machne Routinen gleich die Prüfung machen und ansonsten die Routine reingrätscht
+        return t.TotalSeconds > 3 && t.TotalMinutes < maxminutes; // 3 Sekunde deswegen, weil machne Routinen gleich die Prüfung machen und ansonsten die Routine reingrätscht
     }
 
     internal void Repair() {

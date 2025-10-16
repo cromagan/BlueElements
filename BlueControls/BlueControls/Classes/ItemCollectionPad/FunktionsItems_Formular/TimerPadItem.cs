@@ -134,7 +134,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         var con = new FormulaTimer {
             Seconds = _sekunden,
             Script = _script,
-            Name = this.DefaultItemToControlName(parent?.Page?.KeyName),
+            Name = this.DefaultItemToControlName(parent?.Page?.UniqueId),
             Mode = mode,
             ConnectedFormula = parent
         };

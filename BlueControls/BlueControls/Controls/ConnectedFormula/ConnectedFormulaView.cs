@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -283,13 +284,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
         try {
             foreach (var thisC in base.Controls) {
-                if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.KeyName) && !cx.IsDisposed) { return cx; }
+                if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.UniqueId) && !cx.IsDisposed) { return cx; }
             }
 
             if (onlySerach) { return null; }
 
             var c = thisit.CreateControl(this, mode);
-            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(Page?.KeyName)) {
+            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(Page?.UniqueId)) {
                 Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
                 return null;
             }
@@ -359,13 +360,17 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         DoRows();
 
         if (RowSingleOrNull() is { IsDisposed: false } r) {
-            using var nfc = new FilterCollection(r, "ConnectedFormulaView");
+            if (_page?.GetRowEntryItem()?.TableOutput == r.Table) {
+                using var nfc = new FilterCollection(r, "ConnectedFormulaView");
 
-            FilterOutput.ChangeTo(nfc);
+                FilterOutput.ChangeTo(nfc);
 
-            btnScript.Visible = r.Table is { IsDisposed: false } db && db.IsAdministrator() && !string.IsNullOrEmpty(db.CheckScriptError());
+                btnScript.Visible = r.Table is { IsDisposed: false } db && db.IsAdministrator() && !string.IsNullOrEmpty(db.CheckScriptError());
 
-            if (btnScript.Visible) { btnScript.BringToFront(); }
+                if (btnScript.Visible) { btnScript.BringToFront(); }
+            } else {
+                FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
+            }
         } else {
             FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
         }
@@ -381,11 +386,15 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Page = null;
-
     private void _page_ItemAdded(object sender, System.EventArgs e) => InvalidateView();
 
     private void _page_ItemRemoved(object sender, System.EventArgs e) => InvalidateView();
+
+    //    Invalidate_FilterOutput();
+    //    Invalidate_RowsInput();
+    private void _page_PropertyChanged(object sender, PropertyChangedEventArgs e) => InvalidateView();
+
+    private void _table_Disposing(object sender, System.EventArgs e) => Page = null;
 
     //    public void InitFormula(ItemCollectionPadItem? page, Table? table) {
     //    if (IsDisposed) { return; }
@@ -393,11 +402,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
     //    if (page == _page && FilterOutput.Table == table) { return; }
 
     //    SuspendLayout();
-
-    //    Invalidate_FilterOutput();
-    //    Invalidate_RowsInput();
-    private void _page_PropertyChanged(object sender, PropertyChangedEventArgs e) => InvalidateView();
-
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {
             if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } db) { return; }

@@ -59,8 +59,8 @@ public static class Geometry {
         var sp = PointOnLine(new PointF(p.X, p.Y), x1, y1, x2, y2);
         PointF p1 = new(p.X, p.Y);
         return sp.PointInRect(x1, y1, x2, y2, 5)
-            ? GetLenght(p1, sp)
-            : Math.Min(GetLenght(new PointF(x1, y1), p1), GetLenght(new PointF(x2, x2), p1));
+            ? GetLength(p1, sp)
+            : Math.Min(GetLength(new PointF(x1, y1), p1), GetLength(new PointF(x2, x2), p1));
     }
 
     public static float GetAngle(PointF sp, PointF eP) => GetAngle(sp.X, sp.Y, eP.X, eP.Y);
@@ -72,7 +72,7 @@ public static class Geometry {
         return ya == 0f ? xa <= 0f ? 180f : 0f : ya < 0f ? 90f + ArcTangens(xa / ya) : 270f + ArcTangens(xa / ya);
     }
 
-    public static float GetLenght(Point sP, Point ep) {
+    public static float GetLength(Point sP, Point ep) {
         // Berechnet die Länge einer Strecke
         float l1 = sP.X - ep.X;
         float l2 = sP.Y - ep.Y;
@@ -86,7 +86,7 @@ public static class Geometry {
     /// <param name="sp"></param>
     /// <param name="ep"></param>
     /// <returns></returns>
-    public static float GetLenght(PointF sp, PointF ep) {
+    public static float GetLength(PointF sp, PointF ep) {
         var l1 = sp.X - ep.X;
         var l2 = sp.Y - ep.Y;
         return (float)Math.Sqrt((l1 * l1) + (l2 * l2)); // ^ 2 ist langsamer, laut Project Analyzer

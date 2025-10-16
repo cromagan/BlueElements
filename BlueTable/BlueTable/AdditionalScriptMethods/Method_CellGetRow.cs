@@ -60,7 +60,7 @@ public class Method_CellGetRow : Method_TableGeneric {
         if (db.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
 
         var v = RowItem.CellToVariable(c, row, true, false);
-        if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte {c.KeyName} 'im Skript vorhanden'?", true, ld); }
+        if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte '{c.KeyName} 'im Skript vorhanden'?", true, ld); }
 
         var l = new List<string>();
 

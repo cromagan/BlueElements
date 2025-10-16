@@ -176,8 +176,8 @@ public enum TableDataType : byte {
     IsKeyColumn = 112, //ColumnTimeCode = 112, // co_Ausrichtung = 112
     ColumnQuickInfo = 113,
 
-    MaxTextLenght = 114, // co_FesteBreite = 114
-    MaxCellLenght = 115,  // co_Bitlänge = 115
+    MaxTextLength = 114, // co_FesteBreite = 114
+    MaxCellLength = 115,  // co_Bitlänge = 115
     FixedColumnWidth = 116, // co_FilterOption = 116
     DropDownItems = 117,
 

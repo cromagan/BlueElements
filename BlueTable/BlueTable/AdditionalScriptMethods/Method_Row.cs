@@ -95,7 +95,7 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
         if (invalidateinDays < 0.01) { return new DoItFeedback("Intervall zu kurz.", true, ld); }
 
         if (fic.Table is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Filter", true, ld); }
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback("Zeilen-Status-Spalte nicht gefunden", true, ld); }
+        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback($"Zeilen-Status-Spalte in '{db.KeyName}' nicht gefunden", true, ld); }
 
         foreach (var thisFi in fic) {
             if (thisFi.Column is not { IsDisposed: false } c) {

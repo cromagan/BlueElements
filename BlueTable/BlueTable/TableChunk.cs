@@ -199,7 +199,7 @@ public class TableChunk : TableFile {
             long l = 0;
             foreach (var thisChunk in chunks) {
                 thisChunk.SaveToByteListEOF();
-                l += thisChunk.DataLenght;
+                l += thisChunk.DataLength;
             }
 
             if (l < minLen) { return null; }

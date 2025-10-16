@@ -136,7 +136,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         var t = initialItem.Row.CellGetString(_column).ToUpperInvariant();
         if (string.IsNullOrEmpty(t)) { return; }
         // Alle möglichen Namen holen
-        List<string> names = [.. cf.GetUcaseNamesSortedByLenght()];
+        List<string> names = [.. cf.GetUcaseNamesSortedByLength()];
         // Namen ermitteln, die relevant sind
         List<string> bez = [];
         foreach (var thisN in names.Where(t.Contains)) {

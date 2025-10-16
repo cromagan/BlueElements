@@ -838,17 +838,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             case Routinen.CellFormatUTF8_V402: {
                     type = TableDataType.UTF8Value_withoutSizeData;
 
-                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 1);
-                    var rowKeyByte = new byte[lenghtRowKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lenghtRowKey);
+                    var lengthRowKey = NummerCode1(bLoaded, pointer + 1);
+                    var rowKeyByte = new byte[lengthRowKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lengthRowKey);
                     rowKey = rowKeyByte.ToStringUtf8();
 
-                    var lenghtValue = NummerCode2(bLoaded, pointer + 2 + lenghtRowKey);
-                    var valueByte = new byte[lenghtValue];
-                    Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
+                    var lengthValue = NummerCode2(bLoaded, pointer + 2 + lengthRowKey);
+                    var valueByte = new byte[lengthValue];
+                    Buffer.BlockCopy(bLoaded, pointer + 2 + lengthRowKey + 2, valueByte, 0, lengthValue);
                     value = valueByte.ToStringUtf8();
 
-                    pointer += 2 + lenghtRowKey + 2 + lenghtValue;
+                    pointer += 2 + lengthRowKey + 2 + lengthValue;
 
                     break;
                 }
@@ -856,22 +856,22 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             case Routinen.CellFormatUTF8_V403: {
                     type = TableDataType.UTF8Value_withoutSizeData;
 
-                    var lenghtColumnKey = NummerCode1(bLoaded, pointer + 1);
-                    var columnKeyByte = new byte[lenghtColumnKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 2, columnKeyByte, 0, lenghtColumnKey);
+                    var lengthColumnKey = NummerCode1(bLoaded, pointer + 1);
+                    var columnKeyByte = new byte[lengthColumnKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 2, columnKeyByte, 0, lengthColumnKey);
                     colName = columnKeyByte.ToStringUtf8();
 
-                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 2 + lenghtColumnKey);
-                    var rowKeyByte = new byte[lenghtRowKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 3 + lenghtColumnKey, rowKeyByte, 0, lenghtRowKey);
+                    var lengthRowKey = NummerCode1(bLoaded, pointer + 2 + lengthColumnKey);
+                    var rowKeyByte = new byte[lengthRowKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 3 + lengthColumnKey, rowKeyByte, 0, lengthRowKey);
                     rowKey = rowKeyByte.ToStringUtf8();
 
-                    var lenghtValue = NummerCode2(bLoaded, pointer + 3 + lenghtRowKey + lenghtColumnKey);
-                    var valueByte = new byte[lenghtValue];
-                    Buffer.BlockCopy(bLoaded, pointer + 5 + lenghtRowKey + lenghtColumnKey, valueByte, 0, lenghtValue);
+                    var lengthValue = NummerCode2(bLoaded, pointer + 3 + lengthRowKey + lengthColumnKey);
+                    var valueByte = new byte[lengthValue];
+                    Buffer.BlockCopy(bLoaded, pointer + 5 + lengthRowKey + lengthColumnKey, valueByte, 0, lengthValue);
                     value = valueByte.ToStringUtf8();
 
-                    pointer += 5 + lenghtRowKey + lenghtValue + lenghtColumnKey;
+                    pointer += 5 + lengthRowKey + lengthValue + lengthColumnKey;
 
                     break;
                 }
@@ -989,7 +989,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         List<TableScriptDescription> updatedScripts = [];
 
         foreach (var existingScript in db.EventScript) {
-            if (ReferenceEquals(existingScript, script)) {
+            if (ReferenceEquals(existingScript, script) || (existingScript.KeyName == script.KeyName && existingScript.Script == script.Script)) {
                 found = true;
 
                 if (!isDisposed) {
@@ -2311,6 +2311,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.EventScript:
+                //var tc = _eventScript.Count();
+
                 List<string> ves = [.. value.SplitAndCutByCr()];
                 var vess = new List<TableScriptDescription>();
                 foreach (var t in ves) {
@@ -2318,6 +2320,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
                 Row.InvalidateAllCheckData();
                 _eventScript = vess.AsReadOnly();
+
+                //if (vess.Count != tc && tc > 0) {
+                //    Develop.DebugPrint("TEST");
+                //}
                 break;
 
             //case (TableDataType)79: //.EventScriptEdited:

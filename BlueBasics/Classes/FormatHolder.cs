@@ -37,7 +37,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 1
+        MaxTextLength = 1
     };
 
     public static readonly FormatHolder Color = new("Color") {
@@ -48,7 +48,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 9
+        MaxTextLength = 9
     };
 
     public static readonly FormatHolder Date = new("Date") {
@@ -59,7 +59,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.DateTime,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 10
+        MaxTextLength = 10
     };
 
     public static readonly FormatHolder DateTime = new("DateTime") {
@@ -70,7 +70,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.DateTime,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 19
+        MaxTextLength = 19
     };
 
     public static readonly FormatHolder DateTimeWithMilliSeconds = new("DateTimeWithMilliSeconds") {
@@ -81,7 +81,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.DateTime,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 23
+        MaxTextLength = 23
     };
 
     public static readonly FormatHolder Email = new("EMail") {
@@ -94,7 +94,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 320
+        MaxTextLength = 320
     };
 
     public static readonly FormatHolder Filepath = new("Filepath") {
@@ -106,7 +106,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 512
+        MaxTextLength = 512
     };
 
     public static readonly FormatHolder FilepathAndName = new("FilepathAndName") {
@@ -118,7 +118,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 512
+        MaxTextLength = 512
     };
 
     public static readonly FormatHolder Float = new("Float") {
@@ -130,7 +130,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Float,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 255
+        MaxTextLength = 255
     };
 
     public static readonly FormatHolder FloatPositive = new("Float only Positive") {
@@ -142,7 +142,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Float,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 255
+        MaxTextLength = 255
     };
 
     public static readonly FormatHolder Long = new("Long") {
@@ -153,7 +153,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = long.MinValue.ToString().Length
+        MaxTextLength = long.MinValue.ToString().Length
     };
 
     public static readonly FormatHolder LongPositive = new("Long only Positive") {
@@ -164,7 +164,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = long.MaxValue.ToString().Length
+        MaxTextLength = long.MaxValue.ToString().Length
     };
 
     public static readonly FormatHolder PhoneNumber = new("PhoneNumber") {
@@ -176,7 +176,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 15
+        MaxTextLength = 15
     };
 
     public static readonly FormatHolder SystemName = new("Systemname") {
@@ -187,7 +187,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 128
+        MaxTextLength = 128
     };
 
     public static readonly FormatHolder Text = new("Text") {
@@ -198,7 +198,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = true,
         MultiLine = false,
-        MaxTextLenght = 4000
+        MaxTextLength = 4000
     };
 
     public static readonly FormatHolder TextMitFormatierung = new("Text with format") {
@@ -209,7 +209,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = true,
         MultiLine = true,
-        MaxTextLenght = 4000
+        MaxTextLength = 4000
     };
 
     public static readonly FormatHolder Url = new("Url") {
@@ -221,7 +221,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 2048
+        MaxTextLength = 2048
     };
 
     #endregion
@@ -240,7 +240,7 @@ public class FormatHolder : IInputFormat, IReadableText {
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
     public QuickImage? Image { get; private set; }
-    public int MaxTextLenght { get; set; }
+    public int MaxTextLength { get; set; }
     public bool MultiLine { get; set; }
     public string Name { get; }
     public string RegexCheck { get; set; } = string.Empty;

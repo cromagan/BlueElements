@@ -52,13 +52,13 @@ public static partial class Extensions {
     /// Alle Elemente, die nach erreichen der Maximallänge noch übrig sind, werden verworfen.
     /// </summary>
     /// <param name="collection"></param>
-    /// <param name="maxlenght"></param>
+    /// <param name="maxlength"></param>
     /// <returns></returns>
-    public static string JoinWithCr(this IEnumerable<string> collection, long maxlenght) {
+    public static string JoinWithCr(this IEnumerable<string> collection, long maxlength) {
         StringBuilder sb = new();
 
         foreach (var thisitem in collection) {
-            if (sb.Length + thisitem.Length <= maxlenght) {
+            if (sb.Length + thisitem.Length <= maxlength) {
                 if (sb.Length > 0) { _ = sb.Append("\r"); }
                 _ = sb.Append(thisitem);
             } else {

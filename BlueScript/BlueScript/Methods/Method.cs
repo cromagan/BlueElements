@@ -129,7 +129,7 @@ public abstract class Method : IReadableTextWithKey {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence, string endSequence, LogData? ld) {
+    public static GetEndFeedback GetEnd(string scriptText, int startpos, int lengthStartSequence, string endSequence, LogData? ld) {
         //z.B: beim Befehl DO
         if (string.IsNullOrEmpty(endSequence)) {
             return new GetEndFeedback(startpos, string.Empty);
@@ -140,7 +140,7 @@ public abstract class Method : IReadableTextWithKey {
             return new GetEndFeedback("Endpunkt '" + endSequence + "' nicht gefunden.", true, ld);
         }
 
-        var txtBtw = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
+        var txtBtw = scriptText.Substring(startpos + lengthStartSequence, pos - startpos - lengthStartSequence);
         return new GetEndFeedback(pos + which.Length, txtBtw);
     }
 
@@ -379,7 +379,7 @@ public abstract class Method : IReadableTextWithKey {
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
             } else {
                 var tmp2 = GetVariableByParsing(attributes[n], ld, varcol, scp);
-                if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen,tmp2.FailedReason, tmp2.NeedsScriptFix); }
+                if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, tmp2.FailedReason, tmp2.NeedsScriptFix); }
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
                 if (tmp2.ReturnValue is VariableUnknown) {

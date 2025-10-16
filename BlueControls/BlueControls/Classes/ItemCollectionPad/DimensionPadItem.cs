@@ -204,7 +204,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
                || value.DistanzZuStrecke(_point2, _bezugslinie2) < ne
                || value.DistanzZuStrecke(_schnittPunkt1, _schnittPunkt2) < ne
                || value.DistanzZuStrecke(_schnittPunkt1, _textPoint) < ne
-               || GetLenght(new PointM(value), _textPoint) < ne * 10;
+               || GetLength(new PointM(value), _textPoint) < ne * 10;
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -361,7 +361,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             var sz2 = f.MeasureString(Text_Unten);
             var p1 = _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY);
             var p2 = _schnittPunkt2.ZoomAndMove(scale, shiftX, shiftY);
-            if (sz1.Width + (pfeilG * 2f) < GetLenght(p1, p2)) {
+            if (sz1.Width + (pfeilG * 2f) < GetLength(p1, p2)) {
                 DrawArrow(gr, p1, _winkel, f.ColorMain, pfeilG);
                 DrawArrow(gr, p2, _winkel + 180, f.ColorMain, pfeilG);
             } else {
@@ -424,7 +424,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     }
 
     private void ComputeData() {
-        _länge = GetLenght(_point1, _point2);
+        _länge = GetLength(_point1, _point2);
         _winkel = GetAngle(_point1, _point2);
     }
 

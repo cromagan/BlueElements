@@ -47,12 +47,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private readonly object _rowsInputLock = new object();
     private string? _cachedFilterHash = null;
-    private Table? _tableInput;
-
     private FilterCollection? _filterInput;
-
     private bool _rowsInputChangedHandling;
-
+    private Table? _tableInput;
     private int _waitTimeoutMs = 5000;
 
     #endregion
@@ -66,6 +63,21 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #endregion
 
     #region Properties
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public AbstractPadItem? GeneratedFrom { get; set; }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public virtual string Mode { get; set; } = string.Empty;
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool RowsInputManualSeted { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -103,21 +115,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             }
         }
     }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public AbstractPadItem? GeneratedFrom { get; set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public virtual string Mode { get; set; } = string.Empty;
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; private set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -162,7 +159,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <param name="source"></param>
     /// <param name="mode"></param>
     public void DoDefaultSettings(ConnectedFormulaView? parentFormula, ReciverControlPadItem source, string mode) {
-        Name = source.DefaultItemToControlName(parentFormula?.Page?.KeyName);
+        Name = source.DefaultItemToControlName(parentFormula?.Page?.UniqueId);
         Mode = mode;
         if (source is AbstractPadItem ali) { GeneratedFrom = ali; }
 
@@ -278,18 +275,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         Invalidate_RowsInput();
     }
-
-    protected virtual void TableInput_CellValueChanged(object sender, CellEventArgs e) { }
-
-    protected virtual void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
-
-    protected void TableInput_Disposed(object sender, System.EventArgs e) {
-        TableInput = null;
-    }
-
-    protected virtual void TableInput_Loaded(object sender, System.EventArgs e) { }
-
-    protected virtual void TableInput_RowChecked(object sender, RowCheckedEventArgs e) { }
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
@@ -473,6 +458,18 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         Invalidate_FilterInput();
     }
+
+    protected virtual void TableInput_CellValueChanged(object sender, CellEventArgs e) { }
+
+    protected virtual void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
+
+    protected void TableInput_Disposed(object sender, System.EventArgs e) {
+        TableInput = null;
+    }
+
+    protected virtual void TableInput_Loaded(object sender, System.EventArgs e) { }
+
+    protected virtual void TableInput_RowChecked(object sender, RowCheckedEventArgs e) { }
 
     private void FilterInput_DisposingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 

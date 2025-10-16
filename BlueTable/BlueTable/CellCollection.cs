@@ -496,7 +496,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var oldValue = GetStringCore(column, row);
         if (value == oldValue) { return string.Empty; }
 
-        column.UcaseNamesSortedByLenght = null;
+        column.UcaseNamesSortedByLength = null;
 
         if (!column.SaveContent) {
             return row.SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
@@ -556,7 +556,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal void OnCellValueChanged(CellEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        e.Column.UcaseNamesSortedByLenght = null;
+        e.Column.UcaseNamesSortedByLength = null;
         CellValueChanged?.Invoke(this, e);
     }
 
@@ -591,7 +591,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         List<RowItem?> allRows = [];
         if (row?.Table?.Column.First == null || row.Table.IsDisposed) { return allRows; }
 
-        var names = row.Table.Column.First?.GetUcaseNamesSortedByLenght();
+        var names = row.Table.Column.First?.GetUcaseNamesSortedByLength();
         var relationTextLine = completeRelationText.ToUpperInvariant().SplitAndCutByCr();
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
@@ -716,7 +716,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var c = dbtmp.Column.First;
         if (c == null) { return completeRelationText; }
 
-        var names = c.GetUcaseNamesSortedByLenght();
+        var names = c.GetUcaseNamesSortedByLength();
         var didOld = false;
         var didNew = false;
         for (var z = names.Count - 1; z > -1; z--) {

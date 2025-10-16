@@ -76,7 +76,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new TabControl {
-            Name = this.DefaultItemToControlName(parent?.Page?.KeyName)
+            Name = this.DefaultItemToControlName(parent?.Page?.UniqueId)
         };
         // Die Input-Settings werden direkt auf das erzeugte
         //con.DoInputSettings(parent, this);

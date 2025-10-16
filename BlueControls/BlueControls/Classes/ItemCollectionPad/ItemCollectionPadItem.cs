@@ -250,6 +250,16 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
+    public string UniqueId {
+        get {
+            if (Parent is ItemCollectionPadItem icpi) {
+                return "C" + (icpi.UniqueId + "|" + KeyName).GetHashString();
+            }
+
+            return "S" + this.KeyName.GetHashString();
+        }
+    }
+
     protected override int SaveOrder => 1000;
 
     #endregion

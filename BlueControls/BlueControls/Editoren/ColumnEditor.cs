@@ -140,15 +140,15 @@ internal sealed partial class ColumnEditor : IIsEditor {
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
-    private void btnCalculateMaxCellLenght_Click(object sender, System.EventArgs e) {
+    private void btnCalculateMaxCellLength_Click(object sender, System.EventArgs e) {
         if (_column == null) { return; }
 
-        txbMaxCellLenght.Text = _column.CalculatePreveredMaxCellLenght(1.2f).ToString();
+        txbMaxCellLength.Text = _column.CalculatePreveredMaxCellLength(1.2f).ToString();
     }
 
-    private void btnMaxTextLenght_Click(object sender, System.EventArgs e) {
+    private void btnMaxTextLength_Click(object sender, System.EventArgs e) {
         if (_column == null) { return; }
-        txbMaxTextLenght.Text = _column.CalculatePreveredMaxTextLenght(1.2f).ToString();
+        txbMaxTextLength.Text = _column.CalculatePreveredMaxTextLength(1.2f).ToString();
     }
 
     private void btnOk_Click(object sender, System.EventArgs e) {
@@ -406,8 +406,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         lbxCellEditor.UncheckAll();
         lbxCellEditor.Check(_column.PermissionGroupsChangeCell);
         txbAllowedChars.Text = _column.AllowedChars;
-        txbMaxTextLenght.Text = _column.MaxTextLenght.ToString();
-        txbMaxCellLenght.Text = _column.MaxCellLenght.ToString();
+        txbMaxTextLength.Text = _column.MaxTextLength.ToString();
+        txbMaxCellLength.Text = _column.MaxCellLength.ToString();
         btnOtherValuesToo.Checked = _column.ShowValuesOfOtherCellsInDropdown;
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
         txbAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
@@ -494,8 +494,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
         _column.EditAllowedDespiteLock = btnIgnoreLock.Checked;
         _column.AllowedChars = txbAllowedChars.Text;
-        _column.MaxTextLenght = IntParse(txbMaxTextLenght.Text);
-        _column.MaxCellLenght = IntParse(txbMaxCellLenght.Text);
+        _column.MaxTextLength = IntParse(txbMaxTextLength.Text);
+        _column.MaxCellLength = IntParse(txbMaxCellLength.Text);
         _column.LinkedTableTableName = cbxLinkedTable.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
         _column.ColumnNameOfLinkedTable = cbxTargetColumn.Text; // LINKED TABLE
         _column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);

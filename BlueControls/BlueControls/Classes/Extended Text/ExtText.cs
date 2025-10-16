@@ -84,7 +84,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public ExtText() : base() {
         DrawingPos = new Point(0, 0);
         Ausrichtung = Alignment.Top_Left;
-        MaxTextLenght = 4000;
+        MaxTextLength = 4000;
         Multiline = true;
         AllowedChars = string.Empty;
         DrawingArea = new Rectangle(0, 0, -1, -1);
@@ -158,7 +158,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public bool IsDisposed { get; private set; }
 
-    public int MaxTextLenght { get; }
+    public int MaxTextLength { get; }
 
     public bool Multiline { get; set; }
 
@@ -370,7 +370,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public string Substring(int startIndex, int lenght) => ConvertCharToPlainText(startIndex, startIndex + lenght - 1);
+    public string Substring(int startIndex, int length) => ConvertCharToPlainText(startIndex, startIndex + length - 1);
 
     public string Word(int atPosition) {
         var s = WordStart(atPosition);

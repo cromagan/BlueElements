@@ -72,7 +72,7 @@ public class Chunk : IHasKeyName {
         }
     }
 
-    public long DataLenght => Bytes?.Count ?? 0;
+    public long DataLength => Bytes?.Count ?? 0;
 
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
@@ -305,7 +305,7 @@ public class Chunk : IHasKeyName {
         SaveToByteList(TableDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
         SaveToByteList(TableDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
         SaveToByteList(TableDataType.AfterEditRound, c.AfterEditRound.ToString(), name);
-        SaveToByteList(TableDataType.MaxCellLenght, c.MaxCellLenght.ToString(), name);
+        SaveToByteList(TableDataType.MaxCellLength, c.MaxCellLength.ToString(), name);
         SaveToByteList(TableDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
         SaveToByteList(TableDataType.AfterEditAutoRemoveChar, c.AfterEditAutoRemoveChar, name);
         SaveToByteList(TableDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
@@ -337,7 +337,7 @@ public class Chunk : IHasKeyName {
         //SaveToByteList(l, TableDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
         SaveToByteList(TableDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
         SaveToByteList(TableDataType.AllowedChars, c.AllowedChars, name);
-        SaveToByteList(TableDataType.MaxTextLenght, c.MaxTextLenght.ToString(), name);
+        SaveToByteList(TableDataType.MaxTextLength, c.MaxTextLength.ToString(), name);
         SaveToByteList(TableDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
         SaveToByteList(TableDataType.ColumnTags, c.ColumnTags.JoinWithCr(), name);
         SaveToByteList(TableDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);

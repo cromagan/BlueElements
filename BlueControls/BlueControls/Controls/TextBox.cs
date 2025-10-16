@@ -58,7 +58,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
     private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
     private int _markEnd = -1;
     private int _markStart = -1;
-    private int _maxTextLenght = 4000;
+    private int _maxTextLength = 4000;
     private int _mouseValue;
     private bool _multiline;
     private bool _mustCheck = true;
@@ -124,11 +124,11 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
     public override bool Focused => base.Focused || (_sliderY != null && _sliderY.Focused());
 
     [DefaultValue(4000)]
-    public int MaxTextLenght {
-        get => _maxTextLenght;
+    public int MaxTextLength {
+        get => _maxTextLength;
         set {
-            if (value == _maxTextLenght) { return; }
-            _maxTextLenght = value;
+            if (value == _maxTextLength) { return; }
+            _maxTextLength = value;
             GenerateEtxt(false);
         }
     }
@@ -885,7 +885,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                 if (Clipboard.GetData(ExtCharFormat) is not string sd || string.IsNullOrEmpty(sd)) { return; }
 
                 foreach (var thiss in sd.SplitByCr()) {
-                    if (_eTxt.Count < _maxTextLenght) {
+                    if (_eTxt.Count < _maxTextLength) {
                         var extChar = ParseableItem.NewByParsing<ExtChar>(thiss, _eTxt as ExtText, _cursorCharPos);
 
                         if (extChar != null) {

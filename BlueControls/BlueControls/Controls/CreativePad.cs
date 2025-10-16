@@ -518,14 +518,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
                         foreach (var thisPoint in bpi.JointPoints) {
-                            if (GetLenght(thisPoint, p) < 5f / Zoom) {
+                            if (GetLength(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
                         }
 
                         foreach (var thisPoint in bpi.MovablePoint) {
-                            if (GetLenght(thisPoint, p) < 5f / Zoom) {
+                            if (GetLength(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
@@ -639,7 +639,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
             var p = CoordinatesUnscaled(e, Zoom, ShiftX, ShiftY);
 
             foreach (var thisPoint in bpi.JointPoints) {
-                if (GetLenght(p, thisPoint) < 5f / Zoom) { return thisPoint; }
+                if (GetLength(p, thisPoint) < 5f / Zoom) { return thisPoint; }
             }
         }
 

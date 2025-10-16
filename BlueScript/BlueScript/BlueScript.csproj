@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="EventArgs\CanDoScriptEventArgs.cs" />
     <Compile Include="Methods\Method_Abs.cs" />
+    <Compile Include="Methods\Method_Length.cs" />
     <Compile Include="Methods\Method_Stop.cs" />
     <Compile Include="Methods\Method_Decrypt.cs" />
     <Compile Include="Methods\Method_DeleteDirectory.cs" />

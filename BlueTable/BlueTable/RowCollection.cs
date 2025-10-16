@@ -83,6 +83,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public bool IsDisposed { get; private set; }
 
+    /// <summary>
+    /// Wert in Minuten.
+    /// Gibt an, wieviel minuten Maximal vergangen sein dürfen, um eine Zeile zu INITIALISIEREN
+    /// </summary>
+    public double NewRowTolerance { get; set; } = 1;
+
     public Table? Table {
         get => _table;
         private set {
@@ -181,7 +187,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             while (NextRowToCeck() is { IsDisposed: false } row) {
                 if (row.IsDisposed || row.Table is not { IsDisposed: false } tbl) { break; }
 
-                if (row.Table != l[0]) {
+                if (row.Table == l[0]) {
+                    if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 1) { break; }
+                } else {
                     if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 5 + WaitDelay) { break; }
                 }
 
@@ -588,25 +596,28 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="oldestTo"></param>
     /// <returns></returns>
     public RowItem? NextRowToCheck(bool oldestTo) {
-        if (Table is not { IsDisposed: false } db) { return null; }
+        if (Table is not { IsDisposed: false } tbl) { return null; }
 
-        if (!db.CanDoValueChangedScript(false)) { return null; }
+        if (!tbl.CanDoValueChangedScript(false)) { return null; }
 
-        var rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow());
+        var rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5));
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = db.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow());
+        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance));
+        if (rowToCheck != null) { return rowToCheck; }
+
+        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15));
         if (rowToCheck != null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
 
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return null; }
+        if (tbl.Column.SysRowState is not { IsDisposed: false } srs) { return null; }
         var datefoundmax = new DateTime(2100, 1, 1);
         RowItem? foundrow = null;
 
-        foreach (var thisRow in db.Row) {
+        foreach (var thisRow in tbl.Row) {
             var dateofmyrow = thisRow.CellGetDateTime(srs);
-            if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow()) {
+            if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow(15)) {
                 datefoundmax = dateofmyrow;
                 foundrow = thisRow;
             }

@@ -3073,6 +3073,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     private void ContextMenu_ExecuteScript(AbstractListItem item) {
+        Develop.SetUserDidSomething();
         if (item.Tag is not { } tag) { return; }
         var script = tag.GetType().GetProperty("Script")?.GetValue(tag);
         var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);

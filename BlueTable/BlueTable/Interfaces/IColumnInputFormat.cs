@@ -63,7 +63,7 @@ public static class ColumnInputFormatExtensions {
         t.ScriptType = source.ScriptType;
         t.SortType = source.SortType;
         t.EditableWithTextInput = source.EditableWithTextInput;
-        t.MaxTextLenght = source.MaxTextLenght;
+        t.MaxTextLength = source.MaxTextLength;
         t.DefaultRenderer = source.DefaultRenderer;
         t.RendererSettings = source.RendererSettings;
     }

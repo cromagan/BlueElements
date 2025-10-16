@@ -111,7 +111,7 @@ public class ComicCompPadItem : AbstractPadItem {
         var ne = 5 / zoomfactor;
         if (value.DistanzZuStrecke(P1, P2) < ne) { return true; }
         foreach (var thispoint in PointsForSuccesfullyMove) {
-            if (GetLenght(value, (PointF)thispoint) < ne) { return true; }
+            if (GetLength(value, (PointF)thispoint) < ne) { return true; }
         }
         return false;
     }

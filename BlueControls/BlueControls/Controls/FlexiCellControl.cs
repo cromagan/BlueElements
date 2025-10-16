@@ -435,7 +435,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
         // Background-Thread für schwere Berechnungen
         await Task.Run(async () => {
-            var names = col.GetUcaseNamesSortedByLenght().ToList();
+            var names = col.GetUcaseNamesSortedByLength().ToList();
             cancellationToken.ThrowIfCancellationRequested();
 
             var myname = row.CellFirstString().ToUpperInvariant();

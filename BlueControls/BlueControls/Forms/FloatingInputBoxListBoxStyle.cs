@@ -78,7 +78,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public static void ContextMenuShow(IContextMenu control, object? hotItem, MouseEventArgs e) {
         Close(ListBoxAppearance.KontextMenu);
         Close(control);
-
+        Develop.SetUserDidSomething();
         var thisContextMenu = new List<AbstractListItem>();
 
         var ce = new ContextMenuInitEventArgs(hotItem, thisContextMenu, e);
@@ -88,6 +88,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (thisContextMenu.Count > 0) {
             thisContextMenu.Add(Separator());
             thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
+            Develop.SetUserDidSomething();
             var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, ce.HotItem, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         }

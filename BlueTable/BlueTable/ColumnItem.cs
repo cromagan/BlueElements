@@ -29,6 +29,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -43,7 +44,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     #region Fields
 
-    internal List<string>? UcaseNamesSortedByLenght;
+    internal List<string>? UcaseNamesSortedByLength;
 
     private const string TmpNewDummy = "TMPNEWDUMMY";
 
@@ -134,9 +135,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private string _linkedTableTableName;
 
-    private int _maxCellLenght;
+    private int _maxCellLength;
 
-    private int _maxTextLenght;
+    private int _maxTextLength;
 
     private bool _multiLine;
 
@@ -212,8 +213,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _columnSystemInfo = string.Empty;
         _defaultRenderer = string.Empty;
         _rendererSettings = string.Empty;
-        _maxTextLenght = 4000;
-        _maxCellLenght = 4000;
+        _maxTextLength = 4000;
+        _maxCellLength = 4000;
         //ContentWidthIsValid = false;
         _captionBitmapCode = string.Empty;
         _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
@@ -242,7 +243,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _doOpticalTranslation = TranslationType.Original_Anzeigen;
         _editAllowedDespiteLock = false;
         _linkedTableTableName = string.Empty;
-        UcaseNamesSortedByLenght = null;
+        UcaseNamesSortedByLength = null;
         Am_A_Key_For_Other_Column = string.Empty;
 
         #endregion Standard-Werte
@@ -650,7 +651,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (!string.IsNullOrEmpty(_afterEditAutoRemoveChar)) { return true; }
             if (_afterEditRound > -1) { return true; }
 
-            // _maxCellLenght wird absichtlich ignoriert
+            // _maxCellLength wird absichtlich ignoriert
 
             return false;
         }
@@ -812,22 +813,22 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    public int MaxCellLenght {
-        get => _maxCellLenght;
+    public int MaxCellLength {
+        get => _maxCellLength;
         set {
             if (IsDisposed) { return; }
-            if (_maxCellLenght == value) { return; }
-            _ = Table?.ChangeData(TableDataType.MaxCellLenght, this, _maxCellLenght.ToString(), value.ToString());
+            if (_maxCellLength == value) { return; }
+            _ = Table?.ChangeData(TableDataType.MaxCellLength, this, _maxCellLength.ToString(), value.ToString());
             OnPropertyChanged();
         }
     }
 
-    public int MaxTextLenght {
-        get => _maxTextLenght;
+    public int MaxTextLength {
+        get => _maxTextLength;
         set {
             if (IsDisposed) { return; }
-            if (_maxTextLenght == value) { return; }
-            _ = Table?.ChangeData(TableDataType.MaxTextLenght, this, _maxTextLenght.ToString(), value.ToString());
+            if (_maxTextLength == value) { return; }
+            _ = Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToString(), value.ToString());
             OnPropertyChanged();
         }
     }
@@ -1150,12 +1151,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             value = l.JoinWithCr();
         }
 
-        return value.CutToUtf8Length(_maxCellLenght);
+        return value.CutToUtf8Length(_maxCellLength);
     }
 
     public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && IsAutofilterPossible();
 
-    public int CalculatePreveredMaxCellLenght(double prozentZuschlag) {
+    public int CalculatePreveredMaxCellLength(double prozentZuschlag) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return 0; }
 
         //if (Format == DataFormat.Verknüpfung_zu_anderer_Tabellex) { return 35; }
@@ -1169,11 +1170,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (m <= 0) { return 8; }
         if (m == 1) { return 1; }
-        var erg = Math.Max((int)(m * prozentZuschlag) + 1, _maxTextLenght);
+        var erg = Math.Max((int)(m * prozentZuschlag) + 1, _maxTextLength);
         return Math.Min(erg, 3999);
     }
 
-    public int CalculatePreveredMaxTextLenght(double prozentZuschlag) {
+    public int CalculatePreveredMaxTextLength(double prozentZuschlag) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return 0; }
 
         ////if (Format == DataFormat.Verknüpfung_zu_anderer_Tabellex) { return 35; }
@@ -1259,7 +1260,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         ShowValuesOfOtherCellsInDropdown = source.ShowValuesOfOtherCellsInDropdown;
         AfterEditQuickSortRemoveDouble = source.AfterEditQuickSortRemoveDouble;
         AfterEditRound = source.AfterEditRound;
-        MaxCellLenght = source.MaxCellLenght;
+        MaxCellLength = source.MaxCellLength;
         FixedColumnWidth = source.FixedColumnWidth;
         AfterEditDoUCase = source.AfterEditDoUCase;
         AfterEditAutoCorrect = source.AfterEditAutoCorrect;
@@ -1356,10 +1357,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (!IsValidColumnName(_keyName)) { return "Der Spaltenname ist ungültig."; }
 
-        if (_maxCellLenght < _maxTextLenght) { return "Zellengröße zu klein!"; }
-        if (_maxCellLenght < 1) { return "Zellengröße zu klein!"; }
-        if (_maxCellLenght > 4000) { return "Zellengröße zu groß!"; }
-        if (_maxTextLenght > 4000) { return "Maximallänge zu groß!"; }
+        if (_maxCellLength < _maxTextLength) { return "Zellengröße zu klein!"; }
+        if (_maxCellLength < 1) { return "Zellengröße zu klein!"; }
+        if (_maxCellLength > 4000) { return "Zellengröße zu groß!"; }
+        if (_maxTextLength > 4000) { return "Maximallänge zu groß!"; }
 
         if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
             return "Spalten-Name bereits vorhanden.";
@@ -1531,14 +1532,14 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return string.Empty;
     }
 
-    public List<string> GetUcaseNamesSortedByLenght() {
+    public List<string> GetUcaseNamesSortedByLength() {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return []; }
 
-        if (UcaseNamesSortedByLenght != null) { return UcaseNamesSortedByLenght; }
+        if (UcaseNamesSortedByLength != null) { return UcaseNamesSortedByLength; }
         var tmp = Contents(db.Row.ToList());
         tmp.Sort((s1, s2) => s2.Length.CompareTo(s1.Length));
-        UcaseNamesSortedByLenght = tmp;
-        return UcaseNamesSortedByLenght;
+        UcaseNamesSortedByLength = tmp;
+        return UcaseNamesSortedByLength;
     }
 
     public void Invalidate_ColumAndContent() {
@@ -1697,8 +1698,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //            ScriptType = ScriptType.Nicht_vorhanden;
         //            DoOpticalTranslation = c.DoOpticalTranslation;
 
-        //            MaxTextLenght = c.MaxTextLenght;
-        //            MaxCellLenght = c.MaxCellLenght;
+        //            MaxTextLength = c.MaxTextLength;
+        //            MaxCellLength = c.MaxCellLength;
         //        }
         //        break;
 
@@ -1731,7 +1732,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //        break;
         //}
 
-        if (MaxCellLenght < MaxTextLenght) { MaxCellLenght = MaxTextLenght; }
+        if (MaxCellLength < MaxTextLength) { MaxCellLength = MaxTextLength; }
 
         PermissionGroupsChangeCell = RepairUserGroups(PermissionGroupsChangeCell).AsReadOnly();
 
@@ -1758,8 +1759,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             case "SYS_CREATOR":
 
                 _isFirst = false;
-                _maxTextLenght = 20;
-                _maxCellLenght = 20;
+                _maxTextLength = 20;
+                _maxCellLength = 20;
                 if (setOpticalToo) {
                     Caption = "Ersteller";
                     EditableWithDropdown = true;
@@ -1782,8 +1783,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _editableWithDropdown = false;
                 _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
-                _maxTextLenght = 20;
-                _maxCellLenght = 20;
+                _maxTextLength = 20;
+                _maxCellLength = 20;
                 if (setOpticalToo) {
                     Caption = "Änderer";
                     ForeColor = Color.FromArgb(0, 128, 0);
@@ -1808,7 +1809,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _ignoreAtRowFilter = true;
 
                 this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-                MaxCellLenght = MaxTextLenght;
+                MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
                     Caption = "Erstell-Datum";
                     ForeColor = Color.FromArgb(0, 0, 128);
@@ -1827,7 +1828,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-                MaxCellLenght = MaxTextLenght;
+                MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
                     Caption = "Zeilen-Status";
                     ForeColor = Color.FromArgb(128, 0, 0);
@@ -1847,7 +1848,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 this.GetStyleFrom(ColumnFormatHolder.Color); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-                MaxCellLenght = MaxTextLenght;
+                MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
                     Caption = "Zeilenfarbe";
                     ForeColor = Color.FromArgb(0, 0, 0);
@@ -1869,7 +1870,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _ignoreAtRowFilter = true;
 
                 this.GetStyleFrom(FormatHolder.DateTimeWithMilliSeconds); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-                MaxCellLenght = MaxTextLenght;
+                MaxCellLength = MaxTextLength;
                 _editableWithTextInput = false;
                 _spellCheckingEnabled = false;
                 _editableWithDropdown = false;
@@ -1907,8 +1908,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _permissionGroupsChangeCell.Clear();
                 _editableWithTextInput = false;
                 _editableWithDropdown = false;
-                _maxTextLenght = 1;
-                _maxCellLenght = 1;
+                _maxTextLength = 1;
+                _maxCellLength = 1;
                 _showValuesOfOtherCellsInDropdown = false;
                 _adminInfo = "Diese Spalte kann nur über ein Skript bearbeitet<br>werden, mit dem Befehl 'SetError'";
 
@@ -1929,8 +1930,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _autoFilterJoker = string.Empty;
                 _ignoreAtRowFilter = true;
                 _align = AlignmentHorizontal.Zentriert;
-                _maxTextLenght = 1;
-                _maxCellLenght = 1;
+                _maxTextLength = 1;
+                _maxCellLength = 1;
 
                 if (_editableWithTextInput || _editableWithDropdown) {
                     _columnQuickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
@@ -2198,10 +2199,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     internal void Optimize() {
         if (!IsSystemColumn()) {
             // Maximale Text-Länge beeinflusst stark die Ladezeit vom Server
-            var l = CalculatePreveredMaxCellLenght(1.2f);
-            if (l < MaxCellLenght) { MaxCellLenght = l; }
+            var l = CalculatePreveredMaxCellLength(1.2f);
+            if (l < MaxCellLength) { MaxCellLength = l; }
 
-            if (MaxTextLenght > MaxCellLenght) { MaxTextLenght = MaxCellLenght; }
+            if (MaxTextLength > MaxCellLength) { MaxTextLength = MaxCellLength; }
 
             // ScriptType beeinflusst, ob eine Zeile neu durchgerechnet werden muss nach einer Änderung dieser Zelle
             if (!UsedInScript()) {
@@ -2330,9 +2331,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _allowedChars = newvalue;
                 break;
 
-            case TableDataType.MaxTextLenght:
-                _maxTextLenght = IntParse(newvalue);
-                //_maxCellLenght = _maxTextLenght;
+            case TableDataType.MaxTextLength:
+                _maxTextLength = IntParse(newvalue);
+                //_maxCellLength = _maxTextLength;
                 break;
 
             case TableDataType.FilterOptions:
@@ -2388,8 +2389,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _fixedColumnWidth = IntParse(newvalue);
                 break;
 
-            case TableDataType.MaxCellLenght:
-                _maxCellLenght = IntParse(newvalue);
+            case TableDataType.MaxCellLength:
+                _maxCellLength = IntParse(newvalue);
                 break;
 
             case TableDataType.DoUcaseAfterEdit:
@@ -2417,6 +2418,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case TableDataType.DefaultRenderer:
+                if (string.IsNullOrEmpty(newvalue) && !string.IsNullOrEmpty(_defaultRenderer)) {
+                    Develop.DebugPrint("Test");
+                }
+
                 _defaultRenderer = newvalue;
                 break;
 

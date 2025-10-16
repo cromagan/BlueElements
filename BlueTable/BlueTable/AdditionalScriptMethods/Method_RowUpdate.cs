@@ -82,7 +82,7 @@ public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
             return new DoItFeedback("Die eigene Zeile kann nicht aktualisiert werden.", true, ld);
         }
 
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback("Zeilen-Status-Spalte nicht gefunden", true, ld); }
+        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback($"Zeilen-Status-Spalte in '{db.KeyName}' nicht gefunden", true, ld); }
 
         var minage = attvar.ValueNumGet(1);
         var maxage = attvar.ValueNumGet(2);

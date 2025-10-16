@@ -29,7 +29,7 @@ public static class Polygons {
     #region Methods
 
     public static void AddRad(this GraphicsPath gP, PointF middle, PointF startP, float wink) {
-        var radius = Math.Abs(Geometry.GetLenght(middle, startP));
+        var radius = Math.Abs(Geometry.GetLength(middle, startP));
         var startw = Geometry.GetAngle(middle, startP);
         gP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
     }

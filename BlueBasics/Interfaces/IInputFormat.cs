@@ -31,7 +31,7 @@ public interface IInputFormat {
     //public enAlignmentHorizontal Align { get; set; }
     public string AllowedChars { get; set; }
 
-    public int MaxTextLenght { get; set; }
+    public int MaxTextLength { get; set; }
 
     public bool MultiLine { get; set; }
 
@@ -54,7 +54,7 @@ public static class InputFormatExtensions {
     #region Methods
 
     /// <summary>
-    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking, MaxTextLenght und Multiline
+    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking, MaxTextLength und Multiline
     /// </summary>
     /// <param name="t"></param>
     /// <param name="source"></param>
@@ -65,7 +65,7 @@ public static class InputFormatExtensions {
         t.AllowedChars = source.AllowedChars;
         t.RegexCheck = source.RegexCheck;
         t.MultiLine = source.MultiLine;
-        t.MaxTextLenght = source.MaxTextLenght;
+        t.MaxTextLength = source.MaxTextLength;
         t.SpellCheckingEnabled = source.SpellCheckingEnabled;
         t.TextFormatingAllowed = source.TextFormatingAllowed;
     }
@@ -95,7 +95,7 @@ public static class InputFormatExtensions {
                     return false;
                 }
 
-                if (thisString.Length > formatToCheck.MaxTextLenght) { return false; }
+                if (thisString.Length > formatToCheck.MaxTextLength) { return false; }
 
                 switch (formatToCheck.AdditionalFormatCheck) {
                     case AdditionalCheck.None:
@@ -139,10 +139,10 @@ public static class InputFormatExtensions {
         t.MultiLine == source.MultiLine &&
         t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
         t.TextFormatingAllowed == source.TextFormatingAllowed &&
-        t.MaxTextLenght == source.MaxTextLenght;
+        t.MaxTextLength == source.MaxTextLength;
 
     /// <summary>
-    /// Ignoriert Multiline und wenn MaxTextLenght 4000 ist
+    /// Ignoriert Multiline und wenn MaxTextLength 4000 ist
     /// </summary>
     /// <param name="t"></param>
     /// <param name="source"></param>
@@ -155,11 +155,11 @@ public static class InputFormatExtensions {
                    t.TextFormatingAllowed == source.TextFormatingAllowed;
         if (!x) { return false; }
 
-        if (t.MaxTextLenght < 4000) {
-            if (t.MaxTextLenght != source.MaxTextLenght) { return false; }
+        if (t.MaxTextLength < 4000) {
+            if (t.MaxTextLength != source.MaxTextLength) { return false; }
         }
 
-        return t.MaxTextLenght >= 1;
+        return t.MaxTextLength >= 1;
     }
 
     #endregion

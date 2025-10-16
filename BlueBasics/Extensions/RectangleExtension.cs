@@ -45,7 +45,7 @@ public static partial class Extensions {
         var rp = Point.Empty;
 
         foreach (var thisP in pl) {
-            var l = Geometry.GetLenght(p, thisP);
+            var l = Geometry.GetLength(p, thisP);
             if (l > minl) { continue; }
 
             minl = l;
