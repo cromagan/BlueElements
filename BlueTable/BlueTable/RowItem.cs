@@ -494,7 +494,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         InvalidateCheckData();
         _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
-        if (CellIsNullOrEmpty(srs) && IsMyRow(5)) {
+        if (CellIsNullOrEmpty(srs) && IsMyRow(5, false)) {
             DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} ist bereits invalidiert");
             return;
         }
@@ -832,14 +832,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    internal bool IsMyRow(double maxminutes) {
+    internal bool IsMyRow(double maxminutes, bool mastertoo) {
         if (Table is not { IsDisposed: false } db) { return false; }
-        if (!db.MultiUserPossible) { return true; }
+        if (mastertoo && !db.MultiUserPossible) { return true; }
         if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
         if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        if (db.AmITemporaryMaster(5, 55) && t.TotalMinutes > 30) { return true; }
+        if (mastertoo &&  db.AmITemporaryMaster(5, 55) && t.TotalMinutes > 30) { return true; }
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 

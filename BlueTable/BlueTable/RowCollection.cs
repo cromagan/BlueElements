@@ -600,13 +600,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (!tbl.CanDoValueChangedScript(false)) { return null; }
 
-        var rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5));
+        var rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5, false));
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance));
+        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !tbl.MultiUserPossible ));
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15));
+        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !tbl.MultiUserPossible));
         if (rowToCheck != null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
@@ -617,7 +617,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisRow in tbl.Row) {
             var dateofmyrow = thisRow.CellGetDateTime(srs);
-            if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow(15)) {
+            if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow(15, true)) {
                 datefoundmax = dateofmyrow;
                 foundrow = thisRow;
             }
