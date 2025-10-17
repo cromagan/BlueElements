@@ -25,7 +25,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -352,9 +351,9 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
-		//Used: Only BZL
-		// Open a Stream and decode a TIFF image
-		var imageStreamSource = new System.IO.FileStream(fileName, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+        //Used: Only BZL
+        // Open a Stream and decode a TIFF image
+        var imageStreamSource = new System.IO.FileStream(fileName, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
         List<Bitmap> l = [];
         var frames = 1;
         try {
@@ -375,7 +374,7 @@ public class BitmapExt : IDisposableExtended {
                     Bitmap x2 = new(200, 200);
                     var gr = Graphics.FromImage(x2);
                     gr.Clear(Color.White);
-                    gr.DrawString("Weitere Blätter vorhanden!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
+                    gr.DrawString("Weitere Blätter vorhanden!", new Font("Arial", 9), Brushes.Red, new Point(0, 0), DefaultWithTrailingSpaces);
                     l.Add(x2);
                 }
             } catch (Exception ex) {
@@ -384,7 +383,7 @@ public class BitmapExt : IDisposableExtended {
                 Bitmap x2 = new(200, 200);
                 var gr = Graphics.FromImage(x2);
                 gr.Clear(Color.White);
-                gr.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
+                gr.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0), DefaultWithTrailingSpaces);
                 l.Add(x2);
                 Develop.DebugPrint("Vorschaubild fehlgeschlagen", ex);
             }

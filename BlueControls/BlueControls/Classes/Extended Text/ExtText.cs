@@ -533,7 +533,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var font = Skin.GetBlueFont(SheetStyle, StyleBeginns);
 
         // StringBuilder für temporäre String-Operationen
-        var temp = new StringBuilder(100);
+        var temp = new StringBuilder(_internal.Capacity);
         var pos = 0;
         var zeichen = -1;
 
@@ -666,6 +666,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, ColorParse(attribut), font.ColorOutline, font.ColorBack);
                 break;
 
+            case "BACKCOLOR":
+                style = PadStyles.Undefiniert;
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.ColorMain, font.ColorOutline, ColorParse(attribut));
+                break;
+
+            case "OUTLINECOLOR":
             case "COLOROUTLINE":
             case "FONTOUTLINE":
                 style = PadStyles.Undefiniert;
@@ -905,7 +911,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             _internal[akt].Pos.Y = isY;
 
             // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
-            isX = (float)(isX + Math.Truncate(_internal[akt].Size.Width + 0.5));
+            //isX = (float)(isX + Math.Truncate(_internal[akt].Size.Width + 0.5));
+            isX = isX + _internal[akt].Size.Width;
 
             if (_internal[akt].IsLineBreak()) {
                 isX = vZbxPixel;

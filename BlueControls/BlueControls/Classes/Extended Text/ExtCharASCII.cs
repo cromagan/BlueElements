@@ -31,8 +31,8 @@ public class ExtCharAscii : ExtChar {
 
     private char _char;
     private int _charInt;
-    private string _charString;
-    private string _htmlText;
+    private string _charString = string.Empty;
+    private string _htmlText = string.Empty;
     private bool _isLineBreak;
     private bool _isPossibleLineBreak;
     private bool _isSpace;

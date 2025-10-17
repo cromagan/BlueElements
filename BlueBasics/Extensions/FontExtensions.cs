@@ -27,8 +27,11 @@ public static partial class Extensions {
 
     #region Fields
 
-    private static readonly StringFormat DefaultWithTrailingSpaces = new StringFormat(StringFormat.GenericDefault) {
-        FormatFlags = StringFormat.GenericDefault.FormatFlags | StringFormatFlags.MeasureTrailingSpaces
+    public static readonly StringFormat DefaultWithTrailingSpaces = new StringFormat(StringFormat.GenericTypographic) {
+        FormatFlags = StringFormat.GenericDefault.FormatFlags | StringFormatFlags.MeasureTrailingSpaces,
+        Alignment = StringAlignment.Near,
+        LineAlignment = StringAlignment.Near,
+        Trimming = StringTrimming.None
     };
 
     #endregion
@@ -41,15 +44,6 @@ public static partial class Extensions {
         try {
             using var gr = Graphics.FromHwnd(IntPtr.Zero);
             SetTextRenderingHint(gr, font);
-
-            //// Prüfen auf Leerzeichen am Ende
-            //if (text.EndsWith(" ")) {
-            //    // Wir messen den Text mit einem zusätzlichen x am Ende
-            //    var withX = gr.MeasureString(text + 'x', font, 9999, StringFormat.GenericTypographic);
-            //    var x = gr.MeasureString("x", font, 9999, StringFormat.GenericTypographic);
-
-            //    return new SizeF(withX.Width - x.Width, withX.Height);
-            //}
             return gr.MeasureString(text, font, int.MaxValue, DefaultWithTrailingSpaces);
         } catch {
             return SizeF.Empty;
