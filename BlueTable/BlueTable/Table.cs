@@ -1258,7 +1258,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         //_ = vars.Add(new VariableBool("Successful", true, true, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
         //_ = vars.Add(new VariableString("NotSuccessfulReason", string.Empty, true, "Die letzte Meldung, warum es nicht erfolgreich war."));
         _ = vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
-        _ = vars.Add(new VariableListString("ErrorColumns", [], false, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
+        _ = vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
         #endregion
 
@@ -1366,6 +1366,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 if (row is { IsDisposed: false } r) {
                     t = t + "Zeile: " + r.CellFirstString() + "\r\n";
+                    t = t + "Zeile-Schlüssel: " + r.KeyName + "\r\n";
                     if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
                         t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
                     }
