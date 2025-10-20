@@ -58,6 +58,44 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static readonly ObservableCollection<Table> AllFiles = [];
 
+    /// <summary>
+    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
+    /// </summary>
+    public static readonly int MasterBlockedMax = 180;
+
+    /// <summary>
+    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
+    /// </summary>
+    public static readonly int MasterBlockedMin = 0;
+
+    /// <summary>
+    /// Wert in Minuten. Ist man selbst Master in diesen Range, dann zählt das, dass man ein Master ist
+    /// </summary>
+    public static readonly int MasterCount = 150;
+
+    /// <summary>
+    /// Wert in Minuten. Solange dürfen werden und Masters willkürlich gesetzt.
+    /// </summary>
+    public static readonly int MasterTry = 7;
+
+    /// <summary>
+    /// Wert in Minuten. Solange gilt der gesetzte Master Wert.
+    /// </summary>
+    public static readonly int MasterUntil = 175;
+
+    /// <summary>
+    /// Wert in Minuten. Ab diesen Wert dürfen Master die Zeilenberechnung übernehmen
+    /// </summary>
+    public static readonly int MyRowLost = 6;
+
+    /// <summary>
+    /// Wert in Minuten, in welchem Intervall die Tabellen auf Aktualität geprüft werden.
+    /// </summary>
+    public static readonly int UpdateTable = 5;
+
+    /// <summary>
+    /// So viele Master of Table darf man sein
+    /// </summary>
     public static int MaxMasterCount = 3;
 
     /// <summary>
@@ -2005,13 +2043,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public virtual void TryToSetMeTemporaryMaster() {
         if (!string.IsNullOrEmpty(AreAllDataCorrect())) { return; }
 
-        if (AmITemporaryMaster(0, 60)) { return; }
+        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax)) { return; }
 
         if (!NewMasterPossible()) { return; }
 
         RowCollection.WaitDelay = 0;
         TemporaryTableMasterUser = MyMasterCode;
         TemporaryTableMasterTimeUtc = DateTime.UtcNow.ToString5();
+    }
+
+    public void UnMasterMe() {
+        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax)) {
+            TemporaryTableMasterUser = "Unset: " + Generic.UserName;
+            TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
+        }
     }
 
     public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {
@@ -2492,7 +2537,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!IsAdministrator()) { return false; }
 
         if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
-            if (DateTime.UtcNow.Subtract(dt).TotalMinutes < 60) { return false; }
+            if (DateTime.UtcNow.Subtract(dt).TotalMinutes < MasterBlockedMax) { return false; }
             if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) { return true; }
         }
 
@@ -2503,7 +2548,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         try {
             var masters = 0;
             foreach (var thisDb in AllFiles) {
-                if (MultiUserPossible && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(0, 45)) {
+                if (MultiUserPossible && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(MasterBlockedMin, MasterCount)) {
                     masters++;
                     if (masters >= MaxMasterCount) { return false; }
                 }

@@ -522,6 +522,7 @@ public class TableChunk : TableFile {
     }
 
     protected override void Dispose(bool disposing) {
+        UnMasterMe();
         base.Dispose(disposing);
         _chunks.Clear();
     }

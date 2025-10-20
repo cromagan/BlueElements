@@ -95,7 +95,7 @@ public class TableFragments : TableFile {
     public override bool AmITemporaryMaster(int ranges, int rangee) {
         if (IsInCache.Year < 2000) { return false; }
 
-        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) {
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > UpdateTable) {
             if (!BeSureToBeUpToDate(false)) { return false; }
         }
 
@@ -171,7 +171,7 @@ public class TableFragments : TableFile {
         if (IsDisposed) { return; }
 
         if (disposing) { }
-
+        UnMasterMe();
         CloseWriter();
 
         base.Dispose(disposing);
@@ -255,7 +255,7 @@ public class TableFragments : TableFile {
 
         #region Bei Bedarf neue Komplett-Tabelle erstellen
 
-        if (_masterNeeded && DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > 15 && AmITemporaryMaster(5, 55)) {
+        if (_masterNeeded && DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > 15 && AmITemporaryMaster(MasterTry, MasterUntil)) {
             DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
 
             var f = SaveMainFile(this, IsInCache);

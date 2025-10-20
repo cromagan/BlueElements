@@ -394,7 +394,7 @@ public class TableFile : Table {
 
             if (_tableUpdateTimer != null) { return; }
 
-            _tableUpdateTimer = new System.Threading.Timer(TableUpdater, null, 10000, 3 * 60 * 1000);
+            _tableUpdateTimer = new System.Threading.Timer(TableUpdater, null, 10000, UpdateTable * 60 * 1000);
         }
     }
 

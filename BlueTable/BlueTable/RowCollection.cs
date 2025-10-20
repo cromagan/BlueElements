@@ -79,15 +79,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Properties
 
+    /// <summary>
+    /// Wert in Minuten.
+    /// Gibt an, wieviel Minuten maximal vergangen sein dürfen, um eine Zeile direkt zu INITIALISIEREN
+    /// </summary>
+    public static double NewRowTolerance { get; set; } = 1;
+
     public int Count => _internal.Count;
 
     public bool IsDisposed { get; private set; }
-
-    /// <summary>
-    /// Wert in Minuten.
-    /// Gibt an, wieviel minuten Maximal vergangen sein dürfen, um eine Zeile zu INITIALISIEREN
-    /// </summary>
-    public double NewRowTolerance { get; set; } = 1;
 
     public Table? Table {
         get => _table;
@@ -603,7 +603,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5, false));
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !tbl.MultiUserPossible ));
+        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !tbl.MultiUserPossible));
         if (rowToCheck != null) { return rowToCheck; }
 
         rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !tbl.MultiUserPossible));

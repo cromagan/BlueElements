@@ -36,6 +36,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.Converter;
+using static BlueTable.Table;
 
 namespace BlueTable;
 
@@ -225,9 +226,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <returns>DateTime.MinValue bei Fehlern</returns>
     public DateTime CellGetDateTime(ColumnItem? column) {
-        var value = Table?.Cell.GetString(column, this);
-        if (value == null) { return DateTime.MinValue; }
-        return string.IsNullOrEmpty(value) ? default : DateTimeTryParse(value, out var d) ? d : DateTime.MinValue;
+        var value = Table?.Cell.GetString(column, this) ?? string.Empty;
+        return DateTimeTryParse(value, out var d) ? d : DateTime.MinValue;
     }
 
     /// <summary>
@@ -839,7 +839,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        if (mastertoo &&  db.AmITemporaryMaster(5, 55) && t.TotalMinutes > 30) { return true; }
+        if (mastertoo && db.AmITemporaryMaster(MasterTry, MasterUntil) && t.TotalMinutes > MyRowLost) { return true; }
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 

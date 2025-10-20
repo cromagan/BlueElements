@@ -54,6 +54,7 @@ using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
 using BlueBasics.EventArgs;
 using System.Text;
+using static BlueTable.Table;
 
 namespace BlueControls.Controls;
 
@@ -3357,7 +3358,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                                 gr.FillRectangle(BrushRedTransparent, cellrectangle);
                             } else {
-                                if (db.AmITemporaryMaster(5, 55)) {
+                                if (db.AmITemporaryMaster(MasterTry, MasterUntil)) {
                                     RowCollection.WaitDelay = 0;
                                 }
                             }
@@ -3751,9 +3752,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         // Master-Status anzeigen
-        if (db.AmITemporaryMaster(5, 55)) {
+        if (db.AmITemporaryMaster(MasterTry, MasterUntil)) {
             gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, filterHeight);
-        } else if (db.AmITemporaryMaster(0, 55)) {
+        } else if (db.AmITemporaryMaster(MasterBlockedMin, MasterUntil)) {
             gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, filterHeight);
         }
     }

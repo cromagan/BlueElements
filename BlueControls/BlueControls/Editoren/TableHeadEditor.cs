@@ -360,14 +360,10 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     private void btnUnMaster_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tbl) { return; }
 
-        if (db.AmITemporaryMaster(0, 60)) {
-            db.TemporaryTableMasterUser = "Unset: " + Generic.UserName;
-            db.TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
-            db.BeSureToBeUpToDate(false);
-            Close();
-        }
+        tbl.UnMasterMe();
+        tbl.BeSureToBeUpToDate(false);
     }
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
