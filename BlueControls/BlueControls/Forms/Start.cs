@@ -37,14 +37,14 @@ namespace BlueControls.Forms {
 
             foreach (var thisType in types) {
                 var name = thisType.Name;
-                ImageCode i = ImageCode.Fragezeichen;
+                QuickImage i = QuickImage.Get(ImageCode.Fragezeichen);
                 string kat = "Sonstiges";
                 int sort = 200;
 
                 var attr = thisType.GetCustomAttribute<StandaloneInfo>();
                 if (attr != null) {
                     name = attr.Name;
-                    i = attr.Symbol;
+                    i = attr.Image;
                     kat = attr.Kategorie;
                     sort = attr.Sort;
                 }
@@ -54,9 +54,15 @@ namespace BlueControls.Forms {
                     Forms.ItemAdd(pk);
                 }
 
-                var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToStringInt10() + "1" + name) {
-                    Tag = thisType
+                var p = new BitmapListItem(i, string.Empty, name) {
+                    Padding = 6,
+                    Tag = thisType,
+                    UserDefCompareKey = sort.ToStringInt10() + "1" + name
                 };
+
+                //var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToStringInt10() + "1" + name) {
+                //    Tag = thisType
+                //};
                 Forms.ItemAdd(p);
             }
         }

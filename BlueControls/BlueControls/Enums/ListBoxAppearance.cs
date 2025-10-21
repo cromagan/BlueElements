@@ -34,5 +34,6 @@ public enum ListBoxAppearance {
     //Dropdown = enDesign.Form_SelectBox_Dropdown
     Gallery = 11000,
 
-    FileSystem = 11001
+    FileSystem = 11001,
+    ButtonList = 11003
 }

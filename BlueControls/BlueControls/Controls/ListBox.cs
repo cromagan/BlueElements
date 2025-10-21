@@ -185,18 +185,6 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     public ReadOnlyCollection<string> Checked => _checked.AsReadOnly();
 
-    /// <summary>
-    /// ControlDesign wird durch Appearance gesetzt
-    /// </summary>
-    /// <returns></returns>
-    public Design ControlDesign //Implements IDesignAble.Design
-    {
-        get {
-            if (_controlDesign == Design.Undefiniert) { Develop.DebugPrint(ErrorType.Error, "ControlDesign undefiniert!"); }
-            return _controlDesign;
-        }
-    }
-
     [DefaultValue("")]
     public string FilterText {
         get => _filterText;
@@ -208,18 +196,6 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     }
 
     public int ItemCount => _item.Count;
-
-    /// <summary>
-    /// Itemdesign wird durch Appearance gesetzt
-    /// </summary>
-    /// <returns></returns>
-    public Design ItemDesign //Implements IDesignAble.Design
-    {
-        get {
-            if (_itemDesign == Design.Undefiniert) { Develop.DebugPrint(ErrorType.Error, "ItemDesign undefiniert!"); }
-            return _itemDesign;
-        }
-    }
 
     [DefaultValue(false)]
     public bool ItemEditAllowed {
@@ -444,6 +420,11 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
                 _itemDesign = Design.ComboBox_Textbox;
                 break;
 
+            case ListBoxAppearance.ButtonList:
+                _itemDesign = Design.Button;
+                _controlDesign = Design.GroupBox;
+                break;
+
             default:
                 Develop.DebugPrint(ErrorType.Error, "Unbekanntes Design: " + _appearance);
                 break;
@@ -516,6 +497,15 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
             }
         }
 
+        ValidateCheckStates(_checked, string.Empty);
+    }
+
+    public void Remove(List<AbstractListItem> items) {
+        foreach (var thisItem in items) {
+            if (!_item.Contains(thisItem)) { return; }
+
+            RemoveAndUnRegister(thisItem);
+        }
         ValidateCheckStates(_checked, string.Empty);
     }
 
@@ -607,13 +597,21 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
             #region colWidth
 
             int colWidth;
+            int colHeight;
             switch (_appearance) {
                 case ListBoxAppearance.Gallery:
                     colWidth = 200;
+                    colHeight = 200;
                     break;
 
                 case ListBoxAppearance.FileSystem:
                     colWidth = 110;
+                    colHeight = 110;
+                    break;
+
+                case ListBoxAppearance.ButtonList:
+                    colWidth = 64;
+                    colHeight = 80;
                     break;
 
                 default:
@@ -626,6 +624,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
                         if (r != 0) { colCount++; }
                         colWidth = controlDrawingArea.Width < 5 ? biggestItemX : (controlDrawingArea.Width - sliderWidth) / colCount;
                     }
+                    colHeight = colWidth;
                     break;
             }
 
@@ -646,10 +645,9 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
                     itenc++;
                     if (senkrechtAllowed == Orientation.Waagerecht) {
                         if (thisItem.IsCaption) { wi = controlDrawingArea.Width - sliderWidth; }
-                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign);
-                    } else {
-                        he = thisItem.HeightForListBox(_appearance, wi, ItemDesign);
                     }
+                    he = thisItem.HeightForListBox(_appearance, colHeight, _itemDesign);
+
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
                             if (previtem.Position.Right + colWidth > controlDrawingArea.Width || thisItem.IsCaption) {
@@ -758,10 +756,6 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        var tmpDesign = _appearance is ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.Listbox_Boxes
-            ? Design.ListBox
-            : (Design)_appearance;
-
         var checkboxDesign = CheckboxDesign();
 
         var tmpState = state;
@@ -787,7 +781,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
         if (borderCoords.Height > 0) {
             gr.ScaleTransform(1, 1);
-            Skin.Draw_Back(gr, tmpDesign, tmpState, borderCoords, this, true);
+            Skin.Draw_Back(gr, _controlDesign, tmpState, borderCoords, this, true);
         }
 
         //_mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
@@ -810,8 +804,8 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
             }
         });
 
-        if (borderCoords.Height > 0 && tmpDesign == Design.ListBox) {
-            Skin.Draw_Border(gr, tmpDesign, tmpState, borderCoords);
+        if (borderCoords.Height > 0 && _controlDesign == Design.ListBox) {
+            Skin.Draw_Border(gr, _controlDesign, tmpState, borderCoords);
         }
 
         //if (tmpButtonLeisteHeight > 0) {
@@ -850,7 +844,8 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
                                       ListBoxAppearance.Listbox_Boxes or
                                       ListBoxAppearance.Autofilter or
                                       ListBoxAppearance.Gallery or
-                                      ListBoxAppearance.FileSystem) {
+                                      ListBoxAppearance.FileSystem or
+                                      ListBoxAppearance.ButtonList) {
                         if (nd.IsClickable()) {
                             if (CheckBehavior != CheckBehavior.AllSelected) {
                                 ChangeCheck(nd);

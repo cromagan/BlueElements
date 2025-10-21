@@ -17,7 +17,9 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Enums;
 using System;
 
 namespace BlueControls;
@@ -29,7 +31,21 @@ public class StandaloneInfo : Attribute {
 
     public StandaloneInfo(string name, ImageCode symbol, string kategorie, int sort) {
         Name = name;
-        Symbol = symbol;
+        Image = QuickImage.Get(symbol, 48);
+        Kategorie = kategorie;
+        Sort = sort;
+    }
+
+    public StandaloneInfo(string name, QuickImage image, string kategorie, int sort) {
+        Name = name;
+        Image = image;
+        Kategorie = kategorie;
+        Sort = sort;
+    }
+
+    public StandaloneInfo(string name, string image, string kategorie, int sort) {
+        Name = name;
+        Image = QuickImage.Get(image);
         Kategorie = kategorie;
         Sort = sort;
     }
@@ -38,10 +54,10 @@ public class StandaloneInfo : Attribute {
 
     #region Properties
 
+    public QuickImage Image { get; }
     public string Kategorie { get; }
     public string Name { get; }
     public int Sort { get; }
-    public ImageCode Symbol { get; }
 
     #endregion
 }

@@ -34,7 +34,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-[StandaloneInfo("Formular-Ansicht", ImageCode.Anwendung, "Allgemein", 90)]
+[StandaloneInfo("Formular-Ansicht", ImageCode.Anwendung, "Allgemein", 800)]
 public partial class ConnectedFormulaForm : FormWithStatusBar, IIsStandalone {
 
     #region Fields

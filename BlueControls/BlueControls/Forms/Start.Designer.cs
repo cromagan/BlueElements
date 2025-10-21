@@ -33,12 +33,12 @@ namespace BlueControls.Forms {
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(257, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(550, 24);
             // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 343);
-            this.pnlStatusBar.Size = new System.Drawing.Size(257, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(550, 24);
             // 
             // Forms
             // 
@@ -46,10 +46,11 @@ namespace BlueControls.Forms {
             this.Forms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Forms.AutoSort = true;
+            this.Forms.Appearance = BlueControls.Enums.ListBoxAppearance.ButtonList;
+            this.Forms.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.Forms.Location = new System.Drawing.Point(8, 32);
             this.Forms.Name = "Forms";
-            this.Forms.Size = new System.Drawing.Size(240, 304);
+            this.Forms.Size = new System.Drawing.Size(533, 304);
             this.Forms.TabIndex = 7;
             this.Forms.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.Forms_ItemClicked);
             // 
@@ -64,10 +65,10 @@ namespace BlueControls.Forms {
             // Start
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(257, 367);
+            this.ClientSize = new System.Drawing.Size(550, 367);
             this.Controls.Add(this.capApp);
             this.Controls.Add(this.Forms);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "BeCreative! - (c) Christian Peter";
