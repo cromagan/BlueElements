@@ -89,12 +89,12 @@ public static class IUniqueWindowExtension {
 
     #region Methods
 
-    public static T ShowOrCreate<T>(object o) where T : System.Windows.Forms.Form, IUniqueWindow, new() {
+    public static T ShowOrCreate<T>(object? o) where T : System.Windows.Forms.Form, IUniqueWindow, new() {
         var windowType = typeof(T);
 
         foreach (var form in FormManager.Forms) {
             if (form.GetType() == windowType && form is T { IsDisposed: false } uniqueWindow) {
-                if (uniqueWindow.Object.Equals(o)) {
+                if (uniqueWindow.Object == o) {
                     uniqueWindow.BringToFront();
                     return uniqueWindow;
                 }

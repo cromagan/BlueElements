@@ -207,7 +207,12 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
         }
     }
 
-    public ReadOnlyCollection<AbstractListItem> Items => _item.AsReadOnly();
+    public ReadOnlyCollection<AbstractListItem> Items {
+        get {
+            DoItemOrder();
+            return _item.AsReadOnly();
+        }
+    }
 
     [DefaultValue(false)]
     public bool MoveAllowed {

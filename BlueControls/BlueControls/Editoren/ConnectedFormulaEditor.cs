@@ -42,8 +42,7 @@ using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
-[StandaloneInfo("Formular-Editor", ImageCode.Anwendung, "Admin", 900)]
-public partial class ConnectedFormulaEditor : PadEditor, IIsEditor, IIsStandalone {
+public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Fields
 
@@ -135,6 +134,9 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor, IIsStandalon
     #endregion
 
     #region Methods
+
+    [StandaloneInfo("Formular-Editor", ImageCode.Anwendung, "Admin", 900)]
+    public static System.Windows.Forms.Form Start() => new ConnectedFormulaEditor();
 
     /// <summary>
     /// Clean up any resources being used.

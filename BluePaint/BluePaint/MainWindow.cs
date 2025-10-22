@@ -34,8 +34,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
 
-[BlueControls.StandaloneInfo("Bildbearbeitung", ImageCode.Bild, "Allgemein", 800)]
-public partial class MainWindow : BlueControls.Forms.Form, IIsStandalone {
+public partial class MainWindow : BlueControls.Forms.Form {
 
     #region Fields
 
@@ -65,6 +64,9 @@ public partial class MainWindow : BlueControls.Forms.Form, IIsStandalone {
     #endregion
 
     #region Methods
+
+    [BlueControls.StandaloneInfo("Bild-bearbeitung", ImageCode.Bild, "Allgemein", 800)]
+    public static System.Windows.Forms.Form Start() => new MainWindow();
 
     /// <summary>
     /// Filename wird entfernt!

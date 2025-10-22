@@ -34,8 +34,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-[StandaloneInfo("Formular-Ansicht", ImageCode.Anwendung, "Allgemein", 800)]
-public partial class ConnectedFormulaForm : FormWithStatusBar, IIsStandalone {
+public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     #region Fields
 
@@ -61,6 +60,9 @@ public partial class ConnectedFormulaForm : FormWithStatusBar, IIsStandalone {
     #endregion
 
     #region Methods
+
+    [StandaloneInfo("Formular-Ansicht", ImageCode.Anwendung, "Allgemein", 800)]
+    public static System.Windows.Forms.Form Start() => new ConnectedFormulaForm();
 
     protected void FormulaSet(string? filename) {
         if (filename == null || !FileExists(filename)) {

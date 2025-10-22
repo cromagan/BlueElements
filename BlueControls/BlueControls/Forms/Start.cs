@@ -27,18 +27,18 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.Forms {
 
-    public partial class Start : FormWithStatusBar {
+    public partial class Start : FormWithStatusBar, IUniqueWindow {
 
         #region Constructors
 
         public Start() : base() {
             InitializeComponent();
 
-            var types = Generic.GetTypesOfType<IIsStandalone>();
+            //var types = Generic.GetTypesOfType<IIsStandalone>();
 
-            // var methods = Generic.GetMethodsWithAttribute<StandaloneInfo>();
+            var methods = Generic.GetMethodsWithAttribute<StandaloneInfo>();
 
-            foreach (var thisType in types) {
+            foreach (var thisType in methods) {
                 var name = thisType.Name;
                 QuickImage i = QuickImage.Get(ImageCode.Fragezeichen);
                 string kat = "Sonstiges";
@@ -61,7 +61,7 @@ namespace BlueControls.Forms {
                 }
 
                 var p = new BitmapListItem(i, string.Empty, name) {
-                    Padding = 4,
+                    Padding = 5,
                     Tag = thisType,
                     UserDefCompareKey = sort.ToStringInt10() + "1" + name
                 };
@@ -75,23 +75,35 @@ namespace BlueControls.Forms {
 
         #endregion
 
+        #region Properties
+
+        public object? Object { get; set; }
+
+        #endregion
+
         #region Methods
 
-        public virtual void OpenWindow(Type t) {
-            var instance = (IIsStandalone)Activator.CreateInstance(t);
-
-            if (instance is System.Windows.Forms.Form frm) {
-                FormManager.RegisterForm(frm);
-                frm.Show();
-                Close();
-                frm.BringToFront();
-            }
-        }
-
         private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-            if (e.Item.Tag is not Type t) { return; }
+            if (e.Item.Tag is MethodInfo methodInfo) {
+                var result = methodInfo.Invoke(null, null);
+                if (result is Form form) {
+                    FormManager.RegisterForm(form);
+                    form.Show();
+                    Close();
+                    form.BringToFront();
+                }
+            }
 
-            OpenWindow(t);
+            //if (e.Item.Tag is not Type t) { return; }
+
+            //var instance = (IIsStandalone)Activator.CreateInstance(t);
+
+            //if (instance is System.Windows.Forms.Form frm) {
+            //    FormManager.RegisterForm(frm);
+            //    frm.Show();
+            //    Close();
+            //    frm.BringToFront();
+            //}
         }
 
         #endregion

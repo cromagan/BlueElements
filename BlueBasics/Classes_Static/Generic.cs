@@ -247,23 +247,23 @@ public static class Generic {
         }
     }
 
-    //public static List<MethodInfo> GetMethodsWithAttribute<TAttribute>() where TAttribute : Attribute {
-    //    try {
-    //        List<MethodInfo> l = [];
-    //        foreach (var thisType in AllTypes) {
-    //            if (!thisType.IsClass || thisType.IsAbstract) continue;
+    public static List<MethodInfo> GetMethodsWithAttribute<TAttribute>() where TAttribute : Attribute {
+        try {
+            List<MethodInfo> l = [];
+            foreach (var thisType in AllTypes) {
+                if (!thisType.IsClass || thisType.IsAbstract) continue;
 
-    //            var methods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-    //                .Where(m => m.GetCustomAttribute<TAttribute>() != null);
+                var methods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .Where(m => m.GetCustomAttribute<TAttribute>() != null);
 
-    //            l.AddRange(methods);
-    //        }
-    //        return l;
-    //    } catch {
-    //        Develop.CheckStackOverflow();
-    //        return GetMethodsWithAttribute<TAttribute>();
-    //    }
-    //}
+                l.AddRange(methods);
+            }
+            return l;
+        } catch {
+            Develop.CheckStackOverflow();
+            return GetMethodsWithAttribute<TAttribute>();
+        }
+    }
 
     public static List<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {
         try {

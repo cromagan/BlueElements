@@ -43,8 +43,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-[StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", 800)]
-public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandalone {
+public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     #region Fields
 
@@ -143,6 +142,9 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings, IIsStandal
 
         _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
     }
+
+    [StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", 800)]
+    public static System.Windows.Forms.Form Start() => new TableViewForm();
 
     public string ReadableText() => "Tabellen Ansicht";
 
