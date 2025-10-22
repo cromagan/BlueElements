@@ -24,7 +24,6 @@ using System;
 
 namespace BlueControls;
 
-[AttributeUsage(AttributeTargets.Class)]
 public class StandaloneInfo : Attribute {
 
     #region Constructors

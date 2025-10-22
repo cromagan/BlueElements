@@ -1574,10 +1574,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return r;
     }
 
-    public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) {
-        if (!InitialLoadDone) { return "Tabelle noch nicht geladen."; }
+    public virtual FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
+        if (!InitialLoadDone) { return new("Tabelle noch nicht geladen.", false, true); }
 
-        return AreAllDataCorrect();
+        var t = AreAllDataCorrect();
+
+        if (string.IsNullOrEmpty(t)) { return FileOperationResult.ValueStringEmpty; }
+
+        return FileOperationResult.ValueStringEmpty;
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
@@ -1765,7 +1769,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return !string.IsNullOrEmpty(UserGroup) && _tableAdmin.Contains(UserGroup, false);
     }
 
-    public string IsNowEditable() => GrantWriteAccess(TableDataType.Caption, TableChunk.Chunk_Master);
+    public string IsNowEditable() => GrantWriteAccess(TableDataType.Caption, TableChunk.Chunk_Master).StringValue;
 
     public bool IsRowScriptPossible() {
         if (Column.SysRowChangeDate == null) { return false; }

@@ -196,32 +196,32 @@ public class Chunk : IHasKeyName {
         return false;
     }
 
-    public string Save(string filename) {
-        if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
-        if (Bytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
-        if (_bytesloaded.Year < 2000) { return "Chunk noch nicht geladen"; }
+    public FileOperationResult Save(string filename) {
+        if (LoadFailed) { return new("Chunk wurde nicht korrekt geladen", false, true); }
+        if (Bytes.Count < _minBytes) { return new("Zu große Änderungen, sicherheitshalber geblockt", false, true); }
+        if (_bytesloaded.Year < 2000) { return new("Chunk noch nicht geladen", false, true); }
 
-        if (Develop.AllReadOnly) { return string.Empty; }
+        if (Develop.AllReadOnly) { return FileOperationResult.ValueStringEmpty; }
 
         try {
             Develop.SetUserDidSomething();
 
             // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
             var contentBytes = RemoveHeaderDataTypes(Bytes.ToArray());
-            if (contentBytes == null || contentBytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
+            if (contentBytes == null || contentBytes.Count < _minBytes) { return new("Zu große Änderungen, sicherheitshalber geblockt", false, true); }
 
             // Neuen Header erstellen
             var head = GetHeadAndSetEditor();
-            if (head == null || head.Count < 100) { return "Chunk-Kopf konnte nicht erstellt werden"; }
+            if (head == null || head.Count < 100) { return new("Chunk-Kopf konnte nicht erstellt werden", false, true); }
 
             // Header und Datensätze zusammenführen und komprimieren
             var datacompressed = head.Concat(contentBytes).ToArray().ZipIt();
-            if (datacompressed == null || datacompressed.Length < 100) { return "Komprimierug der Daten fehlgeschlagen"; }
+            if (datacompressed == null || datacompressed.Length < 100) { return new("Komprimierug der Daten fehlgeschlagen", true, true); }
 
             Develop.SetUserDidSomething();
 
             if (!WriteAllBytes(filename, datacompressed)) {
-                return "Speichern fehlgeschlagen";
+                return new("Speichern fehlgeschlagen", false, true);
             }
 
             _minBytes = (int)(contentBytes.Count * 0.1);
@@ -229,10 +229,10 @@ public class Chunk : IHasKeyName {
             Develop.SetUserDidSomething();
         } catch {
             DeleteFile(filename, false);
-            return "Allgemeiner Fehler";
+            return new("Allgemeiner Fehler", false, true);
         }
 
-        return string.Empty;
+        return FileOperationResult.ValueStringEmpty;
     }
 
     public void SaveToByteList(ColumnItem column, RowItem row) {
@@ -395,7 +395,7 @@ public class Chunk : IHasKeyName {
         return false;
     }
 
-    internal string DoExtendedSave() {
+    internal FileOperationResult DoExtendedSave() {
         var filename = ChunkFileName;
         Develop.Message?.Invoke(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
@@ -406,24 +406,24 @@ public class Chunk : IHasKeyName {
 
         var f = Save(tempfile);
 
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (f.Failed) { return f; }
 
         // KRITISCHE ÄNDERUNG: FileInfo der temporären Datei VOR dem Move ermitteln
         // So wissen wir exakt, was wir schreiben und vermeiden Race Conditions
         var tempFileInfo = GetFileState(tempfile, true);
         if (string.IsNullOrEmpty(tempFileInfo)) {
             DeleteFile(tempfile, false);
-            return "Dateiinfo konnte nicht gelesen werden";
+            return new("Dateiinfo konnte nicht gelesen werden", false, true);
         }
 
         if (FileExists(backup) && !DeleteFile(backup, false)) {
             DeleteFile(tempfile, false);
-            return "Backup konnte nicht gelöscht werden";
+            return new("Backup konnte nicht gelöscht werden", false, true);
         }
 
         if (FileExists(filename) && !MoveFile(filename, backup, false)) {
             DeleteFile(tempfile, false);
-            return "Hauptdatei konnte nicht verschoben werden";
+            return new("Hauptdatei konnte nicht verschoben werden", false, true);
         }
 
         // --- TmpFile wird zum Haupt ---
@@ -438,64 +438,66 @@ public class Chunk : IHasKeyName {
                     _fileinfo = tempFileInfo;
                 }
 
-                return string.Empty;
+                return FileOperationResult.ValueStringEmpty;
             }
 
             // Paralleler Prozess hat gespeichert?
             if (FileExists(filename)) {
                 DeleteFile(tempfile, false);
                 LoadBytesFromDisk(true);
-                return "Dateien wurden zwischenzeitlich verändert";
+                return new("Dateien wurden zwischenzeitlich verändert", true, true);
             }
 
             Thread.Sleep(retryDelayMs * attempt);
 
-            if (!FileExists(tempfile)) { return "Temp-Datei Zugriffsfehler"; }
+            if (!FileExists(tempfile)) { return new("Temp-Datei Zugriffsfehler", false, true); }
         }
 
         // Aufräumen falls alles fehlschlägt
         DeleteFile(tempfile, false);
-        return "speichervorgang unerwartet abgebrochen";
+        return new("Speichervorgang unerwartet abgebrochen", false, true);
     }
 
-    internal string GrantWriteAccess() {
+    internal FileOperationResult GrantWriteAccess() {
         var f = IsEditable();
-        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+        if (f.Failed) { return f; }
 
-        if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
+        if (NeedsReload(true)) { return new("Daten müssen neu geladen werden.", false, true); }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
             f = CanSaveFile(ChunkFileName, 5);
-            if (!string.IsNullOrWhiteSpace(f)) { return f; }
+            if (f.Failed) { return f; }
 
             f = DoExtendedSave();
 
-            if (!string.IsNullOrEmpty(f)) {
+            if (f.Failed) {
                 LastEditTimeUtc = DateTime.MinValue;
-                return $"Bearbeitung konnte nicht gesetzt werden ({f})";
+                return f; // $"Bearbeitung konnte nicht gesetzt werden ({f.ReturnValue as string})";
             }
         }
 
-        return string.Empty;
+        return FileOperationResult.ValueStringEmpty;
     }
 
-    internal string IsEditable() {
-        if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
+    internal FileOperationResult IsEditable() {
+        if (LoadFailed) { return new("Chunk wurde nicht korrekt geladen", false, true); }
 
-        if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
+        if (NeedsReload(false)) { return new("Daten müssen neu geladen werden.", false, true); }
+
+        var tryagain = DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 9;
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 10) {
             if (LastEditUser != UserName) {
-                return $"Aktueller Bearbeiter: {LastEditUser}";
+                return new($"Aktueller Bearbeiter: {LastEditUser}", tryagain, true);
             } else {
                 if (LastEditApp != Develop.AppExe()) {
-                    return $"Anderes Programm bearbeitet: {LastEditApp}";
+                    return new($"Anderes Programm bearbeitet: {LastEditApp}", tryagain, true);
                 } else {
                     if (LastEditMachineName != Environment.MachineName) {
-                        return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser}";
+                        return new($"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser}", tryagain, true);
                     }
                     if (LastEditID != MyId) {
-                        return $"Ein anderer Prozess auf diesem PC bearbeitet gerade.";
+                        return new($"Ein anderer Prozess auf diesem PC bearbeitet gerade.", tryagain, true);
                     }
                 }
             }

@@ -46,11 +46,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private int _clientWidth = 16;
 
-    private Table? _table;
-
     private int? _headSize;
-
     private string _sheetStyle = Win11;
+    private Table? _table;
 
     #endregion
 
@@ -90,23 +88,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public int Count => _internal.Count;
 
-    public Table? Table {
-        get => _table;
-        private set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
-
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
-            }
-            _table = value;
-
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
-            }
-        }
-    }
-
     public Type? Editor { get; set; }
 
     public BlueFont Font_RowChapter { get; internal set; } = BlueFont.DefaultFont;
@@ -136,6 +117,23 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
             OnStyleChanged();
+        }
+    }
+
+    public Table? Table {
+        get => _table;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _table) { return; }
+
+            if (_table != null) {
+                _table.DisposingEvent -= _table_Disposing;
+            }
+            _table = value;
+
+            if (_table != null) {
+                _table.DisposingEvent += _table_Disposing;
+            }
         }
     }
 
@@ -332,7 +330,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
-        return db.GrantWriteAccess(TableDataType.ColumnArrangement, TableChunk.Chunk_Master);
+        return db.GrantWriteAccess(TableDataType.ColumnArrangement, TableChunk.Chunk_Master).StringValue;
     }
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);

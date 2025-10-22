@@ -345,20 +345,20 @@ public class TableChunk : TableFile {
         }
     }
 
-    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
+    public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (f.Failed) { return f; }
 
-        if (chunkValue is not { }) { return "Fehlerhafter Chunk-Wert"; }
+        if (chunkValue is not { }) { return new("Fehlerhafter Chunk-Wert", false, true); }
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
         var ok = LoadChunkWithChunkId(chunkId, false);
 
-        if (!ok) { return "Chunk Lade-Fehler"; }
+        if (!ok) { return new("Chunk Lade-Fehler", false, true); }
 
         if (!_chunks.TryGetValue(chunkId, out var chunk)) {
-            return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
+            return new($"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}", false, true);
         } else {
             return chunk.GrantWriteAccess();
         }
@@ -470,9 +470,7 @@ public class TableChunk : TableFile {
     public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName).ToList();
 
     public override void TryToSetMeTemporaryMaster() {
-        if (!string.IsNullOrEmpty(GrantWriteAccess(TableDataType.TemporaryTableMasterUser, string.Empty))) {
-            return;
-        }
+        if (GrantWriteAccess(TableDataType.TemporaryTableMasterUser, string.Empty).Failed) { return; }
 
         base.TryToSetMeTemporaryMaster();
     }
@@ -517,7 +515,7 @@ public class TableChunk : TableFile {
         if (!_chunks.TryGetValue(chunkId, out var chunk)) {
             return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
         } else {
-            return chunk.IsEditable();
+            return chunk.IsEditable().StringValue;
         }
     }
 
@@ -529,11 +527,11 @@ public class TableChunk : TableFile {
 
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true);
 
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (!SaveRequired) { return string.Empty; }
+    protected override FileOperationResult SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (!SaveRequired) { return FileOperationResult.ValueStringEmpty; }
 
         var f = CanSaveMainChunk();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (f.Failed) { return f; }
 
         Develop.SetUserDidSomething();
 
@@ -542,7 +540,7 @@ public class TableChunk : TableFile {
         DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Tabelle '{Caption}'");
 
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
-        if (chunksnew == null || chunksnew.Count == 0) { return "Fehler bei der Chunk Erzeugung"; }
+        if (chunksnew == null || chunksnew.Count == 0) { return new("Fehler bei der Chunk Erzeugung", false, true); }
 
         #endregion
 
@@ -561,13 +559,13 @@ public class TableChunk : TableFile {
 
         #region Chunks speichern, Fehler ermitteln (allok)
 
-        var allok = string.Empty;
+        FileOperationResult? allok = null;
         try {
             foreach (var thisChunk in chunksToSave) {
                 DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
 
                 f = thisChunk.DoExtendedSave();
-                if (string.IsNullOrEmpty(f)) {
+                if (!f.Failed) {
                     _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
                 } else {
                     allok = f;
@@ -583,7 +581,7 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        if (!string.IsNullOrEmpty(allok)) { return allok; }
+        if (allok is { } fr) { return fr; }
 
         #region Nun gibt es noch Chunk-Leichen
 
@@ -606,7 +604,7 @@ public class TableChunk : TableFile {
         #endregion
 
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
-        return string.Empty;
+        return FileOperationResult.ValueStringEmpty;
     }
 
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {

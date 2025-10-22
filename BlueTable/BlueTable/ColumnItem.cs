@@ -1554,7 +1554,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
-        return db.GrantWriteAccess(TableDataType.ColumnName, TableChunk.Chunk_Master);
+        return db.GrantWriteAccess(TableDataType.ColumnName, TableChunk.Chunk_Master).StringValue;
     }
 
     //}

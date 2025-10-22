@@ -21,6 +21,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using System;
 using System.Reflection;
+using static BlueBasics.Converter;
 
 #nullable enable
 
@@ -34,6 +35,8 @@ namespace BlueControls.Forms {
             InitializeComponent();
 
             var types = Generic.GetTypesOfType<IIsStandalone>();
+
+            // var methods = Generic.GetMethodsWithAttribute<StandaloneInfo>();
 
             foreach (var thisType in types) {
                 var name = thisType.Name;
@@ -49,13 +52,16 @@ namespace BlueControls.Forms {
                     sort = attr.Sort;
                 }
 
-                if (Forms[kat] == null) {
+                if (Forms[kat] is { } cap) {
+                    var tmp = Math.Min(IntParse(cap.UserDefCompareKey) / 10, sort);
+                    cap.UserDefCompareKey = tmp.ToStringInt10() + "0";
+                } else {
                     var pk = new TextListItem(kat, kat, null, true, true, sort.ToStringInt10() + "0");
                     Forms.ItemAdd(pk);
                 }
 
                 var p = new BitmapListItem(i, string.Empty, name) {
-                    Padding = 6,
+                    Padding = 4,
                     Tag = thisType,
                     UserDefCompareKey = sort.ToStringInt10() + "1" + name
                 };

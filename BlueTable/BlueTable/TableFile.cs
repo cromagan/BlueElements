@@ -108,17 +108,17 @@ public class TableFile : Table {
     /// Konkrete Prüfung, ob jetzt gespeichert werden kann
     /// </summary>
     /// <returns></returns>
-    public string CanSaveMainChunk() {
+    public FileOperationResult CanSaveMainChunk() {
         var f = AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (!string.IsNullOrEmpty(f)) { return new(f, false, true); }
 
-        if (!InitialLoadDone) { return "Tabelle noch nicht geladen."; }
+        if (!InitialLoadDone) { return new("Tabelle noch nicht geladen.", false, true); }
 
-        if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
+        if (Row.HasPendingWorker()) { return new("Es müssen noch Daten überprüft werden.", true, true); }
 
         //if (ExecutingScriptThreadsAnyTable.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
 
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return new("Kürzlich vorgenommene Änderung muss verarbeitet werden.", true, true); }
 
         //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
 
@@ -127,7 +127,7 @@ public class TableFile : Table {
 
     public override void Freeze(string reason) => base.Freeze(reason);
 
-    public override string GrantWriteAccess(TableDataType type, string? chunkValue) => base.GrantWriteAccess(type, chunkValue);
+    public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) => base.GrantWriteAccess(type, chunkValue);
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
@@ -260,20 +260,20 @@ public class TableFile : Table {
 
     public override void TryToSetMeTemporaryMaster() => base.TryToSetMeTemporaryMaster();
 
-    protected static string SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
+    protected static FileOperationResult SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.CanSaveMainChunk();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (f.Failed) { return f; }
 
         Develop.SetUserDidSomething();
 
         var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false);
-        if (chunksnew == null || chunksnew.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
+        if (chunksnew == null || chunksnew.Count != 1) { return new("Fehler bei der Chunk Erzeugung", false, true); }
 
         f = chunksnew[0].DoExtendedSave();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (f.Failed) { return f; }
 
         tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;
-        return string.Empty;
+        return FileOperationResult.ValueStringEmpty;
     }
 
     protected override void Checker_Tick(object state) {
@@ -352,17 +352,17 @@ public class TableFile : Table {
         return true;
     }
 
-    protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected virtual FileOperationResult SaveInternal(DateTime setfileStateUtcDateTo) {
         try {
             var result = SaveMainFile(this, DateTime.UtcNow);
 
-            _saveRequired_File = !string.IsNullOrEmpty(result);
+            _saveRequired_File = result.Failed;
 
             OnInvalidateView();
 
             return result;
         } catch {
-            return "Allgemeiner Fehler.";
+            return new("Allgemeiner Fehler.", false, true);
         }
     }
 
@@ -428,9 +428,7 @@ public class TableFile : Table {
             var result = SaveInternal(DateTime.UtcNow);
             OnInvalidateView();
 
-            var ok = string.IsNullOrEmpty(result);
-
-            return new(ok, !ok, false);
+            return result;
         } finally {
             _saveSemaphore.Release();
         }

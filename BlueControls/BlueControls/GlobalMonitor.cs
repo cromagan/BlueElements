@@ -79,6 +79,7 @@ public partial class GlobalMonitor : Form {
         tblLog.SortDefinitionTemporary = new RowSortDefinition(db, az, true);
     }
 
+    [StandaloneInfo("Monitoring", ImageCode.Monitor, "Admin", 900)]
     public static void Start() {
         // Prüfe, ob Thread und Monitor bereits funktionieren
         if (_monitorThread != null && _monitorThread.IsAlive && Monitor != null && !Monitor.IsDisposed) {
@@ -151,11 +152,11 @@ public partial class GlobalMonitor : Form {
         r.CellSet("indent", indent, string.Empty);
         //tblLog.Refresh();
     }
+
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         Develop.Message -= Message;
         base.OnFormClosing(e);
     }
-
 
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);

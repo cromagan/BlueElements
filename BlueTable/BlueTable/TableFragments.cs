@@ -151,15 +151,15 @@ public class TableFragments : TableFile {
         base.Freeze(reason);
     }
 
-    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
+    public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (f.Failed) { return f; }
 
         if (_writer == null) { StartWriter(); }
 
-        if (_writer == null) { return "Schreib-Objekt nicht erstellt."; }
+        if (_writer == null) { return new("Schreib-Objekt nicht erstellt.", false, true); }
 
-        return string.Empty;
+        return FileOperationResult.ValueStringEmpty;
     }
 
     public override void TryToSetMeTemporaryMaster() {
@@ -185,15 +185,15 @@ public class TableFragments : TableFile {
         return base.LoadMainData();
     }
 
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (_writer == null) { return "Writer Fehler"; }
+    protected override FileOperationResult SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (_writer == null) { return new("Writer Fehler", false, true); }
 
         try {
             lock (_writer) {
                 _writer.Flush();
             }
-            return string.Empty;
-        } catch { return "Allgemeiner Fehler"; }
+            return FileOperationResult.ValueStringEmpty;
+        } catch { return new("Allgemeiner Fehler", false, true); }
     }
 
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
@@ -260,8 +260,8 @@ public class TableFragments : TableFile {
 
             var f = SaveMainFile(this, IsInCache);
 
-            if (!string.IsNullOrEmpty(f)) {
-                DropMessage(ErrorType.Info, "Komplettierung von {Caption} fehlgeschlagen: {f}");
+            if (f.Failed) {
+                DropMessage(ErrorType.Info, "Komplettierung von {Caption} fehlgeschlagen: {f.StringValue}");
                 //Develop.DebugPrint(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
                 return;
             }

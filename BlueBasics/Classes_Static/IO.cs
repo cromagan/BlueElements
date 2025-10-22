@@ -66,24 +66,24 @@ public static class IO {
     /// <param name="filename">Der Pfad zur zu prüfenden Datei</param>
     /// <param name="recentWriteThresholdSeconds">Schwellwert in Sekunden für kürzliche Schreibvorgänge</param>
     /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
-    public static string CanSaveFile(string filename, int recentWriteThresholdSeconds) {
-        if (string.IsNullOrEmpty(filename)) { return "Kein Dateiname angegeben."; }
+    public static FileOperationResult CanSaveFile(string filename, int recentWriteThresholdSeconds) {
+        if (string.IsNullOrEmpty(filename)) { return new("Kein Dateiname angegeben.", false, true); }
 
         // Prüfen ob Datei schreibbar ist
-        if (!CanWrite(filename)) { return "Windows blockiert die Datei."; }
+        if (!CanWrite(filename)) { return new("Windows blockiert die Datei.", true, true); }
 
         if (recentWriteThresholdSeconds > 0) {
             // Prüfen ob kürzlich geschrieben wurde
             try {
                 var fileInfo = new FileInfo(filename);
                 if (DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc).TotalSeconds < recentWriteThresholdSeconds) {
-                    return "Anderer Speichervorgang noch nicht abgeschlossen.";
+                    return new("Anderer Speichervorgang noch nicht abgeschlossen.", true, true);
                 }
             } catch {
-                return "Dateizugriffsfehler.";
+                return new("Dateizugriffsfehler.", false, true);
             }
         }
-        return string.Empty;
+        return FileOperationResult.ValueStringEmpty;
     }
 
     public static bool CanWrite(string filename) => ProcessFile(TryCanWrite, [filename], false, 5) is true;
@@ -973,11 +973,11 @@ public static class IO {
 
         if (args.Length < 2 || args[0] is not FileShare share || args[1] is not Encoding encoding) { return FileOperationResult.ValueFailed; }
 
-        if (string.IsNullOrWhiteSpace(filename)) { return new(string.Empty); }
+        if (string.IsNullOrWhiteSpace(filename)) { return FileOperationResult.ValueStringEmpty; }
 
         try {
             // Prüfen ob Datei existiert
-            if (TryFileExists([filename]).ReturnValue is not true) { return new(string.Empty); }
+            if (TryFileExists([filename]).ReturnValue is not true) { return FileOperationResult.ValueStringEmpty; }
 
             //// Text aus Datei lesen
             //var content = File.ReadAllText(filename, encoding);

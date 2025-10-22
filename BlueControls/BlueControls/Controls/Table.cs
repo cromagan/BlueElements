@@ -1165,11 +1165,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         OnContextMenuInit(e);
     }
 
-    public string GrantWriteAccess(ColumnViewItem? cellInThisTableColumn, RowData? cellInThisTableRow, string newChunkVal, int waitforSeconds) {
+    public string GrantWriteAccess(ColumnViewItem? cellInThisTableColumn, RowData? cellInThisTableRow, string newChunkVal) {
         var f = IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
-        var f2 = CellCollection.GrantWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, waitforSeconds, false);
+        var f2 = CellCollection.GrantWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
         if (!string.IsNullOrWhiteSpace(f)) { return f2; }
 
         return string.Empty;
@@ -2381,7 +2381,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.GrantWriteAccess(cellInThisTableColumn, null, newChunkVal, 2);
+            var fe = table.GrantWriteAccess(cellInThisTableColumn, null, newChunkVal);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
             var (newrow, message, _) = db.Row.GenerateAndAdd(filterColNewRow.ToArray(), "Neue Zeile über Tabellen-Ansicht");
@@ -2425,7 +2425,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 newChunkVal = newValue;
             }
 
-            var check1 = table.GrantWriteAccess(cellInThisTableColumn, cellInThisTableRow, newChunkVal, 2);
+            var check1 = table.GrantWriteAccess(cellInThisTableColumn, cellInThisTableRow, newChunkVal);
             if (!string.IsNullOrEmpty(check1)) { return check1; }
 
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");

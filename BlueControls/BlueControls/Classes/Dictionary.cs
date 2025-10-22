@@ -74,7 +74,7 @@ internal static class Dictionary {
         return _dictWords.Row[word] != null;
     }
 
-    public static bool IsWriteable() => _dictWords is TableFile { IsDisposed: false } tbf && string.IsNullOrEmpty( tbf.CanSaveMainChunk());
+    public static bool IsWriteable() => _dictWords is TableFile { IsDisposed: false } tbf && !tbf.CanSaveMainChunk().Failed;
 
     public static List<string>? SimilarTo(string word) {
         if (IsWordOk(word) || _dictWords == null) { return null; }

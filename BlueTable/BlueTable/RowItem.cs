@@ -506,9 +506,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public string IsNowEditable() {
-        if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
-
-        return db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue);
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
+        return tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue).StringValue;
     }
 
     public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } db

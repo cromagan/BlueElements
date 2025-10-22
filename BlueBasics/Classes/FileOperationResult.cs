@@ -39,6 +39,11 @@ public readonly struct FileOperationResult {
     public static readonly FileOperationResult ValueFalse = new(false, false, false);
 
     /// <summary>
+    /// Erfolgreiche Operation mit Rückgabewert StringEmpty
+    /// </summary>
+    public static readonly FileOperationResult ValueStringEmpty = new(string.Empty, false, false);
+
+    /// <summary>
     /// Erfolgreiche Operation mit Rückgabewert 'true'
     /// </summary>
     public static readonly FileOperationResult ValueTrue = new(true, false, false);
@@ -57,10 +62,26 @@ public readonly struct FileOperationResult {
         Failed = failed;
     }
 
+    /// <summary>
+    /// Alles Ok! Mit Rückgabewert
+    /// </summary>
+    /// <param name="returnValue"></param>
     public FileOperationResult(object? returnValue) {
         ReturnValue = returnValue;
         Retry = false;
         Failed = false;
+    }
+
+    #endregion
+
+    #region Properties
+
+    public string StringValue {
+        get {
+            if (ReturnValue is string s) { return s; }
+            Develop.DebugPrint(Enums.ErrorType.Error, "Typen unterschiedlich!");
+            return "Interner Fehler!";
+        }
     }
 
     #endregion
