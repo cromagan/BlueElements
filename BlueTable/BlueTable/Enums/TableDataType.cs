@@ -58,10 +58,10 @@ public enum TableDataType : byte {
     TemporaryTableMasterTimeUTC = 4,
 
     TemporaryTableMasterUser = 5,
+    TemporaryTableMasterMachine = 6,    // Zugriffanzahl = 6
+    TemporaryTableMasterApp = 7, //TotalSperrbit = 7
+    TemporaryTableMasterId = 8, //TotalSperrer = 8
 
-    //Zugriffanzahl = 6
-    //TotalSperrbit = 7
-    //TotalSperrer = 8
     //TotalSperrDatum = 9
     Creator = 10,
 

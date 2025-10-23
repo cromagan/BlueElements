@@ -117,6 +117,9 @@ public class TableChunk : TableFile {
 
             masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterUser, db.TemporaryTableMasterUser);
             masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterTimeUTC, db.TemporaryTableMasterTimeUtc);
+            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterApp, db.TemporaryTableMasterApp);
+            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterMachine, db.TemporaryTableMasterMachine);
+            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterId, db.TemporaryTableMasterId);
 
             mainChunk.SaveToByteList(TableDataType.Tags, db.Tags.JoinWithCr());
             mainChunk.SaveToByteList(TableDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());

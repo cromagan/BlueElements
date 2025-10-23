@@ -154,10 +154,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
+    private string _temporaryTableMasterApp = string.Empty;
+    private string _temporaryTableMasterId = string.Empty;
+    private string _temporaryTableMasterMachine = string.Empty;
     private string _temporaryTableMasterTimeUtc = string.Empty;
-
     private string _temporaryTableMasterUser = string.Empty;
-
     private string _variableTmp;
 
     #endregion
@@ -259,7 +260,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     #region Properties
 
     public static List<string> ExecutingScriptThreadsAnyTable { get; } = [];
-    public static string MyMasterCode => UserName + "-" + Environment.MachineName;
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
     public string AdditionalFilesPath {
@@ -453,6 +453,30 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
             _ = ChangeData(TableDataType.Tags, null, _tags.JoinWithCr(), value.JoinWithCr());
+        }
+    }
+
+    public string TemporaryTableMasterApp {
+        get => _temporaryTableMasterApp;
+        set {
+            if (_temporaryTableMasterApp == value) { return; }
+            _ = ChangeData(TableDataType.TemporaryTableMasterApp, null, _temporaryTableMasterApp, value);
+        }
+    }
+
+    public string TemporaryTableMasterId {
+        get => _temporaryTableMasterId;
+        set {
+            if (_temporaryTableMasterId == value) { return; }
+            _ = ChangeData(TableDataType.TemporaryTableMasterId, null, _temporaryTableMasterId, value);
+        }
+    }
+
+    public string TemporaryTableMasterMachine {
+        get => _temporaryTableMasterMachine;
+        set {
+            if (_temporaryTableMasterMachine == value) { return; }
+            _ = ChangeData(TableDataType.TemporaryTableMasterMachine, null, _temporaryTableMasterMachine, value);
         }
     }
 
@@ -1140,7 +1164,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
         if (!MultiUserPossible) { return true; }
 
-        if (TemporaryTableMasterUser != MyMasterCode) { return false; }
+        if (TemporaryTableMasterUser != UserName) { return false; }
+        if (TemporaryTableMasterMachine != Environment.MachineName) { return false; }
 
         var d = DateTimeParse(TemporaryTableMasterTimeUtc);
         var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
@@ -1154,13 +1179,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return mins > ranges && mins < rangee;
     }
 
-    //    StandardFormulaFile = sourceTable.StandardFormulaFile;
-    //    EventScriptVersion = sourceTable.EventScriptVersion;
-    //    NeedsScriptFix = sourceTable.NeedsScriptFix;
-    //    RowQuickInfo = sourceTable.RowQuickInfo;
-    //    if (tagsToo) {
-    //        Tags = new(sourceTable.Tags.Clone());
-    //    }
     public virtual string AreAllDataCorrect() {
         if (IsDisposed) { return "Tabelle verworfen."; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
@@ -1805,6 +1823,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         InitialLoadDone = true;
     }
 
+    public void MasterMe() {
+        RowCollection.WaitDelay = 0;
+        TemporaryTableMasterUser = UserName;
+        TemporaryTableMasterTimeUtc = DateTime.UtcNow.ToString5();
+        TemporaryTableMasterApp = Develop.AppExe();
+        TemporaryTableMasterMachine = Environment.MachineName;
+        TemporaryTableMasterId = MyId;
+    }
+
     public string NextRowKey() {
         if (IsDisposed) { return string.Empty; }
         var tmp = 0;
@@ -2051,9 +2078,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (!NewMasterPossible()) { return; }
 
-        RowCollection.WaitDelay = 0;
-        TemporaryTableMasterUser = MyMasterCode;
-        TemporaryTableMasterTimeUtc = DateTime.UtcNow.ToString5();
+        MasterMe();
     }
 
     public void UnMasterMe() {
@@ -2318,6 +2343,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case TableDataType.CreateDateUTC:
                 _createDate = value;
+                break;
+
+            case TableDataType.TemporaryTableMasterId:
+                _temporaryTableMasterId = value;
+                break;
+
+            case TableDataType.TemporaryTableMasterApp:
+                _temporaryTableMasterApp = value;
+                break;
+
+            case TableDataType.TemporaryTableMasterMachine:
+                _temporaryTableMasterMachine = value;
                 break;
 
             case TableDataType.TemporaryTableMasterUser:

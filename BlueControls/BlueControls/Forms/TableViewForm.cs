@@ -814,6 +814,15 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                     }
 
                     foreach (var thisR in rows) {
+
+                        if(!db.CanDoValueChangedScript(true)) {
+                            MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
+                            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+
+                            lstAufgaben.Enabled = true;
+                            return;
+                        }
+
                         thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
                         _ = thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
                     }

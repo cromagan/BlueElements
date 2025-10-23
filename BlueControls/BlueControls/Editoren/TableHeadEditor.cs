@@ -326,8 +326,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void btnMasterMe_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
-        db.TemporaryTableMasterUser = Table.MyMasterCode;
-        db.TemporaryTableMasterTimeUtc = DateTime.UtcNow.ToString5();
+        db.MasterMe();
+
         db.BeSureToBeUpToDate(false);
         Close();
     }
@@ -380,7 +380,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         var t = "<b>Tabelle:</b> <tab>" + tbl.KeyName + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (tbl.Row.Count() - 1) + "<br>";
-        t += "<b>Temporärer Master:</b>  <tab>" + tbl.TemporaryTableMasterTimeUtc + " " + Table.TemporaryTableMasterUser + "<br>";
+        t += $"<b>Temporärer Master:</b>  <tab>{tbl.TemporaryTableMasterTimeUtc} {Table.TemporaryTableMasterUser} {Table.TemporaryTableMasterMachine}<br>";
 
         t += "<b>Letzte Speicherung der Hauptdatei:</b> <tab>" + tbl.LastSaveMainFileUtcDate.ToString7() + " UTC<br>";
 
