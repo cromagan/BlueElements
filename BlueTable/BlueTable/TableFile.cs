@@ -109,8 +109,8 @@ public class TableFile : Table {
     /// </summary>
     /// <returns></returns>
     public FileOperationResult CanSaveMainChunk() {
-        var f = AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(f)) { return new(f, false, true); }
+        var aadc = AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(aadc)) { return new(aadc, false, true); }
 
         if (!InitialLoadDone) { return new("Tabelle noch nicht geladen.", false, true); }
 

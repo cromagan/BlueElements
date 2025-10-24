@@ -1293,7 +1293,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         //_ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
         _ = vars.Add(new VariableBool("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
         _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
-
+        _ = vars.Add(new VariableString("StartTimeUTC", DateTime.UtcNow.ToString7(), true, "Die Uhrzeit, wann das Skript gestartet wurde.")); // RowCount als Befehl belegt
         //var r = SortDefinition?.SortetdRows(this.Row) ?? new RowSortDefinition(this, this.Column.First, false).SortetdRows(this.Row);
         //_ = vars.Add(new VariableListRow("RowsSorted", r, true, "Alle Zeilen in der aktuellen Tabelle. Sortiert nach der Standard Sortierung."));
 
@@ -1356,8 +1356,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var f = ExternalAbortScriptReason(extended);
         if (!string.IsNullOrEmpty(f)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + f, false, false, script.KeyName); }
 
-        var m = AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, script.KeyName); }
+        var aadc = AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(aadc)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + aadc, false, false, script.KeyName); }
 
         if (!InitialLoadDone) { return new ScriptEndedFeedback("Tabelle noch nicht geladen.", false, false, script.KeyName); }
 
@@ -1595,19 +1595,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public virtual FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
         if (!InitialLoadDone) { return new("Tabelle noch nicht geladen.", false, true); }
 
-        var t = AreAllDataCorrect();
-
-        if (string.IsNullOrEmpty(t)) { return FileOperationResult.ValueStringEmpty; }
+        var aadc = AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(aadc)) { return new(aadc, false, true); }
 
         return FileOperationResult.ValueStringEmpty;
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
-        var f = AreAllDataCorrect();
+        var aadc = AreAllDataCorrect();
 
-        if (!string.IsNullOrEmpty(f)) {
-            DropMessage(ErrorType.Warning, "Abbruch, " + f);
-            return "Abbruch, " + f;
+        if (!string.IsNullOrEmpty(aadc)) {
+            DropMessage(ErrorType.Warning, "Abbruch, " + aadc);
+            return "Abbruch, " + aadc;
         }
 
         #region Text vorbereiten

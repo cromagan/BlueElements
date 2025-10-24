@@ -31,6 +31,8 @@ public class InvalidatedRowsManager {
 
     #region Fields
 
+    public static DGDoUpdateRow DoUpdateRow = UpdateRow;
+
     // ConcurrentDictionary für threadsichere Sammlung der ungültigen Zeilen (Key = KeyName, Value = RowItem)
     private readonly ConcurrentDictionary<string, RowItem> _invalidatedRows = new ConcurrentDictionary<string, RowItem>();
 
@@ -41,6 +43,12 @@ public class InvalidatedRowsManager {
     //private readonly ConcurrentDictionary<string, bool> _processedRowIds = new ConcurrentDictionary<string, bool>();
     // Flag für laufende Verarbeitung
     private volatile bool _isProcessing = false;
+
+    #endregion
+
+    #region Delegates
+
+    public delegate void DGDoUpdateRow(RowItem? masterRow, RowItem row, bool extendedAllowed);
 
     #endregion
 
@@ -72,6 +80,14 @@ public class InvalidatedRowsManager {
     #endregion
 
     #region Methods
+
+    public static void UpdateRow(RowItem? masterRow, RowItem row, bool extendedAllowed) {
+        if (masterRow?.Table != null) {
+            _ = row.UpdateRow(extendedAllowed, "Update von " + masterRow?.CellFirstString());
+        } else {
+            _ = row.UpdateRow(extendedAllowed, "Normales Update");
+        }
+    }
 
     /// <summary>
     /// Fügt ein neues Row-Item zur Sammlung hinzu, wenn es nicht bereits vorhanden
@@ -228,11 +244,7 @@ public class InvalidatedRowsManager {
 
         masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {db.Caption} / {row.CellFirstString()}");
 
-        if (masterRow?.Table != null) {
-            _ = row.UpdateRow(extendedAllowed, "Update von " + masterRow?.CellFirstString());
-        } else {
-            _ = row.UpdateRow(extendedAllowed, "Normales Update");
-        }
+        DoUpdateRow?.Invoke(masterRow, row, extendedAllowed);
     }
 
     #endregion

@@ -468,8 +468,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (!tb.InitialLoadDone) { return "Tabelle noch nicht geladen."; }
 
-        var m = tb.AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(m)) { return m; }
+        var aadc = tb.AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(aadc)) { return aadc; }
 
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
@@ -532,8 +532,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
-        var f = db2.AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(f)) { return (null, "In der Tabelle sind keine neuen Zeilen möglich: " + f, true); }
+        var aadc = db2.AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(aadc)) { return (null, "In der Tabelle sind keine neuen Zeilen möglich: " + aadc, true); }
 
         var s = db2.NextRowKey();
         if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
@@ -867,8 +867,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } db) { return (null, "Tabelle verworfen!", true); }
 
-        var f = db.AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(f)) { return (null, "Neue Zeilen nicht möglich: " + f, true); }
+        var aadc = db.AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(aadc)) { return (null, "Neue Zeilen nicht möglich: " + aadc, true); }
 
         var item = SearchByKey(key);
         if (item != null) { return (null, "Schlüssel bereits belegt!", true); }

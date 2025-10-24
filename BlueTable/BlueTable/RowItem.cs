@@ -494,7 +494,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         InvalidateCheckData();
         _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
-        if (CellIsNullOrEmpty(srs) && IsMyRow(5, false)) {
+        if (CellIsNullOrEmpty(srs) && IsMyRow(RowCollection.NewRowTolerance, false)) {
             DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} ist bereits invalidiert");
             return;
         }
@@ -714,8 +714,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        var m = Table?.AreAllDataCorrect() ?? "Keine Tabelle angekommen";
-        if (!string.IsNullOrEmpty(m) || Table is not { IsDisposed: false } || column == null) { return; }
+        var aadc = Table?.AreAllDataCorrect() ?? "Keine Tabelle angekommen";
+        if (!string.IsNullOrEmpty(aadc) || Table is not { IsDisposed: false } || column == null) { return; }
 
         var columnVar = vars.Get(column.KeyName);
         if (columnVar is not { ReadOnly: false }) { return; }

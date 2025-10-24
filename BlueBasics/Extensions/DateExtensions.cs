@@ -42,6 +42,11 @@ public static partial class Extensions {
 
     public static string ToString6(this DateTime value) => value.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
 
+    /// <summary>
+    /// Deutsche normale Zeitanzeige mit Millisekunden
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static string ToString7(this DateTime value) => value.ToString("dd.MM.yyyy HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
     public static string ToString9(this DateTime value) => value.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);

@@ -103,8 +103,8 @@ public class TableFragments : TableFile {
     }
 
     public override string AreAllDataCorrect() {
-        var f = base.AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        var aadc = base.AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(aadc)) { return aadc; }
 
         if (_doingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
 

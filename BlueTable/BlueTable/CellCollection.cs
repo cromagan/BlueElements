@@ -291,8 +291,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
         }
 
-        var f = db.AreAllDataCorrect();
-        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+        var aadc = db.AreAllDataCorrect();
+        if (!string.IsNullOrWhiteSpace(aadc)) { return aadc; }
 
         if (column.RelationType == RelationType.CellValues) {
             var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
@@ -320,8 +320,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (oldChunk != newChunkValue) {
-            f = db.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk);
-            if (!string.IsNullOrEmpty(f)) { return f; }
+            aadc = db.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk);
+            if (!string.IsNullOrEmpty(aadc)) { return aadc; }
         }
 
         return db.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
@@ -646,8 +646,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         try {
             if (column?.Table is not { IsDisposed: false } db) { return new("Es ist keine Spalte ausgewählt.", false, true); }
 
-            var f = db.AreAllDataCorrect();
-            if (!string.IsNullOrEmpty(f)) { return new(f, false, true); }
+            var aadc = db.AreAllDataCorrect();
+            if (!string.IsNullOrEmpty(aadc)) { return new(aadc, false, true); }
 
             var fo = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
             if (fo.Failed) { return fo; }
@@ -661,7 +661,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (column.RelationType == RelationType.CellValues) {
                 var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
-                if (!string.IsNullOrEmpty(info) && !canrepair) { return new(f, false, true); }
+                if (!string.IsNullOrEmpty(info) && !canrepair) { return new(info, false, true); }
 
                 if (lcolumn?.Table is not { IsDisposed: false } db2) { return new("Verknüpfte Tabelle verworfen.", false, true); }
 
@@ -679,8 +679,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             return FileOperationResult.ValueStringEmpty;
-        } catch (Exception) {
-            return FileOperationResult.DoRetry; // Retry bei Exceptions
+        } catch (Exception ex) {
+            return new FileOperationResult(ex.ToString(), true, false); // Retry bei Exceptions
         }
     }
 

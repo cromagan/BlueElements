@@ -53,8 +53,8 @@ internal class Method_ImportCsv : Method_TableGeneric {
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
-        var m = myTb.AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Tabellesperre: {m}", false, ld); }
+        var aadc = myTb.AreAllDataCorrect();
+        if (!string.IsNullOrEmpty(aadc)) { return new DoItFeedback($"Tabellesperre: {aadc}", false, ld); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
