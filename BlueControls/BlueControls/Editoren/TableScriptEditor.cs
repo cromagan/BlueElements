@@ -105,7 +105,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
                 _item = value;
 
                 btnVerlauf.Enabled = true;
-
+                base.btnAnzeigen_Click(null, System.EventArgs.Empty);
                 if (value.IsOk()) {
                     capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
                 } else {

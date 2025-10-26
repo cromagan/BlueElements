@@ -70,10 +70,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Properties
 
-    public string LastFailedReason {
-        get => txbLastError.Text.TrimEnd(" ");
-        set => txbLastError.Text = value.TrimEnd(" ");
-    }
+    public string LastFailedReason { get; set; }
 
     public virtual object? Object { get; set; }
 
@@ -114,8 +111,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     public void Message(string txt) {
-        txbSkriptInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
-        tabError.SelectedIndex = 0;
+        txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
@@ -153,6 +149,19 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public virtual void WriteInfosBack() { }
 
+    protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
+
+        if(string.IsNullOrEmpty(LastFailedReason)) {
+            txbErrorInfo.Text = "Alles OK - kein Skript-Fehler gespeichert.";
+               
+        } else {
+            txbErrorInfo.Text = "Letzter gespeicherte Skript-Fehler:\r\r" + LastFailedReason;
+        }
+
+
+
+    }
+
     protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
@@ -181,7 +190,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
-        txbLastError.Text = string.Empty;
+        LastFailedReason = string.Empty;
         WriteInfosBack();
     }
 

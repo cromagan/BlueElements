@@ -33,15 +33,13 @@ namespace BlueControls.BlueTableDialogs {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.grpCode = new BlueControls.Controls.GroupBox();
             this.txtSkript = new FastColoredTextBoxNS.FastColoredTextBox();
-            this.tabError = new BlueControls.Controls.TabControl();
-            this.tabCurrent = new System.Windows.Forms.TabPage();
-            this.txbSkriptInfo = new BlueControls.Controls.TextBox();
-            this.tabLastError = new System.Windows.Forms.TabPage();
-            this.btnLeeren = new BlueControls.Controls.Button();
-            this.txbLastError = new BlueControls.Controls.TextBox();
             this.grpVariablen = new BlueControls.VariableEditor();
+            this.tabError = new BlueControls.Controls.GroupBox();
+            this.btnLeeren = new BlueControls.Controls.Button();
+            this.txbErrorInfo = new BlueControls.Controls.TextBox();
             this.tabAssistent = new System.Windows.Forms.TabPage();
             this.lstAssistant = new BlueControls.Controls.ListBox();
+            this.btnAnzeigen = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabStart.SuspendLayout();
@@ -57,8 +55,6 @@ namespace BlueControls.BlueTableDialogs {
             this.grpCode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
             this.tabError.SuspendLayout();
-            this.tabCurrent.SuspendLayout();
-            this.tabLastError.SuspendLayout();
             this.tabAssistent.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -231,8 +227,8 @@ namespace BlueControls.BlueTableDialogs {
             // txtSkript
             // 
             this.txtSkript.AllowMacroRecording = false;
-            this.txtSkript.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.txtSkript.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSkript.AutoCompleteBracketsList = new char[] {
         '(',
@@ -254,7 +250,6 @@ namespace BlueControls.BlueTableDialogs {
             this.txtSkript.CharWidth = 8;
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
@@ -272,74 +267,6 @@ namespace BlueControls.BlueTableDialogs {
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
             this.txtSkript.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TxtSkript_MouseUp);
             // 
-            // tabError
-            // 
-            this.tabError.Controls.Add(this.tabCurrent);
-            this.tabError.Controls.Add(this.tabLastError);
-            this.tabError.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tabError.HotTrack = true;
-            this.tabError.Location = new System.Drawing.Point(360, 0);
-            this.tabError.Name = "tabError";
-            this.tabError.SelectedIndex = 0;
-            this.tabError.Size = new System.Drawing.Size(410, 185);
-            this.tabError.TabDefault = null;
-            this.tabError.TabDefaultOrder = new string[0];
-            this.tabError.TabIndex = 4;
-            // 
-            // tabCurrent
-            // 
-            this.tabCurrent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabCurrent.Controls.Add(this.txbSkriptInfo);
-            this.tabCurrent.Location = new System.Drawing.Point(4, 25);
-            this.tabCurrent.Name = "tabCurrent";
-            this.tabCurrent.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCurrent.Size = new System.Drawing.Size(402, 156);
-            this.tabCurrent.TabIndex = 0;
-            this.tabCurrent.Text = "Ausgabe";
-            // 
-            // txbSkriptInfo
-            // 
-            this.txbSkriptInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbSkriptInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbSkriptInfo.Location = new System.Drawing.Point(3, 3);
-            this.txbSkriptInfo.Name = "txbSkriptInfo";
-            this.txbSkriptInfo.Size = new System.Drawing.Size(396, 150);
-            this.txbSkriptInfo.TabIndex = 1;
-            this.txbSkriptInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // tabLastError
-            // 
-            this.tabLastError.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabLastError.Controls.Add(this.btnLeeren);
-            this.tabLastError.Controls.Add(this.txbLastError);
-            this.tabLastError.Location = new System.Drawing.Point(4, 25);
-            this.tabLastError.Name = "tabLastError";
-            this.tabLastError.Padding = new System.Windows.Forms.Padding(3);
-            this.tabLastError.Size = new System.Drawing.Size(258, 156);
-            this.tabLastError.TabIndex = 1;
-            this.tabLastError.Text = "Letzter Fehler";
-            // 
-            // btnLeeren
-            // 
-            this.btnLeeren.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLeeren.ImageCode = "Papierkorb|16";
-            this.btnLeeren.Location = new System.Drawing.Point(168, 112);
-            this.btnLeeren.Name = "btnLeeren";
-            this.btnLeeren.Size = new System.Drawing.Size(88, 40);
-            this.btnLeeren.TabIndex = 3;
-            this.btnLeeren.Text = "leeren";
-            this.btnLeeren.Click += new System.EventHandler(this.btnLeeren_Click);
-            // 
-            // txbLastError
-            // 
-            this.txbLastError.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbLastError.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbLastError.Location = new System.Drawing.Point(3, 3);
-            this.txbLastError.Name = "txbLastError";
-            this.txbLastError.Size = new System.Drawing.Size(252, 150);
-            this.txbLastError.TabIndex = 2;
-            this.txbLastError.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
             // grpVariablen
             // 
             this.grpVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -351,6 +278,43 @@ namespace BlueControls.BlueTableDialogs {
             this.grpVariablen.TabIndex = 3;
             this.grpVariablen.TabStop = false;
             this.grpVariablen.ToEdit = null;
+            // 
+            // tabError
+            // 
+            this.tabError.Controls.Add(this.btnAnzeigen);
+            this.tabError.Controls.Add(this.btnLeeren);
+            this.tabError.Controls.Add(this.txbErrorInfo);
+            this.tabError.Dock = System.Windows.Forms.DockStyle.Right;
+            this.tabError.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
+            this.tabError.Location = new System.Drawing.Point(360, 0);
+            this.tabError.Name = "tabError";
+            this.tabError.Size = new System.Drawing.Size(410, 185);
+            this.tabError.TabIndex = 4;
+            this.tabError.TabStop = false;
+            this.tabError.Text = "Fehler";
+            // 
+            // btnLeeren
+            // 
+            this.btnLeeren.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLeeren.ImageCode = "Papierkorb|16";
+            this.btnLeeren.Location = new System.Drawing.Point(320, 152);
+            this.btnLeeren.Name = "btnLeeren";
+            this.btnLeeren.Size = new System.Drawing.Size(80, 24);
+            this.btnLeeren.TabIndex = 3;
+            this.btnLeeren.Text = "leeren";
+            this.btnLeeren.Click += new System.EventHandler(this.btnLeeren_Click);
+            // 
+            // txbErrorInfo
+            // 
+            this.txbErrorInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbErrorInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbErrorInfo.Location = new System.Drawing.Point(8, 24);
+            this.txbErrorInfo.Name = "txbErrorInfo";
+            this.txbErrorInfo.Size = new System.Drawing.Size(392, 120);
+            this.txbErrorInfo.TabIndex = 2;
+            this.txbErrorInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // tabAssistent
             // 
@@ -366,7 +330,7 @@ namespace BlueControls.BlueTableDialogs {
             // lstAssistant
             // 
             this.lstAssistant.AddAllowed = BlueControls.Enums.AddType.None;
-            this.lstAssistant.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.lstAssistant.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.lstAssistant.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.lstAssistant.Location = new System.Drawing.Point(8, 8);
@@ -375,9 +339,19 @@ namespace BlueControls.BlueTableDialogs {
             this.lstAssistant.TabIndex = 0;
             this.lstAssistant.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstAssistant_ItemClicked);
             // 
+            // btnAnzeigen
+            // 
+            this.btnAnzeigen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAnzeigen.ImageCode = "Blitz|16";
+            this.btnAnzeigen.Location = new System.Drawing.Point(8, 152);
+            this.btnAnzeigen.Name = "btnAnzeigen";
+            this.btnAnzeigen.Size = new System.Drawing.Size(80, 24);
+            this.btnAnzeigen.TabIndex = 4;
+            this.btnAnzeigen.Text = "anzeigen";
+            this.btnAnzeigen.Click += new System.EventHandler(this.btnAnzeigen_Click);
+            // 
             // ScriptEditorGeneric
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.tbcScriptEigenschaften);
@@ -404,8 +378,6 @@ namespace BlueControls.BlueTableDialogs {
             this.grpCode.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
             this.tabError.ResumeLayout(false);
-            this.tabCurrent.ResumeLayout(false);
-            this.tabLastError.ResumeLayout(false);
             this.tabAssistent.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -423,15 +395,13 @@ namespace BlueControls.BlueTableDialogs {
         private GroupBox grpCode;
         private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
         private VariableEditor grpVariablen;
-        private Controls.TextBox txbSkriptInfo;
         private System.ComponentModel.IContainer components;
         private TabPage tabAssistent;
         private Controls.ListBox lstAssistant;
         protected RibbonBar ribMain;
-        private Controls.TabControl tabError;
-        private TabPage tabCurrent;
-        private TabPage tabLastError;
+        private GroupBox tabError;
         private Button btnLeeren;
-        private Controls.TextBox txbLastError;
+        private Controls.TextBox txbErrorInfo;
+        private Button btnAnzeigen;
     }
 }

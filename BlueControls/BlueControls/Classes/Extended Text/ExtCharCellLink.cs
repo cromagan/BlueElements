@@ -68,14 +68,17 @@ public class ExtCharCellLink : ExtChar {
 
     #region Methods
 
-    public override void Draw(Graphics gr, Point posModificator, float zoom) {
+    public override void Draw(Graphics gr, Point posModificator, float scale) {
         if (string.IsNullOrEmpty(_displayText)) { return; }
 
-        var drawX = (Pos.X * zoom) + posModificator.X;
-        var drawY = (Pos.Y * zoom) + posModificator.Y;
+        var drawX = (Pos.X * scale) + posModificator.X;
+        var drawY = (Pos.Y * scale) + posModificator.Y;
 
         try {
-            this.GetFont().DrawString(gr, _displayText, drawX, drawY, zoom);
+            var f = this.GetFont();
+            var t = f.MeasureString(_displayText);
+            gr.FillRectangle(Brushes.LightGray, drawX, drawY, t.Width * scale, t.Height * scale);
+            f.DrawString(gr, _displayText, drawX, drawY, scale);
         } catch { }
     }
 

@@ -72,9 +72,6 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     #region Properties
 
-
-   
-
     public BlueFont? Font {
         get {
             _font ??= Skin.GetBlueFont(SheetStyle, Style);
@@ -120,7 +117,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         GC.SuppressFinalize(this);
     }
 
-    public abstract void Draw(Graphics gr, Point posModificator, float zoom);
+    public abstract void Draw(Graphics gr, Point posModificator, float scale);
 
     public abstract string HtmlText();
 
@@ -180,7 +177,6 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
             case "font":
                 _font = BlueFont.Get(value.FromNonCritical());
                 return true;
-
         }
         return false;
     }

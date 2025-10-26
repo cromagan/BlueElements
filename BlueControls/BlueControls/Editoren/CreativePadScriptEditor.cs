@@ -32,9 +32,8 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
 
     #region Fields
 
-    private Table? _table;
-
     private CreativePadItem? _item;
+    private Table? _table;
 
     #endregion
 
@@ -48,23 +47,6 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
     #endregion
 
     #region Properties
-
-    public Table? Table {
-        get => _table;
-        set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
-
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
-            }
-            _table = value;
-
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
-            }
-        }
-    }
 
     public override object? Object {
         get => IsDisposed ? null : (object?)_item;
@@ -99,6 +81,23 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         }
     }
 
+    public Table? Table {
+        get => _table;
+        set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _table) { return; }
+
+            if (_table != null) {
+                _table.DisposingEvent -= _table_Disposing;
+            }
+            _table = value;
+
+            if (_table != null) {
+                _table.DisposingEvent += _table_Disposing;
+            }
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -125,7 +124,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
             txbTestZeile.Text = Table?.Row.First()?.CellFirstString() ?? string.Empty;
         }
 
-        var r = Table?.Row[txbTestZeile.Text] ?? Table?.Row.SearchByKey(txbTestZeile.Text); 
+        var r = Table?.Row[txbTestZeile.Text] ?? Table?.Row.SearchByKey(txbTestZeile.Text);
         if (r is not { IsDisposed: false }) {
             return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         }

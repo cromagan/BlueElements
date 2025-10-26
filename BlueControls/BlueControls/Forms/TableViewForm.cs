@@ -146,6 +146,12 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     [StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", 800)]
     public static System.Windows.Forms.Form Start() => new TableViewForm();
 
+    public void AddTabPage(string tablename) {
+        var settings = this.GetSettings("View_" + tablename);
+
+        AddTabPage(tablename, settings);
+    }
+
     public string ReadableText() => "Tabellen Ansicht";
 
     /// <summary>
@@ -162,6 +168,19 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get("Tabelle|32");
+
+    public TabPage? TabExists(string tablename) {
+        tablename = tablename.FileNameWithoutSuffix();
+
+        foreach (var thisT in tbcTableSelector.TabPages) {
+            if (thisT is TabPage { Tag: List<object> s } tp && s[0] is string ci) {
+                if (ci.Equals(tablename, StringComparison.OrdinalIgnoreCase)) {
+                    return tp;
+                }
+            }
+        }
+        return null;
+    }
 
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Tabelle laden zu können - lädt die Tabelle aber selbst nicht.
@@ -361,26 +380,21 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             tablename = tablename.FileNameWithoutSuffix();
         }
 
-        foreach (var thisT in tbcTableSelector.TabPages) {
-            if (thisT is TabPage { Tag: List<object> s } tp && s[0] is string ci) {
-                if (ci.Equals(tablename, StringComparison.OrdinalIgnoreCase)) {
-                    tbcTableSelector.SelectedTab = tp; // tbcTableSelector_Selected macht die eigentliche Arbeit
+        if (TabExists(tablename) is { } tp) {
+            tbcTableSelector.SelectedTab = tp; // tbcTableSelector_Selected macht die eigentliche Arbeit
 
-                    if (_firstOne) {
-                        _firstOne = false;
-                        tbcTableSelector_Selected(null,
-                            new TabControlEventArgs(tp, tbcTableSelector.TabPages.IndexOf(tp),
-                                TabControlAction.Selected));
-                    }
-
-                    return true;
-                }
+            if (_firstOne) {
+                _firstOne = false;
+                tbcTableSelector_Selected(null,
+                    new TabControlEventArgs(tp, tbcTableSelector.TabPages.IndexOf(tp),
+                        TabControlAction.Selected));
             }
+
+            return true;
         }
 
-        var settings = this.GetSettings("View_" + tablename);
+        AddTabPage(tablename);
 
-        AddTabPage(tablename, settings);
         return SwitchTabToTable(tablename); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
     }
 
@@ -814,8 +828,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                     }
 
                     foreach (var thisR in rows) {
-
-                        if(!db.CanDoValueChangedScript(true)) {
+                        if (!db.CanDoValueChangedScript(true)) {
                             MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
                             RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
 

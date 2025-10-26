@@ -55,16 +55,16 @@ internal class ExtCharImageCode : ExtChar {
     #region Methods
 
     //internal ExtCharImageCode(ExtText parent, int styleFromPos, string imagecode) : base(parent, styleFromPos) => _qi = QuickImage.Get(imagecode);
-    public override void Draw(Graphics gr, Point posModificator, float zoom) {
+    public override void Draw(Graphics gr, Point posModificator, float scale) {
         // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
 
-        var drawX = (int)((Pos.X * zoom) + posModificator.X);
-        var drawY = (int)((Pos.Y * zoom) + posModificator.Y);
+        var drawX = (int)((Pos.X * scale) + posModificator.X);
+        var drawY = (int)((Pos.Y * scale) + posModificator.Y);
 
         if (_qi == null) { return; }
 
         try {
-            gr.DrawImage(Math.Abs(zoom - 1) < DefaultTolerance ? _qi : _qi.Scale(zoom), drawX, drawY);
+            gr.DrawImage(Math.Abs(scale - 1) < DefaultTolerance ? _qi : _qi.Scale(scale), drawX, drawY);
         } catch { }
     }
 

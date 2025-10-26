@@ -106,10 +106,9 @@ namespace BlueControls.BlueTableDialogs {
             this.tbcScriptEigenschaften.Controls.Add(this.tabKopfdaten);
             this.tbcScriptEigenschaften.Location = new System.Drawing.Point(237, 110);
             this.tbcScriptEigenschaften.Size = new System.Drawing.Size(547, 427);
-            this.tbcScriptEigenschaften.TabDefault = this.tabKopfdaten;
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[] {
-        "Kopfdaten",
         "Skript-Editor",
+        "Kopfdaten",
         "Befehls-Assistent"};
             this.tbcScriptEigenschaften.TabIndex = 0;
             this.tbcScriptEigenschaften.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
@@ -132,7 +131,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabKopfdaten.Location = new System.Drawing.Point(4, 25);
             this.tabKopfdaten.Name = "tabKopfdaten";
             this.tabKopfdaten.Padding = new System.Windows.Forms.Padding(3);
-            this.tabKopfdaten.Size = new System.Drawing.Size(539, 398);
+            this.tabKopfdaten.Size = new System.Drawing.Size(776, 398);
             this.tabKopfdaten.TabIndex = 0;
             this.tabKopfdaten.Text = "Kopfdaten";
             // 
@@ -143,7 +142,7 @@ namespace BlueControls.BlueTableDialogs {
             this.capFehler.CausesValidation = false;
             this.capFehler.Location = new System.Drawing.Point(712, 80);
             this.capFehler.Name = "capFehler";
-            this.capFehler.Size = new System.Drawing.Size(0, 192);
+            this.capFehler.Size = new System.Drawing.Size(237, 192);
             this.capFehler.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbQuickInfo
@@ -161,7 +160,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.cbxPic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxPic.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxPic.Location = new System.Drawing.Point(199, 32);
+            this.cbxPic.Location = new System.Drawing.Point(436, 32);
             this.cbxPic.Name = "cbxPic";
             this.cbxPic.RaiseChangeDelay = 5;
             this.cbxPic.Size = new System.Drawing.Size(256, 24);
@@ -180,7 +179,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.capImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capImage.CausesValidation = false;
-            this.capImage.Location = new System.Drawing.Point(199, 8);
+            this.capImage.Location = new System.Drawing.Point(436, 8);
             this.capImage.Name = "capImage";
             this.capImage.Size = new System.Drawing.Size(152, 24);
             this.capImage.Text = "Bild:";
@@ -268,8 +267,8 @@ namespace BlueControls.BlueTableDialogs {
             this.chkAuslöser_tableloaded.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkAuslöser_tableloaded.Location = new System.Drawing.Point(8, 24);
             this.chkAuslöser_tableloaded.Name = "chkAuslöser_tableloaded";
-            this.chkAuslöser_tableloaded.QuickInfo = "Das Skript wird direkt nach dem ersten Laden einer Tabelle angestoßen.\r\n\r\nEs ka" +
-    "nn verwendet werden, um z.B. Backups zu erstellen.";
+            this.chkAuslöser_tableloaded.QuickInfo = "Das Skript wird direkt nach dem ersten Laden einer Tabelle angestoßen.\r\n\r\nEs kann" +
+    " verwendet werden, um z.B. Backups zu erstellen.";
             this.chkAuslöser_tableloaded.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_tableloaded.TabIndex = 21;
             this.chkAuslöser_tableloaded.Text = "Tabelle geladen";
@@ -339,7 +338,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnVerlauf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnVerlauf.Enabled = false;
             this.btnVerlauf.ImageCode = "Undo|32";
-            this.btnVerlauf.Location = new System.Drawing.Point(471, 8);
+            this.btnVerlauf.Location = new System.Drawing.Point(708, 8);
             this.btnVerlauf.Name = "btnVerlauf";
             this.btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
             this.btnVerlauf.Size = new System.Drawing.Size(64, 66);
@@ -363,7 +362,7 @@ namespace BlueControls.BlueTableDialogs {
             this.txbName.Location = new System.Drawing.Point(8, 32);
             this.txbName.Name = "txbName";
             this.txbName.RaiseChangeDelay = 5;
-            this.txbName.Size = new System.Drawing.Size(175, 24);
+            this.txbName.Size = new System.Drawing.Size(412, 24);
             this.txbName.TabIndex = 13;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
             // 
@@ -485,7 +484,6 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // TableScriptEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.grpVerfügbareSkripte);

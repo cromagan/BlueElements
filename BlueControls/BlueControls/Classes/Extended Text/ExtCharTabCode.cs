@@ -40,7 +40,7 @@ internal class ExtCharTabCode : ExtChar {
 
     #region Methods
 
-    public override void Draw(Graphics gr, Point posModificator, float zoom) { }
+    public override void Draw(Graphics gr, Point posModificator, float scale) { }
 
     public override string HtmlText() => "<tab>";
 
