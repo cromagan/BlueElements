@@ -69,6 +69,34 @@ public class FormManager : ApplicationContext {
         _current.RegisterFormInternal(frm);
     }
 
+    public static void SaveEnd(Form? lastForm) {
+        try {
+            ExecuteAtEnd?.Invoke();
+        } catch { }
+
+        //Develop.DebugPrint(ErrorType.Info, "Schließe Programm...");
+        //var p = BlueControls.Forms.Progressbar.Show("Beenden eingeleitet\r\nBitte warten, Daten werden gespeichert.");
+
+        Table.SaveAll(false);
+        MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
+
+        Table.SaveAll(true);
+        MultiUserFile.SaveAll(true); // Nun aber
+
+        MultiUserFile.UnlockAllHard();
+
+        List<Table> allTables = [.. Table.AllFiles];
+        foreach (var thisTable in allTables) {
+            try {
+                if (lastForm is Forms.FormWithStatusBar fws) {
+                    fws.UpdateStatus(ErrorType.Info, ImageCode.Tabelle, $"Entlade '{thisTable.Caption}'...", true);
+                }
+            } catch { }
+            thisTable.UnMasterMe();
+            thisTable.Freeze("Beenden...");
+        }
+    }
+
     //public static List<T> GetInstaceOfType<T>(params object[] constructorArgs) where T : class {
     //    List<T> l = new();
     //    foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
@@ -143,29 +171,7 @@ public class FormManager : ApplicationContext {
         thisForm.Enabled = false;
         thisForm.Refresh();
 
-        ExecuteAtEnd?.Invoke();
-
-        Develop.DebugPrint(ErrorType.Info, "Schließe Programm...");
-        //var p = BlueControls.Forms.Progressbar.Show("Beenden eingeleitet\r\nBitte warten, Daten werden gespeichert.");
-
-        Table.SaveAll(false);
-        MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
-
-        Table.SaveAll(true);
-        MultiUserFile.SaveAll(true); // Nun aber
-
-        MultiUserFile.UnlockAllHard();
-
-        List<Table> allTables = [.. Table.AllFiles];
-        foreach (var thisTable in allTables) {
-            try {
-                if (thisForm is Forms.FormWithStatusBar fws) {
-                    fws.UpdateStatus(ErrorType.Info, ImageCode.Tabelle, $"Entlade '{thisTable.Caption}'...", true);
-                }
-            } catch { }
-            thisTable.UnMasterMe();
-            thisTable.Freeze("Beenden...");
-        }
+        SaveEnd(thisForm);
     }
 
     private void RegisterFormInternal(Form frm) {

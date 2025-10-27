@@ -206,6 +206,10 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
                 txbTestZeile.Text = db.Row.First()?.CellFirstString() ?? string.Empty;
             }
 
+            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+                txbTestZeile.Text = db.Row.First()?.KeyName ?? string.Empty;
+            }
+
             r = db.Row[txbTestZeile.Text] ?? db.Row.GetByKey(txbTestZeile.Text);
             if (r is not { IsDisposed: false }) {
                 return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
@@ -247,7 +251,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
     public override void WriteInfosBack() => UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason);
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        WriteInfosBack();
+        base.OnFormClosing(e);
         Item = null; // erst das Item!
         Table = null;
     }
