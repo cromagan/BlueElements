@@ -267,7 +267,7 @@ public class TableFragments : TableFile {
             var f = SaveMainFile(this, IsInCache);
 
             if (f.Failed) {
-                DropMessage(ErrorType.Info, "Komplettierung von {Caption} fehlgeschlagen: {f.StringValue}");
+                DropMessage(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f.StringValue}");
                 //Develop.DebugPrint(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
                 return;
             }
