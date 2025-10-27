@@ -368,7 +368,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         foreach (var thisf in AllFiles) {
             if (!notAllowedChilds.Contains(thisf.Filename)) {
-                if (list.Get(thisf.Filename) == null) {
+                if (list.GetByKey(thisf.Filename) == null) {
                     list.Add(ItemOf(thisf.Filename.FileNameWithoutSuffix(), thisf.Filename, ImageCode.Diskette));
                 }
             }

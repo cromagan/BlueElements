@@ -66,7 +66,7 @@ public class Method_SetError : Method_TableGeneric {
         var r = MyRow(scp);
         if (r is not { IsDisposed: false }) { return DoItFeedback.InternerFehler(ld); }
 
-        if (varCol.Get("ErrorColumns") is not VariableListString vls) { return DoItFeedback.InternerFehler(ld); }
+        if (varCol.GetByKey("ErrorColumns") is not VariableListString vls) { return DoItFeedback.InternerFehler(ld); }
         var l = vls.ValueList;
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {

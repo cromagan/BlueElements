@@ -68,21 +68,20 @@ public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
 
         if (scp.Stufe > 10) {
             return new DoItFeedback("'RowUpdate' wird zu verschachtelt aufgerufen.", true, ld);
         }
 
-        var row = attvar.ValueRowGet(0);
-        if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
-        if (row?.Table is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
+        if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
+        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
         if (row == MyRow(scp)) {
             return new DoItFeedback("Die eigene Zeile kann nicht aktualisiert werden.", true, ld);
         }
 
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback($"Zeilen-Status-Spalte in '{db.KeyName}' nicht gefunden", true, ld); }
+        if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return new DoItFeedback($"Zeilen-Status-Spalte in '{tb.KeyName}' nicht gefunden", true, ld); }
 
         var minage = attvar.ValueNumGet(1);
         var maxage = attvar.ValueNumGet(2);
@@ -91,7 +90,7 @@ public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
             return new DoItFeedback("Die Zeitangaben sind ungültig.", true, ld);
         }
 
-        var coment = $"Skript-Befehl: 'RowUpdate' der Tabelle {myDb.Caption}, Skript {scp.ScriptName}";
+        var coment = $"Skript-Befehl: 'RowUpdate' der Tabelle {myTb.Caption}, Skript {scp.ScriptName}";
 
         var v = row.CellGetDateTime(srs);
         var age = DateTime.UtcNow.Subtract(v).TotalDays;

@@ -128,21 +128,21 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Indexers
 
-    public ColumnItem? this[string columnName] {
+    public ColumnItem? this[string keyName] {
         get {
-            if (IsDisposed || Table is not { IsDisposed: false } || string.IsNullOrEmpty(columnName)) { return null; }
+            if (IsDisposed || Table is not { IsDisposed: false } || string.IsNullOrEmpty(keyName)) { return null; }
 
             try {
-                columnName = columnName.ToUpperInvariant();
-                var col = _internal.TryGetValue(columnName, out var value) ? value : null;
+                keyName = keyName.ToUpperInvariant();
+                var col = _internal.TryGetValue(keyName, out var value) ? value : null;
                 if (col is { IsDisposed: true }) {
-                    Develop.DebugPrint(ErrorType.Error, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
+                    Develop.DebugPrint(ErrorType.Error, "Interner Spaltenfehler, Spalte verworfen: " + keyName);
                     return null;
                 }
                 return col;
             } catch {
                 Develop.CheckStackOverflow();
-                return this[columnName];
+                return this[keyName];
             }
         }
     }
@@ -199,7 +199,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
 
-        //var item = SearchByKey(key);
+        //var item = GetByKey(key);
         //if (item != null) {
         //    Develop.DebugPrint(ErrorType.Error, "Schlüssel belegt!");
         //    return null;
@@ -518,7 +518,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private string Add(ColumnItem column) {
         if (this[column.KeyName] != null) { return "Hinzufügen fehlgeschlagen."; }
 
-        if (!_internal.TryAdd(column.KeyName, column)) { return "Hinzufügen fehlgeschlagen."; }
+        if (!_internal.TryAdd(column.KeyName.ToUpperInvariant(), column)) { return "Hinzufügen fehlgeschlagen."; }
 
         GetSystems();
 

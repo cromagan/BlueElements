@@ -39,13 +39,9 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         new ConcurrentDictionary<Type, Variable>();
 
     private static long _dummyCount;
-
     private static List<Variable>? _varTypes;
-
     private string _comment = string.Empty;
-
     private string _keyName = string.Empty;
-
     private bool _readOnly;
 
     #endregion
@@ -66,7 +62,6 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     #region Properties
 
     public static string Any_Plain => "any";
-
     public static string Any_Variable => "*any";
 
     public static List<Variable> VarTypes {
@@ -90,10 +85,9 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     }
 
     public string CompareKey => CheckOrder.ToStringInt3() + "|" + KeyName.ToUpperInvariant();
-
     public abstract bool GetFromStringPossible { get; }
-
     public abstract bool IsNullOrEmpty { get; }
+    public bool KeyIsCaseSensitive => false;
 
     public string KeyName {
         get => _keyName;

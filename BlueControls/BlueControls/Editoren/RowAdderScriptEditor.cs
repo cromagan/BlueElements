@@ -125,7 +125,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             txbTestZeile.Text = Table?.Row.First()?.CellFirstString() ?? string.Empty;
         }
 
-        var r = Table?.Row[txbTestZeile.Text] ?? Table?.Row.SearchByKey(txbTestZeile.Text);
+        var r = Table?.Row[txbTestZeile.Text] ?? Table?.Row.GetByKey(txbTestZeile.Text);
         if (r is not { IsDisposed: false }) {
             return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         }

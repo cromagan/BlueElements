@@ -41,19 +41,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     #region Fields
 
     public static readonly BlueFont DefaultFont = new();
-
     private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new();
-
     private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
-
     private static readonly ConcurrentDictionary<string, Font> _fontCache = new();
-
     private static readonly ConcurrentDictionary<(int color, float width), Pen> _penCache = new();
-
     private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
-
     private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();
-
     private readonly ConcurrentDictionary<string, string> _transformCache = new();
 
     /// <summary>
@@ -67,21 +60,13 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private Font _fontOl = new("Arial", 9);
 
     private QuickImage? _nameInStyleSym;
-
     private float _oberlänge = -1;
-
     private Bitmap? _sampleTextSym;
-
     private float _sizeTestedAndFailed = float.MaxValue;
-
     private float _sizeTestedAndOk = float.MinValue;
-
     private QuickImage? _symbolForReadableTextSym;
-
     private QuickImage? _symbolOfLineSym;
-
     private float _widthOf2Points;
-
     private int _zeilenabstand = -1;
 
     #endregion
@@ -96,21 +81,14 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public bool BackColor => ColorBack.A > 0;
     public string CaptionForEditor => "Schriftart";
-
     public float CharHeight => _zeilenabstand;
-
     public Color ColorBack { get; private set; } = Color.Transparent;
-
     public Color ColorMain { get; private set; } = Color.Black;
-
     public Color ColorOutline { get; private set; } = Color.Transparent;
-
     public Type? Editor { get; set; }
-
     public string FontName { get; private set; } = "Arial";
-
     public bool Italic { get; private set; }
-
+    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; private set; } = string.Empty;
 
     public bool Outline => ColorOutline.A > 0;

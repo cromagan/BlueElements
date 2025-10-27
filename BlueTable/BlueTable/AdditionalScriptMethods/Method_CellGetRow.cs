@@ -47,9 +47,8 @@ public class Method_CellGetRow : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var row = attvar.ValueRowGet(1);
-        if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
-        if (row?.Table is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
+        if (attvar.ValueRowGet(1) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
+        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
         if (row == MyRow(scp)) {
             return new DoItFeedback("Zugriff der Werte der eigenen Zeile nur über Variablen möglich.", true, ld);
@@ -57,7 +56,7 @@ public class Method_CellGetRow : Method_TableGeneric {
 
         //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{db.Caption}' sind die Skripte defekt", false, ld); }
 
-        if (db.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
+        if (tb.Column[attvar.ValueStringGet(0)] is not { IsDisposed: false } c) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
 
         var v = RowItem.CellToVariable(c, row, true, false);
         if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte '{c.KeyName} 'im Skript vorhanden'?", true, ld); }

@@ -71,7 +71,7 @@ public abstract class Method : IReadableTextWithKey {
     }
 
     public abstract bool GetCodeBlockAfter { get; }
-
+    public bool KeyIsCaseSensitive => false;
     public string KeyName => Command;
 
     /// <summary>
@@ -334,7 +334,7 @@ public abstract class Method : IReadableTextWithKey {
 
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
-            var thisV = varCol.Get(which);
+            var thisV = varCol.GetByKey(which);
             var endz = pos + which.Length;
 
             if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, true, ld); }
@@ -375,7 +375,7 @@ public abstract class Method : IReadableTextWithKey {
                 var varn = attributes[n];
                 if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1), true); }
 
-                v = varcol?.Get(varn);
+                v = varcol?.GetByKey(varn);
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
             } else {
                 var tmp2 = GetVariableByParsing(attributes[n], ld, varcol, scp);
@@ -429,7 +429,7 @@ public abstract class Method : IReadableTextWithKey {
 
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, ld); }
 
-        var vari = varCol.Get(varnam);
+        var vari = varCol.GetByKey(varnam);
         if (generateVariable && vari != null) {
             return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, ld);
         }

@@ -69,7 +69,8 @@ internal class Method_OpenTab : Method {
         }
 
         foreach (var thisForm in FormManager.Forms) {
-            if (thisForm is BlueControls.Forms.TableViewForm tbf && tbf.TabExists(pf) == null) {
+            if (thisForm is Forms.TableViewForm tbf && tbf.TabExists(pf) == null) {
+                if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 tbf.AddTabPage(pf);
             }
         }

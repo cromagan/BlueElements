@@ -205,7 +205,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo 
     #region Methods
 
     public string Infotext() {
-        var m = Method.AllMethods.Get(_action);
+        var m = Method.AllMethods.GetByKey(_action);
 
         if (m is not IUseableForButton ufb) { return "Keine Aktion definiert"; }
 
@@ -276,7 +276,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo 
     private void mainButton_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button != MouseButtons.Left) { return; }
 
-        var m = Method.AllMethods.Get(_action);
+        var m = Method.AllMethods.GetByKey(_action);
 
         if (m is not IUseableForButton ufb) {
             ButtonError("Aktion '" + _action + "' nicht gefunden.");

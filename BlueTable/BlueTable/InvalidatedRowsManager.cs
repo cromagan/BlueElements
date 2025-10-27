@@ -203,19 +203,14 @@ public class InvalidatedRowsManager {
     }
 
     /// <summary>
-    /// Markiert eine Zeile als verarbeitet, ohne sie tatsächlich zu verarbeiten.
     /// Entfernt die Zeile aus der Liste der zu verarbeitenden Einträge, falls vorhanden.
     /// </summary>
-    /// <param name="rowItem">Die als verarbeitet zu markierende Zeile</param>
-    /// <returns>True wenn die Zeile erfolgreich markiert wurde, False wenn nicht</returns>
-    public bool MarkAsProcessed(RowItem? rowItem) {
-        if (rowItem == null) { return false; }
+    /// <param name="rowItem">Die zu entfernende Zeile</param>
+    public void MarkAsProcessed(RowItem? rowItem) {
+        if (rowItem == null) { return; }
 
         // Versuche die Zeile aus der Liste der zu verarbeitenden zu entfernen
-        return _invalidatedRows.TryRemove(rowItem.KeyName, out _);
-
-        //// Markiere die Zeile als verarbeitet
-        //return _processedRowIds.TryAdd(rowItem.KeyName, true);
+        _invalidatedRows.TryRemove(rowItem.KeyName, out _);
     }
 
     private void OnRowChecked(RowEventArgs e) {

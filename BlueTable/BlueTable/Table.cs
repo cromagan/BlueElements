@@ -55,7 +55,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     #region Fields
 
     public const string TableVersion = "4.10";
-
     public static readonly ObservableCollection<Table> AllFiles = [];
 
     /// <summary>
@@ -110,43 +109,24 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public DateTime LastUsedDate = DateTime.UtcNow;
 
     protected NeedPassword? _needPassword;
-
     private static List<string> _allavailableTables = [];
-
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
-
     private readonly List<string> _permissionGroupsNewRow = [];
-
     private readonly List<string> _tableAdmin = [];
-
     private readonly List<string> _tags = [];
-
     private readonly List<Variable> _variables = [];
-
     private string _additionalFilesPath;
-
     private string _cachePfad = string.Empty;
-
     private string _caption = string.Empty;
-
     private Timer? _checker;
-
     private string _columnArrangements = string.Empty;
-
     private string _createDate;
-
     private string _creator;
-
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
-
     private DateTime _eventScriptVersion = DateTime.MinValue;
-
     private string _globalShowPass = string.Empty;
-
     private DateTime _powerEditTime = DateTime.MinValue;
-
     private string _rowQuickInfo = string.Empty;
-
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -363,13 +343,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool InitialLoadDone { get; protected set; } = false;
-
     public bool IsDisposed { get; private set; }
 
     public bool IsFreezed {
         get => IsDisposed || !string.IsNullOrEmpty(FreezedReason);
     }
 
+    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; }
 
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
@@ -1532,7 +1512,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     return new ScriptEndedFeedback(vars, string.Empty);
                 }
             } else {
-                script = EventScript.Get(scriptname);
+                script = EventScript.GetByKey(scriptname);
             }
 
             if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
@@ -1839,7 +1819,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         do {
             key = GetUniqueKey(tmp, "row");
             tmp++;
-        } while (Row.SearchByKey(key) != null);
+        } while (Row.GetByKey(key) != null);
         return key;
     }
 
@@ -1910,10 +1890,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     #region Zeile suchen oder erstellen
 
                     if (!string.IsNullOrEmpty(rowKey)) {
-                        row = Row.SearchByKey(rowKey);
+                        row = Row.GetByKey(rowKey);
                         if (row is not { IsDisposed: false }) {
                             _ = Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
-                            row = Row.SearchByKey(rowKey);
+                            row = Row.GetByKey(rowKey);
                         }
 
                         if (row is not { IsDisposed: false }) {
@@ -2088,7 +2068,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {
-        var existingScript = EventScript.Get(keyName);
+        var existingScript = EventScript.GetByKey(keyName);
         if (existingScript == null) { return false; }
 
         return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed);
@@ -2282,7 +2262,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     return string.Empty;
 
                 case TableDataType.Command_RemoveRow:
-                    var r = Row.SearchByKey(value);
+                    var r = Row.GetByKey(value);
                     if (r == null) { return string.Empty; }
                     return Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc);
 

@@ -119,7 +119,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         }
     }
 
-    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
@@ -134,6 +133,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
+    public override bool TableInputMustMatchOutputTable => false;
 
     #endregion
 
@@ -172,7 +172,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         var f = base.ErrorReason();
 
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
-
 
         if (Column is not { IsDisposed: false }) { return "Spaltenangabe fehlt"; }
 
@@ -219,7 +218,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "column":
-                //Column = GetRowFrom?.Table?.Column.SearchByKey(LongParse(value));
+                //Column = GetRowFrom?.Table?.Column.GetByKey(LongParse(value));
                 return true;
 
             case "columnname":

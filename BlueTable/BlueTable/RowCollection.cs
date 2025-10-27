@@ -505,7 +505,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return string.Empty;
     }
 
-    // TODO: Override a finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources.
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
 
     /// <summary>
@@ -564,12 +563,24 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).newrow;
     }
 
-    //    List<Table> done = new();
+    public RowItem? GetByKey(string? key) {
+        if (Table is not { IsDisposed: false } || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
+        try {
+            var r = _internal.TryGetValue(key, out var value) ? value : null;
+            if (r is { IsDisposed: true }) {
+                Develop.DebugPrint(ErrorType.Error, "Interner Zeilenfehler: " + key);
+                return null;
+            }
+
+            return r;
+        } catch {
+            Develop.CheckStackOverflow();
+            return GetByKey(key);
+        }
+    }
+
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
-    //    if (table is not Table db) { return "Verlinkung zur Tabelle fehlhlerhaft"; }
-    //    if (db.IsDisposed) { return "Tabelle verworfen"; }
-    //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
 
     public bool HasPendingWorker() => Pendingworker.Count > 0;
@@ -679,22 +690,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         #endregion
     }
 
-    public RowItem? SearchByKey(string? key) {
-        if (Table is not { IsDisposed: false } || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
-        try {
-            var r = _internal.TryGetValue(key, out var value) ? value : null;
-            if (r is { IsDisposed: true }) {
-                Develop.DebugPrint(ErrorType.Error, "Interner Zeilenfehler: " + key);
-                return null;
-            }
-
-            return r;
-        } catch {
-            Develop.CheckStackOverflow();
-            return SearchByKey(key);
-        }
-    }
-
     public (RowItem? newrow, string message, bool stoptrying) UniqueRow(string value, string comment) {
         // Used: Only BZL
         if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen", true); }
@@ -725,7 +720,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (IsDisposed || Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
 
         if (type == TableDataType.Command_AddRow) {
-            var row = SearchByKey(rowkey);
+            var row = GetByKey(rowkey);
             if (row is { IsDisposed: false }) { return string.Empty; } // "Zeile " + rowkey+ " bereits vorhanden!";
 
             row = new RowItem(db, rowkey);
@@ -745,7 +740,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (type == TableDataType.Command_RemoveRow) {
-            var row = SearchByKey(rowkey);
+            var row = GetByKey(rowkey);
             if (row == null) { return "Zeile nicht gefunden!"; }
 
             if (reason != Reason.NoUndo_NoInvalidate) {
@@ -781,7 +776,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //    // Zeilen erzeugen und Format übertragen
     //    foreach (var thisRow in sourceTable.Row) {
-    //        var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
+    //        var l = GetByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
     //        l.CloneFrom(thisRow, true);
     //    }
     internal void Repair() {
@@ -792,7 +787,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //    // Zeilen, die zu viel sind, löschen
     //    foreach (var thisRow in this) {
-    //        var l = sourceTable.Row.SearchByKey(thisRow.KeyName);
+    //        var l = sourceTable.Row.GetByKey(thisRow.KeyName);
     //        if (l == null) { _ = Remove(thisRow, "Clone - Zeile zuviel"); }
     //    }
     //private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
@@ -870,7 +865,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var aadc = db.AreAllDataCorrect();
         if (!string.IsNullOrEmpty(aadc)) { return (null, "Neue Zeilen nicht möglich: " + aadc, true); }
 
-        var item = SearchByKey(key);
+        var item = GetByKey(key);
         if (item != null) { return (null, "Schlüssel bereits belegt!", true); }
 
         // REPARIERT: Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
@@ -893,7 +888,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var createResult = db.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
         if (!string.IsNullOrEmpty(createResult)) { return (null, $"Erstellung fehlgeschlagen: {createResult}", false); }
 
-        item = SearchByKey(key);
+        item = GetByKey(key);
         if (item == null) { return (null, $"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}", false); }
 
         // REPARIERT: Sichere Setzung der Initial-Werte mit Fehlerbehandlung

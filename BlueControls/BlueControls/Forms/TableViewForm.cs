@@ -653,7 +653,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         if (IsDisposed || Table.Table is not { IsDisposed: false } db) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(db);
-        tcvc.Get(cbxColumnArr.Text)?.Edit();
+        tcvc.GetByKey(cbxColumnArr.Text)?.Edit();
         _ = TableView.RepairColumnArrangements(db);
     }
 

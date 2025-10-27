@@ -340,7 +340,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
         // Alte verweise eleminieren.
         column = column?.Table?.Column[column.KeyName];
-        row = row?.Table?.Row.SearchByKey(row.KeyName);
+        row = row?.Table?.Row.GetByKey(row.KeyName);
 
         if (column != null && row != null) { return KeyOfCell(column.KeyName, row.KeyName); }
         if (column == null && row != null) { return KeyOfCell(string.Empty, row.KeyName); }
@@ -418,7 +418,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var cd = cellKey.SplitBy("|");
         if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(ErrorType.Error, "Falscher CellKey übergeben: " + cellKey); }
         column = Table?.Column[cd[0]];
-        row = Table?.Row.SearchByKey(cd[1]);
+        row = Table?.Row.GetByKey(cd[1]);
     }
 
     public void Dispose() {
@@ -684,7 +684,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    //    var ownRow = _table.Row.SearchByKey(rowKey);
+    //    var ownRow = _table.Row.GetByKey(rowKey);
     //    var rows = keyc.Format == DataFormat.RelationText
     //        ? ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow)
     //        : RowCollection.MatchesTo(new FilterItem(keyc, FilterType.Istgleich_GroßKleinEgal, ownRow.CellGetString(keyc)));

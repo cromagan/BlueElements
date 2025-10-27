@@ -223,7 +223,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
             if (IsDisposed) { return; }
             if (_enabledwhenrows == value) { return; }
             _enabledwhenrows = value;
-            if (!PossibleFor(Method.AllMethods.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
+            if (!PossibleFor(Method.AllMethods.GetByKey(_action), _enabledwhenrows)) { Aktion = string.Empty; }
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
@@ -366,7 +366,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
         result.Add(new FlexiControlForProperty<string>(() => Aktion, co));
 
-        var m = Method.AllMethods.Get(_action);
+        var m = Method.AllMethods.GetByKey(_action);
 
         if (m is IUseableForButton ufb) {
             if (ufb.ArgsForButton.Count > 0) { result.Add(new FlexiControlForProperty<string>(() => Arg1, ufb.ArgsForButtonDescription[0])); }

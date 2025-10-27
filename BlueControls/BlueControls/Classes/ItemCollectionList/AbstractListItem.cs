@@ -49,9 +49,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     private bool _enabled;
 
     private string _keyName;
-
     private Size _sizeUntouchedForListBox = Size.Empty;
-
     private string _userDefCompareKey;
 
     #endregion
@@ -103,6 +101,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
             OnPropertyChanged();
         }
     }
+
+    public bool KeyIsCaseSensitive => false;
 
     public string KeyName {
         get => _keyName;

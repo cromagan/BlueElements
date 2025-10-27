@@ -52,7 +52,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     #region Methods
 
-    [StandaloneInfo("Layout-Editor", ImageCode.Layout, "Admin", 900)]
+    [StandaloneInfo("Layout-Editor", "Layout|32|||||||||Stift", "Admin", 900)]
     public static System.Windows.Forms.Form Start() => new PadEditorWithFileAccess();
 
     /// <summary>
@@ -174,7 +174,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
         if (x is not { Count: 1 }) { return; }
 
-        var toadd = i.Get(x[0]);
+        var toadd = i.GetByKey(x[0]);
 
         if (toadd is not ReadableListItem { Item: AbstractPadItem api }) { return; }
 

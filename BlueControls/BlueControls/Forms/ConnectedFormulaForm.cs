@@ -212,7 +212,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         //if (rowKey != -1 && Table != null && cf != null) {
         //    RowKey = rowKey;
-        //    _tmpShowingRow = Table?.Row.SearchByKey(RowKey);
+        //    _tmpShowingRow = Table?.Row.GetByKey(RowKey);
         //    SetInputRow();
         //} else {
         //    RemoveRow();

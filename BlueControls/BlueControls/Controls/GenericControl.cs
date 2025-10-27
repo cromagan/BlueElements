@@ -243,7 +243,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
 
     public bool DoDrawings() => !IsDisposed
                                 && !Disposing
-                                && (DesignMode || (_pform is { IsDisposed: false, Visible: true } and not Forms.Form { IsClosing: true } && Visible));
+                                && (DesignMode || (_pform is { IsDisposed: false, Visible: true } && Visible));
 
     public void DoQuickInfo() {
         if (InvokeRequired) {

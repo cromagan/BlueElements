@@ -102,7 +102,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         vaa.AddRange(existingVars.ToListVariableString());
 
         foreach (var thisvar in vaa) {
-            var v = newValues.Get(newValsPrefix + thisvar.KeyName);
+            var v = newValues.GetByKey(newValsPrefix + thisvar.KeyName);
 
             if (v is VariableString vs) {
                 thisvar.ReadOnly = false; // weil kein OnPropertyChanged vorhanden ist
@@ -118,7 +118,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         if (ReadOnly) { return false; }
         if (variable == null) { return false; }
 
-        if (_internal.Get(variable.KeyName) != null) { return false; }
+        if (_internal.GetByKey(variable.KeyName) != null) { return false; }
 
         _internal.Add(variable);
         return true;
@@ -185,7 +185,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     /// <param name="name"></param>
     /// <returns></returns>
     public bool? GetBoolean(string name) {
-        var v = _internal.Get(name);
+        var v = _internal.GetByKey(name);
 
         if (v is not VariableBool vb) {
             //Develop.DebugPrint("Falscher Datentyp");
@@ -205,7 +205,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     /// </summary>
     /// <param name="name"></param>
     public List<string> GetList(string name) {
-        var v = _internal.Get(name);
+        var v = _internal.GetByKey(name);
         if (v == null) { return []; }
 
         if (v is not VariableListString vf) {
@@ -222,7 +222,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     /// <param name="name"></param>
     /// <returns></returns>
     public string GetString(string name) {
-        var v = _internal.Get(name);
+        var v = _internal.GetByKey(name);
 
         if (v is not VariableString vf) {
             //Develop.DebugPrint("Falscher Datentyp");
@@ -297,7 +297,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public bool Set(string name, string value) {
         if (ReadOnly) { return false; }
 
-        var v = _internal.Get(name);
+        var v = _internal.GetByKey(name);
         if (v == null) {
             v = new VariableString(name, string.Empty, false, string.Empty);
             _internal.Add(v);
@@ -328,7 +328,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public bool Set(string name, double value) {
         if (ReadOnly) { return false; }
 
-        var v = _internal.Get(name);
+        var v = _internal.GetByKey(name);
         if (v == null) {
             v = new VariableDouble(name);
             _internal.Add(v);
@@ -353,7 +353,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public bool Set(string name, List<string> value) {
         if (ReadOnly) { return false; }
 
-        var v = _internal.Get(name);
+        var v = _internal.GetByKey(name);
         if (v == null) {
             v = new VariableListString(name);
             _internal.Add(v);
@@ -378,7 +378,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public bool Set(string name, bool value) {
         if (ReadOnly) { return false; }
 
-        var v = _internal.Get(name);
+        var v = _internal.GetByKey(name);
         if (v == null) {
             v = new VariableBool(name);
             _internal.Add(v);

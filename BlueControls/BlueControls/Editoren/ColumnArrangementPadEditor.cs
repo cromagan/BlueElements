@@ -100,7 +100,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         var tcvc = ColumnViewCollection.ParseAll(db);
 
-        return tcvc.Get(_arrangement);
+        return tcvc.GetByKey(_arrangement);
     }
 
     public int IndexOfCurrentArr() {
@@ -281,7 +281,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem is { IsDisposed: false } &&
                 ca[thisColumnItem] is { IsDisposed: false } &&
-                ic.Get(thisColumnItem.KeyName) is { } ali) {
+                ic.GetByKey(thisColumnItem.KeyName) is { } ali) {
                 ali.Enabled = false;
             }
         }

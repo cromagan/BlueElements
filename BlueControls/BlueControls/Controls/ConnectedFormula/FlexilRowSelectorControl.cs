@@ -128,7 +128,7 @@ public partial class FlexilRowSelectorControl : GenericControlReciverSender, IHa
         } else {
             var fh = this.GetSettings(FilterHash());
 
-            if (!string.IsNullOrEmpty(fh) && cb.Items().Get(fh) is { } ali) {
+            if (!string.IsNullOrEmpty(fh) && cb.Items().GetByKey(fh) is { } ali) {
                 f.ValueSet(ali.KeyName, true);
             }
         }
@@ -150,7 +150,7 @@ public partial class FlexilRowSelectorControl : GenericControlReciverSender, IHa
 
     private void F_ValueChanged(object sender, System.EventArgs e) {
         var fh = FilterHash();
-        var row = RowsInput?.Get(f.Value);
+        var row = RowsInput?.GetByKey(f.Value);
         this.SetSetting(fh, row?.KeyName ?? string.Empty);
 
         if (row == null) {

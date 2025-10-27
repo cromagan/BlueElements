@@ -79,7 +79,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     #region Properties
 
     public string CreateDate { get; private set; } = string.Empty;
-
     public string Creator { get; private set; } = string.Empty;
 
     /// <summary>
@@ -128,6 +127,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             return false;
         }
     }
+
+    public bool KeyIsCaseSensitive => false;
 
     /// <summary>
     /// Entspricht dem Dateinamen

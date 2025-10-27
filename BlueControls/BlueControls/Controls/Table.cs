@@ -207,7 +207,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (_currentArrangement != null) { return _currentArrangement; }
 
             var tcvc = ColumnViewCollection.ParseAll(db);
-            _currentArrangement = tcvc.Get(_arrangement);
+            _currentArrangement = tcvc.GetByKey(_arrangement);
 
             if (_currentArrangement == null && tcvc.Count > 1) { _currentArrangement = tcvc[1]; }
             if (_currentArrangement == null && tcvc.Count > 0) { _currentArrangement = tcvc[0]; }
@@ -543,7 +543,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 c = c.Replace("\r", "\r\n");
 
                 var dataObject = new DataObject();
-                dataObject.SetData(CellDataFormat, $"{tb.KeyName}\r{column.KeyName}\r{row.KeyName}");// 1. Als ExtChar-Format (für interne Verwendung)
+
+                if(tb is TableFile) {
+                    dataObject.SetData(CellDataFormat, $"{tb.KeyName}\r{column.KeyName}\r{row.KeyName}");// 1. Als ExtChar-Format (für interne Verwendung)
+
+                }
                 dataObject.SetText(c);// 2. Als Plain Text (für externe Anwendungen)
                 Clipboard.SetDataObject(dataObject, true);
 
@@ -1671,7 +1675,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (Table is { IsDisposed: false } db) {
             var tcvc = ColumnViewCollection.ParseAll(db);
             List<ColumnItem> columSort = [];
-            var orderArrangement = tcvc.Get(FilterAnsichtName);
+            var orderArrangement = tcvc.GetByKey(FilterAnsichtName);
 
             #region Reihenfolge der Spalten bestimmen
 
@@ -3944,7 +3948,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         var tcvc = ColumnViewCollection.ParseAll(db);
 
-        _ähnliche = tcvc.Get(_ähnlicheAnsichtName);
+        _ähnliche = tcvc.GetByKey(_ähnlicheAnsichtName);
         DoÄhnlich();
     }
 
@@ -4105,7 +4109,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                     case "pin":
                         foreach (var thisk in pair.Value.FromNonCritical().SplitBy("|")) {
-                            var r = db.Row.SearchByKey(thisk);
+                            var r = db.Row.GetByKey(thisk);
                             if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
                         }
 

@@ -26,6 +26,8 @@ public abstract class ImageFilter : IHasKeyName {
 
     #region Properties
 
+    public bool KeyIsCaseSensitive => false;
+
     public abstract string KeyName { get; }
 
     #endregion

@@ -164,7 +164,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     public AbstractListItem? this[string @internal] {
         get {
             try {
-                return _items.Get(@internal);
+                return _items.GetByKey(@internal);
             } catch {
                 Develop.CheckStackOverflow();
                 return this[@internal];
@@ -266,7 +266,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             vType = Design.Ribbon_ComboBox_Textbox;
         }
 
-        var i = _items.Get(Text);
+        var i = _items.GetByKey(Text);
         if (i == null) {
             base.DrawControl(gr, state);
             btnDropDown.Invalidate();
@@ -338,7 +338,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         if (!_itemEditAllowed) { return; }
 
-        var _mouseOverItem = _items.Get(Text);
+        var _mouseOverItem = _items.GetByKey(Text);
 
         var editok = false;
 
@@ -384,7 +384,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (IsDisposed) { return; }
         FloatingForm.Close(this);
 
-        var _mouseOverItem = _items.Get(Text);
+        var _mouseOverItem = _items.GetByKey(Text);
 
         if (_itemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
             ie.Edit();

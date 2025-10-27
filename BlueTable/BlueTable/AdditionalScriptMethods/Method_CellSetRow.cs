@@ -50,13 +50,12 @@ public class Method_CellSetRow : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
-        var row = attvar.ValueRowGet(2);
-        if (row is not { IsDisposed: false }) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
-        if (row?.Table is not { IsDisposed: false } db) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
-        if (db != myDb && !db.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.value_changed, true)) { return new DoItFeedback($"In der Tabelle '{db.Caption}' sind die Skripte defekt", false, ld); }
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
+        if (attvar.ValueRowGet(2) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
+        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
+        if (tb != myTb && !tb.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.value_changed, true)) { return new DoItFeedback($"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false, ld); }
 
-        var columnToSet = db.Column[attvar.ValueStringGet(1)];
+        var columnToSet = tb.Column[attvar.ValueStringGet(1)];
         if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true, ld); }
 
         if (row == MyRow(scp)) {
@@ -76,7 +75,7 @@ public class Method_CellSetRow : Method_TableGeneric {
 
         var newchunkval = row.ChunkValue;
 
-        if (columnToSet == db.Column.ChunkValueColumn) { newchunkval = value; }
+        if (columnToSet == tb.Column.ChunkValueColumn) { newchunkval = value; }
 
         var m = CellCollection.GrantWriteAccess(columnToSet, row, newchunkval, 120, false);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
@@ -86,8 +85,8 @@ public class Method_CellSetRow : Method_TableGeneric {
             return DoItFeedback.Wahr();
         }
 
-        row.CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + db.Caption + "'");
-        columnToSet.AddSystemInfo("Edit with Script", db, scp.ScriptName);
+        row.CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + tb.Caption + "'");
+        columnToSet.AddSystemInfo("Edit with Script", tb, scp.ScriptName);
 
         return row.CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

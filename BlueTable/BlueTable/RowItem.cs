@@ -88,9 +88,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public Type? Editor { get; set; }
-
     public bool IsDisposed { get; private set; }
-
+    public bool KeyIsCaseSensitive => true;
     public string KeyName { get; private set; }
 
     public string QuickInfo {
@@ -188,7 +187,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), true, qi);
 
             case ScriptType.Row:
-                return new VariableRowItem(column.KeyName, row?.Table?.Row.SearchByKey(wert), ro, qi);
+                return new VariableRowItem(column.KeyName, row?.Table?.Row.GetByKey(wert), ro, qi);
 
             default:
                 Develop.DebugPrint(column.ScriptType);
@@ -689,7 +688,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             DropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {db.Caption} ({reason})");
 
             if (extendedAllowed) {
-                _ = RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
+                RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
             }
 
             var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
@@ -717,7 +716,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var aadc = Table?.AreAllDataCorrect() ?? "Keine Tabelle angekommen";
         if (!string.IsNullOrEmpty(aadc) || Table is not { IsDisposed: false } || column == null) { return; }
 
-        var columnVar = vars.Get(column.KeyName);
+        var columnVar = vars.GetByKey(column.KeyName);
         if (columnVar is not { ReadOnly: false }) { return; }
         if (!column.CanBeChangedByRules()) { return; }
 

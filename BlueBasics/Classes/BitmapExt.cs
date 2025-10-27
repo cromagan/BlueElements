@@ -400,7 +400,7 @@ public class BitmapExt : IDisposableExtended {
             return false;
         }
 
-        var f = ImageFilters.Get(name);
+        var f = ImageFilters.GetByKey(name);
         if (f == null) { return false; }
 
         f.ProcessFilter(_bitmapData, _bits, factor, 0);

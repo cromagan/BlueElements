@@ -282,10 +282,10 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
             if (!ShowMe(selected, key)) { continue; }
 
-            var check_Item = f.Items.Get(key);
+            var check_Item = f.Items.GetByKey(key);
 
             var dd_Name = key.PathParent().Trim("\\") + "~DD~";
-            var dd_BoxItem = f.Items.Get(dd_Name);
+            var dd_BoxItem = f.Items.GetByKey(dd_Name);
             var dd_isItem = key.EndsWith("+") && !selected.Contains(key);
 
             if (check_Item is ReadableListItem rli && !dd_isItem) {
@@ -306,7 +306,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
                 #region das Item ist ein Objekt unter einem Dropdown und NICHT separat gewählt.
 
-                var vorhandenDD = dli.DropDownItems.Get(key);
+                var vorhandenDD = dli.DropDownItems.GetByKey(key);
 
                 if (vorhandenDD is ReadableListItem rliDD) {
 

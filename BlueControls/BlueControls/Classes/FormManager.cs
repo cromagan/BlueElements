@@ -109,45 +109,69 @@ public class FormManager : ApplicationContext {
         return null;
     }
 
-    //When each form closes, close the application if no other open forms
+    /// <summary>
+    /// When each form closes, close the application if no other open forms
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OnFormClosed(object sender, System.EventArgs e) {
-        _ = Forms.Remove((Form)sender);
-        if (!Forms.Any()) {
-            if (sender != _lastStartForm) {
-                _lastStartForm = CreateForm(FormBeforeEnd, _current);
-                if (_lastStartForm != null) { return; }
-            }
+        if (Forms.Count > 0) { return; }
 
-            Running = false;
-            ExecuteAtEnd?.Invoke();
+        Develop.TraceLogging_End();
 
-            Develop.DebugPrint(ErrorType.Info, "Schließe Programm...");
-            //var p = BlueControls.Forms.Progressbar.Show("Beenden eingeleitet\r\nBitte warten, Daten werden gespeichert.");
+        ExitThread();
+        Develop.AbortExe(true);
+    }
 
-            Table.SaveAll(false);
-            MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
+    /// <summary>
+    /// When each form closes, close the application if no other open forms
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnFormClosing(object sender, System.EventArgs e) {
+        if (sender is not Form thisForm) { return; }
 
-            Table.SaveAll(true);
-            MultiUserFile.SaveAll(true); // Nun aber
+        _ = Forms.Remove(thisForm);
 
-            MultiUserFile.UnlockAllHard();
+        if (Forms.Count > 0) { return; }
 
-            List<Table> l = [.. Table.AllFiles];
-            foreach (var f in l) {
-                f.Freeze("Beenden...");
-            }
+        if (sender != _lastStartForm) {
+            _lastStartForm = CreateForm(FormBeforeEnd, _current);
+            if (_lastStartForm != null) { return; }
+        }
 
-            //p.Close();
-            Develop.TraceLogging_End();
+        thisForm.Enabled = false;
+        thisForm.Refresh();
 
-            ExitThread();
-            Develop.AbortExe(true);
+        ExecuteAtEnd?.Invoke();
+
+        Develop.DebugPrint(ErrorType.Info, "Schließe Programm...");
+        //var p = BlueControls.Forms.Progressbar.Show("Beenden eingeleitet\r\nBitte warten, Daten werden gespeichert.");
+
+        Table.SaveAll(false);
+        MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
+
+        Table.SaveAll(true);
+        MultiUserFile.SaveAll(true); // Nun aber
+
+        MultiUserFile.UnlockAllHard();
+
+        List<Table> allTables = [.. Table.AllFiles];
+        foreach (var thisTable in allTables) {
+            try {
+                if (thisForm is Forms.FormWithStatusBar fws) {
+                    fws.UpdateStatus(ErrorType.Info, ImageCode.Tabelle, $"Entlade '{thisTable.Caption}'...", true);
+                }
+            } catch { }
+            thisTable.UnMasterMe();
+            thisTable.Freeze("Beenden...");
         }
     }
 
     private void RegisterFormInternal(Form frm) {
         if (Forms.Contains(frm)) { return; }
 
+        frm.FormClosing += OnFormClosing;
         frm.FormClosed += OnFormClosed;
         Forms.Add(frm);
     }

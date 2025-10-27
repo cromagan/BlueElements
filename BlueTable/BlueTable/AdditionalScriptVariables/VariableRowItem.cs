@@ -114,7 +114,7 @@ public class VariableRowItem : Variable {
 
             if (Table.Get(tx[0], null) is not { IsDisposed: false } db) { return false; }
 
-            if (db.Row.SearchByKey(tx[1]) is not { IsDisposed: false } row) { return false; }
+            if (db.Row.GetByKey(tx[1]) is not { IsDisposed: false } row) { return false; }
 
             result = row;
             return true;

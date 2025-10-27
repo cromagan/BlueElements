@@ -60,7 +60,7 @@ namespace BlueControls.Forms {
             this.capApp.Location = new System.Drawing.Point(8, 8);
             this.capApp.Name = "capApp";
             this.capApp.Size = new System.Drawing.Size(208, 24);
-            this.capApp.Text = "Applikation wählen:";
+            this.capApp.Text = "<b>Applikation wählen:";
             // 
             // Start
             // 

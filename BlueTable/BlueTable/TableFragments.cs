@@ -53,9 +53,7 @@ public class TableFragments : TableFile {
     private int _doingChanges = 0;
 
     private bool _masterNeeded;
-
     private string _myFragmentsFilename = string.Empty;
-
     private System.IO.StreamWriter? _writer;
 
     #endregion
@@ -73,6 +71,8 @@ public class TableFragments : TableFile {
     #endregion
 
     #region Properties
+
+    public bool CanDeleteWriter { get; private set; } = true;
 
     /// <summary>
     /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
@@ -212,6 +212,8 @@ public class TableFragments : TableFile {
         try {
             lock (_writer) {
                 _writer.WriteLine(l.ParseableItems().FinishParseable());
+
+                if (!type.IsUnimportant()) { CanDeleteWriter = false; }
             }
         } catch {
             Freeze("Netzwerkfehler!");
@@ -243,10 +245,14 @@ public class TableFragments : TableFile {
                     writerToClose.Dispose(); // Dispose ruft Close() automatisch auf
                 } catch { }
             }
+
+            if (CanDeleteWriter) {
+                IO.DeleteFile(_myFragmentsFilename, false);
+            }
         }
     }
 
-    private void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc, DateTime endTimeUtc) {
+    private void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc) {
         if (IsFreezed) { return; }
         if (!InitialLoadDone) { return; }
         if (files is not { Count: >= 1 }) { return; }
@@ -407,7 +413,7 @@ public class TableFragments : TableFile {
                         _changesNotIncluded.Add(thisWork);
 
                         var c = Column[thisWork.ColName];
-                        var r = Row.SearchByKey(thisWork.RowKey);
+                        var r = Row.GetByKey(thisWork.RowKey);
 
                         var error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate);
 
@@ -422,7 +428,7 @@ public class TableFragments : TableFile {
             }
 
             IsInCache = endTimeUtc;
-            DoWorkAfterLastChanges(myfiles, startTimeUtc, endTimeUtc);
+            DoWorkAfterLastChanges(myfiles, startTimeUtc);
             OnInvalidateView();
         } catch {
             Develop.CheckStackOverflow();
@@ -452,8 +458,9 @@ public class TableFragments : TableFile {
             _writer.WriteLine("- Filename " + Filename);
             _writer.WriteLine("- User " + UserName);
 
-            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]", string.Empty);
+            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, " Dummy - systembedingt benötigt", "[Änderung in dieser Session]", string.Empty);
             _writer.WriteLine(l.ParseableItems().FinishParseable());
+            CanDeleteWriter = true;
             _writer.Flush();
         } catch {
             fileStream?.Dispose(); // Nur disposen wenn StreamWriter failed

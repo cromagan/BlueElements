@@ -206,7 +206,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
                 txbTestZeile.Text = db.Row.First()?.CellFirstString() ?? string.Empty;
             }
 
-            r = db.Row[txbTestZeile.Text] ?? db.Row.SearchByKey(txbTestZeile.Text);
+            r = db.Row[txbTestZeile.Text] ?? db.Row.GetByKey(txbTestZeile.Text);
             if (r is not { IsDisposed: false }) {
                 return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             }
@@ -241,7 +241,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         db.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed);
         UpdateList();
 
-        Item = db.EventScript.Get(tmpname);
+        Item = db.EventScript.GetByKey(tmpname);
     }
 
     public override void WriteInfosBack() => UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason);
@@ -384,7 +384,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
         var newitem = new TableScriptDescription(Table);
 
-        if (db.EventScript.Get(newitem.KeyName) != null) {
+        if (db.EventScript.GetByKey(newitem.KeyName) != null) {
             Notification.Show("Es ist bereits ein neues Skript vorhanden,\r\ndieses zuerst bearbeiten.");
             return;
         }
@@ -408,7 +408,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
         WriteInfosBack();
 
-        Item = Table?.EventScript.Get(newItem);
+        Item = Table?.EventScript.GetByKey(newItem);
     }
 
     private void lstEventScripts_RemoveClicked(object sender, AbstractListItemEventArgs e) {
@@ -422,7 +422,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
         //lstEventScripts.UncheckAll();
 
-        var toDel = db.EventScript.Get(toDelete);
+        var toDel = db.EventScript.GetByKey(toDelete);
 
         if (toDel is null) { return; }
 
@@ -444,7 +444,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         if (!BlueScript.ScriptDescription.IsValidName(txbName.Text)) { return; }
 
         if (!string.Equals(txbName.Text, _item.KeyName, StringComparison.OrdinalIgnoreCase)) {
-            if (db.EventScript.Get(txbName.Text) != null) { return; }
+            if (db.EventScript.GetByKey(txbName.Text) != null) { return; }
         }
 
         UpdateSelectedItem(keyName: txbName.Text);
@@ -464,7 +464,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
         foreach (var thisSet in lstEventScripts.Items) {
             if (thisSet is ReadableListItem rli) {
-                if (db.EventScript.Get(rli.KeyName) == null) {
+                if (db.EventScript.GetByKey(rli.KeyName) == null) {
                     toRemove.Add(rli);
                 }
             }

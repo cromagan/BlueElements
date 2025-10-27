@@ -147,7 +147,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     // Used: Only BZL
-    public PointM? GetPoint(string name) => _points.Get(name);
+    public PointM? GetPoint(string name) => _points.GetByKey(name);
 
     public void LetUserAddAPoint(string pointName, Helpers helper, Orientation mittelline) {
         // Used: Only BZL
@@ -178,7 +178,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     public void PointSet(string name, int x, int y) => PointSet(name, x, (float)y);
 
     public void PointSet(string name, float x, float y) {
-        var p = _points.Get(name);
+        var p = _points.GetByKey(name);
         if (p == null) {
             p = new PointM(name, x, y);
             _points.Add(p);

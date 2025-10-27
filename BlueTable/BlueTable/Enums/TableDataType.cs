@@ -41,6 +41,24 @@ public static class TableDataTypeExtension {
 
     public static bool IsObsolete(this TableDataType type) => (int)type is 0 or 2 or 3 or 16 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 64 or 65 or 67 or 70 or 73 or 79 or 81 or 103 or 134 or 151 or 153 or 155 or 178 or 185 or 191 or 249;
 
+    public static bool IsUnimportant(this TableDataType type) => type.IsObsolete() ||
+                                                                  type is TableDataType.TemporaryTableMasterTimeUTC or
+                                                                       TableDataType.TemporaryTableMasterUser or
+                                                                       TableDataType.TemporaryTableMasterMachine or
+                                                                       TableDataType.TemporaryTableMasterApp or
+                                                                       TableDataType.TemporaryTableMasterId or
+                                                                       TableDataType.Werbung or
+                                                                       TableDataType.LastEditApp or
+                                                                       TableDataType.LastEditID or
+                                                                       TableDataType.LastEditMachineName or
+                                                                       TableDataType.LastEditTimeUTC or
+                                                                       TableDataType.LastEditUser or
+                                                                       TableDataType.Undo or
+                                                                       TableDataType.UndoInOne or
+                                                                       TableDataType.EOF or
+                                                                       TableDataType.Command_NewStart or
+                                                                       TableDataType.SystemValue;
+
     #endregion
 
     //public static bool Nameless(this TableDataType type) => type.ToString() == ((int)type).ToString();

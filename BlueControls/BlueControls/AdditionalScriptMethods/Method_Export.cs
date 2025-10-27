@@ -100,7 +100,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
         var tcvc = ColumnViewCollection.ParseAll(myTb);
 
-        var cu = tcvc.Get(attvar.ValueStringGet(2));
+        var cu = tcvc.GetByKey(attvar.ValueStringGet(2));
         if (string.IsNullOrEmpty(attvar.ValueStringGet(2)) || cu == null) {
             cu = tcvc[0];
         }

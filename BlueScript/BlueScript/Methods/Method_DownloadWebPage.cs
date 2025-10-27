@@ -56,7 +56,7 @@ internal class Method_DownloadWebPage : Method {
         var url = attvar.ValueStringGet(0);
         var varn = "X" + url.ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
 
-        if (Last.Get(varn) is VariableString vb) {
+        if (Last.GetByKey(varn) is VariableString vb) {
             return new DoItFeedback(vb.ValueString);
         }
 

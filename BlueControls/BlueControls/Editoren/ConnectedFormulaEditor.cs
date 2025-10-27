@@ -135,7 +135,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Methods
 
-    [StandaloneInfo("Formular-Editor", ImageCode.Anwendung, "Admin", 900)]
+    [StandaloneInfo("Formular-Editor", "Anwendung|32|||||||||Stift", "Admin", 900)]
     public static System.Windows.Forms.Form Start() => new ConnectedFormulaEditor();
 
     /// <summary>
@@ -347,7 +347,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         if (x is not { Count: 1 }) { return; }
 
-        var toadd = i.Get(x[0]);
+        var toadd = i.GetByKey(x[0]);
 
         if (toadd is not ReadableListItem { Item: AbstractPadItem api }) { return; }
 

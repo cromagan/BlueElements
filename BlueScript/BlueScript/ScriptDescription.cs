@@ -73,15 +73,12 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
     #region Properties
 
     public string AdminInfo { get; private set; }
-
     public string ColumnQuickInfo { get; private set; }
     public string CompareKey => KeyName;
-
     public string FailedReason { get; private set; }
     public string Image { get; private set; }
-
     public bool IsDisposed { get; private set; }
-
+    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; private set; }
     public string Script { get; private set; }
 

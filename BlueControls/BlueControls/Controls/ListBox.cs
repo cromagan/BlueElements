@@ -251,7 +251,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     public AbstractListItem? this[string @internal] {
         get {
             try {
-                return _item.Get(@internal);
+                return _item.GetByKey(@internal);
             } catch {
                 Develop.CheckStackOverflow();
                 return this[@internal];
@@ -336,7 +336,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
         var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, CheckBehavior.SingleSelection, null, AddType.None);
 
-        return rück is not { Count: not 0 } ? null : Suggestions.Get(rück[0]);
+        return rück is not { Count: not 0 } ? null : Suggestions.GetByKey(rück[0]);
     }
 
     public Size CalculateColumnAndSize(Renderer_Abstract renderer) {
@@ -563,7 +563,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     internal void AddAndCheck(AbstractListItem? ali) {
         if (ali == null) { return; }
 
-        if (_item.Get(ali.KeyName) != null) { return; }
+        if (_item.GetByKey(ali.KeyName) != null) { return; }
 
         var tmp = _checkBehavior;
         _checkBehavior = CheckBehavior.MultiSelection;
@@ -1225,7 +1225,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
         List<string> newList = [];
 
         foreach (var thisit in newCheckedItems) {
-            var it = _item.Get(thisit) ?? ItemOf(thisit);
+            var it = _item.GetByKey(thisit) ?? ItemOf(thisit);
 
             if (it.IsClickable()) {
                 newList.Add(thisit);

@@ -136,6 +136,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
     /// </summary>
     public ObservableCollection<PointM> JointPoints { get; } = [];
 
+    public bool KeyIsCaseSensitive => false;
+
     public string KeyName {
         get => _keyName;
         set {
@@ -567,7 +569,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
     }
 
     internal void ConnectJointPoint(AbstractPadItem itemToConnect, string pointnameInItem, string otherPointName, bool connectX, bool connectY) {
-        var myPoint = itemToConnect.JointPoints.Get(pointnameInItem);
+        var myPoint = itemToConnect.JointPoints.GetByKey(pointnameInItem);
         if (myPoint == null) { return; }
 
         if (itemToConnect.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }

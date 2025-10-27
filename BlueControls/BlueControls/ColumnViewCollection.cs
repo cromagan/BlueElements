@@ -39,13 +39,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     #region Fields
 
     public bool ShowHead = true;
-
     private readonly List<ColumnViewItem> _internal = [];
-
     private readonly List<string> _permissionGroups_Show = [];
-
     private int _clientWidth = 16;
-
     private int? _headSize;
     private string _sheetStyle = Win11;
     private Table? _table;
@@ -85,15 +81,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string ColumnQuickInfo => string.Empty;
-
     public int Count => _internal.Count;
-
     public Type? Editor { get; set; }
-
     public BlueFont Font_RowChapter { get; internal set; } = BlueFont.DefaultFont;
-
     public bool IsDisposed { get; private set; }
-
+    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {

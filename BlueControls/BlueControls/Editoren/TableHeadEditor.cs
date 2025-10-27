@@ -114,7 +114,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (db.Column[work.ColName] is { IsDisposed: false } col) {
             r.CellSet("columnCaption", col.Caption, string.Empty);
         }
-        if (db.Row.SearchByKey(work.RowKey) is { IsDisposed: false } row) {
+        if (db.Row.GetByKey(work.RowKey) is { IsDisposed: false } row) {
             r.CellSet("RowFirst", row.CellFirstString(), string.Empty);
         } else if (!string.IsNullOrEmpty(work.RowKey)) {
             r.CellSet("RowFirst", "[gelöscht]", string.Empty);

@@ -94,7 +94,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         }
     }
 
-    public RowItem? Row => Table?.Row.SearchByKey(_rowKey);
+    public RowItem? Row => Table?.Row.GetByKey(_rowKey);
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 

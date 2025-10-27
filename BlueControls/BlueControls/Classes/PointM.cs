@@ -128,6 +128,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
         }
     }
 
+    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
     public float Magnitude => (float)Math.Sqrt((_x * _x) + (_y * _y));
     public bool MoveXByMouse { get; set; } = true;

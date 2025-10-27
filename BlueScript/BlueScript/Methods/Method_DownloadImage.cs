@@ -60,7 +60,7 @@ internal class Method_DownloadImage : Method {
         var url = attvar.ValueStringGet(0);
         var varn = "X" + url.ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
 
-        if (Last.Get(varn) is VariableBitmap vb) {
+        if (Last.GetByKey(varn) is VariableBitmap vb) {
             return new DoItFeedback(vb.ValueBitmap);
         }
 

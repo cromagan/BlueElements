@@ -628,7 +628,7 @@ public class TableChunk : TableFile {
     }
 
     private static Chunk GetOrMakechunk(List<Chunk> chunks, TableFile tbf, string chunkId) {
-        var rowchunk = chunks.Get(chunkId);
+        var rowchunk = chunks.GetByKey(chunkId);
 
         if (rowchunk == null) {
             rowchunk = new Chunk(tbf.Filename, chunkId);

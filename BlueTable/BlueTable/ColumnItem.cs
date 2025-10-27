@@ -45,48 +45,28 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     #region Fields
 
     internal List<string>? UcaseNamesSortedByLength;
-
     private const string TmpNewDummy = "TMPNEWDUMMY";
-
     private readonly List<string> _afterEditAutoReplace = [];
-
     private readonly List<string> _columnTags = [];
-
     private readonly List<string> _dropDownItems = [];
-
     private readonly List<string> _linkedCellFilter = [];
-
     private readonly object _linkedTableLock = new object();
-
     private readonly List<string> _permissionGroupsChangeCell = [];
-
     private AdditionalCheck _additionalFormatCheck;
-
     private string _adminInfo;
-
     private bool _afterEditAutoCorrect;
-
     private string _afterEditAutoRemoveChar;
     private bool _afterEditDoUCase;
-
     private bool _afterEditQuickSortRemoveDouble;
-
     private int _afterEditRound;
     private AlignmentHorizontal _align;
-
     private string _allowedChars;
-
     private string _autoFilterJoker;
     private Color _backColor;
-
     private string _caption;
-
     private string _captionBitmapCode;
-
     private string _captionGroup1;
-
     private string _captionGroup2;
-
     private string _captionGroup3;
 
     /// <summary>
@@ -95,37 +75,21 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private string _columnNameOfLinkedTable;
 
     private string _columnQuickInfo;
-
     private string _columnSystemInfo;
-
     private string _defaultRenderer;
-
     private TranslationType _doOpticalTranslation;
-
     private bool _dropdownDeselectAllAllowed;
-
     private bool _editableWithDropdown;
-
     private bool _editableWithTextInput;
-
     private bool _editAllowedDespiteLock;
-
     private FilterOptions _filterOptions;
-
     private int _fixedColumnWidth;
-
     private Color _foreColor;
-
     private bool _ignoreAtRowFilter;
-
     private bool _isFirst;
-
     private bool _isKeyColumn;
-
     private string _keyName;
-
     private ColumnLineStyle _lineStyleLeft;
-
     private ColumnLineStyle _lineStyleRight;
 
     /// <summary>
@@ -134,28 +98,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private Table? _linkedTable;
 
     private string _linkedTableTableName;
-
     private int _maxCellLength;
-
     private int _maxTextLength;
-
     private bool _multiLine;
-
     private string _regexCheck = string.Empty;
-
     private bool _relationship_to_First;
-
     private RelationType _relationType;
-
     private string _rendererSettings;
     private bool _saveContent;
-
     private ScriptType _scriptType;
-
     private bool _showValuesOfOtherCellsInDropdown;
-
     private SortierTyp _sortType;
-
     private bool _spellCheckingEnabled;
 
     //private string _cellInitValue;
@@ -693,6 +646,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             OnPropertyChanged();
         }
     }
+
+    public bool KeyIsCaseSensitive => false;
 
     public string KeyName {
         get => _keyName.ToUpperInvariant();

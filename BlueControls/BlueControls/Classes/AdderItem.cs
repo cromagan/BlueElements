@@ -45,14 +45,15 @@ internal class AdderItem : IReadableTextWithKey {
 
     #endregion
 
-    //public ColumnItem? AdditionalInfoColumn { get; }
-    //public string GeneratedEntityID { get; set; }
-
     #region Properties
 
     //public ColumnItem? OriginIDColumn { get; }
     public string ColumnQuickInfo => KeyName;
 
+    public bool KeyIsCaseSensitive => false;
+
+    //public ColumnItem? AdditionalInfoColumn { get; }
+    //public string GeneratedEntityID { get; set; }
     /// <summary>
     /// Enstpricht TextKey  (ZUTATEN\\MEHL\\) OHNE #
     /// </summary>

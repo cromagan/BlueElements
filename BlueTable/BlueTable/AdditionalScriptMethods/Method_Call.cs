@@ -69,7 +69,7 @@ internal class Method_Call : Method_TableGeneric, IUseableForButton {
 
         var vs = attvar.ValueStringGet(0);
 
-        var sc = myDb.EventScript.Get(vs);
+        var sc = myDb.EventScript.GetByKey(vs);
         if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs + "\r\nNur aktiv geschaltene Skripte werden berücksichtigt.", true, ld); }
 
         var newat = sc.Attributes();

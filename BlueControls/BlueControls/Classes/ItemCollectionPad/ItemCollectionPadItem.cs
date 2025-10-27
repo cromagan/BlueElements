@@ -266,7 +266,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     #region Indexers
 
-    public AbstractPadItem? this[string keyName] => _internal.Get(keyName);
+    public AbstractPadItem? this[string keyName] => _internal.GetByKey(keyName);
 
     public AbstractPadItem? this[int nr] => _internal[nr];
 
@@ -865,7 +865,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return script;
     }
 
-    public ScriptEndedFeedback ReplaceVariables(Table table, string rowkey) => ReplaceVariables(table.Row.SearchByKey(rowkey));
+    public ScriptEndedFeedback ReplaceVariables(Table table, string rowkey) => ReplaceVariables(table.Row.GetByKey(rowkey));
 
     public bool ResetVariables() {
         if (IsDisposed) { return false; }

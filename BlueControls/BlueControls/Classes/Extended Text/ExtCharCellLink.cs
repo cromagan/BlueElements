@@ -140,7 +140,7 @@ public class ExtCharCellLink : ExtChar {
             var c = tb.Column[ColumnKey];
             if (c == null) { return $"[Column '{ColumnKey}' not found]"; }
 
-            var r = tb.Row.SearchByKey(RowKey);
+            var r = tb.Row.GetByKey(RowKey);
             if (r == null) { return $"[Row '{RowKey}' not found]"; }
 
             return r.CellGetString(c);

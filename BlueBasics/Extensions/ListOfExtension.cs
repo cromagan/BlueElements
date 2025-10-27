@@ -89,15 +89,18 @@ public static partial class Extensions {
         return l;
     }
 
-    public static T? Get<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName {
+    public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName {
         if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
 
-        if (items != null) {
+        if (items == null || items.Count() == 0 || items.First() is not { } i) { return default; }
+
+        if (i.KeyIsCaseSensitive) {
+            return items.FirstOrDefault(thisp =>
+                thisp != null && string.Equals(thisp.KeyName, name, StringComparison.Ordinal));
+        } else {
             return items.FirstOrDefault(thisp =>
                 thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase));
         }
-
-        return default;
     }
 
     public static int IndexOf<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {

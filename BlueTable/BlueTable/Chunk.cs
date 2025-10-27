@@ -42,7 +42,6 @@ public class Chunk : IHasKeyName {
     public readonly string MainFileName = string.Empty;
     private DateTime _bytesloaded = DateTime.MinValue;
     private string _fileinfo = string.Empty;
-
     private string _keyname = string.Empty;
     private int _minBytes = 0;
 
@@ -73,8 +72,8 @@ public class Chunk : IHasKeyName {
     }
 
     public long DataLength => Bytes?.Count ?? 0;
-
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
+    public bool KeyIsCaseSensitive => false;
 
     public string KeyName {
         get => _keyname;

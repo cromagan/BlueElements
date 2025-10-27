@@ -95,7 +95,7 @@ public class Method_CallByFilename : Method {
         #region Kritische Variablen Disposen
 
         foreach (var thisVar in tmpv) {
-            if (varCol.Get(thisVar.KeyName) == null) {
+            if (varCol.GetByKey(thisVar.KeyName) == null) {
                 thisVar.DisposeContent();
             }
         }
