@@ -23,7 +23,6 @@ using BlueBasics.MultiUserFile;
 using BlueTable;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 //https://stackoverflow.com/questions/9462592/best-practices-for-multi-form-applications-to-show-and-hide-forms

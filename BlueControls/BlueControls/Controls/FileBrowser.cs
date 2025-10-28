@@ -31,8 +31,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-
-using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;

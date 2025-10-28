@@ -213,14 +213,14 @@ namespace FileSystemCaching {
             ThrowIfDisposed();
             EnsureInitialized();
 
-            var normalizedPath = BlueBasics.IO.NormalizeFile(filename);
+            var normalizedFileName = BlueBasics.IO.NormalizeFile(filename);
 
-            if (!ShouldCacheFile(normalizedPath)) {
-                return CreateCachedFileDirectly(normalizedPath);
+            if (!ShouldCacheFile(normalizedFileName)) {
+                return new CachedFile(normalizedFileName);
             }
 
             // Optimistic read
-            if (_cachedFiles.TryGetValue(normalizedPath, out var cachedFile)) {
+            if (_cachedFiles.TryGetValue(normalizedFileName, out var cachedFile)) {
                 if (BlueBasics.Constants.GlobalRnd.Next(0, 5) == 0) {
                     // Fire-and-forget Validierung
                     _ = Task.Run(() => {
@@ -236,11 +236,11 @@ namespace FileSystemCaching {
             // Cache-Miss
 
             // Datei laden und cachen
-            var newFile = await Task.Run(() => CreateCachedFileDirectly(normalizedPath), cancellationToken)
+            var newFile = await Task.Run(() => new CachedFile(normalizedFileName), cancellationToken)
                 .ConfigureAwait(false);
 
             // Atomar hinzufügen oder existierende zurückgeben
-            return _cachedFiles.GetOrAdd(normalizedPath, newFile);
+            return _cachedFiles.GetOrAdd(normalizedFileName, newFile);
         }
 
         /// <summary>
@@ -303,60 +303,6 @@ namespace FileSystemCaching {
             } catch {
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Liest den gesamten Inhalt einer Datei als Text (asynchron)
-        /// </summary>
-        /// <param name="filename">Dateipfad</param>
-        /// <param name="encoding">Encoding (Standard: UTF8)</param>
-        /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>Dateiinhalt als String</returns>
-        /// <exception cref="FileNotFoundException">Datei existiert nicht</exception>
-        /// <exception cref="IOException">Fehler beim Lesen</exception>
-        public async Task<string> ReadAllTextAsync(string filename, Encoding? encoding = null, CancellationToken cancellationToken = default) {
-            ThrowIfDisposed();
-            EnsureInitialized();
-
-            encoding ??= Encoding.UTF8;
-            var normalizedPath = BlueBasics.IO.NormalizeFile(filename);
-
-            try {
-                var cachedFile = await GetFileAsync(normalizedPath, cancellationToken).ConfigureAwait(false);
-                return cachedFile.GetContentAsString(encoding);
-            } catch {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Benennt eine Datei um und aktualisiert den Cache
-        /// </summary>
-        public async Task RenameFileAsync(string oldFile, string newFile, CancellationToken cancellationToken = default) {
-            ThrowIfDisposed();
-            EnsureInitialized();
-
-            var oldNormalized = BlueBasics.IO.NormalizeFile(oldFile);
-            var newNormalized = BlueBasics.IO.NormalizeFile(newFile);
-
-            try {
-                await Task.Run(() => File.Move(oldNormalized, newNormalized), cancellationToken)
-                    .ConfigureAwait(false);
-
-                // Cache aktualisieren
-                if (_cachedFiles.TryRemove(oldNormalized, out var cachedFile)) {
-                    if (ShouldCacheFile(newNormalized)) {
-                        cachedFile.UpdatePath(newNormalized);
-                        _cachedFiles.TryAdd(newNormalized, cachedFile);
-                    } else {
-                        cachedFile.Dispose();
-                    }
-                }
-            } catch { }
-        }
-
-        private CachedFile CreateCachedFileDirectly(string filename) {
-            return new CachedFile(filename);
         }
 
         private void DebouncedAction(string key, Action action) {
@@ -457,18 +403,24 @@ namespace FileSystemCaching {
         });
 
         private void OnFileRenamed(object sender, RenamedEventArgs e) => DebouncedAction(e.FullPath, () => {
-            // Nur reagieren, wenn alte Datei im Cache war
+            // Alte Datei aus Cache entfernen
             if (_cachedFiles.TryRemove(e.OldFullPath, out var cachedFile)) {
+                cachedFile.Dispose();
+
+                // Neue Datei hinzufügen, falls sie gecacht werden soll
                 if (ShouldCacheFile(e.FullPath)) {
-                    cachedFile.UpdatePath(e.FullPath);
-                    _cachedFiles.TryAdd(e.FullPath, cachedFile);
-                } else {
-                    cachedFile.Dispose();
+                    try {
+                        var normalizedPath = BlueBasics.IO.NormalizeFile(e.FullPath);
+                        _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));
+                    } catch { }
                 }
             } else {
-                // Falls alte Datei nicht im Cache war, neue nur registrieren
+                // Falls alte Datei nicht im Cache war, neue nur registrieren falls relevant
                 if (ShouldCacheFile(e.FullPath)) {
-                    _cachedFiles.TryAdd(e.FullPath, new CachedFile(e.FullPath));
+                    try {
+                        var normalizedPath = BlueBasics.IO.NormalizeFile(e.FullPath);
+                        _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));
+                    } catch { }
                 }
             }
         });

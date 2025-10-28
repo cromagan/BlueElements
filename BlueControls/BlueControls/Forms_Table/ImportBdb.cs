@@ -23,7 +23,6 @@ using BlueTable;
 using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;

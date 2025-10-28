@@ -28,7 +28,6 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace BlueTable.AdditionalScriptMethods;
 
