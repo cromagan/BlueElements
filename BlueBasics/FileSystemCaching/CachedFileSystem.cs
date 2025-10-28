@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using BlueBasics;
-using Microsoft.Extensions.Caching.Memory;
 
 #nullable enable
 
@@ -23,9 +22,7 @@ namespace FileSystemCaching {
 
         private static readonly ConcurrentDictionary<string, CachedFileSystem> _instances = new();
 
-        private readonly IMemoryCache _cache;
-
-        private readonly ConcurrentDictionary<string, byte> _cachedFilenames = new();
+        private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new();
 
         private readonly ConcurrentDictionary<string, Timer> _debounceTimers = new();
 
@@ -52,10 +49,6 @@ namespace FileSystemCaching {
             if (!Directory.Exists(WatchedDirectory)) {
                 throw new DirectoryNotFoundException($"Verzeichnis nicht gefunden: {WatchedDirectory}");
             }
-
-            _cache = new MemoryCache(new MemoryCacheOptions {
-                SizeLimit = MaxCacheSizeBytes
-            });
         }
 
         #endregion
@@ -69,9 +62,6 @@ namespace FileSystemCaching {
 
         /// <summary>Ist das System initialisiert?</summary>
         public bool IsInitialized => _isInitialized;
-
-        /// <summary>Maximale Cache-Größe in Bytes (Standard: 500 MB)</summary>
-        public long MaxCacheSizeBytes { get; set; } = 500 * 1024 * 1024;
 
         /// <summary>Parallelitätsgrad für Batch-Operationen</summary>
         public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
@@ -185,8 +175,11 @@ namespace FileSystemCaching {
                 }
                 _debounceTimers.Clear();
 
-                // Cache leeren
-                _cache.Dispose();
+                // Alle CachedFile-Instanzen disposen
+                foreach (var file in _cachedFiles.Values) {
+                    file.Dispose();
+                }
+                _cachedFiles.Clear();
 
                 _isDisposed = true;
             } finally {
@@ -205,7 +198,7 @@ namespace FileSystemCaching {
             var normalizedPath = BlueBasics.IO.NormalizeFile(filename);
 
             // Erst Cache prüfen
-            if (_cache.TryGetValue<CachedFile>(normalizedPath, out _)) {
+            if (_cachedFiles.TryGetValue(normalizedPath, out _)) {
                 return true;
             }
 
@@ -227,7 +220,7 @@ namespace FileSystemCaching {
             }
 
             // Optimistic read
-            if (_cache.TryGetValue<CachedFile>(normalizedPath, out var cachedFile)) {
+            if (_cachedFiles.TryGetValue(normalizedPath, out var cachedFile)) {
                 if (BlueBasics.Constants.GlobalRnd.Next(0, 5) == 0) {
                     // Fire-and-forget Validierung
                     _ = Task.Run(() => {
@@ -246,9 +239,8 @@ namespace FileSystemCaching {
             var newFile = await Task.Run(() => CreateCachedFileDirectly(normalizedPath), cancellationToken)
                 .ConfigureAwait(false);
 
-            CacheFile(normalizedPath, newFile);
-
-            return newFile;
+            // Atomar hinzufügen oder existierende zurückgeben
+            return _cachedFiles.GetOrAdd(normalizedPath, newFile);
         }
 
         /// <summary>
@@ -258,13 +250,13 @@ namespace FileSystemCaching {
         /// <returns>Liste der Dateipfade, die den Patterns entsprechen</returns>
         public List<string> GetFiles(List<string>? includePatterns = null) {
             if (includePatterns == null || includePatterns.Count == 0) {
-                return [.. _cachedFilenames.Keys];
+                return [.. _cachedFiles.Keys];
             }
 
-            return [.. _cachedFilenames.Keys.Where(filename => {
-        var fileName = Path.GetFileName(filename);
-        return includePatterns.Any(pattern => MatchesPattern(fileName, pattern));
-    })];
+            return [.. _cachedFiles.Keys.Where(filename => {
+                var fileName = Path.GetFileName(filename);
+                return includePatterns.Any(pattern => MatchesPattern(fileName, pattern));
+            })];
         }
 
         /// <summary>
@@ -352,36 +344,19 @@ namespace FileSystemCaching {
                     .ConfigureAwait(false);
 
                 // Cache aktualisieren
-                if (_cache.TryGetValue<CachedFile>(oldNormalized, out var cachedFile)) {
-                    RemoveFromCache(oldNormalized);
-
+                if (_cachedFiles.TryRemove(oldNormalized, out var cachedFile)) {
                     if (ShouldCacheFile(newNormalized)) {
                         cachedFile.UpdatePath(newNormalized);
-                        CacheFile(newNormalized, cachedFile);
+                        _cachedFiles.TryAdd(newNormalized, cachedFile);
+                    } else {
+                        cachedFile.Dispose();
                     }
                 }
             } catch { }
         }
 
-        private void CacheFile(string filename, CachedFile file) {
-            var entryOptions = new MemoryCacheEntryOptions()
-                .SetSize(file.Size)
-                .SetSlidingExpiration(SlidingExpiration)
-                .SetAbsoluteExpiration(AbsoluteExpiration)
-                .RegisterPostEvictionCallback((key, value, reason, state) => {
-                    if (value is IDisposable disposable) {
-                        disposable.Dispose();
-                    }
-                    _cachedFilenames.TryRemove(key.ToString() ?? string.Empty, out _);
-                });
-
-            _cache.Set(filename, file, entryOptions);
-            _cachedFilenames.TryAdd(filename, 0);
-        }
-
         private CachedFile CreateCachedFileDirectly(string filename) {
-            var fileInfo = new FileInfo(filename);
-            return new CachedFile(fileInfo);
+            return new CachedFile(filename);
         }
 
         private void DebouncedAction(string key, Action action) {
@@ -458,7 +433,7 @@ namespace FileSystemCaching {
             if (!ShouldCacheFile(e.FullPath)) return;
 
             // Nur reagieren, wenn Datei bereits im Cache ist
-            if (!_cache.TryGetValue<CachedFile>(e.FullPath, out var cachedFile)) return;
+            if (!_cachedFiles.TryGetValue(e.FullPath, out var cachedFile)) return;
 
             DebouncedAction(e.FullPath, cachedFile.Invalidate);
         }
@@ -470,7 +445,9 @@ namespace FileSystemCaching {
             DebouncedAction(e.FullPath, () => {
                 try {
                     var normalizedPath = BlueBasics.IO.NormalizeFile(e.FullPath);
-                    _cachedFilenames.TryAdd(normalizedPath, 0);
+
+                    // Lazy-Instanz erstellen (ohne Metadaten zu laden)
+                    _cachedFiles.GetOrAdd(normalizedPath, _ => new CachedFile(normalizedPath));
                 } catch { }
             });
         }
@@ -481,17 +458,17 @@ namespace FileSystemCaching {
 
         private void OnFileRenamed(object sender, RenamedEventArgs e) => DebouncedAction(e.FullPath, () => {
             // Nur reagieren, wenn alte Datei im Cache war
-            if (_cache.TryGetValue<CachedFile>(e.OldFullPath, out var cachedFile)) {
-                RemoveFromCache(e.OldFullPath);
-
+            if (_cachedFiles.TryRemove(e.OldFullPath, out var cachedFile)) {
                 if (ShouldCacheFile(e.FullPath)) {
                     cachedFile.UpdatePath(e.FullPath);
-                    CacheFile(e.FullPath, cachedFile);
+                    _cachedFiles.TryAdd(e.FullPath, cachedFile);
+                } else {
+                    cachedFile.Dispose();
                 }
             } else {
                 // Falls alte Datei nicht im Cache war, neue nur registrieren
                 if (ShouldCacheFile(e.FullPath)) {
-                    _cachedFilenames.TryAdd(e.FullPath, 0);
+                    _cachedFiles.TryAdd(e.FullPath, new CachedFile(e.FullPath));
                 }
             }
         });
@@ -502,7 +479,7 @@ namespace FileSystemCaching {
                 await Task.Delay(1000).ConfigureAwait(false);
                 try {
                     var currentFiles = GetAllMatchingFiles().ToHashSet();
-                    var cachedFiles = _cachedFilenames.Keys.ToHashSet();
+                    var cachedFiles = _cachedFiles.Keys.ToHashSet();
 
                     // Gelöschte entfernen
                     foreach (var removed in cachedFiles.Except(currentFiles)) {
@@ -511,12 +488,12 @@ namespace FileSystemCaching {
 
                     // Neue nur registrieren (KEINE Metadaten)
                     foreach (var file in currentFiles.Except(cachedFiles)) {
-                        _cachedFilenames.TryAdd(file, 0);
+                        _cachedFiles.TryAdd(file, new CachedFile(file));
                     }
 
                     // Bestehende Cache-Einträge aktualisieren
                     foreach (var file in currentFiles) {
-                        if (_cache.TryGetValue<CachedFile>(file, out var cached)) {
+                        if (_cachedFiles.TryGetValue(file, out var cached)) {
                             if (cached.IsStale()) cached.Refresh();
                         }
                     }
@@ -527,8 +504,9 @@ namespace FileSystemCaching {
         }
 
         private void RemoveFromCache(string filename) {
-            _cache.Remove(filename);
-            _cachedFilenames.TryRemove(filename, out _);
+            if (_cachedFiles.TryRemove(filename, out var file)) {
+                file.Dispose();
+            }
         }
 
         private bool ShouldCacheFile(string filename) {
@@ -543,7 +521,7 @@ namespace FileSystemCaching {
         }
 
         private async Task WarmCacheAsync(CancellationToken cancellationToken) {
-            // Nur Dateiliste ermitteln und in _cachedFilenames speichern
+            // Nur Dateiliste ermitteln und in _cachedFiles speichern
             var files = GetAllMatchingFiles();
 
             await Task.Run(() => {
@@ -551,8 +529,8 @@ namespace FileSystemCaching {
                     try {
                         var normalizedPath = BlueBasics.IO.NormalizeFile(filePath);
 
-                        // Nur Dateinamen registrieren, KEINE CachedFile-Instanz erstellen
-                        _cachedFilenames.TryAdd(normalizedPath, 0);
+                        // Nur CachedFile-Instanz erstellen (KEINE Metadaten laden)
+                        _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));
                     } catch { }
                 }
             }, cancellationToken).ConfigureAwait(false);

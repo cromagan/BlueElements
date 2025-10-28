@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 #nullable enable
 
@@ -11,44 +10,40 @@ namespace FileSystemCaching {
     /// <summary>
     /// Repräsentiert eine gecachte Datei mit Lazy-Loading-Unterstützung und Versionierung.
     /// Thread-sicher durch Verwendung von ReaderWriterLockSlim.
+    /// Metadaten und Content werden erst bei Bedarf geladen.
     /// </summary>
     public sealed class CachedFile : IDisposable {
 
         #region Fields
 
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
         private DateTime? _cachedLastWriteTimeUtc;
         private string _filename;
         private volatile bool _isDisposed;
         private Lazy<byte[]>? _lazyContent;
-        private int _version;
 
         #endregion
 
         #region Constructors
 
         /// <summary>
-        /// Erstellt eine "leere" CachedFile-Instanz OHNE Metadaten (nur Filename).
-        /// Wird für WarmCache verwendet, um Speicher zu sparen.
+        /// Erstellt eine neue CachedFile-Instanz mit Lazy-Loading für Metadaten und Content.
         /// </summary>
-        internal CachedFile(string filename, bool loadMetadata) {
+        /// <param name="filename">Dateipfad</param>
+        public CachedFile(string filename) {
             _filename = filename ?? throw new ArgumentNullException(nameof(filename));
 
-            if (loadMetadata) {
-                Initialize();
-            } else {
-                // Nur Lazy-Loader initialisieren, KEINE Metadaten laden
-                CachedAtUtc = DateTime.UtcNow;
-                InitializeLazyLoaders();
+            if (!File.Exists(_filename)) {
+                throw new FileNotFoundException($"Datei nicht gefunden: {_filename}", _filename);
             }
+
+            InitializeLazyLoaders();
         }
 
         #endregion
 
         #region Properties
-
-        /// <summary>Zeitpunkt der Cache-Erstellung</summary>
-        public DateTime CachedAtUtc { get; private set; }
 
         public byte[] Content {
             get {
@@ -62,15 +57,6 @@ namespace FileSystemCaching {
                 return _lazyContent.Value;  // Lazy kümmert sich um Thread-Safety
             }
         }
-
-        /// <summary>Erstellungsdatum (UTC, gecacht)</summary>
-        public DateTime CreationTimeUtc { get; private set; }
-
-        /// <summary>Verzeichnispfad</summary>
-        public string Directory => System.IO.Path.GetDirectoryName(Filename) ?? string.Empty;
-
-        /// <summary>Dateierweiterung (inkl. Punkt)</summary>
-        public string Extension => System.IO.Path.GetExtension(Filename);
 
         // Path – read unter Lock mit finally
         public string Filename {
@@ -86,21 +72,6 @@ namespace FileSystemCaching {
 
         // IsContentLoaded – garantiert ExitReadLock via finally
         public bool IsContentLoaded => _lazyContent?.IsValueCreated ?? false;
-
-        /// <summary> Prüft, ob Metadaten geladen wurden</summary>
-        public bool IsMetadataLoaded => Size > 0 || LastWriteTimeUtc != default;
-
-        /// <summary>Letztes Änderungsdatum (UTC, gecacht)</summary>
-        public DateTime LastWriteTimeUtc { get; private set; }
-
-        /// <summary>Dateiname ohne Pfad</summary>
-        public string Name => System.IO.Path.GetFileName(Filename);
-
-        /// <summary>Dateigröße in Bytes (gecacht)</summary>
-        public long Size { get; private set; }
-
-        /// <summary>Aktuelle Version (erhöht sich bei jedem Reload)</summary>
-        public int Version => _version;
 
         #endregion
 
@@ -133,7 +104,7 @@ namespace FileSystemCaching {
             return encoding.GetString(Content);
         }
 
-        // Invalidate – öffentlich, mit sauberem Lock-Handlinig
+        // Invalidate – öffentlich, mit sauberem Lock-Handling
         public void Invalidate() {
             ThrowIfDisposed();
 
@@ -144,8 +115,13 @@ namespace FileSystemCaching {
                     Array.Clear(_lazyContent.Value, 0, _lazyContent.Value.Length);
                 }
 
-                _lazyContent = null;
-                InitializeLazyLoaders(); // Neu initialisieren
+                // Metadaten als ungültig markieren
+                _cachedLastWriteTimeUtc = null;
+
+                // Neu initialisieren (INNERHALB des Locks, kein rekursiver Aufruf)
+                _lazyContent = new Lazy<byte[]>(
+                    LoadContentFromFileSystem,
+                    LazyThreadSafetyMode.ExecutionAndPublication);
             } finally {
                 _lock.ExitWriteLock();
             }
@@ -156,6 +132,7 @@ namespace FileSystemCaching {
         /// </summary>
         public bool IsStale() {
             ThrowIfDisposed();
+            if (_cachedLastWriteTimeUtc == null) { return true; }
 
             try {
                 var fileInfo = new FileInfo(Filename);
@@ -165,7 +142,7 @@ namespace FileSystemCaching {
             }
         }
 
-        // Refresh – alle Locks via finally abgesichert
+        // Refresh – alle Locks via finally
         public void Refresh() {
             ThrowIfDisposed();
 
@@ -176,16 +153,24 @@ namespace FileSystemCaching {
                     throw new FileNotFoundException($"Datei nicht vorhanden: {Filename}", Filename);
                 }
 
-                Size = fileInfo.Length;
-                LastWriteTimeUtc = fileInfo.LastWriteTimeUtc;
-                CreationTimeUtc = fileInfo.CreationTimeUtc;
-                _cachedLastWriteTimeUtc = LastWriteTimeUtc;
+                _lock.EnterWriteLock();
+                try {
+                    _cachedLastWriteTimeUtc = fileInfo.LastWriteTimeUtc;
 
-                InvalidateInternal();
+                    // Content invalidieren (OHNE Lock, da wir bereits WriteLock haben)
+                    if (_lazyContent?.IsValueCreated == true) {
+                        Array.Clear(_lazyContent.Value, 0, _lazyContent.Value.Length);
+                    }
+                    _lazyContent = new Lazy<byte[]>(
+                        LoadContentFromFileSystem,
+                        LazyThreadSafetyMode.ExecutionAndPublication);
+                } finally {
+                    _lock.ExitWriteLock();
+                }
             } catch { }
         }
 
-        public override string ToString() => $"CachedFile {{ Path = {Filename}, Size = {Size:N0} bytes, Version = {Version}, Loaded = {IsContentLoaded} }}";
+        public override string ToString() => $"CachedFile {Filename}, Loaded = {IsContentLoaded}";
 
         // UpdatePath – Lock via finally
         internal void UpdatePath(string newPath) {
@@ -194,44 +179,14 @@ namespace FileSystemCaching {
             _lock.EnterWriteLock();
             try {
                 _filename = newPath ?? throw new ArgumentNullException(nameof(newPath));
-                Interlocked.Increment(ref _version);
             } finally {
                 _lock.ExitWriteLock();
             }
-        }
-
-        private void Initialize() {
-            var fileInfo = new FileInfo(Filename);
-
-            if (!fileInfo.Exists) {
-                throw new FileNotFoundException($"Datei nicht gefunden: {Filename}", Filename);
-            }
-
-            Size = fileInfo.Length;
-            LastWriteTimeUtc = fileInfo.LastWriteTimeUtc;
-            CreationTimeUtc = fileInfo.CreationTimeUtc;
-            CachedAtUtc = DateTime.UtcNow;
-            _cachedLastWriteTimeUtc = LastWriteTimeUtc;
-
-            InitializeLazyLoaders();
         }
 
         private void InitializeLazyLoaders() => _lazyContent = new Lazy<byte[]>(
-                LoadContentFromFileSystem,
-                LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Interner Invalidate-Pfad mit finally
-        private void InvalidateInternal() {
-            _lock.EnterWriteLock();
-            try {
-                if (_lazyContent?.IsValueCreated == true) {
-                    Array.Clear(_lazyContent.Value, 0, _lazyContent.Value.Length);
-                }
-                _lazyContent = null;
-            } finally {
-                _lock.ExitWriteLock();
-            }
-        }
+            LoadContentFromFileSystem,
+            LazyThreadSafetyMode.ExecutionAndPublication);
 
         // Hilfsfunktion: liest Bytes vom FS ohne Locks zu hinterlassen
         private byte[] LoadContentFromFileSystem() {
