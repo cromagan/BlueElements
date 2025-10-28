@@ -64,7 +64,7 @@ public class Method_MsgBox : Method {
 
         if (buttons.Count == 0) { buttons.Add("Ok"); }
 
-        var l = MessageBox.Show(txt, pic, true, buttons.ToArray());
+        var l = MessageBox.Show(txt, pic, true, [.. buttons]);
 
         return new DoItFeedback(l);
     }

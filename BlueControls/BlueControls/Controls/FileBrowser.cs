@@ -457,7 +457,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         try {
             var dropped = (string[])e.Data.GetData(DataFormats.FileDrop);
-            files = dropped.ToList();
+            files = [.. dropped];
         } catch {
             MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
             return;

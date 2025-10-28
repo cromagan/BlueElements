@@ -206,7 +206,7 @@ public class Chunk : IHasKeyName {
             Develop.SetUserDidSomething();
 
             // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
-            var contentBytes = RemoveHeaderDataTypes(Bytes.ToArray());
+            var contentBytes = RemoveHeaderDataTypes([.. Bytes]);
             if (contentBytes == null || contentBytes.Count < _minBytes) { return new("Zu große Änderungen, sicherheitshalber geblockt", false, true); }
 
             // Neuen Header erstellen

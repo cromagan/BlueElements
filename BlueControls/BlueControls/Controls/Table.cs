@@ -588,7 +588,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         //BeSureAllDataLoaded(-1);
 
         var columnListtmp = columnList?.ToList();
-        columnListtmp ??= tbl.Column.Where(thisColumnItem => thisColumnItem != null).ToList();
+        columnListtmp ??= [.. tbl.Column.Where(thisColumnItem => thisColumnItem != null)];
 
         StringBuilder sb = new();
         switch (firstRow) {
@@ -1308,7 +1308,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         rows ??= [];
 
-        rows = rows.Distinct().ToList();
+        rows = [.. rows.Distinct()];
         if (!rows.IsDifferentTo(PinnedRows)) { return; }
 
         PinnedRows.Clear();
@@ -1456,7 +1456,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             return RowsVisibleUnique();
         }
 
-        return l.ToList();
+        return [.. l];
     }
 
     public void TableSet(Table? db, string viewCode) {
@@ -2381,14 +2381,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (table?.Table?.Column.First is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
 
             using var filterColNewRow = new FilterCollection(table.Table, "Edit-Filter");
-            filterColNewRow.AddIfNotExists(table.FilterCombined.ToList());
+            filterColNewRow.AddIfNotExists([.. table.FilterCombined]);
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
             var fe = table.GrantWriteAccess(cellInThisTableColumn, null, newChunkVal);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
-            var (newrow, message, _) = db.Row.GenerateAndAdd(filterColNewRow.ToArray(), "Neue Zeile über Tabellen-Ansicht");
+            var (newrow, message, _) = db.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
 
             if (!string.IsNullOrEmpty(message)) { return message; }
 
@@ -2885,7 +2885,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
         colList.Sort();
-        colDia.CustomColors = colList.Distinct().ToArray();
+        colDia.CustomColors = [.. colList.Distinct()];
         _ = colDia.ShowDialog();
         colDia.Dispose();
 
@@ -3324,7 +3324,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 plus = p16;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
             } else {
-                txt = FilterCollection.InitValue(cellInThisTableColumn, false, false, FilterCombined.ToArray()) ?? string.Empty;
+                txt = FilterCollection.InitValue(cellInThisTableColumn, false, false, [.. FilterCombined]) ?? string.Empty;
                 qi = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
             }
 

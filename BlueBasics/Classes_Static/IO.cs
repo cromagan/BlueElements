@@ -91,7 +91,7 @@ public static class IO {
     public static bool CanWriteInDirectory(string directory) {
         if (string.IsNullOrEmpty(directory)) { return false; }
 
-        directory = directory.CheckPath();
+        directory = directory.NormalizePath();
 
         if (!directory.IsFormat(FormatHolder.Filepath)) { return false; }
 
@@ -121,48 +121,12 @@ public static class IO {
         }
     }
 
-    public static string CheckFile(this string pfad) => pfad.FilePath().CheckPath() + pfad.FileNameWithSuffix();
-
-    /// <summary>
-    /// Standard Pfad-Korrekturen. z.B. Doppelte Slashes, Backslashes. Gibt den Pfad mit abschließenden \ zurück.
-    /// </summary>
-    /// <param name="pfad"></param>
-    /// <returns></returns>
-    public static string CheckPath(this string pfad) {
-        if (string.IsNullOrEmpty(pfad)) { return string.Empty; } // Kann vorkommen, wenn ein Benutzer einen Pfad per Hand eingeben darf
-        if (pfad.Length > 6 && string.Equals(pfad.Substring(0, 7), "http://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
-        if (pfad.Length > 7 && string.Equals(pfad.Substring(0, 8), "https://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
-
-        if (pfad.Contains("/")) { pfad = pfad.Replace("/", "\\"); }
-
-        if (pfad.Contains("%")) {
-            var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
-            pfad = pfad.Replace("%homepath%\\", homep, RegexOptions.IgnoreCase);
-            pfad = pfad.Replace("%homepath%", homep, RegexOptions.IgnoreCase);
-        }
-
-        if (pfad.Length == 0 || pfad.Substring(pfad.Length - 1) != "\\") { pfad += "\\"; }
-        if (pfad.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
-        if (pfad.Length > 1 && pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
-
-        if (pfad.Length > 1 && pfad.IndexOf(":", 2, StringComparison.Ordinal) > 0) {
-            pfad = pfad.Substring(0, 3) + pfad.Substring(3).RemoveChars(":");
-        }
-
-        try {
-            return Path.GetFullPath(pfad);
-        } catch { }
-
-        Develop.CheckStackOverflow();
-        return CheckPath(pfad);
-    }
-
     /// <summary>
     /// Erstellt ein Verzeichnis, mit Fehlerbehandlung und Wiederholungsversuchen
     /// </summary>
     /// <param name="directory">Das zu erstellende Verzeichnis</param>
     /// <returns>True, wenn das Verzeichnis (dann) existiert</returns>
-    public static bool CreateDirectory(string directory) { return ProcessFile(TryCreateDirectory, [directory], false, 5) is true; }
+    public static bool CreateDirectory(string directory) => ProcessFile(TryCreateDirectory, [directory], false, 5) is true;
 
     public static bool DeleteDir(string directory, bool abortIfFailed) => ProcessFile(TryDeleteDir, [directory], abortIfFailed, abortIfFailed ? 60 : 5) is true;
 
@@ -224,7 +188,7 @@ public static class IO {
     /// </summary>
     /// <param name="file">Die zu prüfende Datei</param>
     /// <returns>True, wenn die Datei existiert</returns>
-    public static bool FileExists(string? file) { return ProcessFile(TryFileExists, [file ?? string.Empty], false, 5) is true; }
+    public static bool FileExists(string? file) => ProcessFile(TryFileExists, [file ?? string.Empty], false, 5) is true;
 
     /// <summary>
     /// Gibt den Dateinamen ohne Suffix zurück.
@@ -275,33 +239,33 @@ public static class IO {
     }
 
     public static FileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
-                        ? FileFormat.Unknown
-                        : filename.FileSuffix().ToUpperInvariant() switch {
-                            "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
-                            "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
-                            "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
-                            "CSV" => FileFormat.CSV,
-                            "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
-                            "MSG" or "EML" => FileFormat.EMail,
-                            "PDF" => FileFormat.Pdf,
-                            "HTM" or "HTML" => FileFormat.HTML,
-                            "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
-                            "ICO" => FileFormat.Icon,
-                            "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
-                            "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
-                            "EXE" or "BAT" or "SCR" => FileFormat.Executable,
-                            "CHM" => FileFormat.HelpFile,
-                            "XML" => FileFormat.XMLFile,
-                            "VCF" => FileFormat.Visitenkarte,
-                            "MP3" or "WAV" or "AAC" => FileFormat.Sound,
-                            "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-                            "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Table,
-                            "BDBC" => FileFormat.TableChunk,
-                            "LNK" or "URL" => FileFormat.Link,
-                            "BCR" => FileFormat.BlueCreativeFile,
-                            "BCS" => FileFormat.BlueCreativeSymbol,
-                            _ => FileFormat.Unknown
-                        };
+                            ? FileFormat.Unknown
+                            : filename.FileSuffix().ToUpperInvariant() switch {
+                                "DOC" or "DOCX" or "RTF" or "ODT" => FileFormat.WordKind,
+                                "TXT" or "INI" or "INFO" => FileFormat.Textdocument,
+                                "XLS" or "XLA" or "XLSX" or "XLSM" or "ODS" => FileFormat.ExcelKind,
+                                "CSV" => FileFormat.CSV,
+                                "PPT" or "PPS" or "PPA" => FileFormat.PowerPointKind,
+                                "MSG" or "EML" => FileFormat.EMail,
+                                "PDF" => FileFormat.Pdf,
+                                "HTM" or "HTML" => FileFormat.HTML,
+                                "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => FileFormat.Image,
+                                "ICO" => FileFormat.Icon,
+                                "ZIP" or "RAR" or "7Z" => FileFormat.CompressedArchive,
+                                "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => FileFormat.Movie,
+                                "EXE" or "BAT" or "SCR" => FileFormat.Executable,
+                                "CHM" => FileFormat.HelpFile,
+                                "XML" => FileFormat.XMLFile,
+                                "VCF" => FileFormat.Visitenkarte,
+                                "MP3" or "WAV" or "AAC" => FileFormat.Sound,
+                                "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
+                                "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Table,
+                                "BDBC" => FileFormat.TableChunk,
+                                "LNK" or "URL" => FileFormat.Link,
+                                "BCR" => FileFormat.BlueCreativeFile,
+                                "BCS" => FileFormat.BlueCreativeSymbol,
+                                _ => FileFormat.Unknown
+                            };
 
     /// <summary>
     /// Gibt von einem Pfad den letzten Ordner zurück
@@ -330,10 +294,10 @@ public static class IO {
     public static FileInfo? GetFileInfo(string filename) => ProcessFile(TryGetFileInfo, [filename], false, 5) as FileInfo;
 
     public static string[] GetFiles(string directory, string pattern, SearchOption suchOption)
-                        => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption) as string[] ?? Array.Empty<string>();
+                            => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption) as string[] ?? Array.Empty<string>();
 
     public static string[] GetFiles(string directory)
-                     => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
+                         => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
 
     /// <summary>
     /// Liefert Dateiinformationen mit Fehlerbehandlung und Wiederholungsversuchen
@@ -366,6 +330,42 @@ public static class IO {
     /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <returns>True bei Erfolg</returns>
     public static bool MoveFile(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveFile, [oldName, newName], abortIfFailed, abortIfFailed ? 60 : 5) is true;
+
+    public static string NormalizeFile(this string pfad) => pfad.FilePath().NormalizePath() + pfad.FileNameWithSuffix();
+
+    /// <summary>
+    /// Standard Pfad-Korrekturen. z.B. Doppelte Slashes, Backslashes. Gibt den Pfad mit abschließenden \ zurück.
+    /// </summary>
+    /// <param name="pfad"></param>
+    /// <returns></returns>
+    public static string NormalizePath(this string pfad) {
+        if (string.IsNullOrEmpty(pfad)) { return string.Empty; } // Kann vorkommen, wenn ein Benutzer einen Pfad per Hand eingeben darf
+        if (pfad.Length > 6 && string.Equals(pfad.Substring(0, 7), "http://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
+        if (pfad.Length > 7 && string.Equals(pfad.Substring(0, 8), "https://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
+
+        if (pfad.Contains("/")) { pfad = pfad.Replace("/", "\\"); }
+
+        if (pfad.Contains("%")) {
+            var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
+            pfad = pfad.Replace("%homepath%\\", homep, RegexOptions.IgnoreCase);
+            pfad = pfad.Replace("%homepath%", homep, RegexOptions.IgnoreCase);
+        }
+
+        if (pfad.Length == 0 || !pfad.EndsWith("\\")) { pfad += "\\"; }
+        if (pfad.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
+        if (pfad.Length > 1 && pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
+
+        if (pfad.Length > 1 && pfad.IndexOf(":", 2, StringComparison.Ordinal) > 0) {
+            pfad = pfad.Substring(0, 3) + pfad.Substring(3).RemoveChars(":");
+        }
+
+        try {
+            return Path.GetFullPath(pfad);
+        } catch { }
+
+        Develop.CheckStackOverflow();
+        return NormalizePath(pfad);
+    }
 
     /// <summary>
     /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
@@ -477,7 +477,7 @@ public static class IO {
         if (string.IsNullOrEmpty(suffix)) { suffix = "tmp"; }
         if (string.IsNullOrEmpty(preferedfilename)) { preferedfilename = UserName + DateTime.UtcNow.ToString6(); }
         var z = -1;
-        directory = directory.CheckPath();
+        directory = directory.NormalizePath();
         TryCreateDirectory([directory]);
         preferedfilename = preferedfilename.ReduceToChars(Constants.Char_Numerals + " _+-#" + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant());
 
@@ -538,7 +538,7 @@ public static class IO {
     public static bool WriteAllText(string filename, string contents, Encoding encoding, bool executeAfter) {
         try {
             if (Develop.AllReadOnly) { return true; }
-            filename = filename.CheckFile();
+            filename = filename.NormalizeFile();
 
             var pfad = filename.FilePath();
             if (!CreateDirectory(pfad)) { return false; }
@@ -623,7 +623,7 @@ public static class IO {
     private static FileOperationResult TryCanWrite(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
 
-        filename = filename.CheckFile();
+        filename = filename.NormalizeFile();
 
         lock (_fileOperationLock) {
             if (!CanWriteInDirectory(filename.FilePath())) { return FileOperationResult.ValueFalse; }
@@ -666,7 +666,7 @@ public static class IO {
 
     private static FileOperationResult TryCreateDirectory(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
-        directory = directory.CheckPath();
+        directory = directory.NormalizePath();
 
         if (string.IsNullOrEmpty(directory) || !directory.IsFormat(FormatHolder.Filepath)) { return FileOperationResult.ValueFalse; }
 
@@ -685,7 +685,7 @@ public static class IO {
     private static FileOperationResult TryDeleteDir(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
 
-        directory = directory.CheckPath();
+        directory = directory.NormalizePath();
         if (TryDirectoryExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
 
         try {
@@ -709,7 +709,7 @@ public static class IO {
 
         if (TryFileExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
 
-        filename = filename.CheckFile();
+        filename = filename.NormalizeFile();
 
         // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
         try {
@@ -744,7 +744,7 @@ public static class IO {
 
         if (directory.Length < 3) { return FileOperationResult.ValueFalse; }
 
-        var p = directory.CheckPath();
+        var p = directory.NormalizePath();
 
         if (!p.IsFormat(FormatHolder.Filepath)) { return FileOperationResult.ValueFalse; }
 
@@ -762,8 +762,8 @@ public static class IO {
     private static FileOperationResult TryFileCopy(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 2 || affectingFiles[0] is not string source || affectingFiles[1] is not string target) { return FileOperationResult.ValueFalse; }
 
-        source = source.CheckFile();
-        target = target.CheckFile();
+        source = source.NormalizeFile();
+        target = target.NormalizeFile();
 
         if (source == target) { return FileOperationResult.ValueTrue; }
         if (TryFileExists([source]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
@@ -909,8 +909,8 @@ public static class IO {
     private static FileOperationResult TryMoveDirectory(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count < 2 || affectingFiles[0] is not string oldName || affectingFiles[1] is not string newName) { return FileOperationResult.ValueFalse; }
 
-        oldName = oldName.CheckPath();
-        newName = newName.CheckPath();
+        oldName = oldName.NormalizePath();
+        newName = newName.NormalizePath();
 
         if (oldName == newName) { return FileOperationResult.ValueTrue; }
         if (TryDirectoryExists([oldName]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
@@ -938,8 +938,8 @@ public static class IO {
     private static FileOperationResult TryMoveFile(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count < 2 || affectingFiles[0] is not string oldName || affectingFiles[1] is not string newName) { return FileOperationResult.ValueFalse; }
 
-        oldName = oldName.CheckFile();
-        newName = newName.CheckFile();
+        oldName = oldName.NormalizeFile();
+        newName = newName.NormalizeFile();
 
         if (oldName == newName) { return FileOperationResult.ValueTrue; }
         if (TryFileExists([oldName]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
@@ -1007,7 +1007,7 @@ public static class IO {
         try {
             if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
 
-            filename = filename.CheckFile();
+            filename = filename.NormalizeFile();
 
             var directory = filename.FilePath();
             if (TryCreateDirectory([directory]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }

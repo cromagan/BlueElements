@@ -150,7 +150,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public string ChunkVal {
         get {
             if (Table?.Column.ChunkValueColumn is not { IsDisposed: false } cvc) { return string.Empty; }
-            return InitValue(cvc, true, false, this.ToArray()) ?? string.Empty;
+            return InitValue(cvc, true, false, [.. this]) ?? string.Empty;
         }
     }
 
@@ -181,7 +181,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public ReadOnlyCollection<RowItem> Rows {
         get {
             if (IsDisposed || Table is not { IsDisposed: false }) { return new List<RowItem>().AsReadOnly(); }
-            _rows ??= CalculateFilteredRows(_table, _internal.ToArray());
+            _rows ??= CalculateFilteredRows(_table, [.. _internal]);
             return _rows.AsReadOnly();
         }
     }
@@ -189,7 +189,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public RowItem? RowSingleOrNull {
         get {
             if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-            _rows ??= CalculateFilteredRows(_table, _internal.ToArray());
+            _rows ??= CalculateFilteredRows(_table, [.. _internal]);
             return _rows.Count != 1 ? null : _rows[0];
         }
     }
@@ -840,7 +840,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (_rows == null) { return; }
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 
-        if (e.Row.MatchesTo(_internal.ToArray()) != _rows.Contains(e.Row)) {
+        if (e.Row.MatchesTo([.. _internal]) != _rows.Contains(e.Row)) {
             Invalidate_FilteredRows();
         }
 
@@ -957,7 +957,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void Row_Added(object sender, RowEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (_rows == null) { return; }
-        if (e.Row.MatchesTo(_internal.ToArray())) { Invalidate_FilteredRows(); }
+        if (e.Row.MatchesTo([.. _internal])) { Invalidate_FilteredRows(); }
     }
 
     private void Row_RowRemoved(object sender, RowEventArgs e) {

@@ -162,7 +162,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
-        _files = LoadTab.FileNames.ToList();
+        _files = [.. LoadTab.FileNames];
         CheckButtons();
     }
 

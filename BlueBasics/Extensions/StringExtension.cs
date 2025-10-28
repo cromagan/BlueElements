@@ -420,7 +420,7 @@ public static partial class Extensions {
             }
         }
 
-        return new string(result.ToArray());
+        return new string([.. result]);
     }
 
     public static bool FromPlusMinus(this string value) {
@@ -1122,7 +1122,7 @@ public static partial class Extensions {
             }
         }
 
-        return new string(result.ToArray());
+        return new string([.. result]);
     }
 
     public static string ToTitleCase(this string text) {

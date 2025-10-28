@@ -54,7 +54,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public Renderer_ImageAndText(string imageReplacement) : base(true) {
         _bild_anzeigen = true;
         _text_anzeigen = false;
-        _imagereplacement = imageReplacement.SplitAndCutByCr().ToList();
+        _imagereplacement = [.. imageReplacement.SplitAndCutByCr()];
     }
 
     #endregion
@@ -80,7 +80,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             var old = Bild_ersetzen;
             if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _imagereplacement = value.SplitByCr().ToList();
+            _imagereplacement = [.. value.SplitByCr()];
             OnPropertyChanged();
 
             if (string.IsNullOrEmpty(old) != string.IsNullOrEmpty(value)) {
@@ -158,7 +158,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             var old = Text_ersetzen;
             if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
 
-            _opticalReplace = value.SplitByCr().ToList();
+            _opticalReplace = [.. value.SplitByCr()];
 
             OnPropertyChanged();
 

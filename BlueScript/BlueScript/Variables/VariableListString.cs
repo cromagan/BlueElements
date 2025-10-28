@@ -110,7 +110,7 @@ public class VariableListString : Variable {
         if (x is List<string> val) {
             _list = val;
         } else if (x is string[] val2) {
-            _list = val2.ToList();
+            _list = [.. val2];
         } else {
             Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
         }

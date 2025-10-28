@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueTable.Enums;
+using FileSystemCaching;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -338,7 +339,9 @@ public class TableFragments : TableFile {
 
             #region Alle Fragment-Dateien im Verzeichnis ermitteln und eigene Ausfiltern (frgma)
 
-            var frgma = GetFiles(FragmengtsPath(), KeyName.ToUpper() + "-*." + SuffixOfFragments(), System.IO.SearchOption.TopDirectoryOnly).ToList();
+            var filesystem = CachedFileSystem.Get(FragmengtsPath());
+
+            var frgma = filesystem.GetFiles([KeyName.ToUpper() + "-*." + SuffixOfFragments()]); // GetFiles(FragmengtsPath(), KeyName.ToUpper() + "-*." + SuffixOfFragments(), System.IO.SearchOption.TopDirectoryOnly).ToList();
             _ = frgma.Remove(_myFragmentsFilename);
 
             #endregion
@@ -348,8 +351,7 @@ public class TableFragments : TableFile {
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {
-                var fil = ReadAllText(thisf, System.IO.FileShare.ReadWrite, Encoding.UTF8);
-
+                var fil = filesystem.ReadAllText(thisf, Encoding.UTF8);
                 var fils = fil.SplitAndCutByCrToList();
 
                 foreach (var thist in fils) {

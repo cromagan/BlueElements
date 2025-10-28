@@ -261,7 +261,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (column?.Table is not { IsDisposed: false } tb) { return []; }
 
         if (column.TextFormatingAllowed) {
-            return tb.Cell.GetString(column, this).SplitAndCutBy("<br>").ToList();
+            return [.. tb.Cell.GetString(column, this).SplitAndCutBy("<br>")];
         }
 
         return tb.Cell.GetString(column, this).SplitAndCutByCrToList();

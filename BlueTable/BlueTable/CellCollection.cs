@@ -149,7 +149,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
         if (linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
-            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, false, fi.ToArray())))
+            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, false, [.. fi])))
                 return (null, "Filter des Chunk-Wertes fehlt.");
         }
 
@@ -375,7 +375,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             default: {
                     if (addRowIfNotExists) {
-                        var (newrow, message, _) = linkedTable.Row.GenerateAndAdd(fc.ToArray(), "LinkedCell aus " + db.KeyName);
+                        var (newrow, message, _) = linkedTable.Row.GenerateAndAdd([.. fc], "LinkedCell aus " + db.KeyName);
                         if (!string.IsNullOrEmpty(message)) { return (targetColumn, null, message, false); }
                         targetRow = newrow;
                     }

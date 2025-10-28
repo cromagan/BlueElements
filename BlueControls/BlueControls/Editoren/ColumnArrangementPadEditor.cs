@@ -171,7 +171,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         List<AbstractListItem> aa = [];
         aa.AddRange(ItemsOf(TableView.Permission_AllUsed(false)));
-        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, ca.PermissionGroups_Show.ToList(), AddType.Text);
+        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, [.. ca.PermissionGroups_Show], AddType.Text);
         if (b == null) { return; }
 
         if (IsDefaultView()) { b.Add(Constants.Everybody); }

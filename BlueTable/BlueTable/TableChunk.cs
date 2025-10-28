@@ -283,11 +283,10 @@ public class TableChunk : TableFile {
         var files = GetFiles(chunkPath, "*.bdbc", System.IO.SearchOption.TopDirectoryOnly);
         var fileQuery = anzahl < 0 || anzahl >= files.Length
             ? files
-            : files.Select(GetFileInfo)
+            : [.. files.Select(GetFileInfo)
                   .OrderBy(f => f?.LastWriteTime ?? DateTime.Now)
                   .Take(anzahl)
-                  .Select(f => f?.FullName ?? string.Empty)
-                  .ToArray();
+                  .Select(f => f?.FullName ?? string.Empty)];
 
         foreach (var file in fileQuery) {
             var chunkId = file.FileNameWithoutSuffix();
@@ -470,7 +469,7 @@ public class TableChunk : TableFile {
         _ = SaveInternal(DateTime.UtcNow);
     }
 
-    public List<RowItem> RowsOfChunk(Chunk chunk) => Row.Where(r => GetChunkId(r) == chunk.KeyName).ToList();
+    public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => GetChunkId(r) == chunk.KeyName)];
 
     public override void TryToSetMeTemporaryMaster() {
         if (GrantWriteAccess(TableDataType.TemporaryTableMasterUser, string.Empty).Failed) { return; }
@@ -664,7 +663,7 @@ public class TableChunk : TableFile {
         }
 
         // Zuerst parsen, bevor der Chunk in die Dictionary kommt
-        var parseSuccessful = Parse(chunk.Bytes.ToArray(), chunk.IsMain);
+        var parseSuccessful = Parse([.. chunk.Bytes], chunk.IsMain);
 
         if (!parseSuccessful) {
             chunk.LoadFailed = true;

@@ -1111,7 +1111,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (_additionalFilesPathTemp != null) { return _additionalFilesPathTemp; }
 
         if (!string.IsNullOrEmpty(_additionalFilesPath)) {
-            var t = _additionalFilesPath.CheckPath();
+            var t = _additionalFilesPath.NormalizePath();
             if (DirectoryExists(t)) {
                 _additionalFilesPathTemp = t;
                 return t;
@@ -1119,7 +1119,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (this is TableFile tbf && !string.IsNullOrEmpty(tbf.Filename)) {
-            var t = (tbf.Filename.FilePath() + "AdditionalFiles\\").CheckPath();
+            var t = (tbf.Filename.FilePath() + "AdditionalFiles\\").NormalizePath();
             if (DirectoryExists(t)) {
                 _additionalFilesPathTemp = t;
                 return t;
@@ -1289,7 +1289,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        _ = vars.Add(new VariableString("AdditionalFilesPath", (AdditionalFilesPathWhole().Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+        _ = vars.Add(new VariableString("AdditionalFilesPath", (AdditionalFilesPathWhole().Trim("\\") + "\\").NormalizePath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
 
         //_ = vars.Add(new VariableBool("Successful", true, true, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
         //_ = vars.Add(new VariableString("NotSuccessfulReason", string.Empty, true, "Die letzte Meldung, warum es nicht erfolgreich war."));

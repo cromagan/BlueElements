@@ -94,7 +94,7 @@ internal class Method_AutoCorrect : Method_TableGeneric {
                     break;
 
                 case VariableListString vl:
-                    vl.ValueList = s.SplitByCrToList().ToList();
+                    vl.ValueList = [.. s.SplitByCrToList()];
                     break;
 
                 case VariableBool vb:

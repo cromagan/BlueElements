@@ -413,7 +413,7 @@ public static class Generic {
 
             // Überprüfen Sie, ob ein Konstruktor existiert, der den Typen der bereitgestellten Argumente entspricht
             var constructorInfo = type.GetConstructor(
-                constructorArgs.Select(arg => arg?.GetType()).ToArray()
+                [.. constructorArgs.Select(arg => arg?.GetType())]
             );
 
             return constructorInfo != null;

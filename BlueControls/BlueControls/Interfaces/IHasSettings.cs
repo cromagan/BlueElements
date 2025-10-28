@@ -69,7 +69,7 @@ public static class HasSettings {
         if (Develop.AllReadOnly) { return; }
         if (!settings.UsesSettings) { return; }
 
-        var pf = settings.SettingsFileName().FilePath().CheckPath();
+        var pf = settings.SettingsFileName().FilePath().NormalizePath();
 
         if (string.IsNullOrEmpty(pf)) { return; }
 
@@ -122,8 +122,8 @@ public static class HasSettings {
         if (!settings.UsesSettings) { return string.Empty; }
 
         return !string.IsNullOrEmpty(settings.SettingsManualFilename) ?
-            settings.SettingsManualFilename.CheckFile() :
-            ("%homepath%\\" + Develop.AppName() + "\\" + settings.Name + ".ini").CheckFile();
+            settings.SettingsManualFilename.NormalizeFile() :
+            ("%homepath%\\" + Develop.AppName() + "\\" + settings.Name + ".ini").NormalizeFile();
     }
 
     #endregion

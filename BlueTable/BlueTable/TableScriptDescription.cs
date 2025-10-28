@@ -38,7 +38,7 @@ public static class TableScriptDescriptionExtension {
 
     public static List<TableScriptDescription> Get(this ReadOnlyCollection<TableScriptDescription> scripts, ScriptEventTypes type) {
         try {
-            return scripts.Where(script => script.EventTypes.HasFlag(type)).ToList();
+            return [.. scripts.Where(script => script.EventTypes.HasFlag(type))];
         } catch {
             Develop.CheckStackOverflow();
             return scripts.Get(type);

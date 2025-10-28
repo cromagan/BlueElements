@@ -164,7 +164,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (source is AbstractPadItem ali) { GeneratedFrom = ali; }
 
         if (this is IHasSettings ihs) {
-            ihs.SettingsManualFilename = ("%homepath%\\" + Develop.AppName() + "\\" + source.KeyName + ".ini").CheckFile();
+            ihs.SettingsManualFilename = ("%homepath%\\" + Develop.AppName() + "\\" + source.KeyName + ".ini").NormalizeFile();
         }
 
         if (parentFormula == null) { return; }

@@ -86,7 +86,7 @@ public class TableFile : Table {
             }
         }
 
-        return GetFiles(path, "*." + fx, System.IO.SearchOption.TopDirectoryOnly).ToList();
+        return [.. GetFiles(path, "*." + fx, System.IO.SearchOption.TopDirectoryOnly)];
     }
 
     public override bool AmITemporaryMaster(int ranges, int rangee) => base.AmITemporaryMaster(ranges, rangee);

@@ -279,7 +279,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             }
         }
 
-        points = points.Distinct().ToList();
+        points = [.. points.Distinct()];
 
         if (points.Count < 1) { return new RectangleF(0, 0, 10, 10); }
 

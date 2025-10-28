@@ -270,7 +270,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public AbstractPadItem? this[int nr] => _internal[nr];
 
-    public List<AbstractPadItem> this[Point p] => _internal.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
+    public List<AbstractPadItem> this[Point p] => [.. _internal.Where(thisItem => thisItem != null && thisItem.Contains(p, 1))];
 
     #endregion
 

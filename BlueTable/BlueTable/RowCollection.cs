@@ -179,7 +179,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             List<Table> l = [.. Table.AllFiles];
             if (l.Count == 0) { return; }
             try {
-                l = l.OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
+                l = [.. l.OrderByDescending(eintrag => eintrag.LastUsedDate)];
             } catch { return; }
 
             var tim = Stopwatch.StartNew();
@@ -241,7 +241,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
             }
         }
-        unique = unique.Except(notUnique).ToList();
+        unique = [.. unique.Except(notUnique)];
     }
 
     /// <summary>
@@ -258,7 +258,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 l.Shuffle();
             } else {
                 try {
-                    l = l.OrderByDescending(eintrag => eintrag?.LastUsedDate ?? DateTime.MinValue).ToList();
+                    l = [.. l.OrderByDescending(eintrag => eintrag?.LastUsedDate ?? DateTime.MinValue)];
                 } catch {
                     return null;
                 }
@@ -297,7 +297,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         Table? db = null;
 
-        allrows = allrows.Distinct().ToList();
+        allrows = [.. allrows.Distinct()];
 
         foreach (var thisr in allrows) {
             db ??= thisr.Table;
@@ -334,7 +334,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        return r.OrderBy(eintrag => eintrag.UrgencyUpdate).ToList();
+        return [.. r.OrderBy(eintrag => eintrag.UrgencyUpdate)];
     }
 
     public static string UniqueKeyValue() {
@@ -388,7 +388,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? myRow;
 
         if (r.Count == 0) {
-            var (newrow, message, stoptrying) = db.Row.GenerateAndAdd(filter.ToArray(), coment);
+            var (newrow, message, stoptrying) = db.Row.GenerateAndAdd([.. filter], coment);
             if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message, stoptrying); }
             myRow = newrow;
         } else {
@@ -396,7 +396,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         // REPARIERT: Finale Validierung dass die Zeile auch wirklich den Filtern entspricht
-        if (!myRow.MatchesTo(filter.ToArray())) {
+        if (!myRow.MatchesTo([.. filter])) {
             return (myRow, "RowUnique mit falschen Werten initialisiert", true);
         }
 

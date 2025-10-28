@@ -2001,7 +2001,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         double summ = 0;
         foreach (var thisrow in db.Row) {
-            if (thisrow != null && thisrow.MatchesTo(fc.ToArray())) {
+            if (thisrow != null && thisrow.MatchesTo([.. fc])) {
                 if (!thisrow.CellIsNullOrEmpty(this)) {
                     if (!thisrow.CellGetString(this).IsDouble()) { return null; }
                     summ += thisrow.CellGetDouble(this);
