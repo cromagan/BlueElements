@@ -272,11 +272,11 @@ public class TableFragments : TableFile {
         if (files is not { Count: >= 1 }) { return; }
         if (!FirstTimAlleFragmentsLoaded) { return; }
 
-        _masterNeeded = files.Count > 30 || _changesNotIncluded.Count > 100 || DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > DoComplete;
+        _masterNeeded = DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > DoComplete;
 
         #region Bei Bedarf neue Komplett-Tabelle erstellen
 
-        if (_masterNeeded && DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > 15 && AmITemporaryMaster(MasterTry, MasterUntil)) {
+        if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil)) {
             DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
 
             var t = LastSaveMainFileUtcDate;
@@ -434,15 +434,14 @@ public class TableFragments : TableFile {
                 }
                 _isInCache = endTimeUtc;
                 FirstTimAlleFragmentsLoaded = true;
+            } finally {
+                Interlocked.Decrement(ref _doingChanges);
                 Column.GetSystems();
                 DoWorkAfterLastChanges(myfiles, startTimeUtc);
                 RepairAfterParse();
                 TryToSetMeTemporaryMaster();
-            } finally {
-                Interlocked.Decrement(ref _doingChanges);
+                OnInvalidateView();
             }
-
-            OnInvalidateView();
         } catch {
             Develop.CheckStackOverflow();
             InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc);

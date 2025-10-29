@@ -302,6 +302,8 @@ namespace BlueBasics.FileSystemCaching {
         }
 
         private void InitializeWatcher() {
+            if (_isDisposed) { return; }
+
             try {
                 _watcherLock.EnterWriteLock();
                 _watcher?.Dispose();
@@ -387,6 +389,8 @@ namespace BlueBasics.FileSystemCaching {
         });
 
         private void OnWatcherError(object sender, ErrorEventArgs e) {
+            if(_isDisposed) { return; }
+
             // Vollständiger Cache-Rescan
             Task.Run(async () => {
                 await Task.Delay(1000).ConfigureAwait(false);
