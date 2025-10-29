@@ -713,7 +713,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        var aadc = Table?.AreAllDataCorrect() ?? "Keine Tabelle angekommen";
+        var aadc = Table?.IsEditableGeneric() ?? "Keine Tabelle angekommen";
         if (!string.IsNullOrEmpty(aadc) || Table is not { IsDisposed: false } || column == null) { return; }
 
         var columnVar = vars.GetByKey(column.KeyName);
@@ -845,16 +845,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     internal void Repair() {
-        if (Table is not { IsDisposed: false } db) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
 
-        if (db.Column.SysCorrect is { IsDisposed: false } sc) {
-            if (string.IsNullOrEmpty(db.Cell.GetStringCore(sc, this))) {
+        if (tb.Column.SysCorrect is { IsDisposed: false } sc) {
+            if (string.IsNullOrEmpty(tb.Cell.GetStringCore(sc, this))) {
                 _ = SetValueInternal(sc, true.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }
 
-        if (db.Column.SysLocked is { IsDisposed: false } sl) {
-            if (string.IsNullOrEmpty(db.Cell.GetStringCore(sl, this))) {
+        if (tb.Column.SysLocked is { IsDisposed: false } sl) {
+            if (string.IsNullOrEmpty(tb.Cell.GetStringCore(sl, this))) {
                 _ = SetValueInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }

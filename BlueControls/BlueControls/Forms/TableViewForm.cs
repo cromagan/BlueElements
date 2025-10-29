@@ -114,19 +114,15 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     public static bool EditabelErrorMessage(Table? table) {
         if (table == null) { return false; }
 
-        var m = table.AreAllDataCorrect();
+        var m = table.IsEditableGeneric();
         if (string.IsNullOrEmpty(m)) { return false; }
 
-        MessageBox.Show("Aktion nicht möglich:<br>" + m);
+        MessageBox.Show($"<b><u>Aktion nicht möglich:</u></b><br><br><u>Grund:</u><br>{m}", ImageCode.Information, "OK");
         return true;
     }
 
-    public static void OpenLayoutEditor(Table db, string layoutToOpen) {
-        var x = db.AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(x)) {
-            MessageBox.Show(x);
-            return;
-        }
+    public static void OpenLayoutEditor(Table tb, string layoutToOpen) {
+        if (EditabelErrorMessage(tb)) { return; }
 
         var w = new PadEditorWithFileAccess();
 
@@ -137,10 +133,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         _ = w.ShowDialog();
     }
 
-    public static void OpenScriptEditor(Table? db) {
-        if (db is not { IsDisposed: false }) { return; }
+    public static void OpenScriptEditor(Table? tb) {
+        if (EditabelErrorMessage(tb)) { return; }
 
-        _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
+        _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
     }
 
     [StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", 800)]
@@ -347,7 +343,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         #endregion
 
-        if (BlueTable.Table.Get(tablename, TableView.Table_NeedPassword) is { IsDisposed: false } tb) {
+        if (BlueTable.Table.Get(tablename, TableView.Table_NeedPassword, false) is { IsDisposed: false } tb) {
             if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
                 if (!string.IsNullOrEmpty(tbf.Filename)) {
                     btnLetzteDateien.AddFileName(tbf.Filename, tb.KeyName);
@@ -376,7 +372,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         BlueTable.Table.SaveAll(false);
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            _ = BlueTable.Table.Get(tablename, TableView.Table_NeedPassword);
+            _ = BlueTable.Table.Get(tablename, TableView.Table_NeedPassword, false);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -646,7 +642,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
         BlueTable.Table.SaveAll(true);
-        BlueTable.Table.BeSureToBeUpToDate(BlueTable.Table.AllFiles);
+        BlueTable.Table.BeSureToBeUpToDate(BlueTable.Table.AllFiles, false);
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
@@ -668,7 +664,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInDBScripts();
 
-    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table.Table, typeof(TableHeadEditor), false);
+    private void btnTabelleKopf_Click(object sender, System.EventArgs e) {
+        if (EditabelErrorMessage(Table.Table)) { return; }
+        InputBoxEditor.Show(Table.Table, typeof(TableHeadEditor), false);
+    }
 
     private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
         BlueTable.Table.SaveAll(false);
@@ -720,12 +719,12 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        if (Table.Table is not { IsDisposed: false } db || !db.IsAdministrator()) {
+        if (Table.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
             tabAdmin.Enabled = false;
             return; // Weitere funktionen benötigen sicher eine Tabelle um keine Null Exception auszulösen
         }
 
-        var m = db.AreAllDataCorrect();
+        var m = tb.IsEditableGeneric();
 
         grpAdminAllgemein.Enabled = string.IsNullOrEmpty(m);
         grpImport.Enabled = string.IsNullOrEmpty(m);

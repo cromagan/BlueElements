@@ -60,7 +60,7 @@ internal class Method_OpenTab : Method {
             return new DoItFeedback("Datei nicht vorhanden: " + pf, true, ld);
         }
 
-        var tb = Table.Get(pf, null);
+        var tb = Table.Get(pf, null, false);
 
         if (tb is not Table { IsDisposed: false }) {
             return new DoItFeedback("Datei konnte nicht geladen werden: " + pf, true, ld);

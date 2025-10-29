@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -364,7 +365,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
                 FilterOutput.ChangeTo(nfc);
 
-                btnScript.Visible = r.Table is { IsDisposed: false } db && db.IsAdministrator() && !string.IsNullOrEmpty(db.CheckScriptError());
+                btnScript.Visible = r.Table is { IsDisposed: false } db && db.IsAdministrator() && string.IsNullOrEmpty(r.Table.IsEditableGeneric()) && !string.IsNullOrEmpty(db.CheckScriptError());
 
                 if (btnScript.Visible) { btnScript.BringToFront(); }
             } else {
@@ -403,9 +404,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
     //    SuspendLayout();
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {
-            if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } db) { return; }
+            if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } tb) { return; }
 
-            _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
+            if (TableViewForm.EditabelErrorMessage(tb)) { return; }
+
+            _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
         } else {
             MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }

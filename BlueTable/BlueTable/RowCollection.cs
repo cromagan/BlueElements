@@ -466,9 +466,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        if (!tb.InitialLoadDone) { return "Tabelle noch nicht geladen."; }
+        if (!tb.MainChunkLoadDone) { return "Tabelle noch nicht geladen."; }
 
-        var aadc = tb.AreAllDataCorrect();
+        var aadc = tb.IsEditableGeneric();
         if (!string.IsNullOrEmpty(aadc)) { return aadc; }
 
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
@@ -518,26 +518,26 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="comment"></param>
     /// <returns></returns>
     public (RowItem? newrow, string message, bool stoptrying) GenerateAndAdd(FilterItem[] filter, string comment) {
-        Table? db2 = null;
+        Table? tb2 = null;
 
         foreach (var thisfi in filter) {
-            if (thisfi.Table is not { IsDisposed: false } db1) { return (null, "Tabelle eines Filters nicht angegeben", true); }
-            db2 ??= db1;
+            if (thisfi.Table is not { IsDisposed: false } tb1) { return (null, "Tabelle eines Filters nicht angegeben", true); }
+            tb2 ??= tb1;
 
-            if (thisfi.Column?.Table is { } db3 && db3 != db2) { return (null, "Tabellen der Spalten im Filter unterschiedlich", true); }
+            if (thisfi.Column?.Table is { } tb3 && tb3 != tb2) { return (null, "Tabellen der Spalten im Filter unterschiedlich", true); }
         }
 
-        if (db2 is not { IsDisposed: false }) { return (null, "Tabellen verworfen", true); }
+        if (tb2 is not { IsDisposed: false }) { return (null, "Tabellen verworfen", true); }
 
         //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
-        var aadc = db2.AreAllDataCorrect();
+        var aadc = tb2.IsEditableGeneric();
         if (!string.IsNullOrEmpty(aadc)) { return (null, "In der Tabelle sind keine neuen Zeilen möglich: " + aadc, true); }
 
-        var s = db2.NextRowKey();
+        var s = tb2.NextRowKey();
         if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
 
-        foreach (var thisColum in db2.Column) {
+        foreach (var thisColum in tb2.Column) {
             if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
                 var inval = FilterCollection.InitValue(thisColum, true, false, filter);
                 if (inval is not { } || string.IsNullOrWhiteSpace(inval)) {
@@ -545,7 +545,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {
-                    if (!db2.BeSureRowIsLoaded(inval)) {
+                    if (!tb2.BeSureRowIsLoaded(inval)) {
                         return (null, "Chunk konnte nicht geladen werden.", false);
                     }
                 }
@@ -862,7 +862,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } db) { return (null, "Tabelle verworfen!", true); }
 
-        var aadc = db.AreAllDataCorrect();
+        var aadc = db.IsEditableGeneric();
         if (!string.IsNullOrEmpty(aadc)) { return (null, "Neue Zeilen nicht möglich: " + aadc, true); }
 
         var item = GetByKey(key);

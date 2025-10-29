@@ -139,7 +139,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         get {
             if (string.IsNullOrEmpty(_filename)) { return false; }
             if (_checkedAndReloadNeed) { return true; }
-            if (GetFileState(_filename, false) != _lastSaveCode) {
+            if (GetFileState(_filename, false, 0.5f) != _lastSaveCode) {
                 _checkedAndReloadNeed = true;
                 return true;
             }
@@ -277,9 +277,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         try {
             if (_initialLoadDone && !ReloadNeeded) { return true; }
 
-            var tmpFileInfo1 = GetFileState(_filename, true);
+            var tmpFileInfo1 = GetFileState(_filename, false, 0.1f);
             var data = ReadAllText(_filename, Constants.Win1252);
-            var tmpFileInfo2 = GetFileState(_filename, true);
+            var tmpFileInfo2 = GetFileState(_filename, true, 30);
             if (tmpFileInfo1 != tmpFileInfo2) { return false; }
             if (data.Length < 10) { return false; }
 
@@ -376,7 +376,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (t) {
             _isSaved = true;
             _checkedAndReloadNeed = false;
-            _lastSaveCode = GetFileState(_filename, false);
+            _lastSaveCode = GetFileState(_filename, false, 1);
         }
 
         return t;
@@ -483,13 +483,17 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     private void CreateWatcher() {
         if (!string.IsNullOrEmpty(_filename)) {
-            _watcher = new System.IO.FileSystemWatcher(_filename.FilePath());
+            _watcher = new System.IO.FileSystemWatcher(_filename.FilePath()) {
+                InternalBufferSize = 64 * 1024,
+                IncludeSubdirectories = false,
+                EnableRaisingEvents = true,
+            };
+
             _watcher.Changed += Watcher_Changed;
             _watcher.Created += Watcher_Created;
             _watcher.Deleted += Watcher_Deleted;
             _watcher.Renamed += Watcher_Renamed;
             _watcher.Error += Watcher_Error;
-            _watcher.EnableRaisingEvents = true;
         }
     }
 

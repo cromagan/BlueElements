@@ -740,7 +740,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             Invalidate_LinkedTable(); // Events sicher abmelden
 
-            var newTable = Get(_linkedTableTableName, null);
+            var newTable = Get(_linkedTableTableName, null, false);
 
             if (newTable != null) {
                 // Event-Registrierung vor dem Lock
@@ -1180,7 +1180,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.AreAllDataCorrect())) { return; }
+        if (!string.IsNullOrEmpty(tb.IsEditableGeneric())) { return; }
 
         if (source.Table != null) { source.Repair(); }
 
@@ -1597,7 +1597,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.AreAllDataCorrect())) { return; }
+        if (!string.IsNullOrWhiteSpace(tb.IsEditableGeneric())) { return; }
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (IsDisposed) { return; }

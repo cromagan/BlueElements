@@ -53,8 +53,10 @@ internal class Method_Table : Method {
 
         //if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
 
-        if (Table.Get(filn, null) is { IsDisposed: false } db) {
-            return new DoItFeedback(new VariableTable(db));
+        if (Table.Get(filn, null, true) is { IsDisposed: false } tb) {
+            tb.BeSureToBeUpToDate(false, true);
+
+            return new DoItFeedback(new VariableTable(tb));
         }
 
         return new DoItFeedback($"Tabelle '{filn}' nicht gefunden", true, ld);

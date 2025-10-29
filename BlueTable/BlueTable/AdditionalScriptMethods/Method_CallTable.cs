@@ -58,12 +58,12 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
 
-        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false } db) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
-        if (db == myDb) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
+        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
+        if (tb == myTb) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 
-        var m = db.AreAllDataCorrect();
+        var m = tb.IsEditableGeneric();
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Tabellesperre: {m}", false, ld); }
 
         StackTrace stackTrace = new();
@@ -80,18 +80,18 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
 
         #endregion
 
-        var scx = db.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
+        var scx = tb.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
         scx.ConsumeBreakAndReturn();
         if (scx.NeedsScriptFix) {
-            return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{db.Caption}' hat Fehler verursacht.", false, ld);
+            return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{tb.Caption}' hat Fehler verursacht.", false, ld);
         }
         return scx;
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) {
-        var db = Table.Get(args[0], null);
+        var db = Table.Get(args[0], null, true);
         var vdb = new VariableTable(db);
-       return vdb.ValueForReplace + "," + args[1] + "," + args[2];
+        return vdb.ValueForReplace + "," + args[1] + "," + args[2];
     }
 
     #endregion

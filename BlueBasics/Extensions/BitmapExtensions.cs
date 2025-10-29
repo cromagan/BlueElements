@@ -62,14 +62,11 @@ public static partial class Extensions {
         }
     }
 
-
-
-
     public static Image? Image_FromFile(string filename) {
         if (string.IsNullOrEmpty(filename)) { return null; }
         if (!FileExists(filename)) { return null; }
         try {
-            var bytes = LoadAllBytes(filename);
+            var bytes = ReadAllBytes(filename, 3);
             if (bytes == null) { return null; }
             using var ms = new System.IO.MemoryStream(bytes);
             var im = Image.FromStream(ms);

@@ -81,8 +81,6 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public bool AutoSizeableHeight => true;
 
-    public override bool TableInputMustMatchOutputTable => false;
-
     public float DefaultCopyScale {
         get => _defaultCopyScale;
         set {
@@ -120,7 +118,6 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     }
 
     public override bool InputMustBeOneRow => true;
-
     public override bool MustBeInDrawingArea => true;
 
     public float Scale {
@@ -146,6 +143,8 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             OnPropertyChanged();
         }
     }
+
+    public override bool TableInputMustMatchOutputTable => false;
 
     public string Typ {
         get => _typ;
@@ -336,9 +335,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     /// Skripte der Tabelle
     /// </summary>
     public void Skripte_Bearbeiten() {
-        if (TableInput is { IsDisposed: false } db) {
-            TableViewForm.OpenScriptEditor(db);
-        }
+        TableViewForm.OpenScriptEditor(TableInput);
         OnDoUpdateSideOptionMenu();
     }
 

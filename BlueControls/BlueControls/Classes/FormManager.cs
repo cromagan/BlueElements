@@ -24,6 +24,7 @@ using BlueTable;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using BlueBasics.FileSystemCaching;
 
 //https://stackoverflow.com/questions/9462592/best-practices-for-multi-form-applications-to-show-and-hide-forms
 namespace BlueControls;
@@ -94,6 +95,8 @@ public class FormManager : ApplicationContext {
             thisTable.UnMasterMe();
             thisTable.Freeze("Beenden...");
         }
+
+        CachedFileSystem.DisposeAll();
     }
 
     //public static List<T> GetInstaceOfType<T>(params object[] constructorArgs) where T : class {

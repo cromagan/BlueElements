@@ -155,7 +155,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
             case "database":
             case "table":
-                Table = Table.Get(value.FromNonCritical(), TableView.Table_NeedPassword);
+                Table = Table.Get(value.FromNonCritical(), TableView.Table_NeedPassword, false);
                 return true;
 
             case "rowid": // TODO: alt

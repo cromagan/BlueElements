@@ -34,7 +34,6 @@ namespace BlueControls.BlueTableDialogs {
             this.chkZeile = new BlueControls.Controls.Button();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
             this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
-            this.chkAuslöser_tableloaded = new BlueControls.Controls.Button();
             this.chkAuslöser_export = new BlueControls.Controls.Button();
             this.chkAuslöser_newrow = new BlueControls.Controls.Button();
             this.chkAuslöser_valuechangedThread = new BlueControls.Controls.Button();
@@ -238,7 +237,6 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.grpAuslöser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpAuslöser.Controls.Add(this.chkAuslöser_deletingRow);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_tableloaded);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_export);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_newrow);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechangedThread);
@@ -261,18 +259,6 @@ namespace BlueControls.BlueTableDialogs {
             this.chkAuslöser_deletingRow.TabIndex = 24;
             this.chkAuslöser_deletingRow.Text = "Zeile wird gelöscht";
             this.chkAuslöser_deletingRow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
-            // 
-            // chkAuslöser_tableloaded
-            // 
-            this.chkAuslöser_tableloaded.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_tableloaded.Location = new System.Drawing.Point(8, 24);
-            this.chkAuslöser_tableloaded.Name = "chkAuslöser_tableloaded";
-            this.chkAuslöser_tableloaded.QuickInfo = "Das Skript wird direkt nach dem ersten Laden einer Tabelle angestoßen.\r\n\r\nEs kann" +
-    " verwendet werden, um z.B. Backups zu erstellen.";
-            this.chkAuslöser_tableloaded.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_tableloaded.TabIndex = 21;
-            this.chkAuslöser_tableloaded.Text = "Tabelle geladen";
-            this.chkAuslöser_tableloaded.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_export
             // 
@@ -517,7 +503,6 @@ namespace BlueControls.BlueTableDialogs {
         private TextBox txbTestZeile;
         private Caption cpZeile;
         private Button chkAuslöser_valuechangedThread;
-        private Button chkAuslöser_tableloaded;
         private Button chkAuslöser_export;
         private Button btnVersionErhöhen;
         private Button btnVerlauf;

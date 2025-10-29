@@ -7,11 +7,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using BlueBasics;
 
 #nullable enable
 
-namespace FileSystemCaching {
+namespace BlueBasics.FileSystemCaching {
 
     /// <summary>
     /// Hauptklasse für das Caching-System mit automatischer Synchronisation
@@ -55,13 +54,8 @@ namespace FileSystemCaching {
 
         #region Properties
 
-        public TimeSpan AbsoluteExpiration { get; set; } = TimeSpan.FromHours(2);
-
         /// <summary>Debouncing-Verzögerung für FileSystemWatcher-Events (ms)</summary>
         public int DebounceDelayMs { get; set; } = 500;
-
-        /// <summary>Ist das System initialisiert?</summary>
-        public bool IsInitialized => _isInitialized;
 
         /// <summary>Parallelitätsgrad für Batch-Operationen</summary>
         public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
@@ -83,7 +77,7 @@ namespace FileSystemCaching {
         /// Entfernt und disposed eine Instanz
         /// </summary>
         public static void Dispose(string directory) {
-            var key = BlueBasics.IO.NormalizePath(directory);
+            var key = IO.NormalizePath(directory);
             if (_instances.TryRemove(key, out var instance)) {
                 instance.Dispose();
             }
@@ -104,48 +98,13 @@ namespace FileSystemCaching {
         /// Holt oder erstellt eine CachedFileSystem-Instanz für das angegebene Verzeichnis
         /// </summary>
         public static CachedFileSystem Get(string directory) {
-            var key = BlueBasics.IO.NormalizePath(directory);
+            var key = IO.NormalizePath(directory);
 
             return _instances.GetOrAdd(key, _ => {
                 var instance = new CachedFileSystem(directory);
                 instance.InitializeAsync().GetAwaiter().GetResult();
                 return instance;
             });
-        }
-
-        /// <summary>
-        /// Löscht eine Datei synchron und entfernt sie aus dem Cache
-        /// </summary>
-        /// <param name="filename">Dateipfad</param>
-        /// <exception cref="FileNotFoundException">Datei existiert nicht</exception>
-        /// <exception cref="IOException">Fehler beim Löschen</exception>
-        public void DeleteFile(string filename) {
-            ThrowIfDisposed();
-            EnsureInitialized();
-
-            var normalizedPath = BlueBasics.IO.NormalizeFile(filename);
-
-            try {
-                File.Delete(normalizedPath);
-
-                // Sofort aus Cache entfernen (Watcher macht es dann nochmal, aber das ist idempotent)
-                RemoveFromCache(normalizedPath);
-            } catch { }
-        }
-
-        /// <summary>
-        /// Löscht eine Datei asynchron und entfernt sie aus dem Cache
-        /// </summary>
-        /// <param name="filename">Datei</param>
-        /// <param name="cancellationToken">Cancellation Token</param>
-        /// <exception cref="FileNotFoundException">Datei existiert nicht</exception>
-        /// <exception cref="IOException">Fehler beim Löschen</exception>
-        public async Task DeleteFileAsync(string filename, CancellationToken cancellationToken = default) {
-            ThrowIfDisposed();
-            EnsureInitialized();
-
-            await Task.Run(() => DeleteFile(filename), cancellationToken)
-                .ConfigureAwait(false);
         }
 
         public void Dispose() {
@@ -155,7 +114,7 @@ namespace FileSystemCaching {
             try {
                 if (_isDisposed) return;
 
-                _instances.TryRemove(BlueBasics.IO.NormalizePath(WatchedDirectory), out _);
+                _instances.TryRemove(IO.NormalizePath(WatchedDirectory), out _);
 
                 // Watcher stoppen
                 if (_watcher != null) {
@@ -195,7 +154,7 @@ namespace FileSystemCaching {
         /// </summary>
         public bool FileExists(string filename) {
             ThrowIfDisposed();
-            var normalizedPath = BlueBasics.IO.NormalizeFile(filename);
+            var normalizedPath = IO.NormalizeFile(filename);
 
             // Erst Cache prüfen
             if (_cachedFiles.TryGetValue(normalizedPath, out _)) {
@@ -213,7 +172,7 @@ namespace FileSystemCaching {
             ThrowIfDisposed();
             EnsureInitialized();
 
-            var normalizedFileName = BlueBasics.IO.NormalizeFile(filename);
+            var normalizedFileName = IO.NormalizeFile(filename);
 
             if (!ShouldCacheFile(normalizedFileName)) {
                 return new CachedFile(normalizedFileName);
@@ -221,11 +180,11 @@ namespace FileSystemCaching {
 
             // Optimistic read
             if (_cachedFiles.TryGetValue(normalizedFileName, out var cachedFile)) {
-                if (BlueBasics.Constants.GlobalRnd.Next(0, 5) == 0) {
+                if (Constants.GlobalRnd.Next(0, 5) == 0) {
                     // Fire-and-forget Validierung
                     _ = Task.Run(() => {
                         if (cachedFile.IsStale()) {
-                            cachedFile.Refresh();
+                            cachedFile.Invalidate();
                         }
                     });
                 }
@@ -295,7 +254,7 @@ namespace FileSystemCaching {
             EnsureInitialized();
 
             encoding ??= Encoding.UTF8;
-            var normalizedPath = BlueBasics.IO.NormalizeFile(filename);
+            var normalizedPath = IO.NormalizeFile(filename);
 
             try {
                 var cachedFile = GetFileAsync(normalizedPath).GetAwaiter().GetResult();
@@ -343,8 +302,8 @@ namespace FileSystemCaching {
         }
 
         private void InitializeWatcher() {
-            _watcherLock.EnterWriteLock();
             try {
+                _watcherLock.EnterWriteLock();
                 _watcher?.Dispose();
 
                 _watcher = new FileSystemWatcher(WatchedDirectory) {
@@ -353,7 +312,7 @@ namespace FileSystemCaching {
                                  | NotifyFilters.Size
                                  | NotifyFilters.CreationTime,
                     IncludeSubdirectories = false,
-                    InternalBufferSize = WatcherBufferSize
+                    InternalBufferSize = 128 * 1024
                 };
 
                 _watcher.Created += OnFileCreated;
@@ -364,7 +323,9 @@ namespace FileSystemCaching {
 
                 _watcher.EnableRaisingEvents = true;
             } finally {
-                _watcherLock.ExitWriteLock();
+                try {
+                    _watcherLock.ExitWriteLock();
+                } catch { }
             }
         }
 
@@ -390,7 +351,7 @@ namespace FileSystemCaching {
             // Nur Dateinamen registrieren, KEINE Metadaten laden
             DebouncedAction(e.FullPath, () => {
                 try {
-                    var normalizedPath = BlueBasics.IO.NormalizeFile(e.FullPath);
+                    var normalizedPath = IO.NormalizeFile(e.FullPath);
 
                     // Lazy-Instanz erstellen (ohne Metadaten zu laden)
                     _cachedFiles.GetOrAdd(normalizedPath, _ => new CachedFile(normalizedPath));
@@ -410,7 +371,7 @@ namespace FileSystemCaching {
                 // Neue Datei hinzufügen, falls sie gecacht werden soll
                 if (ShouldCacheFile(e.FullPath)) {
                     try {
-                        var normalizedPath = BlueBasics.IO.NormalizeFile(e.FullPath);
+                        var normalizedPath = IO.NormalizeFile(e.FullPath);
                         _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));
                     } catch { }
                 }
@@ -418,7 +379,7 @@ namespace FileSystemCaching {
                 // Falls alte Datei nicht im Cache war, neue nur registrieren falls relevant
                 if (ShouldCacheFile(e.FullPath)) {
                     try {
-                        var normalizedPath = BlueBasics.IO.NormalizeFile(e.FullPath);
+                        var normalizedPath = IO.NormalizeFile(e.FullPath);
                         _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));
                     } catch { }
                 }
@@ -446,7 +407,7 @@ namespace FileSystemCaching {
                     // Bestehende Cache-Einträge aktualisieren
                     foreach (var file in currentFiles) {
                         if (_cachedFiles.TryGetValue(file, out var cached)) {
-                            if (cached.IsStale()) cached.Refresh();
+                            if (cached.IsStale()) cached.Invalidate();
                         }
                     }
 
@@ -479,7 +440,7 @@ namespace FileSystemCaching {
             await Task.Run(() => {
                 foreach (var filePath in files) {
                     try {
-                        var normalizedPath = BlueBasics.IO.NormalizeFile(filePath);
+                        var normalizedPath = IO.NormalizeFile(filePath);
 
                         // Nur CachedFile-Instanz erstellen (KEINE Metadaten laden)
                         _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));

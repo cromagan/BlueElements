@@ -75,7 +75,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
             if (_tableOutputLoaded) { return _tableOutput; }
 
-            _tableOutput = Table.Get(_tableOutputName, TableView.Table_NeedPassword);
+            _tableOutput = Table.Get(_tableOutputName, TableView.Table_NeedPassword, false);
 
             _tableOutputLoaded = true;
 

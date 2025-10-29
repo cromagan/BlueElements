@@ -67,11 +67,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public ColumnViewItem? CVI { get; }
 
-    public string Tabelle => IsDisposed || CVI?.Column?.Table is not { IsDisposed: false } db ? "?" : db.KeyName;
-
     public override string Description => string.Empty;
-
     public Renderer_Abstract Renderer { get; }
+    public string Tabelle => IsDisposed || CVI?.Column?.Table is not { IsDisposed: false } db ? "?" : db.KeyName;
 
     /// <summary>
     /// Wird von Flexoptions aufgerufen
@@ -86,14 +84,14 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         if (CVI is not { IsDisposed: false } cvi) { return []; }
         if (cvi.Column is not { IsDisposed: false } col) { return []; }
-        if (col.Table is not { IsDisposed: false } db) { return []; }
+        if (col.Table is not { IsDisposed: false } tb) { return []; }
 
-        db.Editor = typeof(TableHeadEditor);
+        tb.Editor = typeof(TableHeadEditor);
         col.Editor = typeof(ColumnEditor);
 
         List<GenericControl> result =
         [
-            new FlexiDelegateControl(db.Edit, "Tabelle: " + db.Caption, ImageCode.Tabelle),
+            new FlexiDelegateControl(tb.Edit, "Tabelle: " + tb.Caption, ImageCode.Tabelle),
             new FlexiDelegateControl(col.Edit, "Spalte: " + col.Caption, ImageCode.Spalte),
             new FlexiControl(),
             new FlexiControlForProperty<bool>(() => cvi.Permanent),

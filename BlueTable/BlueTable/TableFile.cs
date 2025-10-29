@@ -90,28 +90,21 @@ public class TableFile : Table {
 
     public override bool AmITemporaryMaster(int ranges, int rangee) => base.AmITemporaryMaster(ranges, rangee);
 
-    public override string AreAllDataCorrect() {
-        if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
-        if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
-
-        return base.AreAllDataCorrect();
-    }
-
     public override bool BeSureAllDataLoaded(int anzahl) => base.BeSureAllDataLoaded(anzahl);
 
     public override bool BeSureRowIsLoaded(string chunkValue) => base.BeSureRowIsLoaded(chunkValue);
 
-    public override bool BeSureToBeUpToDate(bool firstTime) => base.BeSureToBeUpToDate(firstTime);
+    public override bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) => base.BeSureToBeUpToDate(firstTime, instantUpdate);
 
     /// <summary>
     /// Konkrete Prüfung, ob jetzt gespeichert werden kann
     /// </summary>
     /// <returns></returns>
     public FileOperationResult CanSaveMainChunk() {
-        var aadc = AreAllDataCorrect();
+        var aadc = IsEditableGeneric();
         if (!string.IsNullOrEmpty(aadc)) { return new(aadc, false, true); }
 
-        if (!InitialLoadDone) { return new("Tabelle noch nicht geladen.", false, true); }
+        if (!MainChunkLoadDone) { return new("Tabelle noch nicht geladen.", false, true); }
 
         if (Row.HasPendingWorker()) { return new("Es müssen noch Daten überprüft werden.", true, true); }
 
@@ -130,7 +123,7 @@ public class TableFile : Table {
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
-            var db = Get(thisFile, null);
+            var db = Get(thisFile, null, true);
             if (db == null) {
                 return thisFile + " konnte nicht geladen werden.";
             }
@@ -176,7 +169,14 @@ public class TableFile : Table {
         return string.Empty;
     }
 
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze) {
+    public override string IsEditableGeneric() {
+        if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+        if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
+
+        return base.IsEditableGeneric();
+    }
+
+    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool instantUpdate) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
@@ -204,8 +204,8 @@ public class TableFile : Table {
         LoadMainData();
 
         _saveRequired_File = false;
-        InitialLoadDone = true;
-        _ = BeSureToBeUpToDate(true);
+        MainChunkLoadDone = true;
+        _ = BeSureToBeUpToDate(true, instantUpdate);
 
         RepairAfterParse();
 
@@ -219,7 +219,7 @@ public class TableFile : Table {
         CreateWatcher();
 
         DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
+        //_ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
     }
 
     public override void ReorganizeChunks() => base.ReorganizeChunks();
@@ -252,7 +252,7 @@ public class TableFile : Table {
 
         _ = mainchunk.Save(newFileName);
 
-        InitialLoadDone = true;
+        MainChunkLoadDone = true;
     }
 
     public override string ToString() => base.ToString();
@@ -334,7 +334,7 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var byteData = LoadAndUnzipAllBytes(Filename);
+        var byteData = ReadAndUnzipAllBytes(Filename);
 
         if (byteData is null) {
             Freeze("Laden fehlgeschlagen!");
@@ -381,10 +381,10 @@ public class TableFile : Table {
                 if (!string.IsNullOrEmpty(tbf.Filename)) { return; } // Irgend eine Tabelle wird aktuell geladen
             }
 
-            if (!thisTbl.InitialLoadDone) { return; }
+            if (!thisTbl.MainChunkLoadDone) { return; }
         }
 
-        BeSureToBeUpToDate(AllFiles);
+        BeSureToBeUpToDate(AllFiles, false);
     }
 
     private void GenerateTableUpdateTimer() {

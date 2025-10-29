@@ -544,7 +544,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                 var dataObject = new DataObject();
 
-                if(tb is TableFile) {
+                if (tb is TableFile) {
                     dataObject.SetData(CellDataFormat, $"{tb.KeyName}\r{column.KeyName}\r{row.KeyName}");// 1. Als ExtChar-Format (für interne Verwendung)
 
                 }
@@ -3074,6 +3074,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void ContextMenu_EditColumnProperties(AbstractListItem item) {
         if (item.Tag is not ColumnItem column) { return; }
+
+        if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
+
+
         OpenColumnEditor(column, _mouseOverRow?.Row);
     }
 
@@ -3738,7 +3742,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        if (db.IsAdministrator() && !db.IsFreezed) {
+        if (db.IsAdministrator() && string.IsNullOrWhiteSpace(db.IsEditableGeneric())) {
             // Skripte-Status anzeigen
             if (!string.IsNullOrEmpty(db.CheckScriptError())) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);

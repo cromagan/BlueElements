@@ -226,9 +226,10 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     private void btnSpaltenkopf_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false } tb) { return; }
+        if (TableViewForm.EditabelErrorMessage(tb)) { return; }
 
-        _ = db.Edit(typeof(TableHeadEditor));
+        _ = tb.Edit(typeof(TableHeadEditor));
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {

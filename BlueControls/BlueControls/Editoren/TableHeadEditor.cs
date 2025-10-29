@@ -324,11 +324,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     private void btnMasterMe_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        db.MasterMe();
-
-        db.BeSureToBeUpToDate(false);
+        tb.BeSureToBeUpToDate(false, true);
+        tb.MasterMe();
+        tb.BeSureToBeUpToDate(false, true);
         Close();
     }
 
@@ -360,10 +360,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     private void btnUnMaster_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tbl) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        tbl.UnMasterMe();
-        tbl.BeSureToBeUpToDate(false);
+        tb.BeSureToBeUpToDate(false, true);
+        tb.UnMasterMe();
+        tb.BeSureToBeUpToDate(false, false);
     }
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {

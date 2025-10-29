@@ -251,13 +251,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
     public static string IsCellEditable(ColumnItem? column, RowItem? row, string? newChunkValue) {
-        if (column?.Table is not { IsDisposed: false } db) { return "Es ist keine Spalte ausgewählt."; }
+        if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
 
         if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
 
         var oldChunk = newChunkValue;
 
-        if (!column.EditableWithTextInput && !column.EditableWithDropdown && !db.PowerEdit) {
+        if (!column.EditableWithTextInput && !column.EditableWithDropdown && !tb.PowerEdit) {
             return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
         }
 
@@ -266,31 +266,31 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (row == null) {
-            if (db.Column.First is not { IsDisposed: false } firstcol || firstcol != column) {
+            if (tb.Column.First is not { IsDisposed: false } firstcol || firstcol != column) {
                 return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
             }
 
-            if (!db.PermissionCheck(db.PermissionGroupsNewRow, null)) {
+            if (!tb.PermissionCheck(tb.PermissionGroupsNewRow, null)) {
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
 
-            if (db.Column.ChunkValueColumn is { } cvc && newChunkValue != null) {
-                if (cvc != db.Column.First && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
+            if (tb.Column.ChunkValueColumn is { } cvc && newChunkValue != null) {
+                if (cvc != tb.Column.First && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
             }
         } else {
-            if (!db.PowerEdit && db.Column.SysLocked != null) {
-                if (column != db.Column.SysLocked && row.CellGetBoolean(db.Column.SysLocked) && !column.EditAllowedDespiteLock) {
+            if (!tb.PowerEdit && tb.Column.SysLocked != null) {
+                if (column != tb.Column.SysLocked && row.CellGetBoolean(tb.Column.SysLocked) && !column.EditAllowedDespiteLock) {
                     return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
                 }
             }
             oldChunk = row.ChunkValue;
         }
 
-        if (!db.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
+        if (!tb.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
             return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
         }
 
-        var aadc = db.AreAllDataCorrect();
+        var aadc = tb.IsEditableGeneric();
         if (!string.IsNullOrWhiteSpace(aadc)) { return aadc; }
 
         if (column.RelationType == RelationType.CellValues) {
@@ -300,7 +300,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (lcolumn?.Table is not { IsDisposed: false } db2) { return "Verknüpfte Tabelle verworfen."; }
 
-            db2.PowerEdit = db.PowerEdit;
+            db2.PowerEdit = tb.PowerEdit;
 
             if (lrow != null) {
                 var tmp = IsCellEditable(lcolumn, lrow, lrow.ChunkValue);
@@ -312,18 +312,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Allgemeiner Fehler.";
         }
 
-        if (row == null && db.Column.ChunkValueColumn == db.Column.First && newChunkValue == null) {
+        if (row == null && tb.Column.ChunkValueColumn == tb.Column.First && newChunkValue == null) {
             // Es soll eine neue Zeile erstellt werden, und die erste Spalte ist die Chunk-Spalte.
             // Wir wissen nicht, was das Ziel ist.
             return string.Empty;
         }
 
         if (oldChunk != newChunkValue) {
-            aadc = db.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk);
+            aadc = tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk);
             if (!string.IsNullOrEmpty(aadc)) { return aadc; }
         }
 
-        return db.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
+        return tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
     }
 
     /// <summary>
@@ -643,16 +643,16 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         try {
-            if (column?.Table is not { IsDisposed: false } db) { return new("Es ist keine Spalte ausgewählt.", false, true); }
+            if (column?.Table is not { IsDisposed: false } tb) { return new("Es ist keine Spalte ausgewählt.", false, true); }
 
-            var aadc = db.AreAllDataCorrect();
+            var aadc = tb.IsEditableGeneric();
             if (!string.IsNullOrEmpty(aadc)) { return new(aadc, false, true); }
 
-            var fo = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
+            var fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
             if (fo.Failed) { return fo; }
 
             if (row != null) {
-                fo = db.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+                fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
                 if (fo.Failed) { return fo; }
             }
 
@@ -664,7 +664,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
                 if (lcolumn?.Table is not { IsDisposed: false } db2) { return new("Verknüpfte Tabelle verworfen.", false, true); }
 
-                db2.PowerEdit = db.PowerEdit;
+                db2.PowerEdit = tb.PowerEdit;
 
                 if (lrow != null) {
                     waitforseconds = Math.Max(1, waitforseconds / 2);

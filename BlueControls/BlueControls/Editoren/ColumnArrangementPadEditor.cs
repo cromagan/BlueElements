@@ -214,10 +214,10 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db || TableViewForm.EditabelErrorMessage(db)) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditabelErrorMessage(tb)) { return; }
 
         ColumnItem? vorlage = null;
-        if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.CVI?.Column?.Table == db) {
+        if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.CVI?.Column?.Table == tb) {
             vorlage = cpi.CVI?.Column;
         }
 
@@ -240,7 +240,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                     return;
             }
         }
-        var newc = db.Column.GenerateAndAdd();
+        var newc = tb.Column.GenerateAndAdd();
 
         if (newc == null) { return; }
         newc.Editor = typeof(ColumnEditor);
@@ -248,7 +248,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         if (vorlage != null) {
             newc.CloneFrom(vorlage, false);
             if (mitDaten) {
-                foreach (var thisR in db.Row) {
+                foreach (var thisR in tb.Row) {
                     thisR.CellSet(newc, thisR.CellGetString(vorlage), "Neue Spalte mit allem Daten");
                 }
             }
@@ -258,7 +258,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             newc.Invalidate_ColumAndContent();
             //w.Dispose();
         }
-        db.Column.Repair();
+        tb.Column.Repair();
 
         var ca = CloneOfCurrentArrangement();
 
@@ -267,7 +267,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             ChangeCurrentArrangementto(ca);
         }
 
-        db.RepairAfterParse();
+        tb.RepairAfterParse();
         ShowOrder();
     }
 

@@ -134,7 +134,7 @@ public class ExtCharCellLink : ExtChar {
 
     private string GetCellValue() {
         try {
-            var tb = Table.Get(TableName, null);
+            var tb = Table.Get(TableName, null, false);
             if (tb == null) { return $"[Table '{TableName}' not found]"; }
 
             var c = tb.Column[ColumnKey];

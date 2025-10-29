@@ -134,7 +134,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
         if (EventTypes == ScriptEventTypes.value_changed && extended) { return MethodType.ManipulatesUser; }
 
-        if (EventTypes == ScriptEventTypes.loaded) { return MethodType.ManipulatesUser; }
+        //if (EventTypes == ScriptEventTypes.loaded) { return MethodType.ManipulatesUser; }
 
         return MethodType.LongTime;
     }
@@ -156,9 +156,9 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     }
 
     public override string ErrorReason() {
-        if (Table is not { IsDisposed: false } tbl) { return "Tabelle verworfen"; }
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        if (tbl is TableChunk tblc) {
+        if (tb is TableChunk) {
             if (!NeedRow && ChangeValuesAllowed && EventTypes != ScriptEventTypes.Ohne_Auslöser) { return "Gechunkte Tabellen unterstütze nur Zeilenskripte."; }
         }
 
@@ -207,15 +207,15 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             if (EventTypes != ScriptEventTypes.InitialValues) { return "Routinen zum Initialisieren müssen für sich alleine stehen."; }
         }
 
-        if (EventTypes.HasFlag(ScriptEventTypes.loaded)) {
-            if (NeedRow) { return "Routinen nach dem Laden einer Tabelle, dürfen sich nicht auf Zeilen beziehen."; }
-        }
+        //if (EventTypes.HasFlag(ScriptEventTypes.loaded)) {
+        //    if (NeedRow) { return "Routinen nach dem Laden einer Tabelle, dürfen sich nicht auf Zeilen beziehen."; }
+        //}
 
         if (NeedRow && !Table.IsRowScriptPossible()) { return "Zeilenskripte in dieser Tabelle nicht möglich"; }
 
         if (EventTypes.ToString() == ((int)EventTypes).ToString()) { return "Skripte öffnen und neu speichern."; }
 
-        foreach (var script in tbl.EventScript) {
+        foreach (var script in tb.EventScript) {
             if (script != this) {
                 if (string.Equals(script.KeyName, KeyName, StringComparison.OrdinalIgnoreCase)) { return $"Skriptname '{script.KeyName}' mehrfach vorhanden"; }
 
@@ -276,7 +276,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.export)) { symb = ImageCode.Layout; }
-        if (EventTypes.HasFlag(ScriptEventTypes.loaded)) { symb = ImageCode.Diskette; }
+        //if (EventTypes.HasFlag(ScriptEventTypes.loaded)) { symb = ImageCode.Diskette; }
         if (EventTypes.HasFlag(ScriptEventTypes.InitialValues)) { symb = ImageCode.Zeile; }
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed)) { symb = ImageCode.Stift; }
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }

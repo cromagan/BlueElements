@@ -151,6 +151,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
         result.Add(_button);
         result.Add(new FlexiControlForProperty<int>(() => Sekunden));
+        result.Add(new FlexiControlForProperty<string>(() => Script));
 
         return result;
     }

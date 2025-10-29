@@ -122,6 +122,10 @@ public sealed class RowSortDefinition : IParseable {
     public void Repair() {
         if (Columns.Count == 0) { return; }
 
+        if (Table is not { IsDisposed: false } tb) { return; }
+
+        if (!string.IsNullOrWhiteSpace(tb.IsEditableGeneric())) { return; }
+
         for (var i = 0; i < Columns.Count; i++) {
             if (Columns[i] is not ColumnItem { IsDisposed: false }) {
                 Columns.RemoveAt(i);

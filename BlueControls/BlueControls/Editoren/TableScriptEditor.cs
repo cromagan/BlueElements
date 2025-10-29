@@ -89,7 +89,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
                 chkExtendend.Visible = chkAuslöser_valuechanged.Checked;
                 chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
                 chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
-                chkAuslöser_tableloaded.Checked = value.EventTypes.HasFlag(ScriptEventTypes.loaded);
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
                 chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
                 Script = value.Script;
@@ -125,7 +124,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
                 chkAuslöser_valuechanged.Checked = false;
                 chkAuslöser_prepaireformula.Checked = false;
                 chkAuslöser_valuechangedThread.Checked = false;
-                chkAuslöser_tableloaded.Checked = false;
                 chkAuslöser_export.Checked = false;
                 btnVerlauf.Enabled = false;
                 capFehler.Text = string.Empty;
@@ -343,7 +341,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
         if (chkAuslöser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
         if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
-        if (chkAuslöser_tableloaded.Checked) { tmp |= ScriptEventTypes.loaded; }
         if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
         if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
 

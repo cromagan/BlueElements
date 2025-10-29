@@ -348,13 +348,17 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
 
         if (!string.IsNullOrEmpty(_directory) && DirectoryExists(_directory)) {
-            _watcher = new System.IO.FileSystemWatcher(_directory);
+            _watcher = new System.IO.FileSystemWatcher(_directory) {
+                InternalBufferSize = 64 * 1024,
+                IncludeSubdirectories = false,
+                EnableRaisingEvents = true,
+            };
+
             _watcher.Changed += Watcher_Changed;
             _watcher.Created += Watcher_Created;
             _watcher.Deleted += Watcher_Deleted;
             _watcher.Renamed += Watcher_Renamed;
             _watcher.Error += Watcher_Error;
-            _watcher.EnableRaisingEvents = true;
         }
     }
 

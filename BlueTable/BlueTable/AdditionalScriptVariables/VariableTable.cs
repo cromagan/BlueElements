@@ -61,6 +61,8 @@ public class VariableTable : Variable {
     /// </summary>
     public override string ReadableText => _lastText;
 
+    public override string SearchValue => ReadableText;
+
     public Table? Table {
         get => _table;
         private set {
@@ -70,8 +72,6 @@ public class VariableTable : Variable {
             GetText();
         }
     }
-
-    public override string SearchValue => ReadableText;
 
     public override bool ToStringPossible => true;
 
@@ -109,9 +109,9 @@ public class VariableTable : Variable {
 
             if (t == "?") { return true; }
 
-            if (Table.Get(t, null) is not { IsDisposed: false } db) { return false; }
+            if (Table.Get(t, null, true) is not { IsDisposed: false } tb) { return false; }
 
-            result = db;
+            result = tb;
             return true;
         }
 

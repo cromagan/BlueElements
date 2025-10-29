@@ -258,19 +258,6 @@ public class TableChunk : TableFile {
         return base.AmITemporaryMaster(ranges, rangee);
     }
 
-    public override string AreAllDataCorrect() {
-        var f = base.AreAllDataCorrect();
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Maindata"; }
-        if (!_chunks.TryGetValue(Chunk_Master.ToLower(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Master"; }
-        if (!_chunks.TryGetValue(Chunk_Variables.ToLower(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Variablen"; }
-        if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLower(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Uses"; }
-        if (!_chunks.TryGetValue(Chunk_UnknownData.ToLower(), out var chkukn) || chkukn.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-UnknownData"; }
-
-        return string.Empty;
-    }
-
     public override bool BeSureAllDataLoaded(int anzahl) {
         if (!base.BeSureAllDataLoaded(anzahl)) { return false; }
 
@@ -317,8 +304,8 @@ public class TableChunk : TableFile {
         return true;
     }
 
-    public override bool BeSureToBeUpToDate(bool firstTime) {
-        if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
+    public override bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) {
+        if (!base.BeSureToBeUpToDate(firstTime, instantUpdate)) { return false; }
 
         DropMessage(ErrorType.Info, "Lade Chunks von '" + KeyName + "'");
 
@@ -364,6 +351,19 @@ public class TableChunk : TableFile {
         } else {
             return chunk.GrantWriteAccess();
         }
+    }
+
+    public override string IsEditableGeneric() {
+        var f = base.IsEditableGeneric();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Maindata"; }
+        if (!_chunks.TryGetValue(Chunk_Master.ToLower(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Master"; }
+        if (!_chunks.TryGetValue(Chunk_Variables.ToLower(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Variablen"; }
+        if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLower(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Uses"; }
+        if (!_chunks.TryGetValue(Chunk_UnknownData.ToLower(), out var chkukn) || chkukn.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-UnknownData"; }
+
+        return string.Empty;
     }
 
     /// <summary>

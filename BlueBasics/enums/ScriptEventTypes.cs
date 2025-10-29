@@ -34,8 +34,10 @@ public enum ScriptEventTypes {
     prepare_formula = 4,
 
     value_changed_extra_thread = 8,
-    loaded = 16,
+
+    //loaded = 16,
     export = 32,
+
     //clipboard_changed = 64,
 
     //value_changed_large = 128,

@@ -64,8 +64,8 @@ public class Chunk : IHasKeyName {
         get {
             if (IsMain) { return MainFileName; }
 
-            var folder = MainFileName.FilePath();
-            var tablename = MainFileName.FileNameWithoutSuffix();
+            //var folder = MainFileName.FilePath();
+            //var tablename = MainFileName.FileNameWithoutSuffix();
 
             return $"{ChunkFolder()}{KeyName}.bdbc";
         }
@@ -154,7 +154,7 @@ public class Chunk : IHasKeyName {
             return;
         }
 
-        var byteData = LoadAndUnzipAllBytes(c);
+        var byteData = ReadAndUnzipAllBytes(c);
         var tmp = DateTime.UtcNow;
         if (byteData is null) { LoadFailed = true; return; }
 
@@ -188,7 +188,7 @@ public class Chunk : IHasKeyName {
         }
 
         if (DateTime.UtcNow.Subtract(_bytesloaded).TotalMinutes > 6 || important) {
-            var nf = GetFileState(ChunkFileName, false);
+            var nf = GetFileState(ChunkFileName, false, 0.1f);
             return nf != _fileinfo;
         }
 
@@ -409,7 +409,7 @@ public class Chunk : IHasKeyName {
 
         // KRITISCHE ÄNDERUNG: FileInfo der temporären Datei VOR dem Move ermitteln
         // So wissen wir exakt, was wir schreiben und vermeiden Race Conditions
-        var tempFileInfo = GetFileState(tempfile, true);
+        var tempFileInfo = GetFileState(tempfile, true, 60);
         if (string.IsNullOrEmpty(tempFileInfo)) {
             DeleteFile(tempfile, false);
             return new("Dateiinfo konnte nicht gelesen werden", false, true);
@@ -546,7 +546,7 @@ public class Chunk : IHasKeyName {
     private void ParseLockData() {
         var pointer = 0;
         var data = Bytes.ToArray();
-        var filename = ChunkFileName;
+        //var filename = ChunkFileName;
 
         while (pointer < data.Length) {
             var (newPointer, type, value, _, _) = Table.Parse(data, pointer);
@@ -590,7 +590,7 @@ public class Chunk : IHasKeyName {
 
         var result = new List<byte>(bytes.Length);
         var pointer = 0;
-        var filename = ChunkFileName;
+        //var filename = ChunkFileName;
 
         // Durch alle Datensätze gehen
         while (pointer < bytes.Length) {
