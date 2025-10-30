@@ -185,6 +185,19 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             case TableDataType.TemporaryTableMasterUser:
                 symb = ImageCode.Person;
                 break;
+
+            case TableDataType.TemporaryTableMasterMachine:
+                symb = ImageCode.Monitor;
+                break;
+            case TableDataType.TemporaryTableMasterApp:
+                symb = ImageCode.Anwendung;
+                break;
+            case TableDataType.TemporaryTableMasterId:
+                symb = ImageCode.Formel;
+
+
+                break;
+
         }
         r.CellSet("Aenderung", work.Command.ToString(), string.Empty);
         r.CellSet("symbol", symb + "|24", string.Empty);

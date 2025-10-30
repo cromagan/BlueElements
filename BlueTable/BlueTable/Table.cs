@@ -1241,7 +1241,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
                 if (v != null) { _ = vars.Add(v); }
             }
-            _ = vars.Add(new VariableString("RowKey", row.KeyName, true, "Der interne Zeilenschlüssel."));
+            _ = vars.Add(new VariableString("CurrentRowKey", row.KeyName, true, "Der interne Zeilenschlüssel der Zeile,\r\nmit der das Skript aufgerufen wurde."));
+            _ = vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
         }
 
         if (dbVariables) {

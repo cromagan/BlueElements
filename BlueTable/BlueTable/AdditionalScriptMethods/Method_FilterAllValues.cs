@@ -30,7 +30,7 @@ public class Method_FilterAllValues : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, BoolVal, FilterVar];
+    public override List<List<string>> Args => [StringVal, BoolVal, FilterVar];
     public override string Command => "filterallvalues";
     public override List<string> Constants => [];
     public override string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.\r\n\r\nBei Sort True  werden alle Suchergebnisse kombiniert, gemischt und sortiert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
