@@ -129,7 +129,14 @@
     <Compile Include="AdditionalScriptMethods\VariablePadItem.cs" />
     <Compile Include="Allgemein.cs" />
     <Compile Include="Classes\Extended Text\ExtCharCellLink.cs" />
+    <Compile Include="Classes\ItemCollectionPad\FunktionsItems_Formular\ScriptButtonPadItem.cs" />
     <Compile Include="Classes\StandaloneInfo.cs" />
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaScriptButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ConnectedFormula\ConnectedFormulaScriptButton.Designer.cs">
+      <DependentUpon>ConnectedFormulaScriptButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Export.cs" />
     <Compile Include="Forms\Start.cs">
       <SubType>Form</SubType>
@@ -760,6 +767,9 @@
     <Compile Include="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\ConnectedFormula\ConnectedFormulaScriptButton.resx">
+      <DependentUpon>ConnectedFormulaScriptButton.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Start.resx">
       <DependentUpon>Start.cs</DependentUpon>
     </EmbeddedResource>

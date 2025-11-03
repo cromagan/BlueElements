@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Structures;
 using System.Windows.Forms;
@@ -27,7 +28,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
     #region Fields
 
-    private TimerPadItem? _item;
+    private RectanglePadItem? _item;
 
     #endregion
 
@@ -45,7 +46,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
     public override object? Object {
         get => IsDisposed ? null : (object?)_item;
         set {
-            if (value is not TimerPadItem) { value = null; }
+            if (value is not TimerPadItem and not ScriptButtonPadItem) { value = null; }
             if (_item == value) { return; }
 
             WriteInfosBack();
@@ -56,6 +57,10 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
                 tbcScriptEigenschaften.Enabled = true;
                 Script = cpi.Script;
                 _item = cpi;
+            } else if (value is ScriptButtonPadItem sbpi) {
+                tbcScriptEigenschaften.Enabled = true;
+                Script = sbpi.Script;
+                _item = sbpi;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
                 Script = string.Empty;
@@ -78,14 +83,24 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
         WriteInfosBack();
 
-        return TimerPadItem.ExecuteScript(_item.Script, "Testmodus", string.Empty, string.Empty, string.Empty);
+        if (_item is TimerPadItem tpi) {
+            return TimerPadItem.ExecuteScript(tpi.Script, "Testmodus", string.Empty, string.Empty, string.Empty);
+        }
+        if (_item is ScriptButtonPadItem sbpi) {
+            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus");
+        }
+
+        return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein");
     }
 
     public override void WriteInfosBack() {
         //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table == null || Table.IsDisposed) { return; }
 
-        if (_item != null) {
-            _item.Script = Script;
+        if (_item is TimerPadItem tpi) {
+            tpi.Script = Script;
+        }
+        if (_item is ScriptButtonPadItem sbpi) {
+            sbpi.Script = Script;
         }
     }
 

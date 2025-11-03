@@ -45,8 +45,6 @@ public static class AbstractListItemExtension {
         return ld2;
     }
 
-    public static TextListItem ItemOf(IHasInfo info) => ItemOf("Information anzeigen", ImageCode.Information, ShowInfo, info, true);
-
     public static TextListItem ItemOf(IEditable edit) => ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, OpenEditor, edit, true);
 
     public static TextListItem ItemOf(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
@@ -250,11 +248,6 @@ public static class AbstractListItemExtension {
     private static void OpenEditor(AbstractListItem item) {
         if (item.Tag is not IEditable edit) { return; }
         edit.Edit();
-    }
-
-    private static void ShowInfo(AbstractListItem item) {
-        if (item.Tag is not IHasInfo info) { return; }
-        MessageBox.Show(info.Infotext(), ImageCode.Information, "Ok");
     }
 
     #endregion

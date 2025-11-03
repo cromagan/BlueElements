@@ -40,7 +40,7 @@ using static BlueTable.Table;
 
 namespace BlueTable;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IComparable, IEditable, IHasInfo {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IComparable, IEditable {
 
     #region Fields
 
@@ -454,30 +454,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         } while (true);
     }
 
-    //public string Hash() {
-    //    if (Table is not TableFile { IsDisposed: false } tbf) { return string.Empty; }
-
-    //    var thisss = "Table=" + tbf.Caption + ";File=" + tbf.Filename + ";";
-
-    //    foreach (var thisColumnItem in tbf.Column) {
-    //        if (thisColumnItem.IsDisposed) { return string.Empty; }
-
-    //        if (thisColumnItem.IsSystemColumn()) { continue; }
-
-    //        thisss = thisss + thisColumnItem.KeyName + "=" + CellGetString(thisColumnItem) + ";";
-    //    }
-
-    //    return thisss.GetHashString();
-    //}
-
-    public string Infotext() {
-        if (!string.IsNullOrEmpty(QuickInfo)) { return QuickInfo; }
-
-        return CellFirstString();
-    }
-
-    //public void CloneFrom(RowItem source, bool nameAndKeyToo) {
-    //    if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
     public void InvalidateCheckData() {
         _ = RowCollection.FailedRows.TryRemove(this, out _);
         _lastCheckedEventArgs = null;

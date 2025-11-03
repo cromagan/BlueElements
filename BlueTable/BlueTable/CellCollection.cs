@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using BlueTable.Enums;
 using BlueTable.EventArgs;

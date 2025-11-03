@@ -48,6 +48,8 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
     private string _columnName = string.Empty;
+    private string _feldID = string.Empty;
+    private bool _freiesFeld = false;
 
     #endregion
 
@@ -131,6 +133,28 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         }
     }
 
+    public string FeldID {
+        get => _feldID;
+        set {
+            if (IsDisposed) { return; }
+            if (_feldID == value) { return; }
+            _feldID = value;
+            OnPropertyChanged();
+            OnDoUpdateSideOptionMenu();
+        }
+    }
+
+    [DefaultValue(false)]
+    public bool Freies_Feld {
+        get => _freiesFeld;
+        set {
+            if (IsDisposed) { return; }
+            if (_freiesFeld == value) { return; }
+            _freiesFeld = value;
+            OnPropertyChanged();
+        }
+    }
+
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override bool TableInputMustMatchOutputTable => false;
@@ -139,8 +163,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     #region Methods
 
-    //public Bitmap? Bitmap { get; set; }
-    //public enSizeModes Bild_Modus { get; set; }
     public static List<AbstractListItem> GetAllowedEditTypes(ColumnItem? column) {
         var l = new List<AbstractListItem>();
         if (column is not { IsDisposed: false }) { return l; }
@@ -160,7 +182,9 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         var con = new FlexiCellControl {
             ColumnName = _columnName,
             EditType = EditType,
-            CaptionPosition = CaptionPosition
+            CaptionPosition = CaptionPosition,
+            SyncWithCell = !Freies_Feld,
+            FieldID = FeldID
         };
 
         con.DoDefaultSettings(parent, this, mode);
@@ -174,6 +198,8 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (Column is not { IsDisposed: false }) { return "Spaltenangabe fehlt"; }
+
+        if (_freiesFeld && string.IsNullOrWhiteSpace(_feldID)) { return "Feld-ID fehlt."; }
 
         return string.Empty;
     }
@@ -201,6 +227,11 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         b.AddRange(GetAllowedEditTypes(Column));
         result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
 
+        result.Add(new FlexiControlForProperty<bool>(() => Freies_Feld));
+        if (_freiesFeld) {
+            result.Add(new FlexiControlForProperty<string>(() => FeldID));
+        }
+
         return result;
     }
 
@@ -212,6 +243,8 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _captionPosition);
         result.ParseableAdd("AutoDistance", _autoX);
+        result.ParseableAdd("NoSave", _freiesFeld);
+        result.ParseableAdd("FieldID", _feldID);
         return result;
     }
 
@@ -225,6 +258,10 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
                 _columnName = value;
                 return true;
 
+            case "fieldid":
+                _feldID = value;
+                return true;
+
             case "edittype":
                 _bearbeitung = (EditTypeFormula)IntParse(value);
                 return true;
@@ -235,6 +272,10 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
             case "autodistance":
                 _autoX = value.FromPlusMinus();
+                return true;
+
+            case "nosave":
+                _freiesFeld = value.FromPlusMinus();
                 return true;
 
             case "style":
@@ -272,77 +313,4 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     }
 
     #endregion
-
-    //public bool ReplaceVariable(Variable variable) {
-    //    if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
-    //    if ("~" + variable.Name.ToLowerInvariant() + "~" != Platzhalter_Für_Layout.ToLowerInvariant()) { return false; }
-    //    if (variable is not VariableBitmap vbmp) { return false; }
-    //    var ot = vbmp.ValueBitmap;
-    //    if (ot is Bitmap bmp) {
-    //        Bitmap = bmp;
-    //        OnPropertyChanged(string propertyname);
-    //        return true;
-    //    }
-
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~BitmapPadItem()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
-    //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-    //{
-    //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
-    //    if (Tags.TagGet("Bildschirmbereich wählen").FromPlusMinus())
-    //    {
-    //        CloseMenu = false;
-    //        if (Bitmap != null)
-    //        {
-    //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-    //        }
-    //        Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
-    //        return;
-    //    }
-    //    if (Tags.TagGet("Datei laden").FromPlusMinus())
-    //    {
-    //        CloseMenu = false;
-    //        if (Bitmap != null)
-    //        {
-    //            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-    //        }
-    //        var e = new System.Windows.Forms.OpenFileDialog();
-    //        e.CheckFileExists = true;
-    //        e.Multiselect = false;
-    //        e.Title = "Bild wählen:";
-    //        e.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp";
-    //        e.ShowDialog();
-    //        if (!FileExists(e.FileName))
-    //        {
-    //            return;
-    //        }
-    //        Bitmap = (Bitmap)Generic.Image_FromFile(e.FileName);
-    //        return;
-    //    }
-    //    if (Tags.TagGet("Skalieren").FromPlusMinus())
-    //    {
-    //        CloseMenu = false;
-    //        var t = InputBox.Show("Skalierfaktor oder Formel eingeben:", "1", DataFormat.Text);
-    //        var sc = modErgebnis.Ergebnis(t);
-    //        if (sc == null || sc == 1)
-    //        {
-    //            Notification.Show("Keine Änderung vorgenommen.");
-    //            return;
-    //        }
-    //        var x = p_RU.X - p_LO.X;
-    //        var y = p_RU.Y - p_LO.Y;
-    //        p_RU.X = (float)((float)p_LO.X + (float)x * sc);
-    //        p_RU.Y = (float)((float)p_LO.Y + (float)y * sc);
-    //        KeepInternalLogic();
-    //        return;
-    //    }
-    //    Hintergrund_weiß_füllen = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
-    //    Bild_Modus = (enSizeModes)IntParse(Tags.TagGet("Bild-Modus"));
-    //    Style = (PadStyles)IntParse(Tags.TagGet("Umrandung"));
-    //    Platzhalter_für_Layout = Tags.TagGet("Platzhalter für Layout").FromNonCritical();
-    //}
 }

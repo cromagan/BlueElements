@@ -243,7 +243,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             }
 
             if(VisibleFor.Count == 0) {
-                return "Element wird nicht angezeigt, Sichtbarkeitsrechte müssen gefplegt werden.";
+                return "Element wird nicht angezeigt, Sichtbarkeitsrechte müssen gepflegt werden.";
             }
         }
 

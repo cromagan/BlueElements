@@ -117,7 +117,8 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     }
 
     public EditTypeFormula EditType { get => f.EditType; set => f.EditType = value; }
-
+    public string FieldID { get; internal set; } = string.Empty;
+    public bool SyncWithCell { get; internal set; } = true;
     public string Value => f.Value;
 
     #endregion
@@ -125,9 +126,9 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     #region Methods
 
     public void OpenScriptEditor() {
-        if (IsDisposed || TableInput is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || TableInput is not { IsDisposed: false } tb) { return; }
 
-        var se = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
+        var se = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
         se.Row = _lastrow;
     }
 
@@ -167,9 +168,19 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         if (_lastrow?.CheckRow() is { } rce) {
             TableInput_RowChecked(this, rce);
         }
+
+        if (!SyncWithCell) {
+            if (Generic.IsAdministrator()) {
+                f.InfoText = "Temporäres Feld";
+            }
+
+            return;
+        }
     }
 
     protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
+        if (!SyncWithCell) { return; }
+
         try {
             if (InvokeRequired) {
                 _ = Invoke(new Action(() => TableInput_CellValueChanged(sender, e)));
@@ -220,6 +231,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
     protected override void TableInput_RowChecked(object sender, RowCheckedEventArgs e) {
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
+        if (!SyncWithCell) { return; }
 
         if (e.Row != _lastrow) { return; }
         if (e.ColumnsWithErrors == null) {
@@ -282,6 +294,11 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
         if (column == null) {
             f.DisabledReason = "Kein Bezug zu einer Spalte.";
+            return;
+        }
+
+        if (!SyncWithCell) {
+            f.DisabledReason = string.Empty;
             return;
         }
 
@@ -383,6 +400,8 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     }
 
     private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        if (!SyncWithCell) { return; }
+
         switch (e.Item.KeyName.ToLowerInvariant()) {
             case "dateiöffnen":
                 if (e.HotItem is TextListItem t) {
@@ -493,6 +512,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     }
 
     private void SetValueFromCell(ColumnItem? column, RowItem? row) {
+        if (!SyncWithCell) { return; }
         if (IsDisposed) { return; }
 
         if (column == null || row == null) {
@@ -649,6 +669,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     private void TextBox_TextChanged(object sender, System.EventArgs e) => RestartMarker();
 
     private void ValueToCell() {
+        if (!SyncWithCell) { return; }
         if (!f.Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
         if (_column is not { IsDisposed: false }) { return; }

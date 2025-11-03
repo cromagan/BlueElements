@@ -37,7 +37,7 @@ using static BlueBasics.Converter;
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 // ReSharper disable once UnusedMember.Global
-public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
+public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpenScriptEditor {
 
     #region Fields
 
@@ -147,16 +147,35 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        _button = new FlexiDelegateControl(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript);
+        _button = new FlexiDelegateControl(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
+
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
         result.Add(_button);
+        result.Add(new FlexiControlForProperty<string>(() => Script, 3));
         result.Add(new FlexiControlForProperty<int>(() => Sekunden));
-        result.Add(new FlexiControlForProperty<string>(() => Script));
 
         return result;
     }
 
     public bool IsVisibleForMe(string mode, bool nowDrawing) => true;
+
+    /// <summary>
+    /// Internes Skript
+    /// </summary>
+    public void OpenScriptEditor() {
+        var f = GenericControl.ParentForm(_button);
+
+        if (f != null) { f.Opacity = 0f; }
+
+        var tse = new TimerScriptEditor {
+            Object = this
+        };
+        _ = tse.ShowDialog();
+
+        //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
+
+        if (f != null) { f.Opacity = 1f; }
+    }
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -185,24 +204,6 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
     }
 
     public override string ReadableText() => "Timer";
-
-    /// <summary>
-    /// Internes Skript
-    /// </summary>
-    public void Skript_Bearbeiten() {
-        var f = GenericControl.ParentForm(_button);
-
-        if (f != null) { f.Opacity = 0f; }
-
-        var tse = new TimerScriptEditor {
-            Object = this
-        };
-        _ = tse.ShowDialog();
-
-        //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
-
-        if (f != null) { f.Opacity = 1f; }
-    }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr, 16);
 

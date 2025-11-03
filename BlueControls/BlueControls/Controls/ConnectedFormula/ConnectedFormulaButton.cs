@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -37,7 +36,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo {
+internal partial class ConnectedFormulaButton : GenericControlReciver {
 
     #region Fields
 
@@ -204,25 +203,6 @@ internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo 
 
     #region Methods
 
-    public string Infotext() {
-        var m = Method.AllMethods.GetByKey(_action);
-
-        if (m is not IUseableForButton ufb) { return "Keine Aktion definiert"; }
-
-        var t = m.ReadableText();
-
-        if (ufb.ArgsForButton.Count > 0) { t = t + "\r\n" + ufb.ArgsForButtonDescription[0] + " = " + Arg1; }
-        if (ufb.ArgsForButton.Count > 1) { t = t + "\r\n" + ufb.ArgsForButtonDescription[1] + " = " + Arg2; }
-        if (ufb.ArgsForButton.Count > 2) { t = t + "\r\n" + ufb.ArgsForButtonDescription[2] + " = " + Arg3; }
-        if (ufb.ArgsForButton.Count > 3) { t = t + "\r\n" + ufb.ArgsForButtonDescription[3] + " = " + Arg4; }
-        if (ufb.ArgsForButton.Count > 4) { t = t + "\r\n" + ufb.ArgsForButtonDescription[4] + " = " + Arg5; }
-        if (ufb.ArgsForButton.Count > 5) { t = t + "\r\n" + ufb.ArgsForButtonDescription[5] + " = " + Arg6; }
-        if (ufb.ArgsForButton.Count > 6) { t = t + "\r\n" + ufb.ArgsForButtonDescription[6] + " = " + Arg7; }
-        if (ufb.ArgsForButton.Count > 7) { t = t + "\r\n" + ufb.ArgsForButtonDescription[7] + " = " + Arg8; }
-
-        return t;
-    }
-
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
 
@@ -265,8 +245,6 @@ internal partial class ConnectedFormulaButton : GenericControlReciver, IHasInfo 
     private void ButtonError(string message) => MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
 
     private void mainButton_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.ContextMenu.Add(ItemOf(this));
-
         if (TableInput is { IsDisposed: false } db) {
             db.Editor ??= typeof(TableHeadEditor);
             e.ContextMenu.Add(ItemOf(db));

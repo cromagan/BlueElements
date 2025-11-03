@@ -48,6 +48,7 @@ public enum ImageCode {
     Drucker,
     EbeneNachHinten,
     EbeneNachVorne,
+    Einkaufswagen,
     Eins,
     Excel,
     Farben,

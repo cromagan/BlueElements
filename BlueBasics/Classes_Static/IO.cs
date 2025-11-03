@@ -444,6 +444,14 @@ public static class IO {
     public static string ReadAllText(string filename, Encoding encoding) {
         var result = ProcessFile(TryReadAllBytes, [filename], false, 10);
         var b = result as byte[] ?? Array.Empty<byte>();
+
+        // UTF-8 BOM (EF BB BF) entfernen, falls am Anfang vorhanden
+        if (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) {
+            var nb = new byte[b.Length - 3];
+            Buffer.BlockCopy(b, 3, nb, 0, nb.Length);
+            b = nb;
+        }
+
         return encoding.GetString(b);
     }
 
