@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 
 namespace BlueTable;
@@ -466,10 +467,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        if (!tb.MainChunkLoadDone) { return "Tabelle noch nicht geladen."; }
-
-        var aadc = tb.IsEditableGeneric();
-        if (!string.IsNullOrEmpty(aadc)) { return aadc; }
+        if (!tb.IsEditable(false)) { return tb.IsNotEditableReason(false); }
 
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
@@ -529,14 +527,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (tb2 is not { IsDisposed: false }) { return (null, "Tabellen verworfen", true); }
 
-        //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
-
-        var aadc = tb2.IsEditableGeneric();
-        if (!string.IsNullOrEmpty(aadc)) { return (null, "In der Tabelle sind keine neuen Zeilen möglich: " + aadc, true); }
-
         var s = tb2.NextRowKey();
         if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
 
+        var chunkval = string.Empty;
         foreach (var thisColum in tb2.Column) {
             if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
                 var inval = FilterCollection.InitValue(thisColum, true, false, filter);
@@ -545,12 +539,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {
+                    chunkval = inval;
                     if (!tb2.BeSureRowIsLoaded(inval)) {
                         return (null, "Chunk konnte nicht geladen werden.", false);
                     }
                 }
             }
         }
+
+        //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
+
+        var m = tb2.IsNowNewRowPossible(chunkval);
+        if (!string.IsNullOrEmpty(m)) { return (null, $"In der Tabelle sind keine neuen Zeilen möglich: {m}", true); }
 
         return GenerateAndAddInternal(s, filter, comment);
     }
@@ -860,19 +860,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="comment"></param>
     /// <returns></returns>
     private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
-        if (Table is not { IsDisposed: false } db) { return (null, "Tabelle verworfen!", true); }
+        if (Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen!", true); }
 
-        var aadc = db.IsEditableGeneric();
-        if (!string.IsNullOrEmpty(aadc)) { return (null, "Neue Zeilen nicht möglich: " + aadc, true); }
+        if (!tb.IsEditable(false)) { return (null, "Neue Zeilen nicht möglich: " + tb.IsNotEditableReason, true); }
 
         var item = GetByKey(key);
         if (item != null) { return (null, "Schlüssel bereits belegt!", true); }
 
         // REPARIERT: Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
         var chunkvalue = string.Empty;
-        List<ColumnItem> orderedColumns = [.. db.Column];
+        List<ColumnItem> orderedColumns = [.. tb.Column];
 
-        if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
+        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             _ = orderedColumns.Remove(spc);
             orderedColumns.Insert(0, spc);
             chunkvalue = FilterCollection.InitValue(spc, true, false, fc) ?? string.Empty;
@@ -885,7 +884,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var d = DateTime.UtcNow;
 
         // REPARIERT: Fehlerbehandlung für Zeilen-Erstellung
-        var createResult = db.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
+        var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
         if (!string.IsNullOrEmpty(createResult)) { return (null, $"Erstellung fehlgeschlagen: {createResult}", false); }
 
         item = GetByKey(key);
@@ -915,7 +914,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return (null, $"Initialwert-Fehler: {string.Join("; ", initErrors)}", false);
         }
 
-        Develop.Message?.Invoke(ErrorType.DevelopInfo, db, db.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {db.Caption}\\{item.CellFirstString()}", 0);
+        Develop.Message?.Invoke(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{item.CellFirstString()}", 0);
 
         var scriptResult = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
 

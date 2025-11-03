@@ -67,8 +67,7 @@ public class Method_AddRows : Method_TableGeneric {
 
         if (!tb.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
-        var m = tb.IsEditableGeneric();
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Tabellesperre: {m}", false, ld); }
+        if (!tb.IsEditable(false)) { return new DoItFeedback($"Tabellesperre: {tb.IsNotEditableReason(false)}", false, ld); }
 
         var keys = attvar.ValueListStringGet(2);
         keys = keys.SortedDistinctList();

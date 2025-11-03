@@ -1180,7 +1180,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsEditableGeneric())) { return; }
+        if (!tb.IsEditable(false)) { return; }
 
         if (source.Table != null) { source.Repair(); }
 
@@ -1597,10 +1597,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrWhiteSpace(tb.IsEditableGeneric())) { return; }
+        if (!tb.IsEditable(false)) { return; }
 
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        if (IsDisposed) { return; }
+        //if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+        //if (IsDisposed) { return; }
 
         //if (_function.ToString() == ((int)_function).ToString()) {
         //    this.GetStyleFrom(ColumnFormatHolder.Text);

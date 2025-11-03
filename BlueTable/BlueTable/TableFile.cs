@@ -101,10 +101,7 @@ public class TableFile : Table {
     /// </summary>
     /// <returns></returns>
     public FileOperationResult CanSaveMainChunk() {
-        var aadc = IsEditableGeneric();
-        if (!string.IsNullOrEmpty(aadc)) { return new(aadc, false, true); }
-
-        if (!MainChunkLoadDone) { return new("Tabelle noch nicht geladen.", false, true); }
+        if (!IsEditable(false)) { return new(IsNotEditableReason(false), false, true); }
 
         if (Row.HasPendingWorker()) { return new("Es müssen noch Daten überprüft werden.", true, true); }
 
@@ -169,11 +166,16 @@ public class TableFile : Table {
         return string.Empty;
     }
 
-    public override string IsEditableGeneric() {
+    public override string IsNotEditableReason(bool isLoading) {
         if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+
+        // Das ist eins super schnelle Prüfung, also vorziehen.
+        var m = base.IsNotEditableReason(isLoading);
+        if (!string.IsNullOrWhiteSpace(m)) { return m; }
+
         if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
 
-        return base.IsEditableGeneric();
+        return string.Empty;
     }
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool instantUpdate) {
@@ -214,12 +216,9 @@ public class TableFile : Table {
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded(true);
 
-        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
-
         CreateWatcher();
 
         DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
-        //_ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
     }
 
     public override void ReorganizeChunks() => base.ReorganizeChunks();
@@ -278,7 +277,7 @@ public class TableFile : Table {
     protected override void Checker_Tick(object state) {
         base.Checker_Tick(state);
 
-        if (IsDisposed || !string.IsNullOrEmpty(FreezedReason) || !SaveRequired || !LogUndo) {
+        if (!IsEditable(false) || !SaveRequired || !LogUndo) {
             _checkerTickCount = 0;
             return;
         }

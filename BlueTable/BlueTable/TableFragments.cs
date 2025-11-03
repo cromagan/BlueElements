@@ -163,9 +163,11 @@ public class TableFragments : TableFile {
         return FileOperationResult.ValueStringEmpty;
     }
 
-    public override string IsEditableGeneric() {
-        var aadc = base.IsEditableGeneric();
+    public override string IsNotEditableReason(bool isLoading) {
+        var aadc = base.IsNotEditableReason(isLoading);
         if (!string.IsNullOrEmpty(aadc)) { return aadc; }
+
+        if (string.IsNullOrEmpty(FragmengtsPath())) { return "Fragmentpfad nicht gesetzt."; }
 
         if (!FirstTimAlleFragmentsLoaded) { return "Tabelle wird noch geladen."; }
 
@@ -267,8 +269,7 @@ public class TableFragments : TableFile {
     }
 
     private void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc) {
-        if (IsFreezed) { return; }
-        if (!MainChunkLoadDone) { return; }
+        if (!IsEditable(false)) { return; }
         if (files is not { Count: >= 1 }) { return; }
         if (!FirstTimAlleFragmentsLoaded) { return; }
 
@@ -339,9 +340,7 @@ public class TableFragments : TableFile {
     private string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
 
     private (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(DateTime endTimeUtc) {
-        if (string.IsNullOrEmpty(FragmengtsPath())) { return (null, null); }
-
-        if (!string.IsNullOrEmpty(FreezedReason)) { return (null, null); }
+        if (IsEditable(true)) { return (null, null); }
 
         CheckPath();
 
@@ -391,15 +390,9 @@ public class TableFragments : TableFile {
     /// <param name="endTimeUtc"></param>
     private void InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
         if (data == null) { return; }
-        if (IsDisposed) { return; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
+        if (IsEditable(true)) { return; }
 
         if (Column.ChunkValueColumn is { IsDisposed: false }) { return; }
-
-        if (!string.IsNullOrEmpty(Filename) && !MainChunkLoadDone) {
-            Develop.DebugPrint(ErrorType.Error, "Tabelle noch nicht korrekt geladen!");
-            return;
-        }
 
         var dataSorted = data.Where(obj => obj?.DateTimeUtc != null).OrderBy(obj => obj.DateTimeUtc);
 
@@ -441,6 +434,7 @@ public class TableFragments : TableFile {
                 RepairAfterParse();
                 TryToSetMeTemporaryMaster();
                 OnInvalidateView();
+                OnLoaded(false);
             }
         } catch {
             Develop.CheckStackOverflow();
@@ -453,7 +447,8 @@ public class TableFragments : TableFile {
             Freeze("Fragmentpfad nicht gesetzt. Stand: " + _isInCache.ToString5());
             return;
         }
-        if (!FirstTimAlleFragmentsLoaded) { return; }
+
+        if (!IsEditable(false)) { return; }
         CheckPath();
 
         _myFragmentsFilename = TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());

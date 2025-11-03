@@ -365,7 +365,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //}
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrWhiteSpace(tb.IsEditableGeneric())) { return; }
+        if (!tb.IsEditable(false)) { return; }
 
         GetSystems();
         //for (var s1 = 0; s1 < Count; s1++) {

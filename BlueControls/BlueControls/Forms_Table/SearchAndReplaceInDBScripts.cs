@@ -58,8 +58,8 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
         var count = 0;
 
         foreach (var thisTb in Table.AllFiles) {
-            if (thisTb is { IsDisposed: false } db && string.IsNullOrEmpty(db.IsEditableGeneric())) {
-                foreach (var script in db.EventScript.ToList()) { // ToList() für sichere Iteration
+            if (thisTb is { IsDisposed: false } tb && tb.IsEditable(false)) {
+                foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
                     var newScriptContent = script.Script.Replace(txbAlt.Text, txbNeu.Text);
                     if (newScriptContent != script.Script) {
                         count++;

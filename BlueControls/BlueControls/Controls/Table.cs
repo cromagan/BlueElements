@@ -139,8 +139,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public event EventHandler<FilterEventArgs>? AutoFilterClicked;
 
-    public event EventHandler<CellEditBlockReasonEventArgs>? BlockEdit;
-
     public event EventHandler<CellEventArgs>? CellClicked;
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
@@ -546,7 +544,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                 if (tb is TableFile) {
                     dataObject.SetData(CellDataFormat, $"{tb.KeyName}\r{column.KeyName}\r{row.KeyName}");// 1. Als ExtChar-Format (für interne Verwendung)
-
                 }
                 dataObject.SetText(c);// 2. Als Plain Text (für externe Anwendungen)
                 Clipboard.SetDataObject(dataObject, true);
@@ -1221,9 +1218,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        CellEditBlockReasonEventArgs ed = new(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, string.Empty);
-        OnBlockEdit(ed);
-        return ed.BlockReason;
+        return string.Empty;
     }
 
     public bool IsInHead(int y) {
@@ -1589,14 +1584,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return RendererOf(columnViewItem.Column, style);
     }
 
-    internal static bool RepairColumnArrangements(Table db) {
-        if (db.IsDisposed) { return false; }
-        if (!string.IsNullOrEmpty(db.FreezedReason)) { return false; }
+    internal static bool RepairColumnArrangements(Table tb) {
+        if (!tb.IsEditable(false)) { return false; }
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
 
         for (var z = 0; z < Math.Max(2, tcvc.Count); z++) {
-            if (tcvc.Count < z + 1) { tcvc.Add(new ColumnViewCollection(db, string.Empty)); }
+            if (tcvc.Count < z + 1) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
             ColumnViewCollection.Repair(tcvc[z], z);
         }
 
@@ -1612,8 +1606,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         var n = tcvc.ToString(false);
 
-        if (n != db.ColumnArrangements) {
-            db.ColumnArrangements = n;
+        if (n != tb.ColumnArrangements) {
+            tb.ColumnArrangements = n;
             return true;
         }
 
@@ -3077,7 +3071,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
 
-
         OpenColumnEditor(column, _mouseOverRow?.Row);
     }
 
@@ -3733,23 +3726,23 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private void Draw_TableStatus(Graphics gr, Table db, ColumnViewCollection ca, int filterHeight) {
+    private void Draw_TableStatus(Graphics gr, Table tb, ColumnViewCollection ca, int filterHeight) {
         // Zeige Stifte-Symbol bei ausstehenden Änderungen
-        if (db.IsFreezed) {
+        if (tb.IsFreezed) {
             gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, filterHeight + 8);
-            if (!string.IsNullOrEmpty(db.FreezedReason)) {
-                ca.Font_RowChapter.DrawString(gr, db.FreezedReason, 52, filterHeight + 12);
+            if (!string.IsNullOrEmpty(tb.FreezedReason)) {
+                ca.Font_RowChapter.DrawString(gr, tb.FreezedReason, 52, filterHeight + 12);
             }
         }
 
-        if (db.IsAdministrator() && string.IsNullOrWhiteSpace(db.IsEditableGeneric())) {
+        if (tb.IsAdministrator() && tb.IsEditable(false)) {
             // Skripte-Status anzeigen
-            if (!string.IsNullOrEmpty(db.CheckScriptError())) {
+            if (!string.IsNullOrEmpty(tb.CheckScriptError())) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
                 ca.Font_RowChapter.DrawString(gr, "Skripte müssen repariert werden", 90, filterHeight + 12);
             } else {
                 // Verknüpfte Tabellen überprüfen
-                foreach (var thisColumn in db.Column) {
+                foreach (var thisColumn in tb.Column) {
                     if (thisColumn.LinkedTable is { IsDisposed: false } linkedDb && !string.IsNullOrEmpty(linkedDb.CheckScriptError())) {
                         gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
                         ca.Font_RowChapter.DrawString(gr, $"Skripte von {linkedDb.Caption} müssen repariert werden", 90, filterHeight + 12);
@@ -3760,9 +3753,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         // Master-Status anzeigen
-        if (db.AmITemporaryMaster(MasterTry, MasterUntil)) {
+        if (tb.AmITemporaryMaster(MasterTry, MasterUntil)) {
             gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, filterHeight);
-        } else if (db.AmITemporaryMaster(MasterBlockedMin, MasterUntil)) {
+        } else if (tb.AmITemporaryMaster(MasterBlockedMin, MasterUntil)) {
             gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, filterHeight);
         }
     }
@@ -4029,8 +4022,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     private void OnAutoFilterClicked(FilterEventArgs e) => AutoFilterClicked?.Invoke(this, e);
-
-    private void OnBlockEdit(CellEditBlockReasonEventArgs ed) => BlockEdit?.Invoke(this, ed);
 
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
@@ -4341,21 +4332,19 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     private string UserEdit_NewRowAllowed() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
-        if (db.Column.Count == 0) { return "Keine Spalten vorhanden"; }
-        if (db.Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
+
+        if (tb.Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
         if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return "Erste Spalte nicht sichtbar"; }
 
-        if (!db.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
+        string? chunkValue = null;
 
-        string? chunkv = null;
-
-        if (fc != db.Column.ChunkValueColumn) {
-            chunkv = FilterCombined.ChunkVal;
+        if (fc != tb.Column.ChunkValueColumn) {
+            chunkValue = FilterCombined.ChunkVal;
         }
 
-        return IsCellEditable(fcv, null, chunkv, false);
+        return tb.IsNowNewRowPossible(chunkValue);
     }
 
     #endregion

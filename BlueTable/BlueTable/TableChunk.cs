@@ -353,8 +353,8 @@ public class TableChunk : TableFile {
         }
     }
 
-    public override string IsEditableGeneric() {
-        var f = base.IsEditableGeneric();
+    public override string IsNotEditableReason(bool isLoading) {
+        var f = base.IsNotEditableReason(isLoading);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Maindata"; }
@@ -430,9 +430,7 @@ public class TableChunk : TableFile {
     }
 
     public override void ReorganizeChunks() {
-        if (IsDisposed) { return; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
-        if (string.IsNullOrEmpty(Filename)) { return; }
+        if (!IsEditable(false)) { return; }
 
         base.ReorganizeChunks();
 

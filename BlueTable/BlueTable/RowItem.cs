@@ -713,8 +713,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        var aadc = Table?.IsEditableGeneric() ?? "Keine Tabelle angekommen";
-        if (!string.IsNullOrEmpty(aadc) || Table is not { IsDisposed: false } || column == null) { return; }
+        if (Table is not { IsDisposed: false } tb || column == null) { return; }
+
+        if (!tb.IsEditable(false)) { return; }
 
         var columnVar = vars.GetByKey(column.KeyName);
         if (columnVar is not { ReadOnly: false }) { return; }

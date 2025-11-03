@@ -365,7 +365,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
                 FilterOutput.ChangeTo(nfc);
 
-                btnScript.Visible = r.Table is { IsDisposed: false } db && db.IsAdministrator() && string.IsNullOrEmpty(r.Table.IsEditableGeneric()) && !string.IsNullOrEmpty(db.CheckScriptError());
+                btnScript.Visible = r.Table is { IsDisposed: false } tb && tb.IsAdministrator() && tb.IsEditable(false) && !string.IsNullOrEmpty(tb.CheckScriptError());
 
                 if (btnScript.Visible) { btnScript.BringToFront(); }
             } else {

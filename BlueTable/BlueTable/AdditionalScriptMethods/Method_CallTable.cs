@@ -63,8 +63,7 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
         if (tb == myTb) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 
-        var m = tb.IsEditableGeneric();
-        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Tabellesperre: {m}", false, ld); }
+        if (!tb.IsEditable(false)) { return new DoItFeedback($"Tabellesperre: {tb.IsNotEditableReason(false)}", false, ld); }
 
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback("Stapelspeicherüberlauf", true, ld); }

@@ -228,7 +228,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             pad.Items = [];
             pad.Items.Endless = true;
 
-            if (Skin.StyleDb?.Row != null) {
+            if (Skin.StyleTb?.Row != null) {
                 pad.Items.SheetStyle = DefaultDesign;
             }
 

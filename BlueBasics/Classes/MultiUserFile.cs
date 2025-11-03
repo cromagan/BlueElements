@@ -104,10 +104,12 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     public bool IsDisposed { get; private set; }
 
+    public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
+
     public bool IsLoading {
         get {
             if (IsDisposed) { return false; }
-            if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
+            if (IsFreezed) { return false; }
 
             // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
             if (!_loadSemaphore.Wait(0)) { return true; }
@@ -119,7 +121,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     public bool IsSaving {
         get {
             if (IsDisposed) { return false; }
-            if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
+            if (IsFreezed) { return false; }
 
             // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
             if (!_saveSemaphore.Wait(0)) { return true; }
@@ -364,7 +366,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     public bool Save(bool mustSave) {
         if (_isSaved) { return true; }
 
-        if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
+        if (IsFreezed) { return false; }
         if (IsLoading) { return false; }
 
         if (ReloadNeeded) { return false; }

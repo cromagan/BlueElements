@@ -124,7 +124,7 @@ public sealed class RowSortDefinition : IParseable {
 
         if (Table is not { IsDisposed: false } tb) { return; }
 
-        if (!string.IsNullOrWhiteSpace(tb.IsEditableGeneric())) { return; }
+        if (!tb.IsEditable(false)) { return; }
 
         for (var i = 0; i < Columns.Count; i++) {
             if (Columns[i] is not ColumnItem { IsDisposed: false }) {

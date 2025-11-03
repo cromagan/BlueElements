@@ -41,7 +41,7 @@ public partial class PadEditor : FormWithStatusBar {
         PadDesign.ItemAddRange(ItemsOf(Skin.AllStyles()));
         PadDesign.Text = PadDesign[0]?.KeyName ?? string.Empty;
 
-        if (Pad?.Items != null && Skin.StyleDb != null) {
+        if (Pad?.Items != null && Skin.StyleTb != null) {
             Pad.Items.SheetStyle = PadDesign.Text;
         }
     }
@@ -138,7 +138,7 @@ public partial class PadEditor : FormWithStatusBar {
     }
 
     private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Pad?.Items != null && Skin.StyleDb?.Row != null) {
+        if (Pad?.Items != null && Skin.StyleTb?.Row != null) {
             Pad.Items.SheetStyle = e.Item.KeyName;
         }
     }

@@ -837,11 +837,10 @@ public static class Skin {
     public const int Padding = 9;
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2, MidpointRounding.AwayFromZero);
-    public static Table? StyleDb;
-
-    public static ColumnItem? StyleDb_Font;
-    public static ColumnItem? StyleDb_Name;
-    public static ColumnItem? StyleDb_Style;
+    public static Table? StyleTb;
+    public static ColumnItem? StyleTb_Font;
+    public static ColumnItem? StyleTb_Name;
+    public static ColumnItem? StyleTb_Style;
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
@@ -868,7 +867,7 @@ public static class Skin {
 
     public static List<string>? AllStyles() {
         InitStyles();
-        return StyleDb?.Column.First?.Contents();
+        return StyleTb?.Column.First?.Contents();
     }
 
     public static void ChangeDesign(Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc2, string f, string pic) {
@@ -1211,20 +1210,20 @@ public static class Skin {
         if (format == PadStyles.Undefiniert || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
 
         InitStyles();
-        if (StyleDb is not { IsDisposed: false } db ||
-            StyleDb_Style is not { IsDisposed: false } cs ||
-            StyleDb_Name is not { IsDisposed: false } cn ||
-            StyleDb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
+        if (StyleTb is not { IsDisposed: false } tb ||
+            StyleTb_Style is not { IsDisposed: false } cs ||
+            StyleTb_Name is not { IsDisposed: false } cn ||
+            StyleTb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
 
         var f1 = new FilterItem(cn, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, style);
         var f2 = new FilterItem(cs, BlueTable.Enums.FilterType.Istgleich, ((int)format).ToString());
 
-        var r = db.Row[f1, f2];
+        var r = tb.Row[f1, f2];
 
         if (r == null) {
-            if (!db.IsFreezed) {
+            if (tb.IsEditable(false)) {
                 var fc = new FilterItem[] { f1, f2 };
-                _ = db.Row.GenerateAndAdd(fc, "Unbekannter Stil");
+                _ = tb.Row.GenerateAndAdd(fc, "Unbekannter Stil");
             }
 
             return BlueFont.DefaultFont;
@@ -1232,7 +1231,7 @@ public static class Skin {
 
         var font = GetBlueFont(r);
 
-        if (!db.IsFreezed) {
+        if (tb.IsEditable(false)) {
             r.CellSet(cf, font.ParseableItems().FinishParseable(), "Automatische Korrektur");
         }
 
@@ -1240,7 +1239,7 @@ public static class Skin {
     }
 
     public static BlueFont GetBlueFont(RowItem? r) {
-        if (r == null || StyleDb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
+        if (r == null || StyleTb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
 
         var s = r.CellGetString(cf);
 
@@ -1327,11 +1326,11 @@ public static class Skin {
     }
 
     public static void InitStyles() {
-        StyleDb ??= Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
+        StyleTb ??= Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
 
-        StyleDb_Name = StyleDb?.Column["Name"];
-        StyleDb_Style = StyleDb?.Column["Style"];
-        StyleDb_Font = StyleDb?.Column["Font"];
+        StyleTb_Name = StyleTb?.Column["Name"];
+        StyleTb_Style = StyleTb?.Column["Style"];
+        StyleTb_Font = StyleTb?.Column["Font"];
     }
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate

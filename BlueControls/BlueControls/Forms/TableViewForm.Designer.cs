@@ -844,7 +844,6 @@ namespace BlueControls.Forms {
             this.Table.SelectedRowChanged += new System.EventHandler<BlueTable.EventArgs.RowNullableEventArgs>(this.Table_SelectedRowChanged);
             this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler(this.Table_VisibleRowsChanged);
-            this.Table.EnabledChanged += new System.EventHandler(this.Table_EnabledChanged);
             // 
             // SplitContainer1
             // 

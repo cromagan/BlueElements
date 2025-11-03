@@ -20,10 +20,11 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using BlueScript.Variables;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -290,8 +291,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
         }
 
-        var aadc = tb.IsEditableGeneric();
-        if (!string.IsNullOrWhiteSpace(aadc)) { return aadc; }
+        if (!tb.IsEditable(false)) { return $"Tabellesperre: {tb.IsNotEditableReason(false)}"; }
 
         if (column.RelationType == RelationType.CellValues) {
             var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
@@ -319,7 +319,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (oldChunk != newChunkValue) {
-            aadc = tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk);
+            var aadc = tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk);
             if (!string.IsNullOrEmpty(aadc)) { return aadc; }
         }
 
@@ -645,8 +645,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         try {
             if (column?.Table is not { IsDisposed: false } tb) { return new("Es ist keine Spalte ausgewählt.", false, true); }
 
-            var aadc = tb.IsEditableGeneric();
-            if (!string.IsNullOrEmpty(aadc)) { return new(aadc, false, true); }
+            if (!tb.IsEditable(false)) { return new(tb.IsNotEditableReason(false), false, true); }
 
             var fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
             if (fo.Failed) { return fo; }

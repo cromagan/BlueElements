@@ -344,12 +344,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public bool IsDisposed { get; private set; }
 
-    public bool IsFreezed {
-        get => IsDisposed || !string.IsNullOrEmpty(FreezedReason);
-    }
+    public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
 
     public bool KeyIsCaseSensitive => false;
+
     public string KeyName { get; }
+
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
 
     /// Der Wert wird im System verankert und gespeichert.
@@ -360,7 +360,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public DateTime LastSaveMainFileUtcDate { get; protected set; }
 
     public bool LogUndo { get; set; } = true;
+
     public bool MainChunkLoadDone { get; protected set; } = false;
+
     public virtual bool MasterNeeded => false;
 
     public virtual bool MultiUserPossible => false;
@@ -1022,7 +1024,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
-        if (!string.IsNullOrEmpty(tb.IsEditableGeneric())) { return false; }
+        if (!tb.IsEditable(false)) { return false; }
 
         var found = false;
 
@@ -1139,8 +1141,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </param>
     /// <returns></returns>
     public virtual bool AmITemporaryMaster(int ranges, int rangee) {
-        if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
         if (!MultiUserPossible) { return true; }
+        if (!IsEditable(false)) { return false; }
 
         if (TemporaryTableMasterUser != UserName) { return false; }
         if (TemporaryTableMasterMachine != Environment.MachineName) { return false; }
@@ -1159,7 +1161,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public virtual bool BeSureAllDataLoaded(int anzahl) => BeSureToBeUpToDate(false, true);
 
-    public virtual bool BeSureRowIsLoaded(string chunkValue) => string.IsNullOrEmpty(IsEditableGeneric());
+    public virtual bool BeSureRowIsLoaded(string chunkValue) => IsEditable(false);
 
     public virtual bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) => true;
 
@@ -1182,7 +1184,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="comment"></param>
     public string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, string oldchunkvalue, string newchunkvalue) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
+        if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
         var colName = column?.KeyName ?? string.Empty;
@@ -1324,10 +1326,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var f = ExternalAbortScriptReason(extended);
         if (!string.IsNullOrEmpty(f)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + f, false, false, script.KeyName); }
 
-        var aadc = IsEditableGeneric();
-        if (!string.IsNullOrEmpty(aadc)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + aadc, false, false, script.KeyName); }
+        if (!IsEditable(false)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + IsNotEditableReason(false), false, false, script.KeyName); }
 
-        if (!MainChunkLoadDone) { return new ScriptEndedFeedback("Tabelle noch nicht geladen.", false, false, script.KeyName); }
+        //if (!MainChunkLoadDone) { return new ScriptEndedFeedback("Tabelle noch nicht geladen.", false, false, script.KeyName); }
 
         if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback($"Das Skript ist fehlerhaft: {script.ErrorReason()}", false, true, script.KeyName); }
 
@@ -1532,7 +1533,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public virtual void Freeze(string reason) {
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
 
-        if (string.IsNullOrEmpty(FreezedReason)) {
+        if (!IsFreezed) {
             DropMessage(ErrorType.DevelopInfo, $"Tabelle {KeyName} wird eingefohren: {reason}");
         }
 
@@ -1561,20 +1562,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public virtual FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
-        if (!MainChunkLoadDone) { return new("Tabelle noch nicht geladen.", false, true); }
-
-        var aadc = IsEditableGeneric();
-        if (!string.IsNullOrEmpty(aadc)) { return new(aadc, false, true); }
+        if (!IsEditable(false)) { return new(IsNotEditableReason(false), false, true); }
 
         return FileOperationResult.ValueStringEmpty;
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
-        var aadc = IsEditableGeneric();
-
-        if (!string.IsNullOrEmpty(aadc)) {
-            DropMessage(ErrorType.Warning, "Abbruch, " + aadc);
-            return "Abbruch, " + aadc;
+        if (!IsEditable(false)) {
+            DropMessage(ErrorType.Warning, "Abbruch, " + IsNotEditableReason(false));
+            return "Abbruch, " + IsNotEditableReason(false);
         }
 
         #region Text vorbereiten
@@ -1754,12 +1750,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return !string.IsNullOrEmpty(UserGroup) && _tableAdmin.Contains(UserGroup, false);
     }
 
-    public virtual string IsEditableGeneric() {
+    /// <summary>
+    /// Überprüft, ob ein generelles Bearbeiten eine Wertes möglich ist.
+    /// Dieser Wert kann sich im Laufe der Ausführung ändern. (z.B. wenn eine Tabelle komplett geladen wurde)
+    /// </summary>
+    public virtual bool IsEditable(bool isloading) => string.IsNullOrEmpty(IsNotEditableReason(isloading));
+
+    public virtual string IsNotEditableReason(bool isloading) {
         if (IsDisposed) { return "Tabelle verworfen."; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
+        if (IsFreezed) { return $"Tabelle eingefroren: {FreezedReason}"; }
+
+        if (!isloading && !MainChunkLoadDone) { return "Laden noch nicht abgeschlossen"; }
 
         if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(TableVersion.Replace(".", string.Empty))) {
-            return "Diese Programm kann nur Tabellen bis Version " + TableVersion + " bearbeiten.";
+            return $"Dieses Programm kann Tabellen nur bis Version {TableVersion} bearbeiten.";
         }
 
         return string.Empty;
@@ -1771,10 +1775,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns></returns>
     public string IsNowEditable() => GrantWriteAccess(TableDataType.Caption, TableChunk.Chunk_Master).StringValue;
 
+    public string IsNowNewRowPossible(string? chunkValue) {
+        if (IsDisposed) { return "Tabelle verworfen"; }
+        if (Column.Count == 0) { return "Keine Spalten vorhanden"; }
+        if (Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
+
+        if (!IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
+
+        return CellCollection.IsCellEditable(fc, null, chunkValue);
+    }
+
     public bool IsRowScriptPossible() {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
-        return string.IsNullOrEmpty(IsEditableGeneric());
+        return IsEditable(false);
     }
 
     public bool IsThisScriptBroken(ScriptEventTypes type, bool returnValueCount0) {
@@ -1801,8 +1815,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _ = Parse(bLoaded, true);
         RepairAfterParse();
         Freeze("Stream-Tabelle");
-        OnLoaded(true);
         MainChunkLoadDone = true;
+        OnLoaded(true);
     }
 
     public void MasterMe() {
@@ -2030,7 +2044,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public virtual void ReorganizeChunks() { }
 
     public virtual void RepairAfterParse() {
-        if (!string.IsNullOrEmpty(IsEditableGeneric())) { return; }
+        if (!IsEditable(false)) { return; }
 
         Column.Repair();
 
@@ -2054,7 +2068,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
     /// </summary>
     public virtual void TryToSetMeTemporaryMaster() {
-        if (!string.IsNullOrEmpty(IsEditableGeneric())) { return; }
+        if (!IsEditable(false)) { return; }
 
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax)) { return; }
 
@@ -2086,7 +2100,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Develop.DebugPrint(ErrorType.Warning, t);
     }
 
-    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsEditableGeneric();
+    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsNotEditableReason(false);
 
     //public void Variables_RemoveAll(bool isLoading) {
     //    //while (_variables.Count > 0) {
@@ -2120,7 +2134,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     protected virtual void Checker_Tick(object state) {
         // Grundlegende Überprüfungen
-        if (IsDisposed || !string.IsNullOrEmpty(FreezedReason)) { return; }
+        if (!IsEditable(false)) { return; }
 
         // Script-Überprüfung
         var e = new CanDoScriptEventArgs(false);
@@ -2129,9 +2143,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected void CreateWatcher() {
-        if (!IsFreezed) {
-            _checker?.Dispose();
+        _checker?.Dispose();
+        _checker = null;
 
+        if (IsEditable(true)) {
             _checker = new Timer(Checker_Tick);
             _ = _checker.Change(2000, 2000);
         }
@@ -2211,7 +2226,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
-        if ((reason != Reason.NoUndo_NoInvalidate) && !string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren: " + FreezedReason; }
+        if ((reason != Reason.NoUndo_NoInvalidate) && !IsEditable(false)) { return "Tabelle eingefroren: " + IsNotEditableReason(false); }
         if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;
@@ -2482,7 +2497,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return;
             }
 
-            if (!string.IsNullOrEmpty(FreezedReason)) {
+            if (IsFreezed) {
                 DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {KeyName} eingefrohren {FreezedReason}");
                 return;
             }
@@ -2496,7 +2511,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     protected virtual string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Tabelle eingefroren!"; } // Sicherheitshalber!
+        if (IsFreezed) { return "Tabelle eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
 
         return string.Empty;
@@ -2556,8 +2571,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     private bool NewMasterPossible() {
-        if (IsFreezed) { return false; }
         if (!IsAdministrator()) { return false; }
+
+        if (!IsEditable(false)) { return false; }
 
         if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
             if (DateTime.UtcNow.Subtract(dt).TotalMinutes < MasterBlockedMax) { return false; }
