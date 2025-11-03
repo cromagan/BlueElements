@@ -37,19 +37,16 @@ public partial class GlobalMonitor : Form {
 
     public static void GenerateLogTable(Controls.TableView tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
-        Table db = new(Table.UniqueKeyValue()) {
-            LogUndo = false,
-            DropMessages = false
-        };
-        var dbi = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        var tb = new Table();
+        var dbi = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         dbi.IsFirst = true;
-        _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
-        var az = db.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolder.DateTime);
-        _ = db.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolder.Long);
+        _ = tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
+        var az = tb.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolder.DateTime);
+        _ = tb.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolder.Long);
 
-        foreach (var thisColumn in db.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
                 thisColumn.EditableWithTextInput = false;
@@ -58,7 +55,7 @@ public partial class GlobalMonitor : Form {
             }
         }
 
-        if (db.Column["Symbol"] is { IsDisposed: false } c) {
+        if (tb.Column["Symbol"] is { IsDisposed: false } c) {
             var o = new Renderer_ImageAndText {
                 Text_anzeigen = false,
                 Bild_anzeigen = true
@@ -67,16 +64,16 @@ public partial class GlobalMonitor : Form {
             c.RendererSettings = o.ParseableItems().FinishParseable();
         }
 
-        db.RepairAfterParse();
+        tb.RepairAfterParse();
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc[1].ShowColumns("Symbol", "Zeit", "category", "indent", "Message");
 
-        db.ColumnArrangements = tcvc.ToString(false);
+        tb.ColumnArrangements = tcvc.ToString(false);
 
-        tblLog.TableSet(db, string.Empty);
+        tblLog.TableSet(tb, string.Empty);
         tblLog.Arrangement = string.Empty;
-        tblLog.SortDefinitionTemporary = new RowSortDefinition(db, az, true);
+        tblLog.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }
 
     [StandaloneInfo("Monitoring", ImageCode.Monitor, "Admin", 900)]

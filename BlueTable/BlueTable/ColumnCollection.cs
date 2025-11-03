@@ -205,7 +205,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    return null;
         //}
 
-        _ = Table?.ChangeData(TableDataType.Command_AddColumnByName, null, string.Empty, keyName);
+        Table?.ChangeData(TableDataType.Command_AddColumnByName, null, string.Empty, keyName);
         var item = this[keyName];
         if (item == null) {
             Develop.DebugPrint(ErrorType.Error, "Erstellung fehlgeschlagen.");

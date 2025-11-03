@@ -33,7 +33,6 @@ public partial class VariableEditor : EditorEasy {
 
     public VariableEditor() : base() => InitializeComponent();
 
-
     #endregion
 
     #region Methods
@@ -65,18 +64,15 @@ public partial class VariableEditor : EditorEasy {
     public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Table is not { IsDisposed: false } db ? null : db.Row[variable.KeyName];
 
     protected override void InitializeComponentDefaultValues() {
-        Table db = new(Table.UniqueKeyValue()) {
-            LogUndo = false,
-            DropMessages = false
-        };
-        var na = db.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
+        var tb = new Table();
+        var na = tb.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         na.IsFirst = true;
-        _ = db.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
-        _ = db.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
-        var inh = db.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.TextMitFormatierung, "Inhalt");
-        var kom = db.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Kommentar");
+        _ = tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
+        _ = tb.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
+        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.TextMitFormatierung, "Inhalt");
+        var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Kommentar");
 
-        foreach (var thisColumn in db.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
                 thisColumn.EditableWithTextInput = false;
@@ -84,7 +80,7 @@ public partial class VariableEditor : EditorEasy {
             }
         }
 
-        db.Column.GenerateAndAddSystem();
+        tb.Column.GenerateAndAddSystem();
 
         if (Editabe) {
             List<ColumnItem?> l = [na, inh, kom];
@@ -101,10 +97,10 @@ public partial class VariableEditor : EditorEasy {
             if (inh != null) { inh.Caption = "Inhalt"; }
             if (kom != null) { kom.Caption = "Kommentar"; }
 
-            db.PermissionGroupsNewRow = new([Constants.Everybody]);
+            tb.PermissionGroupsNewRow = new([Constants.Everybody]);
         }
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
 
         //if (car != null) {
         if (Editabe) {
@@ -115,15 +111,14 @@ public partial class VariableEditor : EditorEasy {
             tcvc[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
         }
 
-        db.RepairAfterParse();
-        db.ColumnArrangements = tcvc.ToString(false);
+        tb.RepairAfterParse();
+        tb.ColumnArrangements = tcvc.ToString(false);
 
-        db.SortDefinition = new RowSortDefinition(db, na, true);
+        tb.SortDefinition = new RowSortDefinition(tb, na, true);
 
-        tableVariablen.TableSet(db, string.Empty);
+        tableVariablen.TableSet(tb, string.Empty);
 
-
-        db.Cell.CellValueChanged += TableVariablen_CellValueChanged;
+        tb.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }
 
     protected override bool SetValuesToFormula(IEditable? variables) {

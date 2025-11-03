@@ -145,7 +145,24 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     #region Constructors
 
-    public Table(string tablename) {
+    public Table() : this(Table.UniqueKeyValue()) {
+        LogUndo = false;
+        DropMessages = false;
+        MainChunkLoadDone = true;
+
+        OnLoading();
+
+        MainChunkLoadDone = true;
+        _ = BeSureToBeUpToDate(true, true);
+
+        RepairAfterParse();
+
+        OnLoaded(true);
+
+        CreateWatcher();
+    }
+
+    protected Table(string tablename) {
         // Keine Konstruktoren mit Dateiname, Filestreams oder sonst was.
         // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
         Develop.StartService();
@@ -1775,12 +1792,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns></returns>
     public string IsNowEditable() => GrantWriteAccess(TableDataType.Caption, TableChunk.Chunk_Master).StringValue;
 
-    public string IsNowNewRowPossible(string? chunkValue) {
+    public string IsNowNewRowPossible(string? chunkValue, bool checkUserRights) {
         if (IsDisposed) { return "Tabelle verworfen"; }
         if (Column.Count == 0) { return "Keine Spalten vorhanden"; }
         if (Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
         if (!IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
+
+        if (!checkUserRights) { return string.Empty; }
 
         return CellCollection.IsCellEditable(fc, null, chunkValue);
     }

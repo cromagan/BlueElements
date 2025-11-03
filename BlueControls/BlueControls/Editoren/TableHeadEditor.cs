@@ -189,15 +189,15 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             case TableDataType.TemporaryTableMasterMachine:
                 symb = ImageCode.Monitor;
                 break;
+
             case TableDataType.TemporaryTableMasterApp:
                 symb = ImageCode.Anwendung;
                 break;
+
             case TableDataType.TemporaryTableMasterId:
                 symb = ImageCode.Formel;
 
-
                 break;
-
         }
         r.CellSet("Aenderung", work.Command.ToString(), string.Empty);
         r.CellSet("symbol", symb + "|24", string.Empty);
@@ -206,27 +206,24 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     public static void GenerateUndoTabelle(TableView tblUndo) {
-        Table db = new(Table.UniqueKeyValue()) {
-            LogUndo = false,
-            DropMessages = false
-        };
+        var tb = new Table();
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
-        var f = db.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        var f = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         f.IsFirst = true;
-        _ = db.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
-        _ = db.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
-        var az = db.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
-        _ = db.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
-        _ = db.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
-        _ = db.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
-        foreach (var thisColumn in db.Column) {
+        _ = tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
+        _ = tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
+        var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
+        _ = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
+        _ = tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
+        _ = tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
+        foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
                 thisColumn.EditableWithTextInput = false;
@@ -244,7 +241,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             az.RendererSettings = o.ParseableItems().FinishParseable();
         }
 
-        if (db.Column["Symbol"] is { IsDisposed: false } c) {
+        if (tb.Column["Symbol"] is { IsDisposed: false } c) {
             var o = new Renderer_ImageAndText {
                 Text_anzeigen = false,
                 Bild_anzeigen = true
@@ -253,18 +250,18 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             c.RendererSettings = o.ParseableItems().FinishParseable();
         }
 
-        db.RepairAfterParse();
+        tb.RepairAfterParse();
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc[1].ShowColumns("Table", "ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
 
-        db.ColumnArrangements = tcvc.ToString(false);
+        tb.ColumnArrangements = tcvc.ToString(false);
 
         //x.SortDefinition = new RowSortDefinition(db, "Index", true);
 
-        tblUndo.TableSet(db, string.Empty);
+        tblUndo.TableSet(tb, string.Empty);
         tblUndo.Arrangement = string.Empty;
-        tblUndo.SortDefinitionTemporary = new RowSortDefinition(db, az, true);
+        tblUndo.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {

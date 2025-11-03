@@ -548,7 +548,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
-        var m = tb2.IsNowNewRowPossible(chunkval);
+        var m = tb2.IsNowNewRowPossible(chunkval, false);
         if (!string.IsNullOrEmpty(m)) { return (null, $"In der Tabelle sind keine neuen Zeilen möglich: {m}", true); }
 
         return GenerateAndAddInternal(s, filter, comment);

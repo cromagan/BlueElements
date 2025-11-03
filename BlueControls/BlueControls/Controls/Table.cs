@@ -4344,7 +4344,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             chunkValue = FilterCombined.ChunkVal;
         }
 
-        return tb.IsNowNewRowPossible(chunkValue);
+        return tb.IsNowNewRowPossible(chunkValue, true);
     }
 
     #endregion

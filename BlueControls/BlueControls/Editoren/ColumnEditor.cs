@@ -538,21 +538,18 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (linkdb == null) { return; }
 
         if (tblFilterliste.Table == null) {
-            Table db = new(Table.UniqueKeyValue()) {
-                LogUndo = false,
-                DropMessages = false
-            };
+            var tb = new Table();
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
-            var spn = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
+            var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
             spn.IsFirst = true;
-            var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
+            var vis = tb.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
             if (vis is not { IsDisposed: false }) { return; }
-            var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
+            var sp = tb.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
             if (sp is not { IsDisposed: false }) { return; }
 
             sp.Align = AlignmentHorizontal.Rechts;
 
-            var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
+            var b = tb.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
             if (b is not { IsDisposed: false }) { return; }
             b.ColumnQuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
@@ -579,21 +576,21 @@ internal sealed partial class ColumnEditor : IIsEditor {
             };
             b.RendererSettings = s.ReadableText();
 
-            db.RepairAfterParse();
-            var tcvc = ColumnViewCollection.ParseAll(db);
+            tb.RepairAfterParse();
+            var tcvc = ColumnViewCollection.ParseAll(tb);
 
             tcvc[1].Add(sp);
             tcvc[1].Add(b);
 
-            db.ColumnArrangements = tcvc.ToString(false);
+            tb.ColumnArrangements = tcvc.ToString(false);
 
-            db.SortDefinition = new RowSortDefinition(db, sp, false);
-            tblFilterliste.TableSet(db, string.Empty);
+            tb.SortDefinition = new RowSortDefinition(tb, sp, false);
+            tblFilterliste.TableSet(tb, string.Empty);
             //tblFilterliste.Arrangement = 1;
 
-            var t = db.Tags.Clone();
+            var t = tb.Tags.Clone();
             t.TagSet("Filename", linkdb.KeyName);
-            db.Tags = t.AsReadOnly();
+            tb.Tags = t.AsReadOnly();
 
             tblFilterliste?.Filter.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
         }
