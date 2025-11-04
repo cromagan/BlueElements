@@ -28,7 +28,6 @@ public class VariableListRow : Variable {
     #region Fields
 
     public static readonly List<string> ListRowVar = [ShortName_Variable];
-
     private List<RowItem> _list;
 
     #endregion
@@ -60,9 +59,9 @@ public class VariableListRow : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _list.Count == 0;
-
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
+    public override string ValueForCell => string.Empty;
 
     public List<RowItem> ValueList {
         get => _list;

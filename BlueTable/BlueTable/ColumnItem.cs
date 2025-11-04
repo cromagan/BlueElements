@@ -787,6 +787,25 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
+    public string MostUsedValue {
+        get {
+            var liste = Contents();
+
+            Dictionary<string, int> zähler = new Dictionary<string, int>();
+
+            foreach (string wert in liste) {
+                if (!string.IsNullOrEmpty(wert)) {
+                    if (zähler.ContainsKey(wert))
+                        zähler[wert]++;
+                    else
+                        zähler[wert] = 1;
+                }
+            }
+
+            return zähler.OrderByDescending(kvp => kvp.Value).FirstOrDefault().Key;
+        }
+    }
+
     public bool MultiLine {
         get => _multiLine;
         set {
@@ -1476,8 +1495,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
         }
 
-        if (_relationType == RelationType.DropDownValues ||
-            _scriptType == ScriptType.Row) {
+        if (_relationType == RelationType.DropDownValues) {
             if (_afterEditRound != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
                 return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben, Erlaubte Zeichen oder Sortierung.";
             }

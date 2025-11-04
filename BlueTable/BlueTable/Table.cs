@@ -1795,11 +1795,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public string IsNowNewRowPossible(string? chunkValue, bool checkUserRights) {
         if (IsDisposed) { return "Tabelle verworfen"; }
         if (Column.Count == 0) { return "Keine Spalten vorhanden"; }
-        if (Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
         if (!IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
 
         if (!checkUserRights) { return string.Empty; }
+
+        if (Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
         return CellCollection.IsCellEditable(fc, null, chunkValue);
     }

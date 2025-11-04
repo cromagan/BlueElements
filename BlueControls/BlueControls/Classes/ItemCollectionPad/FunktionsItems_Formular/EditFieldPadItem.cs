@@ -48,7 +48,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
     private string _columnName = string.Empty;
-    private string _feldID = string.Empty;
     private bool _freiesFeld = false;
 
     #endregion
@@ -133,14 +132,12 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         }
     }
 
-    public string FeldID {
-        get => _feldID;
-        set {
-            if (IsDisposed) { return; }
-            if (_feldID == value) { return; }
-            _feldID = value;
-            OnPropertyChanged();
-            OnDoUpdateSideOptionMenu();
+    public string FieldName {
+        get {
+            if (!Freies_Feld) { return string.Empty; }
+            if (Column is not { } c || c.Table is not { } tb) { return string.Empty; }
+
+            return $"FIELD_{tb.KeyName}_{c.KeyName}";
         }
     }
 
@@ -183,8 +180,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             ColumnName = _columnName,
             EditType = EditType,
             CaptionPosition = CaptionPosition,
-            SyncWithCell = !Freies_Feld,
-            FieldID = FeldID
+            SyncWithCell = !Freies_Feld
         };
 
         con.DoDefaultSettings(parent, this, mode);
@@ -198,8 +194,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (Column is not { IsDisposed: false }) { return "Spaltenangabe fehlt"; }
-
-        if (_freiesFeld && string.IsNullOrWhiteSpace(_feldID)) { return "Feld-ID fehlt."; }
 
         return string.Empty;
     }
@@ -228,10 +222,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
 
         result.Add(new FlexiControlForProperty<bool>(() => Freies_Feld));
-        if (_freiesFeld) {
-            result.Add(new FlexiControlForProperty<string>(() => FeldID));
-        }
-
         return result;
     }
 
@@ -244,7 +234,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         result.ParseableAdd("Caption", _captionPosition);
         result.ParseableAdd("AutoDistance", _autoX);
         result.ParseableAdd("NoSave", _freiesFeld);
-        result.ParseableAdd("FieldID", _feldID);
         return result;
     }
 
@@ -259,7 +248,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
                 return true;
 
             case "fieldid":
-                _feldID = value;
                 return true;
 
             case "edittype":

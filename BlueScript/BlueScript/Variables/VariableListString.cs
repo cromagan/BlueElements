@@ -81,6 +81,7 @@ public class VariableListString : Variable {
 
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;
+    public override string ValueForCell => _list.JoinWithCr();
     public override string ValueForReplace => ReadableText;
 
     public List<string> ValueList {
@@ -117,13 +118,12 @@ public class VariableListString : Variable {
     }
 
     protected override bool TryParseValue(string txt, out object? result) {
-
         if (txt is "[]" or "[ ]") { result = new List<string>(); return true; } // Leere Liste
 
         if (txt.Length > 3 && txt.StartsWith("[\"") && txt.EndsWith("\"]")) {
             var t = txt.Substring(2, txt.Length - 4);
 
-            t=t.Replace("\", \"", "\",\"");
+            t = t.Replace("\", \"", "\",\"");
 
             if (string.IsNullOrEmpty(t)) { result = new List<string>() { string.Empty }; return true; } // Leere Liste
 

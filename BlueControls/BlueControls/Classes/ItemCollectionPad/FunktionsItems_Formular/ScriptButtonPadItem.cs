@@ -150,7 +150,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -164,9 +164,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
             new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
         ];
 
-        //var m = Method.GetMethods(MethodType.);
-
-        //using var gr = Graphics.FromImage(bmp);
+        vars.AddRange(fields);
 
         var scp = new ScriptProperties("ScriptButton", Method.AllMethods, true, [], null, "ScriptButton", "ScriptButton in Formular");
 

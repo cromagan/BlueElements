@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Variables;
+using BlueTable;
 using BlueTable.Enums;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -129,6 +130,8 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         HandleChangesNow();
 
+        #region Variablen erstellen
+
         VariableCollection vars;
 
         var row = RowSingleOrNull();
@@ -139,30 +142,35 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
             vars = [];
         }
 
-        //#region FilterVariablen erstellen und in fis speichern
+        foreach (var thisCon in Parent.Controls) {
+            if (thisCon is FlexiCellControl fcc && !fcc.SyncWithCell && fcc.Column is { } c) {
+                var fn = fcc.FieldName;
 
-        //var fis = string.Empty;
+                if (!string.IsNullOrEmpty(fn)) {
+                    _ = vars.Add(RowItem.CellToVariable(fn, c.ScriptType, fcc.Value, false, "Feld im Formular"));
+                }
+            }
+        }
 
-        //if (FilterInput is { IsDisposed: false } fi) {
-        //    for (var fz = 0; fz < fi.Count; fz++) {
-        //        if (fi[fz] is { } thisf) {
-        //            var nam = "Filter" + fz;
-        //            _ = vars.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
-        //            fis = fis + nam + ",";
-        //        }
-        //    }
-        //    ai = fi.Table;
-        //}
-        //fis = fis.TrimEnd(",");
+        #endregion
 
-        //#endregion
-
-        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode);
+        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, vars);
 
         if (t.Failed) {
             Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Fehler: " + t.Protocol, 0);
             MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + t.Protocol, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
+
+        #region Variablen zurückschreiben
+
+        foreach (var thisCon in Parent.Controls) {
+            if (thisCon is FlexiCellControl fcc && !fcc.SyncWithCell && fcc.Column is { } && vars.GetByKey(fcc.FieldName) is Variable v) {
+                fcc.Value = v.ValueForCell;
+            }
+        }
+
+        #endregion
+
         mainButton.Enabled = true;
         mainButton.Refresh();
     }

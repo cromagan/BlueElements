@@ -62,6 +62,7 @@ public class VariableString : Variable {
     public override string SearchValue => _valueString;
 
     public override bool ToStringPossible => true;
+    public override string ValueForCell => _valueString;
 
     /// <summary>
     /// Der Wert mit " Anfang/Ende und entfernten kritischen Zeichen.

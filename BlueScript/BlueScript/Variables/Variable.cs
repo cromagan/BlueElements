@@ -114,6 +114,8 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     /// </summary>
     public abstract bool ToStringPossible { get; }
 
+    public abstract string ValueForCell { get; }
+
     /// <summary>
     /// Wichtig für Boolsche Vergleiche
     /// </summary>

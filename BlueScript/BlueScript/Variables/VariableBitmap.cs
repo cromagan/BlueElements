@@ -27,7 +27,6 @@ public class VariableBitmap : Variable {
     #region Fields
 
     public static readonly List<string> BmpVar = [ShortName_Variable];
-
     private Bitmap? _bmp;
 
     #endregion
@@ -51,7 +50,6 @@ public class VariableBitmap : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _bmp == null;
-
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
 
@@ -62,6 +60,8 @@ public class VariableBitmap : Variable {
             _bmp = value;
         }
     }
+
+    public override string ValueForCell => string.Empty;
 
     #endregion
 

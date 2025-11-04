@@ -28,6 +28,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
@@ -84,7 +85,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
     public string Caption {
         get {
-            _column ??= GetTmpColumn();
+            _column ??= Column;
 
             if (_column != null) {
                 return _column.ReadableText() + ":";
@@ -99,6 +100,18 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     }
 
     public CaptionPosition CaptionPosition { get => f.CaptionPosition; set => f.CaptionPosition = value; }
+
+    public ColumnItem? Column {
+        get {
+            try {
+                return TableInput is { IsDisposed: false } tb ? tb.Column[_columnName] : null;
+            } catch {
+                // Multitasking sei dank kann _table trotzem null sein...
+                Develop.CheckStackOverflow();
+                return Column;
+            }
+        }
+    }
 
     [DefaultValue("")]
     public string ColumnName {
@@ -117,9 +130,24 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     }
 
     public EditTypeFormula EditType { get => f.EditType; set => f.EditType = value; }
-    public string FieldID { get; internal set; } = string.Empty;
+
+    public string FieldName {
+        get {
+            if (GeneratedFrom is not EditFieldPadItem efpi) { return string.Empty; }
+            return efpi.FieldName;
+        }
+    }
+
+    //public string FieldID { get; internal set; } = string.Empty;
     public bool SyncWithCell { get; internal set; } = true;
-    public string Value => f.Value;
+
+    public string Value {
+        get => f.Value;
+        set {
+            if (SyncWithCell) { Develop.DebugPrint(ErrorType.Error, "Wert kann über ValueSet nicht gesetzt werden."); }
+            f.ValueSet(value, true);
+        }
+    }
 
     #endregion
 
@@ -159,7 +187,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         DoRows();
 
         _lastrow = RowSingleOrNull();
-        _column ??= GetTmpColumn();
+        _column ??= Column;
 
         StyleControls(_column, _lastrow);
         SetValueFromCell(_column, _lastrow);
@@ -387,16 +415,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         if (gbColumn != null) { f.GetStyleFrom(gbColumn); }
 
         return gbColumn;
-    }
-
-    private ColumnItem? GetTmpColumn() {
-        try {
-            return TableInput is { IsDisposed: false } db ? db.Column[_columnName] : null;
-        } catch {
-            // Multitasking sei dank kann _table trotzem null sein...
-            Develop.CheckStackOverflow();
-            return GetTmpColumn();
-        }
     }
 
     private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {

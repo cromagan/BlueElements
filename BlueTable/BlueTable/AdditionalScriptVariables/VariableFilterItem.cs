@@ -28,7 +28,6 @@ public class VariableFilterItem : Variable {
     #region Fields
 
     private FilterItem? _filter;
-
     private string _lastText = string.Empty;
 
     #endregion
@@ -51,9 +50,7 @@ public class VariableFilterItem : Variable {
     #region Properties
 
     public static string ClassId => "fil";
-
     public static string ShortName_Variable => "*fil";
-
     public override int CheckOrder => 99;
 
     public FilterItem? FilterItem {
@@ -66,12 +63,11 @@ public class VariableFilterItem : Variable {
     }
 
     public override bool GetFromStringPossible => false;
-
     public override bool IsNullOrEmpty => _filter == null || !_filter.IsOk();
-
     public override string ReadableText => _lastText;
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
+    public override string ValueForCell => string.Empty;
 
     #endregion
 

@@ -17,9 +17,12 @@
 
 #nullable enable
 
+using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Structures;
+using BlueScript.Variables;
+using BlueTable;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;
@@ -87,7 +90,33 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             return TimerPadItem.ExecuteScript(tpi.Script, "Testmodus", string.Empty, string.Empty, string.Empty);
         }
         if (_item is ScriptButtonPadItem sbpi) {
-            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus");
+
+            #region Variablen erstellen
+
+            VariableCollection vars;
+
+            var row = sbpi.TableInput?.Row?.First();
+
+            if (row?.Table is { IsDisposed: false } tb) {
+                vars = tb.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+            } else {
+                vars = [];
+            }
+            if (sbpi.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                foreach (var thisCon in icpi) {
+                    if (thisCon is EditFieldPadItem fcc && fcc.Freies_Feld && fcc.Column is { } c) {
+                        var fn = fcc.FieldName;
+
+                        if (!string.IsNullOrEmpty(fn)) {
+                            _ = vars.Add(RowItem.CellToVariable(fn, c.ScriptType, c.MostUsedValue, false, "Feld im Formular"));
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars);
         }
 
         return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein");

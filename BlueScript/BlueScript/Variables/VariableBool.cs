@@ -46,17 +46,11 @@ public class VariableBool : Variable {
     #region Properties
 
     public static string ClassId => "bol";
-
     public static string ShortName_Plain => "bol";
-
     public static string ShortName_Variable => "*bol";
-
     public override int CheckOrder => 0;
-
     public override bool GetFromStringPossible => true;
-
     public override bool IsNullOrEmpty => false;
-
     public override string ReadableText => _valuebool.ToString();
 
     /// <summary>
@@ -74,6 +68,7 @@ public class VariableBool : Variable {
         }
     }
 
+    public override string ValueForCell => _valuebool.ToPlusMinus();
     public override string ValueForReplace => _valuebool ? "true" : "false";
 
     #endregion

@@ -63,6 +63,8 @@ public class VariableDouble : Variable {
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;
 
+    public override string ValueForCell => ReadableText;
+
     /// <summary>
     /// Der Zahlenwert mit maximal 5 Kommastellen (0.#####)
     /// </summary>

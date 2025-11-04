@@ -135,62 +135,50 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Methods
 
-    public static Variable? CellToVariable(ColumnItem? column, RowItem? row, bool mustbeReadOnly, bool virtualcolumns) {
+    public static Variable? CellToVariable(ColumnItem? column, RowItem? row, bool readOnly, bool virtualcolumns) {
         if (column is not { ScriptType: not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert) }) { return null; }
 
         if (!column.SaveContent) {
             if (!virtualcolumns) { return null; }
-            mustbeReadOnly = false;
+            readOnly = false;
         }
 
         if (!column.CanBeCheckedByRules()) { return null; }
-        //if (!column.SaveContent) { return null; }
+        if (!column.CanBeChangedByRules()) { readOnly = true; }
 
-        #region ReadOnly bestimmen
+        var value = row?.CellGetString(column) ?? string.Empty;
 
-        var ro = mustbeReadOnly || !column.CanBeChangedByRules();
-        //if (column == column.Table.Column.SysCorrect) { ro = true; }
-        //if (column == column.Table.Column.SysRowChanger) { ro = true; }
-        //if (column == column.Table.Column.SysRowChangeDate) { ro = true; }
+        return CellToVariable(column.KeyName, column.ScriptType, value, readOnly, "Spalte: " + column.ReadableText());
+    }
 
-        #endregion
-
-        var wert = row?.CellGetString(column) ?? string.Empty;
-
-        var qi = "Spalte: " + column.ReadableText();
-
-        switch (column.ScriptType) {
+    public static Variable? CellToVariable(string varname, ScriptType scriptType, string value, bool readOnly, string coment) {
+        switch (scriptType) {
             case ScriptType.Bool:
-                return new VariableBool(column.KeyName, wert == "+", ro, qi);
+                return new VariableBool(varname, value.FromPlusMinus(), readOnly, coment);
 
             case ScriptType.List:
-                return new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), ro, qi);
+                return new VariableListString(varname, value.SplitAndCutByCrToList(), readOnly, coment);
 
             case ScriptType.Numeral:
-                _ = DoubleTryParse(wert, out var f);
-                return new VariableDouble(column.KeyName, f, ro, qi);
+                return new VariableDouble(varname, DoubleParse(value), readOnly, coment);
 
             case ScriptType.Numeral_Readonly:
-                _ = DoubleTryParse(wert, out var f2);
-                return new VariableDouble(column.KeyName, f2, true, qi);
+                return new VariableDouble(varname, DoubleParse(value), true, coment);
 
             case ScriptType.String:
-                return new VariableString(column.KeyName, wert, ro, qi);
+                return new VariableString(varname, value, readOnly, coment);
 
             case ScriptType.String_Readonly:
-                return new VariableString(column.KeyName, wert, true, qi);
+                return new VariableString(varname, value, true, coment);
 
             case ScriptType.Bool_Readonly:
-                return new VariableBool(column.KeyName, wert == "+", true, qi);
+                return new VariableBool(varname, value.FromPlusMinus(), true, coment);
 
             case ScriptType.List_Readonly:
-                return new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), true, qi);
-
-            case ScriptType.Row:
-                return new VariableRowItem(column.KeyName, row?.Table?.Row.GetByKey(wert), ro, qi);
+                return new VariableListString(varname, value.SplitAndCutByCrToList(), true, coment);
 
             default:
-                Develop.DebugPrint(column.ScriptType);
+                Develop.DebugPrint(scriptType);
                 return null;
         }
     }
@@ -697,35 +685,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (columnVar is not { ReadOnly: false }) { return; }
         if (!column.CanBeChangedByRules()) { return; }
 
-        var comment = "Skript '" + scriptname + "'";
-
-        switch (columnVar) {
-            case VariableDouble vf:
-                CellSet(column, vf.ValueNum, comment);
-                break;
-
-            case VariableListString vl:
-                CellSet(column, vl.ValueList, comment);
-                break;
-
-            case VariableBool vb:
-                CellSet(column, vb.ValueBool, comment);
-                break;
-
-            case VariableString vs:
-                CellSet(column, vs.ValueString, comment);
-                break;
-
-            case VariableRowItem vr:
-                var r = string.Empty;
-                if (vr.RowItem is { IsDisposed: false } ro) { r = ro.KeyName; }
-                CellSet(column, r, comment);
-                break;
-
-            default:
-                Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
-                break;
-        }
+        CellSet(column, columnVar.ValueForCell, $"Skript '{scriptname}'");
     }
 
     internal static bool CompareValues(string istValue, string filterValue, FilterType typ) {
