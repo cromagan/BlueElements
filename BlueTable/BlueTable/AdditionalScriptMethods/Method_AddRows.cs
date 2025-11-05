@@ -61,7 +61,8 @@ public class Method_AddRows : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
+        var myTb = MyTable(scp);
+        var cap = myTb?.Caption ?? "Unbekannt";
 
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
 
@@ -101,7 +102,7 @@ public class Method_AddRows : Method_TableGeneric {
 
             allFi.Add(new(c, FilterType.Istgleich_GroßKleinEgal, thisKey));
 
-            var scx = Method_Row.UniqueRow(allFi, d, $"Skript-Befehl: 'AddRows' der Tabelle {myTb.Caption}, Skript {scp.ScriptName}", scp, ld);
+            var scx = Method_Row.UniqueRow(allFi, d, $"Skript-Befehl: 'AddRows' der Tabelle {cap}, Skript {scp.ScriptName}", scp, ld);
             allFi.Dispose();
             if (scx.Failed) { return scx; }
         }

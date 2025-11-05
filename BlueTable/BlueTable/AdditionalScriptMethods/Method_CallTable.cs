@@ -58,10 +58,9 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
 
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
-        if (tb == myTb) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
+        if (tb == MyTable(scp)) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 
         if (!tb.IsEditable(false)) { return new DoItFeedback($"Tabellesperre: {tb.IsNotEditableReason(false)}", false, ld); }
 

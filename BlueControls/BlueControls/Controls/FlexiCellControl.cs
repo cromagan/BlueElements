@@ -196,14 +196,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         if (_lastrow?.CheckRow() is { } rce) {
             TableInput_RowChecked(this, rce);
         }
-
-        if (!SyncWithCell) {
-            if (Generic.IsAdministrator()) {
-                f.InfoText = "Temporäres Feld";
-            }
-
-            return;
-        }
     }
 
     protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {

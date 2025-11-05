@@ -46,7 +46,7 @@ internal class Method_ImportCsv : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return new DoItFeedback($"Import nur aus einer Datenbank heraus möglich.", true, ld); }
 
         if (MyRow(scp) != null) { return new DoItFeedback($"Import in einem Zeilenskript nicht möglich.", false, ld); }
 

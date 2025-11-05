@@ -65,12 +65,12 @@ internal class Method_Call : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
 
         var vs = attvar.ValueStringGet(0);
 
-        var sc = myDb.EventScript.GetByKey(vs);
-        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs + "\r\nNur aktiv geschaltene Skripte werden berücksichtigt.", true, ld); }
+        var sc = myTb.EventScript.GetByKey(vs);
+        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs , true, ld); }
 
         var newat = sc.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {

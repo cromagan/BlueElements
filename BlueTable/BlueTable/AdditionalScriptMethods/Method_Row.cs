@@ -161,14 +161,16 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
+        var myTb = MyTable(scp);
+        var cap = myTb?.Caption ?? "Unbekannt";
 
-        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);
+
+        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myTb, scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
         var d = attvar.ValueNumGet(0);
 
-        var fb = UniqueRow(allFi, d, $"Skript-Befehl: 'Row' der Tabelle {myDb.Caption}, Skript {scp.ScriptName}", scp, ld);
+        var fb = UniqueRow(allFi, d, $"Skript-Befehl: 'Row' der Tabelle {cap}, Skript {scp.ScriptName}", scp, ld);
         allFi.Dispose();
 
         return fb;

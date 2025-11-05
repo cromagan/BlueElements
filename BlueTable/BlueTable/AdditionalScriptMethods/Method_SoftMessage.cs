@@ -64,12 +64,10 @@ public class Method_SoftMessage : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
-
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
 
 
-        Develop.Message?.Invoke(ErrorType.Info, myDb, "Skript", ImageCode.Tabelle, txt, 0);
+        Develop.Message?.Invoke(ErrorType.Info, MyTable(scp), "Skript", ImageCode.Tabelle, txt, 0);
 
         return DoItFeedback.Null();
     }

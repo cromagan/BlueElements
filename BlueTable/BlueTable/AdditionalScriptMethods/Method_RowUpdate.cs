@@ -68,7 +68,7 @@ public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
+
 
         if (scp.Stufe > 10) {
             return new DoItFeedback("'RowUpdate' wird zu verschachtelt aufgerufen.", true, ld);
@@ -90,7 +90,11 @@ public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
             return new DoItFeedback("Die Zeitangaben sind ungültig.", true, ld);
         }
 
-        var coment = $"Skript-Befehl: 'RowUpdate' der Tabelle {myTb.Caption}, Skript {scp.ScriptName}";
+
+        var myTb = MyTable(scp);
+        var cap = myTb?.Caption ?? "Unbekannt";
+
+        var coment = $"Skript-Befehl: 'RowUpdate' der Tabelle {cap}, Skript {scp.ScriptName}";
 
         var v = row.CellGetDateTime(srs);
         var age = DateTime.UtcNow.Subtract(v).TotalDays;

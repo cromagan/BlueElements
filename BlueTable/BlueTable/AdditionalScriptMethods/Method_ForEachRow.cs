@@ -49,7 +49,6 @@ internal class Method_ForEachRow : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(infos.LogData); }
 
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
@@ -65,7 +64,7 @@ internal class Method_ForEachRow : Method_TableGeneric {
             return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }
 
-        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myDb, scp.ScriptName, true);
+        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyTable(scp), scp.ScriptName, true);
 
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, infos.LogData); }
 

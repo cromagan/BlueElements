@@ -50,18 +50,17 @@ public class Method_CellSetFilter : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myDb) { return DoItFeedback.InternerFehler(ld); }
 
-        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, myDb, scp.ScriptName, true);
+        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
-        var db = allFi.Table;
-        if (db is not { IsDisposed: false }) {
+        var tb = allFi.Table;
+        if (tb is not { IsDisposed: false }) {
             allFi.Dispose();
             return new DoItFeedback("Tabelle verworfen.", true, ld);
         }
 
-        if (db.Column[attvar.ValueStringGet(1)] is not { IsDisposed: false } columnToSet) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(4), true, ld); }
+        if (tb.Column[attvar.ValueStringGet(1)] is not { IsDisposed: false } columnToSet) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(4), true, ld); }
 
         if (!columnToSet.CanBeChangedByRules()) { return new DoItFeedback("Spalte kann nicht bearbeitet werden: " + attvar.ValueStringGet(4), true, ld); }
 
@@ -87,9 +86,9 @@ public class Method_CellSetFilter : Method_TableGeneric {
             return DoItFeedback.Wahr();
         }
 
-        r[0].CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + db.Caption + "'");
+        r[0].CellSet(columnToSet, value, "Skript: '" + scp.ScriptName + "' aus '" + tb.Caption + "'");
 
-        columnToSet.AddSystemInfo("Edit with Script", db, scp.ScriptName);
+        columnToSet.AddSystemInfo("Edit with Script", tb, scp.ScriptName);
 
         return r[0].CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

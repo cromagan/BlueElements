@@ -61,8 +61,6 @@ public class Method_SetError : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        //if (!SetErrorAllowed(varCol)) { return new DoItFeedback(ld, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
-
         var r = MyRow(scp);
         if (r is not { IsDisposed: false }) { return DoItFeedback.InternerFehler(ld); }
 
