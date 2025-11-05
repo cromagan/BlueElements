@@ -56,7 +56,7 @@ public class Renderer_Number : Renderer_Abstract {
 
     public override string Description => "Kann Zahlenwerte formatiert anzeigen.";
 
-    public int Nachomma {
+    public int Nachkomma {
         get => _nachkomma;
         set {
             if (value < 0) { value = 0; }
@@ -128,7 +128,7 @@ public class Renderer_Number : Renderer_Abstract {
         [   new FlexiControlForProperty<string>(() => Präfix),
             new FlexiControlForProperty<string>(() => Suffix,Renderer_TextOneLine.Suffixe(), true),
             new FlexiControlForProperty<bool>(() => Trennzeichen),
-            new FlexiControlForProperty<int>(() => Nachomma)
+            new FlexiControlForProperty<int>(() => Nachkomma)
         ];
         return result;
     }
@@ -210,13 +210,11 @@ public class Renderer_Number : Renderer_Abstract {
         var txt = content;
 
         if (DoubleTryParse(content, out var value)) {
-
-            if(_trennzeichen) {
+            if (_trennzeichen) {
                 txt = value.ToString($"N{_nachkomma}", System.Globalization.CultureInfo.InstalledUICulture);
-            }else {
+            } else {
                 txt = value.ToString($"F{_nachkomma}", System.Globalization.CultureInfo.InstalledUICulture);
             }
-      
         }
 
         if (!string.IsNullOrEmpty(t_präfix)) { txt = $"{t_präfix} {txt}"; }

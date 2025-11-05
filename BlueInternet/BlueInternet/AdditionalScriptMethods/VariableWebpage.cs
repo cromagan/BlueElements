@@ -27,7 +27,6 @@ public class VariableWebpage : Variable {
     #region Fields
 
     public static readonly List<string> WebPageVal = [ShortName_Variable];
-
     private ChromiumWebBrowser? _browser;
 
     #endregion
@@ -53,9 +52,9 @@ public class VariableWebpage : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _browser == null;
-
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
+    public override string ValueForCell => string.Empty;
 
     public ChromiumWebBrowser? ValueWebpage {
         get => _browser;

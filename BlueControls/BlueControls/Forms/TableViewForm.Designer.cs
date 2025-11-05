@@ -832,7 +832,6 @@ namespace BlueControls.Forms {
             this.Table.ÄhnlicheAnsichtName = "Filterleiste Ähnlich";
             this.Table.FilterAnsichtName = "Filterleiste Waagerecht";
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Table.FilterleisteZeilen = 1;
             this.Table.Location = new System.Drawing.Point(0, 24);
             this.Table.Name = "Table";
             this.Table.SheetStyle = "Windows 11";

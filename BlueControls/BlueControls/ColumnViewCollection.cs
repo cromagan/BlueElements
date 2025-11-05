@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static BlueBasics.Constants;
+using static BlueBasics.Converter;
 
 namespace BlueTable;
 
@@ -83,6 +84,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string ColumnQuickInfo => string.Empty;
     public int Count => _internal.Count;
     public Type? Editor { get; set; }
+    public int FilterRows { get; internal set; } = 1;
     public BlueFont Font_RowChapter { get; internal set; } = BlueFont.DefaultFont;
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => false;
@@ -143,16 +145,16 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Methods
 
-    public static List<ColumnViewCollection> ParseAll(Table db) {
+    public static List<ColumnViewCollection> ParseAll(Table tb) {
         var tcvc = new List<ColumnViewCollection>();
-        List<string> ca = [.. db.ColumnArrangements.SplitAndCutByCr()];
+        List<string> ca = [.. tb.ColumnArrangements.SplitAndCutByCr()];
         foreach (var t in ca) {
-            tcvc.Add(new ColumnViewCollection(db, t));
+            tcvc.Add(new ColumnViewCollection(tb, t));
         }
 
-        if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(db, string.Empty)); }
+        if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
 
-        if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(db, string.Empty)); }
+        if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
 
         foreach (var thisC in tcvc) {
             thisC.Editor = typeof(ColumnArrangementPadEditor);
@@ -352,6 +354,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
+        result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("Column", _internal);
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
@@ -361,12 +364,19 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public void ParseFinished(string parsed) {
+        if (FilterRows < 0) { FilterRows = 0; }
+        if (FilterRows > 10) { FilterRows = 10; }
+    }
 
     public bool ParseThis(string key, string value) {
         switch (key) {
             case "name":
                 KeyName = value;
+                return true;
+
+            case "filterrows":
+                FilterRows = IntParse(value);
                 return true;
 
             case "column":

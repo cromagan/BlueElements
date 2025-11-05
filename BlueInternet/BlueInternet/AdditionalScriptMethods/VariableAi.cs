@@ -65,6 +65,8 @@ public class VariableAi : Variable {
         }
     }
 
+    public override string ValueForCell => string.Empty;
+
     #endregion
 
     #region Methods

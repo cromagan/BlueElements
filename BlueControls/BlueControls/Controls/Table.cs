@@ -84,7 +84,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private bool _controlPressing;
     private ColumnViewCollection? _currentArrangement;
     private bool _editButton;
-    private int _filterleisteZeilen = 1;
+
     private bool _isFilling;
     private bool _isinClick;
     private bool _isinDoubleClick;
@@ -200,11 +200,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public ColumnViewCollection? CurrentArrangement {
         get {
-            if (IsDisposed || Table is not { IsDisposed: false } db) { return null; }
+            if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
 
             if (_currentArrangement != null) { return _currentArrangement; }
 
-            var tcvc = ColumnViewCollection.ParseAll(db);
+            var tcvc = ColumnViewCollection.ParseAll(tb);
             _currentArrangement = tcvc.GetByKey(_arrangement);
 
             if (_currentArrangement == null && tcvc.Count > 1) { _currentArrangement = tcvc[1]; }
@@ -215,6 +215,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 cu.ClientWidth = (int)(DisplayRectangleWithoutSlider().Width / _zoom);
                 cu.ComputeAllColumnPositions();
             }
+
+            UpdateFilterleisteVisibility();
 
             return _currentArrangement;
         }
@@ -246,23 +248,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     [DefaultValue("")]
     public string FilterAnsichtName { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Legt fest, wie viele Zeilen die Filterleiste haben soll.
-    /// Bei 0 wird die Filterleiste nicht angezeigt.
-    /// Die Höhe jeder Zeile beträgt 48 Pixel.
-    /// </summary>
-    [DefaultValue(1)]
-    public int FilterleisteZeilen {
-        get => _filterleisteZeilen;
-        set {
-            if (_filterleisteZeilen == value) { return; }
-            _filterleisteZeilen = Math.Max(0, value);
-            UpdateFilterleisteVisibility();
-            RepositionControls();
-            FillFilters();
-            Invalidate();
-        }
-    }
+    public int FilterleisteZeilen => CurrentArrangement?.FilterRows ?? 1;
 
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
     public FilterTypesToShow FilterTypesToShow { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
@@ -382,9 +368,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// </summary>
     private int FilterleisteHeight {
         get {
-            if (_filterleisteZeilen < 1) { return 0; }
+            if (FilterleisteZeilen < 1) { return 0; }
 
-            return btnAlleFilterAus.Top * 2 + _filterleisteZeilen * btnAlleFilterAus.Height + (_filterleisteZeilen - 1) * rowSpacing;
+            return btnAlleFilterAus.Top * 2 + FilterleisteZeilen * btnAlleFilterAus.Height + (FilterleisteZeilen - 1) * rowSpacing;
         }
     }
 
@@ -4289,7 +4275,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             return;
         }
 
-        var visible = _filterleisteZeilen > 0;
+        var visible = FilterleisteZeilen > 0;
 
         // Hauptsteuerelemente der Filterleiste
         btnTextLöschen.Visible = visible;

@@ -64,10 +64,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => true;
 
-    public override bool TableInputMustMatchOutputTable => true;
-
     public override string Description => "Darstellung einer Tabelle als bearbeitbare und filterbare Tabelle.";
-
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
 
@@ -81,6 +78,8 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
             OnPropertyChanged();
         }
     }
+
+    public override bool TableInputMustMatchOutputTable => true;
 
     protected override int SaveOrder => 1;
 

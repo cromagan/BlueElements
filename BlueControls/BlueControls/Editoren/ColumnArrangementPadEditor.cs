@@ -40,6 +40,7 @@ using System.Linq;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
+using static BlueBasics.Converter;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -334,17 +335,15 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     /// </summary>
 
     private void chkShowCaptions_CheckedChanged(object sender, System.EventArgs e) {
-    }
-
-    private void chkShowCaptions_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
+        if (ca.ShowHead == chkShowCaptions.Checked) { return; }
+
         ca.ShowHead = chkShowCaptions.Checked;
 
         ChangeCurrentArrangementto(ca);
-        //ShowOrder();
     }
 
     private void FixColumnArrangement() {
@@ -540,6 +539,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         SortColumns();
 
         chkShowCaptions.Checked = ca.ShowHead;
+        txbFilterRows.Text = ca.FilterRows.ToStringInt1();
     }
 
     private void SortColumns() {
@@ -552,6 +552,22 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             x.SetLeftTopPoint(left, 0);
             left = x.UsedArea.Right;
         } while (true);
+    }
+
+    private void txbFilterRows_TextChanged(object sender, System.EventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+
+        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
+
+        var rows = IntParse(txbFilterRows.Text);
+        if (rows < 0) { rows = 0; }
+        if (rows > 10) { rows = 10; }
+
+        if (ca.FilterRows == rows) { return; }
+
+        ca.FilterRows = rows;
+
+        ChangeCurrentArrangementto(ca);
     }
 
     private void UpdateCombobox() => TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Table, _arrangement);
