@@ -71,17 +71,8 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
-        if (string.IsNullOrEmpty(content)) { return; }
-        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
-
-        Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
-    }
-
-    public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<AbstractListItem> cbxEinheit =
-        [
+    public static List<AbstractListItem> Suffixe() {
+        return [
             ItemOf("µm", ImageCode.Lineal),
             ItemOf("mm", ImageCode.Lineal),
             ItemOf("cm", ImageCode.Lineal),
@@ -98,11 +89,21 @@ public class Renderer_TextOneLine : Renderer_Abstract {
             ItemOf("h", ImageCode.Uhr),
             ItemOf("min", ImageCode.Uhr),
             ItemOf("St.", ImageCode.Eins)
-        ];
+];
+    }
 
+    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+        if (string.IsNullOrEmpty(content)) { return; }
+        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+
+        Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
+    }
+
+    public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
         [   new FlexiControlForProperty<string>(() => Präfix),
-            new FlexiControlForProperty<string>(() => Suffix,cbxEinheit, true)
+            new FlexiControlForProperty<string>(() => Suffix,Suffixe(), true)
         ];
         return result;
     }

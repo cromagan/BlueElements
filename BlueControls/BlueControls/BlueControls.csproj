@@ -199,6 +199,7 @@
     <Compile Include="Renderer\Renderer_DynamicSymbol.cs" />
     <Compile Include="Renderer\Renderer_Button.cs" />
     <Compile Include="Renderer\Renderer_DateTime.cs" />
+    <Compile Include="Renderer\Renderer_Number.cs" />
     <Compile Include="Renderer\Renderer_RichText.cs" />
     <Compile Include="Renderer\Renderer_TextOneLine.cs" />
     <Compile Include="Renderer\Renderer_ImageAndText.cs" />

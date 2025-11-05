@@ -102,8 +102,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
         ShowValuesOfOtherCellsInDropdown = false,
-        DefaultRenderer = "TextOneLine",
-        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
+        DefaultRenderer = "DateTime",
+        RendererSettings = "{ClassId=\"DateTime\", Style=\"Windows 11\", UTCToLocal=+, ShowSymbol=+}"
     };
 
     public new static readonly ColumnFormatHolder Email = new(FormatHolder.Email) {
@@ -132,8 +132,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
         ShowValuesOfOtherCellsInDropdown = false,
-        DefaultRenderer = "TextOneLine",
-        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
+        DefaultRenderer = "Number",
+        RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=2}"
     };
 
     // ReSharper disable once UnusedMember.Global
@@ -148,8 +148,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
         ShowValuesOfOtherCellsInDropdown = false,
-        DefaultRenderer = "TextOneLine",
-        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
+        DefaultRenderer = "Number",
+        RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=2}"
     };
 
     public new static readonly ColumnFormatHolder Long = new(FormatHolder.Long) {
@@ -163,8 +163,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
         ShowValuesOfOtherCellsInDropdown = false,
-        DefaultRenderer = "TextOneLine",
-        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
+        DefaultRenderer = "Number",
+        RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=0}"
     };
 
     public new static readonly ColumnFormatHolder LongPositive = new(FormatHolder.LongPositive) {
@@ -178,8 +178,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         EditableWithTextInput = true,
         DropDownItems = new(Array.Empty<string>()),
         ShowValuesOfOtherCellsInDropdown = false,
-        DefaultRenderer = "TextOneLine",
-        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
+        DefaultRenderer = "Number",
+        RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=0}"
     };
 
     public new static readonly ColumnFormatHolder PhoneNumber = new(FormatHolder.PhoneNumber) {
