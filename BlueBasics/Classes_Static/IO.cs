@@ -348,7 +348,7 @@ public static class IO {
             return Path.GetFullPath(pfad);
         } catch { }
 
-        Develop.CheckStackOverflow();
+        Develop.AbortAppIfStackOverflow();
         return NormalizePath(pfad);
     }
 

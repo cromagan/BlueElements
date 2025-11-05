@@ -809,6 +809,14 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void Tb_Loaded(object? sender, FirstEventArgs? e) {
         if (IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(() => Tb_Loaded(sender, e)));
+            } catch { }
+            return;
+        }
+
         var isEditable = false;
         var isAdmin = false;
 

@@ -645,7 +645,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             return null;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return Get(fileOrTableName, needPassword, instantUpdate);
         }
     }
@@ -1471,7 +1471,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             return scf;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, ignoreError);
         } finally {
             //  ExecutingScriptAnyTable wird IMMER aufgeräumt - egal was passiert
@@ -1526,7 +1526,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, false);
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, dbVariables, extended);
         }
     }
@@ -2541,7 +2541,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         try {
             return ExecutingScriptThreadsAnyTable.Any(thread => thread != excludeThreadId);
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return HasActiveThreadsExcept(excludeThreadId);
         }
     }
@@ -2613,7 +2613,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return NewMasterPossible();
         }
 

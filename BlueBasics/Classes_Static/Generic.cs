@@ -54,6 +54,7 @@ public static class Generic {
 
     #region Properties
 
+    public static bool Ending { get; set; } = false;
     public static string MyId { get; } = Guid.NewGuid().ToString();
 
     public static string UserName {
@@ -242,7 +243,7 @@ public static class Generic {
             }
             return l;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return GetInstaceOfType<T>(constructorArgs);
         }
     }
@@ -260,7 +261,7 @@ public static class Generic {
             }
             return l;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return GetMethodsWithAttribute<TAttribute>();
         }
     }
@@ -278,7 +279,7 @@ public static class Generic {
             }
             return l;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return GetTypesOfType<T>(constructorArgTypes);
         }
     }

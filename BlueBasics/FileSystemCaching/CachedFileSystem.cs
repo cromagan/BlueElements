@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlueBasics.Interfaces;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -15,9 +16,11 @@ namespace BlueBasics.FileSystemCaching {
     /// <summary>
     /// Hauptklasse für das Caching-System mit automatischer Synchronisation
     /// </summary>
-    public sealed class CachedFileSystem : IDisposable {
+    public sealed class CachedFileSystem : IDisposableExtended {
 
         #region Fields
+
+        private static readonly SemaphoreSlim _globalInstanceLock = new(1, 1);
 
         private static readonly ConcurrentDictionary<string, CachedFileSystem> _instances = new();
 
@@ -27,12 +30,11 @@ namespace BlueBasics.FileSystemCaching {
 
         private readonly SemaphoreSlim _initializationLock = new(1, 1);
 
-        private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.NoRecursion);
+        private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
 
-        private volatile bool _isDisposed;
+        private volatile int _isDisposedFlag = 0;
 
-        private volatile bool _isInitialized;
-
+        private string _watchedDirectory = string.Empty;
         private FileSystemWatcher? _watcher;
 
         #endregion
@@ -43,11 +45,7 @@ namespace BlueBasics.FileSystemCaching {
         /// Erstellt eine neue CachedFileSystem-Instanz
         /// </summary>
         private CachedFileSystem(string watchedDirectory) {
-            WatchedDirectory = watchedDirectory ?? throw new ArgumentNullException(nameof(watchedDirectory));
-
-            if (!Directory.Exists(WatchedDirectory)) {
-                throw new DirectoryNotFoundException($"Verzeichnis nicht gefunden: {WatchedDirectory}");
-            }
+            WatchedDirectory = watchedDirectory;
         }
 
         #endregion
@@ -55,78 +53,115 @@ namespace BlueBasics.FileSystemCaching {
         #region Properties
 
         /// <summary>Debouncing-Verzögerung für FileSystemWatcher-Events (ms)</summary>
-        public int DebounceDelayMs { get; set; } = 500;
+        public int DebounceDelayMs => 500;
 
-        /// <summary>Parallelitätsgrad für Batch-Operationen</summary>
-        public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
-
-        /// <summary>Sliding Expiration für Cache-Einträge (Standard: 30 Minuten)</summary>
-        public TimeSpan SlidingExpiration { get; set; } = TimeSpan.FromMinutes(30);
+        // Property anpassen:
+        public bool IsDisposed => _isDisposedFlag == 1;
 
         /// <summary>Überwachtes Verzeichnis</summary>
-        public string WatchedDirectory { get; }
+        public string WatchedDirectory {
+            get {
+                if (IsDisposed) { return string.Empty; }
+                return _watchedDirectory;
+            }
+            set {
+                if (IsDisposed) { return; }
 
-        /// <summary>Buffer-Größe für FileSystemWatcher (Bytes)</summary>
-        public int WatcherBufferSize { get; set; } = 1024 * 1024;
+                value = IO.NormalizePath(value);
+
+                if (!IO.DirectoryExists(value)) {
+                    Develop.DebugPrint(Enums.ErrorType.Error, $"Verzeichnis nicht gefunden: {value}");
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(_watchedDirectory) && !IsSubPath(value, _watchedDirectory)) {
+                    Develop.DebugPrint(Enums.ErrorType.Error, $"Unerlaubte Modifikation: {_watchedDirectory} -> {value}");
+                    return;
+                }
+
+                // Watcher stoppen und neu initialisieren
+                _watcherLock.EnterWriteLock();
+                try {
+                    DisposeWatcher();
+                    _instances.TryRemove(_watchedDirectory, out _);
+                    _watchedDirectory = value;
+                    InitializeWatcher();
+                    _instances.TryAdd(_watchedDirectory, this);
+                } finally {
+                    _watcherLock.ExitWriteLock();
+                    WarmCache();
+                }
+            }
+        }
 
         #endregion
 
         #region Methods
 
         /// <summary>
-        /// Entfernt und disposed eine Instanz
-        /// </summary>
-        public static void Dispose(string directory) {
-            var key = IO.NormalizePath(directory);
-            if (_instances.TryRemove(key, out var instance)) {
-                instance.Dispose();
-            }
-        }
-
-        /// <summary>
         /// Disposed alle Instanzen
         /// </summary>
         public static void DisposeAll() {
-            foreach (var kvp in _instances.ToArray()) {
-                if (_instances.TryRemove(kvp.Key, out var instance)) {
-                    instance.Dispose();
+            _globalInstanceLock.Wait();
+            try {
+                foreach (var kvp in _instances.Values) {
+                    kvp.Dispose();
                 }
+            } finally {
+                _globalInstanceLock.Release();
             }
         }
 
         /// <summary>
         /// Holt oder erstellt eine CachedFileSystem-Instanz für das angegebene Verzeichnis
         /// </summary>
-        public static CachedFileSystem Get(string directory) {
-            var key = IO.NormalizePath(directory);
+        public static CachedFileSystem Get(string path) {
+            var normalizedPath = IO.NormalizePath(path);
 
-            return _instances.GetOrAdd(key, _ => {
-                var instance = new CachedFileSystem(directory);
-                instance.InitializeAsync().GetAwaiter().GetResult();
-                return instance;
-            });
+            // Fast-Path: Instanz existiert bereits exakt
+            if (_instances.TryGetValue(normalizedPath, out var existingInstance)) {
+                return existingInstance;
+            }
+
+            // Slow-Path: Hierarchie-Analyse erforderlich
+            _globalInstanceLock.Wait();
+            try {
+                // Double-Check nach Lock
+                if (_instances.TryGetValue(normalizedPath, out existingInstance)) {
+                    return existingInstance;
+                }
+
+                // Szenario 1: Gibt es eine Parent-Instanz (flacherer Pfad)?
+                var parentInstanceKvp = FindParentInstance(normalizedPath);
+                if (parentInstanceKvp is { }) { return parentInstanceKvp; }
+
+                // Szenario 2: Gibt es Child-Instanzen (tiefere Pfade)?
+                var firstChild = FindChildInstances(normalizedPath);
+                if (firstChild is { }) {
+                    // Verzeichnis der Child-Instanz ändern
+                    firstChild.WatchedDirectory = path;
+                    return firstChild;
+                }
+
+                // Szenario 3: Keine Hierarchie-Konflikte -> neue Instanz erstellen
+                return new CachedFileSystem(path);
+            } finally {
+                _globalInstanceLock.Release();
+            }
         }
 
         public void Dispose() {
-            if (_isDisposed) return;
+            // Atomare Prüfung und Setzen: Gibt vorherigen Wert zurück
+            if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
 
-            _watcherLock.EnterWriteLock();
+            var lockAcquired = false;
+
             try {
-                if (_isDisposed) return;
+                _watcherLock.EnterWriteLock();
+                lockAcquired = true;
+                _instances.TryRemove(WatchedDirectory, out _);
 
-                _instances.TryRemove(IO.NormalizePath(WatchedDirectory), out _);
-
-                // Watcher stoppen
-                if (_watcher != null) {
-                    _watcher.EnableRaisingEvents = false;
-                    _watcher.Created -= OnFileCreated;
-                    _watcher.Changed -= OnFileChanged;
-                    _watcher.Deleted -= OnFileDeleted;
-                    _watcher.Renamed -= OnFileRenamed;
-                    _watcher.Error -= OnWatcherError;
-                    _watcher.Dispose();
-                    _watcher = null;
-                }
+                DisposeWatcher();
 
                 // Debounce-Timer aufräumen
                 foreach (var timer in _debounceTimers.Values) {
@@ -139,10 +174,12 @@ namespace BlueBasics.FileSystemCaching {
                     file.Dispose();
                 }
                 _cachedFiles.Clear();
-
-                _isDisposed = true;
             } finally {
-                _watcherLock.ExitWriteLock();
+                if (lockAcquired) {
+                    try {
+                        _watcherLock.ExitWriteLock();
+                    } catch { }
+                }
             }
 
             _watcherLock.Dispose();
@@ -153,92 +190,62 @@ namespace BlueBasics.FileSystemCaching {
         /// Prüft, ob eine Datei existiert
         /// </summary>
         public bool FileExists(string filename) {
-            ThrowIfDisposed();
-            var normalizedPath = IO.NormalizeFile(filename);
+            if (IsDisposed) { return false; }
 
-            // Erst Cache prüfen
-            if (_cachedFiles.TryGetValue(normalizedPath, out _)) {
-                return true;
+            var normalizedFileName = IO.NormalizeFile(filename);
+
+            if (!ShouldCacheFile(normalizedFileName)) {
+                Develop.DebugPrint(Enums.ErrorType.Error, $"Der angegebene Pfad '{filename}' liegt nicht im überwachten Bereich '{WatchedDirectory}'.");
             }
 
-            // Dann Dateisystem
-            return File.Exists(normalizedPath);
+            // Erst Cache prüfen
+            return _cachedFiles.TryGetValue(normalizedFileName, out _);
         }
 
         /// <summary>
         /// Liest eine Datei aus dem Cache oder Dateisystem
         /// </summary>
-        public async Task<CachedFile> GetFileAsync(string filename, CancellationToken cancellationToken = default) {
-            ThrowIfDisposed();
-            EnsureInitialized();
+        public CachedFile? GetFile(string filename) {
+            if (IsDisposed) { return null; }
 
             var normalizedFileName = IO.NormalizeFile(filename);
 
             if (!ShouldCacheFile(normalizedFileName)) {
-                return new CachedFile(normalizedFileName);
+                Develop.DebugPrint(Enums.ErrorType.Error, $"Der angegebene Pfad '{filename}' liegt nicht im überwachten Bereich '{WatchedDirectory}'.");
             }
 
-            // Optimistic read
-            if (_cachedFiles.TryGetValue(normalizedFileName, out var cachedFile)) {
-                if (Constants.GlobalRnd.Next(0, 5) == 0) {
-                    // Fire-and-forget Validierung
-                    _ = Task.Run(() => {
-                        if (cachedFile.IsStale()) {
-                            cachedFile.Invalidate();
-                        }
-                    });
-                }
-
-                return cachedFile;
-            }
-
-            // Cache-Miss
-
-            // Datei laden und cachen
-            var newFile = await Task.Run(() => new CachedFile(normalizedFileName), cancellationToken)
-                .ConfigureAwait(false);
-
-            // Atomar hinzufügen oder existierende zurückgeben
-            return _cachedFiles.GetOrAdd(normalizedFileName, newFile);
+            return AddToCache(normalizedFileName);
         }
 
         /// <summary>
         /// Gibt alle gecachten Dateien zurück, optional gefiltert nach Patterns
         /// </summary>
+        /// <param name="path">Pfad, aus dem die Dateien abgerufen werden sollen</param>
         /// <param name="includePatterns">Optionale Filter-Patterns (z.B. "*.txt", "*.json"). Wenn null, werden alle gecachten Dateien zurückgegeben.</param>
         /// <returns>Liste der Dateipfade, die den Patterns entsprechen</returns>
-        public List<string> GetFiles(List<string>? includePatterns = null) {
+        /// <exception cref="ArgumentException">Wenn der Pfad nicht im Watcher-Bereich liegt</exception>
+        public List<string> GetFiles(string path, List<string>? includePatterns = null) {
+            if (IsDisposed) { return []; }
+
+            var normalizedPath = IO.NormalizePath(path);
+
+            // Prüfen, ob Pfad im Watcher-Bereich liegt
+            if (!ShouldCacheFile(normalizedPath)) {
+                Develop.DebugPrint(Enums.ErrorType.Error, $"Der angegebene Pfad '{normalizedPath}' liegt nicht im überwachten Bereich '{WatchedDirectory}'.");
+            }
+
+            // Dateien filtern, die im angegebenen Pfad liegen
+            var filesInPath = _cachedFiles.Keys.Where(filename => {
+                return filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase);
+            }).ToList();
+
             if (includePatterns == null || includePatterns.Count == 0) {
-                return [.. _cachedFiles.Keys];
+                return [.. filesInPath];
             }
 
-            return [.. _cachedFiles.Keys.Where(filename => {
-                var fileName = Path.GetFileName(filename);
-                return includePatterns.Any(pattern => MatchesPattern(fileName, pattern));
+            return [.. filesInPath.Where(filename => {
+                return includePatterns.Any(pattern => MatchesPattern(filename, pattern));
             })];
-        }
-
-        /// <summary>
-        /// Initialisiert das Caching-System
-        /// </summary>
-        public async Task InitializeAsync(CancellationToken cancellationToken = default) {
-            ThrowIfDisposed();
-
-            if (_isInitialized) return;
-
-            await _initializationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-            try {
-                if (_isInitialized) return;
-
-                // FileSystemWatcher einrichten
-                InitializeWatcher();
-
-                await WarmCacheAsync(cancellationToken).ConfigureAwait(false);
-
-                _isInitialized = true;
-            } finally {
-                _initializationLock.Release();
-            }
         }
 
         /// <summary>
@@ -247,74 +254,127 @@ namespace BlueBasics.FileSystemCaching {
         /// <param name="filename">Dateipfad</param>
         /// <param name="encoding">Encoding (Standard: UTF8)</param>
         /// <returns>Dateiinhalt als String</returns>
-        /// <exception cref="FileNotFoundException">Datei existiert nicht</exception>
-        /// <exception cref="IOException">Fehler beim Lesen</exception>
         public string ReadAllText(string filename, Encoding? encoding = null) {
-            ThrowIfDisposed();
-            EnsureInitialized();
+            if (IsDisposed) { return string.Empty; }
 
             encoding ??= Encoding.UTF8;
-            var normalizedPath = IO.NormalizeFile(filename);
+            var cachedFile = GetFile(filename);
+            return cachedFile?.GetContentAsString(encoding) ?? string.Empty;
+        }
 
-            try {
-                var cachedFile = GetFileAsync(normalizedPath).GetAwaiter().GetResult();
-                return cachedFile.GetContentAsString(encoding);
-            } catch {
-                throw;
+        /// <summary>
+        /// Findet eine Isntanz, die Unterpfade des angegebenen Pfades sind
+        /// </summary>
+        private static CachedFileSystem? FindChildInstances(string parentPath) {
+            foreach (var kvp in _instances) {
+                if (IsSubPath(parentPath, kvp.Key)) {
+                    return kvp.Value;
+                }
             }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Findet die Instanz mit dem längsten gemeinsamen Pfad-Präfix
+        /// </summary>
+        private static CachedFileSystem? FindParentInstance(string childPath) {
+            CachedFileSystem? bestMatch = null;
+            int longestMatchLength = 0;
+
+            foreach (var kvp in _instances) {
+                if (IsSubPath(kvp.Key, childPath)) {
+                    var matchLength = kvp.Key.Length;
+                    if (matchLength > longestMatchLength) {
+                        longestMatchLength = matchLength;
+                        bestMatch = kvp.Value;
+                    }
+                }
+            }
+
+            return bestMatch;
+        }
+
+        /// <summary>
+        /// Prüft, ob childPath ein Unterpfad von parentPath ist
+        /// </summary>
+        private static bool IsSubPath(string parentPath, string childPath) {
+            var normalizedParentPath = IO.NormalizePath(parentPath);
+            var normalizedChildPath = IO.NormalizePath(childPath);
+
+            if (normalizedParentPath.Equals(normalizedChildPath, StringComparison.OrdinalIgnoreCase)) {
+                return false; // Gleicher Pfad, kein Unterpfad
+            }
+
+            return normalizedChildPath.StartsWith(normalizedParentPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private CachedFile AddToCache(string fileName) {
+            var normalizedFileName = IO.NormalizeFile(fileName);
+
+            return _cachedFiles.GetOrAdd(normalizedFileName,
+                key => new CachedFile(key));
         }
 
         private void DebouncedAction(string key, Action action) {
-            var newTimer = new Timer(_ => {
-                try {
-                    action();
-                } finally {
-                    if (_debounceTimers.TryRemove(key, out var t)) {
-                        t?.Dispose();
-                    }
+            if (IsDisposed) { return; }
+
+            var newTimer = new Timer(state => {
+                action();
+
+                if (_debounceTimers.TryRemove(key, out var executedTimer)) {
+                    try { executedTimer?.Dispose(); } catch { }
                 }
             }, null, DebounceDelayMs, Timeout.Infinite);
 
-            // Atomic swap mit Dispose
-            var oldTimer = _debounceTimers.AddOrUpdate(
-                key,
-                newTimer,
-                (_, existing) => {
-                    existing.Dispose();
-                    return newTimer;
-                }
-            );
+            // Alten Timer entfernen und disposen, dann neuen hinzufügen
+            if (_debounceTimers.TryRemove(key, out var oldTimer)) {
+                try { oldTimer.Change(Timeout.Infinite, Timeout.Infinite); } catch { }
+                try { oldTimer.Dispose(); } catch { }
+            }
 
-            // Falls AddOrUpdate den addValueFactory-Pfad genommen hat, gibt es keinen oldTimer
-            // (newTimer wurde bereits eingefügt)
+            _debounceTimers[key] = newTimer;
         }
 
-        private void EnsureInitialized() {
-            if (!_isInitialized) {
-                throw new InvalidOperationException(
-                    "CachedFileSystem ist nicht initialisiert. Rufen Sie InitializeAsync() auf.");
+        private void DisposeWatcher() {
+            try {
+                _watcherLock.EnterWriteLock();
+                if (_watcher != null) {
+                    _watcher.EnableRaisingEvents = false;
+                    _watcher.Created -= OnFileCreated;
+                    _watcher.Changed -= OnFileChanged;
+                    _watcher.Deleted -= OnFileDeleted;
+                    _watcher.Renamed -= OnFileRenamed;
+                    _watcher.Error -= OnWatcherError;
+                    _watcher.Dispose();
+                    _watcher = null;
+                }
+            } finally {
+                try {
+                    _watcherLock.ExitWriteLock();
+                } catch { }
             }
         }
 
         private List<string> GetAllMatchingFiles() {
-            var allFiles = Directory.GetFiles(WatchedDirectory, "*.*", SearchOption.TopDirectoryOnly);
+            var allFiles = Directory.GetFiles(WatchedDirectory, "*.*", SearchOption.AllDirectories);
             return [.. allFiles.Where(ShouldCacheFile)];
         }
 
         private void InitializeWatcher() {
-            if (_isDisposed) { return; }
+            if (IsDisposed) { return; }
 
             try {
                 _watcherLock.EnterWriteLock();
-                _watcher?.Dispose();
+                DisposeWatcher();
 
                 _watcher = new FileSystemWatcher(WatchedDirectory) {
                     NotifyFilter = NotifyFilters.FileName
                                  | NotifyFilters.LastWrite
                                  | NotifyFilters.Size
                                  | NotifyFilters.CreationTime,
-                    IncludeSubdirectories = false,
-                    InternalBufferSize = 128 * 1024
+                    IncludeSubdirectories = true,
+                    InternalBufferSize = 64 * 1024
                 };
 
                 _watcher.Created += OnFileCreated;
@@ -332,125 +392,99 @@ namespace BlueBasics.FileSystemCaching {
         }
 
         private bool MatchesPattern(string fileName, string pattern) {
-            var regexPattern = "^" + Regex.Escape(pattern)
-                .Replace("\\*", ".*")
-                .Replace("\\?", ".") + "$";
-            return Regex.IsMatch(fileName, regexPattern, RegexOptions.IgnoreCase);
+            var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
+            return Regex.IsMatch(fileName.FileNameWithSuffix(), regexPattern, RegexOptions.IgnoreCase);
         }
 
         private void OnFileChanged(object sender, FileSystemEventArgs e) {
-            if (!ShouldCacheFile(e.FullPath)) return;
-
-            // Nur reagieren, wenn Datei bereits im Cache ist
-            if (!_cachedFiles.TryGetValue(e.FullPath, out var cachedFile)) return;
-
-            DebouncedAction(e.FullPath, cachedFile.Invalidate);
+            if (IsDisposed) { return; }
+            RemoveFromCache(e.FullPath);
         }
 
         private void OnFileCreated(object sender, FileSystemEventArgs e) {
-            if (!ShouldCacheFile(e.FullPath)) return;
+            if (IsDisposed) { return; }
+            if (!ShouldCacheFile(e.FullPath)) { return; }
 
             // Nur Dateinamen registrieren, KEINE Metadaten laden
             DebouncedAction(e.FullPath, () => {
-                try {
-                    var normalizedPath = IO.NormalizeFile(e.FullPath);
-
-                    // Lazy-Instanz erstellen (ohne Metadaten zu laden)
-                    _cachedFiles.GetOrAdd(normalizedPath, _ => new CachedFile(normalizedPath));
-                } catch { }
+                AddToCache(e.FullPath);
             });
         }
 
-        private void OnFileDeleted(object sender, FileSystemEventArgs e) => DebouncedAction(e.FullPath, () => {
-            RemoveFromCache(e.FullPath);
-        });
+        private void OnFileDeleted(object sender, FileSystemEventArgs e) => DebouncedAction(e.FullPath, () => { RemoveFromCache(e.FullPath); });
 
         private void OnFileRenamed(object sender, RenamedEventArgs e) => DebouncedAction(e.FullPath, () => {
-            // Alte Datei aus Cache entfernen
-            if (_cachedFiles.TryRemove(e.OldFullPath, out var cachedFile)) {
-                cachedFile.Dispose();
-
-                // Neue Datei hinzufügen, falls sie gecacht werden soll
-                if (ShouldCacheFile(e.FullPath)) {
-                    try {
-                        var normalizedPath = IO.NormalizeFile(e.FullPath);
-                        _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));
-                    } catch { }
-                }
-            } else {
-                // Falls alte Datei nicht im Cache war, neue nur registrieren falls relevant
-                if (ShouldCacheFile(e.FullPath)) {
-                    try {
-                        var normalizedPath = IO.NormalizeFile(e.FullPath);
-                        _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));
-                    } catch { }
-                }
-            }
+            RemoveFromCache(e.OldFullPath);
+            AddToCache(e.FullPath);
         });
 
         private void OnWatcherError(object sender, ErrorEventArgs e) {
-            if(_isDisposed) { return; }
+            if (IsDisposed) { return; }
 
-            // Vollständiger Cache-Rescan
             Task.Run(async () => {
-                await Task.Delay(1000).ConfigureAwait(false);
-                try {
-                    var currentFiles = GetAllMatchingFiles().ToHashSet();
-                    var cachedFiles = _cachedFiles.Keys.ToHashSet();
+                int attempts = 0;
 
-                    // Gelöschte entfernen
-                    foreach (var removed in cachedFiles.Except(currentFiles)) {
-                        RemoveFromCache(removed);
-                    }
+                do {
+                    await Task.Delay(2000).ConfigureAwait(false);
+                    attempts++;
 
-                    // Neue nur registrieren (KEINE Metadaten)
-                    foreach (var file in currentFiles.Except(cachedFiles)) {
-                        _cachedFiles.TryAdd(file, new CachedFile(file));
-                    }
+                    try {
+                        var currentFiles = GetAllMatchingFiles().ToHashSet();
+                        var cachedFiles = _cachedFiles.Keys.ToHashSet();
 
-                    // Bestehende Cache-Einträge aktualisieren
-                    foreach (var file in currentFiles) {
-                        if (_cachedFiles.TryGetValue(file, out var cached)) {
-                            if (cached.IsStale()) cached.Invalidate();
+                        // Gelöschte entfernen
+                        foreach (var removed in cachedFiles.Except(currentFiles)) {
+                            RemoveFromCache(removed);
                         }
-                    }
 
-                    InitializeWatcher();
-                } catch { }
+                        // Neue nur registrieren (KEINE Metadaten)
+                        foreach (var file in currentFiles.Except(cachedFiles)) {
+                            AddToCache(file);
+                        }
+
+                        // Bestehende Cache-Einträge aktualisieren
+                        foreach (var file in currentFiles) {
+                            if (GetFile(file) is { } f) {
+                                if (f.IsStale()) { f.Invalidate(); }
+                            }
+                        }
+
+                        InitializeWatcher();
+                        return;
+                    } catch {
+                    }
+                } while (attempts < 15);
+
+                // Nach 15 Versuchen (30 Sekunden) aufgeben
+                Develop.DebugPrint(Enums.ErrorType.Error, $"FileSystemWatcher für '{WatchedDirectory}' konnte nicht wiederhergestellt werden.");
             });
         }
 
         private void RemoveFromCache(string filename) {
-            if (_cachedFiles.TryRemove(filename, out var file)) {
+            if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return; }
+            if (_cachedFiles.TryRemove(IO.NormalizeFile(filename), out var file)) {
                 file.Dispose();
             }
         }
 
         private bool ShouldCacheFile(string filename) {
-            var directory = filename.FilePath() ?? string.Empty;
-            return directory.Equals(WatchedDirectory, StringComparison.OrdinalIgnoreCase);
+            if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return false; }
+
+            return IO.NormalizeFile(filename).StartsWith(WatchedDirectory, StringComparison.OrdinalIgnoreCase);
         }
 
-        private void ThrowIfDisposed() {
-            if (_isDisposed) {
-                throw new ObjectDisposedException(nameof(CachedFileSystem));
-            }
-        }
-
-        private async Task WarmCacheAsync(CancellationToken cancellationToken) {
+        private void WarmCache() {
             // Nur Dateiliste ermitteln und in _cachedFiles speichern
             var files = GetAllMatchingFiles();
 
-            await Task.Run(() => {
-                foreach (var filePath in files) {
-                    try {
-                        var normalizedPath = IO.NormalizeFile(filePath);
-
-                        // Nur CachedFile-Instanz erstellen (KEINE Metadaten laden)
-                        _cachedFiles.TryAdd(normalizedPath, new CachedFile(normalizedPath));
-                    } catch { }
+            foreach (var filePath in files) {
+                try {
+                    AddToCache(filePath);
+                } catch {
+                    Develop.AbortAppIfStackOverflow();
+                    WarmCache();
                 }
-            }, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         #endregion

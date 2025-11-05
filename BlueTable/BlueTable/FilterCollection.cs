@@ -303,7 +303,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
 
         if (hasError) {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return CalculateFilteredRows(db, filter);
         }
 

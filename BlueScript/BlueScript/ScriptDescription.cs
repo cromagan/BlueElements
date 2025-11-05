@@ -126,7 +126,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
             return result;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ParseableItems();
         }
     }

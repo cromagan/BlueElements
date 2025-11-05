@@ -23,7 +23,6 @@ using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
@@ -178,7 +177,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new VariableListString(varname, value.SplitAndCutByCrToList(), true, coment);
 
             case ScriptType.Nicht_vorhanden:
-                return null;    
+                return null;
 
             default:
                 Develop.DebugPrint(scriptType);
@@ -969,7 +968,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         } catch (Exception ex) {
             Develop.DebugPrint("Unerwarteter Filter-Fehler", ex);
             Generic.Pause(0.1, true);
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return MatchesTo(column, filtertyp, searchvalue);
         }
     }

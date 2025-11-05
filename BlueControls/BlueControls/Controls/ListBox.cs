@@ -253,7 +253,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
             try {
                 return _item.GetByKey(@internal);
             } catch {
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 return this[@internal];
             }
         }
@@ -264,7 +264,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
             try {
                 return no < 0 || no > _item.Count ? null : _item[no];
             } catch {
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 return this[no];
             }
         }
@@ -306,7 +306,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
             return (w, h, hall, or);
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ItemData(item, itemDesign);
         }
     }
@@ -317,7 +317,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
                 _ = thisItem?.SizeUntouchedForListBox(itemDesign);
             });
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             PreComputeSize(item, itemDesign);
         }
     }
@@ -718,7 +718,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
             _maxNeededItemSize = new Size(maxX, maxy);
             return _maxNeededItemSize;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ComputeAllItemPositions(controlDrawingArea, sliderY, biggestItemX, heightAdded, senkrechtAllowed, addy, renderer);
         }
     }

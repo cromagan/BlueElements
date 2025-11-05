@@ -454,7 +454,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return GetStringCore(column, row);
         } catch {
             // Manchmal verscwhindwet der vorhandene KeyName?!?
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return GetString(column, row);
         }
     }
@@ -575,13 +575,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             foreach (var thisKey in removeKeys) {
                 if (!TryRemove(thisKey, out _)) {
-                    Develop.CheckStackOverflow();
+                    Develop.AbortAppIfStackOverflow();
                     RemoveOrphans();
                     return;
                 }
             }
         } catch {
-            Develop.CheckStackOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
+            Develop.AbortAppIfStackOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
         }
     }
 

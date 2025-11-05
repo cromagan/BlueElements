@@ -110,7 +110,7 @@ public class RowFormulaListItem : AbstractListItem {
             if (_tmpBmp == null) { GeneratePic(); }
             return _tmpBmp?.Size ?? new Size(200, 200);
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ComputeSizeUntouchedForListBox(itemdesign);
         }
     }

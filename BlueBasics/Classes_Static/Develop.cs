@@ -43,6 +43,7 @@ public static class Develop {
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
     public static MessageDelegate? Message = null;
+    public static string MonitorMessage = "Monitor-Message";
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
 
     private static readonly object SyncLockObject = new();
@@ -77,21 +78,26 @@ public static class Develop {
     public static string OrigingNumberDecimalSeparator { get; private set; } = ",";
 
     [DefaultValue(false)] private static bool ServiceStarted { get; set; }
-    public static string MonitorMessage = "Monitor-Message";
 
     #endregion
 
     #region Methods
 
-    public static void AbortExe(bool endtracelog) {
+    public static void AbortAppIfStackOverflow() {
+        StackTrace stackTrace = new();
+        if (stackTrace.FrameCount > 100) {
+            DebugPrint(ErrorType.Error, "Stack-Overflow abgefangen!");
+        }
+    }
 
+    public static void AbortExe(bool endtracelog) {
         try {
             if (endtracelog) {
                 TraceLogging_End();
             }
         } catch { }
 
-            Exited = true;
+        Exited = true;
         // http://geekswithblogs.net/mtreadwell/archive/2004/06/06/6123.aspx
         Environment.Exit(1);
         Application.Exit();
@@ -107,13 +113,6 @@ public static class Develop {
             }
         } catch { }
         return "Programm von Christian Peter";
-    }
-
-    public static void CheckStackOverflow() {
-        StackTrace stackTrace = new();
-        if (stackTrace.FrameCount > 100) {
-            DebugPrint(ErrorType.Error, "Stack-Overflow abgefangen!");
-        }
     }
 
     /// <summary>
@@ -156,7 +155,6 @@ public static class Develop {
                 var nr = 100;
                 List<string>? l = null;
                 Trace.WriteLine("<tr>");
-
 
                 switch (type) {
                     case ErrorType.DevelopInfo:

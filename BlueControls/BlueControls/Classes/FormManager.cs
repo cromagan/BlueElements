@@ -70,6 +70,8 @@ public class FormManager : ApplicationContext {
     }
 
     public static void SaveEnd(Form? lastForm) {
+        Generic.Ending = true;
+
         try {
             ExecuteAtEnd?.Invoke();
         } catch { }

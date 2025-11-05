@@ -17,9 +17,11 @@ namespace BlueBasics.FileSystemCaching {
         #region Fields
 
         public readonly string Filename;
+        private readonly int _checkIntervalMs = 180000;
         private readonly object _lock = new object();
         private byte[]? _content;
         private int _isDisposed = 0;
+        private Timer? _staleCheckTimer;
         private string? _timestamp;
 
         #endregion
@@ -54,6 +56,7 @@ namespace BlueBasics.FileSystemCaching {
                     _timestamp = timestamp;
                     _content = content;
 
+                    StartStaleCheckTimer();
                     return _content;
                 }
             }
@@ -70,13 +73,18 @@ namespace BlueBasics.FileSystemCaching {
 
         public string GetContentAsString(Encoding? encoding = null) {
             if (_isDisposed > 0) { return string.Empty; }
+
+            var content = Content; // Lokale Kopie
+            if (content.Length == 0) { return string.Empty; }
+
             encoding ??= Encoding.UTF8;
-            return encoding.GetString(Content);
+            return encoding.GetString(content);
         }
 
         // Invalidate – öffentlich, mit sauberem Lock-Handling
         public void Invalidate() {
             lock (_lock) {
+                StopStaleCheckTimer();
                 _timestamp = null;
                 _content = null;
             }
@@ -99,6 +107,17 @@ namespace BlueBasics.FileSystemCaching {
 
         public override string ToString() => $"CachedFile {Filename}";
 
+        /// <summary>
+        /// Callback-Methode für den Timer: Prüft ob Datei veraltet ist und invalidiert sie.
+        /// </summary>
+        private void CheckAndInvalidateIfStale() {
+            if (_isDisposed > 0) { return; }
+
+            if (IsStale()) {
+                Invalidate();
+            }
+        }
+
         // Hilfsfunktion: liest Bytes vom FS ohne Locks zu hinterlassen
         // Double-Checked-Locking kümmert sich um Thread-Safety
         private (byte[] Content, string Timestamp) ReadContentFromFileSystem() {
@@ -108,6 +127,38 @@ namespace BlueBasics.FileSystemCaching {
                 var fileInfo2 = GetFileState(Filename, false, 2f);
                 if (fileInfo1 == fileInfo2) { return (content, fileInfo2); }
             } while (true);
+        }
+
+        /// <summary>
+        /// Startet den Timer für die automatische Stale-Prüfung.
+        /// </summary>
+        private void StartStaleCheckTimer() {
+            lock (_lock) {
+                // Timer nur starten, wenn noch keiner läuft
+                if (_staleCheckTimer == null) {
+                    _staleCheckTimer = new Timer(
+                        callback: _ => CheckAndInvalidateIfStale(),
+                        state: null,
+                        dueTime: _checkIntervalMs,
+                        period: _checkIntervalMs
+                    );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stoppt und disposed den Timer.
+        /// </summary>
+        private void StopStaleCheckTimer() {
+            Timer? timerToDispose = null;
+
+            lock (_lock) {
+                timerToDispose = _staleCheckTimer;
+                _staleCheckTimer = null;
+            }
+
+            // Dispose außerhalb des Locks
+            timerToDispose?.Dispose();
         }
 
         #endregion

@@ -135,7 +135,7 @@ public class GenericControlReciverSender : GenericControlReciver {
             OnFilterOutputPropertyChanged();
         } catch {
             //Develop.DebugPrint(ErrorType.Error, "Fehler in FilterOutput_PropertyChanged", ex);
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             FilterOutput_PropertyChanged(sender, e);
         } finally {
             _recursionDepth--;

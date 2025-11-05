@@ -383,7 +383,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             result.ParseableAdd("Origin", Origin);
             return result;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ParseableItems();
         }
     }

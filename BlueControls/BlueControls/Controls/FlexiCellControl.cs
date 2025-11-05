@@ -28,7 +28,6 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
@@ -107,7 +106,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
                 return TableInput is { IsDisposed: false } tb ? tb.Column[_columnName] : null;
             } catch {
                 // Multitasking sei dank kann _table trotzem null sein...
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 return Column;
             }
         }
@@ -201,7 +200,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         } catch {
             // Invoke: auf das verworfene Ojekt blah blah
             if (!IsDisposed) {
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 TableInput_CellValueChanged(sender, e);
             }
         }
@@ -222,7 +221,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 TableInput_Loaded(sender, e); // am Anfang der Routine wird auf disposed geprüft
                 return;
             }

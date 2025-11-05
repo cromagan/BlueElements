@@ -113,7 +113,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             }
         } catch {
             // Wird bereits an anderer Stelle verwendet... Multitasking, wenn mehrere items auf einmal generiert werden.
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             DrawString(gr, text, font, brush, x, y);
         }
     }
@@ -415,7 +415,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             return new Size(minSize, minSize);
         } catch {
             // tmpImageCode wird an anderer Stelle verwendet
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return FormatedText_NeededSize(text, qi, minSize);
         }
     }

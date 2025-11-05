@@ -105,7 +105,7 @@ public partial class FloatingForm : Form {
             if (AllBoxes.Contains(this)) { _ = AllBoxes.Remove(this); }
             base.Close();
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             Close();
         }
     }

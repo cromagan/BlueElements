@@ -166,7 +166,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             try {
                 return _items.GetByKey(@internal);
             } catch {
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 return this[@internal];
             }
         }
@@ -177,7 +177,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             try {
                 return no < 0 || no >= _items.Count ? null : _items[no];
             } catch {
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 return this[no];
             }
         }

@@ -269,6 +269,7 @@ public class TableFragments : TableFile {
     }
 
     private void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc) {
+        if (Generic.Ending) { return; }
         if (!IsEditable(false)) { return; }
         if (files is not { Count: >= 1 }) { return; }
         if (!FirstTimAlleFragmentsLoaded) { return; }
@@ -350,7 +351,7 @@ public class TableFragments : TableFile {
 
             var filesystem = CachedFileSystem.Get(FragmengtsPath());
 
-            var frgma = filesystem.GetFiles([KeyName.ToUpper() + "-*." + SuffixOfFragments()]); // GetFiles(FragmengtsPath(), KeyName.ToUpper() + "-*." + SuffixOfFragments(), System.IO.SearchOption.TopDirectoryOnly).ToList();
+            var frgma = filesystem.GetFiles(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]); // GetFiles(FragmengtsPath(), KeyName.ToUpper() + "-*." + SuffixOfFragments(), System.IO.SearchOption.TopDirectoryOnly).ToList();
             _ = frgma.Remove(_myFragmentsFilename);
 
             #endregion
@@ -437,7 +438,7 @@ public class TableFragments : TableFile {
                 OnLoaded(false);
             }
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc);
         }
     }
@@ -476,7 +477,7 @@ public class TableFragments : TableFile {
             _writer = null;
 
             Pause(3, false);
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             StartWriter();
         }
     }

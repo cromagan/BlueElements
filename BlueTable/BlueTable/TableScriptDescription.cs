@@ -40,7 +40,7 @@ public static class TableScriptDescriptionExtension {
         try {
             return [.. scripts.Where(script => script.EventTypes.HasFlag(type))];
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return scripts.Get(type);
         }
     }
@@ -235,7 +235,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             result.ParseableAdd("Events", EventTypes);
             return result;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ParseableItems();
         }
     }

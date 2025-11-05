@@ -387,7 +387,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             return _stringBuilder.ToString().Replace("\n", string.Empty);
         } catch {
             // Wenn Chars geändert wird (und dann der _internal.Count nimmer stimmt)
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return ConvertCharToPlainText(first, last);
         }
     }

@@ -107,17 +107,14 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         if (InvokeRequired) {
             try {
                 _ = Invoke(new Action(() => _lastRow_DropMessage(type, symbol, message)));
-                return;
-            } catch {
-                return;
-            }
+            } catch { }
+            return;
         }
 
         _n--;
         if (_n < 0) { _n = 99999; }
 
         lstDone.ItemAdd(ItemOf(message, Generic.GetUniqueKey(), symbol, false, _n.ToStringInt7()));
-        
 
         lstDone.Refresh();
         //capInfo.Text = message;

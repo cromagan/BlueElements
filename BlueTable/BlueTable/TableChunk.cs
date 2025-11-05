@@ -209,7 +209,7 @@ public class TableChunk : TableFile {
 
             return x != db.LastChange ? null : chunks; // Stand stimmt nicht mehr
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return GenerateNewChunks(db, minLen, fileStateUtcDateToSave, chunksAllowed);
         }
     }
@@ -400,7 +400,7 @@ public class TableChunk : TableFile {
         }
 
         if (!parsed) {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             chunk.LoadBytesFromDisk(false);
             chunk.WaitBytesLoaded();
             if (chunk.LoadFailed) { return false; }

@@ -503,7 +503,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
             var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
             return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return WordStarts(word, position);
         }
     }

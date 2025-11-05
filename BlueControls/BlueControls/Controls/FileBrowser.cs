@@ -341,7 +341,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 CreateWatcher();
                 return;
             }
@@ -564,7 +564,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 ReloadDirectory();
                 return;
             }

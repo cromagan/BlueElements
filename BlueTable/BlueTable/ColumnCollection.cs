@@ -141,7 +141,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 }
                 return col;
             } catch {
-                Develop.CheckStackOverflow();
+                Develop.AbortAppIfStackOverflow();
                 return this[keyName];
             }
         }

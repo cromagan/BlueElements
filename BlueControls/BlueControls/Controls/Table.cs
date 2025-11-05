@@ -1410,7 +1410,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             return RowsFilteredAndPinned(); // Rekursiver Aufruf. Manchmal funktiniert OnRowsSorted nicht ...
         } catch {
             // Komisch, manchmal wird die Variable _sortedRowDatax verworfen.
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             Invalidate_SortedRowData();
             return RowsFilteredAndPinned();
         }
@@ -1433,7 +1433,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 }
             });
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return RowsVisibleUnique();
         }
 
@@ -3729,7 +3729,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             } else {
                 // Verknüpfte Tabellen überprüfen
                 foreach (var thisColumn in tb.Column) {
-                    if (thisColumn.LinkedTable is { IsDisposed: false } linkedDb && !string.IsNullOrEmpty(linkedDb.CheckScriptError())) {
+                    if (thisColumn.LinkedTable is { IsDisposed: false } linkedDb && !string.IsNullOrEmpty(linkedDb.CheckScriptError()) && linkedDb.IsEditable(false)) {
                         gr.DrawImage(QuickImage.Get(ImageCode.Kritisch, 64), 16, filterHeight + 8);
                         ca.Font_RowChapter.DrawString(gr, $"Skripte von {linkedDb.Caption} müssen repariert werden", 90, filterHeight + 12);
                         break; // Nur die erste fehlerhafte Tabelle anzeigen

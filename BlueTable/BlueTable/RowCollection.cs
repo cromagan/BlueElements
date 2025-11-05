@@ -573,7 +573,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             return r;
         } catch {
-            Develop.CheckStackOverflow();
+            Develop.AbortAppIfStackOverflow();
             return GetByKey(key);
         }
     }
