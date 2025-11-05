@@ -104,8 +104,8 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             }
             if (sbpi.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
                 foreach (var thisCon in icpi) {
-                    if (thisCon is EditFieldPadItem fcc && fcc.Freies_Feld && fcc.Column is { } c) {
-                        var fn = fcc.FieldName;
+                    if (thisCon is OutputFilterPadItem ofpi && ofpi.Column is { } c) {
+                        var fn = ofpi.FieldName;
 
                         if (!string.IsNullOrEmpty(fn)) {
                             _ = vars.Add(RowItem.CellToVariable(fn, c.ScriptType, c.MostUsedValue, false, "Feld im Formular"));

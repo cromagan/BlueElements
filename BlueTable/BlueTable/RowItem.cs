@@ -177,6 +177,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             case ScriptType.List_Readonly:
                 return new VariableListString(varname, value.SplitAndCutByCrToList(), true, coment);
 
+            case ScriptType.Nicht_vorhanden:
+                return null;    
+
             default:
                 Develop.DebugPrint(scriptType);
                 return null;

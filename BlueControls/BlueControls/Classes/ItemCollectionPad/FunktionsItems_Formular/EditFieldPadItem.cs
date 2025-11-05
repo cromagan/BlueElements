@@ -48,7 +48,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
     private string _columnName = string.Empty;
-    private bool _freiesFeld = false;
 
     #endregion
 
@@ -132,26 +131,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         }
     }
 
-    public string FieldName {
-        get {
-            if (!Freies_Feld) { return string.Empty; }
-            if (Column is not { } c || c.Table is not { } tb) { return string.Empty; }
-
-            return $"FIELD_{tb.KeyName}_{c.KeyName}";
-        }
-    }
-
-    [DefaultValue(false)]
-    public bool Freies_Feld {
-        get => _freiesFeld;
-        set {
-            if (IsDisposed) { return; }
-            if (_freiesFeld == value) { return; }
-            _freiesFeld = value;
-            OnPropertyChanged();
-        }
-    }
-
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
     public override bool TableInputMustMatchOutputTable => false;
@@ -180,7 +159,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             ColumnName = _columnName,
             EditType = EditType,
             CaptionPosition = CaptionPosition,
-            SyncWithCell = !Freies_Feld
         };
 
         con.DoDefaultSettings(parent, this, mode);
@@ -221,7 +199,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         b.AddRange(GetAllowedEditTypes(Column));
         result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
 
-        result.Add(new FlexiControlForProperty<bool>(() => Freies_Feld));
         return result;
     }
 
@@ -233,7 +210,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _captionPosition);
         result.ParseableAdd("AutoDistance", _autoX);
-        result.ParseableAdd("NoSave", _freiesFeld);
         return result;
     }
 
@@ -263,7 +239,6 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
                 return true;
 
             case "nosave":
-                _freiesFeld = value.FromPlusMinus();
                 return true;
 
             case "style":

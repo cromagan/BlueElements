@@ -26,6 +26,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueTable;
 using BlueTable.Enums;
 using System.Collections.Generic;
@@ -74,6 +75,13 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     /// </summary>
     public CaptionPosition DefaultCaptionPosition { get; }
 
+    public string FieldName {
+        get {
+            if (GeneratedFrom is not OutputFilterPadItem efpi) { return string.Empty; }
+            return efpi.FieldName;
+        }
+    }
+
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -85,9 +93,17 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     public bool SavesSettings { get; internal set; } = false;
 
     public List<string> Settings { get; } = [];
+
     public bool SettingsLoaded { get; set; }
+
     public string SettingsManualFilename { get; set; } = string.Empty;
+
     public bool UsesSettings => true;
+
+    public string Value {
+        get => f.Value;
+        set { f.ValueSet(value, true); }
+    }
 
     #endregion
 

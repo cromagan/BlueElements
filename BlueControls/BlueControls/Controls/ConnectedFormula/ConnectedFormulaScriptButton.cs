@@ -143,11 +143,11 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         }
 
         foreach (var thisCon in Parent.Controls) {
-            if (thisCon is FlexiCellControl fcc && !fcc.SyncWithCell && fcc.Column is { } c) {
-                var fn = fcc.FieldName;
+            if (thisCon is FlexiFilterControl ffc && ffc.FilterSingleColumn is { } c) {
+                var fn = ffc.FieldName;
 
                 if (!string.IsNullOrEmpty(fn)) {
-                    _ = vars.Add(RowItem.CellToVariable(fn, c.ScriptType, fcc.Value, false, "Feld im Formular"));
+                    _ = vars.Add(RowItem.CellToVariable(fn, c.ScriptType, ffc.Value, false, "Feld im Formular"));
                 }
             }
         }
@@ -164,8 +164,8 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         #region Variablen zurückschreiben
 
         foreach (var thisCon in Parent.Controls) {
-            if (thisCon is FlexiCellControl fcc && !fcc.SyncWithCell && fcc.Column is { } && vars.GetByKey(fcc.FieldName) is Variable v) {
-                fcc.Value = v.ValueForCell;
+            if (thisCon is FlexiFilterControl ffc && ffc.FilterSingleColumn is { } && vars.GetByKey(ffc.FieldName) is Variable v) {
+                ffc.Value = v.ValueForCell;
             }
         }
 

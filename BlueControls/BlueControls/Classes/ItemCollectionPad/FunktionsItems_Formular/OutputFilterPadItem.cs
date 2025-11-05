@@ -93,9 +93,14 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         }
     }
 
-    public override bool TableInputMustMatchOutputTable => true;
+    public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.\r\nWerte können mit 'Skript-Knöpfen' abgefragt und manipuluert werden.";
 
-    public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.";
+    public string FieldName {
+        get {
+            if (Column is not { } c || c.Table is not { } tb) { return string.Empty; }
+            return $"FIELD_{tb.KeyName}_{c.KeyName}";
+        }
+    }
 
     public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
         get => _filterart_Bei_Texteingabe;
@@ -120,6 +125,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         }
     }
 
+    public override bool TableInputMustMatchOutputTable => true;
     protected override int SaveOrder => 1;
 
     #endregion
