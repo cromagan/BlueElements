@@ -171,7 +171,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        Renderer_DynamicSymbol.Method.Draw(gr, _script, positionModified.ToRect(), TranslationType.Original_Anzeigen, Alignment.Left, scale);
+        Renderer_DynamicSymbol.Method.Draw(gr, _script, null, positionModified.ToRect(), TranslationType.Original_Anzeigen, Alignment.Left, scale);
 
         //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
         //gr.TranslateTransform(trp.X, trp.Y);

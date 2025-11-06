@@ -82,12 +82,12 @@ public class Renderer_DateTime : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
-        QuickImage? qi= null;
+        QuickImage? qi = null;
 
         if (_showSymbol) {
             var pix = (int)(14 * scale);
@@ -96,7 +96,6 @@ public class Renderer_DateTime : Renderer_Abstract {
             } else {
                 qi = QuickImage.Get(ImageCode.Globus, pix);
             }
-
         }
 
         Skin.Draw_FormatedText(gr, replacedText, qi, align, scaleddrawarea, this.GetFont(scale), false);

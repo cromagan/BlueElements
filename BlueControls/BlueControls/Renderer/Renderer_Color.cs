@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
+using BlueTable;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
@@ -79,7 +80,7 @@ public class Renderer_Color : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
         QuickImage? qi = null;
@@ -90,7 +91,6 @@ public class Renderer_Color : Renderer_Abstract {
             replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
             if (_showSymbol) {
-
                 qi = QuickImage.Get(ImageCode.Kreis, pix, Color.Transparent, col);
             }
         }
@@ -159,7 +159,6 @@ public class Renderer_Color : Renderer_Abstract {
 
             if (string.IsNullOrEmpty(n)) { return col.ToHtmlCode(); }
             return $"{col.ToHtmlCode()} {n}";
-
         } else if (_showName) {
             var n = col.Name();
             if (!string.IsNullOrEmpty(n)) { return n; }

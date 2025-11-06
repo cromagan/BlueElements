@@ -172,7 +172,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var pix16 = (int)(16 * scale);
@@ -359,11 +359,11 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             }
         }
 
-        var i = QuickImage.Get(QuickImage.GenerateCode(_imgpräfix + name, constw, consth, ImageCodeEffect.Ohne, null,null, 100, 100, 0, 0, string.Empty));
+        var i = QuickImage.Get(QuickImage.GenerateCode(_imgpräfix + name, constw, consth, ImageCodeEffect.Ohne, null, null, 100, 100, 0, 0, string.Empty));
 
         if (i.IsError) {
             if (!string.IsNullOrEmpty(_defaultImage)) {
-                i = QuickImage.Get(QuickImage.GenerateCode(_defaultImage, constw, consth, ImageCodeEffect.Ohne, null,null, 100, 100, 0, 0, string.Empty));
+                i = QuickImage.Get(QuickImage.GenerateCode(_defaultImage, constw, consth, ImageCodeEffect.Ohne, null, null, 100, 100, 0, 0, string.Empty));
                 if (!i.IsError) { return i; }
             }
             return null;

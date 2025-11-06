@@ -1370,9 +1370,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (!_saveContent) {
             if (_fixedColumnWidth < 16) { return "Bei Spalten ohne Inhaltsspeicherung muss eine feste Spaltenbreite angegeben werden."; }
-            if (_scriptType is not ScriptType.Bool and not ScriptType.String and not ScriptType.Numeral and not ScriptType.List) {
-                return "Spalten ohne Inhaltsspeicherung müssen im Skript gesetzt werden und deswegen vorhanden sein.";
-            }
+            //if (_scriptType is not ScriptType.Bool and not ScriptType.String and not ScriptType.Numeral and not ScriptType.List) {
+            //    return "Spalten ohne Inhaltsspeicherung müssen im Skript gesetzt werden und deswegen vorhanden sein.";
+            //}
             if (!_ignoreAtRowFilter) { return "Spalten ohne Inhaltsspeicherung müssen bei Zeilenfiltern ignoriert werden."; }
 
             if (_isKeyColumn) {
@@ -2390,9 +2390,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case TableDataType.DefaultRenderer:
-                if (string.IsNullOrEmpty(newvalue) && !string.IsNullOrEmpty(_defaultRenderer)) {
-                    Develop.DebugPrint("Test");
-                }
+                //if (string.IsNullOrEmpty(newvalue) && !string.IsNullOrEmpty(_defaultRenderer)) {
+                //    Develop.DebugPrint("Test");
+                //}
 
                 _defaultRenderer = newvalue;
                 break;

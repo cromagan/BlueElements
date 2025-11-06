@@ -185,12 +185,12 @@ public class TableFragments : TableFile {
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
-        if (disposing) { }
+        if (disposing) {
+            UnMasterMe();
+            CloseWriter();
 
-        UnMasterMe();
-        CloseWriter();
-
-        base.Dispose(disposing);
+            base.Dispose(disposing);
+        }
     }
 
     protected override bool LoadMainData() {

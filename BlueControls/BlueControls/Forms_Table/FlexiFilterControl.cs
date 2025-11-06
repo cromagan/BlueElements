@@ -31,6 +31,7 @@ using BlueTable;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -352,9 +353,19 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private void UpdateFilterData(FilterItem? filterSingle) {
         if (IsDisposed || f is null) { return; }
 
+        var stackTrace = new StackTrace();
+        if (stackTrace.FrameCount > 100) {
+            f.DisabledReason = "Interner Fehler.";
+            f.Caption = "Interner Fehler";
+            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            FilterOutput.ChangeTo(new FilterItem(FilterSingleColumn?.Table, string.Empty));
+            Invalidate_FilterOutput();
+            return;
+        }
+
         #region Wenn keine Spalte vorhanden, Fehler machen
 
-        if (FilterSingleColumn?.Table is not { IsDisposed: false } db) {
+        if (FilterSingleColumn?.Table is not { IsDisposed: false } tb) {
             f.DisabledReason = "Bezug zum Filter verloren.";
             f.Caption = "?";
             f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
@@ -368,9 +379,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         DoInputFilter(null, false);
 
-        #region Den FilterOutput erstellen
-
-        using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(db, "UpdateFilterData");
+        using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(tb, "UpdateFilterData");
 
         if (filterSingle == null) {
             if (Standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
@@ -384,10 +393,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         FilterOutput.ChangeTo(fic);
 
-        #endregion
-
-        #region Auf Festplatte speichern
-
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
             if (FilterOutput is { Count: 1, Rows.Count: 1 } fio && fio[0] is { } fi) {
@@ -395,8 +400,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
                 this.SettingsAdd(toAdd);
             }
         }
-
-        #endregion
 
         var nf = FilterOutput[FilterSingleColumn];
 
@@ -411,8 +414,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         if (IsDisposed || f is null) { return; } // Kommt vor!
         f.DisabledReason = !string.IsNullOrEmpty(_filterOrigin) ? $"<b>Dieser Filter wurde automatisch gesetzt:</b><br>{_filterOrigin}" : string.Empty;
 
-        #region Wählen-Button - und keine weitere Berechnungen
-
         if (MustMenu()) {
             f.CaptionPosition = DefaultCaptionPosition;
             f.Caption = FilterSingleColumn.ReadableText() + ":";
@@ -420,10 +421,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
             return;
         }
-
-        #endregion
-
-        #region Löschen-Button - und keine weiteren Berechnungen
 
         // Komplett neue Berechnung für showDelFilterButton
         var showDelFilterButton = false;
@@ -464,8 +461,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             }
         }
 
-        #endregion
-
         if (filterSingle != null) {
             if (filterSingle is { FilterType: FilterType.Instr_GroßKleinEgal, SearchValue.Count: 1 }) {
                 nvalue = filterSingle.SearchValue[0];
@@ -474,26 +469,25 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             }
         }
 
-        #region Filter verbieten - und keine weiteren Berechnungen
-
         if (!FilterSingleColumn.AutoFilterSymbolPossible()) {
             f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
             f.DisabledReason = "Kein Filter erlaubt";
             return;
         }
 
-        #endregion
-
-        #region Text-Eingabefeld - und keine weitere Berechnungen
-
         if (IsDisposed || f is null) { return; } // Kommt vor!
 
         f.CaptionPosition = DefaultCaptionPosition;
         f.Caption = FilterSingleColumn.ReadableText() + ":";
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-        f.ValueSet(nvalue, true);
 
-        #endregion
+        if (FilterSingleColumn.Value_for_Chunk != ChunkType.None) {
+            f.DisabledReason = "Chunk-Spalte.";
+            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            return;
+        }
+
+        f.ValueSet(nvalue, true);
     }
 
     #endregion

@@ -3314,7 +3314,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (!string.IsNullOrEmpty(txt)) {
                 var pos = new Rectangle(realHead.Left + plus, (int)(-SliderY.Value + realHead.Bottom + p1), realHead.Width - plus, p16);
                 gr.DrawImage(qi, new Point(realHead.Left + p1, (int)(-SliderY.Value + realHead.Bottom + p1)));
-                viewItem.GetRenderer(SheetStyle).Draw(gr, txt, pos, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
+                viewItem.GetRenderer(SheetStyle).Draw(gr, txt, null, pos, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
             }
         }
 
@@ -3371,7 +3371,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 }
 
                 var toDrawd = cellInThisTableRow.CellGetString(cellInThisTableColumn);
-                viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellrectangle, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
+                viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, cellrectangle, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
 
                 #endregion
 

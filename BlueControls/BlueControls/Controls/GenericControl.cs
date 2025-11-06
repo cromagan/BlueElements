@@ -521,6 +521,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     protected override void WndProc(ref Message m) {
+        if (Develop.Exited) { return; }
+
         try {
             //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
             if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }

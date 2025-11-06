@@ -51,6 +51,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
+using BlueBasics.FileSystemCaching;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -94,9 +95,14 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
-        if (IO.FileExists(layoutFileName)) {
-            this.Parse(IO.ReadAllText(layoutFileName, Win1252));
+        if (layoutFileName.IsFormat(FormatHolder.FilepathAndName)) {
+            var f = CachedFileSystem.Get(layoutFileName.FilePath());
+
+            if (f.FileExists(layoutFileName)) {
+                this.Parse(f.ReadAllText(layoutFileName, Win1252));
+            }
         }
+
         IsSaved = true;
     }
 

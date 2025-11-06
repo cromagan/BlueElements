@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueTable;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
@@ -45,7 +46,7 @@ public class Renderer_Font : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
         Skin.Draw_FormatedText(gr, txt, null, align, scaleddrawarea, BlueFont.Get(content).Scale(scale), false);
     }

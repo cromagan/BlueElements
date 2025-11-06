@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Extended_Text;
+using BlueTable;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
@@ -34,13 +35,13 @@ public class Renderer_RichText : Renderer_Abstract {
 
     public static string ClassId => "RichText";
 
-    public override string Description => "Langsame aber korrekte Anzeige mit Formatierungen.";
+    public override string Description => "Langsame, aber korrekte Anzeige mit Formatierungen.";
 
     #endregion
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         //gr.SetClip(positionModified);
@@ -99,9 +100,7 @@ public class Renderer_RichText : Renderer_Abstract {
     /// <param name="style"></param>
     /// <param name="translate"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
-        return content;
-    }
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) => content;
 
     #endregion
 }

@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueTable;
 using BlueTable.Enums;
 using System;
 using System.Collections.Concurrent;
@@ -95,7 +96,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     #region Methods
 
     public Size ContentSize(string content, TranslationType translate) {
-        if (string.IsNullOrEmpty(content)) { return Size.Empty; }
+        //if (string.IsNullOrEmpty(content)) { return Size.Empty; }
 
         var key = TextSizeKey(_lastCode, content);
 
@@ -108,7 +109,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
         return contentsize;
     }
 
-    public abstract void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale);
+    public abstract void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale);
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 

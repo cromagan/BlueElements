@@ -42,13 +42,23 @@ internal static class Program {
     [STAThread]
     private static void Main() {
         Develop.StartService();
+
         var currentDomain = AppDomain.CurrentDomain;
         currentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+        // ProcessExit Handler - wird beim Beenden aufgerufen
+        currentDomain.ProcessExit += (sender, e) => {
+            System.Diagnostics.Debugger.Break(); // Breakpoint hier
+            System.Diagnostics.Debug.WriteLine("ProcessExit wurde aufgerufen!");
+            System.Diagnostics.Debug.WriteLine(Environment.StackTrace);
+        };
+
         //CultureInfo culture = new("de-DE");
         //CultureInfo.DefaultThreadCurrentCulture = culture;
         //CultureInfo.DefaultThreadCurrentUICulture = culture;
         //System.Windows.Forms.Application.EnableVisualStyles();
         //System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+
         Application.Run(new MainWindow(true));
     }
 

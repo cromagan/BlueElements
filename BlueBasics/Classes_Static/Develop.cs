@@ -52,7 +52,7 @@ public static class Develop {
 
     private static bool _deleteTraceLog = true;
 
-    private static bool _isTraceLogging;
+    private static ErrorType? _isTraceLogging = null;
 
     private static string _lastDebugMessage = string.Empty;
 
@@ -85,7 +85,7 @@ public static class Develop {
 
     public static void AbortAppIfStackOverflow() {
         StackTrace stackTrace = new();
-        if (stackTrace.FrameCount > 100) {
+        if (stackTrace.FrameCount > 200) {
             DebugPrint(ErrorType.Error, "Stack-Overflow abgefangen!");
         }
     }
@@ -135,16 +135,16 @@ public static class Develop {
     public static void DebugPrint(ErrorType type, string message) {
         lock (SyncLockObject) {
             try {
-                if (_isTraceLogging) {
-                    if (type == ErrorType.Error) { AbortExe(false); }
-                    return;
+                if (_isTraceLogging != null) {
+                    if (_isTraceLogging == ErrorType.Error) { return; }
+                    if (type != ErrorType.Error) { return; }
                 }
-                _isTraceLogging = true;
+                _isTraceLogging = type;
                 if (type == ErrorType.Error) { _lastDebugMessage = string.Empty; }
                 if (DateTime.UtcNow.Subtract(_lastDebugTime).TotalSeconds > 5) { _lastDebugMessage = string.Empty; }
                 var net = type + (";" + message);
                 if (net == _lastDebugMessage) {
-                    _isTraceLogging = false;
+                    _isTraceLogging = null;
                     return;
                 }
                 _lastDebugMessage = net;
@@ -159,7 +159,7 @@ public static class Develop {
                 switch (type) {
                     case ErrorType.DevelopInfo:
                         if (!IsHostRunning()) {
-                            _isTraceLogging = false;
+                            _isTraceLogging = null;
                             return;
                         }
                         Trace.WriteLine("<th><font size = 3>Runtime-Info");
@@ -233,7 +233,7 @@ public static class Develop {
                     AbortExe(false);
                     return;
                 }
-                _isTraceLogging = false;
+                _isTraceLogging = null;
             } catch { }
         }
     }

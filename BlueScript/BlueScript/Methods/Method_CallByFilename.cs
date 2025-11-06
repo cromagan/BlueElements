@@ -18,6 +18,8 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.FileSystemCaching;
+using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -116,27 +118,34 @@ public class Method_CallByFilename : Method {
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var vs = attvar.ValueStringGet(0);
-        string f;
+        string file = attvar.ValueStringGet(0);
 
-        var addp = varCol.GetString("AdditionalFilesPath");
-
-        try {
-            if (FileExists(vs)) {
-                f = ReadAllText(vs, Encoding.UTF8);
-            } else if (FileExists(addp + vs)) {
-                f = ReadAllText(addp + vs, Encoding.UTF8);
-            } else {
-                return new DoItFeedback("Datei nicht gefunden: " + vs, true, ld);
-            }
-        } catch {
-            return new DoItFeedback("Fehler beim Lesen der Datei: " + vs, true, ld);
+        if (!file.IsFormat(FormatHolder.FilepathAndName)) {
+            file = varCol.GetString("AdditionalFilesPath") + file;
         }
 
-        (f, var error) = Script.NormalizedText(f);
+        if (!file.IsFormat(FormatHolder.FilepathAndName)) {
+            return new DoItFeedback($"Nicht als Datei erkannt: {file} ", true, ld);
+        }
+
+        var vfs = CachedFileSystem.Get(file.FilePath());
+
+        if (!vfs.FileExists(file)) {
+            return new DoItFeedback($"Datei nicht gefunden: {file}", true, ld);
+        }
+
+        string scripttxt;
+
+        try {
+            scripttxt = ReadAllText(file, Encoding.UTF8);
+        } catch {
+            return new DoItFeedback($"Fehler beim Lesen der Datei: {file}", true, ld);
+        }
+
+        (scripttxt, var error) = Script.NormalizedText(scripttxt);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback("Fehler in Datei " + vs + ": " + error, true, ld);
+            return new DoItFeedback($"Fehler in Datei {file}: {error}", true, ld);
         }
 
         #region Attributliste erzeugen
@@ -148,7 +157,7 @@ public class Method_CallByFilename : Method {
 
         #endregion
 
-        var scx = CallSub(varCol, scp, "Datei-Subroutinen-Aufruf [" + vs + "]", f, 0, vs.FileNameWithSuffix(), null, a, vs, ld);
+        var scx = CallSub(varCol, scp, "Datei-Subroutinen-Aufruf [" + file.FileNameWithoutSuffix() + "]", scripttxt, 0, file.FileNameWithSuffix(), null, a, file.FileNameWithSuffix(), ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         return scx;
     }

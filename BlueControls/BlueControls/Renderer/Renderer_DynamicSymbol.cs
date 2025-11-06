@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.ItemCollectionPad;
+using BlueTable;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
@@ -46,7 +47,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         if (scaleddrawarea is { Width: > 4, Height: > 4 }) {
