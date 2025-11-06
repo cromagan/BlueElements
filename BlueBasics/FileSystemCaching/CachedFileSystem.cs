@@ -199,7 +199,7 @@ namespace BlueBasics.FileSystemCaching {
             }
 
             // Erst Cache prüfen
-            return _cachedFiles.TryGetValue(normalizedFileName, out _);
+            return _cachedFiles.TryGetValue(normalizedFileName.ToUpperInvariant(), out _);
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace BlueBasics.FileSystemCaching {
         private CachedFile AddToCache(string fileName) {
             var normalizedFileName = IO.NormalizeFile(fileName);
 
-            return _cachedFiles.GetOrAdd(normalizedFileName,
+            return _cachedFiles.GetOrAdd(normalizedFileName.ToUpperInvariant(),
                 key => new CachedFile(key));
         }
 
@@ -398,7 +398,12 @@ namespace BlueBasics.FileSystemCaching {
 
         private void OnFileChanged(object sender, FileSystemEventArgs e) {
             if (IsDisposed) { return; }
-            RemoveFromCache(e.FullPath);
+
+            DebouncedAction(e.FullPath, () => {
+                AddToCache(e.FullPath);
+                var cachedFile = GetFile(e.FullPath);
+                cachedFile?.Invalidate();
+            });
         }
 
         private void OnFileCreated(object sender, FileSystemEventArgs e) {
@@ -411,12 +416,18 @@ namespace BlueBasics.FileSystemCaching {
             });
         }
 
-        private void OnFileDeleted(object sender, FileSystemEventArgs e) => DebouncedAction(e.FullPath, () => { RemoveFromCache(e.FullPath); });
+        private void OnFileDeleted(object sender, FileSystemEventArgs e) {
+            if (IsDisposed) { return; }
+            DebouncedAction(e.FullPath, () => { RemoveFromCache(e.FullPath); });
+        }
 
-        private void OnFileRenamed(object sender, RenamedEventArgs e) => DebouncedAction(e.FullPath, () => {
-            RemoveFromCache(e.OldFullPath);
-            AddToCache(e.FullPath);
-        });
+        private void OnFileRenamed(object sender, RenamedEventArgs e) {
+            if (IsDisposed) { return; }
+            DebouncedAction(e.FullPath, () => {
+                RemoveFromCache(e.OldFullPath);
+                AddToCache(e.FullPath);
+            });
+        }
 
         private void OnWatcherError(object sender, ErrorEventArgs e) {
             if (IsDisposed) { return; }
@@ -462,7 +473,7 @@ namespace BlueBasics.FileSystemCaching {
 
         private void RemoveFromCache(string filename) {
             if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return; }
-            if (_cachedFiles.TryRemove(IO.NormalizeFile(filename), out var file)) {
+            if (_cachedFiles.TryRemove(IO.NormalizeFile(filename).ToUpperInvariant(), out var file)) {
                 file.Dispose();
             }
         }

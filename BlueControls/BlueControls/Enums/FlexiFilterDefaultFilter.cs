@@ -31,5 +31,5 @@ public enum FlexiFilterDefaultFilter {
     /// <summary>
     /// Wird ein Text eingegeben, wird ein Filter Istgleich_ODER_GroßKleinEgal erzeugt
     /// </summary>
-    Ist = FilterType.Istgleich_ODER_GroßKleinEgal
+    Istgleich = FilterType.Istgleich_ODER_GroßKleinEgal
 }

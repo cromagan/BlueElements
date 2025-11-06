@@ -20,15 +20,14 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueTable;
 using BlueTable.Enums;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Navigation;
 
 namespace BlueControls.CellRenderer;
 
@@ -62,12 +61,11 @@ public class Renderer_Layout : Renderer_Abstract {
     #region Methods
 
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
-      
-        if(affectingRow == null) { return; }
-
+        if (affectingRow == null) { return; }
 
         using var l = new ItemCollectionPadItem(_file);
         l.ForPrinting = true;
+        l.GridShow = 0;
 
         if (!l.Any()) {
             var replacedText = ValueReadable("Layout nicht gefunden oder fehlerhaft.", ShortenStyle.Replaced, translate);
@@ -94,7 +92,8 @@ public class Renderer_Layout : Renderer_Abstract {
         }
 
         try {
-            gr.DrawImage(bmp, scaleddrawarea);
+            float scale2 = Math.Min((float)scaleddrawarea.Width / bmp.Width, (float)scaleddrawarea.Height / bmp.Height);
+            gr.DrawImage(bmp, new Rectangle(scaleddrawarea.X + (scaleddrawarea.Width - (int)(bmp.Width * scale2)) / 2, scaleddrawarea.Y + (scaleddrawarea.Height - (int)(bmp.Height * scale2)) / 2, (int)(bmp.Width * scale2), (int)(bmp.Height * scale2)));
         } catch {
             var replacedText = ValueReadable("Anzeige fehlgeschlagen.", ShortenStyle.Replaced, translate);
         }

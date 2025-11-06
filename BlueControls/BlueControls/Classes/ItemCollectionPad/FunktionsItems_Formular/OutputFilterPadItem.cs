@@ -44,6 +44,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
     private string _columnName = string.Empty;
+    private bool _einschnappen = true;
     private FlexiFilterDefaultFilter _filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _standard_Bei_Keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
@@ -95,6 +96,16 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.\r\nWerte können mit 'Skript-Knöpfen' abgefragt und manipuluert werden.";
 
+    public bool Einschnappen {
+        get => _einschnappen;
+        set {
+            if (IsDisposed) { return; }
+            if (_einschnappen == value) { return; }
+            _einschnappen = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string FieldName {
         get {
             if (Column is not { } c || c.Table is not { } tb) { return string.Empty; }
@@ -133,7 +144,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiFilterControl(Column, _captionPosition, _standard_Bei_Keiner_Eingabe, _filterart_Bei_Texteingabe) {
+        var con = new FlexiFilterControl(Column, _captionPosition, _standard_Bei_Keiner_Eingabe, _filterart_Bei_Texteingabe, _einschnappen, true) {
             SavesSettings = true
         };
 
@@ -176,6 +187,8 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         u3.AddRange(ItemsOf(typeof(FlexiFilterDefaultFilter)));
         result.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
 
+        result.Add(new FlexiControlForProperty<bool>(() => Einschnappen));
+
         return result;
     }
 
@@ -189,6 +202,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         result.ParseableAdd("Caption", _captionPosition);
         result.ParseableAdd("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
         result.ParseableAdd("DefaultTextFilter", _filterart_Bei_Texteingabe);
+        result.ParseableAdd("SnapFilter", _einschnappen);
 
         return result;
     }
@@ -215,6 +229,10 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
                 _filterart_Bei_Texteingabe = (FlexiFilterDefaultFilter)IntParse(value);
                 return true;
 
+            case "snapfilter":
+                _einschnappen = value.FromPlusMinus();
+                return true;
+
                 //case "captiontext":
                 //    _überschrift = value.FromNonCritical();
                 //    return true;
@@ -232,7 +250,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return txt + TableOutput?.Caption;
     }
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Trichter, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Trichter, 16, Skin.IdColor(OutputColorId), Color.Transparent); //  QuickImage.Get(ImageCode.Trichter, 16);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
         if (!ForPrinting) {

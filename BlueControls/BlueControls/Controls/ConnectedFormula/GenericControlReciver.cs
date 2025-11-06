@@ -32,7 +32,6 @@ using BlueTable.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 
 namespace BlueControls.Controls;
@@ -42,7 +41,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #region Fields
 
     public readonly List<GenericControlReciverSender> Parents = [];
-
+    protected const string _outputf = "FilterOutput";
     private readonly object _filterInputLock = new object();
 
     // Ein privates Objekt zum Sperren für die Thread-Sicherheit
@@ -53,8 +52,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     private FilterCollection? _filterInput;
 
     private Table? _tableInput;
-
-    private int _waitTimeoutMs = 5000;
 
     #endregion
 
@@ -187,25 +184,26 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     public virtual void Invalidate_FilterInput() {
         if (IsDisposed) { return; }
 
-        var filterNeedsInvalidation = false;
-
         lock (_filterInputLock) {
-            if (FilterInputChangedHandled) {
-                if (_filterInputChangedHandling) {
-                    Develop.DebugPrint(ErrorType.Error, "Filter wird gerade berechnet");
-                    return;
-                }
-
+            // Wenn bereits eine Berechnung läuft, Flag setzen und zurückkehren
+            if (_filterInputChangedHandling) {
+                // Merken, dass nach der aktuellen Berechnung erneut invalidiert werden muss
                 FilterInputChangedHandled = false;
-                filterNeedsInvalidation = true;
+                return;
+            }
+
+            if (FilterInputChangedHandled) {
+                FilterInputChangedHandled = false;
+                _cachedFilterHash = null;
+            } else {
+                // Bereits invalidiert, nichts zu tun
+                return;
             }
         }
 
-        if (filterNeedsInvalidation) {
-            _cachedFilterHash = null; // Cache invalidieren
-            Invalidate_RowsInput();
-        }
-
+        // Außerhalb des Locks invalidieren
+        _cachedFilterHash = null;
+        Invalidate_RowsInput();
         Invalidate();
     }
 
@@ -277,26 +275,43 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     /// <param name="mustbeTable"></param>
     /// <param name="doEmptyFilterToo"></param>
     protected void DoInputFilter(Table? mustbeTable, bool doEmptyFilterToo) {
-        if (IsDisposed || FilterInputChangedHandled) { return; }
+        if (IsDisposed) { return; }
 
-        _filterInputChangedHandling = true;
+        lock (_filterInputLock) {
+            if (FilterInputChangedHandled) { return; }
+
+            if (_filterInputChangedHandling) {
+                // Bereits in Berechnung - nach Abschluss erneut prüfen
+                FilterInputChangedHandled = false;
+                return;
+            }
+
+            _filterInputChangedHandling = true;
+            FilterInputChangedHandled = true;
+        }
 
         try {
-            FilterInputChangedHandled = true;
-
             FilterInput = GetInputFilter(mustbeTable, doEmptyFilterToo);
 
             if (FilterInput is { Table: null }) {
                 FilterInput = new FilterCollection(mustbeTable, "Fehlerhafter Filter") {
                 new FilterItem(mustbeTable, string.Empty)
             };
-                //Develop.DebugPrint(ErrorType.Error, "Tabelle Fehler");
             }
+
             Invalidate_RowsInput();
         } catch (Exception ex) {
             Develop.DebugPrint(ErrorType.Error, "Unerwartet bei DoInputFilter", ex);
         } finally {
-            _filterInputChangedHandling = false;
+            lock (_filterInputLock) {
+                _filterInputChangedHandling = false;
+
+                // Wenn während der Berechnung erneut invalidiert wurde
+                if (!FilterInputChangedHandled) {
+                    // Erneut aufrufen (außerhalb des Locks)
+                    System.Threading.Tasks.Task.Run(() => Invalidate_FilterInput());
+                }
+            }
         }
     }
 
@@ -414,26 +429,25 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     private void RegisterEvents() {
-        if (FilterInput is not { IsDisposed: false }) { return; }
-        FilterInput.RowsChanged += FilterInput_RowsChanged;
-        FilterInput.DisposingEvent += FilterInput_DisposingEvent;
+        if (_filterInput is not { IsDisposed: false }) { return; }
+        _filterInput.RowsChanged += FilterInput_RowsChanged;
+        _filterInput.DisposingEvent += FilterInput_DisposingEvent;
     }
 
     private void UnRegisterFilterInputAndDispose() {
-        if (FilterInput is not { IsDisposed: false }) { return; }
+        if (_filterInput is not { IsDisposed: false }) { return; }
 
         // Events zuerst entfernen
-        FilterInput.RowsChanged -= FilterInput_RowsChanged;
-        FilterInput.DisposingEvent -= FilterInput_DisposingEvent;
+        _filterInput.RowsChanged -= FilterInput_RowsChanged;
+        _filterInput.DisposingEvent -= FilterInput_DisposingEvent;
 
-        var filterToDispose = FilterInput;
+        var filterToDispose = _filterInput;
 
         // Explizite Referenz löschen
         _filterInput = null;
 
         // Dispose durchführen, wenn wir dafür verantwortlich sind
-        if (Parents.Count > 1) {
-            // Nur bei mehreren Parents sind wir sicher für den Filter verantwortlich
+        if (!filterToDispose.Coment.StartsWith(_outputf, StringComparison.OrdinalIgnoreCase)) {
             filterToDispose.Table = null;
             filterToDispose.Dispose();
         }

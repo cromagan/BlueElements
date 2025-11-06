@@ -39,8 +39,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Fields
 
-    //TODO: Kommentar wieder entfernen
-    private readonly string _coment;
+    public readonly string Coment;
 
     private readonly List<FilterItem> _internal = [];
 
@@ -55,14 +54,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public FilterCollection(Table? table, string coment) {
         Table = table;
-        _coment = coment;
+        Coment = coment;
     }
 
     /// <summary>
     /// Erstellt einen Filter, der den Zeilenschlüssel sucht. Mit der SplitColumn als zweiten Filter
     /// </summary>
     public FilterCollection(RowItem r, string coment) {
-        _coment = coment;
+        Coment = coment;
         if (r.Table is not { IsDisposed: false } db) {
             Develop.DebugPrint(ErrorType.Error, "Fehler im Filter");
             return;
@@ -88,7 +87,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <param name="sql">Die vollständige SQL-SELECT-Anweisung</param>
     /// <param name="comment">Kommentar für den Filter</param>
     public FilterCollection(string sql, string comment) {
-        _coment = comment;
+        Coment = comment;
 
         if (string.IsNullOrWhiteSpace(sql)) {
             Table = null;

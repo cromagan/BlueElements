@@ -113,7 +113,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
         DrawHeight = 18;
 
         foreach (var thisViewItem in ca) {
-            if (thisViewItem.Column is { IsDisposed: false } tmpc && !Row.CellIsNullOrEmpty(tmpc)) {
+            if (thisViewItem.Column is { IsDisposed: false } tmpc) {
                 var renderer = thisViewItem.GetRenderer(style);
                 DrawHeight = Math.Max(DrawHeight, renderer.ContentSize(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation).Height);
             }

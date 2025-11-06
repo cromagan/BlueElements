@@ -1706,10 +1706,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                             _ = flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil);
+                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil, true, false);
                             flx.FilterOutput.Table = thisColumn.Table;
-                            flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-                            flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
+                            //flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+                            //flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
                             ChildIsBorn(flx);
                             flx.FilterOutputPropertyChanged += FlexSingeFilter_FilterOutputPropertyChanged;
                             Controls.Add(flx);

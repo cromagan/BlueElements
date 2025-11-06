@@ -43,6 +43,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     #region Fields
 
+    public bool Einschnappen = true;
     public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
     private const int MaxRecentFilterEntries = 20;
@@ -52,7 +53,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     #region Constructors
 
-    public FlexiFilterControl(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, FlexiFilterDefaultOutput emptyInputBehavior, FlexiFilterDefaultFilter defaultTextInputFilter) : base(false, false, false) {
+    public FlexiFilterControl(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, FlexiFilterDefaultOutput emptyInputBehavior, FlexiFilterDefaultFilter defaultTextInputFilter, bool einschnappen, bool saveSettings) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
@@ -63,6 +64,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         Standard_bei_keiner_Eingabe = emptyInputBehavior;
         Filterart_Bei_Texteingabe = defaultTextInputFilter;
         DefaultCaptionPosition = defaultCaptionPosition;
+        Einschnappen = einschnappen;
+        SavesSettings = saveSettings;
         //Invalidate_FilterInput();
     }
 
@@ -134,8 +137,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         DoInputFilter(null, false);
 
         var filterSingle = FilterInput?[FilterSingleColumn];
-
-        // Entferne die Berechnung von _isDeleteButtonVisible
         UpdateFilterData(filterSingle);
     }
 
@@ -178,7 +179,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
                     }
                 }
             }
-            return;
+            if (nr >= 0) { return; }
         }
 
         if (FilterSingleColumn == null) {
@@ -189,7 +190,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null, true);
         if (listFilterString.Count == 0) {
             cbx.ItemAdd(ItemOf("Keine (weiteren) Einträge vorhanden", "|~", ImageCode.Kreuz, false));
-        } else if (listFilterString.Count < 400) {
+        } else if (listFilterString.Count < 200) {
             cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer));
         } else {
             cbx.ItemAdd(ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
@@ -218,8 +219,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     }
 
     private void F_ButtonClick(object sender, System.EventArgs e) {
-        //base.CommandButton_Click(); // Nope, keine Ereignisse und auch nicht auf + setzen
-
         var filterSingle = FilterInput?[FilterSingleColumn];
 
         if (filterSingle == null) {
@@ -247,12 +246,6 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private void F_ControlAdded(object sender, ControlEventArgs e) {
         if (e.Control is ComboBox cbx) {
             List<AbstractListItem> item2 = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
-
-            //var c = Filter.Column.Contents(null);
-            //foreach (var thiss in c)
-            //{
-            //    Item2.GenerateAndAdd("|" + thiss, thiss));
-            //}
 
             if (TextEntryAllowed()) {
                 f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false, 1);
@@ -282,7 +275,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             return;
         }
 
-        var filterSingleo = FilterInput?[FilterSingleColumn];
+        var filterSingleo = FilterOutput?[FilterSingleColumn];
 
         var currentValue = filterSingleo?.SearchValue.JoinWithCr() ?? string.Empty;
 
@@ -353,15 +346,19 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     private void UpdateFilterData(FilterItem? filterSingle) {
         if (IsDisposed || f is null) { return; }
 
+        #region Endlosschleifen abfangen
+
         var stackTrace = new StackTrace();
         if (stackTrace.FrameCount > 100) {
-            f.DisabledReason = "Interner Fehler.";
+            f.DisabledReason = "Interner Fehler\r\nEndlosschleife abgefangen.";
             f.Caption = "Interner Fehler";
             f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
             FilterOutput.ChangeTo(new FilterItem(FilterSingleColumn?.Table, string.Empty));
             Invalidate_FilterOutput();
             return;
         }
+
+        #endregion
 
         #region Wenn keine Spalte vorhanden, Fehler machen
 
@@ -377,11 +374,23 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         #endregion
 
+        #region Wenn Ausgangsfilter Disposed ist, Fehler machen
+
+        if (FilterOutput.IsDisposed) {
+            f.DisabledReason = "Ausgangsfilter verworfen.";
+            f.Caption = "?";
+            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            return;
+        }
+
+        #endregion
+
         DoInputFilter(null, false);
 
-        using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ?? new FilterCollection(tb, "UpdateFilterData");
+        using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ??
+                       new FilterCollection(tb, "UpdateFilterData");
 
-        if (filterSingle == null) {
+        if (filterSingle == null || filterSingle.SearchValue.Count == 0 || filterSingle.SearchValue[0].Length == 0) {
             if (Standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
                 fic.RemoveOtherAndAdd(new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, string.Empty));
             } else {
@@ -393,15 +402,16 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         FilterOutput.ChangeTo(fic);
 
-        if (SavesSettings) {
+        if (SavesSettings && FilterOutput.Rows.Count > 30) {
             this.LoadSettingsFromDisk(false);
-            if (FilterOutput is { Count: 1, Rows.Count: 1 } fio && fio[0] is { } fi) {
-                var toAdd = $"{FilterHash()}|{fi.SearchValue.JoinWithCr()}";
+
+            if (Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Istgleich && FilterOutput?.Rows.Count > 0) {
+                var toAdd = $"{FilterHash()}|{f.Value}";
                 this.SettingsAdd(toAdd);
             }
         }
 
-        var nf = FilterOutput[FilterSingleColumn];
+        var nf = FilterOutput?[FilterSingleColumn];
 
         var nvalue = nf?.SearchValue.JoinWithCr() ?? string.Empty;
         var _filterOrigin = nf?.Origin ?? string.Empty;
@@ -427,7 +437,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         if (filterSingle != null) {
             // Fall 1: Eine ComboBox wurde angeklickt (nicht durch Texteingabe)
-            if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) { showDelFilterButton = true; }
+            if (showDelFilterButton && f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) { showDelFilterButton = true; }
 
             // Fall 2: Es existiert ein Filter, der mehr als einen Wert hat
             if (filterSingle.SearchValue.Count > 1) { showDelFilterButton = true; }
@@ -439,7 +449,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
             if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
 
             // Fall 5: Aufwendige Berechnung, wenn der Filter ein Ergebnis zurückliefert
-            if (!showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false } c) {
+            if (Einschnappen && !showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false } c) {
                 //if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
                 using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
 
@@ -464,7 +474,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         if (filterSingle != null) {
             if (filterSingle is { FilterType: FilterType.Instr_GroßKleinEgal, SearchValue.Count: 1 }) {
                 nvalue = filterSingle.SearchValue[0];
-            } else if (Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Ist) {
+            } else if (Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Istgleich) {
                 nvalue = filterSingle.SearchValue[0];
             }
         }
@@ -484,6 +494,11 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         if (FilterSingleColumn.Value_for_Chunk != ChunkType.None) {
             f.DisabledReason = "Chunk-Spalte.";
             f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            return;
+        }
+
+        if (FilterInput?.HasAlwaysFalse() ?? false) {
+            f.DisabledReason = "Bitte vorherhige Felder richtig befüllen,\r\ndann gehts auch hier weiter.";
             return;
         }
 

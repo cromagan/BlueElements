@@ -364,8 +364,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
                 FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
             }
         } else {
-            FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
-        }
+            FilterOutput.Clear();
+        } 
+
+
+        //else {
+        //    FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
+        //}
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
