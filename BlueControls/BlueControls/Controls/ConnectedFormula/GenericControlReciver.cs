@@ -27,10 +27,12 @@ using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueTable;
+using BlueTable.Enums;
 using BlueTable.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 
 namespace BlueControls.Controls;
@@ -40,16 +42,18 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #region Fields
 
     public readonly List<GenericControlReciverSender> Parents = [];
+
     private readonly object _filterInputLock = new object();
 
     // Ein privates Objekt zum Sperren für die Thread-Sicherheit
     private readonly object _lockObject = new object();
 
-    private readonly object _rowsInputLock = new object();
     private string? _cachedFilterHash = null;
+
     private FilterCollection? _filterInput;
-    private bool _rowsInputChangedHandling;
+
     private Table? _tableInput;
+
     private int _waitTimeoutMs = 5000;
 
     #endregion
@@ -73,11 +77,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public virtual string Mode { get; set; } = string.Empty;
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputManualSeted { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -135,11 +134,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected bool FilterInputChangedHandled { get; private set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected List<RowItem>? RowsInput { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -218,62 +212,46 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     public RowItem? RowSingleOrNull() {
         if (IsDisposed || DesignMode) { return null; }
 
-        if (!RowsInputManualSeted) {
-            if (!FilterInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "FilterInput nicht gehandelt"); }
-            if (!RowsInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "RowInput nicht gehandelt"); }
-        }
+        if (!FilterInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "FilterInput nicht gehandelt"); }
 
-        if (RowsInput is not { Count: 1 } r) { return null; }
+        if (FilterInput?.Rows is not { Count: 1 } r) { return null; }
         _ = r[0].CheckRow();
         return r[0];
     }
 
     public void SetToRow(RowItem? row) {
         if (IsDisposed) { return; }
+
+        // Wenn Parents existieren, diese entfernen
         if (Parents.Count > 0) {
-            Develop.DebugPrint(ErrorType.Error, "Element wird von Parents gesteuert!");
-            return;
-        }
-
-        // Prüfen, ob wir nach der Zuweisung Events registrieren müssen
-        var needRegisterEvents = _tableInput == null;
-
-        // Sicherstellen, dass die manuellen Flags gesetzt sind
-        if (!RowsInputManualSeted) {
-            lock (_rowsInputLock) {
-                FilterInputChangedHandled = true;
-                RowsInputChangedHandled = true;
-                RowsInputManualSeted = true;
+            foreach (var parent in Parents) {
+                _ = parent.Childs.Remove(this);
             }
+            Parents.Clear();
         }
 
-        // Prüfen, ob die Row zur aktuellen Tabelle gehört
-        if (row != null && _tableInput is { IsDisposed: false } dbi) {
-            if (row.Table != dbi) {
-                row = null;
+        // Row validieren
+        if (row != null && TableInput is { IsDisposed: false } tb) {
+            if (row.Table != tb) { row = null; }
+        }
+
+        if (row?.Table is { } tb2) {
+            var fc = new FilterCollection(tb2, "SetToRow Filter");
+            FilterInputChangedHandled = true;
+
+            // FilterInput direkt setzen
+            lock (_filterInputLock) {
+                fc.Add(new FilterItem(tb2, FilterType.RowKey, row.KeyName));
+
+                FilterInput = fc;
+                _ = row?.CheckRow();
             }
-        }
-
-        // Keine Änderung notwendig, wenn die Row bereits die aktuelle ist
-        if (row == RowSingleOrNull()) { return; }
-
-        // Neue Rows-Liste erstellen (thread-sicher)
-        lock (_rowsInputLock) {
-            RowsInput = [];
-
-            if (row?.Table is { IsDisposed: false }) {
-                RowsInput.Add(row);
-            }
-        }
-
-        // Zusätzliche Verarbeitung außerhalb des Locks
-        if (row?.Table is { IsDisposed: false }) {
-            _ = row.CheckRow();
-
-            if (needRegisterEvents) { RegisterEvents(); }
+        } else {
+            FilterInput = null;
         }
 
         Invalidate_RowsInput();
+        Invalidate();
     }
 
     protected override void Dispose(bool disposing) {
@@ -322,57 +300,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
-    protected void DoRows() {
-        if (RowsInputChangedHandled || IsDisposed) { return; }
-
-        var needsProcessing = false;
-
-        lock (_rowsInputLock) {
-            // Doppelte Prüfung im Lock (Verhindert Race Conditions)
-            if (RowsInputChangedHandled || _rowsInputChangedHandling) { return; }
-
-            RowsInputChangedHandled = true;
-
-            if (RowsInputManualSeted) { return; }
-
-            _rowsInputChangedHandling = true;
-            needsProcessing = true;
-        }
-
-        try {
-            if (needsProcessing) {
-                if (!FilterInputChangedHandled) {
-                    Develop.DebugPrint(ErrorType.Error, "Filter unbehandelt!");
-                }
-
-                if (FilterInput == null) {
-                    lock (_rowsInputLock) {
-                        RowsInput = [];
-                    }
-                    return;
-                }
-
-                // Erstelle eine Kopie der Rows außerhalb des Locks
-                List<RowItem> rowsToProcess = [.. FilterInput.Rows];
-                // Verarbeitung außerhalb des Locks
-                if (RowSingleOrNull() is { IsDisposed: false } r) {
-                    _ = r.CheckRow();
-                }
-
-                // Ergebnis im Lock speichern
-                lock (_rowsInputLock) {
-                    RowsInput = rowsToProcess;
-                }
-            }
-        } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Error, "Unerwartet bei DoRows", ex);
-        } finally {
-            lock (_rowsInputLock) {
-                _rowsInputChangedHandling = false;
-            }
-        }
-    }
-
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         HandleChangesNow();
@@ -404,8 +331,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected virtual void HandleChangesNow() {
         if (IsDisposed) {
             TableInput = null;
-        } else if (RowsInput is { Count: > 0 } ri && ri[0] is { IsDisposed: false } row && row.Table is { IsDisposed: false } db) {
-            TableInput = db;
         } else if (FilterInput is { IsDisposed: false } fc) {
             TableInput = fc.Table;
         } else {
@@ -415,35 +340,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected void Invalidate_RowsInput() {
         if (IsDisposed || !RowsInputChangedHandled) { return; }
-
-        var lockTaken = false;
-        try {
-            // Versuche den Lock zu erhalten mit Timeout
-            lockTaken = System.Threading.Monitor.TryEnter(_rowsInputLock, _waitTimeoutMs);
-
-            if (!lockTaken) {
-                Develop.DebugPrint(ErrorType.Error, "Timeout beim Warten auf Rows-Berechnung");
-                return; // Abbruch bei Timeout
-            }
-
-            // Prüfen, ob Berechnung läuft (im sicheren Kontext)
-            if (_rowsInputChangedHandling) {
-                Develop.DebugPrint(ErrorType.Error, "Rows werden gerade berechnet");
-                return; // Wichtig: Return wenn Berechnung läuft
-            }
-
-            if (!RowsInputManualSeted) { RowsInput = null; }
-            RowsInputChangedHandled = false;
-        } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Error, "Unerwartet bei Invalidate_RowsInput", ex);
-        } finally {
-            // Lock immer freigeben, wenn er erhalten wurde
-            if (lockTaken) {
-                System.Threading.Monitor.Exit(_rowsInputLock);
-            }
-        }
-
-        // Invalidate außerhalb des Lock-Blocks aufrufen
+        RowsInputChangedHandled = false;
         Invalidate();
     }
 
@@ -456,7 +353,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         base.OnVisibleChanged(e);
         if (!Visible) { return; }
 
-        Invalidate_FilterInput();
+        Invalidate_RowsInput();
     }
 
     protected virtual void TableInput_CellValueChanged(object sender, CellEventArgs e) { }

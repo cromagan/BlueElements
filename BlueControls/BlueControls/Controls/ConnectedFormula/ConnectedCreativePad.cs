@@ -128,7 +128,6 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
-        DoRows();
 
         LastRow = RowSingleOrNull();
     }

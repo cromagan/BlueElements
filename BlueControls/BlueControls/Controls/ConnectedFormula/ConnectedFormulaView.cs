@@ -73,11 +73,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
-    //        InvalidateView();
-    //        Invalidate_FilterOutput();
-    //        Invalidate_RowsInput();
-    //    }
-    //}
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle GroupBoxStyle {
         get => _groupBoxStyle;
@@ -244,9 +239,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
             thisc?.Dispose();
         }
 
-        if (_generated) {
-            Invalidate_RowsInput();
-        }
+        Invalidate_RowsInput();
     }
 
     //public ConnectedFormula.ConnectedFormula? ConnectedFormula {
@@ -357,7 +350,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(FilterOutput.Table, false);
-        DoRows();
 
         if (RowSingleOrNull() is { IsDisposed: false } r) {
             if (_page?.GetRowEntryItem()?.TableOutput == r.Table) {
@@ -390,8 +382,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     private void _page_ItemRemoved(object sender, System.EventArgs e) => InvalidateView();
 
-    //    Invalidate_FilterOutput();
-    //    Invalidate_RowsInput();
     private void _page_PropertyChanged(object sender, PropertyChangedEventArgs e) => InvalidateView();
 
     private void _table_Disposing(object sender, System.EventArgs e) => Page = null;

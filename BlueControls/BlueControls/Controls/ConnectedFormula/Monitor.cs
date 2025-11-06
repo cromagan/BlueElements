@@ -93,7 +93,6 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
-        DoRows();
 
         LastRow = RowSingleOrNull();
     }

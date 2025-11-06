@@ -167,7 +167,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         if (!f.Allinitialized) { return; }
 
         DoInputFilter(null, false);
-        DoRows();
 
         _lastrow = RowSingleOrNull();
         _column ??= Column;
@@ -334,8 +333,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
                 Develop.DebugPrint("Control unbekannt");
                 break;
         }
-
-        Invalidate_FilterInput();
+        Invalidate_RowsInput();
         Invalidate();
     }
 

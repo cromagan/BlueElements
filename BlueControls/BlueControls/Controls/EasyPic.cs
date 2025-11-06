@@ -192,7 +192,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
-        DoRows();
 
         var ct = string.Empty;
 

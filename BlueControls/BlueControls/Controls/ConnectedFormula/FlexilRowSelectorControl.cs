@@ -82,7 +82,6 @@ public partial class FlexilRowSelectorControl : GenericControlReciverSender, IHa
         if (!f.Allinitialized) { f.CreateSubControls(); }
 
         DoInputFilter(FilterOutput.Table, true);
-        DoRows();
 
         #region Combobox suchen
 
@@ -99,9 +98,9 @@ public partial class FlexilRowSelectorControl : GenericControlReciverSender, IHa
 
         #region Zeilen erzeugen
 
-        if (RowsInput == null || !RowsInputChangedHandled) { return; }
+        if (FilterInput?.Rows is not { } rows) { return; }
 
-        foreach (var thisR in RowsInput) {
+        foreach (var thisR in rows) {
             if (cb[thisR.KeyName] == null) {
                 var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, null);
                 cb.ItemAdd(ItemOf(tmpQuickInfo, thisR.KeyName));
@@ -150,7 +149,7 @@ public partial class FlexilRowSelectorControl : GenericControlReciverSender, IHa
 
     private void F_ValueChanged(object sender, System.EventArgs e) {
         var fh = FilterHash();
-        var row = RowsInput?.GetByKey(f.Value);
+        var row = FilterInput?.Rows.GetByKey(f.Value);
         this.SetSetting(fh, row?.KeyName ?? string.Empty);
 
         if (row == null) {

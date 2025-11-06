@@ -91,8 +91,6 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         DoInputFilter(null, false);
 
-        DoRows();
-
         bool enabled;
 
         switch (_enabledwhenrows) {
@@ -101,15 +99,15 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
                 break;
 
             case ButtonArgs.Keine_Zeile:
-                enabled = RowsInput is { Count: 0 };
+                enabled = FilterInput?.Rows is { Count: 0 };
                 break;
 
             case ButtonArgs.Genau_eine_Zeile:
-                enabled = RowsInput is { Count: 1 };
+                enabled = FilterInput?.Rows is { Count: 1 };
                 break;
 
             case ButtonArgs.Eine_oder_mehr_Zeilen:
-                enabled = RowsInput is { Count: > 0 };
+                enabled = FilterInput?.Rows is { Count: > 0 };
                 break;
 
             default:

@@ -215,7 +215,6 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
-        DoRows();
 
         if (Parents.Count > 0) {
             var tmpDirectory = string.Empty;

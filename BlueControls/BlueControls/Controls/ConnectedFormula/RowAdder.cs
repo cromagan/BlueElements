@@ -207,7 +207,6 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         _mustUpdate = false;
 
         DoInputFilter(null, true);
-        DoRows();
 
         if (_ignoreCheckedChanged) {
             Develop.DebugPrint("Liste wird bereits erstellt!");
