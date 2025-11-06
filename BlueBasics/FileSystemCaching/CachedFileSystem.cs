@@ -26,8 +26,6 @@ namespace BlueBasics.FileSystemCaching {
 
         private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new();
 
-        private readonly ConcurrentDictionary<string, Timer> _debounceTimers = new();
-
         private readonly SemaphoreSlim _initializationLock = new(1, 1);
 
         private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
@@ -35,6 +33,7 @@ namespace BlueBasics.FileSystemCaching {
         private volatile int _isDisposedFlag = 0;
 
         private string _watchedDirectory = string.Empty;
+
         private FileSystemWatcher? _watcher;
 
         #endregion
@@ -163,12 +162,6 @@ namespace BlueBasics.FileSystemCaching {
 
                 DisposeWatcher();
 
-                // Debounce-Timer aufräumen
-                foreach (var timer in _debounceTimers.Values) {
-                    timer.Dispose();
-                }
-                _debounceTimers.Clear();
-
                 // Alle CachedFile-Instanzen disposen
                 foreach (var file in _cachedFiles.Values) {
                     file.Dispose();
@@ -258,6 +251,7 @@ namespace BlueBasics.FileSystemCaching {
             if (IsDisposed) { return string.Empty; }
 
             encoding ??= Encoding.UTF8;
+
             var cachedFile = GetFile(filename);
             return cachedFile?.GetContentAsString(encoding) ?? string.Empty;
         }
@@ -314,26 +308,6 @@ namespace BlueBasics.FileSystemCaching {
 
             return _cachedFiles.GetOrAdd(normalizedFileName.ToUpperInvariant(),
                 key => new CachedFile(key));
-        }
-
-        private void DebouncedAction(string key, Action action) {
-            if (IsDisposed) { return; }
-
-            var newTimer = new Timer(state => {
-                action();
-
-                if (_debounceTimers.TryRemove(key, out var executedTimer)) {
-                    try { executedTimer?.Dispose(); } catch { }
-                }
-            }, null, DebounceDelayMs, Timeout.Infinite);
-
-            // Alten Timer entfernen und disposen, dann neuen hinzufügen
-            if (_debounceTimers.TryRemove(key, out var oldTimer)) {
-                try { oldTimer.Change(Timeout.Infinite, Timeout.Infinite); } catch { }
-                try { oldTimer.Dispose(); } catch { }
-            }
-
-            _debounceTimers[key] = newTimer;
         }
 
         private void DisposeWatcher() {
@@ -398,35 +372,31 @@ namespace BlueBasics.FileSystemCaching {
 
         private void OnFileChanged(object sender, FileSystemEventArgs e) {
             if (IsDisposed) { return; }
+            if (!ShouldCacheFile(e.FullPath)) { return; }
 
-            DebouncedAction(e.FullPath, () => {
-                AddToCache(e.FullPath);
-                var cachedFile = GetFile(e.FullPath);
-                cachedFile?.Invalidate();
-            });
+            AddToCache(e.FullPath);
+            GetFile(e.FullPath)?.Invalidate();
         }
 
         private void OnFileCreated(object sender, FileSystemEventArgs e) {
             if (IsDisposed) { return; }
             if (!ShouldCacheFile(e.FullPath)) { return; }
 
-            // Nur Dateinamen registrieren, KEINE Metadaten laden
-            DebouncedAction(e.FullPath, () => {
-                AddToCache(e.FullPath);
-            });
+            AddToCache(e.FullPath);
         }
 
         private void OnFileDeleted(object sender, FileSystemEventArgs e) {
             if (IsDisposed) { return; }
-            DebouncedAction(e.FullPath, () => { RemoveFromCache(e.FullPath); });
+            RemoveFromCache(e.FullPath);
         }
 
         private void OnFileRenamed(object sender, RenamedEventArgs e) {
             if (IsDisposed) { return; }
-            DebouncedAction(e.FullPath, () => {
-                RemoveFromCache(e.OldFullPath);
-                AddToCache(e.FullPath);
-            });
+
+            RemoveFromCache(e.OldFullPath);
+
+            if (!ShouldCacheFile(e.FullPath)) { return; }
+            AddToCache(e.FullPath);
         }
 
         private void OnWatcherError(object sender, ErrorEventArgs e) {

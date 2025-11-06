@@ -361,7 +361,6 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         }
 
         foreach (var thisV in SearchValue) {
-            Develop.AbortAppIfStackOverflow();
             if (thisV.Contains("~")) { return $"Unaufgelöste Variable {thisV}"; }
         }
 
