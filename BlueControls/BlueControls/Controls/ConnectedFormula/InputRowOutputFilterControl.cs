@@ -95,9 +95,10 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
-        if (FilterInputChangedHandled) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
+        RowsInputChangedHandled = true;
         Invalidate();
 
         var lastInputRow = FilterInput?.RowSingleOrNull;

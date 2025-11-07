@@ -82,6 +82,7 @@ public partial class FlexilRowSelectorControl : GenericControlReciverSender, IHa
         if (!f.Allinitialized) { f.CreateSubControls(); }
 
         DoInputFilter(FilterOutput.Table, true);
+        RowsInputChangedHandled = true;
 
         #region Combobox suchen
 

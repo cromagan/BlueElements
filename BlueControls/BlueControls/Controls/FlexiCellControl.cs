@@ -167,6 +167,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         if (!f.Allinitialized) { return; }
 
         DoInputFilter(null, false);
+        RowsInputChangedHandled = true;
 
         _lastrow = RowSingleOrNull();
         _column ??= Column;

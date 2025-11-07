@@ -210,6 +210,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
+        RowsInputChangedHandled = true;
 
         bool enabled;
 

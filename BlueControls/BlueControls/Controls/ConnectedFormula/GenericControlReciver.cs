@@ -135,7 +135,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected bool RowsInputChangedHandled { get; private set; }
+    protected bool RowsInputChangedHandled { get; set; }
 
     private bool _filterInputChangedHandling { get; set; }
 

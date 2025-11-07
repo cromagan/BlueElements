@@ -350,6 +350,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(FilterOutput.Table, false);
+        RowsInputChangedHandled = true;
 
         if (RowSingleOrNull() is { IsDisposed: false } r) {
             if (_page?.GetRowEntryItem()?.TableOutput == r.Table) {

@@ -90,6 +90,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         DoInputFilter(null, false);
+        RowsInputChangedHandled = true;
 
         bool enabled;
 
