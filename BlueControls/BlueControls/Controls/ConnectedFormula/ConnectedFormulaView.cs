@@ -32,6 +32,7 @@ using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
@@ -195,7 +196,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
         foreach (var thisit in _page) {
             if (thisit is IItemToControl thisitco) {
-                var con = SearchOrGenerate(thisitco, false, Mode);
+                var con = SearchOrGenerate(thisitco, Mode);
 
                 if (con != null) {
                     _ = unused.Remove(con);
@@ -268,11 +269,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    //    InvalidateView();
-    //    ResumeLayout();
-    //    Invalidate();
-    //}
-    public Control? SearchOrGenerate(IItemToControl? thisit, bool onlySerach, string mode) {
+    public Control? SearchOrGenerate(IItemToControl? thisit, string mode) {
         if (thisit == null) { return null; }
 
         try {
@@ -280,7 +277,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
                 if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.UniqueId) && !cx.IsDisposed) { return cx; }
             }
 
-            if (onlySerach) { return null; }
+            var stackTrace = new StackTrace();
+            if (stackTrace.FrameCount > 100) {
+                return null;
+            }
 
             var c = thisit.CreateControl(this, mode);
             if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(Page?.UniqueId)) {
@@ -365,8 +365,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
             }
         } else {
             FilterOutput.Clear();
-        } 
-
+        }
 
         //else {
         //    FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));

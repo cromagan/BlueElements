@@ -122,7 +122,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         base.Dispose(disposing);
 
         if (disposing) {
-            f.Dispose();
+            f?.Dispose();
             f = null;
         }
     }

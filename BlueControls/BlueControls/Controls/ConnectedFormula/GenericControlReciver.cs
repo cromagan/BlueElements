@@ -165,7 +165,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 var it = icpi[thisKey];
 
                 if (it is IItemToControl itc) {
-                    var parentCon = parentFormula.SearchOrGenerate(itc, false, mode);
+                    var parentCon = parentFormula.SearchOrGenerate(itc, mode);
                     if (parentCon is GenericControlReciverSender parentConSender) {
                         parentConSender.ChildIsBorn(this);
                     }

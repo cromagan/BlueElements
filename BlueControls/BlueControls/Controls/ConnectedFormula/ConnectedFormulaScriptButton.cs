@@ -156,7 +156,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         if (t.Failed) {
             Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Fehler: " + t.Protocol, 0);
-            MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + t.Protocol, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+            MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + t.ProtocolText, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
 
         #region Variablen zurückschreiben
