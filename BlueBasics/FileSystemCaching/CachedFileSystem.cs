@@ -66,7 +66,7 @@ namespace BlueBasics.FileSystemCaching {
             set {
                 if (IsDisposed) { return; }
 
-                value = IO.NormalizePath(value);
+                value = IO.NormalizePath(value).ToUpperInvariant();
 
                 if (!IO.DirectoryExists(value)) {
                     Develop.DebugPrint(Enums.ErrorType.Error, $"Verzeichnis nicht gefunden: {value}");
@@ -115,7 +115,7 @@ namespace BlueBasics.FileSystemCaching {
         /// Holt oder erstellt eine CachedFileSystem-Instanz für das angegebene Verzeichnis
         /// </summary>
         public static CachedFileSystem Get(string path) {
-            var normalizedPath = IO.NormalizePath(path);
+            var normalizedPath = IO.NormalizePath(path).ToUpperInvariant();
 
             // Fast-Path: Instanz existiert bereits exakt
             if (_instances.TryGetValue(normalizedPath, out var existingInstance)) {
@@ -300,7 +300,7 @@ namespace BlueBasics.FileSystemCaching {
                 return false; // Gleicher Pfad, kein Unterpfad
             }
 
-            return normalizedChildPath.StartsWith(normalizedParentPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+            return normalizedChildPath.StartsWith(normalizedParentPath, StringComparison.OrdinalIgnoreCase);
         }
 
         private CachedFile AddToCache(string fileName) {

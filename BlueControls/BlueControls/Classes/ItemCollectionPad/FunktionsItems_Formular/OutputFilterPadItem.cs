@@ -24,6 +24,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueScript.Variables;
 using BlueTable;
 using BlueTable.Enums;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable {
+public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, IAutosizable, IHasFieldVariable {
 
     #region Fields
 
@@ -161,6 +162,14 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return base.ErrorReason();
     }
 
+    public Variable? GetFieldVariable() {
+        var fn = FieldName;
+        if (!string.IsNullOrEmpty(fn) && Column is { } c) {
+            return RowItem.CellToVariable(fn, c.ScriptType, c.MostUsedValue, false, "Feld im Formular");
+        }
+        return null;
+    }
+
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
         [
@@ -249,6 +258,8 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
         return txt + TableOutput?.Caption;
     }
+
+    public void SetValueFromVariable(Variable v) { }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Trichter, 16, Skin.IdColor(OutputColorId), Color.Transparent); //  QuickImage.Get(ImageCode.Trichter, 16);
 

@@ -26,7 +26,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+using BlueScript.Variables;
 using BlueTable;
 using BlueTable.Enums;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiFilterControl : GenericControlReciverSender, IHasSettings {
+public partial class FlexiFilterControl : GenericControlReciverSender, IHasSettings, IHasFieldVariable {
 
     #region Fields
 
@@ -81,7 +81,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     public string FieldName {
         get {
-            if (GeneratedFrom is not OutputFilterPadItem efpi) { return string.Empty; }
+            if (GeneratedFrom is not IHasFieldVariable efpi) { return string.Empty; }
             return efpi.FieldName;
         }
     }
@@ -113,9 +113,25 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     #region Methods
 
+    public Variable? GetFieldVariable() {
+        if (FilterSingleColumn is { } c) {
+            var fn = FieldName;
+
+            if (!string.IsNullOrEmpty(fn)) {
+                return RowItem.CellToVariable(fn, c.ScriptType, Value, false, "Feld im Formular");
+            }
+        }
+
+        return null;
+    }
+
     public override void Invalidate_FilterInput() {
         base.Invalidate_FilterInput();
         HandleChangesNow();
+    }
+
+    public void SetValueFromVariable(Variable v) {
+        Value = v.ValueForCell;
     }
 
     protected override void Dispose(bool disposing) {

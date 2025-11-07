@@ -36,6 +36,7 @@ public class Renderer_Layout : Renderer_Abstract {
 
     #region Fields
 
+    private static readonly Dictionary<string, Bitmap> _bitmapCache = new();
     private string _file = string.Empty;
 
     #endregion
@@ -63,39 +64,60 @@ public class Renderer_Layout : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (affectingRow == null) { return; }
 
-        using var l = new ItemCollectionPadItem(_file);
-        l.ForPrinting = true;
-        l.GridShow = 0;
-
-        if (!l.Any()) {
-            var replacedText = ValueReadable("Layout nicht gefunden oder fehlerhaft.", ShortenStyle.Replaced, translate);
-
-            Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
-            return;
-        }
-
-        _ = l.ResetVariables();
-        var scx = l.ReplaceVariables(affectingRow);
-
-        if (scx.Failed) {
-            var replacedText = ValueReadable("Layout Generierung fehlgeschlagen.", ShortenStyle.Replaced, translate);
-            Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
-            return;
-        }
-
-        var bmp = l.ToBitmap(scale);
-
-        if (bmp == null) {
-            var replacedText = ValueReadable("Bild Erstellung fehlgeschlagen.", ShortenStyle.Replaced, translate);
-            Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
-            return;
-        }
-
         try {
-            float scale2 = Math.Min((float)scaleddrawarea.Width / bmp.Width, (float)scaleddrawarea.Height / bmp.Height);
-            gr.DrawImage(bmp, new Rectangle(scaleddrawarea.X + (scaleddrawarea.Width - (int)(bmp.Width * scale2)) / 2, scaleddrawarea.Y + (scaleddrawarea.Height - (int)(bmp.Height * scale2)) / 2, (int)(bmp.Width * scale2), (int)(bmp.Height * scale2)));
+            using var l = new ItemCollectionPadItem(_file);
+            l.ForPrinting = true;
+            l.GridShow = 0;
+
+            if (!l.Any()) {
+                var replacedText = ValueReadable("Layout nicht gefunden oder fehlerhaft.", ShortenStyle.Replaced, translate);
+
+                Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
+                return;
+            }
+
+            var rowHash = affectingRow.RowStamp() + l.ParseableItems().FinishParseable().GetHashString();
+
+            // Prüfen, ob das Bitmap bereits im Cache existiert
+            if (_bitmapCache.TryGetValue(rowHash, out var cachedBmp)) {
+                // Bitmap an erste Stelle verschieben (als zuletzt verwendet markieren)
+                _bitmapCache.Remove(rowHash);
+                _bitmapCache.Add(rowHash, cachedBmp);
+            } else {
+                _ = l.ResetVariables();
+                var scx = l.ReplaceVariables(affectingRow);
+
+                if (scx.Failed) {
+                    var replacedText = ValueReadable("Layout Generierung fehlgeschlagen.", ShortenStyle.Replaced, translate);
+                    Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
+                    return;
+                }
+
+                var bmp = l.ToBitmap(scale);
+                if (bmp == null) {
+                    var replacedText = ValueReadable("Bild Erstellung fehlgeschlagen.", ShortenStyle.Replaced, translate);
+                    Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
+                    return;
+                }
+
+                // Cache-Limit prüfen und ältestes Bitmap entfernen
+                if (_bitmapCache.Count >= 50) {
+                    var oldestKey = _bitmapCache.First().Key;
+                    var oldestBmp = _bitmapCache[oldestKey];
+                    oldestBmp?.Dispose();
+                    _bitmapCache.Remove(oldestKey);
+                }
+
+                // Neues Bitmap zum Cache hinzufügen
+                _bitmapCache.Add(rowHash, bmp);
+                cachedBmp = bmp;
+            }
+
+            float scale2 = Math.Min((float)scaleddrawarea.Width / cachedBmp.Width, (float)scaleddrawarea.Height / cachedBmp.Height);
+            gr.DrawImage(cachedBmp, new Rectangle(scaleddrawarea.X + (scaleddrawarea.Width - (int)(cachedBmp.Width * scale2)) / 2, scaleddrawarea.Y + (scaleddrawarea.Height - (int)(cachedBmp.Height * scale2)) / 2, (int)(cachedBmp.Width * scale2), (int)(cachedBmp.Height * scale2)));
         } catch {
             var replacedText = ValueReadable("Anzeige fehlgeschlagen.", ShortenStyle.Replaced, translate);
+            Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
         }
     }
 

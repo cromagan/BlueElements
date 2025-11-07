@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -104,12 +105,8 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             }
             if (sbpi.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
                 foreach (var thisCon in icpi) {
-                    if (thisCon is OutputFilterPadItem ofpi && ofpi.Column is { } c) {
-                        var fn = ofpi.FieldName;
-
-                        if (!string.IsNullOrEmpty(fn)) {
-                            _ = vars.Add(RowItem.CellToVariable(fn, c.ScriptType, c.MostUsedValue, false, "Feld im Formular"));
-                        }
+                    if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
+                        vars.Add(v);
                     }
                 }
             }

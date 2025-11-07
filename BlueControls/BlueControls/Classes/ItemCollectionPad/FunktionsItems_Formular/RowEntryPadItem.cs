@@ -21,7 +21,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueScript;
+using BlueScript.Variables;
 using BlueTable;
 using System.Collections.Generic;
 using System.Drawing;
@@ -33,7 +36,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
 /// Unsichtbares Element, wird nicht angezeigt.
 /// </summary>
-public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
+public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText, IHasFieldVariable {
 
     #region Constructors
 
@@ -46,20 +49,36 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
     #region Properties
 
     public static string ClassId => "FI-RowEntryElement";
+
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None;
 
-    public override bool TableInputMustMatchOutputTable => true;
-
     public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
+
+    public string FieldName => "Field_EntryRow";
+
     public new List<int> InputColorId => [OutputColorId];
+
     public override bool InputMustBeOneRow => false;
+
     public override bool MustBeInDrawingArea => false;
+
+    public override bool TableInputMustMatchOutputTable => true;
 
     protected override int SaveOrder => 1;
 
     #endregion
 
     #region Methods
+
+    public Variable? GetFieldVariable() {
+        var fn = FieldName;
+
+        if (!string.IsNullOrEmpty(fn) && TableOutput?.Row?.First() is { } r) {
+            return new VariableRowItem(fn, r, true, "Die Eingangszeile des Formulares");
+        }
+
+        return null;
+    }
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -82,6 +101,8 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText {
 
         return txt + TableOutput?.Caption;
     }
+
+    public void SetValueFromVariable(Variable v) { }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 

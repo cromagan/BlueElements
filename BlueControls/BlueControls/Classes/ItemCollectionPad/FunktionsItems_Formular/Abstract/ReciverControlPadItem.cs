@@ -79,31 +79,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     public abstract AllowedInputFilter AllowedInputFilter { get; }
 
-    /// <summary>
-    /// Holt die Datebank aus dem erst Parent, anschließend aus dem Output
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public Table? TableInput {
-        get {
-            //if (item.TableInputMustMatchOutputTable) {
-            //    return item is ReciverSenderControlPadItem iiss ? iiss.TableOutput : null;
-            //}
-
-            var g = GetFilterFromGet();
-
-            if (g.Count > 0) {
-                if (g[0].TableOutput is { IsDisposed: false } db) {
-                    db.Editor ??= typeof(TableHeadEditor);
-                    return db;
-                }
-            }
-            return null;
-        }
-    }
-
-    public abstract bool TableInputMustMatchOutputTable { get; }
-
     public List<int> InputColorId {
         get {
             if (_inputColorId.Count == 0) {
@@ -146,6 +121,31 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             OnDoUpdateSideOptionMenu();
         }
     }
+
+    /// <summary>
+    /// Holt die Datebank aus dem erst Parent, anschließend aus dem Output
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public Table? TableInput {
+        get {
+            //if (item.TableInputMustMatchOutputTable) {
+            //    return item is ReciverSenderControlPadItem iiss ? iiss.TableOutput : null;
+            //}
+
+            var g = GetFilterFromGet();
+
+            if (g.Count > 0) {
+                if (g[0].TableOutput is { IsDisposed: false } db) {
+                    db.Editor ??= typeof(TableHeadEditor);
+                    return db;
+                }
+            }
+            return null;
+        }
+    }
+
+    public abstract bool TableInputMustMatchOutputTable { get; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -242,19 +242,23 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
                 return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
             }
 
-            if(VisibleFor.Count == 0) {
+            if (VisibleFor.Count == 0) {
                 return "Element wird nicht angezeigt, Sichtbarkeitsrechte müssen gepflegt werden.";
             }
         }
 
-        if(VisibleFor.Count >1) {
+        if (VisibleFor.Count > 1) {
             if (VisibleFor.Contains(Constants.Everybody)) {
                 return "Element ist für jeden sichtbar, enthält aber weitere oboslete Angaben.";
             }
         }
-        
 
-
+        if (p.Count > 1) {
+            var tb = p[0].TableOutput;
+            foreach (var thisp in p) {
+                if (tb != thisp.TableOutput) { return "Element wird von verschiedenen Tabellen bespeist."; }
+            }
+        }
 
         return string.Empty;
     }

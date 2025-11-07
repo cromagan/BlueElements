@@ -19,9 +19,9 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Variables;
-using BlueTable;
 using BlueTable.Enums;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -141,13 +141,13 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
             vars = [];
         }
 
-        foreach (var thisCon in Parent.Controls) {
-            if (thisCon is FlexiFilterControl ffc && ffc.FilterSingleColumn is { } c) {
-                var fn = ffc.FieldName;
+        if (Parent is IHasFieldVariable hfvp && hfvp.GetFieldVariable() is { } v2) {
+            _ = vars.Add(v2);
+        }
 
-                if (!string.IsNullOrEmpty(fn)) {
-                    _ = vars.Add(RowItem.CellToVariable(fn, c.ScriptType, ffc.Value, false, "Feld im Formular"));
-                }
+        foreach (var thisCon in Parent.Controls) {
+            if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
+                _ = vars.Add(v);
             }
         }
 
@@ -163,8 +163,8 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         #region Variablen zurückschreiben
 
         foreach (var thisCon in Parent.Controls) {
-            if (thisCon is FlexiFilterControl ffc && ffc.FilterSingleColumn is { } && vars.GetByKey(ffc.FieldName) is Variable v) {
-                ffc.Value = v.ValueForCell;
+            if (thisCon is IHasFieldVariable hfv && vars.GetByKey(hfv.FieldName) is Variable v && !v.ReadOnly) {
+                hfv.SetValueFromVariable(v);
             }
         }
 

@@ -156,6 +156,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             }
         } else {
             result.Add(new FlexiControlForProperty<Table?>(() => TableOutput, AllAvailableTables()));
+            if (TableOutput is { } tbo) {
+                tbo.Editor = typeof(TableHeadEditor);
+                result.Add(new FlexiDelegateControl(tbo.Edit, "Tabelle: " + tbo.Caption, ImageCode.Tabelle));
+            }
         }
 
         return result;

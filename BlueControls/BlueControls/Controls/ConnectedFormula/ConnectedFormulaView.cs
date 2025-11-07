@@ -27,6 +27,8 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueScript;
+using BlueScript.Variables;
 using BlueTable;
 using BlueTable.Enums;
 using System;
@@ -41,12 +43,13 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControlReciverSender {
+public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFieldVariable {
 
     #region Fields
 
     private bool _generated;
     private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Normal;
+    private RowItem? _lastRow;
     private ItemCollectionPadItem? _page;
 
     #endregion
@@ -73,6 +76,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
             return base.Controls;
         }
     }
+
+    public string FieldName => "Field_EntryRow";
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle GroupBoxStyle {
@@ -243,10 +248,16 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         Invalidate_RowsInput();
     }
 
-    //public ConnectedFormula.ConnectedFormula? ConnectedFormula {
-    //    get => _connectedFormula;
-    //    private set {
-    //        if (value == _connectedFormula) { return; }
+    public Variable? GetFieldVariable() {
+        var fn = FieldName;
+
+        if (!string.IsNullOrEmpty(fn)) {
+            return new VariableRowItem(fn, _lastRow, true, "Die Eingangszeile des Formulares");
+        }
+
+        return null;
+    }
+
     public void GetHeadPageFrom(Table? table) {
         if (table is { IsDisposed: false }) {
             var f = table.FormulaFileName();
@@ -301,12 +312,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         }
     }
 
+    public void SetValueFromVariable(Variable v) { }
+
     internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() => Page?.GetConnectedFormula();
 
-    //        if (FilterOutput.Table is { IsDisposed: false } db2) {
-    //            db2.DisposingEvent += _table_Disposing;
-    //        }
-    //    }
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
     /// </summary>
@@ -322,7 +331,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         base.Dispose(disposing);
     }
 
-    //        FilterOutput.Table = table;
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         var s = States.Standard;
@@ -339,10 +347,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         base.DrawControl(gr, state);
     }
 
-    //    if (FilterOutput.Table != table) {
-    //        if (FilterOutput.Table is { IsDisposed: false } db1) {
-    //            db1.DisposingEvent -= _table_Disposing;
-    //        }
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
 
@@ -352,8 +356,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         DoInputFilter(FilterOutput.Table, false);
         RowsInputChangedHandled = true;
 
+        _lastRow = null;
+
         if (RowSingleOrNull() is { IsDisposed: false } r) {
             if (_page?.GetRowEntryItem()?.TableOutput == r.Table) {
+                _lastRow = r;
                 using var nfc = new FilterCollection(r, "ConnectedFormulaView");
 
                 FilterOutput.ChangeTo(nfc);
@@ -367,10 +374,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
         } else {
             FilterOutput.Clear();
         }
-
-        //else {
-        //    FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
-        //}
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
@@ -391,12 +394,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender {
 
     private void _table_Disposing(object sender, System.EventArgs e) => Page = null;
 
-    //    public void InitFormula(ItemCollectionPadItem? page, Table? table) {
-    //    if (IsDisposed) { return; }
-
-    //    if (page == _page && FilterOutput.Table == table) { return; }
-
-    //    SuspendLayout();
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {
             if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } tb) { return; }
