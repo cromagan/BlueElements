@@ -181,7 +181,7 @@ public class Renderer_Button : Renderer_Abstract {
     }
 
     private QuickImage? QImage(string content) {
-        var t = content.SplitBy(";");
+        var t = (content + ";;;").SplitBy(";");
 
         return _bild_anzeigen ? QuickImage.Get(t[0]) : null;
     }
