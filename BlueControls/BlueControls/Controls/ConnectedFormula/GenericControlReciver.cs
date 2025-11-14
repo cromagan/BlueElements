@@ -185,24 +185,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (IsDisposed) { return; }
 
         lock (_filterInputLock) {
-            // Wenn bereits eine Berechnung läuft, Flag setzen und zurückkehren
-            if (_filterInputChangedHandling) {
-                // Merken, dass nach der aktuellen Berechnung erneut invalidiert werden muss
-                FilterInputChangedHandled = false;
-                return;
-            }
+            if (!FilterInputChangedHandled) { return; }
 
-            if (FilterInputChangedHandled) {
-                FilterInputChangedHandled = false;
-                _cachedFilterHash = null;
-            } else {
-                // Bereits invalidiert, nichts zu tun
-                return;
-            }
+            FilterInputChangedHandled = false;
+            _cachedFilterHash = null;
         }
 
         // Außerhalb des Locks invalidieren
-        _cachedFilterHash = null;
         Invalidate_RowsInput();
         Invalidate();
     }

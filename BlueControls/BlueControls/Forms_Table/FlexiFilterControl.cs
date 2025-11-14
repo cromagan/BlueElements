@@ -406,7 +406,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ??
                        new FilterCollection(tb, "UpdateFilterData");
 
-        if (filterSingle == null || filterSingle.SearchValue.Count == 0 || filterSingle.SearchValue[0].Length == 0) {
+        if (filterSingle == null || filterSingle.SearchValue.Count == 0) {
             if (Standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
                 fic.RemoveOtherAndAdd(new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, string.Empty));
             } else {

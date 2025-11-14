@@ -3191,13 +3191,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             return;
         }
 
-        using var nf = new FilterCollection(Filter.Table, "TmpFilterCombined");
+        using var nfc = new FilterCollection(Filter.Table, "TmpFilterCombined");
 
-        nf.Table = Filter.Table;
-        nf.RemoveOtherAndAdd(Filter, null);
-        nf.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
+        nfc.Table = Filter.Table;
+        nfc.RemoveOtherAndAdd(Filter, null);
+        nfc.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
 
-        FilterCombined.ChangeTo(nf);
+        FilterCombined.ChangeTo(nfc);
     }
 
     private void DoFilterOutput() {
