@@ -34,11 +34,6 @@ namespace BlueControls.Controls;
 [DefaultEvent("ItemClicked")]
 public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
-    #region Fields
-
-
-    #endregion
-
     #region Constructors
 
     public LastFilesCombo() : base() => SetLastFilesStyle();

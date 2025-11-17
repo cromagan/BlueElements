@@ -253,7 +253,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
     }
 
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
-        _ = Focus();
+        Focus();
         var newWord = string.Empty;
 
         if (e.HotItem is not List<string> tags) { return; }
@@ -890,13 +890,13 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                 if (Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
                     //var tmp = _cursorCharPos;
                     //if (Forms.MessageBox.Show("Als Link oder als Text?", ImageCode.Stern, "Link", "Text") == 0) {
-                        //_cursorCharPos = tmp;
-                        var t = sd.SplitByCr();
-                        var c = new ExtCharCellLink(_eTxt, _cursorCharPos, t[0], t[1], t[2]);
-                        _eTxt.Insert(_cursorCharPos, c);
-                        _cursorCharPos++;
-                        RaiseEventIfTextChanged(false);
-                        return;
+                    //_cursorCharPos = tmp;
+                    var t = sd.SplitByCr();
+                    var c = new ExtCharCellLink(_eTxt, _cursorCharPos, t[0], t[1], t[2]);
+                    _eTxt.Insert(_cursorCharPos, c);
+                    _cursorCharPos++;
+                    RaiseEventIfTextChanged(false);
+                    return;
                     //}
                 }
             }
@@ -984,7 +984,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
     /// <remarks></remarks>
     private void GenerateEtxt(bool resetCoords) {
         if (InvokeRequired) {
-            _ = Invoke(new Action(() => GenerateEtxt(resetCoords)));
+            Invoke(new Action(() => GenerateEtxt(resetCoords)));
             return;
         }
 

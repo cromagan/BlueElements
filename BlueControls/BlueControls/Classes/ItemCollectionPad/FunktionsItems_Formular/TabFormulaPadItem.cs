@@ -191,7 +191,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         var tmp = new List<ItemCollectionPadItem>();
 
         foreach (var thisc in _childs) {
-            if (GetChild(thisc) is { IsDisposed: false } icpi) { _ = tmp.AddIfNotExists(icpi); }
+            if (GetChild(thisc) is { IsDisposed: false } icpi) { tmp.AddIfNotExists(icpi); }
         }
         return tmp;
     }
@@ -221,7 +221,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                 var tmp = value.FromNonCritical().SplitBy("|");
                 _childs.Clear();
                 foreach (var thiss in tmp) {
-                    _ = _childs.AddIfNotExists(thiss.FromNonCritical());
+                    _childs.AddIfNotExists(thiss.FromNonCritical());
                 }
                 return true;
 
@@ -355,7 +355,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         if (ParentFormula == null) { return; }
 
         foreach (var thisl in ParentFormula.NotAllowedChilds) {
-            _ = _childs.Remove(thisl);
+            _childs.Remove(thisl);
         }
 
         //OnPropertyChanged(string propertyname);

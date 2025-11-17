@@ -29,11 +29,6 @@ namespace BlueControls.Controls;
 [ToolboxBitmap(typeof(System.Windows.Forms.GroupBox))]
 public partial class GroupBox : System.Windows.Forms.GroupBox {
 
-    #region Fields
-
-
-    #endregion
-
     #region Constructors
 
     public GroupBox() : base() => SetStandardValues();

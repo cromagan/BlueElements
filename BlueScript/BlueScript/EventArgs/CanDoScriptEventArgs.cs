@@ -25,14 +25,11 @@ public class CanDoScriptEventArgs : CancelReasonEventArgs {
 
     public readonly bool Extended;
 
-
-
     #endregion
 
     #region Constructors
 
     public CanDoScriptEventArgs(bool extended) => Extended = extended;
-
 
     #endregion
 }

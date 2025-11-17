@@ -15,17 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
+using BlueTable.AdditionalScriptMethods;
+using CefSharp;
+using CefSharp.OffScreen;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using BlueBasics;
-using BlueTable.AdditionalScriptMethods;
-using BlueScript.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
-using CefSharp;
-using CefSharp.OffScreen;
 
 namespace BlueScript.Methods;
 

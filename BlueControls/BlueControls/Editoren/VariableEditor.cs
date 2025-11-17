@@ -20,9 +20,9 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
+using BlueScript.Variables;
 using BlueTable;
 using BlueTable.EventArgs;
-using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueControls;
@@ -53,7 +53,7 @@ public partial class VariableEditor : EditorEasy {
 
         foreach (var thisr in db.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
-            _ = list.Add(v);
+            list.Add(v);
         }
 
         return list;
@@ -67,8 +67,8 @@ public partial class VariableEditor : EditorEasy {
         var tb = new Table();
         var na = tb.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         na.IsFirst = true;
-        _ = tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
-        _ = tb.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
+        tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
+        tb.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
         var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.TextMitFormatierung, "Inhalt");
         var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Kommentar");
 
@@ -149,7 +149,7 @@ public partial class VariableEditor : EditorEasy {
         var c = tableVariablen.Table?.Column.First;
         if (e.Column == c) {
             if (e.Row.CellIsNullOrEmpty(c)) {
-                _ = RowCollection.Remove(e.Row, "Variable gelöscht");
+                RowCollection.Remove(e.Row, "Variable gelöscht");
             }
         }
     }

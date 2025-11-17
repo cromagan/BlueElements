@@ -18,11 +18,11 @@
 #nullable enable
 
 using BlueBasics;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
@@ -61,7 +61,7 @@ internal class Method_Execte : Method, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        _ = IO.ExecuteFile(attvar.ValueStringGet(0), attvar.ValueStringGet(1), false, false);
+        IO.ExecuteFile(attvar.ValueStringGet(0), attvar.ValueStringGet(1), false, false);
 
         return DoItFeedback.Null();
     }

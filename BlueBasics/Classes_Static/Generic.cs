@@ -89,7 +89,7 @@ public static class Generic {
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
         //GC.WaitForPendingFinalizers();
         //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-        _ = GC.WaitForFullGCComplete(1000);
+        GC.WaitForFullGCComplete(1000);
     }
 
     public static bool CopytoClipboard(string text) {
@@ -221,7 +221,7 @@ public static class Generic {
         if (inputString is { }) {
             var sb = new StringBuilder();
             foreach (var b in GetHash(inputString)) {
-                _ = sb.Append(b.ToString("X2"));
+                sb.Append(b.ToString("X2"));
             }
 
             return sb.ToString();
@@ -248,7 +248,8 @@ public static class Generic {
         try {
             List<MethodInfo> l = [];
             foreach (var thisType in AllTypes) {
-                if (!thisType.IsClass || thisType.IsAbstract) continue;
+                if (!thisType.IsClass || thisType.IsAbstract)
+                    continue;
 
                 var methods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static)
                     .Where(m => m.GetCustomAttribute<TAttribute>() != null);
@@ -320,7 +321,7 @@ public static class Generic {
             }
         }
         // browserName = "edge.exe";
-        _ = Process.Start(new ProcessStartInfo(browserName, adds + " " + url));
+        Process.Start(new ProcessStartInfo(browserName, adds + " " + url));
     }
 
     public static int LevenshteinDistance(string txt1, string txt2) {
@@ -351,7 +352,7 @@ public static class Generic {
         // Alle Assemblys laden und instanziieren
         foreach (var assemblyFile in assemblyFiles) {
             try {
-                _ = Assembly.LoadFrom(assemblyFile);
+                Assembly.LoadFrom(assemblyFile);
                 //Console.WriteLine(assembly.FullName);
             } catch {
                 //Console.WriteLine($"Fehler beim Laden der Assembly: {ex.Message}");

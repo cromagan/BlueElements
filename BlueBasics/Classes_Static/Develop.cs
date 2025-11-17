@@ -229,7 +229,7 @@ public static class Develop {
                         if (l != null) { endl.AddRange(l); }
                     }
                     HTML_AddFoot(endl);
-                    _ = endl.WriteAllText(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
+                    endl.WriteAllText(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
                     AbortExe(false);
                     return;
                 }
@@ -398,7 +398,7 @@ public static class Develop {
                     _traceListener = null;
                 }
 
-                if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { _ = DeleteFile(_currentTraceLogFile, false); }
+                if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { DeleteFile(_currentTraceLogFile, false); }
             }
         } catch { }
         _currentTraceLogFile = string.Empty;
@@ -411,7 +411,7 @@ public static class Develop {
         if (FileExists(_currentTraceLogFile)) { DeleteFile(_currentTraceLogFile, false); }
         _currentTraceLogFile = TempFile(traceFileName);
         _traceListener = new TextWriterTraceListener(_currentTraceLogFile);
-        _ = Trace.Listeners.Add(_traceListener);
+        Trace.Listeners.Add(_traceListener);
         try {
             Trace.AutoFlush = true;
             Trace.WriteLine("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");

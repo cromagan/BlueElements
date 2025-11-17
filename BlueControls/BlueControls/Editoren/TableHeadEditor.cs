@@ -25,10 +25,10 @@ using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueScript.Variables;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +44,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     public bool UndoDone;
     private bool _frmHeadEditorFormClosingIsin;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -54,7 +54,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table = null;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -77,7 +77,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public IEditable? ToEdit { set => Table = value is BlueTable.Table tb ? tb : null; }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -199,19 +199,19 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         var f = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         f.IsFirst = true;
-        _ = tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
-        _ = tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
+        tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
         var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
-        _ = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
-        _ = tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
+        tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
@@ -336,7 +336,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void btnSkripte_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
-        _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
+        IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
         //var se = new_TableScriptEditor(db);
         //_ = se.ShowDialog();
     }
@@ -346,7 +346,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         var tcvc = ColumnViewCollection.ParseAll(db);
         tcvc[1].Edit();
-        _ = TableView.RepairColumnArrangements(db);
+        TableView.RepairColumnArrangements(db);
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
@@ -355,7 +355,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
         var c = new TableViewForm(db, false, true, true);
-        _ = c.ShowDialog();
+        c.ShowDialog();
     }
 
     private void btnUnMaster_Click(object sender, System.EventArgs e) {
@@ -424,7 +424,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table.TableAdmin = new(lbxTableAdmin.Checked);
 
         var tmp = PermissionGroups_NewRow.Checked.ToList();
-        _ = tmp.Remove(Constants.Administrator);
+        tmp.Remove(Constants.Administrator);
         Table.PermissionGroupsNewRow = new(tmp);
 
         #region Sortierung
@@ -452,5 +452,5 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         #endregion Variablen
     }
 
-    #endregion Methods
+    #endregion
 }

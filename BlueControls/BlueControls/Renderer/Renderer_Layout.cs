@@ -84,7 +84,7 @@ public class Renderer_Layout : Renderer_Abstract {
                 _bitmapCache.Remove(rowHash);
                 _bitmapCache.Add(rowHash, cachedBmp);
             } else {
-                _ = l.ResetVariables();
+                l.ResetVariables();
                 var scx = l.ReplaceVariables(affectingRow);
 
                 if (scx.Failed) {

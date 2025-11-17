@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using BlueTable;
-using BlueTable.AdditionalScriptMethods;
-using BlueTable.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable;
+using BlueTable.AdditionalScriptMethods;
+using BlueTable.Enums;
 using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
@@ -87,7 +87,7 @@ public class Method_ImportLinked : Method_TableGeneric {
             v ??= new VariableUnknown("xxx");
             v.KeyName = "Linked_" + thisColumn.KeyName;
             v.Comment = t;
-            _ = varCol.Add(v);
+            varCol.Add(v);
         }
 
         return DoItFeedback.Null();

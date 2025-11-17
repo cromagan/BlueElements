@@ -23,7 +23,6 @@ using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;

@@ -164,7 +164,6 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
         var myTb = MyTable(scp);
         var cap = myTb?.Caption ?? "Unbekannt";
 
-
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, myTb, scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 

@@ -17,14 +17,12 @@
 
 #nullable enable
 
+using BlueControls.Extended_Text;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-
-using BlueScript.Methods;
-
-using BlueControls.Extended_Text;
 
 namespace BlueControls.AdditionalScriptMethods;
 

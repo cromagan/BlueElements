@@ -56,6 +56,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     /// Timer-Objekt und Variablen für Dauer-Feuer-Buttonn
     /// </summary>
     private Timer? _clickFirerer;
+
     private bool _isFireing;
 
     #endregion

@@ -174,16 +174,16 @@ public partial class Voting : System.Windows.Forms.Form {
         }
 
         var p1 = new ItemCollectionPadItem(_filename);
-        _ = p1.ResetVariables();
-        _ = p1.ReplaceVariables(_fr1);
+        p1.ResetVariables();
+        p1.ReplaceVariables(_fr1);
 
         Pad1.Items = p1;
         Pad1.ShowInPrintMode = true;
         Pad1.ZoomFit();
 
         var p2 = new ItemCollectionPadItem(_filename);
-        _ = p2.ResetVariables();
-        _ = p2.ReplaceVariables(_fr2);
+        p2.ResetVariables();
+        p2.ReplaceVariables(_fr2);
 
         Pad2.Items = p2;
         Pad2.ShowInPrintMode = true;

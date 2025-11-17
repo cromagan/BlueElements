@@ -21,9 +21,9 @@ using BlueBasics.Interfaces;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+using BlueScript.Structures;
 using BlueTable;
 using BlueTable.Interfaces;
-using BlueScript.Structures;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;

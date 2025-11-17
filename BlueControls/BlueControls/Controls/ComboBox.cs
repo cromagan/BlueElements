@@ -53,6 +53,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     /// der Button-Text stehen bleibt und nicht der Ausgewählte
     /// </summary>
     private string _initialtext = string.Empty;
+
     private string? _lastClickedText;
 
     #endregion
@@ -231,7 +232,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     internal void Remove(AbstractListItem thisit) {
         if (!_items.Contains(thisit)) { return; }
-        _ = _items.Remove(thisit);
+        _items.Remove(thisit);
         Invalidate();
     }
 
@@ -314,7 +315,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     protected override void OnGotFocus(System.EventArgs e) {
         if (_dropDownStyle == ComboBoxStyle.DropDownList) {
-            _ = btnDropDown.Focus();
+            btnDropDown.Focus();
         } else {
             base.OnGotFocus(e);
         }
@@ -399,7 +400,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     //private void _Item_ItemRemoved(object sender, System.EventArgs e) {
     private void DropDownMenu_Cancel(object sender, object mouseOver) {
         FloatingForm.Close(this);
-        _ = Focus();
+        Focus();
     }
 
     private void DropDownMenu_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -410,7 +411,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             Text = bli.KeyName;
             OnItemClicked(new AbstractListItemEventArgs(bli));
         }
-        _ = Focus();
+        Focus();
     }
 
     private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);

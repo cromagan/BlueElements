@@ -185,7 +185,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public static void TrimAllCaches(int maxItemsPerFont = 1000, int maxFonts = 100) {
         // Parallele Verarbeitung aller Fonts
-        _ = Parallel.ForEach(_blueFontCache.Values, font => {
+        Parallel.ForEach(_blueFontCache.Values, font => {
             try {
                 font.TrimCache(maxItemsPerFont);
             } catch {
@@ -432,7 +432,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
 
         var n = "FontName-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(FontName, true)); }
+        if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol(FontName, true)); }
 
         _nameInStyleSym = QuickImage.Get(n);
         return _nameInStyleSym;
@@ -590,8 +590,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         const string commonChars = " abcdefghijklmnopqrstuvwxyzäöüéßABCDEFGHIJKLMNOPQRSTUVWXYÄÖÜZ0123456789.,!?-_+/*()[]{}|\\@#$%&";
 
         // Parallele Vorberechnung der häufigsten Zeichen
-        _ = Parallel.ForEach(commonChars, c => {
-            _ = CharSize(c);
+        Parallel.ForEach(commonChars, c => {
+            CharSize(c);
         });
     }
 
@@ -623,7 +623,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
 
         var n = "Font-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false)); }
+        if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol("Abc", false)); }
 
         _symbolForReadableTextSym = QuickImage.Get(n);
         return _symbolForReadableTextSym;
@@ -640,7 +640,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
 
         var n = "Line-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp); }
+        if (!QuickImage.Exists(n)) { new QuickImage(n, bmp); }
 
         _symbolOfLineSym = QuickImage.Get(n);
         return _symbolOfLineSym;
@@ -656,7 +656,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         var keysToRemove = _charSizeCache.Keys.Take(itemsToRemove).ToList();
 
         foreach (var key in keysToRemove) {
-            _ = _charSizeCache.TryRemove(key, out _);
+            _charSizeCache.TryRemove(key, out _);
         }
 
         // Auch String-Cache aufräumen
@@ -664,7 +664,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (stringsToRemove > 0) {
             var stringKeysToRemove = _stringSizeCache.Keys.Take(stringsToRemove).ToList();
             foreach (var key in stringKeysToRemove) {
-                _ = _stringSizeCache.TryRemove(key, out _);
+                _stringSizeCache.TryRemove(key, out _);
             }
         }
     }

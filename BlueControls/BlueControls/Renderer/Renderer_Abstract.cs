@@ -103,7 +103,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
         var contentsize = CalculateContentSize(content, translate);
 
-        _ = Sizes.TryAdd(key, contentsize);
+        Sizes.TryAdd(key, contentsize);
 
         return contentsize;
     }
@@ -146,7 +146,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
         var replaced = CalculateValueReadable(content, style, translate);
 
-        _ = Replaced.TryAdd(key, replaced);
+        Replaced.TryAdd(key, replaced);
 
         return replaced;
     }

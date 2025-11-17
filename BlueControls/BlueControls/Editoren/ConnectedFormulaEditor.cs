@@ -44,11 +44,6 @@ namespace BlueControls.Forms;
 
 public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
-    #region Fields
-
-
-    #endregion
-
     #region Constructors
 
     public ConnectedFormulaEditor(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
@@ -74,7 +69,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem());
 
-        _ = FormulaSet(filename, notAllowedchilds);
+        FormulaSet(filename, notAllowedchilds);
 
         //MultiUserFile.SaveAll(false);
         //Table.ForceSaveAll();
@@ -245,7 +240,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(true);
-        _ = FormulaSet(e.Item.KeyName, null);
+        FormulaSet(e.Item.KeyName, null);
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
@@ -265,11 +260,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             return;
         }
 
-        _ = SaveTab.ShowDialog();
+        SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
+        if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
         tmpf.SaveAs(SaveTab.FileName);
 
@@ -278,7 +273,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
-        _ = LoadTab.ShowDialog();
+        LoadTab.ShowDialog();
     }
 
     private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
@@ -310,7 +305,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
         if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }
 
-        _ = LoadSymbol.ShowDialog();
+        LoadSymbol.ShowDialog();
     }
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
@@ -361,7 +356,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void DoPages() {
         if (InvokeRequired) {
-            _ = Invoke(new Action(DoPages));
+            Invoke(new Action(DoPages));
             return;
         }
 
@@ -386,7 +381,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
                         return;
                     }
 
-                    _ = x.Remove(tb.Text);
+                    x.Remove(tb.Text);
                     if (Pad?.Items != null && tb.Text == Pad.Items.Caption) { later = tb; }
                 }
 

@@ -212,7 +212,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         SetValueFromProperty();
         GenFehlerText();
 
-        _ = CheckEnabledState();
+        CheckEnabledState();
 
         _checker = new Timer {
             Enabled = true,
@@ -254,7 +254,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
-        _ = CheckEnabledState();
+        CheckEnabledState();
         base.OnControlAdded(e);
     }
 
@@ -402,17 +402,17 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<int> ai:
-                _ = int.TryParse(Value, out var i);
+                int.TryParse(Value, out var i);
                 if (ai.Get() != i) { ai.Set(i); }
                 break;
 
             case Accessor<double> ad:
-                _ = DoubleTryParse(Value, out var d);
+                DoubleTryParse(Value, out var d);
                 if (Math.Abs(ad.Get() - d) > DefaultTolerance) { ad.Set(d); }
                 break;
 
             case Accessor<float> af:
-                _ = FloatTryParse(Value, out var f);
+                FloatTryParse(Value, out var f);
                 if (Math.Abs(af.Get() - f) > DefaultTolerance) { af.Set(f); }
                 break;
 
@@ -440,7 +440,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 if (_accessor.Get() is null) {
                 } else if (_accessor.Get() is IEditable) {
                 } else if (_accessor.Get() is Enum) {
-                    _ = int.TryParse(Value, out var ef);
+                    int.TryParse(Value, out var ef);
                     var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                     if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
                 } else {

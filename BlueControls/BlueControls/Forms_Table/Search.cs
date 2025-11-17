@@ -67,7 +67,7 @@ public sealed partial class Search : Form {
             return;
         }
         _tableView.CursorPos_Set(found, gefRow, true);
-        _ = txbSuchText.Focus();
+        txbSuchText.Focus();
     }
 
     private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
@@ -117,7 +117,7 @@ public sealed partial class Search : Form {
             return;
         }
         _tableView.CursorPos_Set(found, _row, true);
-        _ = txbSuchText.Focus();
+        txbSuchText.Focus();
     }
 
     private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();

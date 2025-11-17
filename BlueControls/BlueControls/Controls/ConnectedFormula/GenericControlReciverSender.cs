@@ -74,9 +74,9 @@ public class GenericControlReciverSender : GenericControlReciver {
     internal void ChildIsBorn(GenericControlReciver child) {
         if (child.IsDisposed || IsDisposed) { return; }
 
-        _ = child.Parents.AddIfNotExists(this);
+        child.Parents.AddIfNotExists(this);
 
-        _ = Childs.AddIfNotExists(child);
+        Childs.AddIfNotExists(child);
 
         child.Invalidate_FilterInput();
     }
@@ -88,7 +88,7 @@ public class GenericControlReciverSender : GenericControlReciver {
             }
 
             foreach (var thisChild in Childs) {
-                _ = thisChild.Parents.Remove(this);
+                thisChild.Parents.Remove(this);
             }
 
             Childs.Clear();

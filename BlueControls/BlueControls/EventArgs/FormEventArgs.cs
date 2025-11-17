@@ -27,11 +27,11 @@ public class FormEventArgs : System.EventArgs {
         Form = form;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     public System.Windows.Forms.Form Form { get; private set; }
 
-    #endregion Properties
+    #endregion
 }

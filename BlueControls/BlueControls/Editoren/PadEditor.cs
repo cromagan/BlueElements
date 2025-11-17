@@ -75,7 +75,7 @@ public partial class PadEditor : FormWithStatusBar {
         if (Pad?.Items == null) { return; }
 
         ColorDia.Color = Pad.Items.BackColor;
-        _ = ColorDia.ShowDialog();
+        ColorDia.ShowDialog();
         Pad.Items.BackColor = ColorDia.Color;
         Pad.Invalidate();
     }

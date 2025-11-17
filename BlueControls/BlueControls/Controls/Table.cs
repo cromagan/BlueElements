@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.BlueTableDialogs;
@@ -43,18 +44,17 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
+using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static BlueBasics.Generic;
-using MessageBox = BlueControls.Forms.MessageBox;
-using BlueBasics.EventArgs;
-using System.Text;
 using static BlueTable.Table;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -398,8 +398,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var colsToRefresh = new List<ColumnItem>();
         var reverse = false;
         if (sortused is { } rsd) { colsToRefresh.AddRange(rsd.Columns); reverse = rsd.Reverse; }
-        //if (db.Column.SysChapter is { IsDisposed: false } csc) { _ = colsToRefresh.AddIfNotExists(csc); }
-        if (db.Column.First is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
+        //if (db.Column.SysChapter is { IsDisposed: false } csc) { colsToRefresh.AddIfNotExists(csc); }
+        if (db.Column.First is { IsDisposed: false } cf) { colsToRefresh.AddIfNotExists(cf); }
 
         #endregion
 
@@ -410,7 +410,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         List<RowData> pinnedData = [];
 
         if (pinnedRows != null) {
-            _ = Parallel.ForEach(pinnedRows, thisRow => {
+            Parallel.ForEach(pinnedRows, thisRow => {
                 var rd = new RowData(thisRow, "Angepinnt") {
                     PinStateSortAddition = "1",
                     MarkYellow = true,
@@ -429,7 +429,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         #region Gefiltere Zeilen erstellen (_rowData)
 
         List<RowData> rowData = [];
-        _ = Parallel.ForEach(filteredRows, thisRow => {
+        Parallel.ForEach(filteredRows, thisRow => {
             var adk = thisRow.CompareKey(colsToRefresh);
 
             var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
@@ -438,7 +438,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             var caps = db.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : ([]);
             if (caps.Count > 0) {
                 if (caps.Contains(string.Empty)) {
-                    _ = caps.Remove(string.Empty);
+                    caps.Remove(string.Empty);
                     caps.Add("-?-");
                 }
             }
@@ -581,21 +581,21 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         tmp = tmp.Replace(";", "|");
                         tmp = tmp.Replace(" |", "|");
                         tmp = tmp.Replace("| ", "|");
-                        _ = sb.Append(tmp);
-                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(";"); }
+                        sb.Append(tmp);
+                        if (colNr < columnListtmp.Count - 1) { sb.Append(";"); }
                     }
                 }
-                _ = sb.Append("\r\n");
+                sb.Append("\r\n");
                 break;
 
             case FirstRow.ColumnInternalName:
                 for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
                     if (columnListtmp[colNr] != null) {
-                        _ = sb.Append(columnListtmp[colNr].KeyName);
-                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(';'); }
+                        sb.Append(columnListtmp[colNr].KeyName);
+                        if (colNr < columnListtmp.Count - 1) { sb.Append(';'); }
                     }
                 }
-                _ = sb.Append("\r\n");
+                sb.Append("\r\n");
                 break;
 
             default:
@@ -618,11 +618,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         tmp = tmp.Replace("\r", "|");
                         tmp = tmp.Replace("\n", "|");
                         tmp = tmp.Replace(";", "<sk>");
-                        _ = sb.Append(tmp);
-                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(';'); }
+                        sb.Append(tmp);
+                        if (colNr < columnListtmp.Count - 1) { sb.Append(';'); }
                     }
                 }
-                _ = sb.Append("\r\n");
+                sb.Append("\r\n");
             }
         }
         return sb.ToString().TrimEnd("\r\n");
@@ -630,42 +630,42 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public static void ImportBdb(Table table) {
         using ImportBdb x = new(table);
-        _ = x.ShowDialog();
+        x.ShowDialog();
     }
 
     public static void ImportCsv(Table table, string csvtxt) {
         using ImportCsv x = new(table, csvtxt);
-        _ = x.ShowDialog();
+        x.ShowDialog();
     }
 
     public static List<string> Permission_AllUsed(bool mitRowCreator) {
         var l = new List<string>();
 
-        foreach (var thisDb in Table.AllFiles) {
-            if (!thisDb.IsDisposed) {
-                l.AddRange(Permission_AllUsedInThisDB(thisDb, mitRowCreator));
+        foreach (var thisTb in Table.AllFiles) {
+            if (!thisTb.IsDisposed) {
+                l.AddRange(Permission_AllUsedInThisTable(thisTb, mitRowCreator));
             }
         }
 
         return Table.RepairUserGroups(l);
     }
 
-    public static List<string> Permission_AllUsedInThisDB(Table db, bool mitRowCreator) {
+    public static List<string> Permission_AllUsedInThisTable(Table tb, bool mitRowCreator) {
         List<string> e = [];
-        foreach (var thisColumnItem in db.Column) {
+        foreach (var thisColumnItem in tb.Column) {
             if (thisColumnItem != null) {
                 e.AddRange(thisColumnItem.PermissionGroupsChangeCell);
             }
         }
-        e.AddRange(db.PermissionGroupsNewRow);
-        e.AddRange(db.TableAdmin);
+        e.AddRange(tb.PermissionGroupsNewRow);
+        e.AddRange(tb.TableAdmin);
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
         foreach (var thisArrangement in tcvc) {
             e.AddRange(thisArrangement.PermissionGroups_Show);
         }
 
-        foreach (var thisEv in db.EventScript) {
+        foreach (var thisEv in tb.EventScript) {
             e.AddRange(thisEv.UserGroups);
         }
 
@@ -813,7 +813,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     public static void Table_AdditionalRepair(object sender, System.EventArgs e) {
         if (sender is not Table tbl) { return; }
 
-        _ = RepairColumnArrangements(tbl);
+        RepairColumnArrangements(tbl);
     }
 
     public static void Table_CanDoScript(object sender, CanDoScriptEventArgs e) {
@@ -945,7 +945,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
         if (ensureVisible && CurrentArrangement is { IsDisposed: false } ca) {
-            _ = EnsureVisible(ca, CursorPosColumn, CursorPosRow);
+            EnsureVisible(ca, CursorPosColumn, CursorPosRow);
         }
         Invalidate();
 
@@ -1048,7 +1048,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         da.TableEnd();
         da.AddFoot();
-        _ = da.Save(filename, execute);
+        da.Save(filename, execute);
     }
 
     /// <summary>
@@ -1057,7 +1057,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// <returns></returns>
     public new void Focus() {
         if (Focused()) { return; }
-        _ = base.Focus();
+        base.Focus();
     }
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
@@ -1248,7 +1248,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         column.Repair();
 
         using ColumnEditor w = new(bearbColumn, this);
-        _ = w.ShowDialog();
+        w.ShowDialog();
 
         bearbColumn.Repair();
     }
@@ -1303,7 +1303,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public void PinRemove(RowItem? row) {
         if (row is not { IsDisposed: false }) { return; }
-        _ = PinnedRows.Remove(row);
+        PinnedRows.Remove(row);
         Invalidate_SortedRowData();
         OnPinnedChanged();
     }
@@ -1397,7 +1397,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                 _rowsFilteredAndPinned = sortedRowDataTmp;
             }
-            //         _ = EnsureVisible(CursorPosColumn, CursorPosRow);
+            //         EnsureVisible(CursorPosColumn, CursorPosRow);
             // EnsureVisible macht probleme, wenn mit der Maus auf ein linked Cell gezogen wird und eine andere Cell
             //markiert ist. Dann wird sortiren angestoßen, und der Cursor zurückgesprungen
 
@@ -1421,7 +1421,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         try {
             var lockMe = new object();
-            _ = Parallel.ForEach(Table.Row, thisRowItem => {
+            Parallel.ForEach(Table.Row, thisRowItem => {
                 if (thisRowItem != null) {
                     if (f.Contains(thisRowItem) || PinnedRows.Contains(thisRowItem)) {
                         lock (lockMe) { l.Add(thisRowItem); }
@@ -1470,7 +1470,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         _tableDrawError = null;
         //InitializeSkin(); // Neue Schriftgrößen
         if (Table is { IsDisposed: false } db2) {
-            _ = RepairColumnArrangements(db2);
+            RepairColumnArrangements(db2);
             FilterOutput.Table = db2;
 
             db2.Cell.CellValueChanged += _Table_CellValueChanged;
@@ -1600,7 +1600,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (IsDisposed || FilterleisteZeilen <= 0) { return; }
 
         if (InvokeRequired) {
-            _ = Invoke(new Action(FillFilters));
+            Invoke(new Action(FillFilters));
             return;
         }
 
@@ -1657,18 +1657,18 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
             if (orderArrangement != null) {
                 foreach (var thisclsVitem in orderArrangement) {
-                    if (thisclsVitem?.Column is { IsDisposed: false } ci) { _ = columSort.AddIfNotExists(ci); }
+                    if (thisclsVitem?.Column is { IsDisposed: false } ci) { columSort.AddIfNotExists(ci); }
                 }
             }
 
             if (cu != null) {
                 foreach (var thisclsVitem in cu) {
-                    if (thisclsVitem?.Column is { IsDisposed: false } ci) { _ = columSort.AddIfNotExists(ci); }
+                    if (thisclsVitem?.Column is { IsDisposed: false } ci) { columSort.AddIfNotExists(ci); }
                 }
             }
 
             foreach (var thisColumn in Table.Column) {
-                _ = columSort.AddIfNotExists(thisColumn);
+                columSort.AddIfNotExists(thisColumn);
             }
 
             #endregion
@@ -1699,7 +1699,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         var flx = FlexiItemOf(thisColumn);
                         if (flx != null) {
                             // Sehr Gut, Flex vorhanden, wird später nicht mehr gelöscht
-                            _ = flexsToDelete.Remove(flx);
+                            flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
                             flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil, true, false);
@@ -1720,7 +1720,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                             // Prüfen, ob wir noch in den verfügbaren Zeilen sind
                             if (currentRow >= availableRows) {
-                                _ = flexsToDelete.AddIfNotExists(flx);
+                                flexsToDelete.AddIfNotExists(flx);
                                 break;
                             }
                         }
@@ -1779,7 +1779,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (IsDisposed) { return; }
 
         if (InvokeRequired) {
-            _ = Invoke(new Action(() => DrawControl(gr, state)));
+            Invoke(new Action(() => DrawControl(gr, state)));
             return;
         }
         base.DrawControl(gr, state);
@@ -2162,14 +2162,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                 if (!string.IsNullOrEmpty(rc)) {
                     if (_collapsed.Contains(rc)) {
-                        _ = _collapsed.Remove(rc);
+                        _collapsed.Remove(rc);
                     } else {
                         _collapsed.Add(rc);
                     }
                     Invalidate_SortedRowData();
                 }
             }
-            _ = EnsureVisible(ca, _mouseOverColumn, _mouseOverRow);
+            EnsureVisible(ca, _mouseOverColumn, _mouseOverRow);
             CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
             Develop.SetUserDidSomething();
             _isinMouseDown = false;
@@ -2411,11 +2411,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
 
             if (contentHolderCellColumn.SaveContent) {
-                _ = contentHolderCellRow.UpdateRow(true, "Nach Benutzereingabe");
+                contentHolderCellRow.UpdateRow(true, "Nach Benutzereingabe");
             } else {
                 // Variablen sind en nicht im Script enthalten, also nur die schnelle Berechnung
                 contentHolderCellRow.InvalidateCheckData();
-                _ = contentHolderCellRow.CheckRow();
+                contentHolderCellRow.CheckRow();
             }
 
             if (table.Table == cellInThisTableColumn.Column?.Table) { table.CursorPos_Set(cellInThisTableColumn, cellInThisTableRow, false); }
@@ -2755,7 +2755,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-        _ = db.Edit(typeof(TableHeadEditor));
+        db.Edit(typeof(TableHeadEditor));
     }
 
     private void btnPin_Click(object sender, System.EventArgs e) => Pin(RowsVisibleUnique());
@@ -2796,12 +2796,12 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         switch (dia) {
             case EditTypeTable.Textfeld:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                _ = Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
+                Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
                 break;
 
             case EditTypeTable.Textfeld_mit_Auswahlknopf:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                _ = Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow, BCB, 20, 18);
+                Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow, BCB, 20, 18);
                 break;
 
             case EditTypeTable.Dropdown_Single:
@@ -2862,7 +2862,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
         colList.Sort();
         colDia.CustomColors = [.. colList.Distinct()];
-        _ = colDia.ShowDialog();
+        colDia.ShowDialog();
         colDia.Dispose();
 
         NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToString(), viewItem, cellInThisTableRow, false));
@@ -2958,7 +2958,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         box.Visible = true;
         box.BringToFront();
-        _ = box.Focus();
+        box.Focus();
         return true;
     }
 
@@ -2966,7 +2966,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
-            _ = Invoke(new Action(CloseAllComponents));
+            Invoke(new Action(CloseAllComponents));
             return;
         }
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
@@ -3032,7 +3032,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private void ContextMenu_DataValidation(AbstractListItem item) {
         if (item.Tag is not RowItem row || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
         row.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-        _ = row.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
+        row.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
         RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true, null);
         MessageBox.Show("Datenüberprüfung:\r\n" + row.CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
     }
@@ -3044,7 +3044,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         var valueCol0 = row.CellFirstString();
         if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
-            _ = RowCollection.Remove(row, "Benutzer: löschen Befehl");
+            RowCollection.Remove(row, "Benutzer: löschen Befehl");
         }
     }
 
@@ -3135,7 +3135,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private void ContextMenu_Voting(AbstractListItem item) {
         if (item.Tag is not ColumnItem column || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
         var v = new Voting(column, [.. FilterCombined.Rows]);
-        _ = v.ShowDialog();
+        v.ShowDialog();
     }
 
     private void Cursor_Move(Direction richtung) {
@@ -3363,7 +3363,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 #region Draw_CellTransparent
 
                 if (!cellInThisTableColumn.SaveContent) {
-                    _ = cellInThisTableRow.CheckRow();
+                    cellInThisTableRow.CheckRow();
                 }
 
                 var toDrawd = cellInThisTableRow.CellGetString(cellInThisTableColumn);
@@ -4135,7 +4135,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// </summary>
     private void RepositionControls() {
         if (InvokeRequired) {
-            _ = Invoke(new Action(RepositionControls));
+            Invoke(new Action(RepositionControls));
             return;
         }
 
@@ -4183,7 +4183,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }
         if (e.Row == _mouseOverRow?.Row) { _mouseOverRow = null; }
         if (PinnedRows.Contains(e.Row)) {
-            _ = PinnedRows.Remove(e.Row);
+            PinnedRows.Remove(e.Row);
             Invalidate_SortedRowData();
         }
     }
@@ -4267,7 +4267,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void UpdateFilterleisteVisibility() {
         if (InvokeRequired) {
-            _ = Invoke(new Action(UpdateFilterleisteVisibility));
+            Invoke(new Action(UpdateFilterleisteVisibility));
             return;
         }
 

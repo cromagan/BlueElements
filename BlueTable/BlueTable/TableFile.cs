@@ -207,7 +207,7 @@ public class TableFile : Table {
 
         _saveRequired_File = false;
         MainChunkLoadDone = true;
-        _ = BeSureToBeUpToDate(true, instantUpdate);
+        BeSureToBeUpToDate(true, instantUpdate);
 
         RepairAfterParse();
 
@@ -249,7 +249,7 @@ public class TableFile : Table {
 
         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return; }
 
-        _ = mainchunk.Save(newFileName);
+        mainchunk.Save(newFileName);
 
         MainChunkLoadDone = true;
     }
@@ -374,13 +374,13 @@ public class TableFile : Table {
     }
 
     private static void TableUpdater(object state) {
-        foreach (var thisTbl in AllFiles) {
-            if (thisTbl is TableFile { IsDisposed: false } tbf) {
-                //if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
+        foreach (var thisTb in AllFiles) {
+            if (thisTb is TableFile { IsDisposed: false } tbf) {
+                //if (!thisTb.LogUndo) { return true; } // Irgend ein heikler Prozess
                 if (!string.IsNullOrEmpty(tbf.Filename)) { return; } // Irgend eine Tabelle wird aktuell geladen
             }
 
-            if (!thisTbl.MainChunkLoadDone) { return; }
+            if (!thisTb.MainChunkLoadDone) { return; }
         }
 
         BeSureToBeUpToDate(AllFiles, false);

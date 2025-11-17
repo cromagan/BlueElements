@@ -78,7 +78,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         if (items is not { Count: not 0 }) { return null; }
 
         var x = new ItemSelect(items);
-        _ = x.ShowDialog();
+        x.ShowDialog();
 
         return x._giveBack;
     }

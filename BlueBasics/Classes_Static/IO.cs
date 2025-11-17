@@ -141,7 +141,7 @@ public static class IO {
         var lockMe = new object();
         var did = false;
 
-        _ = Parallel.ForEach(filelist, thisf => {
+        Parallel.ForEach(filelist, thisf => {
             if (FileExists(thisf)) {
                 if (DeleteFile(thisf, false)) {
                     lock (lockMe) {
@@ -548,7 +548,7 @@ public static class IO {
             if (!CreateDirectory(pfad)) { return false; }
 
             File.WriteAllText(filename, contents, encoding);
-            if (executeAfter) { _ = ExecuteFile(filename); }
+            if (executeAfter) { ExecuteFile(filename); }
             return true;
         } catch {
             //  Develop.DebugPrint(ErrorType.Info, "Fehler beim Speichern der Datei: " + filename, ex);

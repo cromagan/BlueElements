@@ -65,8 +65,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
         Unselect();
 
         if (row is { }) {
-            _ = Items.ResetVariables();
-            _ = Items.ReplaceVariables(row);
+            Items.ResetVariables();
+            Items.ReplaceVariables(row);
         }
     }
 
@@ -237,7 +237,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
                         f.AddExtension = true;
                         f.DefaultExt = "bcs";
                         f.Title = "Speichern:";
-                        _ = f.ShowDialog();
+                        f.ShowDialog();
                         if (string.IsNullOrEmpty(f.FileName)) { return; }
                         IO.WriteAllText(f.FileName, ps.ParseableItems().FinishParseable(), Constants.Win1252, false);
                         IO.LastFilePath = f.FileName.FilePath();
@@ -250,7 +250,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
             switch (e.Item.KeyName.ToLowerInvariant()) {
                 case "löschen":
                     if (pm.Parent is AbstractPadItem api) {
-                        _ = api.JointPoints.Remove(pm);
+                        api.JointPoints.Remove(pm);
                     }
 
                     return;
@@ -322,7 +322,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
     public void OpenSaveDialog(string title) {
         title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
         PicsSave.FileName = title + ".png";
-        _ = PicsSave.ShowDialog();
+        PicsSave.ShowDialog();
     }
 
     public void Print() {
@@ -350,7 +350,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
 
     public void ShowPrintPreview() {
         DruckerDokument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
-        _ = PrintPreviewDialog1.ShowDialog();
+        PrintPreviewDialog1.ShowDialog();
         RepairPrinterData();
     }
 

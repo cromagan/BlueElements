@@ -19,16 +19,16 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 using BlueTable;
 using BlueTable.AdditionalScriptMethods;
-using static BlueBasics.IO;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System;
+using System.Collections.Generic;
+using static BlueBasics.IO;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -137,7 +137,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
                         var chunks = TableChunk.GenerateNewChunks(tbf, 100, DateTime.UtcNow, false);
 
                         if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
-                        _ = mainchunk.Save(filn);
+                        mainchunk.Save(filn);
                         break;
                     }
 

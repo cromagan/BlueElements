@@ -333,7 +333,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(CreateWatcher));
+                Invoke(new Action(CreateWatcher));
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
@@ -398,7 +398,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 break;
 
             case "Explorer":
-                _ = ExecuteFile(it.KeyName);
+                ExecuteFile(it.KeyName);
                 break;
 
             case "Umbenennen":
@@ -410,7 +410,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
                 nn = n.FilePath() + nn + "." + n.FileSuffix();
 
-                _ = MoveFile(it.KeyName, nn, true);
+                MoveFile(it.KeyName, nn, true);
 
                 ReloadDirectory();
 
@@ -424,11 +424,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             //    var ziel = it.KeyName + "\\" + _ausschneiden.FileNameWithSuffix();
 
             //    if (FileExists(ziel)) {
-            //        _ = MessageBox.Show("Datei existiert am Zielort bereits, abbruch.", ImageCode.Information);
+            //        MessageBox.Show("Datei existiert am Zielort bereits, abbruch.", ImageCode.Information);
             //        return;
             //    }
 
-            //    _ = MoveFile(_ausschneiden, ziel, true);
+            //    MoveFile(_ausschneiden, ziel, true);
 
             //    //if (FileExists(ThumbFile(_ausschneiden))) {
             //    //    RenameFile(ThumbFile(_ausschneiden), ThumbFile(ziel), true);
@@ -472,11 +472,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             var f = TempFile(_directory, thisfile.FileNameWithoutSuffix(), thisfile.FileSuffix());
 
             if (tmp == DragDropEffects.Copy) {
-                _ = FileCopy(thisfile, f, true);
+                FileCopy(thisfile, f, true);
             }
 
             if (tmp == DragDropEffects.Move) {
-                _ = MoveFile(thisfile, f, true);
+                MoveFile(thisfile, f, true);
             }
         }
     }
@@ -525,7 +525,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                     return;
 
                 case FileFormat.Textdocument:
-                    _ = ExecuteFile("Notepad.exe", e.Item.KeyName);
+                    ExecuteFile("Notepad.exe", e.Item.KeyName);
                     return;
             }
 
@@ -543,7 +543,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 Arguments = "/C \"" + x + "\""
             };
             process.StartInfo = startInfo;
-            _ = process.Start();
+            process.Start();
 
             return;
         }
@@ -556,7 +556,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     private void ReloadDirectory() {
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(ReloadDirectory));
+                Invoke(new Action(ReloadDirectory));
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
@@ -616,7 +616,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 if (emd.Length == 0) {
                     var emf = GetFiles(_todel, "*", System.IO.SearchOption.TopDirectoryOnly);
                     if (emf.Length == 0) {
-                        _ = DeleteDir(_todel, false);
+                        DeleteDir(_todel, false);
                     }
                 }
             }
@@ -631,7 +631,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (!DirectoryExists(dir)) {
             if (CreateDir && Enabled && RowsInputChangedHandled && FilterInputChangedHandled &&
                 !string.IsNullOrEmpty(dir) && dir.IsFormat(FormatHolder.Filepath)) {
-                _ = CreateDirectory(dir);
+                CreateDirectory(dir);
             } else {
                 return;
             }
@@ -773,7 +773,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     private void Watcher_Changed(object sender, System.IO.FileSystemEventArgs e) {
         var fi = GetFileInfo(e.Name);
-        _ = AddThis(fi);
+        AddThis(fi);
 
         //if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
         //if(e.ChangeType == WatcherChangeTypes.Changed) { return; }

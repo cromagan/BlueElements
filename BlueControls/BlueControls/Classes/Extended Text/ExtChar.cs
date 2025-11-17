@@ -22,9 +22,9 @@ using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
-using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.Extended_Text;
@@ -134,9 +134,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         if (px > area.Right) { return false; }
 
         var py = (Pos.Y * zoom) + drawingPos.Y;
-        if (py > area.Bottom) { return false; }
-
-        return px + (Size.Width * zoom) >= area.Left &&
+        return py <= area.Bottom && px + (Size.Width * zoom) >= area.Left &&
                py + (Size.Height * zoom) >= area.Top;
     }
 
@@ -151,19 +149,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         return result;
     }
 
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-
-        //if (_parent != null) {
-        //    _parent.StyleChanged -= _parent_StyleChanged;
-        //    _parent = null;
-        //}
-
-        //Pos = PointF.Empty;
-        //_font = null;
-        //_parent = null;
-        //_size = new Size(0, 0);
-    }
+    public override void ParseFinished(string parsed) => base.ParseFinished(parsed);//if (_parent != null) {//    _parent.StyleChanged -= _parent_StyleChanged;//    _parent = null;//}//Pos = PointF.Empty;//_font = null;//_parent = null;//_size = new Size(0, 0);
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
@@ -171,7 +157,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
                 return value.ToNonCritical() == MyClassId;
 
             case "style":
-                _style = (PadStyles)(IntParse(value.FromNonCritical()));
+                _style = (PadStyles)IntParse(value.FromNonCritical());
                 return true;
 
             case "font":

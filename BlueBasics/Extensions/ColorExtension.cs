@@ -110,7 +110,7 @@ public static partial class Extensions {
     }
 
     public static string ToHtmlCode(this Color? color) {
-        if(color is not { } c) { return string.Empty; }
+        if (color is not { } c) { return string.Empty; }
 
         if (c.A < 255) {
             // Alpha, Red, Green, Blue
@@ -122,7 +122,6 @@ public static partial class Extensions {
     }
 
     public static string ToHtmlCode(this Color color) {
- 
         if (color.A < 255) {
             // Alpha, Red, Green, Blue
             return $"#{color.A:x2}{color.R:x2}{color.G:x2}{color.B:x2}";
@@ -131,7 +130,6 @@ public static partial class Extensions {
             return $"#{color.R:x2}{color.G:x2}{color.B:x2}";
         }
     }
-
 
     #endregion
 }

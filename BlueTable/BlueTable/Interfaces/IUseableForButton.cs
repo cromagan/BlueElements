@@ -18,11 +18,11 @@
 #nullable enable
 
 using BlueBasics;
-using BlueTable.Enums;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Enums;
 using System.Collections.Generic;
 
 namespace BlueTable.Interfaces;
@@ -73,7 +73,7 @@ public static class UseableForButton {
         var cdw = new CanDoFeedback(0, normalizedText, string.Empty, ld);
 
         var scp = new ScriptProperties("Knopfdruck im Formular", Method.AllMethods, true, [], additionalInfo, "Button", "Button");
-        _ = ufb.DoIt(varCol, cdw, scp);
+        ufb.DoIt(varCol, cdw, scp);
 
         return cdw.LogData?.Protocol.JoinWithCr() ?? string.Empty;
     }

@@ -69,7 +69,7 @@ public partial class FontEditor : EditorEasy {
                 if (f.IsStyleAvailable(FontStyle.Regular)) {
                     Font fo = new(f.Name, 100);
                     try {
-                        _ = fo.MeasureString("T");
+                        fo.MeasureString("T");
                         _fnList.Add(ItemOf(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true));
                     } catch { }
                 }
@@ -127,14 +127,14 @@ public partial class FontEditor : EditorEasy {
 
     private void btnBackColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
-        _ = ColorDia.ShowDialog();
+        ColorDia.ShowDialog();
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
         ChangeFont();
     }
 
     private void cFarbe_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
-        _ = ColorDia.ShowDialog();
+        ColorDia.ShowDialog();
         btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
         ChangeFont();
     }
@@ -155,7 +155,7 @@ public partial class FontEditor : EditorEasy {
 
     private void cRandF_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
-        _ = ColorDia.ShowDialog();
+        ColorDia.ShowDialog();
         btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
         ChangeFont();
     }

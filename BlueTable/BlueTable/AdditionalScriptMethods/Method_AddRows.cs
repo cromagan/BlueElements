@@ -18,11 +18,11 @@
 #nullable enable
 
 using BlueBasics;
-using BlueTable.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Diagnostics;
 

@@ -152,7 +152,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         OnLoading();
 
         MainChunkLoadDone = true;
-        _ = BeSureToBeUpToDate(true, true);
+        BeSureToBeUpToDate(true, true);
 
         RepairAfterParse();
 
@@ -263,7 +263,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         set {
             if (_additionalFilesPath == value) { return; }
             _additionalFilesPathTemp = null;
-            _ = ChangeData(TableDataType.AdditionalFilesPath, null, _additionalFilesPath, value);
+            ChangeData(TableDataType.AdditionalFilesPath, null, _additionalFilesPath, value);
             Cell.InvalidateAllSizes();
         }
     }
@@ -275,7 +275,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _caption;
         set {
             if (_caption == value) { return; }
-            _ = ChangeData(TableDataType.Caption, null, _caption, value);
+            ChangeData(TableDataType.Caption, null, _caption, value);
         }
     }
 
@@ -287,7 +287,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _columnArrangements;
         set {
             if (_columnArrangements == value) { return; }
-            _ = ChangeData(TableDataType.ColumnArrangement, null, _columnArrangements, value);
+            ChangeData(TableDataType.ColumnArrangement, null, _columnArrangements, value);
             OnViewChanged();
         }
     }
@@ -296,7 +296,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _createDate;
         private set {
             if (_createDate == value) { return; }
-            _ = ChangeData(TableDataType.CreateDateUTC, null, _createDate, value);
+            ChangeData(TableDataType.CreateDateUTC, null, _createDate, value);
         }
     }
 
@@ -304,7 +304,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _creator.Trim();
         private set {
             if (_creator == value) { return; }
-            _ = ChangeData(TableDataType.Creator, null, _creator, value);
+            ChangeData(TableDataType.Creator, null, _creator, value);
         }
     }
 
@@ -324,7 +324,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             var eventScriptNew = l.ToString(false);
 
             if (eventScriptOld == eventScriptNew) { return; }
-            _ = ChangeData(TableDataType.EventScript, null, eventScriptOld, eventScriptNew);
+            ChangeData(TableDataType.EventScript, null, eventScriptOld, eventScriptNew);
         }
     }
 
@@ -332,7 +332,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _eventScriptVersion;
         set {
             if (_eventScriptVersion == value) { return; }
-            _ = ChangeData(TableDataType.EventScriptVersion, null, _eventScriptVersion.ToString5(), value.ToString5());
+            ChangeData(TableDataType.EventScriptVersion, null, _eventScriptVersion.ToString5(), value.ToString5());
         }
     }
 
@@ -347,7 +347,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _globalShowPass;
         set {
             if (_globalShowPass == value) { return; }
-            _ = ChangeData(TableDataType.GlobalShowPass, null, _globalShowPass, value);
+            ChangeData(TableDataType.GlobalShowPass, null, _globalShowPass, value);
         }
     }
 
@@ -380,7 +380,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => new(_permissionGroupsNewRow);
         set {
             if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
-            _ = ChangeData(TableDataType.PermissionGroupsNewRow, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr());
+            ChangeData(TableDataType.PermissionGroupsNewRow, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -399,7 +399,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _rowQuickInfo;
         set {
             if (_rowQuickInfo == value) { return; }
-            _ = ChangeData(TableDataType.RowQuickInfo, null, _rowQuickInfo, value);
+            ChangeData(TableDataType.RowQuickInfo, null, _rowQuickInfo, value);
         }
     }
 
@@ -411,7 +411,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (_sortDefinition != null) { alt = _sortDefinition.ParseableItems().FinishParseable(); }
             if (value != null) { neu = value.ParseableItems().FinishParseable(); }
             if (alt == neu) { return; }
-            _ = ChangeData(TableDataType.SortDefinition, null, alt, neu);
+            ChangeData(TableDataType.SortDefinition, null, alt, neu);
 
             OnSortParameterChanged();
         }
@@ -425,7 +425,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _standardFormulaFile;
         set {
             if (_standardFormulaFile == value) { return; }
-            _ = ChangeData(TableDataType.StandardFormulaFile, null, _standardFormulaFile, value);
+            ChangeData(TableDataType.StandardFormulaFile, null, _standardFormulaFile, value);
         }
     }
 
@@ -433,7 +433,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => new(_tableAdmin);
         set {
             if (!_tableAdmin.IsDifferentTo(value)) { return; }
-            _ = ChangeData(TableDataType.TableAdminGroups, null, _tableAdmin.JoinWithCr(), value.JoinWithCr());
+            ChangeData(TableDataType.TableAdminGroups, null, _tableAdmin.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -441,7 +441,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => new(_tags);
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
-            _ = ChangeData(TableDataType.Tags, null, _tags.JoinWithCr(), value.JoinWithCr());
+            ChangeData(TableDataType.Tags, null, _tags.JoinWithCr(), value.JoinWithCr());
         }
     }
 
@@ -449,7 +449,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _temporaryTableMasterApp;
         set {
             if (_temporaryTableMasterApp == value) { return; }
-            _ = ChangeData(TableDataType.TemporaryTableMasterApp, null, _temporaryTableMasterApp, value);
+            ChangeData(TableDataType.TemporaryTableMasterApp, null, _temporaryTableMasterApp, value);
         }
     }
 
@@ -457,7 +457,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _temporaryTableMasterId;
         set {
             if (_temporaryTableMasterId == value) { return; }
-            _ = ChangeData(TableDataType.TemporaryTableMasterId, null, _temporaryTableMasterId, value);
+            ChangeData(TableDataType.TemporaryTableMasterId, null, _temporaryTableMasterId, value);
         }
     }
 
@@ -465,7 +465,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _temporaryTableMasterMachine;
         set {
             if (_temporaryTableMasterMachine == value) { return; }
-            _ = ChangeData(TableDataType.TemporaryTableMasterMachine, null, _temporaryTableMasterMachine, value);
+            ChangeData(TableDataType.TemporaryTableMasterMachine, null, _temporaryTableMasterMachine, value);
         }
     }
 
@@ -473,7 +473,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _temporaryTableMasterTimeUtc;
         set {
             if (_temporaryTableMasterTimeUtc == value) { return; }
-            _ = ChangeData(TableDataType.TemporaryTableMasterTimeUTC, null, _temporaryTableMasterTimeUtc, value);
+            ChangeData(TableDataType.TemporaryTableMasterTimeUTC, null, _temporaryTableMasterTimeUtc, value);
         }
     }
 
@@ -481,7 +481,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _temporaryTableMasterUser;
         set {
             if (_temporaryTableMasterUser == value) { return; }
-            _ = ChangeData(TableDataType.TemporaryTableMasterUser, null, _temporaryTableMasterUser, value);
+            ChangeData(TableDataType.TemporaryTableMasterUser, null, _temporaryTableMasterUser, value);
         }
     }
 
@@ -504,7 +504,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #endregion
 
-            _ = ChangeData(TableDataType.TableVariables, null, _variableTmp, l.ToString(true));
+            ChangeData(TableDataType.TableVariables, null, _variableTmp, l.ToString(true));
         }
     }
 
@@ -526,13 +526,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         // reicht es, das Verzeichnis einmal zu prüfen
         var allreadychecked = new List<Table>();
 
-        var alf = new List<Table>();// könnte sich ändern, deswegen Zwischenspeichern
-        alf.AddRange(AllFiles);
+        var allfiles = new List<Table>();// könnte sich ändern, deswegen Zwischenspeichern
+        allfiles.AddRange(AllFiles);
 
-        foreach (var thisDb in alf) {
-            var possibletables = thisDb.AllAvailableTables(allreadychecked);
+        foreach (var thisTb in allfiles) {
+            var possibletables = thisTb.AllAvailableTables(allreadychecked);
 
-            allreadychecked.Add(thisDb);
+            allreadychecked.Add(thisTb);
 
             if (possibletables != null) {
                 _allavailableTables.AddRange(possibletables);
@@ -547,7 +547,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         List<Table> l = [.. ofTables];
 
         foreach (var tbl in l) {
-            _ = tbl.BeSureToBeUpToDate(false, instantUpdate);
+            tbl.BeSureToBeUpToDate(false, instantUpdate);
         }
     }
 
@@ -591,7 +591,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             var folder = new List<string>();
 
             if (fileOrTableName.IsFormat(FormatHolder.FilepathAndName)) {
-                _ = folder.AddIfNotExists(fileOrTableName.FilePath());
+                folder.AddIfNotExists(fileOrTableName.FilePath());
                 fileOrTableName = fileOrTableName.FileNameWithoutSuffix();
             }
 
@@ -604,7 +604,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
 
                 if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder.FilepathAndName)) {
-                    _ = folder.AddIfNotExists(tbf.Filename.FilePath());
+                    folder.AddIfNotExists(tbf.Filename.FilePath());
                 }
             }
 
@@ -980,7 +980,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
             if (thisFile is TableFile tbf) {
-                _ = tbf.Save(mustSave);
+                tbf.Save(mustSave);
                 if (x != AllFiles.Count) {
                     // Die Auflistung wurde verändert! Selten, aber kann passieren!
                     SaveAll(mustSave);
@@ -1222,7 +1222,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (!string.IsNullOrEmpty(f2)) {
                 DropMessage(ErrorType.Warning, $"Rollback aufgrund eines Fehlers:\r\n{f2}");
                 // Rollback: Vorherigen Wert im Speicher wiederherstellen
-                _ = SetValueInternal(type, column, row, previousValue, user, datetimeutc, Reason.NoUndo_NoInvalidate);
+                SetValueInternal(type, column, row, previousValue, user, datetimeutc, Reason.NoUndo_NoInvalidate);
                 return f2;
             }
         }
@@ -1250,50 +1250,50 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (row is { IsDisposed: false }) {
             foreach (var thisCol in Column) {
                 var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
-                if (v != null) { _ = vars.Add(v); }
+                if (v != null) { vars.Add(v); }
             }
-            _ = vars.Add(new VariableString("CurrentRowKey", row.KeyName, true, "Der interne Zeilenschlüssel der Zeile,\r\nmit der das Skript aufgerufen wurde."));
-            _ = vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
+            vars.Add(new VariableString("CurrentRowKey", row.KeyName, true, "Der interne Zeilenschlüssel der Zeile,\r\nmit der das Skript aufgerufen wurde."));
+            vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
         }
 
         if (dbVariables) {
             foreach (var thisvar in Variables.ToListVariableString()) {
                 var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Tabellen-Kopf-Variable\r\n" + thisvar.Comment);
-                _ = vars.Add(v);
+                vars.Add(v);
             }
         }
 
-        _ = vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
-        _ = vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-        _ = vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-        _ = vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Tabelle ist."));
-        _ = vars.Add(new VariableString("Tablename", KeyName, true, "Der aktuelle Tabellenname."));
-        _ = vars.Add(new VariableTable("CurrentTable", this, true, "Die aktuelle Tabelle"));
+        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
+        vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Tabelle ist."));
+        vars.Add(new VariableString("Tablename", KeyName, true, "Der aktuelle Tabellenname."));
+        vars.Add(new VariableTable("CurrentTable", this, true, "Die aktuelle Tabelle"));
         //_ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
-        _ = vars.Add(new VariableBool("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
-        _ = vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
-        _ = vars.Add(new VariableString("StartTimeUTC", DateTime.UtcNow.ToString7(), true, "Die Uhrzeit, wann das Skript gestartet wurde.")); // RowCount als Befehl belegt
+        vars.Add(new VariableBool("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
+        vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
+        vars.Add(new VariableString("StartTimeUTC", DateTime.UtcNow.ToString7(), true, "Die Uhrzeit, wann das Skript gestartet wurde.")); // RowCount als Befehl belegt
         //var r = SortDefinition?.SortetdRows(this.Row) ?? new RowSortDefinition(this, this.Column.First, false).SortetdRows(this.Row);
         //_ = vars.Add(new VariableListRow("RowsSorted", r, true, "Alle Zeilen in der aktuellen Tabelle. Sortiert nach der Standard Sortierung."));
 
         //if (Column.SysCorrect is { IsDisposed: false } csc && row is { IsDisposed: false }) {
-        //    _ = vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));
+        //    vars.Add(new VariableBool("sys_correct", row.CellGetBoolean(csc), true, "Der aktuelle Zeilenstand, ob die Zeile laut Skript Fehler korrekt durchgerechnet worden ist\r\nAchtung: Das ist der eingfrohrende Stand, zu Beginn des Skriptes."));
         //}
 
         if (Column.First is { IsDisposed: false } fc) {
-            _ = vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
+            vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
 
             if (row != null) {
-                _ = vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
+                vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
             }
         }
 
-        _ = vars.Add(new VariableString("AdditionalFilesPath", (AdditionalFilesPathWhole().Trim("\\") + "\\").NormalizePath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+        vars.Add(new VariableString("AdditionalFilesPath", (AdditionalFilesPathWhole().Trim("\\") + "\\").NormalizePath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
 
         //_ = vars.Add(new VariableBool("Successful", true, true, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
         //_ = vars.Add(new VariableString("NotSuccessfulReason", string.Empty, true, "Die letzte Meldung, warum es nicht erfolgreich war."));
-        _ = vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
-        _ = vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
+        vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
+        vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
         #endregion
 
@@ -1414,7 +1414,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (scf.Failed) {
-                if (row != null) { _ = RowCollection.FailedRows.TryAdd(row, scf.FailedReason); }
+                if (row != null) { RowCollection.FailedRows.TryAdd(row, scf.FailedReason); }
 
                 DropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
                 return scf;
@@ -1705,8 +1705,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             RowItem? row;
 
             if (dictVorhanden.ContainsKey(thisD.Key)) {
-                _ = dictVorhanden.TryGetValue(thisD.Key, out row);
-                _ = dictVorhanden.Remove(thisD.Key); // Speedup
+                dictVorhanden.TryGetValue(thisD.Key, out row);
+                dictVorhanden.Remove(thisD.Key); // Speedup
             } else {
                 neuZ++;
                 row = Row.GenerateAndAdd(thisD.Value[0], "Import, fehlende Zeile");
@@ -1731,7 +1731,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             //if (DateTime.Now.Subtract(d1).TotalMinutes > 5) {
             //    DropMessage(ErrorType.Info, "Import: Zwischenspeichern der Tabelle");
-            //    _ = Save();
+            //    Save();
             //    d1 = DateTime.Now;
             //}
 
@@ -1824,7 +1824,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt() ?? bLoaded; }
 
         OnLoading();
-        _ = Parse(bLoaded, true);
+        Parse(bLoaded, true);
         RepairAfterParse();
         Freeze("Stream-Tabelle");
         MainChunkLoadDone = true;
@@ -1876,7 +1876,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (thisColumn.RelationType == RelationType.None) {
                 var x = thisColumn.Contents();
                 if (x.Count == 0) {
-                    _ = Column.Remove(thisColumn, "Automatische Optimierung");
+                    Column.Remove(thisColumn, "Automatische Optimierung");
                     Optimize();
                     return;
                 }
@@ -1888,7 +1888,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (Column.SysChapter is { IsDisposed: false } c) {
             var x = c.Contents();
             if (x.Count < 2) {
-                _ = Column.Remove(c, "Automatische Optimierung");
+                Column.Remove(c, "Automatische Optimierung");
             }
         }
     }
@@ -1921,7 +1921,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     if (!string.IsNullOrEmpty(rowKey)) {
                         row = Row.GetByKey(rowKey);
                         if (row is not { IsDisposed: false }) {
-                            _ = Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
+                            Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
                             row = Row.GetByKey(rowKey);
                         }
 
@@ -1940,7 +1940,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         column = Column[columname];
                         if (command == TableDataType.ColumnName) {
                             if (column is not { IsDisposed: false }) {
-                                _ = Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
+                                Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
                                 column = Column[columname];
                                 if (column is not { IsDisposed: false }) {
                                     Develop.DebugPrint(ErrorType.Error, "Spalte hinzufügen Fehler");
@@ -1998,7 +1998,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             foreach (var thisColumn in l) {
                 if (!columnUsed.Contains(thisColumn)) {
-                    _ = Column.ExecuteCommand(TableDataType.Command_RemoveColumn, thisColumn.KeyName, Reason.NoUndo_NoInvalidate);
+                    Column.ExecuteCommand(TableDataType.Command_RemoveColumn, thisColumn.KeyName, Reason.NoUndo_NoInvalidate);
                 }
             }
 
@@ -2010,7 +2010,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(TableVersion.Replace(".", string.Empty))) { Freeze("Tabelleversions-Konflikt"); }
 
-        _ = Undo.OrderBy(k => k.DateTimeUtc);
+        Undo.OrderBy(k => k.DateTimeUtc);
         //Undo.OrderByDescending(k => k.DateTimeUtc)
 
         return true;
@@ -2160,7 +2160,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (IsEditable(true)) {
             _checker = new Timer(Checker_Tick);
-            _ = _checker.Change(2000, 2000);
+            _checker.Change(2000, 2000);
         }
     }
 
@@ -2193,7 +2193,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 _tags.Clear();
 
                 // Aus statischer Liste entfernen
-                _ = AllFiles.Remove(this);
+                AllFiles.Remove(this);
             } catch (Exception ex) {
                 Develop.DebugPrint(ErrorType.Error, "Fehler beim Dispose: " + ex.Message);
             }
@@ -2598,8 +2598,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         try {
             var masters = 0;
-            foreach (var thisDb in AllFiles) {
-                if (MultiUserPossible && !thisDb.IsDisposed && thisDb.AmITemporaryMaster(MasterBlockedMin, MasterCount)) {
+            foreach (var thisTb in AllFiles) {
+                if (MultiUserPossible && !thisTb.IsDisposed && thisTb.AmITemporaryMaster(MasterBlockedMin, MasterCount)) {
                     masters++;
                     if (masters >= MaxMasterCount) { return false; }
                 }
@@ -2677,7 +2677,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (updatedArrangements != _columnArrangements) {
             _columnArrangements = updatedArrangements;
             // Speichern ohne ChangeData aufzurufen (würde Endlosschleife verursachen)
-            _ = WriteValueToDiscOrServer(TableDataType.ColumnArrangement, _columnArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
+            WriteValueToDiscOrServer(TableDataType.ColumnArrangement, _columnArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
         }
     }
 

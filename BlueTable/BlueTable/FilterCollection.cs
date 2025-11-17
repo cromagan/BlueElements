@@ -278,7 +278,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var hasError = false;
 
         try {
-            _ = Parallel.ForEach(db.Row, (thisRowItem, state) => {
+            Parallel.ForEach(db.Row, (thisRowItem, state) => {
                 try {
                     if (hasError) {
                         state.Break();
@@ -618,7 +618,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (existingColumnFilter.Any()) {
             OnChanging();
             foreach (var thisItem in existingColumnFilter) {
-                _ = _internal.Remove(thisItem);
+                _internal.Remove(thisItem);
             }
             Invalidate_FilteredRows();
             OnPropertyChanged("FilterItems");
@@ -658,7 +658,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         OnChanging();
         foreach (var thisItem in existingColumnFilter) {
-            _ = _internal.Remove(thisItem);
+            _internal.Remove(thisItem);
         }
         AddInternal(fi);
         Invalidate_FilteredRows();
@@ -702,7 +702,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         // Entferne die identifizierten Filter
         foreach (var filter in toRemove) {
-            _ = _internal.Remove(filter);
+            _internal.Remove(filter);
         }
 
         // Füge neue Filter hinzu

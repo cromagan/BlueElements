@@ -31,18 +31,14 @@ public interface IContextMenu {
 
     #region Events
 
-
     /// <summary>
     /// Dieses Event wird vom Steuerelement benutzt, um von außen zusätzliche Items zu erhalten.
     /// </summary>
     event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-
     #endregion
 
     #region Methods
-
-
 
     /// <summary>
     /// Diese Routine wird als erstes aufgerufen und holt sich alle relevanten Daten.

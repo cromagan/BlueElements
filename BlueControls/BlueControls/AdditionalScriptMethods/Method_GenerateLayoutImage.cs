@@ -18,10 +18,10 @@
 #nullable enable
 
 using BlueControls.ItemCollectionPad;
-using BlueTable.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.AdditionalScriptMethods;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -77,7 +77,7 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
 
         if (!l.Any()) { return new DoItFeedback("Layout nicht gefunden oder fehlerhaft.", true, ld); }
 
-        _ = l.ResetVariables();
+        l.ResetVariables();
         var scx = l.ReplaceVariables(r);
 
         if (scx.Failed) {

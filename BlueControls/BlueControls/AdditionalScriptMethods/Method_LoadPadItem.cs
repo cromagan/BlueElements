@@ -28,7 +28,6 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing;
 
-
 namespace BlueControls.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global

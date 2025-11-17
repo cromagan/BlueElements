@@ -1223,7 +1223,7 @@ public static class Skin {
         if (r == null) {
             if (tb.IsEditable(false)) {
                 var fc = new FilterItem[] { f1, f2 };
-                _ = tb.Row.GenerateAndAdd(fc, "Unbekannter Stil");
+                tb.Row.GenerateAndAdd(fc, "Unbekannter Stil");
             }
 
             return BlueFont.DefaultFont;

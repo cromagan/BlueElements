@@ -157,7 +157,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     " ",
                     scf.ProtocolText
                 ];
-                _ = l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
+                l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Constants.Win1252, true);
             }
         }
 
@@ -299,7 +299,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
                 rli.Enabled = !HasChildNode(selected, key);
 
-                _ = olditems.Remove(key);
+                olditems.Remove(key);
 
                 #endregion
             } else if (dd_BoxItem is DropDownListItem dli && dd_isItem) {
@@ -327,7 +327,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     dli.DropDownItems.Add(itDD);
                     dli.Enabled = !HasChildNode(selected, key);
                 }
-                _ = olditems.Remove(dd_Name);
+                olditems.Remove(dd_Name);
 
                 #endregion
             } else {
@@ -348,7 +348,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
 
                     it.Indent = Math.Max(keyAndInfo[z].CountChar('\\'), 0);
                     f.ItemAdd(it);
-                    _ = olditems.Remove(key);
+                    olditems.Remove(key);
                     it.UserDefCompareKey = z.ToStringInt10();
                     it.Enabled = !HasChildNode(selected, key);
 
@@ -361,7 +361,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     ndli.DropDownItems.Add(it);
                     ndli.Indent = Math.Max(keyAndInfo[z].CountChar('\\'), 0);
                     f.ItemAdd(ndli);
-                    _ = olditems.Remove(dd_Name);
+                    olditems.Remove(dd_Name);
                     ndli.UserDefCompareKey = z.ToStringInt10();
                     ndli.Enabled = !HasChildNode(selected, key);
 

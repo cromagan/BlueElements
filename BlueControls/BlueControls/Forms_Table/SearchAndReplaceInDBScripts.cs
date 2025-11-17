@@ -77,24 +77,24 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
         if (_isWorking) { return; }
         _isWorking = true;
 
-        var l = new List<string>();
+        var txt = new List<string>();
 
-        foreach (var thisDb in Table.AllFiles) {
-            if (thisDb is { IsDisposed: false } db) {
+        foreach (var thisTb in Table.AllFiles) {
+            if (thisTb is { IsDisposed: false } db) {
                 foreach (var thiss in db.EventScript) {
                     // Prüfen, ob der Suchtext im Skript vorkommt
                     if (thiss.Script.Contains(txbAlt.Text)) {
                         // Tabellename -> Skriptname zur Liste hinzufügen
-                        l.Add(string.Empty);
-                        l.Add(string.Empty);
-                        l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                        l.Add($"{db.Caption} -> {thiss.KeyName}");
+                        txt.Add(string.Empty);
+                        txt.Add(string.Empty);
+                        txt.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                        txt.Add($"{db.Caption} -> {thiss.KeyName}");
 
                         // Alle Zeilen durchgehen und die mit dem Suchtext zur Liste hinzufügen
                         var lines = thiss.Script.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
                         foreach (var line in lines) {
                             if (line.Contains(txbAlt.Text)) {
-                                l.Add(line.Trim());
+                                txt.Add(line.Trim());
                             }
                         }
                     }
@@ -102,7 +102,7 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
             }
         }
 
-        l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
+        txt.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Win1252, true);
         _isWorking = false;
     }
 

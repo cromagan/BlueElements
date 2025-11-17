@@ -64,7 +64,7 @@ internal class Method_DownloadWebPage : Method {
             Generic.CollectGarbage();
             var txt = Generic.Download(url);
 
-            _ = Last.Add(new VariableString(varn, txt, true, string.Empty));
+            Last.Add(new VariableString(varn, txt, true, string.Empty));
             return new DoItFeedback(txt);
         } catch {
             return new DoItFeedback(string.Empty);

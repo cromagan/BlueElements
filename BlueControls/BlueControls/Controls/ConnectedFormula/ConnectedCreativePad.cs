@@ -218,8 +218,8 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         if (!string.IsNullOrEmpty(LoadAtRowChange)) {
             if (LoadAtRowChange.FileType() is FileFormat.BlueCreativeFile) {
                 pad.Items = new ItemCollectionPadItem(LoadAtRowChange);
-                _ = pad.Items.ResetVariables();
-                _ = pad.Items.ReplaceVariables(LastRow);
+                pad.Items.ResetVariables();
+                pad.Items.ReplaceVariables(LastRow);
             }
         } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
             pad.Items = [];
@@ -230,7 +230,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             }
 
             if (LastRow != null) {
-                _ = pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, LastRow);
+                pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, LastRow);
             }
         }
 

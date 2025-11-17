@@ -98,11 +98,11 @@ public partial class FloatingForm : Form {
     public new void Close() {
         try {
             if (InvokeRequired) {
-                _ = Invoke(new Action(Close));
+                Invoke(new Action(Close));
                 return;
             }
 
-            if (AllBoxes.Contains(this)) { _ = AllBoxes.Remove(this); }
+            if (AllBoxes.Contains(this)) { AllBoxes.Remove(this); }
             base.Close();
         } catch {
             Develop.AbortAppIfStackOverflow();
@@ -141,10 +141,10 @@ public partial class FloatingForm : Form {
     }
 
     public new void Show() {
-        if(IsDisposed || Disposing) { return; }
+        if (IsDisposed || Disposing) { return; }
 
         try {
-            _ = WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
+            WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
         } catch (ObjectDisposedException) {
             // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
         } catch (Exception ex) {

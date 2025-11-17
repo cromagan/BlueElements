@@ -46,7 +46,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     public VariableCollection(List<Variable> v, bool readOnly) {
         foreach (var thisV in v) {
-            _ = Add(thisV);
+            Add(thisV);
         }
         ReadOnly = readOnly;
     }
@@ -58,7 +58,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public VariableCollection(List<VariableString>? v) {
         if (v != null) {
             foreach (var thisV in v) {
-                _ = Add(thisV);
+                Add(thisV);
             }
         }
         ReadOnly = true;

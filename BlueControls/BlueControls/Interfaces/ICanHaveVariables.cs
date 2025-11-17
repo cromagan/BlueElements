@@ -40,11 +40,11 @@ public static class CanHaveVariables {
     #region Methods
 
     public static void ParseVariables(this ICanHaveVariables obj, VariableCollection? variables) {
-        _ = obj.ResetVariables();
+        obj.ResetVariables();
         if (variables == null) { return; }
 
         foreach (var thisV in variables) {
-            _ = obj.ReplaceVariable(thisV);
+            obj.ReplaceVariable(thisV);
         }
     }
 

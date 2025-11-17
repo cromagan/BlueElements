@@ -84,7 +84,7 @@ public class Method_CallByFilename : Method {
         var scp2 = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, $"{scp.Chain}\\[{lineadd + 1}] {chainlog}");
 
         var tmpv = new VariableCollection();
-        _ = tmpv.AddRange(varCol);
+        tmpv.AddRange(varCol);
         if (addMe != null) {
             foreach (var thisV in addMe) {
                 tmpv.Remove(thisV.KeyName);
@@ -107,7 +107,7 @@ public class Method_CallByFilename : Method {
         if (scx.Failed) {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
             varCol.Clear();
-            _ = varCol.AddRange(tmpv);
+            varCol.AddRange(tmpv);
             ld?.Protocol.AddRange(scx.Protocol);
 
             //scx.ChangeFailedReason(scx.FailedReason, scx.NeedsScriptFix, ld);

@@ -79,12 +79,10 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         }
     }
 
-    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
-
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-
+    public override bool TableInputMustMatchOutputTable => false;
     protected override int SaveOrder => 4;
 
     #endregion

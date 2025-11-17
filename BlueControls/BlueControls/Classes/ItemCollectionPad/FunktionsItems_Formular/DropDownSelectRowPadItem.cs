@@ -96,11 +96,10 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         }
     }
 
-    public override bool TableInputMustMatchOutputTable => true;
-
     public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann, die durch die Vor-Filter bestimmt wurden.";
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
+    public override bool TableInputMustMatchOutputTable => true;
     protected override int SaveOrder => 1;
 
     #endregion

@@ -103,8 +103,6 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override bool TableInputMustMatchOutputTable => false;
-
     public override string Description => "Ein Steuerelement, das eine andere Tabelle befüllen kann.\r\n" +
                                           "Aus der eingehenden Zeile wird eine ID generiert, diese wird zum dauerhaften Speichern in der Ausgangstabelle benutzt.\r\n" +
                                             "Diese ID wird auch aus Ausgangsfilter weitergegeben.";
@@ -191,6 +189,8 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         }
     }
 
+    public override bool TableInputMustMatchOutputTable => false;
+
     #endregion
 
     #region Methods
@@ -218,7 +218,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             return "Spalte, in der die Herkunft-ID geschrieben werden soll, fehlt";
         }
 
-        if (!oic.IsKeyColumn && !oic.IsFirst ) {
+        if (!oic.IsKeyColumn && !oic.IsFirst) {
             return $"Die Herkunft-ID-Spalte '{oic.Caption}' muss eine Schlüsselspalte oder die erste Spalte sein.";
         }
 

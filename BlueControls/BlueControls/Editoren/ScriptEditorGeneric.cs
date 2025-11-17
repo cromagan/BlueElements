@@ -92,7 +92,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
         switch (e.Item.KeyName.ToLowerInvariant()) {
             case "variableninhalt kopieren":
-                _ = Generic.CopytoClipboard(_lastVariableContent);
+                Generic.CopytoClipboard(_lastVariableContent);
                 return;
         }
 
@@ -150,16 +150,11 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public virtual void WriteInfosBack() { }
 
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
-
-        if(string.IsNullOrEmpty(LastFailedReason)) {
+        if (string.IsNullOrEmpty(LastFailedReason)) {
             txbErrorInfo.Text = "Alles OK - kein Skript-Fehler gespeichert.";
-               
         } else {
             txbErrorInfo.Text = "Letzter gespeicherte Skript-Fehler:\r\r" + LastFailedReason;
         }
-
-
-
     }
 
     protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);

@@ -200,7 +200,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (!FilterInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "FilterInput nicht gehandelt"); }
 
         if (FilterInput?.Rows is not { Count: 1 } r) { return null; }
-        _ = r[0].CheckRow();
+        r[0].CheckRow();
         return r[0];
     }
 
@@ -210,7 +210,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         // Wenn Parents existieren, diese entfernen
         if (Parents.Count > 0) {
             foreach (var parent in Parents) {
-                _ = parent.Childs.Remove(this);
+                parent.Childs.Remove(this);
             }
             Parents.Clear();
         }
@@ -229,7 +229,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 fc.Add(new FilterItem(tb2, FilterType.RowKey, row.KeyName));
 
                 FilterInput = fc;
-                _ = row?.CheckRow();
+                row?.CheckRow();
             }
         } else {
             FilterInput = null;
@@ -248,7 +248,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             Invalidate_FilterInput();
 
             foreach (var thisParent in Parents) {
-                _ = thisParent.Childs.Remove(this);
+                thisParent.Childs.Remove(this);
             }
 
             Parent?.Controls.Remove(this);

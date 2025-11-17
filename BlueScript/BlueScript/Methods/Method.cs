@@ -403,7 +403,7 @@ public abstract class Method : IReadableTextWithKey {
 
             if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId, true); }
 
-            _ = feedbackVariables.Add(v);
+            feedbackVariables.Add(v);
 
             //if (s != null) { line += lb; }
         }
@@ -450,7 +450,7 @@ public abstract class Method : IReadableTextWithKey {
             if (generateVariable) {
                 v.KeyName = varnam.ToLowerInvariant();
                 v.ReadOnly = false;
-                _ = varCol.Add(v);
+                varCol.Add(v);
                 return new DoItFeedback(v);
             }
 

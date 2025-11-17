@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Threading.Tasks;
 using BlueBasics;
 using BlueScript.Methods;
 using CefSharp;
 using CefSharp.OffScreen;
+using System;
+using System.Threading.Tasks;
 
 namespace BlueTable.AdditionalScriptMethods;
 

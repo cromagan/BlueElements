@@ -59,8 +59,8 @@ public static partial class Extensions {
 
         foreach (var thisitem in collection) {
             if (sb.Length + thisitem.Length <= maxlength) {
-                if (sb.Length > 0) { _ = sb.Append("\r"); }
-                _ = sb.Append(thisitem);
+                if (sb.Length > 0) { sb.Append("\r"); }
+                sb.Append(thisitem);
             } else {
                 return sb.ToString();
             }

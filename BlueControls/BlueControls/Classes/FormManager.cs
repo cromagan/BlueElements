@@ -19,12 +19,12 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.FileSystemCaching;
 using BlueBasics.MultiUserFile;
 using BlueTable;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BlueBasics.FileSystemCaching;
 
 //https://stackoverflow.com/questions/9462592/best-practices-for-multi-form-applications-to-show-and-hide-forms
 namespace BlueControls;
@@ -171,7 +171,7 @@ public class FormManager : ApplicationContext {
     private void OnFormClosing(object sender, System.EventArgs e) {
         if (sender is not Form thisForm) { return; }
 
-        _ = Forms.Remove(thisForm);
+        Forms.Remove(thisForm);
 
         FormRemoved?.Invoke(this, new EventArgs.FormEventArgs(thisForm));
 

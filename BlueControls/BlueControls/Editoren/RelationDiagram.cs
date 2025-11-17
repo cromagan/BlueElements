@@ -138,7 +138,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         // Namen ermitteln, die relevant sind
         List<string> bez = [];
         foreach (var thisN in names.Where(t.Contains)) {
-            _ = bez.AddIfNotExists(thisN);
+            bez.AddIfNotExists(thisN);
             t = t.Replace(thisN, string.Empty);
         }
         if (bez.Count == 0) { return; }
@@ -314,7 +314,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         if (_column == null) { return; }
 
         FolderBrowserDialog fl = new();
-        _ = fl.ShowDialog();
+        fl.ShowDialog();
 
         List<string> l = [];
         foreach (var thisR in Pad.Items) {
@@ -336,11 +336,11 @@ public partial class RelationDiagram : PadEditor, IHasTable {
                 no = no.Replace(",", "_");
                 no = no.Replace("__", "_");
                 var newn = IO.TempFile(fl.SelectedPath, no, "txt");
-                _ = t.WriteAllText(newn, Constants.Win1252, false);
+                t.WriteAllText(newn, Constants.Win1252, false);
             }
         }
         var newn2 = IO.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
-        _ = l.WriteAllText(newn2, Constants.Win1252, true);
+        l.WriteAllText(newn2, Constants.Win1252, true);
     }
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
@@ -351,7 +351,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, CheckBehavior.SingleSelection, null, AddType.None);
         if (i is not { Count: 1 }) { return; }
 
-        _ = AddOne(i[0], 0, 0, string.Empty);
+        AddOne(i[0], 0, 0, string.Empty);
         if (Pad.Items.Count() < 10) {
             Pad.ZoomFit();
         }

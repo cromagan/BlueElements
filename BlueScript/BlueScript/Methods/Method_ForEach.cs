@@ -70,15 +70,11 @@ internal class Method_ForEach : Method {
 
         var t = Stopwatch.StartNew();
 
-
         for (var index = 0; index < l.Count; index++) {
             var addme = new List<Variable>() {
             new VariableString(varnam, l[index], true, "Iterations-Variable"),
             new VariableDouble("Index", index, true, "Iterations-Variable")
             };
-
-
-
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEach-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
@@ -92,7 +88,6 @@ internal class Method_ForEach : Method {
         if (scx == null) {
             return new DoItFeedback(false, false, false, string.Empty, null, infos.LogData);
         }
-
 
         scx.ConsumeBreak();// Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
         return scx;

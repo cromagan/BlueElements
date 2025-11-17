@@ -86,7 +86,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (!Generic.IsAdministrator()) { return; }
         if (_lastItem is ReciverSenderControlPadItem { TableOutput: { IsDisposed: false } db }) {
             var c = new TableViewForm(db, false, true, true);
-            _ = c.ShowDialog();
+            c.ShowDialog();
         }
     }
 
@@ -94,7 +94,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (!Generic.IsAdministrator()) { return; }
         if (_lastItem is ReciverControlPadItem { TableInput: { IsDisposed: false } db }) {
             var c = new TableViewForm(db, false, true, true);
-            _ = c.ShowDialog();
+            c.ShowDialog();
         }
     }
 
@@ -127,7 +127,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         Opacity = 0f;
         using var x = new ConnectedFormulaEditor(cf.Filename, null);
 
-        _ = x.ShowDialog();
+        x.ShowDialog();
         cf.UnlockEditing();
         CFormula.InvalidateView();
         Opacity = 1f;
@@ -144,7 +144,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
         Table.SaveAll(false);
-        _ = LoadTab.ShowDialog();
+        LoadTab.ShowDialog();
     }
 
     private void btnScript_Click(object sender, System.EventArgs e) {

@@ -146,7 +146,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
                     foreach (var thisTab in TabPages) {
                         if (thisTab is TabPage tb) {
                             if (string.Equals(tb.Text, thisTabName, StringComparison.OrdinalIgnoreCase)) {
-                                _ = neworder.AddIfNotExists(tb);
+                                neworder.AddIfNotExists(tb);
                             }
                         }
                     }

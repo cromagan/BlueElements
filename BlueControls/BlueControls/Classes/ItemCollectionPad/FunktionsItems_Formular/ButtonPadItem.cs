@@ -25,9 +25,9 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueScript.Methods;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
-using BlueScript.Methods;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -213,7 +213,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
         }
     }
 
-    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Eine Schaltfläche, den der Benutzer drücken kann und eine Aktion startet.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
@@ -231,7 +230,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     public override bool InputMustBeOneRow => false;
     public override bool MustBeInDrawingArea => true;
-
+    public override bool TableInputMustMatchOutputTable => false;
     protected override int SaveOrder => 1;
 
     #endregion

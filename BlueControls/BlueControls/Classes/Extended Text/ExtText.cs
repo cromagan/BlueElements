@@ -652,7 +652,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             case "FONTSIZE":
                 style = PadStyles.Undefiniert;
-                _ = FloatTryParse(attribut, out var fs);
+                FloatTryParse(attribut, out var fs);
                 font = BlueFont.Get(font.FontName, fs, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.ColorMain, font.ColorOutline, font.ColorBack);
                 break;
 
@@ -882,7 +882,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         do {
             akt++;
             if (akt > _internal.Count - 1) {
-                _ = Row_SetOnLine(zbChar, akt - 1);
+                Row_SetOnLine(zbChar, akt - 1);
                 ri.Add(zbChar + ";" + (akt - 1));
                 break;
             }
@@ -917,7 +917,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (_internal[akt].IsLineBreak()) {
                 isX = vZbxPixel;
                 if (_internal[akt] is ExtCharTopCode) {
-                    _ = Row_SetOnLine(zbChar, akt);
+                    Row_SetOnLine(zbChar, akt);
                     ri.Add(zbChar + ";" + akt);
                 } else {
                     isY += (int)(Row_SetOnLine(zbChar, akt) * _zeilenabstand);

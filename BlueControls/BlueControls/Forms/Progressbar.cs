@@ -81,7 +81,7 @@ public partial class Progressbar : FloatingForm {
     public void Update(int current) {
         if (InvokeRequired) {
             // Es kommt zwar die ganze Berechnung durcheinander, aber besser als ein Fehler
-            _ = Invoke(new Action(() => Update(current)));
+            Invoke(new Action(() => Update(current)));
             return;
         }
         UpdateInternal(CalculateText(_baseText, current, _count));

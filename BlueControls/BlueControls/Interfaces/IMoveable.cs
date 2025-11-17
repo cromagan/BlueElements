@@ -21,10 +21,14 @@ namespace BlueControls.Interfaces;
 
 public interface IMoveable {
 
-    #region Methods
+    #region Properties
 
-    public bool MoveYByMouse { get; }
     public bool MoveXByMouse { get; }
+    public bool MoveYByMouse { get; }
+
+    #endregion
+
+    #region Methods
 
     public void Move(float x, float y, bool isMouse);
 

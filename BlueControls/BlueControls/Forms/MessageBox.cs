@@ -74,7 +74,7 @@ public partial class MessageBox : Form {
 
     #region Properties
 
-    public sealed override string Text {
+    public override sealed string Text {
         get => base.Text;
         set => base.Text = value;
     }
@@ -92,7 +92,7 @@ public partial class MessageBox : Form {
     public static int Show(string txt, ImageCode? pic, bool dialog, params string[] buttons) {
         MessageBox mb = new(txt, pic, buttons);
         if (dialog) {
-            _ = mb.ShowDialog();
+            mb.ShowDialog();
         } else {
             mb.Show();
             while (mb._pressed == null) {

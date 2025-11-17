@@ -21,9 +21,9 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+using BlueScript.Structures;
 using BlueTable;
 using BlueTable.Interfaces;
-using BlueScript.Structures;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;
@@ -31,7 +31,6 @@ namespace BlueControls.BlueTableDialogs;
 public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTable {
 
     #region Fields
-
 
     private RowAdderPadItem? _item;
 
@@ -54,23 +53,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     #endregion
 
     #region Properties
-
-    public Table? Table {
-        get;
-        set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == field) { return; }
-
-            if (field != null) {
-                field.DisposingEvent -= _table_Disposing;
-            }
-            field = value;
-
-            if (field != null) {
-                field.DisposingEvent += _table_Disposing;
-            }
-        }
-    }
 
     public override object? Object {
         get => IsDisposed ? null : (object?)_item;
@@ -95,6 +77,23 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         set {
             txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
             Table = value?.Table;
+        }
+    }
+
+    public Table? Table {
+        get;
+        set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == field) { return; }
+
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
+            }
+            field = value;
+
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
+            }
         }
     }
 
@@ -174,8 +173,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         Close();
     }
 
-    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
-
     private void btnScriptAfter_Click(object sender, System.EventArgs e) {
         WriteInfosBack();
         scriptNo = 3;
@@ -193,6 +190,8 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         scriptNo = 2;
         ShowScript();
     }
+
+    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
 
     private void ShowScript() {
         if (_item is RowAdderPadItem cpi) {

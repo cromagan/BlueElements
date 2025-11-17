@@ -46,12 +46,10 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
-    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Zeigt Änderungen einer Zeile an.";
-
     public override bool InputMustBeOneRow => true;
     public override bool MustBeInDrawingArea => true;
-
+    public override bool TableInputMustMatchOutputTable => false;
     protected override int SaveOrder => 5;
 
     #endregion

@@ -23,9 +23,8 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using static BlueBasics.IO;
-
 using System.Text;
+using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 

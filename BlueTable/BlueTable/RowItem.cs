@@ -20,11 +20,11 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -339,7 +339,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var tmp = sef.Variables?.GetList("ErrorColumns");
         if (tmp is { Count: > 0 }) {
             foreach (var thiss in tmp) {
-                _ = cols.AddIfNotExists(thiss);
+                cols.AddIfNotExists(thiss);
                 var t = thiss.SplitBy("|");
 
                 if (Table?.Column[t[0]] is { IsDisposed: false } thisc) {
@@ -370,10 +370,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         StringBuilder r = new();
 
         foreach (var t in columns) {
-            _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
+            r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
         }
 
-        _ = r.Append(Constants.SecondSortChar + KeyName);
+        r.Append(Constants.SecondSortChar + KeyName);
         return r.ToString();
     }
 
@@ -382,8 +382,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var colsToRefresh = new List<ColumnItem>();
         if (db.SortDefinition?.Columns is { } lc) { colsToRefresh.AddRange(lc); }
-        if (db.Column.SysChapter is { IsDisposed: false } csc) { _ = colsToRefresh.AddIfNotExists(csc); }
-        if (db.Column.First is { IsDisposed: false } cf) { _ = colsToRefresh.AddIfNotExists(cf); }
+        if (db.Column.SysChapter is { IsDisposed: false } csc) { colsToRefresh.AddIfNotExists(csc); }
+        if (db.Column.First is { IsDisposed: false } cf) { colsToRefresh.AddIfNotExists(cf); }
 
         return CompareKey(colsToRefresh);
     }
@@ -445,7 +445,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void InvalidateCheckData() {
-        _ = RowCollection.FailedRows.TryRemove(this, out _);
+        RowCollection.FailedRows.TryRemove(this, out _);
         _lastCheckedEventArgs = null;
     }
 
@@ -457,7 +457,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (db.Column.SysRowChangeDate is not { IsDisposed: false } scd) { return; }
 
         InvalidateCheckData();
-        _ = RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
+        RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
         if (CellIsNullOrEmpty(srs) && IsMyRow(RowCollection.NewRowTolerance, false)) {
             DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} ist bereits invalidiert");
@@ -475,15 +475,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue).StringValue;
     }
 
-    public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } db
-|| db.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
+    public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } tb ||
+                                   tb.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
 
-    public bool IsNullOrEmpty(ColumnItem? column) => IsDisposed || Table is not { IsDisposed: false } db || db.Cell.IsNullOrEmpty(column, this);
+    public bool IsNullOrEmpty(ColumnItem? column) => IsDisposed || Table is not { IsDisposed: false } tb ||
+                                                     tb.Cell.IsNullOrEmpty(column, this);
 
     public bool MatchesTo(FilterItem fi) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return false; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return false; }
 
-        if (fi.Table != db) { return false; }
+        if (fi.Table != tb) { return false; }
 
         if (fi.FilterType == FilterType.AlwaysFalse) { return false; }
 
@@ -500,14 +501,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool MatchesTo(params FilterItem[]? filter) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return false; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return false; }
 
-        if (filter is not { Length: not 0 }) { return Table.Column.ChunkValueColumn == null || db.PowerEdit; }
+        if (filter is not { Length: not 0 }) { return Table.Column.ChunkValueColumn == null || tb.PowerEdit; }
 
-        if (Table.Column.ChunkValueColumn is { IsDisposed: false } csp && !Table.PowerEdit) {
+        if (Table.Column.ChunkValueColumn is { IsDisposed: false } cvc && !Table.PowerEdit) {
             var found = false;
             foreach (var thisF in filter) {
-                if (thisF.Column == csp) { found = true; break; }
+                if (thisF.Column == cvc) { found = true; break; }
             }
             if (!found) { return false; }
         }
@@ -516,7 +517,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var ok = true;
 
-        _ = Parallel.ForEach(filter, (thisFilter, state) => {
+        Parallel.ForEach(filter, (thisFilter, state) => {
             if (!MatchesTo(thisFilter)) {
                 ok = false;
                 state.Break();
@@ -531,8 +532,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <returns></returns>
     public bool NeedsRowInitialization() {
-        if (Table is not { IsDisposed: false } db) { return false; }
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
         return string.IsNullOrEmpty(CellGetString(srs));
     }
 
@@ -541,8 +542,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <returns></returns>
     public bool NeedsRowUpdate() {
-        if (Table is not { IsDisposed: false } db) { return false; }
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
         if (string.IsNullOrEmpty(CellGetString(srs))) { return true; }
         return CellGetDateTime(srs) < Table.EventScriptVersion;
     }
@@ -552,11 +553,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <returns>Empty, wenn alles in Ordung ist. Ansonten ein Grund.</returns>
     public string RepairAllLinks() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        foreach (var thisColumn in db.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (thisColumn.RelationType == RelationType.CellValues) {
-                _ = CellCollection.LinkedCellData(thisColumn, this, true, false);
+                CellCollection.LinkedCellData(thisColumn, this, true, false);
 
                 //if (!string.IsNullOrEmpty(info) && !canrepair) { return false; }
             }
@@ -572,7 +573,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="varcol">Wir eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
     /// <returns></returns>
     public string ReplaceVariables(string txt, bool removeLineBreaks, VariableCollection? varcol) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return txt; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return txt; }
 
         var erg = txt;
 
@@ -598,7 +599,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         // Variablen ersetzen
-        foreach (var column in db.Column) {
+        foreach (var column in tb.Column) {
             if (!erg.Contains("~")) { return erg; }
 
             if (column != null) {
@@ -623,10 +624,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public string RowStamp() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return string.Empty; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         var erg = string.Empty;
-        foreach (var thisColumn in db.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (thisColumn is { IsDisposed: false }) {
                 if (thisColumn.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { continue; }
                 erg += CellGetString(thisColumn) + "|";
@@ -636,13 +637,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, string reason) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
 
-        if (!db.CanDoValueChangedScript(true)) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
+        if (!tb.CanDoValueChangedScript(true)) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
         Table.WaitScriptsDone();
 
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) {
+        if (tb.Column.SysRowState is not { IsDisposed: false } srs) {
             return new ScriptEndedFeedback([], RepairAllLinks());
         }
 
@@ -651,7 +652,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
-            DropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {db.Caption} ({reason})");
+            DropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {tb.Caption} ({reason})");
 
             if (extendedAllowed) {
                 RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
@@ -671,7 +672,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             InvalidateCheckData();
             RowCollection.AddBackgroundWorker(this);
-            db.OnInvalidateView();
+            tb.OnInvalidateView();
             return ok;
         } catch {
             return new ScriptEndedFeedback("Interner Fehler", false, true, "Allgemein");
@@ -692,7 +693,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     internal static bool CompareValues(string istValue, string filterValue, FilterType typ) {
         var comparisonType = typ.HasFlag(FilterType.GroﬂKleinEgal) ? StringComparison.OrdinalIgnoreCase
-                                                                                : StringComparison.Ordinal;
+                                                                   : StringComparison.Ordinal;
 
         // Entfernen des GroﬂKleinEgal-Flags, da es nicht mehr benˆtigt wird
         typ &= ~FilterType.GroﬂKleinEgal;
@@ -749,8 +750,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (column.RelationType == RelationType.CellValues) { return; }
 
-        if (db.Column.SysRowChanger is { IsDisposed: false } src && src != column) { _ = SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
-        if (db.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { _ = SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
+        if (db.Column.SysRowChanger is { IsDisposed: false } src && src != column) { SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
+        if (db.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 
         if (db.Column.SysRowState is { IsDisposed: false } srs && srs != column && column.SaveContent) {
             InvalidateCheckData();
@@ -759,10 +760,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 RowCollection.WaitDelay = 0;
 
                 if (column.IsKeyColumn) {
-                    _ = SetValueInternal(srs, string.Empty, reason);
+                    SetValueInternal(srs, string.Empty, reason);
                 } else {
                     if (!string.IsNullOrEmpty(CellGetString(srs))) {
-                        _ = SetValueInternal(srs, "01.01.1900", reason);
+                        SetValueInternal(srs, "01.01.1900", reason);
                     }
                 }
             }
@@ -788,13 +789,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (tb.Column.SysCorrect is { IsDisposed: false } sc) {
             if (string.IsNullOrEmpty(tb.Cell.GetStringCore(sc, this))) {
-                _ = SetValueInternal(sc, true.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
+                SetValueInternal(sc, true.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }
 
         if (tb.Column.SysLocked is { IsDisposed: false } sl) {
             if (string.IsNullOrEmpty(tb.Cell.GetStringCore(sl, this))) {
-                _ = SetValueInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
+                SetValueInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }
     }
@@ -849,7 +850,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (reason == Reason.SetCommand) {
                 if (column.IsKeyColumn) {
                     if (db.Column.SysRowState is { IsDisposed: false } srs) {
-                        _ = SetValueInternal(srs, string.Empty, reason);
+                        SetValueInternal(srs, string.Empty, reason);
                     }
                 }
 
@@ -923,7 +924,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             // Tats‰chlichen String ermitteln --------------------------------------------
             string txt;
 
-            if (!column.SaveContent) { _ = CheckRow(); }
+            if (!column.SaveContent) { CheckRow(); }
 
             txt = Table?.Cell.GetStringCore(column, this) ?? string.Empty;
 

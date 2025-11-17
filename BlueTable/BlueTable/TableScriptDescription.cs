@@ -20,9 +20,9 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueTable.Interfaces;
 using BlueScript;
 using BlueScript.Enums;
+using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -49,11 +49,6 @@ public static class TableScriptDescriptionExtension {
 }
 
 public sealed class TableScriptDescription : ScriptDescription, IHasTable {
-
-    #region Fields
-
-
-    #endregion
 
     #region Constructors
 

@@ -18,13 +18,13 @@
 #nullable enable
 
 using BlueBasics;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
@@ -70,7 +70,7 @@ internal class Method_Call : Method_TableGeneric, IUseableForButton {
         var vs = attvar.ValueStringGet(0);
 
         var sc = myTb.EventScript.GetByKey(vs);
-        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs , true, ld); }
+        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
 
         var newat = sc.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {

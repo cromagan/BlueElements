@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static BlueBasics.IO;
 
-
 namespace BlueBasics;
 
 public class BackupVerwalter {
@@ -87,7 +86,7 @@ public class BackupVerwalter {
             }
 
             foreach (var thisF in Deleteable) {
-                _ = DeleteFile(thisF, false);
+                DeleteFile(thisF, false);
             }
 
             return string.Empty;

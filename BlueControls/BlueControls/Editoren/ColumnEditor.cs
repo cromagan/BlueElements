@@ -88,7 +88,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             if (value == _column) { return; }
             if (IsDisposed) { return; }
 
-            if (_column is { IsDisposed: false }) { _ = AllOk(); }
+            if (_column is { IsDisposed: false }) { AllOk(); }
 
             _column = value is ColumnItem c ? c : null;
             Column_DatenAuslesen();
@@ -136,7 +136,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     private void btnBackColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.White;
-        _ = ColorDia.ShowDialog();
+        ColorDia.ShowDialog();
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
@@ -229,7 +229,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (IsDisposed || _column?.Table is not { IsDisposed: false } tb) { return; }
         if (TableViewForm.EditabelErrorMessage(tb)) { return; }
 
-        _ = tb.Edit(typeof(TableHeadEditor));
+        tb.Edit(typeof(TableHeadEditor));
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {
@@ -247,7 +247,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     private void btnTextColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo ?? Color.White;
-        _ = ColorDia.ShowDialog();
+        ColorDia.ShowDialog();
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 

@@ -73,14 +73,12 @@ public static class HasSettings {
 
         if (string.IsNullOrEmpty(pf)) { return; }
 
-
         if (!CanWriteInDirectory(pf.PathParent())) { return; }
-
 
         CreateDirectory(pf);
 
         if (CanWriteInDirectory(pf)) {
-            _ = settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
+            settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
             settings.SettingsLoaded = true;
         }
     }

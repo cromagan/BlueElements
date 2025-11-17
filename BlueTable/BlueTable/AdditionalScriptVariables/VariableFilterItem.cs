@@ -18,8 +18,8 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
-using BlueTable;
 using BlueScript.Variables;
+using BlueTable;
 
 namespace BlueScript;
 

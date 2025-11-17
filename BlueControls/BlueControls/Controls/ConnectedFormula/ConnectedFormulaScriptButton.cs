@@ -31,11 +31,6 @@ namespace BlueControls.Controls;
 
 internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
-    #region Fields
-
-
-    #endregion
-
     #region Constructors
 
     public ConnectedFormulaScriptButton() : base(false, false, false) => InitializeComponent();
@@ -140,12 +135,12 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         }
 
         if (Parent is IHasFieldVariable hfvp && hfvp.GetFieldVariable() is { } v2) {
-            _ = vars.Add(v2);
+            vars.Add(v2);
         }
 
         foreach (var thisCon in Parent.Controls) {
             if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
-                _ = vars.Add(v);
+                vars.Add(v);
             }
         }
 

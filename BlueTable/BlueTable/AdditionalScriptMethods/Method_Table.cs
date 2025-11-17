@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using BlueTable;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;

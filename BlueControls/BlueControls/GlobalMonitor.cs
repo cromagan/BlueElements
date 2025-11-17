@@ -40,11 +40,11 @@ public partial class GlobalMonitor : Form {
         var tb = new Table();
         var dbi = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         dbi.IsFirst = true;
-        _ = tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
+        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
         var az = tb.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolder.DateTime);
-        _ = tb.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolder.Text);
-        _ = tb.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolder.Long);
+        tb.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("Message", "Message", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("Indent", "Stufe", ColumnFormatHolder.Long);
 
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
@@ -82,7 +82,7 @@ public partial class GlobalMonitor : Form {
         if (_monitorThread != null && _monitorThread.IsAlive && Monitor != null && !Monitor.IsDisposed) {
             // Thread läuft und Fenster existiert, bringe es in den Vordergrund
             try {
-                _ = Monitor.BeginInvoke(new Action(() => {
+                Monitor.BeginInvoke(new Action(() => {
                     Monitor.BringToFront();
                     if (Monitor.WindowState == System.Windows.Forms.FormWindowState.Minimized) {
                         Monitor.WindowState = System.Windows.Forms.FormWindowState.Normal;
@@ -122,7 +122,7 @@ public partial class GlobalMonitor : Form {
 
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(() => Message(type, reference, category, symbol, message, indent)));
+                Invoke(new Action(() => Message(type, reference, category, symbol, message, indent)));
                 return;
             } catch {
                 return;
@@ -209,10 +209,10 @@ public partial class GlobalMonitor : Form {
             Monitor = new GlobalMonitor();
 
             // Registriere die Formularschließung beim CancellationToken
-            _ = cancellationToken.Register(() => {
+            cancellationToken.Register(() => {
                 try {
                     if (Monitor != null && !Monitor.IsDisposed) {
-                        _ = Monitor.BeginInvoke(new Action(() => Monitor.Close()));
+                        Monitor.BeginInvoke(new Action(() => Monitor.Close()));
                     }
                 } catch {
                     // Ignoriere Fehler beim Schließen
@@ -232,7 +232,7 @@ public partial class GlobalMonitor : Form {
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
         if (tblLog.Table is { IsDisposed: false } db) {
-            _ = db.Row.Clear("Monitoring-Log geleert");
+            db.Row.Clear("Monitoring-Log geleert");
         }
 
         Develop.Message?.Invoke(ErrorType.Info, this, "Global", ImageCode.Information, "Monitoring-Log geleert", 0);

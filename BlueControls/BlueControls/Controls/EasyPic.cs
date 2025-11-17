@@ -301,7 +301,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     private void Lade_Click(object sender, System.EventArgs e) {
         if (!DeleteImageInFileSystem()) { return; }
         if (!HasFileName()) { return; }
-        _ = OpenDia.ShowDialog();
+        OpenDia.ShowDialog();
     }
 
     private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
@@ -322,7 +322,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
             compatibleBitmap.Save(memory, ImageFormat.Png);
             WriteAllBytes(FileName, memory.ToArray());
         } catch (Exception ex) {
-            _ = System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
+            System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
         }
     }
 

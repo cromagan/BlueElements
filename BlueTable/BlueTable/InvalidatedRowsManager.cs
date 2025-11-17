@@ -95,9 +95,9 @@ public class InvalidatedRowsManager {
     /// <param name="extendedAllowed"></param>
     public static void UpdateRow(RowItem? masterRow, RowItem row, bool extendedAllowed) {
         if (masterRow?.Table != null) {
-            _ = row.UpdateRow(extendedAllowed, "Update von " + masterRow?.CellFirstString());
+            row.UpdateRow(extendedAllowed, "Update von " + masterRow?.CellFirstString());
         } else {
-            _ = row.UpdateRow(extendedAllowed, "Normales Update");
+            row.UpdateRow(extendedAllowed, "Normales Update");
         }
     }
 

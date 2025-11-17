@@ -55,9 +55,11 @@ public enum Design {
     Table_And_Pad = 1205,
 
     EasyPic = 1207,
+
     //TextBox_Stufe3 = 1208,
     //TextBox_Bold = 1209,
     Slider_Hintergrund_Waagerecht = 1220,
+
     Slider_Hintergrund_Senkrecht = 1221,
 
     //TextBox_FürPasswort = 1225,

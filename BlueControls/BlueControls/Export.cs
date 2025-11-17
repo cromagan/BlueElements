@@ -20,8 +20,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad;
-using System;
 using BlueTable;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.IO;
@@ -56,7 +56,7 @@ public static class Export {
 
         if (!l.Any()) { return "Layout nicht gefunden oder fehlerhaft."; }
 
-        _ = l.ResetVariables();
+        l.ResetVariables();
         var scx = l.ReplaceVariables(row);
 
         if (scx.Failed) { return "Generierung fehlgeschlagen"; }
@@ -524,7 +524,7 @@ public static class Export {
             if (thisRow is { IsDisposed: false }) {
                 var tmpBody = body;
 
-                _ = thisRow.CheckRow(); // Nichtspeicherbare Spalten
+                thisRow.CheckRow(); // Nichtspeicherbare Spalten
                 var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
 
                 if (script.Failed) {
@@ -545,7 +545,7 @@ public static class Export {
         tmpSave += foot;
         if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne Suffix-Angabe können nicht gespeichert werden
         {
-            _ = WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
+            WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
         }
 
         return !string.IsNullOrEmpty(f) ? "Fehler bei:\r\n" + f + "\r\nDie Meldung des letzten Eintrages:\r\n" + onemled : string.Empty;

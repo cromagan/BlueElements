@@ -27,8 +27,6 @@ public interface IInputFormat {
     #region Properties
 
     public AdditionalCheck AdditionalFormatCheck { get; set; }
-
-    //public enAlignmentHorizontal Align { get; set; }
     public string AllowedChars { get; set; }
 
     public int MaxTextLength { get; set; }
@@ -37,16 +35,11 @@ public interface IInputFormat {
 
     public string RegexCheck { get; set; }
 
-    //public enSortierTyp SortType { get; set; }
     public bool SpellCheckingEnabled { get; set; }
 
-    //public int BildCode_ConstantHeight { get; set; }
-    //public BildTextVerhalten BildTextVerhalten { get; set; }
     public bool TextFormatingAllowed { get; set; }
 
     #endregion
-
-    //public enTranslationType Translate { get; set; }
 }
 
 public static class InputFormatExtensions {
@@ -54,7 +47,7 @@ public static class InputFormatExtensions {
     #region Methods
 
     /// <summary>
-    /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking, MaxTextLength und Multiline
+    /// Setzt: AllowedChars, RegexCheck, TextFormatingAllowed, AdditionalFormatCheck, SpellCheckingEnabled, MaxTextLength und Multiline
     /// </summary>
     /// <param name="t"></param>
     /// <param name="source"></param>
@@ -103,24 +96,15 @@ public static class InputFormatExtensions {
 
                     case AdditionalCheck.Integer:
                         if (!thisString.IsLong()) { return false; }
-
                         break;
 
                     case AdditionalCheck.Float:
                         if (!thisString.IsDouble()) { return false; }
-
                         break;
 
                     case AdditionalCheck.DateTime:
                         if (!thisString.IsDateTime()) { return false; }
-
                         break;
-
-                    //case AdditionalCheck.Path:
-                    //    if (thisString.Contains("\\\\")) {
-                    //        return false;
-                    //    }
-                    //  break;
 
                     default:
                         Develop.DebugPrint(formatToCheck.AdditionalFormatCheck);
@@ -130,7 +114,6 @@ public static class InputFormatExtensions {
         }
 
         return true;
-        //return l.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
     }
 
     public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalFormatCheck == source.AdditionalFormatCheck &&

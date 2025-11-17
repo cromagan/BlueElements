@@ -98,7 +98,7 @@ internal class AdderItem : IReadableTextWithKey {
                         additionalInfoColumn.AdminInfo = "Diese Spalte wird für Zusatzinfos de Textgenerators benutzt.";
                         r.CellSet(additionalInfoColumn, info, "Zeilengenerator im Formular");
                     }
-                    _ = r.UpdateRow(true, "Zeile erstellt");
+                    r.UpdateRow(true, "Zeile erstellt");
                 }
             }
         }
@@ -110,7 +110,7 @@ internal class AdderItem : IReadableTextWithKey {
         var fi = new FilterCollection(db, "Zeilengenerator im Formular");
         var key = OriginId(keyName + "#", originIdColumn, generatedEntityId);
         fi.Add(new FilterItem(originIdColumn, FilterType.Istgleich_UND_GroßKleinEgal, key));
-        _ = RowCollection.Remove(fi, null, "Zeilengenerator im Formular");
+        RowCollection.Remove(fi, null, "Zeilengenerator im Formular");
         fi.Dispose();
 
         //fi = new FilterCollection(db, "Zeilengenerator im Formular");

@@ -27,12 +27,6 @@ namespace BlueScript.Methods;
 // ReSharper disable once UnusedMember.Global
 public class Method_Stop : Method {
 
-    #region Fields
-
-
-
-    #endregion
-
     #region Properties
 
     public override List<List<string>> Args => [];

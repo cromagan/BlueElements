@@ -83,7 +83,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
 
     public static PrintDocument? Show(PrintDocument printDocument1, bool nurHochformat) {
         PageSetupDialog mb = new(printDocument1, nurHochformat);
-        _ = mb.ShowDialog();
+        mb.ShowDialog();
         return mb._giveBack;
     }
 

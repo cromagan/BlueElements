@@ -410,7 +410,7 @@ public class TableChunk : TableFile {
             ok = Parse(chunk);
 
             if (ok) {
-                _ = _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
+                _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
             }
 
             OnLoaded(isFirst);
@@ -456,7 +456,7 @@ public class TableChunk : TableFile {
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_Variables}.bdbc", false);
 
             foreach (var file in chunkFiles) {
-                _ = DeleteFile(file, false);
+                DeleteFile(file, false);
                 var key = file.FileNameWithoutSuffix().ToLower();
                 _chunks.TryRemove(key, out _);
             }
@@ -464,7 +464,7 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        _ = SaveInternal(DateTime.UtcNow);
+        SaveInternal(DateTime.UtcNow);
     }
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => GetChunkId(r) == chunk.KeyName)];
@@ -548,7 +548,7 @@ public class TableChunk : TableFile {
 
         var chunksToSave = new List<Chunk>();
         foreach (var thisChunk in chunksnew) {
-            _ = _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
+            _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
             if (existingChunk == null || existingChunk.SaveRequired) {
                 chunksBeingSaved.TryAdd(thisChunk.KeyName, 0);
                 chunksToSave.Add(thisChunk);
@@ -566,16 +566,16 @@ public class TableChunk : TableFile {
 
                 f = thisChunk.DoExtendedSave();
                 if (!f.Failed) {
-                    _ = _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
+                    _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
                 } else {
                     allok = f;
                 }
-                _ = chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);  // Hier bereits entfernen, dass andere Routinen einen Fortschritt sehen
+                chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);  // Hier bereits entfernen, dass andere Routinen einen Fortschritt sehen
             }
         } finally {
             // Sicherstellen, dass alle vorgemerkten Chunks aus chunksBeingSaved entfernt werden
             foreach (var thisChunk in chunksToSave) {
-                _ = chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
+                chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
             }
         }
 
@@ -595,8 +595,8 @@ public class TableChunk : TableFile {
                 var rowsInChunk = RowsOfChunk(thisChunk);
                 if (rowsInChunk.Count == 0) {
                     DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
-                    _ = thisChunk.Delete();
-                    _ = _chunks.TryRemove(thisChunk.KeyName, out _);
+                    thisChunk.Delete();
+                    _chunks.TryRemove(thisChunk.KeyName, out _);
                 }
             }
         }
@@ -646,7 +646,7 @@ public class TableChunk : TableFile {
         if (rowsToRemove.Count > 0) {
             // Zeilen und zugehörige Zellen entfernen
             foreach (var row in rowsToRemove) {
-                _ = Row.ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, Reason.NoUndo_NoInvalidate, null, null);
+                Row.ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, Reason.NoUndo_NoInvalidate, null, null);
             }
 
             // Verwaiste Zellen entfernen

@@ -68,7 +68,7 @@ internal class Method_ScaledView : Method {
         var n = new List<string>();
 
         for (var z = 5; z < attvar.Attributes.Count; z++) {
-            _ = n.AddIfNotExists(attvar.ValueStringGet(z));
+            n.AddIfNotExists(attvar.ValueStringGet(z));
         }
         d.IncludedJointPoints = n.AsReadOnly();
 

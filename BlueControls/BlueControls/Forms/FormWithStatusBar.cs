@@ -36,14 +36,14 @@ public partial class FormWithStatusBar : Form {
     private static readonly List<FormWithStatusBar> _formsWithStatusBar = [];
 
     /// <summary>
-    /// Tracks ob der statische Handler bereits registriert wurde
-    /// </summary>
-    private static bool _staticHandlerRegistered = false;
-
-    /// <summary>
     /// Lock für Thread-Sicherheit bei Handler-Registrierung
     /// </summary>
     private static readonly object _handlerLock = new();
+
+    /// <summary>
+    /// Tracks ob der statische Handler bereits registriert wurde
+    /// </summary>
+    private static bool _staticHandlerRegistered = false;
 
     private DateTime _lastMessage = DateTime.UtcNow;
 
@@ -53,7 +53,7 @@ public partial class FormWithStatusBar : Form {
 
     public FormWithStatusBar() : base() {
         InitializeComponent();
-        _ = _formsWithStatusBar.AddIfNotExists(this);
+        _formsWithStatusBar.AddIfNotExists(this);
 
         // Handler nur einmal statisch registrieren
         RegisterStaticHandler();
@@ -70,18 +70,6 @@ public partial class FormWithStatusBar : Form {
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// Registriert den statischen Handler nur einmal
-    /// </summary>
-    private static void RegisterStaticHandler() {
-        lock (_handlerLock) {
-            if (!_staticHandlerRegistered) {
-                Develop.Message += UpdateStatusBar;
-                _staticHandlerRegistered = true;
-            }
-        }
-    }
 
     /// <summary>
     /// Statischer Handler der an alle FormWithStatusBar-Instanzen weiterleitet
@@ -164,7 +152,7 @@ public partial class FormWithStatusBar : Form {
     }
 
     protected override void OnFormClosed(FormClosedEventArgs e) {
-        _ = _formsWithStatusBar.Remove(this);
+        _formsWithStatusBar.Remove(this);
 
         // Handler nur entfernen, wenn keine Forms mehr vorhanden sind
         lock (_handlerLock) {
@@ -177,9 +165,21 @@ public partial class FormWithStatusBar : Form {
         base.OnFormClosed(e);
     }
 
+    /// <summary>
+    /// Registriert den statischen Handler nur einmal
+    /// </summary>
+    private static void RegisterStaticHandler() {
+        lock (_handlerLock) {
+            if (!_staticHandlerRegistered) {
+                Develop.Message += UpdateStatusBar;
+                _staticHandlerRegistered = true;
+            }
+        }
+    }
+
     private void timMessageClearer_Tick(object sender, System.EventArgs e) {
         if (InvokeRequired) {
-            _ = Invoke(new Action(() => timMessageClearer_Tick(sender, e)));
+            Invoke(new Action(() => timMessageClearer_Tick(sender, e)));
             return;
         }
 

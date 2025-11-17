@@ -137,7 +137,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             Title = "Bild wählen:",
             Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp"
         };
-        _ = e.ShowDialog();
+        e.ShowDialog();
 
         if (!FileExists(e.FileName)) { return; }
         Bitmap = (Bitmap?)Image_FromFile(e.FileName);

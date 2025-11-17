@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.FileSystemCaching;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,6 @@ using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using BlueBasics.FileSystemCaching;
 
 namespace BlueTable;
 
@@ -244,7 +244,7 @@ public class TableFragments : TableFile {
     private void CheckPath() {
         if (string.IsNullOrEmpty(Filename)) { return; }
 
-        _ = CreateDirectory(FragmengtsPath());
+        CreateDirectory(FragmengtsPath());
         //CreateDirectory(OldFragmengtsPath());
     }
 
@@ -294,7 +294,7 @@ public class TableFragments : TableFile {
             CloseWriter();
             StartWriter();
 
-            _ = ChangeData(TableDataType.LastSaveMainFileUtcDate, null, t.ToString7(), LastSaveMainFileUtcDate.ToString7());
+            ChangeData(TableDataType.LastSaveMainFileUtcDate, null, t.ToString7(), LastSaveMainFileUtcDate.ToString7());
             MasterMe();
 
             _masterNeeded = false;
@@ -311,7 +311,7 @@ public class TableFragments : TableFile {
         if (_changesNotIncluded.Any()) {
             foreach (var thisch in _changesNotIncluded) {
                 //if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalMinutes < DeleteFragmentsAfter) {
-                _ = files.Remove(thisch.Container);
+                files.Remove(thisch.Container);
                 //}
             }
         }
@@ -329,7 +329,7 @@ public class TableFragments : TableFile {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
                         DropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-                        _ = DeleteFile(thisf, false);
+                        DeleteFile(thisf, false);
                         //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
                         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { break; }
                     }
@@ -352,7 +352,7 @@ public class TableFragments : TableFile {
             var filesystem = CachedFileSystem.Get(FragmengtsPath());
 
             var frgma = filesystem.GetFiles(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]); // GetFiles(FragmengtsPath(), KeyName.ToUpper() + "-*." + SuffixOfFragments(), System.IO.SearchOption.TopDirectoryOnly).ToList();
-            _ = frgma.Remove(_myFragmentsFilename);
+            frgma.Remove(_myFragmentsFilename);
 
             #endregion
 
@@ -403,7 +403,7 @@ public class TableFragments : TableFile {
             if (checkedDataFiles != null) {
                 foreach (var thisf in checkedDataFiles) {
                     if (thisf.Contains("\\" + KeyName.ToUpperInvariant() + "-")) {
-                        _ = myfiles.AddIfNotExists(thisf);
+                        myfiles.AddIfNotExists(thisf);
                     }
                 }
             }

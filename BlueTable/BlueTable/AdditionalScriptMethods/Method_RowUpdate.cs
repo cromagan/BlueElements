@@ -68,8 +68,6 @@ public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
-
         if (scp.Stufe > 10) {
             return new DoItFeedback("'RowUpdate' wird zu verschachtelt aufgerufen.", true, ld);
         }
@@ -89,7 +87,6 @@ public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
         if (minage < 0 || minage > maxage) {
             return new DoItFeedback("Die Zeitangaben sind ungültig.", true, ld);
         }
-
 
         var myTb = MyTable(scp);
         var cap = myTb?.Caption ?? "Unbekannt";

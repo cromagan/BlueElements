@@ -65,7 +65,7 @@ internal class Method_ExtractTags : Method {
                 var vn = x[0].ToLowerInvariant().ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                    _ = varCol.Add(new VariableString("extracted_" + vn, thisv, true, comment));
+                    varCol.Add(new VariableString("extracted_" + vn, thisv, true, comment));
                 }
             }
         }

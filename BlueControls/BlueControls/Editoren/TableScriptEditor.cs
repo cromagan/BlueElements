@@ -24,11 +24,12 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueScript.Structures;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
-using BlueScript.Structures;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,7 +39,6 @@ using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
-using BlueControls.Interfaces;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -53,7 +53,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private bool loaded = false;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -63,7 +63,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         tbcScriptEigenschaften.Enabled = false;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -96,7 +96,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
                 lstPermissionExecute.ItemClear();
                 var l = TableView.Permission_AllUsed(false).ToList();
-                _ = l.AddIfNotExists(Administrator);
+                l.AddIfNotExists(Administrator);
                 lstPermissionExecute.ItemAddRange(l);
                 lstPermissionExecute.Check(value.UserGroups);
                 lstPermissionExecute.Suggestions.Clear();
@@ -129,11 +129,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 capFehler.Text = string.Empty;
             }
         }
-    }
-
-    public IEditable? ToEdit {
-        get => Table;
-        set => Table = value is BlueTable.Table tb ? tb : null;
     }
 
     public override object? Object {
@@ -179,7 +174,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
     }
 
-    #endregion Properties
+    public IEditable? ToEdit {
+        get => Table;
+        set => Table = value is BlueTable.Table tb ? tb : null;
+    }
+
+    #endregion
 
     #region Methods
 
@@ -280,7 +280,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void btnTest_Click(object sender, System.EventArgs e) {
         if (!loaded && Table != null && Table.Row.Count == 0) {
             loaded = true;
-            _ = Table.BeSureAllDataLoaded(10);
+            Table.BeSureAllDataLoaded(10);
         }
         TesteScript(true);
     }
@@ -320,7 +320,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             }
         }
         // Schreiben der Liste in eine temporäre Datei
-        _ = l.WriteAllText(TempFile(string.Empty, "Scrip.txt"), Win1252, true);
+        l.WriteAllText(TempFile(string.Empty, "Scrip.txt"), Win1252, true);
     }
 
     private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {
@@ -333,7 +333,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-        _ = ExecuteFile(db.AdditionalFilesPathWhole());
+        ExecuteFile(db.AdditionalFilesPathWhole());
     }
 
     private void cbxPic_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(image: cbxPic.Text.TrimEnd("|16"));
@@ -511,7 +511,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
                 if (!didMessage && thisSet.NeedRow && !db.IsRowScriptPossible()) {
                     didMessage = true;
-                    _ = EnableScript();
+                    EnableScript();
                 }
             }
         }
@@ -519,5 +519,5 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         #endregion Neue Items hinzufügen
     }
 
-    #endregion Methods
+    #endregion
 }

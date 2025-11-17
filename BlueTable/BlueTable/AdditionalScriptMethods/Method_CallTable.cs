@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -58,7 +58,6 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
         if (tb == MyTable(scp)) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 

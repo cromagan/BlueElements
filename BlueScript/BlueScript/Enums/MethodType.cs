@@ -38,7 +38,7 @@ public enum MethodType {
     ManipulatesUser = 2,
 
     /// <summary>
-    /// Dieser Befehl kann nur aktiv verwendet werden, wenn der Benutzer aktiv vor dem Bildschirm sitzt. 
+    /// Dieser Befehl kann nur aktiv verwendet werden, wenn der Benutzer aktiv vor dem Bildschirm sitzt.
     /// Evtl. werden Skripte gestoppt und warten auf Benutzereingaben.
     /// </summary>
     GUI = 3,
@@ -47,7 +47,4 @@ public enum MethodType {
     /// Sehr spezielle Befehle, die nur an einer einzigen Position erlaubt sind
     /// </summary>
     Special = 9
-
-
-
 }

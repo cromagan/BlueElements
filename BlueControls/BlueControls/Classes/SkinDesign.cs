@@ -44,7 +44,7 @@ public static class SkinDesignExtensions {
 
     public static void Remove(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status) {
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
-            _ = existingDictOfControl.Remove(status);
+            existingDictOfControl.Remove(status);
         }
     }
 

@@ -81,7 +81,7 @@ public partial class PictureView : Form, IDisposableExtended {
 
     #region Properties
 
-    public sealed override string Text {
+    public override sealed string Text {
         get => base.Text;
         set => base.Text = value;
     }

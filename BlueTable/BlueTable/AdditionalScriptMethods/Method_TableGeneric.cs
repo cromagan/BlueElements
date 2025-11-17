@@ -38,14 +38,14 @@ public abstract class Method_TableGeneric : Method {
 
     #region Methods
 
-    protected static Table? MyTable(ScriptProperties scp) {
-        if (scp.AdditionalInfo is Table { IsDisposed: false } db) { return db; }
-        if (scp.AdditionalInfo is RowItem r) { return r.Table; }
+    protected static RowItem? MyRow(ScriptProperties scp) {
+        if (scp.AdditionalInfo is RowItem r) { return r; }
         return null;
     }
 
-    protected static RowItem? MyRow(ScriptProperties scp) {
-        if (scp.AdditionalInfo is RowItem r) { return r; }
+    protected static Table? MyTable(ScriptProperties scp) {
+        if (scp.AdditionalInfo is Table { IsDisposed: false } db) { return db; }
+        if (scp.AdditionalInfo is RowItem r) { return r.Table; }
         return null;
     }
 
@@ -59,7 +59,6 @@ public abstract class Method_TableGeneric : Method {
 
         return MyTable(scp)?.Column[c.KeyName];
     }
-
 
     #endregion
 }

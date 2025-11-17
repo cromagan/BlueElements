@@ -595,7 +595,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
 
         foreach (var thispoint in j) {
             if (names.Count == 0 || names.Contains(thispoint.KeyName, false)) {
-                _ = JointPoints.Remove(thispoint);
+                JointPoints.Remove(thispoint);
             }
         }
     }

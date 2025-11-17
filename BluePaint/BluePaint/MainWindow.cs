@@ -115,7 +115,7 @@ public partial class MainWindow : BlueControls.Forms.Form {
 
     public new Bitmap? ShowDialog() {
         if (Visible) { Visible = false; }
-        _ = base.ShowDialog();
+        base.ShowDialog();
         return P.Bmp;
     }
 
@@ -182,13 +182,13 @@ public partial class MainWindow : BlueControls.Forms.Form {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         if (!IsSaved()) { return; }
-        _ = LoadTab.ShowDialog();
+        LoadTab.ShowDialog();
     }
 
     private void btnSave_Click(object sender, System.EventArgs e) => Speichern();
 
     private void btnSaveAs_Click(object? sender, System.EventArgs e) {
-        _ = SaveTab.ShowDialog();
+        SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
         if (FileExists(SaveTab.FileName)) {

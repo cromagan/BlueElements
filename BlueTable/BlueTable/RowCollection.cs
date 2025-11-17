@@ -204,7 +204,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 Develop.SetUserDidSomething();
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
-                _ = row.UpdateRow(true, "Allgemeines Update (User Idle)");
+                row.UpdateRow(true, "Allgemeines Update (User Idle)");
                 Develop.SetUserDidSomething();
                 if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
             }
@@ -233,7 +233,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 var values = column.MultiLine ? thisRow.CellGetList(column) : [thisRow.CellGetString(column)];
                 foreach (var value in values) {
                     if (!uniqueSet.Add(value)) {
-                        _ = notUnique.AddIfNotExists(value);
+                        notUnique.AddIfNotExists(value);
                     } else {
                         unique.Add(value);
                     }
@@ -249,22 +249,22 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     public static RowItem? NextRowToCeck() {
         try {
-            List<Table> l = [.. Table.AllFiles];
+            List<Table> allfiles = [.. Table.AllFiles];
 
-            if (l.Count == 0) { return null; }
+            if (allfiles.Count == 0) { return null; }
 
             if (Constants.GlobalRnd.Next(10) == 1) {
-                l.Shuffle();
+                allfiles.Shuffle();
             } else {
                 try {
-                    l = [.. l.OrderByDescending(eintrag => eintrag?.LastUsedDate ?? DateTime.MinValue)];
+                    allfiles = [.. allfiles.OrderByDescending(eintrag => eintrag?.LastUsedDate ?? DateTime.MinValue)];
                 } catch {
                     return null;
                 }
             }
 
-            foreach (var thisDb in l) {
-                if (thisDb is { IsDisposed: false } db) {
+            foreach (var thisTb in allfiles) {
+                if (thisTb is { IsDisposed: false } db) {
                     try {
                         if (!db.CanDoValueChangedScript(false)) { continue; }
 
@@ -323,13 +323,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     public static List<RowItem> RowListToCheck() {
         var r = new List<RowItem>();
-        List<Table> l = [.. Table.AllFiles];
+        List<Table> allfiles = [.. Table.AllFiles];
 
-        foreach (var thisDb in l) {
-            if (thisDb is { IsDisposed: false } db) {
-                if (!db.CanDoValueChangedScript(false)) { continue; }
-                _ = db.BeSureAllDataLoaded(30);
-                r.AddRange(db.Row);
+        foreach (var thisTb in allfiles) {
+            if (thisTb is { IsDisposed: false } tb) {
+                if (!tb.CanDoValueChangedScript(false)) { continue; }
+                tb.BeSureAllDataLoaded(30);
+                r.AddRange(tb.Row);
             }
         }
 
@@ -651,7 +651,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    //}
     //    if (x.Count == 0) { return false; }
     //    foreach (var thisKey in x) {
-    //        _ = Remove(thisKey, comment);
+    //        Remove(thisKey, comment);
     //    }
     //    return true;
     //}
@@ -678,10 +678,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        _ = Remove(toDel, "RowCleanUp");
+        Remove(toDel, "RowCleanUp");
 
         if (reduceToOne) {
-            _ = l.Remove(toDel);
+            l.Remove(toDel);
             if (l.Count > 1) { RemoveYoungest(l, true); }
         }
 
@@ -725,10 +725,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var f = Add(row, reason);
 
             if (string.IsNullOrEmpty(f) && user != null && datetimeutc is { } dt) {
-                if (db.Column.SysRowCreator is { IsDisposed: false } src) { _ = row.SetValueInternal(src, user, reason); }
-                if (db.Column.SysRowCreateDate is { IsDisposed: false } scd) { _ = row.SetValueInternal(scd, dt.ToString5(), reason); }
-                if (db.Column.SysLocked is { IsDisposed: false } sl) { _ = row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
-                if (db.Column.SysCorrect is { IsDisposed: false } sc) { _ = row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
+                if (db.Column.SysRowCreator is { IsDisposed: false } src) { row.SetValueInternal(src, user, reason); }
+                if (db.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.SetValueInternal(scd, dt.ToString5(), reason); }
+                if (db.Column.SysLocked is { IsDisposed: false } sl) { row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
+                if (db.Column.SysCorrect is { IsDisposed: false } sc) { row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
             }
 
             if (reason == Reason.SetCommand && db.LogUndo) {
@@ -746,12 +746,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (reason == Reason.SetCommand) {
-                _ = row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
+                row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
             }
 
             foreach (var thisColumn in db.Column) {
                 if (thisColumn != null) {
-                    _ = row.SetValueInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
+                    row.SetValueInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
                 }
             }
 
@@ -786,7 +786,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    // Zeilen, die zu viel sind, löschen
     //    foreach (var thisRow in this) {
     //        var l = sourceTable.Row.GetByKey(thisRow.KeyName);
-    //        if (l == null) { _ = Remove(thisRow, "Clone - Zeile zuviel"); }
+    //        if (l == null) { Remove(thisRow, "Clone - Zeile zuviel"); }
     //    }
     //private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
     //    if (row1 == null) { return row2; }
@@ -809,7 +809,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }
         if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { return; }
 
-        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, 10, null, true, false);
+        r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, 10, null, true, false);
     }
 
     //internal void CloneFrom(Table sourceTable) {
@@ -830,7 +830,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (reason != Reason.NoUndo_NoInvalidate) {
             OnRowAdded(new RowEventArgs(row));
             //if (Table?.Column.SysRowState != null) {
-            //    _ = InvalidatedRowsManager.AddInvalidatedRow(row);
+            //    InvalidatedRowsManager.AddInvalidatedRow(row);
             //}
         }
 
@@ -870,7 +870,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         List<ColumnItem> orderedColumns = [.. tb.Column];
 
         if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
-            _ = orderedColumns.Remove(spc);
+            orderedColumns.Remove(spc);
             orderedColumns.Insert(0, spc);
             chunkvalue = FilterCollection.InitValue(spc, true, false, fc) ?? string.Empty;
 
@@ -908,7 +908,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // REPARIERT: Bei kritischen Initialwert-Fehlern Zeile wieder löschen
         if (initErrors.Count > 0) {
             // Kritische Fehler - Zeile wieder entfernen
-            _ = Remove(item, "Cleanup nach Initialwert-Fehler");
+            Remove(item, "Cleanup nach Initialwert-Fehler");
             return (null, $"Initialwert-Fehler: {string.Join("; ", initErrors)}", false);
         }
 

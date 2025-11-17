@@ -187,7 +187,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         foreach (var thisp in Pages) {
             if (thisp is ItemCollectionPadItem { IsDisposed: false, HasItems: true } icp) {
-                _ = p.AddIfNotExists(icp.Caption);
+                p.AddIfNotExists(icp.Caption);
             }
         }
 

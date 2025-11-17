@@ -34,11 +34,6 @@ namespace BlueTable;
 
 public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDisposableExtended, IHasTable {
 
-    #region Fields
-
-
-    #endregion
-
     #region Constructors
 
     public CellCollection(Table table) : base() => Table = table;
@@ -347,11 +342,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, RowItem? inputRow, bool repairallowed, bool addRowIfNotExists) {
-        if (inputColumn?.Table is not { IsDisposed: false } db) { return (null, null, "Eigene Tabelle verworfen.", false); }
+        if (inputColumn?.Table is not { IsDisposed: false } tb) { return (null, null, "Eigene Tabelle verworfen.", false); }
         if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
-        if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine Split-Spalte sein.", false); }
+        if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine ChunkValue-Spalte sein.", false); }
         if (inputColumn.LinkedTable is not { IsDisposed: false } linkedTable) { return (null, null, "Verknüpfte Tabelle verworfen.", false); }
-        if (inputRow is not { IsDisposed: false }) { return (null, null, "Keine Zeile zum finden des Zeilenschlüssels angegeben.", false); }
+        if (inputRow is not { IsDisposed: false }) { return (null, null, "Keine Zeile zum Finden des Zeilenschlüssels angegeben.", false); }
 
         if (linkedTable.Column[inputColumn.ColumnNameOfLinkedTable] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieltabelle nicht vorhanden.", false); }
         if (targetColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkungen auf Chunk-Spalten nicht möglich.", false); }
@@ -372,7 +367,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             default: {
                     if (addRowIfNotExists) {
-                        var (newrow, message, _) = linkedTable.Row.GenerateAndAdd([.. fc], "LinkedCell aus " + db.KeyName);
+                        var (newrow, message, _) = linkedTable.Row.GenerateAndAdd([.. fc], "LinkedCell aus " + tb.KeyName);
                         if (!string.IsNullOrEmpty(message)) { return (targetColumn, null, message, false); }
                         targetRow = newrow;
                     }
@@ -383,7 +378,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (targetRow != null) {
             if (targetColumn != null && inputColumn != null) {
                 if (inputRow != null && repairallowed && inputColumn.RelationType == RelationType.CellValues) {
-                    var oldvalue = db.Cell.GetStringCore(inputColumn, inputRow);
+                    var oldvalue = tb.Cell.GetStringCore(inputColumn, inputRow);
                     var newvalue = targetRow.CellGetString(targetColumn);
 
                     if (oldvalue != newvalue) {
@@ -395,11 +390,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                         //row.CellSet(column, targetRow.KeyName);
                         //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
-                        var fehler = db.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, inputRow, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, chunkValue);
+                        var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, inputRow, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, chunkValue);
                         if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
                     }
                 }
-                targetColumn.AddSystemInfo("Links to me", db, inputColumn.KeyName);
+                targetColumn.AddSystemInfo("Links to me", tb, inputColumn.KeyName);
             }
         }
 
@@ -445,7 +440,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return string.Empty;
             }
 
-            //if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Tabelle) {
+            //if (column.RelationType == RelationType.CellValues) {
             //    var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
             //    return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
             //}
@@ -470,22 +465,30 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.IsNullOrEmpty(GetStringCore(column, row));
     }
 
+    /// <summary>
+    /// Lenkt den Wert evtl. auf die verlinkte Zelle um
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="value"></param>
+    /// <param name="comment"></param>
+    /// <returns></returns>
     public string Set(ColumnItem? column, RowItem? row, string value, string comment) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return "Tabelle ungültig!"; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
 
-        if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Tabelle eingefroren!"; }
+        if (!string.IsNullOrEmpty(tb.FreezedReason)) { return "Tabelle eingefroren!"; }
 
         if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
 
         if (row is not { IsDisposed: false }) { return "Zeile ungültig!"; }
 
-        if (db != row.Table || db != column.Table) { return "Tabelle ungültig!"; }
+        if (tb != row.Table || tb != column.Table) { return "Tabelle ungültig!"; }
 
         if (column.RelationType == RelationType.CellValues) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
 
             //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
-            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + db.Caption + " (" + comment + ")");
+            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
             return string.Empty;
         }
 
@@ -502,11 +505,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var newChunkValue = row.ChunkValue;
         var oldChunkValue = newChunkValue;
 
-        if (column == db.Column.ChunkValueColumn) {
+        if (column == tb.Column.ChunkValueColumn) {
             newChunkValue = value;
         }
 
-        var message = db.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue);
+        var message = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue);
 
         if (!string.IsNullOrEmpty(message)) { return message; }
 
@@ -602,7 +605,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
             }
 
-            if (r.Count == 1 || r.Contains(row)) { _ = allRows.AddIfNotExists(r); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
+            if (r.Count == 1 || r.Contains(row)) { allRows.AddIfNotExists(r); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
         }
         return allRows;
     }
@@ -769,7 +772,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
             foreach (var thisColumn in db.Column) {
                 if (thisColumn.RelationType == RelationType.CellValues) {
-                    _ = LinkedCellData(thisColumn, row, true, false);
+                    LinkedCellData(thisColumn, row, true, false);
                 }
             }
         }
@@ -810,7 +813,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
         currentString = ChangeTextFromRowId(currentString);
         if (currentString != GetString(column, row)) {
-            _ = Set(column, row, currentString, "Bezugstextänderung");
+            Set(column, row, currentString, "Bezugstextänderung");
             return;
         }
         var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();

@@ -38,9 +38,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
-using static BlueBasics.Converter;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -253,7 +253,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             }
         }
         using (ColumnEditor w = new(newc, null)) {
-            _ = w.ShowDialog();
+            w.ShowDialog();
             newc.Invalidate_ColumAndContent();
             //w.Dispose();
         }
@@ -382,7 +382,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                 if (thiscol != null && ca[thiscol] is null) {
                     if (MessageBox.Show("Spalte <b>" + thiscol.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                             "Ja", "Nein") == 0) {
-                        _ = db.Column.Remove(thiscol, "Benutzer löscht im ColArrangement Editor");
+                        db.Column.Remove(thiscol, "Benutzer löscht im ColArrangement Editor");
                         did = true;
                     }
                 }
@@ -464,7 +464,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         foreach (var thisc in db.Column) {
             if (thisc.LinkedTable != null) {
                 var dbN = thisc.LinkedTable.KeyName + "|" + thisc.LinkedCellFilter.JoinWithCr();
-                _ = dbColumnCombi.AddIfNotExists(dbN);
+                dbColumnCombi.AddIfNotExists(dbN);
             }
         }
 
@@ -505,7 +505,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                                             if (thisc2.Table is { IsDisposed: false } db3) {
                                                 var rkcolit = (ColumnPadItem?)Pad.Items[db3.KeyName + "|" + thisc2.KeyName];
                                                 if (rkcolit != null) {
-                                                    _ = Pad.Items.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
+                                                    Pad.Items.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                                 }
                                             }
                                         }
@@ -524,7 +524,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                                 kx = it2.UsedArea.Right;
 
                                 // und noch die Tabelle auf die Spalte zeigen lassem
-                                _ = Pad.Items.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
+                                Pad.Items.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
                             }
                         }
                     }

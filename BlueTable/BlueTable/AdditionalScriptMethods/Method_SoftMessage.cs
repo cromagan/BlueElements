@@ -19,11 +19,11 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
@@ -65,7 +65,6 @@ public class Method_SoftMessage : Method_TableGeneric, IUseableForButton {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
-
 
         Develop.Message?.Invoke(ErrorType.Info, MyTable(scp), "Skript", ImageCode.Tabelle, txt, 0);
 

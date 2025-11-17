@@ -170,7 +170,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
         var tse = new TimerScriptEditor {
             Object = this
         };
-        _ = tse.ShowDialog();
+        tse.ShowDialog();
 
         //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
 

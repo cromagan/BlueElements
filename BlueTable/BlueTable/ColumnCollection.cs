@@ -282,7 +282,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         da.TableEnd();
         da.AddFoot();
-        _ = da.Save(TempFile(string.Empty, "Spaltenliste.html"), true);
+        da.Save(TempFile(string.Empty, "Spaltenliste.html"), true);
     }
 
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
@@ -442,7 +442,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (l == null) { names.Add(thisColumn); }
         }
         foreach (var thisname in names) {
-            _ = Remove(thisname, "Clone - Spalte zu viel");
+            Remove(thisname, "Clone - Spalte zu viel");
         }
 
         // Spalten erzeugen und Format übertragen
@@ -539,7 +539,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void Column_DisposingEvent(object sender, System.EventArgs e) {
         if (sender is ColumnItem c) {
             c.DisposingEvent -= Column_DisposingEvent;
-            _ = _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
+            _internal.TryRemove(c.KeyName.ToUpperInvariant(), out _);
             OnColumnDisposed(new ColumnEventArgs(c));
             //Remove(c, "Disposing");
         }

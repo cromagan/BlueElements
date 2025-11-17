@@ -69,7 +69,6 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         }
     }
 
-    public override bool TableInputMustMatchOutputTable => false;
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
 
     public string Filter {
@@ -123,6 +122,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         }
     }
 
+    public override bool TableInputMustMatchOutputTable => false;
     protected override int SaveOrder => 4;
 
     #endregion

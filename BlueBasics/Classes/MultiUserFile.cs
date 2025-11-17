@@ -61,7 +61,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         ReCreateWatcher();
         _checkedAndReloadNeed = true;
         _lastSaveCode = string.Empty;
-        _ = _checker.Change(2000, 2000);
+        _checker.Change(2000, 2000);
     }
 
     #endregion
@@ -207,7 +207,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     public void Dispose(bool disposing) {
         if (!IsDisposed) {
-            _ = AllFiles.Remove(this);
+            AllFiles.Remove(this);
             if (disposing) {
                 // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
                 //_ = Save(false);
@@ -315,7 +315,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             try {
-                _ = DeleteFile(Blockdateiname(), false);
+                DeleteFile(Blockdateiname(), false);
                 WriteAllText(Blockdateiname(), tmpInhalt, Constants.Win1252, false);
                 _inhaltBlockdatei = tmpInhalt;
             } catch {
@@ -341,7 +341,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return result;
     }
 
-    public virtual void ParseFinished(string parsed) { }
+    public virtual void ParseFinished(string parsed) {
+    }
 
     public virtual bool ParseThis(string key, string value) {
         switch (key.ToLowerInvariant()) {
@@ -406,14 +407,14 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         try {
             inhalt = ReadAllText(Blockdateiname(), Constants.Win1252);
         } catch {
-            if (!silent) { _ = MessageBox.Show("Dateisystem Fehler"); }
+            if (!silent) { MessageBox.Show("Dateisystem Fehler"); }
             return false;
         }
 
         if (_inhaltBlockdatei == inhalt) { return true; }
 
         if (!silent) {
-            _ = MessageBox.Show("<b>Bearbeiten nicht möglich.</b>\r\n" + inhalt);
+            MessageBox.Show("<b>Bearbeiten nicht möglich.</b>\r\n" + inhalt);
         }
 
         return false;
@@ -479,7 +480,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         } else if (!_isSaved) {
             if (_checkerTickCount > saveDelaySecond) { Save(false); }
         } else if (mustReload) {
-            if (_checkerTickCount > reloadDelaySecond) { _ = Load_Reload(); }
+            if (_checkerTickCount > reloadDelaySecond) { Load_Reload(); }
         }
     }
 
@@ -557,7 +558,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             }
 
             // --- TmpFile wird zum Haupt ---
-            _ = MoveFile(tmpFileName, filename, true);
+            MoveFile(tmpFileName, filename, true);
 
             // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
             if (ParseableItems().FinishParseable() != ReadAllText(filename, Constants.Win1252)) { return FileOperationResult.DoRetry; }

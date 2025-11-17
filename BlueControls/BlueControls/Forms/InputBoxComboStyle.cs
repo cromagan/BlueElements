@@ -74,7 +74,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
 
     private static string Show(string txt, string vorschlagsText, List<AbstractListItem>? suggest, bool texteingabeErlaubt) {
         var MB = new InputBoxComboStyle(txt, vorschlagsText, suggest, texteingabeErlaubt);
-        _ = MB.ShowDialog();
+        MB.ShowDialog();
         return MB._giveBack;
     }
 

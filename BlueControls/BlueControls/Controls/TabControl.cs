@@ -41,7 +41,7 @@ public class TabControl : AbstractTabControl, ISendsFocusedChild {
 
     #region Properties
 
-    public sealed override Color BackColor {
+    public override sealed Color BackColor {
         get => base.BackColor;
         set => base.BackColor = value;
     }

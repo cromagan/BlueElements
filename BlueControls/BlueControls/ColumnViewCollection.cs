@@ -192,7 +192,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case 1:
                 if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Standard"; }
-                _ = tmp.AddIfNotExists(Everybody);
+                tmp.AddIfNotExists(Everybody);
                 break;
         }
 

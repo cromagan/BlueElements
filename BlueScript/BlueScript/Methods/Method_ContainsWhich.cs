@@ -70,7 +70,7 @@ internal class Method_ContainsWhitch : Method {
         if (attvar.Attributes[0] is VariableString vs2) {
             foreach (var thisW in wordlist) {
                 if (vs2.ValueString.ContainsWord(thisW, rx)) {
-                    _ = found.AddIfNotExists(thisW);
+                    found.AddIfNotExists(thisW);
                 }
             }
         }
@@ -79,7 +79,7 @@ internal class Method_ContainsWhitch : Method {
             foreach (var thiss in vl2.ValueList) {
                 foreach (var thisW in wordlist) {
                     if (thiss.ContainsWord(thisW, rx)) {
-                        _ = found.AddIfNotExists(thisW);
+                        found.AddIfNotExists(thisW);
                     }
                 }
             }

@@ -199,8 +199,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
             return;
         }
 
-        _ = icp.ResetVariables();
-        _ = icp.ReplaceVariables(db, _rowKey);
+        icp.ResetVariables();
+        icp.ReplaceVariables(db, _rowKey);
         GeneratedBitmap = icp.ToBitmap(1);
     }
 

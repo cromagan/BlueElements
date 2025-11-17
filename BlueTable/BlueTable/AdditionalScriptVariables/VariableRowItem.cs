@@ -19,8 +19,8 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueTable;
 using BlueScript.Variables;
+using BlueTable;
 
 namespace BlueScript;
 

@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using Anthropic.SDK;
+using System.Collections.Generic;
 
 namespace BlueScript.Variables;
 

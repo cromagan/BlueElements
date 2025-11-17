@@ -178,7 +178,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             }
         }
 
-        _ = unused.Remove(btnScript);
+        unused.Remove(btnScript);
 
         #endregion
 
@@ -202,7 +202,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 var con = SearchOrGenerate(thisitco, Mode);
 
                 if (con != null) {
-                    _ = unused.Remove(con);
+                    unused.Remove(con);
 
                     con.Visible = thisit is not ReciverControlPadItem cspi || cspi.IsVisibleForMe(Mode, true);
 
@@ -398,7 +398,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
             if (TableViewForm.EditabelErrorMessage(tb)) { return; }
 
-            _ = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
+            IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
         } else {
             MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }

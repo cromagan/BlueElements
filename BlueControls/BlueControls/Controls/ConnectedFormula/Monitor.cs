@@ -32,7 +32,6 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
     {
     #region Fields
 
-
     private int _n = 99999;
 
     #endregion
@@ -105,7 +104,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
 
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(() => _lastRow_DropMessage(type, symbol, message)));
+                Invoke(new Action(() => _lastRow_DropMessage(type, symbol, message)));
             } catch { }
             return;
         }

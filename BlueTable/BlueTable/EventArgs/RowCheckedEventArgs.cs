@@ -32,7 +32,6 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     #region Constructors
 
-
     public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, ScriptEndedFeedback scriptfeedback, string message) : base(row) {
         ColumnsWithErrors = columnsWithErrors;
         Feedback = scriptfeedback;

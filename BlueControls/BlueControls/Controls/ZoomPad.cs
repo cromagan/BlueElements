@@ -28,8 +28,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
 using static BlueBasics.Constants;
+using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;

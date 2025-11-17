@@ -129,7 +129,7 @@ public sealed partial class ExportDialog : IHasTable {
         if (rowsForExport is not { Count: > 0 }) { return -1; }
 
         var tmp = new ItemCollectionPadItem(layoutFileName);
-        _ = tmp.ResetVariables();
+        tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (scx.Failed) { return -1; }
         tmp.ForPrinting = true;
@@ -156,7 +156,7 @@ public sealed partial class ExportDialog : IHasTable {
                 it.ForPrinting = true;
 
                 //if (it._internal is { }) {
-                _ = it.ReplaceVariables(rowsForExport[startNr]);
+                it.ReplaceVariables(rowsForExport[startNr]);
                 //    it.GridShow = -1;
                 //}
                 pad.Items.Add(it);
@@ -185,9 +185,9 @@ public sealed partial class ExportDialog : IHasTable {
     }
 
     private void Attribute_Changed(object? sender, System.EventArgs? e) {
-        _ = FloatTryParse(flxBreite.Value, out var b);
-        _ = FloatTryParse(flxHöhe.Value, out var h);
-        _ = FloatTryParse(flxAbstand.Value, out var ab);
+        FloatTryParse(flxBreite.Value, out var b);
+        FloatTryParse(flxHöhe.Value, out var h);
+        FloatTryParse(flxAbstand.Value, out var ab);
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
@@ -199,7 +199,7 @@ public sealed partial class ExportDialog : IHasTable {
             padSchachteln.Items.BackColor = Color.Transparent;
         }
 
-        _ = GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _rowsForExport, ab);
+        GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _rowsForExport, ab);
     }
 
     private void BefülleLayoutDropdowns() {
@@ -228,9 +228,9 @@ public sealed partial class ExportDialog : IHasTable {
     private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
         if (padSchachteln.Items is not { IsDisposed: false }) { return; }
 
-        _ = FloatTryParse(flxBreite.Value, out var b);
-        _ = FloatTryParse(flxHöhe.Value, out var h);
-        _ = FloatTryParse(flxAbstand.Value, out var ab);
+        FloatTryParse(flxBreite.Value, out var b);
+        FloatTryParse(flxHöhe.Value, out var h);
+        FloatTryParse(flxAbstand.Value, out var ab);
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
@@ -261,7 +261,7 @@ public sealed partial class ExportDialog : IHasTable {
     private void Button_PageSetup_Click(object? sender, System.EventArgs e) {
         padPrint.ShowPrinterPageSetup();
         padPrint.CopyPrinterSettingsToWorkingArea();
-        _ = GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
+        GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
     }
 
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
@@ -272,8 +272,8 @@ public sealed partial class ExportDialog : IHasTable {
         } else {
             padVorschau.ShowInPrintMode = true;
             padVorschau.Items = new ItemCollectionPadItem(cbxLayoutWahl.Text);
-            _ = padVorschau.Items.ResetVariables();
-            _ = padVorschau.Items.ReplaceVariables(_rowsForExport[0]);
+            padVorschau.Items.ResetVariables();
+            padVorschau.Items.ReplaceVariables(_rowsForExport[0]);
             padVorschau.ZoomFit();
         }
     }
@@ -322,7 +322,7 @@ public sealed partial class ExportDialog : IHasTable {
 
         switch (e.Item.KeyName) {
             case "DateiPfadÖffnen":
-                _ = ExecuteFile(tl.KeyName.FilePath());
+                ExecuteFile(tl.KeyName.FilePath());
                 break;
 
             case "Kopieren":
@@ -378,7 +378,7 @@ public sealed partial class ExportDialog : IHasTable {
             tabDrucken.Enabled = true;
             Tabs.SelectedTab = tabDrucken;
             Button_PageSetup_Click(null, System.EventArgs.Empty);
-            _ = GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
+            GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
         }
 
         if (optEinzelnSpeichern.Checked || optSpezialFormat.Checked) {

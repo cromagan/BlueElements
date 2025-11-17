@@ -29,11 +29,6 @@ namespace BlueControls.Controls;
 [Designer(typeof(BasicDesigner))]
 public class Line : GenericControl, IBackgroundNone {
 
-    #region Fields
-
-
-    #endregion
-
     #region Constructors
 
     public Line() : base(false, false, false) {

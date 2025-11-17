@@ -97,7 +97,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         // lColumn für das Aussehen und Verhalten des FilterDialogs
 
         //if (_column.Function == ColumnFunction.Verknüpfung_zu_anderer_Tabelle) {
-        //    _ = CellCollection.LinkedCellData(_column, null, false, false);
+        //    CellCollection.LinkedCellData(_column, null, false, false);
         //}
 
         Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), minWidth);
@@ -261,7 +261,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         var doJoker = !string.IsNullOrEmpty(_column.AutoFilterJoker);
         if (_negativAuswahl) { doJoker = false; }
         List<string> l = [e.Item.KeyName];
-        if (doJoker) { _ = l.AddIfNotExists(_column.AutoFilterJoker); }
+        if (doJoker) { l.AddIfNotExists(_column.AutoFilterJoker); }
         if (_negativAuswahl) {
             // Nur ohne Multirow
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal, l));
@@ -356,7 +356,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         BringToFront();
         if (Timer1x.Interval < 5000) {
             Timer1x.Interval = 5000;
-            if (txbEingabe.Enabled && txbEingabe is { Visible: true, Focused: false }) { _ = txbEingabe.Focus(); }
+            if (txbEingabe.Enabled && txbEingabe is { Visible: true, Focused: false }) { txbEingabe.Focus(); }
         }
     }
 

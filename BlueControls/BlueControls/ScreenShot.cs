@@ -33,9 +33,8 @@ public sealed partial class ScreenShot : Form {
 
     private readonly string _drawText = string.Empty;
     private readonly ScreenData _feedBack;
-    private readonly bool _onlyMouseDown;
-
     private readonly Helpers _helpers = Helpers.None;
+    private readonly bool _onlyMouseDown;
 
     #endregion
 
@@ -115,7 +114,7 @@ public sealed partial class ScreenShot : Form {
             zoomPic.Helper = _helpers;
 
             // Zeige die Form
-            _ = ShowDialog();
+            ShowDialog();
 
             if (frm != null) { frm.Opacity = op; }
 

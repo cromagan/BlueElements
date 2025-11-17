@@ -32,11 +32,6 @@ namespace BlueControls.BlueTableDialogs;
 
 public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
-    #region Fields
-
-
-    #endregion
-
     #region Constructors
 
     public RowCleanUp(Controls.TableView table) {

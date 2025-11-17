@@ -145,7 +145,7 @@ public class WindowsThumbnailProvider {
         try {
             return GetBitmapFromHBitmap((IntPtr)hBitmap);
         } finally {
-            _ = DeleteObject((IntPtr)hBitmap);
+            DeleteObject((IntPtr)hBitmap);
         }
     }
 
@@ -182,7 +182,7 @@ public class WindowsThumbnailProvider {
 
         var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
 
-        _ = Marshal.ReleaseComObject(nativeShellItem);
+        Marshal.ReleaseComObject(nativeShellItem);
 
         return hr == HResult.Ok ? hBitmap : null;
         //throw Marshal.GetExceptionForHR((int)hr);

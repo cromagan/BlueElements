@@ -31,7 +31,6 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
 
     #region Fields
 
-
     private List<string>? _files;
 
     #endregion
@@ -91,7 +90,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
         Close();
     }
 
-    private void btnChoseTable_Click(object sender, System.EventArgs e) => _ = LoadTab.ShowDialog();
+    private void btnChoseTable_Click(object sender, System.EventArgs e) => LoadTab.ShowDialog();
 
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
@@ -149,7 +148,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
 
         var m = "Tabellen-Fehler";
 
-        if (Table is  TableFile { IsDisposed: false } tbf) {
+        if (Table is TableFile { IsDisposed: false } tbf) {
             m = tbf.ImportBdb(_files, Table.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);
         }
 

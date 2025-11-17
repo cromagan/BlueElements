@@ -233,11 +233,11 @@ public static partial class Extensions {
         var l = new StringBuilder();
 
         foreach (var thisString in value) {
-            _ = l.Append(thisString.ToNonCritical());
-            _ = l.Append("|");
+            l.Append(thisString.ToNonCritical());
+            l.Append("|");
         }
 
-        if (l.Length > 0) { _ = l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
+        if (l.Length > 0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
 
         col.Add(tagname + "=" + l);
     }
@@ -271,7 +271,7 @@ public static partial class Extensions {
     public static void Remove<T>(this List<T> items, string name) where T : class, IHasKeyName {
         if (string.IsNullOrEmpty(name)) { return; }
 
-        _ = items.RemoveAll(item => item != null && string.Equals(item.KeyName, name, StringComparison.OrdinalIgnoreCase));
+        items.RemoveAll(item => item != null && string.Equals(item.KeyName, name, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -427,7 +427,7 @@ public static partial class Extensions {
         //Used: Only BZL
         var found = col.TagGetPosition(tagname);
         if (found >= 0) {
-            _ = col.Remove(col.ElementAtOrDefault(found));
+            col.Remove(col.ElementAtOrDefault(found));
         }
     }
 
@@ -437,7 +437,7 @@ public static partial class Extensions {
 
         if (found >= 0) {
             if (col.ElementAtOrDefault(found) == n) { return; }
-            _ = col.Remove(col.ElementAtOrDefault(found));
+            col.Remove(col.ElementAtOrDefault(found));
         }
 
         col.Add(n);

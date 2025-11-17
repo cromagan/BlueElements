@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using BlueTable;
-using BlueTable.AdditionalScriptMethods;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable;
+using BlueTable.AdditionalScriptMethods;
 using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;

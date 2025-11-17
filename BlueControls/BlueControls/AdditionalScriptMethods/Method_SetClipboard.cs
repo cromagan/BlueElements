@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System.Collections.Generic;
 using static BlueBasics.Generic;
 
@@ -62,7 +62,7 @@ internal class Method_SetClipboard : Method, IUseableForButton {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var vs = attvar.ValueStringGet(0);
-        _ = CopytoClipboard(vs);
+        CopytoClipboard(vs);
 
         return DoItFeedback.Null();
     }

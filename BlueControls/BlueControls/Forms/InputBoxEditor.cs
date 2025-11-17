@@ -58,7 +58,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         var mb = new InputBoxEditor(toEdit.GetControl(400), false);
 
         if (isDialog) {
-            _ = mb.ShowDialog();
+            mb.ShowDialog();
             mb.Dispose();
         } else {
             mb.Show();
@@ -130,7 +130,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         var ok = true;
 
         if (isDialog) {
-            _ = mb.ShowDialog();
+            mb.ShowDialog();
 
             if (toEdit is IErrorCheckable iec && !iec.IsOk()) { ok = false; }
 
@@ -175,7 +175,7 @@ public static class InputBoxEditorExtension {
     public static void Edit(this IEditable? toEdit) {
         if (toEdit == null) { return; }
 
-        _ = InputBoxEditor.Show(toEdit, true, false);
+        InputBoxEditor.Show(toEdit, true, false);
     }
 
     /// <summary>
@@ -204,7 +204,7 @@ public static class InputBoxEditorExtension {
     public static void Edit(this IEditable? toEdit, Type? type, bool isDialog) {
         if (toEdit == null || type == null) { return; }
 
-        _ = InputBoxEditor.Show(toEdit, type, isDialog);
+        InputBoxEditor.Show(toEdit, type, isDialog);
     }
 
     #endregion

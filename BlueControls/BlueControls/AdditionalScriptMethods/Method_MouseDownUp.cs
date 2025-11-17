@@ -71,11 +71,11 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
         var xup = attvar.ValueIntGet(3);
         var yup = attvar.ValueIntGet(4);
 
-        _ = WindowsRemoteControl.MoveMouse(xdown, ydown);
+        WindowsRemoteControl.MoveMouse(xdown, ydown);
         Generic.Pause(0.01, false);
         WindowsRemoteControl.MouseAction(MouseEventFlags.MOUSEEVENTF_LEFTDOWN, xdown, ydown);
         Generic.Pause(time, false);
-        _ = WindowsRemoteControl.MoveMouse(xup, yup);
+        WindowsRemoteControl.MoveMouse(xup, yup);
         Generic.Pause(0.01, false);
         WindowsRemoteControl.MouseAction(MouseEventFlags.MOUSEEVENTF_LEFTUP, xup, yup);
         return DoItFeedback.Null();

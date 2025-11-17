@@ -43,16 +43,13 @@ public readonly struct SplittedAttributesFeedback {
 
     #endregion
 
-
-    public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason) || ScriptIssueType != ScriptIssueType.ohne;
-
     #region Properties
 
-    public bool NeedsScriptFix { get; } = false;
-
     public VariableCollection Attributes { get; }
-    public string FailedReason { get; }= string.Empty;
+    public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason) || ScriptIssueType != ScriptIssueType.ohne;
 
+    public string FailedReason { get; } = string.Empty;
+    public bool NeedsScriptFix { get; } = false;
     public ScriptIssueType ScriptIssueType { get; } = ScriptIssueType.ohne;
 
     #endregion

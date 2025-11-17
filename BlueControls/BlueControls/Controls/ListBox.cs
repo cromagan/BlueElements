@@ -70,6 +70,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     /// Bei einem MouseWheel wird nichts eingeblendet
     /// </summary>
     private Point _mousepos = Point.Empty;
+
     private bool _sorted;
 
     #endregion
@@ -301,8 +302,8 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     public static void PreComputeSize(List<AbstractListItem> item, Design itemDesign) {
         try {
-            _ = Parallel.ForEach(item, thisItem => {
-                _ = thisItem?.SizeUntouchedForListBox(itemDesign);
+            Parallel.ForEach(item, thisItem => {
+                thisItem?.SizeUntouchedForListBox(itemDesign);
             });
         } catch {
             Develop.AbortAppIfStackOverflow();
@@ -371,7 +372,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     public new void Focus() {
         if (Focused()) { return; }
-        _ = base.Focus();
+        base.Focus();
     }
 
     public new bool Focused() => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused || SliderY.Focused();
@@ -541,7 +542,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
         if (!IsChecked(name)) { return; }
 
         List<string> l = [.. _checked];
-        _ = l.Remove(name);
+        l.Remove(name);
 
         ValidateCheckStates(l, string.Empty);
     }
@@ -765,7 +766,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
         }
 
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData(_item, _itemDesign);
-        _ = ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy, Renderer);
+        ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy, Renderer);
 
         var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
 
@@ -781,7 +782,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
         object locker = new();
         DoItemOrder();
 
-        _ = Parallel.ForEach(_item, thisItem => {
+        Parallel.ForEach(_item, thisItem => {
             var currentItem = thisItem;
             if (currentItem.Position.IntersectsWith(visArea)) {
                 var itemState = tmpState;
@@ -1166,8 +1167,8 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     private void RemoveAndUnRegister(AbstractListItem item) {
         item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
         item.PropertyChanged -= Item_PropertyChanged;
-        _ = _item.Remove(item);
-        _ = _checked.Remove(item.KeyName);
+        _item.Remove(item);
+        _checked.Remove(item.KeyName);
         InvalidateItemOrder();
     }
 

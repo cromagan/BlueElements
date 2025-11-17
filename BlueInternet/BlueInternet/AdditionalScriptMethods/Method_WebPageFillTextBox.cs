@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using BlueTable.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.AdditionalScriptMethods;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using static BlueScript.Variables.VariableWebpage;
 
 //using CefSharp.WinForms;

@@ -22,12 +22,12 @@ using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueTable;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;
+using BlueTable;
+using BlueTable.Enums;
+using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -37,11 +37,6 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.Controls;
 
 internal partial class ConnectedFormulaButton : GenericControlReciver {
-
-    #region Fields
-
-
-    #endregion
 
     #region Constructors
 
@@ -277,7 +272,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
             for (var fz = 0; fz < fi.Count; fz++) {
                 if (fi[fz] is { } thisf) {
                     var nam = "Filter" + fz;
-                    _ = vars.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
+                    vars.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
                     fis = fis + nam + ",";
                 }
             }
@@ -292,7 +287,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         var rn = "thisrow";
 
         if (row != null) {
-            _ = vars.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
+            vars.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
             ai = row;
             row.DropMessage(ErrorType.Info, "Knopfdruck mit dieser Zeile");
         }

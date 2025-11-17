@@ -57,7 +57,7 @@ public class FlexiDelegateControl : FlexiControl {
 
         GenFehlerText();
 
-        _ = CheckEnabledState();
+        CheckEnabledState();
     }
 
     #endregion
@@ -76,7 +76,7 @@ public class FlexiDelegateControl : FlexiControl {
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
-        _ = CheckEnabledState();
+        CheckEnabledState();
         base.OnControlAdded(e);
     }
 

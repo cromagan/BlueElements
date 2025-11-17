@@ -82,7 +82,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         this.LoadSettingsFromDisk(false);
 
-        _ = SwitchTabToTable(table);
+        SwitchTabToTable(table);
 
         FormManager.FormAdded += FormManager_FormsChanged;
         FormManager.FormRemoved += FormManager_FormsChanged;
@@ -134,7 +134,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             w.LoadFile(layoutToOpen);
         }
 
-        _ = w.ShowDialog();
+        w.ShowDialog();
     }
 
     public static TableScriptEditor? OpenScriptEditor(Table? tb) {
@@ -200,7 +200,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
-        _ = CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+        CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
@@ -215,14 +215,14 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                 var selectedRows = Table.RowsVisibleUnique();
 
                 using (var l = new ExportDialog(db, selectedRows)) {
-                    _ = l.ShowDialog();
+                    l.ShowDialog();
                 }
 
                 Visible = true;
                 break;
 
             case "csv":
-                _ = CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+                CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
                 MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
                 break;
 
@@ -307,8 +307,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         #region Status-Meldung updaten?
 
         var maybeok = false;
-        foreach (var thisdb in BlueTable.Table.AllFiles) {
-            if (thisdb.KeyName.Equals(tablename, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
+        foreach (var thisTb in BlueTable.Table.AllFiles) {
+            if (thisTb.KeyName.Equals(tablename, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
         }
 
         if (!maybeok) {
@@ -344,7 +344,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         BlueTable.Table.SaveAll(false);
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            _ = BlueTable.Table.Get(tablename, TableView.Table_NeedPassword, false);
+            BlueTable.Table.Get(tablename, TableView.Table_NeedPassword, false);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -378,7 +378,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
-            _ = Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
+            Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
             return;
         }
 
@@ -390,7 +390,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void Table_SelectedRowChanged(object sender, RowNullableEventArgs e) {
         if (InvokeRequired) {
-            _ = Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
+            Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
             return;
         }
 
@@ -409,7 +409,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void Table_VisibleRowsChanged(object sender, System.EventArgs e) {
         if (InvokeRequired) {
-            _ = Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
+            Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
             return;
         }
 
@@ -527,7 +527,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (x.IsClosed || x.IsDisposed) { return; }
 
-        _ = x.ShowDialog();
+        x.ShowDialog();
     }
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
@@ -537,7 +537,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         OpenLayoutEditor(db, string.Empty);
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) => _ = SwitchTabToTable(e.Item.KeyName);
+    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) => SwitchTabToTable(e.Item.KeyName);
 
     private void btnMDBImport_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table.Table is not { IsDisposed: false } db || !db.IsAdministrator()) {
@@ -553,7 +553,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         MultiUserFile.SaveAll(false);
         BlueTable.Table.SaveAll(false);
 
-        _ = SaveTab.ShowDialog();
+        SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) {
             return;
         }
@@ -563,12 +563,12 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         if (FileExists(SaveTab.FileName)) {
-            _ = DeleteFile(SaveTab.FileName, true);
+            DeleteFile(SaveTab.FileName, true);
         }
 
         var db = new TableFile(SaveTab.FileName.FileNameWithoutSuffix());
         db.SaveAsAndChangeTo(SaveTab.FileName);
-        _ = SwitchTabToTable(SaveTab.FileName);
+        SwitchTabToTable(SaveTab.FileName);
     }
 
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
@@ -576,7 +576,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
         BlueTable.Table.SaveAll(false);
-        _ = LoadTab.ShowDialog();
+        LoadTab.ShowDialog();
     }
 
     private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
@@ -591,17 +591,17 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
             if (!tbf.IsEditable(false)) { return; }
 
-            _ = SaveTab.ShowDialog();
+            SaveTab.ShowDialog();
             if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
 
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
             if (FileExists(SaveTab.FileName)) {
-                _ = DeleteFile(SaveTab.FileName, true);
+                DeleteFile(SaveTab.FileName, true);
             }
 
             tbf.SaveAsAndChangeTo(SaveTab.FileName);
-            _ = SwitchTabToTable(SaveTab.FileName);
+            SwitchTabToTable(SaveTab.FileName);
         }
     }
 
@@ -616,7 +616,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         var tcvc = ColumnViewCollection.ParseAll(db);
         tcvc.GetByKey(cbxColumnArr.Text)?.Edit();
-        _ = TableView.RepairColumnArrangements(db);
+        TableView.RepairColumnArrangements(db);
     }
 
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Table?.Column.GenerateOverView();
@@ -640,14 +640,14 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         MultiUserFile.SaveAll(false);
 
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
-            _ = ExecuteFile(tbf.Filename.FilePath());
+            ExecuteFile(tbf.Filename.FilePath());
         }
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         BlueTable.Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
-        _ = ExecuteFile(System.IO.Path.GetTempPath());
+        ExecuteFile(System.IO.Path.GetTempPath());
     }
 
     private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) =>
@@ -667,7 +667,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        _ = RowCollection.Remove(Table.FilterCombined, Table.PinnedRows, "Benutzer: Zeile löschen");
+        RowCollection.Remove(Table.FilterCombined, Table.PinnedRows, "Benutzer: Zeile löschen");
     }
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Table.Zoom = 1f;
@@ -683,7 +683,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(() => CheckButtons()));
+                Invoke(new Action(() => CheckButtons()));
             } catch { }
             return;
         }
@@ -788,7 +788,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
         if (!FileExists(LoadTab.FileName)) { return; }
 
-        _ = SwitchTabToTable(LoadTab.FileName);
+        SwitchTabToTable(LoadTab.FileName);
     }
 
     private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -855,7 +855,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                         }
 
                         thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-                        _ = thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
+                        thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
                     }
 
                     RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);

@@ -144,16 +144,16 @@ public static partial class Extensions {
         // Einmaliger Durchlauf durch den String
         for (var i = 0; i < txt.Length; i++) {
             if (txt[i] == '\r' && i + 1 < txt.Length && txt[i + 1] == '\n') {
-                _ = sb.Append("<br>");
+                sb.Append("<br>");
                 i++; // Überspringe das \n
             } else if (txt[i] == '<' && i + 1 < txt.Length && txt[i + 1] == '<' && i + 2 < txt.Length && txt[i + 2] == '>') {
-                _ = sb.Append("&lt;");
+                sb.Append("&lt;");
                 i += 2; // Überspringe die restlichen Zeichen
             } else if (txt[i] == '<' && i + 1 < txt.Length && txt[i + 1] == '>' && i + 2 < txt.Length && txt[i + 2] == '>') {
-                _ = sb.Append("&gt;");
+                sb.Append("&gt;");
                 i += 2; // Überspringe die restlichen Zeichen
             } else {
-                _ = sb.Append(txt[i]);
+                sb.Append(txt[i]);
             }
         }
 
@@ -784,7 +784,7 @@ public static partial class Extensions {
 
         foreach (var currentChar in input) {
             if (previousChar != currentChar) {
-                _ = result.Append(currentChar);
+                result.Append(currentChar);
                 previousChar = currentChar;
             }
         }
