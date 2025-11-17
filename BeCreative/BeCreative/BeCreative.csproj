@@ -11,7 +11,7 @@
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsFormsWithCustomSubMain</MyType>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -58,7 +58,6 @@
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
-  <PropertyGroup />
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />

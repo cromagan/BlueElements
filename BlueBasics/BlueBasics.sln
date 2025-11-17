@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11205.157
+MinimumVisualStudioVersion = 17.1.32414.318
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBasics", "BlueBasics.csproj", "{E7E05BAC-07CB-478D-861A-DB24A27BBF75}"
 EndProject
 Global
