@@ -113,7 +113,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private bool _textFormatingAllowed;
     private ChunkType _value_for_Chunk;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -200,7 +200,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         Invalidate_LinkedTable();
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Destructors
 
@@ -209,7 +209,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         Dispose(false);
     }
 
-    #endregion
+    #endregion Destructors
 
     #region Events
 
@@ -219,7 +219,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    #endregion
+    #endregion Events
 
     #region Properties
 
@@ -979,7 +979,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    #endregion
+    #endregion Properties
 
     #region Methods
 
@@ -2010,54 +2010,20 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
     }
 
-    public double? Summe(FilterCollection fc) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return null; }
+    public double? Summe(FilterCollection fc) => Summe(fc.Rows);
+
+    public double? Summe(IEnumerable<RowItem>? rows) {
+        if (rows == null) { return null; }
 
         double summ = 0;
-        foreach (var thisrow in db.Row) {
-            if (thisrow != null && thisrow.MatchesTo([.. fc])) {
-                if (!thisrow.CellIsNullOrEmpty(this)) {
-                    if (!thisrow.CellGetString(this).IsDouble()) { return null; }
-                    summ += thisrow.CellGetDouble(this);
-                }
-            }
+        foreach (var thisrow in rows) {
+            var val = thisrow.CellGetString(this);
+            if (val.IsDouble()) { return null; }
+            summ += DoubleParse(val);
         }
         return summ;
     }
 
-    //        default:
-    //            Develop.DebugPrint(ErrorType.Warning);
-    //            break;
-    //    }
-    //}
-    //public string SimplyFile(string fullFileName) {
-    //    if (_format != DataFormat.Link_To_Filesystem) {
-    //        Develop.DebugPrint(ErrorType.Error, "Nur bei Link_To_Filesystem erlaubt!");
-    //    }
-    //    var tmpfile = fullFileName.FileNameWithoutSuffix();
-    //    if (string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }
-    //    if (string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase)) { return tmpfile; }
-    //    tmpfile = fullFileName.FileNameWithSuffix();
-    //    return string.Equals(tmpfile, fullFileName, StringComparison.OrdinalIgnoreCase)
-    //        ? tmpfile
-    //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase) ? tmpfile : fullFileName;
-    //}
-    public double? Summe(IEnumerable<RowItem>? sort) {
-        if (sort == null) { return null; }
-
-        double summ = 0;
-        foreach (var thisrow in sort) {
-            if (thisrow != null && !thisrow.CellIsNullOrEmpty(this)) {
-                if (!thisrow.CellGetString(this).IsDouble()) { return null; }
-                summ += thisrow.CellGetDouble(this);
-            }
-        }
-        return summ;
-    }
-
-    //        case FormatHolder.Bit:
-    //            SetFormatForBit();
-    //            break;
     public QuickImage? SymbolForReadableText() {
         if (IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
         if (IsDisposed || Table is not { IsDisposed: false } db) { return QuickImage.Get(ImageCode.Warnung); }
@@ -2620,8 +2586,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (fc != null && string.IsNullOrWhiteSpace(info)) {
             foreach (var thisRow in fc.Rows) {
-                if (thisRow.CellGetString(this) != val) {
-                    CellCollection.LinkedCellData(this, thisRow, true, false);
+                if (thisRow.CellGetStringCore(this) != val) {
+                    thisRow.LinkedCellData(this, true, false);
                 }
             }
             fc.Dispose();
@@ -2634,7 +2600,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    #endregion
+    #endregion Methods
 
     //private void ManipulateRendererSettings(string settingname, string newvalue) {
     //    if (string.IsNullOrEmpty(newvalue)) { return; }

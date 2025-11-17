@@ -24,6 +24,7 @@ using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueTable;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;
@@ -33,6 +34,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using Orientation = BlueBasics.Enums.Orientation;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -48,6 +50,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     // None ist -1 und muss gesetzt sein!
     private EditTypeFormula _editType;
+
     private Caption? _infoCaption;
     private string _infoText = string.Empty;
 
@@ -425,7 +428,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     public void CreateSubControls() {
         if (InvokeRequired) {
-            _ = Invoke(new Action(CreateSubControls));
+            Invoke(new Action(CreateSubControls));
             return;
         }
 
@@ -520,7 +523,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public void StyleComboBox(ComboBox? control, List<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists, int raiseChangeDelayinSec) {
         if (control == null) { return; }
 
-        //control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.RaiseChangeDelay = raiseChangeDelayinSec;
         control.DropDownStyle = style;
@@ -539,7 +541,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public void StyleTextBox(TextBox? control, int raiseChangeDelayinSec) {
         if (control == null) { return; }
-        //control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.RaiseChangeDelay = raiseChangeDelayinSec;
         control.Verhalten = MultiLine || Height > 20
@@ -562,6 +563,84 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Value = newvalue;
         if (updateControls) { UpdateValueToControl(); }
         OnValueChanged();
+    }
+
+    internal void StyleListBox(ListBox control, ColumnItem? column) {
+        control.CheckBehavior = CheckBehavior.MultiSelection;
+        if (column is not { IsDisposed: false }) { return; }
+
+        var item = new List<AbstractListItem>();
+        if (column.EditableWithDropdown) {
+            var r = TableView.RendererOf(column, Constants.Win11);
+            item.AddRange(ItemsOf(column, null, 10000, r));
+            if (!column.ShowValuesOfOtherCellsInDropdown) {
+                bool again;
+                do {
+                    again = false;
+                    foreach (var thisItem in item) {
+                        if (!column.DropDownItems.Contains(thisItem.KeyName)) {
+                            again = true;
+                            item.Remove(thisItem);
+                            break;
+                        }
+                    }
+                } while (again);
+            }
+        }
+        control.ItemAddRange(item);
+
+        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+            case EditTypeTable.Textfeld:
+                control.AddAllowed = AddType.Text;
+                break;
+
+            case EditTypeTable.Listbox:
+                control.AddAllowed = AddType.OnlySuggests;
+                break;
+
+            default:
+                control.AddAllowed = AddType.None;
+                break;
+        }
+
+        control.MoveAllowed = false;
+        switch (EditType) {
+            //case EditTypeFormula.Gallery:
+            //    control.Appearance = BlueListBoxAppearance.Gallery;
+            //    control.RemoveAllowed = true;
+            //    break;
+
+            case EditTypeFormula.Listbox:
+                control.RemoveAllowed = true;
+                control.Appearance = ListBoxAppearance.Listbox;
+                break;
+        }
+    }
+
+    internal void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
+        //control.Enabled = Enabled;
+        //control.UnCheck();
+        control.SuggestionsClear();
+        if (column is not { IsDisposed: false }) { return; }
+
+        var r = TableView.RendererOf(column, Constants.Win11);
+
+        var item = new List<AbstractListItem>();
+        item.AddRange(ItemsOf(column, null, 10000, r));
+        control.SuggestionsAdd(item);
+        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+            case EditTypeTable.Textfeld:
+                control.AddAllowed = AddType.Text;
+                break;
+
+            case EditTypeTable.Listbox:
+                control.AddAllowed = AddType.OnlySuggests;
+                break;
+
+            default:
+                control.AddAllowed = AddType.None;
+                break;
+        }
     }
 
     protected void CommandButton_Click(object sender, System.EventArgs e) {
@@ -705,7 +784,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void _InfoCaption_Click(object sender, System.EventArgs e) {
         if (GetControl<ComboBox>() is { IsDisposed: false } cbx) {
-            _ = cbx.Focus();
+            cbx.Focus();
             cbx.ShowMenu(null, null);
         }
     }
@@ -841,7 +920,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void DoInfoTextCaption(string disabledReason) {
         if (InvokeRequired) {
-            _ = Invoke(new Action(() => DoInfoTextCaption(disabledReason)));
+            Invoke(new Action(() => DoInfoTextCaption(disabledReason)));
             return;
         }
 

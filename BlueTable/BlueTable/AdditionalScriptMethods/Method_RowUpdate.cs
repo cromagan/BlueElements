@@ -98,7 +98,7 @@ public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
 
         if ((age >= minage && age <= maxage) || age > 10000) {
             if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
-            var m = CellCollection.GrantWriteAccess(srs, row, row.ChunkValue, 120, false);
+            var m = Table.GrantWriteAccess(srs, row, row.ChunkValue, 120, false);
             if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Tabellesperre: {m}", false, ld); }
             row.InvalidateRowState(coment);
             var sce = row.UpdateRow(true, coment);

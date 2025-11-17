@@ -112,7 +112,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private float _zoom = 1f;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -127,7 +127,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         OnEnabledChanged(System.EventArgs.Empty);
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Events
 
@@ -153,7 +153,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public event EventHandler? VisibleRowsChanged;
 
-    #endregion
+    #endregion Events
 
     #region Properties
 
@@ -370,28 +370,28 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    #endregion
+    #endregion Properties
 
     #region Methods
 
-    public static (List<RowData> rows, long visiblerowcount) CalculateSortedRows(Table db, IEnumerable<RowItem> filteredRows, IEnumerable<RowItem>? pinnedRows, RowSortDefinition? sortused) {
-        if (db.IsDisposed) { return ([], 0); }
+    public static (List<RowData> rows, long visiblerowcount) CalculateSortedRows(Table tb, IEnumerable<RowItem> filteredRows, IEnumerable<RowItem>? pinnedRows, RowSortDefinition? sortused) {
+        if (tb.IsDisposed) { return ([], 0); }
 
         var vrc = 0;
 
         #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
 
         var capName = pinnedRows != null && pinnedRows.Any();
-        if (!capName && db.Column.SysChapter is { IsDisposed: false } cap) {
+        if (!capName && tb.Column.SysChapter is { IsDisposed: false } cap) {
             foreach (var thisRow in filteredRows) {
-                if (thisRow.Table != null && !thisRow.CellIsNullOrEmpty(cap)) {
+                if (thisRow.Table != null && !string.IsNullOrEmpty(thisRow.CellGetString(cap))) {
                     capName = true;
                     break;
                 }
             }
         }
 
-        #endregion
+        #endregion Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
 
         #region Refresh
 
@@ -399,9 +399,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var reverse = false;
         if (sortused is { } rsd) { colsToRefresh.AddRange(rsd.Columns); reverse = rsd.Reverse; }
         //if (db.Column.SysChapter is { IsDisposed: false } csc) { colsToRefresh.AddIfNotExists(csc); }
-        if (db.Column.First is { IsDisposed: false } cf) { colsToRefresh.AddIfNotExists(cf); }
+        if (tb.Column.First is { IsDisposed: false } cf) { colsToRefresh.AddIfNotExists(cf); }
 
-        #endregion
+        #endregion Refresh
 
         var lockMe = new object();
 
@@ -424,7 +424,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             });
         }
 
-        #endregion
+        #endregion _Angepinnten Zeilen erstellen (_pinnedData)
 
         #region Gefiltere Zeilen erstellen (_rowData)
 
@@ -435,7 +435,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
             var added = markYellow;
 
-            var caps = db.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : ([]);
+            var caps = tb.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : ([]);
             if (caps.Count > 0) {
                 if (caps.Contains(string.Empty)) {
                     caps.Remove(string.Empty);
@@ -459,7 +459,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         });
 
-        #endregion
+        #endregion Gefiltere Zeilen erstellen (_rowData)
 
         pinnedData.Sort();
         rowData.Sort();
@@ -546,7 +546,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (!column.SaveContent) { return; }
 
         if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, true, false);
+            var (lcolumn, lrow, _, _) = row.LinkedCellData(column, true, false);
             if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
             return;
         }
@@ -607,7 +607,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (thisRow is { IsDisposed: false }) {
                 for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
                     if (columnListtmp[colNr] != null) {
-                        var tmp = tbl.Cell.GetString(columnListtmp[colNr], thisRow);
+                        var tmp = thisRow.CellGetString(columnListtmp[colNr]);
 
                         if (columnListtmp[colNr].TextFormatingAllowed) {
                             using var t = new ExtText() { HtmlText = tmp };
@@ -1015,7 +1015,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         da.RowEnd();
 
-        #endregion
+        #endregion Spaltenköpfe
 
         #region Zeilen
 
@@ -1044,7 +1044,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion
+        #endregion Zeilen
 
         da.TableEnd();
         da.AddFoot();
@@ -1076,7 +1076,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 }
             }
 
-            #endregion
+            #endregion Pinnen
 
             #region Sortierung
 
@@ -1087,7 +1087,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 e.ContextMenu.Add(ItemOf("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, column, true));
             }
 
-            #endregion
+            #endregion Sortierung
 
             #region Zelle
 
@@ -1103,7 +1103,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 e.ContextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, row2, db.IsAdministrator()));
             }
 
-            #endregion
+            #endregion Zelle
 
             #region Spalte
 
@@ -1121,7 +1121,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 }
             }
 
-            #endregion
+            #endregion Spalte
 
             #region Zeile
 
@@ -1142,7 +1142,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 }
             }
 
-            #endregion
+            #endregion Zeile
         }
 
         OnContextMenuInit(e);
@@ -1152,7 +1152,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var f = IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
-        var f2 = CellCollection.GrantWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
+        var f2 = Table.GrantWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
         if (!string.IsNullOrWhiteSpace(f)) { return f2; }
 
         return string.Empty;
@@ -1226,7 +1226,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var posError = false;
 
         if (column.RelationType == RelationType.CellValues) {
-            (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
+            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false);
             posError = true;
         }
 
@@ -1377,7 +1377,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         thisRowData.ShowCap = false;
                     }
 
-                    #endregion
+                    #endregion Caption bestimmen
 
                     #region Expaned (oder pinned) bestimmen
 
@@ -1387,7 +1387,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         maxY += thisRowData.DrawHeight;
                     }
 
-                    #endregion
+                    #endregion Expaned (oder pinned) bestimmen
 
                     sortedRowDataTmp.Add(thisRowData);
                 }
@@ -1615,7 +1615,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                                 ? Filter.RowFilterText
                                 : string.Empty;
 
-        #endregion
+        #endregion ZeilenFilter befüllen
 
         var consthe = btnAlleFilterAus.Height;
 
@@ -1632,7 +1632,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var right = constwi + Skin.PaddingSmal;
         const AnchorStyles anchor = AnchorStyles.Top | AnchorStyles.Left;
 
-        #endregion
+        #endregion Variablen für Waagerecht / Senkrecht bestimmen
 
         List<FlexiFilterControl> flexsToDelete = [];
 
@@ -1642,7 +1642,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (thisControl is FlexiFilterControl flx) { flexsToDelete.Add(flx); }
         }
 
-        #endregion
+        #endregion Vorhandene Flexis ermitteln
 
         var cu = CurrentArrangement;
 
@@ -1671,7 +1671,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 columSort.AddIfNotExists(thisColumn);
             }
 
-            #endregion
+            #endregion Reihenfolge der Spalten bestimmen
 
             var currentRow = 1; // Die erste Zeile ist bereits belegt mit den Hauptsteuerelementen
             var count = 0;
@@ -1693,7 +1693,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         if (FilterInput?[thisColumn] is { }) { showMe = true; }
                     }
 
-                    #endregion
+                    #endregion Sichtbarkeit des Filterelements bestimmen
 
                     if (showMe && currentRow <= availableRows) {
                         var flx = FlexiItemOf(thisColumn);
@@ -1738,7 +1738,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion
+        #endregion Neue Flexis erstellen / updaten
 
         #region Unnötige Flexis löschen
 
@@ -1749,7 +1749,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             thisFlexi.Dispose();
         }
 
-        #endregion
+        #endregion Unnötige Flexis löschen
 
         _isFilling = false;
     }
@@ -1883,7 +1883,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         SliderX.LargeChange = displayRectangleWoSlider.Width;
         SliderX.Enabled = SliderX.Maximum > 0;
 
-        #endregion
+        #endregion Slider
 
         Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement);
 
@@ -2044,21 +2044,12 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 case Keys.X:
                     if (e.Modifiers == Keys.Control) {
                         CopyToClipboard(c, CursorPosRow?.Row, true);
-                        if (CursorPosRow?.Row is null || CursorPosRow.Row.CellIsNullOrEmpty(c)) {
-                            _isinKeyDown = false;
-                            return;
-                        }
                         NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
                     }
                     break;
 
                 case Keys.Delete:
-                    if (CursorPosRow?.Row is null || CursorPosRow.Row.CellIsNullOrEmpty(c)) {
-                        _isinKeyDown = false;
-                        return;
-                    }
                     NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
-
                     break;
 
                 case Keys.Left:
@@ -2201,10 +2192,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             } else {
                 if (IsInHead(e.Y)) {
                     QuickInfo = QuickInfoText(c, string.Empty);
-                } else if (_mouseOverRow != null) {
+                } else if (_mouseOverRow?.Row is { } mor) {
                     if (c.RelationType == RelationType.CellValues) {
                         if (c.LinkedTable != null) {
-                            var (lcolumn, _, info, _) = CellCollection.LinkedCellData(c, _mouseOverRow?.Row, true, false);
+                            var (lcolumn, _, info, _) = mor.LinkedCellData(c, true, false);
                             if (lcolumn != null) { QuickInfo = QuickInfoText(lcolumn, c.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
                             if (!string.IsNullOrEmpty(info) && db.IsAdministrator()) {
@@ -2328,12 +2319,12 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
         var contentHolderCellRow = cellInThisTableRow?.Row;
-        if (contentHolderCellRow != null && contentHolderCellColumn.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
+        if (contentHolderCellRow is {IsDisposed: false } && contentHolderCellColumn.RelationType == RelationType.CellValues) {
+            (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
         }
 
-        #endregion
+        #endregion Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
         #region Format prüfen
 
@@ -2345,7 +2336,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion
+        #endregion Format prüfen
 
         newValue = contentHolderCellColumn.AutoCorrect(newValue, false);
 
@@ -2384,7 +2375,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             return string.Empty;
         }
 
-        #endregion
+        #endregion neue Zeile anlegen? (Das ist niemals in der ein LinkedCell-Tabelle)
 
         //using var filterColNewChunk = new FilterCollection(table.Table, "Edit-Filter");
         //filterColNewChunk.AddIfNotExists(table.FilterCombined.ToList());
@@ -2727,7 +2718,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         foreach (var thiscolumnitem in _ähnliche) {
             if (thiscolumnitem?.Column != null && FilterCombined != null) {
                 if (thiscolumnitem.AutoFilterSymbolPossible) {
-                    if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
+                    if (string.IsNullOrEmpty(r[0].CellGetString(thiscolumnitem.Column))) {
                         var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
                         Filter.Add(fi);
                     } else if (thiscolumnitem.Column.MultiLine) {
@@ -2779,7 +2770,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var contentHolderCellRow = cellInThisTableRow?.Row;
 
         if (viewItem.Column.RelationType == RelationType.CellValues) {
-            (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
+            (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
         }
 
         if (contentHolderCellColumn is not { IsDisposed: false }) {
@@ -2894,7 +2885,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         if (contentHolderCellColumn.EditableWithTextInput) {
-            if (t.Count == 0 && (cellInThisTableRow?.Row.CellIsNullOrEmpty(viewItem.Column) ?? true)) {
+            if (t.Count == 0 && string.IsNullOrWhiteSpace(cellInThisTableRow?.Row.CellGetString(viewItem.Column))) {
                 // Bei nur einem Wert, wenn Texteingabe erlaubt, Dropdown öffnen
                 Cell_Edit(ca, viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
                 return;
@@ -3369,7 +3360,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 var toDrawd = cellInThisTableRow.CellGetString(cellInThisTableColumn);
                 viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, cellrectangle, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
 
-                #endregion
+                #endregion Draw_CellTransparent
 
                 if (_unterschiede != null && _unterschiede != cellInThisTableRow) {
                     if (cellInThisTableRow.CellGetString(cellInThisTableColumn) != _unterschiede.CellGetString(cellInThisTableColumn)) {
@@ -3436,7 +3427,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             );
         }
 
-        #endregion
+        #endregion Recude-Button zeichnen
 
         #region Trichter-Text && trichterState
 
@@ -3454,7 +3445,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion
+        #endregion Trichter-Text && trichterState
 
         #region Roten Rand für Split-Spalten
 
@@ -3466,7 +3457,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             trichterText = string.Empty;
         }
 
-        #endregion
+        #endregion Roten Rand für Split-Spalten
 
         #region Filter-Knopf mit Trichter
 
@@ -3536,7 +3527,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             viewItem.Font_Head_Colored.Scale(_zoom).DrawString(gr, tx, 0, 0);
             gr.TranslateTransform(-pos.X, -pos.Y);
 
-            #endregion
+            #endregion Spalte mit Bild zeichnen
         } else {
 
             #region Spalte ohne Bild zeichnen
@@ -3548,7 +3539,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             gr.TranslateTransform(-pos.X, -pos.Y);
             gr.ResetTransform();
 
-            #endregion
+            #endregion Spalte ohne Bild zeichnen
         }
 
         #region Sortierrichtung Zeichnen
@@ -3560,7 +3551,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 realHead.Bottom - p6 - paf);
         }
 
-        #endregion
+        #endregion Sortierrichtung Zeichnen
     }
 
     /// <summary>
@@ -3597,7 +3588,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                     prevViewItemWithOtherCaption = thisViewItem;
 
-                    #endregion
+                    #endregion Ende einer Gruppierung gefunden
                 }
 
                 prevViewItem = thisViewItem;
@@ -3855,7 +3846,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return true;
     }
 
-    private void Filter_PropertyChanged(object sender, PropertyChangedEventArgs e) { DoFilterCombined(); }
+    private void Filter_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+        DoFilterCombined();
+    }
 
     private void Filter_ZeilenFilterSetzen() {
         if (IsDisposed || (Table?.IsDisposed ?? true)) {
@@ -4329,5 +4322,5 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return tb.IsNowNewRowPossible(chunkValue, true);
     }
 
-    #endregion
+    #endregion Methods
 }

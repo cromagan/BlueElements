@@ -45,7 +45,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private RowCheckedEventArgs? _lastCheckedEventArgs;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -55,7 +55,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         QuickInfo = null;
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Destructors
 
@@ -63,13 +63,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         Dispose(false);
     }
 
-    #endregion
+    #endregion Destructors
 
     #region Events
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
-    #endregion
+    #endregion Events
 
     #region Properties
 
@@ -79,7 +79,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         get {
             if (Table is not TableChunk) { return string.Empty; }
 
-            if (Table?.Column.ChunkValueColumn is { IsDisposed: false } spc) { return Table.Cell.GetStringCore(spc, this); }
+            if (Table?.Column.ChunkValueColumn is { IsDisposed: false } spc) { return CellGetStringCore(spc); }
             return string.Empty;
         }
     }
@@ -130,7 +130,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    #endregion
+    #endregion Properties
 
     #region Methods
 
@@ -189,11 +189,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool CellGetBoolean(string columnName) => CellGetBoolean(Table?.Column[columnName]);
 
-    public bool CellGetBoolean(ColumnItem? column) => Table?.Cell.GetString(column, this).FromPlusMinus() ?? default;
+    public bool CellGetBoolean(ColumnItem? column) => CellGetString(column).FromPlusMinus();
 
     public Color CellGetColor(string columnName) => CellGetColor(Table?.Column[columnName]);
 
-    public Color CellGetColor(ColumnItem? column) => ColorParse(Table?.Cell.GetString(column, this) ?? string.Empty);
+    public Color CellGetColor(ColumnItem? column) => ColorParse(CellGetString(column) ?? string.Empty);
 
     public int CellGetColorBgr(ColumnItem? column) {
         var c = CellGetColor(column);
@@ -215,7 +215,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <returns>DateTime.MinValue bei Fehlern</returns>
     public DateTime CellGetDateTime(ColumnItem? column) {
-        var value = Table?.Cell.GetString(column, this) ?? string.Empty;
+        var value = CellGetString(column) ?? string.Empty;
         return DateTimeTryParse(value, out var d) ? d : DateTime.MinValue;
     }
 
@@ -231,7 +231,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="column"></param>
     /// <returns>0 bei Fehlern</returns>
-    public double CellGetDouble(ColumnItem? column) => DoubleParse(Table?.Cell.GetString(column, this));
+    public double CellGetDouble(ColumnItem? column) => DoubleParse(CellGetString(column));
 
     /// <summary>
     ///
@@ -245,16 +245,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="column"></param>
     /// <returns>0 bei Fehlern</returns>
-    public int CellGetInteger(ColumnItem? column) => IntParse(Table?.Cell.GetString(column, this));
+    public int CellGetInteger(ColumnItem? column) => IntParse(CellGetString(column));
 
     public List<string> CellGetList(ColumnItem? column) {
         if (column?.Table is not { IsDisposed: false } tb) { return []; }
 
         if (column.TextFormatingAllowed) {
-            return [.. tb.Cell.GetString(column, this).SplitAndCutBy("<br>")];
+            return [.. CellGetString(column).SplitAndCutBy("<br>")];
         }
 
-        return tb.Cell.GetString(column, this).SplitAndCutByCrToList();
+        return CellGetString(column).SplitAndCutByCrToList();
     }
 
     public List<string> CellGetList(string columnName) => CellGetList(Table?.Column[columnName]);
@@ -264,54 +264,45 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// </summary>
     /// <param name="column"></param>
     /// <returns>0 bei Fehlern</returns>
-    public long CellGetLong(ColumnItem? column) => LongParse(Table?.Cell.GetString(column, this));
+    public long CellGetLong(ColumnItem? column) => LongParse(CellGetString(column));
 
     public Point CellGetPoint(ColumnItem? column) // Main Method
     {
-        var value = Table?.Cell.GetString(column, this);
+        var value = CellGetString(column);
         return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
     }
 
     public Point CellGetPoint(string columnName) => CellGetPoint(Table?.Column[columnName]);
 
-    public string CellGetString(string columnName) => Table?.Cell.GetString(Table?.Column[columnName], this) ?? string.Empty;
+    public string CellGetString(string columnName) => CellGetString(Table?.Column[columnName]) ?? string.Empty;
 
-    public string CellGetString(ColumnItem column) {
-        if (Table is not { IsDisposed: false } || column.IsDisposed) { return string.Empty; }
-        return Table.Cell.GetString(column, this);
-    }
+    public void CellSet(string columnName, bool value, string comment) => Set(Table?.Column[columnName], value.ToPlusMinus(), comment);
 
-    public bool CellIsNullOrEmpty(string columnName) => Table?.Cell.IsNullOrEmpty(Table?.Column[columnName], this) ?? true;
+    public void CellSet(ColumnItem column, bool value, string comment) => Set(column, value.ToPlusMinus(), comment);
 
-    public bool CellIsNullOrEmpty(ColumnItem? column) => Table?.Cell.IsNullOrEmpty(column, this) ?? true;
+    public void CellSet(string columnName, string value, string comment) => Set(Table?.Column[columnName], value, comment);
 
-    public void CellSet(string columnName, bool value, string comment) => Table?.Cell.Set(Table?.Column[columnName], this, value.ToPlusMinus(), comment);
+    public void CellSet(ColumnItem? column, string value, string comment) => Set(column, value, comment);
 
-    public void CellSet(ColumnItem column, bool value, string comment) => Table?.Cell.Set(column, this, value.ToPlusMinus(), comment);
+    public void CellSet(string columnName, double value, string comment) => Set(Table?.Column[columnName], value.ToStringFloat5(), comment);
 
-    public void CellSet(string columnName, string value, string comment) => Table?.Cell.Set(Table?.Column[columnName], this, value, comment);
+    public void CellSet(ColumnItem column, double value, string comment) => Set(column, value.ToStringFloat5(), comment);
 
-    public void CellSet(ColumnItem? column, string value, string comment) => Table?.Cell.Set(column, this, value, comment);
+    public void CellSet(string columnName, int value, string comment) => Set(Table?.Column[columnName], value.ToString(), comment);
 
-    public void CellSet(string columnName, double value, string comment) => Table?.Cell.Set(Table?.Column[columnName], this, value.ToStringFloat5(), comment);
+    public void CellSet(ColumnItem column, int value, string comment) => Set(column, value.ToString(), comment);
 
-    public void CellSet(ColumnItem column, double value, string comment) => Table?.Cell.Set(column, this, value.ToStringFloat5(), comment);
+    public void CellSet(string columnName, Point value, string comment) => Set(Table?.Column[columnName], value.ToString(), comment);
 
-    public void CellSet(string columnName, int value, string comment) => Table?.Cell.Set(Table?.Column[columnName], this, value.ToString(), comment);
+    public void CellSet(ColumnItem column, Point value, string comment) => Set(column, value.ToString(), comment);
 
-    public void CellSet(ColumnItem column, int value, string comment) => Table?.Cell.Set(column, this, value.ToString(), comment);
+    public void CellSet(string columnName, List<string>? value, string comment) => Set(Table?.Column[columnName], value.JoinWithCr(), comment);
 
-    public void CellSet(string columnName, Point value, string comment) => Table?.Cell.Set(Table?.Column[columnName], this, value.ToString(), comment);
+    public void CellSet(ColumnItem column, List<string>? value, string comment) => Set(column, value.JoinWithCr(), comment);
 
-    public void CellSet(ColumnItem column, Point value, string comment) => Table?.Cell.Set(column, this, value.ToString(), comment);
+    public void CellSet(string columnName, DateTime value, string comment) => Set(Table?.Column[columnName], value.ToString5(), comment);
 
-    public void CellSet(string columnName, List<string>? value, string comment) => Table?.Cell.Set(Table?.Column[columnName], this, value.JoinWithCr(), comment);
-
-    public void CellSet(ColumnItem column, List<string>? value, string comment) => Table?.Cell.Set(column, this, value.JoinWithCr(), comment);
-
-    public void CellSet(string columnName, DateTime value, string comment) => Table?.Cell.Set(Table?.Column[columnName], this, value.ToString5(), comment);
-
-    public void CellSet(ColumnItem column, DateTime value, string comment) => Table?.Cell.Set(column, this, value.ToString5(), comment);
+    public void CellSet(ColumnItem column, DateTime value, string comment) => Set(column, value.ToString5(), comment);
 
     public RowCheckedEventArgs CheckRow() {
         if (_lastCheckedEventArgs != null) {
@@ -351,8 +342,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         if (Table?.Column.SysCorrect is { IsDisposed: false } sc) {
-            //CellSet(sc, cols.Count == 0, "Fehlerprüfung");
-            if (IsNullOrEmpty(sc) || (cols.Count == 0) != CellGetBoolean(sc)) {
+            if (cols.Count == 0 != CellGetBoolean(sc)) {
                 if (string.IsNullOrEmpty(Table.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) {
                     CellSet(sc, cols.Count == 0, "Fehlerprüfung");
                 }
@@ -444,6 +434,41 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         } while (true);
     }
 
+    public string CellGetString(ColumnItem? column) // Main Method
+                                                                                                {
+        try {
+            if (IsDisposed) {
+                Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Table.KeyName);
+                return string.Empty;
+            }
+
+            if (IsDisposed || Table is not { IsDisposed: false }) {
+                Table?.DevelopWarnung("Tabelle ungültig!");
+                Develop.DebugPrint(ErrorType.Error, "Tabelle ungültig!");
+                return string.Empty;
+            }
+
+            if (column is not { IsDisposed: false }) {
+                Table?.DevelopWarnung("Spalte ungültig!");
+                Develop.DebugPrint(ErrorType.Error, "Spalte ungültig!<br>" + Table?.KeyName);
+                return string.Empty;
+            }
+
+            if (column.RelationType == RelationType.CellValues) {
+                var (lcolumn, lrow, _, _) = LinkedCellData(column, false, false);
+                return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
+            }
+
+            return CellGetStringCore(column);
+        } catch {
+            // Manchmal verscwhindwet der vorhandene KeyName?!?
+            Develop.AbortAppIfStackOverflow();
+            return CellGetString(column);
+        }
+    }
+
+    public string CellGetStringCore(ColumnItem? column) => Table?.Cell[column, this]?.Value ?? string.Empty;
+
     public void InvalidateCheckData() {
         RowCollection.FailedRows.TryRemove(this, out _);
         _lastCheckedEventArgs = null;
@@ -459,7 +484,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         InvalidateCheckData();
         RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
-        if (CellIsNullOrEmpty(srs) && IsMyRow(RowCollection.NewRowTolerance, false)) {
+        if (string.IsNullOrEmpty(CellGetStringCore(srs)) && IsMyRow(RowCollection.NewRowTolerance, false)) {
             DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} ist bereits invalidiert");
             return;
         }
@@ -476,10 +501,67 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } tb ||
-                                   tb.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
+                                   tb.Column.All(thisColumnItem => thisColumnItem != null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
 
-    public bool IsNullOrEmpty(ColumnItem? column) => IsDisposed || Table is not { IsDisposed: false } tb ||
-                                                     tb.Cell.IsNullOrEmpty(column, this);
+    public (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, bool repairallowed, bool addRowIfNotExists) {
+        if (inputColumn?.Table is not { IsDisposed: false } tb) { return (null, null, "Eigene Tabelle verworfen.", false); }
+        if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
+        if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine ChunkValue-Spalte sein.", false); }
+        if (inputColumn.LinkedTable is not { IsDisposed: false } linkedTable) { return (null, null, "Verknüpfte Tabelle verworfen.", false); }
+        if (IsDisposed) { return (null, null, "Keine Zeile zum Finden des Zeilenschlüssels angegeben.", false); }
+
+        if (linkedTable.Column[inputColumn.ColumnNameOfLinkedTable] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieltabelle nicht vorhanden.", false); }
+        if (targetColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkungen auf Chunk-Spalten nicht möglich.", false); }
+
+        var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedTable, inputColumn, this, null);
+        if (!string.IsNullOrEmpty(info)) { return (targetColumn, null, info, false); }
+        if (fc is not { Count: not 0 }) { return (targetColumn, null, "Filter konnten nicht generiert werden", false); }
+
+        RowItem? targetRow = null;
+        var rows = fc.Rows;
+        switch (rows.Count) {
+            case > 1:
+                return (targetColumn, null, "Suchergebnis liefert mehrere Ergebnisse.", false);
+
+            case 1:
+                targetRow = rows[0];
+                break;
+
+            default: {
+                    if (addRowIfNotExists) {
+                        var (newrow, message, _) = linkedTable.Row.GenerateAndAdd([.. fc], "LinkedCell aus " + tb.KeyName);
+                        if (!string.IsNullOrEmpty(message)) { return (targetColumn, null, message, false); }
+                        targetRow = newrow;
+                    }
+                    break;
+                }
+        }
+
+        if (targetRow != null) {
+            if (targetColumn != null && inputColumn != null) {
+                if (repairallowed && inputColumn.RelationType == RelationType.CellValues) {
+                    var oldvalue = CellGetStringCore(inputColumn);
+                    var newvalue = targetRow.CellGetString(targetColumn);
+
+                    if (oldvalue != newvalue) {
+                        var chunkValue = ChunkValue;
+                        var editableError = Table.GrantWriteAccess(inputColumn, this, chunkValue, 2, true);
+
+                        if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
+                        //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
+                        //row.CellSet(column, targetRow.KeyName);
+                        //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
+
+                        var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, Generic.UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, chunkValue);
+                        if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
+                    }
+                }
+                targetColumn.AddSystemInfo("Links to me", tb, inputColumn.KeyName);
+            }
+        }
+
+        return (targetColumn, targetRow, string.Empty, true);
+    }
 
     public bool MatchesTo(FilterItem fi) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return false; }
@@ -557,7 +639,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         foreach (var thisColumn in tb.Column) {
             if (thisColumn.RelationType == RelationType.CellValues) {
-                CellCollection.LinkedCellData(thisColumn, this, true, false);
+                LinkedCellData(thisColumn, true, false);
 
                 //if (!string.IsNullOrEmpty(info) && !canrepair) { return false; }
             }
@@ -634,6 +716,59 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
         return erg;
+    }
+
+    /// <summary>
+    /// Lenkt den Wert evtl. auf die verlinkte Zelle um
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="value"></param>
+    /// <param name="comment"></param>
+    /// <returns></returns>
+    public string Set(ColumnItem? column, string value, string comment) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
+
+        if (!string.IsNullOrEmpty(tb.FreezedReason)) { return "Tabelle eingefroren!"; }
+
+        if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
+
+        if (tb != Table || tb != column.Table) { return "Tabelle ungültig!"; }
+
+        if (column.RelationType == RelationType.CellValues) {
+            var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value));
+
+            //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
+            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
+            return string.Empty;
+        }
+
+        value = column.AutoCorrect(value, true);
+        var oldValue = CellGetStringCore(column);
+        if (value == oldValue) { return string.Empty; }
+
+        column.UcaseNamesSortedByLength = null;
+
+        if (!column.SaveContent) {
+            return SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
+        }
+
+        var newChunkValue = ChunkValue;
+        var oldChunkValue = newChunkValue;
+
+        if (column == tb.Column.ChunkValueColumn) {
+            newChunkValue = value;
+        }
+
+        var message = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue);
+
+        if (!string.IsNullOrEmpty(message)) { return message; }
+
+        if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
+
+        DoSpecialFormats(column, oldValue, value);
+
+        return string.Empty;
     }
 
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, string reason) {
@@ -743,7 +878,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(Table?.Cell.GetStringCore(column, this) ?? string.Empty, filterValue, typ);
+    internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(CellGetStringCore(column) ?? string.Empty, filterValue, typ);
 
     internal void DoSystemColumns(Table db, ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
         if (reason == Reason.NoUndo_NoInvalidate) { return; }
@@ -788,13 +923,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (Table is not { IsDisposed: false } tb) { return; }
 
         if (tb.Column.SysCorrect is { IsDisposed: false } sc) {
-            if (string.IsNullOrEmpty(tb.Cell.GetStringCore(sc, this))) {
+            if (string.IsNullOrEmpty(CellGetStringCore(sc))) {
                 SetValueInternal(sc, true.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }
 
         if (tb.Column.SysLocked is { IsDisposed: false } sl) {
-            if (string.IsNullOrEmpty(tb.Cell.GetStringCore(sl, this))) {
+            if (string.IsNullOrEmpty(CellGetStringCore(sl))) {
                 SetValueInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }
@@ -863,6 +998,52 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
+    private static List<RowItem> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
+        List<RowItem> allRows = [];
+        if (row?.Table?.Column.First == null || row.Table.IsDisposed) { return allRows; }
+
+        var names = row.Table.Column.First?.GetUcaseNamesSortedByLength();
+        var relationTextLine = completeRelationText.ToUpperInvariant().SplitAndCutByCr();
+        foreach (var thisTextLine in relationTextLine) {
+            var tmp = thisTextLine;
+            List<RowItem> rows = [];
+            if (names != null) {
+                for (var z = names.Count - 1; z > -1; z--) {
+                    if (tmp.IndexOfWord(names[z], 0, RegexOptions.IgnoreCase) > -1 && row.Table.Row[names[z]] is { } r) {
+                        rows.Add(r);
+                        tmp = tmp.Replace(names[z], string.Empty);
+                    }
+                }
+            }
+
+            if (rows.Count == 1 || rows.Contains(row)) { allRows.AddIfNotExists(rows); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
+        }
+        return allRows;
+    }
+
+    private static void MakeNewRelations(ColumnItem? column, RowItem? row, ICollection<string> oldBz, IEnumerable<string> newBz) {
+        if (row is not { IsDisposed: false }) { return; }
+        if (column is not { IsDisposed: false }) { return; }
+
+        //// Dann die neuen Erstellen
+        foreach (var t in newBz) {
+            if (!oldBz.Contains(t)) {
+                var x = ConnectedRowsOfRelations(t, row);
+                foreach (var thisRow in x) {
+                    if (thisRow != null && thisRow != row) {
+                        var ex = thisRow.CellGetList(column);
+                        if (x.Contains(row)) {
+                            ex.Add(t);
+                        } else {
+                            ex.Add(t.ReplaceWord(thisRow.CellFirstString(), row.CellFirstString(), RegexOptions.IgnoreCase));
+                        }
+                        thisRow.CellSet(column, ex.SortedDistinctList(), "Automatische Beziehungen von '" + row.CellFirstString() + "'");
+                    }
+                }
+            }
+        }
+    }
+
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
@@ -871,6 +1052,59 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     private string CellGetCompareKey(ColumnItem column) => Table?.Cell.CompareKey(column, this) ?? string.Empty;
+
+    private string ChangeTextFromRowId(string completeRelationText) {
+        var dbtmp = Table;
+        if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
+
+        foreach (var rowItem in dbtmp.Row) {
+            if (rowItem != null) {
+                completeRelationText = completeRelationText.Replace("/@X" + rowItem.KeyName + "X@/", rowItem.CellFirstString());
+            }
+        }
+        return completeRelationText;
+    }
+
+    private string ChangeTextToRowId(string completeRelationText, string oldValue, string newValue, string keyOfCHangedRow) {
+        var dbtmp = Table;
+        if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
+
+        var c = dbtmp.Column.First;
+        if (c == null) { return completeRelationText; }
+
+        var names = c.GetUcaseNamesSortedByLength();
+        var didOld = false;
+        var didNew = false;
+        for (var z = names.Count - 1; z > -1; z--) {
+            if (!didOld && names[z].Length <= oldValue.Length) {
+                didOld = true;
+                DoReplace(oldValue, keyOfCHangedRow);
+            }
+            if (!didNew && names[z].Length <= newValue.Length) {
+                didNew = true;
+                DoReplace(newValue, keyOfCHangedRow);
+            }
+            if (completeRelationText.ToUpperInvariant().Contains(names[z])) {
+                var r = dbtmp.Row[names[z]];
+                if (r is { IsDisposed: false }) { DoReplace(names[z], r.KeyName); }
+            }
+        }
+        if (string.IsNullOrEmpty(newValue)) { return completeRelationText; }
+        // Nochmal am Schluss, wenn die Wörter alle lang sind, und die nicht mehr zum ZUg kommen.
+        if (oldValue.Length > newValue.Length) {
+            DoReplace(oldValue, keyOfCHangedRow);
+            DoReplace(newValue, keyOfCHangedRow);
+        } else {
+            DoReplace(newValue, keyOfCHangedRow);
+            DoReplace(oldValue, keyOfCHangedRow);
+        }
+        return completeRelationText;
+        void DoReplace(string name, string key) {
+            if (!string.IsNullOrEmpty(name)) {
+                completeRelationText = completeRelationText.Replace(name, "/@X" + key + "X@/", RegexOptions.IgnoreCase);
+            }
+        }
+    }
 
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
@@ -883,6 +1117,30 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             InvalidateCheckData();
 
             IsDisposed = true;
+        }
+    }
+
+    private void DoSpecialFormats(ColumnItem column, string previewsValue, string currentValue) {
+        if (currentValue == previewsValue) { return; }
+
+        if (column.Table is not { IsDisposed: false } db) { return; }
+
+        if (column.Relationship_to_First) { RepairRelationText(column, previewsValue); }
+
+        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
+            foreach (var thisColumn in db.Column) {
+                if (thisColumn.RelationType == RelationType.CellValues) {
+                    LinkedCellData(thisColumn, true, false);
+                }
+            }
+        }
+
+        if (db.Column.First is { IsDisposed: false } c && c == column) {
+            foreach (var thisColumn in db.Column) {
+                if (column.Relationship_to_First) {
+                    RelationTextNameChanged(thisColumn, KeyName, previewsValue, currentValue);
+                }
+            }
         }
     }
 
@@ -926,7 +1184,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (!column.SaveContent) { CheckRow(); }
 
-            txt = Table?.Cell.GetStringCore(column, this) ?? string.Empty;
+            txt = CellGetStringCore(column) ?? string.Empty;
 
             if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, column.DoOpticalTranslation, null); }
             // Multiline-Typ ermitteln  --------------------------------------------
@@ -976,6 +1234,54 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
 
+    private void RelationTextNameChanged(ColumnItem columnToRepair, string rowKey, string oldValue, string newValue) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (string.IsNullOrEmpty(newValue)) { return; }
+        foreach (var thisRowItem in tb.Row) {
+            var t = thisRowItem.CellGetString(columnToRepair);
+            if (!string.IsNullOrEmpty(t)) {
+                if (!string.IsNullOrEmpty(oldValue) && t.ToUpperInvariant().Contains(oldValue.ToUpperInvariant())) {
+                    t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
+                    t = ChangeTextFromRowId(t);
+                    var t2 = t.SplitAndCutByCrToList().SortedDistinctList();
+                    thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
+                }
+                if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {
+                    MakeNewRelations(columnToRepair, thisRowItem, [], t.SplitAndCutByCrToList());
+                }
+            }
+        }
+    }
+
+    private void RepairRelationText(ColumnItem column, string previewsValue) {
+        var currentString = CellGetString(column);
+        currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
+        currentString = ChangeTextFromRowId(currentString);
+        if (currentString != CellGetString(column)) {
+            Set(column, currentString, "Bezugstextänderung");
+            return;
+        }
+        var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();
+        var newBz = new List<string>(currentString.SplitAndCutByCr()).SortedDistinctList();
+        // Zuerst Beziehungen LÖSCHEN
+        foreach (var t in oldBz) {
+            if (!newBz.Contains(t)) {
+                var x = ConnectedRowsOfRelations(t, this);
+                foreach (var thisRow in x) {
+                    if (thisRow != this) {
+                        var ex = thisRow.CellGetList(column);
+                        _ = x.Contains(this)
+                            ? ex.Remove(t)
+                            : ex.Remove(t.ReplaceWord(thisRow.CellFirstString(), CellFirstString(), RegexOptions.IgnoreCase));
+                        thisRow.CellSet(column, ex.SortedDistinctList(), "Bezugstextänderung / Löschung");
+                    }
+                }
+            }
+        }
+        MakeNewRelations(column, this, oldBz, newBz);
+    }
+
     private bool RowFilterMatch(string searchText) {
         if (string.IsNullOrEmpty(searchText)) { return true; }
         if (IsDisposed || Table is not { IsDisposed: false } db) { return false; }
@@ -993,5 +1299,5 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return false;
     }
 
-    #endregion
+    #endregion Methods
 }

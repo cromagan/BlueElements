@@ -30,8 +30,8 @@ public class ExtCharCellLink : ExtChar {
 
     #region Fields
 
-    private string _displayText;
-    private string _htmlText;
+    private string _displayText = string.Empty;
+    private string _htmlText = string.Empty;
 
     #endregion
 
@@ -58,11 +58,11 @@ public class ExtCharCellLink : ExtChar {
     #region Properties
 
     public static string ClassId => "ExtCharCellLink";
-    public string ColumnKey { get; private set; }
+    public string ColumnKey { get; private set; } = string.Empty;
 
-    public string RowKey { get; private set; }
+    public string RowKey { get; private set; } = string.Empty;
 
-    public string TableName { get; private set; }
+    public string TableName { get; private set; } = string.Empty;
 
     #endregion
 

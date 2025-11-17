@@ -235,9 +235,9 @@ public class Chunk : IHasKeyName {
 
     public void SaveToByteList(ColumnItem column, RowItem row) {
         if (LoadFailed) { return; }
-        if (column.Table is not { IsDisposed: false } db) { return; }
+        if (column.Table is not { IsDisposed: false } tb) { return; }
 
-        var cellContent = db.Cell.GetStringCore(column, row);
+        var cellContent = row.CellGetStringCore(column);
         if (string.IsNullOrEmpty(cellContent)) { return; }
 
         Bytes.Add((byte)Routinen.CellFormatUTF8_V403);

@@ -38,7 +38,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public CellCollection(Table table) : base() => Table = table;
 
-    #endregion
+    #endregion Constructors
 
     #region Destructors
 
@@ -48,13 +48,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         Dispose(false);
     }
 
-    #endregion
+    #endregion Destructors
 
     #region Events
 
     public event EventHandler<CellEventArgs>? CellValueChanged;
 
-    #endregion
+    #endregion Events
 
     #region Properties
 
@@ -77,7 +77,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    #endregion
+    #endregion Properties
 
     #region Indexers
 
@@ -101,7 +101,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    #endregion
+    #endregion Indexers
 
     #region Methods
 
@@ -226,16 +226,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <summary>
     /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
     /// </summary>
-    /// <param name="column">Die Spalte</param>
-    /// <param name="row">Die Zeile</param>
-    /// <param name="newChunkValue">Der neue Zellwert</param>
-    /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
-    public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
-        IO.ProcessFile(TryGrantWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel) as string ?? "Unbekannter Fehler";
-
-    /// <summary>
-    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
-    /// </summary>
     /// <param name="row"></param>
     /// <param name="column"></param>
     /// <param name="mode"></param>
@@ -287,7 +277,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!tb.IsEditable(false)) { return $"Tabellesperre: {tb.IsNotEditableReason(false)}"; }
 
         if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
+            var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
 
             if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
 
@@ -341,66 +331,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public static (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, RowItem? inputRow, bool repairallowed, bool addRowIfNotExists) {
-        if (inputColumn?.Table is not { IsDisposed: false } tb) { return (null, null, "Eigene Tabelle verworfen.", false); }
-        if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
-        if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine ChunkValue-Spalte sein.", false); }
-        if (inputColumn.LinkedTable is not { IsDisposed: false } linkedTable) { return (null, null, "Verknüpfte Tabelle verworfen.", false); }
-        if (inputRow is not { IsDisposed: false }) { return (null, null, "Keine Zeile zum Finden des Zeilenschlüssels angegeben.", false); }
-
-        if (linkedTable.Column[inputColumn.ColumnNameOfLinkedTable] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieltabelle nicht vorhanden.", false); }
-        if (targetColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkungen auf Chunk-Spalten nicht möglich.", false); }
-
-        var (fc, info) = GetFilterFromLinkedCellData(linkedTable, inputColumn, inputRow, null);
-        if (!string.IsNullOrEmpty(info)) { return (targetColumn, null, info, false); }
-        if (fc is not { Count: not 0 }) { return (targetColumn, null, "Filter konnten nicht generiert werden", false); }
-
-        RowItem? targetRow = null;
-        var rows = fc.Rows;
-        switch (rows.Count) {
-            case > 1:
-                return (targetColumn, null, "Suchergebnis liefert mehrere Ergebnisse.", false);
-
-            case 1:
-                targetRow = rows[0];
-                break;
-
-            default: {
-                    if (addRowIfNotExists) {
-                        var (newrow, message, _) = linkedTable.Row.GenerateAndAdd([.. fc], "LinkedCell aus " + tb.KeyName);
-                        if (!string.IsNullOrEmpty(message)) { return (targetColumn, null, message, false); }
-                        targetRow = newrow;
-                    }
-                    break;
-                }
-        }
-
-        if (targetRow != null) {
-            if (targetColumn != null && inputColumn != null) {
-                if (inputRow != null && repairallowed && inputColumn.RelationType == RelationType.CellValues) {
-                    var oldvalue = tb.Cell.GetStringCore(inputColumn, inputRow);
-                    var newvalue = targetRow.CellGetString(targetColumn);
-
-                    if (oldvalue != newvalue) {
-                        var chunkValue = inputRow.ChunkValue;
-                        var editableError = GrantWriteAccess(inputColumn, inputRow, chunkValue, 2, true);
-
-                        if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
-                        //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
-                        //row.CellSet(column, targetRow.KeyName);
-                        //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
-
-                        var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, inputRow, oldvalue, newvalue, UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, chunkValue);
-                        if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
-                    }
-                }
-                targetColumn.AddSystemInfo("Links to me", tb, inputColumn.KeyName);
-            }
-        }
-
-        return (targetColumn, targetRow, string.Empty, true);
-    }
-
     public void DataOfCellKey(string cellKey, out ColumnItem? column, out RowItem? row) {
         if (string.IsNullOrEmpty(cellKey)) {
             column = null;
@@ -418,106 +348,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         Table = null;
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    public string GetString(ColumnItem? column, RowItem? row) // Main Method
-    {
-        try {
-            if (IsDisposed || Table is not { IsDisposed: false }) {
-                Table?.DevelopWarnung("Tabelle ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Tabelle ungültig!");
-                return string.Empty;
-            }
-
-            if (column is not { IsDisposed: false }) {
-                Table?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Spalte ungültig!<br>" + Table?.KeyName);
-                return string.Empty;
-            }
-
-            if (row is not { IsDisposed: false }) {
-                Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Table.KeyName);
-                return string.Empty;
-            }
-
-            //if (column.RelationType == RelationType.CellValues) {
-            //    var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
-            //    return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
-            //}
-
-            return GetStringCore(column, row);
-        } catch {
-            // Manchmal verscwhindwet der vorhandene KeyName?!?
-            Develop.AbortAppIfStackOverflow();
-            return GetString(column, row);
-        }
-    }
-
-    public bool IsNullOrEmpty(ColumnItem? column, RowItem? row) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return true; }
-        if (column is not { IsDisposed: false }) { return true; }
-        if (row is not { IsDisposed: false }) { return true; }
-        //if (column.Function is ColumnFunction.Verknüpfung_zu_anderer_Tabelle) {
-        //    var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
-        //    return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
-        //}
-
-        return string.IsNullOrEmpty(GetStringCore(column, row));
-    }
-
-    /// <summary>
-    /// Lenkt den Wert evtl. auf die verlinkte Zelle um
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="value"></param>
-    /// <param name="comment"></param>
-    /// <returns></returns>
-    public string Set(ColumnItem? column, RowItem? row, string value, string comment) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
-
-        if (!string.IsNullOrEmpty(tb.FreezedReason)) { return "Tabelle eingefroren!"; }
-
-        if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
-
-        if (row is not { IsDisposed: false }) { return "Zeile ungültig!"; }
-
-        if (tb != row.Table || tb != column.Table) { return "Tabelle ungültig!"; }
-
-        if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
-
-            //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
-            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
-            return string.Empty;
-        }
-
-        value = column.AutoCorrect(value, true);
-        var oldValue = GetStringCore(column, row);
-        if (value == oldValue) { return string.Empty; }
-
-        column.UcaseNamesSortedByLength = null;
-
-        if (!column.SaveContent) {
-            return row.SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
-        }
-
-        var newChunkValue = row.ChunkValue;
-        var oldChunkValue = newChunkValue;
-
-        if (column == tb.Column.ChunkValueColumn) {
-            newChunkValue = value;
-        }
-
-        var message = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue);
-
-        if (!string.IsNullOrEmpty(message)) { return message; }
-
-        if (value != GetStringCore(column, row)) { return "Nachprüfung fehlgeschlagen"; }
-
-        DoSpecialFormats(column, row, oldValue, value);
-
-        return string.Empty;
     }
 
     internal bool ChangeColumnName(string oldName, string newName) {
@@ -543,9 +373,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return true;
     }
 
-    internal string CompareKey(ColumnItem column, RowItem row) => GetStringCore(column, row).CompareKey(column.SortType);
-
-    internal string GetStringCore(ColumnItem? column, RowItem? row) => this[column, row]?.Value ?? string.Empty;
+    internal string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
     internal void InvalidateAllSizes() {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
@@ -587,167 +415,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    private static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
-        List<RowItem?> allRows = [];
-        if (row?.Table?.Column.First == null || row.Table.IsDisposed) { return allRows; }
-
-        var names = row.Table.Column.First?.GetUcaseNamesSortedByLength();
-        var relationTextLine = completeRelationText.ToUpperInvariant().SplitAndCutByCr();
-        foreach (var thisTextLine in relationTextLine) {
-            var tmp = thisTextLine;
-            List<RowItem?> r = [];
-            if (names != null) {
-                for (var z = names.Count - 1; z > -1; z--) {
-                    if (tmp.IndexOfWord(names[z], 0, RegexOptions.IgnoreCase) > -1) {
-                        r.Add(row.Table.Row[names[z]]);
-                        tmp = tmp.Replace(names[z], string.Empty);
-                    }
-                }
-            }
-
-            if (r.Count == 1 || r.Contains(row)) { allRows.AddIfNotExists(r); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
-        }
-        return allRows;
-    }
-
-    private static void MakeNewRelations(ColumnItem? column, RowItem? row, ICollection<string> oldBz, IEnumerable<string> newBz) {
-        if (row is not { IsDisposed: false }) { return; }
-        if (column is not { IsDisposed: false }) { return; }
-
-        //// Dann die neuen Erstellen
-        foreach (var t in newBz) {
-            if (!oldBz.Contains(t)) {
-                var x = ConnectedRowsOfRelations(t, row);
-                foreach (var thisRow in x) {
-                    if (thisRow != null && thisRow != row) {
-                        var ex = thisRow.CellGetList(column);
-                        if (x.Contains(row)) {
-                            ex.Add(t);
-                        } else {
-                            ex.Add(t.ReplaceWord(thisRow.CellFirstString(), row.CellFirstString(), RegexOptions.IgnoreCase));
-                        }
-                        thisRow.CellSet(column, ex.SortedDistinctList(), "Automatische Beziehungen von '" + row.CellFirstString() + "'");
-                    }
-                }
-            }
-        }
-    }
-
-    private static FileOperationResult TryGrantWriteAccess(List<string> affectingFiles, params object?[] args) {
-        if (args.Length < 5 ||
-            args[0] is not string newChunkValue ||
-            args[1] is not ColumnItem column ||
-            args[2] is not RowItem row ||
-            args[3] is not int waitforseconds ||
-             args[4] is not bool onlyTopLevel) {
-            return new("Ungültige Parameter.", false, true);
-        }
-
-        try {
-            if (column?.Table is not { IsDisposed: false } tb) { return new("Es ist keine Spalte ausgewählt.", false, true); }
-
-            if (!tb.IsEditable(false)) { return new(tb.IsNotEditableReason(false), false, true); }
-
-            var fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
-            if (fo.Failed) { return fo; }
-
-            if (row != null) {
-                fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-                if (fo.Failed) { return fo; }
-            }
-
-            if (onlyTopLevel) { return FileOperationResult.ValueStringEmpty; }
-
-            if (column.RelationType == RelationType.CellValues) {
-                var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, false, false);
-                if (!string.IsNullOrEmpty(info) && !canrepair) { return new(info, false, true); }
-
-                if (lcolumn?.Table is not { IsDisposed: false } db2) { return new("Verknüpfte Tabelle verworfen.", false, true); }
-
-                db2.PowerEdit = tb.PowerEdit;
-
-                if (lrow != null) {
-                    waitforseconds = Math.Max(1, waitforseconds / 2);
-
-                    var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
-                    if (!string.IsNullOrEmpty(tmp)) { return new("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, waitforseconds > 10, false); }
-                    return FileOperationResult.ValueStringEmpty;
-                }
-
-                return new("Allgemeiner Fehler.", true, true);
-            }
-
-            return FileOperationResult.ValueStringEmpty;
-        } catch (Exception ex) {
-            return new FileOperationResult(ex.ToString(), true, false); // Retry bei Exceptions
-        }
-    }
-
-    //    var ownRow = _table.Row.GetByKey(rowKey);
-    //    var rows = keyc.Format == DataFormat.RelationText
-    //        ? ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow)
-    //        : RowCollection.MatchesTo(new FilterItem(keyc, FilterType.Istgleich_GroßKleinEgal, ownRow.CellGetString(keyc)));
-    //    rows.Remove(ownRow);
-    //    if (rows.Count < 1) { return; }
-    //    foreach (var thisRow in rows) {
-    //        thisRow.CellSet(column, currentvalue);
-    //    }
-    //}
-
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private string ChangeTextFromRowId(string completeRelationText) {
-        var dbtmp = Table;
-        if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
-
-        foreach (var rowItem in dbtmp.Row) {
-            if (rowItem != null) {
-                completeRelationText = completeRelationText.Replace("/@X" + rowItem.KeyName + "X@/", rowItem.CellFirstString());
-            }
-        }
-        return completeRelationText;
-    }
-
-    private string ChangeTextToRowId(string completeRelationText, string oldValue, string newValue, string keyOfCHangedRow) {
-        var dbtmp = Table;
-        if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
-
-        var c = dbtmp.Column.First;
-        if (c == null) { return completeRelationText; }
-
-        var names = c.GetUcaseNamesSortedByLength();
-        var didOld = false;
-        var didNew = false;
-        for (var z = names.Count - 1; z > -1; z--) {
-            if (!didOld && names[z].Length <= oldValue.Length) {
-                didOld = true;
-                DoReplace(oldValue, keyOfCHangedRow);
-            }
-            if (!didNew && names[z].Length <= newValue.Length) {
-                didNew = true;
-                DoReplace(newValue, keyOfCHangedRow);
-            }
-            if (completeRelationText.ToUpperInvariant().Contains(names[z])) {
-                var r = dbtmp.Row[names[z]];
-                if (r is { IsDisposed: false }) { DoReplace(names[z], r.KeyName); }
-            }
-        }
-        if (string.IsNullOrEmpty(newValue)) { return completeRelationText; }
-        // Nochmal am Schluss, wenn die Wörter alle lang sind, und die nicht mehr zum ZUg kommen.
-        if (oldValue.Length > newValue.Length) {
-            DoReplace(oldValue, keyOfCHangedRow);
-            DoReplace(newValue, keyOfCHangedRow);
-        } else {
-            DoReplace(newValue, keyOfCHangedRow);
-            DoReplace(oldValue, keyOfCHangedRow);
-        }
-        return completeRelationText;
-        void DoReplace(string name, string key) {
-            if (!string.IsNullOrEmpty(name)) {
-                completeRelationText = completeRelationText.Replace(name, "/@X" + key + "X@/", RegexOptions.IgnoreCase);
-            }
-        }
-    }
 
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
@@ -762,79 +430,5 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    private void DoSpecialFormats(ColumnItem column, RowItem row, string previewsValue, string currentValue) {
-        if (currentValue == previewsValue) { return; }
-
-        if (column.Table is not { IsDisposed: false } db) { return; }
-
-        if (column.Relationship_to_First) { RepairRelationText(column, row, previewsValue); }
-
-        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
-            foreach (var thisColumn in db.Column) {
-                if (thisColumn.RelationType == RelationType.CellValues) {
-                    LinkedCellData(thisColumn, row, true, false);
-                }
-            }
-        }
-
-        if (db.Column.First is { IsDisposed: false } c && c == column) {
-            foreach (var thisColumn in db.Column) {
-                if (column.Relationship_to_First) {
-                    RelationTextNameChanged(thisColumn, row.KeyName, previewsValue, currentValue);
-                }
-            }
-        }
-    }
-
-    private void RelationTextNameChanged(ColumnItem columnToRepair, string rowKey, string oldValue, string newValue) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-
-        if (string.IsNullOrEmpty(newValue)) { return; }
-        foreach (var thisRowItem in db.Row) {
-            if (thisRowItem != null) {
-                if (!thisRowItem.CellIsNullOrEmpty(columnToRepair)) {
-                    var t = thisRowItem.CellGetString(columnToRepair);
-                    if (!string.IsNullOrEmpty(oldValue) && t.ToUpperInvariant().Contains(oldValue.ToUpperInvariant())) {
-                        t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
-                        t = ChangeTextFromRowId(t);
-                        var t2 = t.SplitAndCutByCrToList().SortedDistinctList();
-                        thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
-                    }
-                    if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {
-                        MakeNewRelations(columnToRepair, thisRowItem, [], t.SplitAndCutByCrToList());
-                    }
-                }
-            }
-        }
-    }
-
-    private void RepairRelationText(ColumnItem column, RowItem row, string previewsValue) {
-        var currentString = GetString(column, row);
-        currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
-        currentString = ChangeTextFromRowId(currentString);
-        if (currentString != GetString(column, row)) {
-            Set(column, row, currentString, "Bezugstextänderung");
-            return;
-        }
-        var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();
-        var newBz = new List<string>(currentString.SplitAndCutByCr()).SortedDistinctList();
-        // Zuerst Beziehungen LÖSCHEN
-        foreach (var t in oldBz) {
-            if (!newBz.Contains(t)) {
-                var x = ConnectedRowsOfRelations(t, row);
-                foreach (var thisRow in x) {
-                    if (thisRow != null && thisRow != row) {
-                        var ex = thisRow.CellGetList(column);
-                        _ = x.Contains(row)
-                            ? ex.Remove(t)
-                            : ex.Remove(t.ReplaceWord(thisRow.CellFirstString(), row.CellFirstString(), RegexOptions.IgnoreCase));
-                        thisRow.CellSet(column, ex.SortedDistinctList(), "Bezugstextänderung / Löschung");
-                    }
-                }
-            }
-        }
-        MakeNewRelations(column, row, oldBz, newBz);
-    }
-
-    #endregion
+    #endregion Methods
 }

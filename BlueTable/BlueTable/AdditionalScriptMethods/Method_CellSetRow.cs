@@ -76,7 +76,7 @@ public class Method_CellSetRow : Method_TableGeneric {
 
         if (columnToSet == tb.Column.ChunkValueColumn) { newchunkval = value; }
 
-        var m = CellCollection.GrantWriteAccess(columnToSet, row, newchunkval, 120, false);
+        var m = Table.GrantWriteAccess(columnToSet, row, newchunkval, 120, false);
         if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {

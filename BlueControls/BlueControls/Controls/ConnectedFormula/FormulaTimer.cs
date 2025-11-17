@@ -60,7 +60,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string Script { get; internal set; }
+    public string Script { get; internal set; } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]

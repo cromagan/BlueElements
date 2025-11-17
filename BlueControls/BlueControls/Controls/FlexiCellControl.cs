@@ -172,7 +172,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         _lastrow = RowSingleOrNull();
         _column ??= Column;
 
-        StyleControls(_column, _lastrow);
+        if (_lastrow != null) { StyleControls(_column, _lastrow); }
         SetValueFromCell(_column, _lastrow);
         CheckEnabledState(_column, _lastrow);
 
@@ -184,7 +184,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
         try {
             if (InvokeRequired) {
-                _ = Invoke(new Action(() => TableInput_CellValueChanged(sender, e)));
+                Invoke(new Action(() => TableInput_CellValueChanged(sender, e)));
                 return;
             }
 
@@ -217,7 +217,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
         if (InvokeRequired) {
             try {
-                _ = Invoke(new Action(() => TableInput_Loaded(sender, e)));
+                Invoke(new Action(() => TableInput_Loaded(sender, e)));
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
@@ -369,26 +369,12 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
     private void F_VisibleChanged(object sender, System.EventArgs e) => RestartMarker();
 
-    private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
-        ColumnItem? gbColumn;
-
-        if (column?.RelationType == RelationType.CellValues) {
-            (gbColumn, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
-        } else {
-            gbColumn = column;
-        }
-
-        if (gbColumn != null) { f.GetStyleFrom(gbColumn); }
-
-        return gbColumn;
-    }
-
     private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         switch (e.Item.KeyName.ToLowerInvariant()) {
             case "dateiöffnen":
                 if (e.HotItem is TextListItem t) {
                     if (FileExists(t.KeyName)) {
-                        _ = ExecuteFile(t.KeyName);
+                        ExecuteFile(t.KeyName);
                     }
                 }
                 break;
@@ -406,7 +392,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
     private void RestartMarker() {
         // Fire-and-forget Pattern für Event-Handler
-        _ = Task.Run(async () => {
+        Task.Run(async () => {
             try {
                 await ActivateMarker();
             } catch (Exception ex) {
@@ -502,13 +488,16 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
             return;
         }
 
-        if (column.RelationType == RelationType.CellValues) { _ = GetRealColumn(column, row); }
-
         f.ValueSet(row.CellGetString(column), true);
     }
 
-    private void StyleControls(ColumnItem? column, RowItem? row) {
-        var realColumn = GetRealColumn(column, row);
+    private void StyleControls(ColumnItem? column, RowItem row) {
+        ColumnItem? realColumn = column;
+
+        if (column?.RelationType == RelationType.CellValues) {
+            (realColumn, _, _, _) = row.LinkedCellData(column, true, false);
+        }
+
         f.Caption = Caption;
         int delay = 1;
 
@@ -545,11 +534,11 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
                     break;
 
                 case ListBox listBox:
-                    StyleListBox(listBox, realColumn);
+                    f.StyleListBox(listBox, realColumn);
                     break;
 
                 case SwapListBox swapListBox:
-                    StyleSwapListBox(swapListBox, realColumn);
+                    f.StyleSwapListBox(swapListBox, realColumn);
                     break;
 
                 case BlueControls.Controls.Caption:
@@ -562,86 +551,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
                     Develop.DebugPrint("Control unbekannt");
                     break;
             }
-        }
-    }
-
-    private void StyleListBox(ListBox control, ColumnItem? column) {
-        //control.Enabled = Enabled;
-        //control.ItemClear();
-        control.CheckBehavior = CheckBehavior.MultiSelection;
-        if (column is not { IsDisposed: false }) { return; }
-
-        var item = new List<AbstractListItem>();
-        if (column.EditableWithDropdown) {
-            var r = TableView.RendererOf(column, Constants.Win11);
-            item.AddRange(ItemsOf(column, null, 10000, r));
-            if (!column.ShowValuesOfOtherCellsInDropdown) {
-                bool again;
-                do {
-                    again = false;
-                    foreach (var thisItem in item) {
-                        if (!column.DropDownItems.Contains(thisItem.KeyName)) {
-                            again = true;
-                            _ = item.Remove(thisItem);
-                            break;
-                        }
-                    }
-                } while (again);
-            }
-        }
-        control.ItemAddRange(item);
-
-        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld:
-                control.AddAllowed = AddType.Text;
-                break;
-
-            case EditTypeTable.Listbox:
-                control.AddAllowed = AddType.OnlySuggests;
-                break;
-
-            default:
-                control.AddAllowed = AddType.None;
-                break;
-        }
-
-        control.MoveAllowed = false;
-        switch (f.EditType) {
-            //case EditTypeFormula.Gallery:
-            //    control.Appearance = BlueListBoxAppearance.Gallery;
-            //    control.RemoveAllowed = true;
-            //    break;
-
-            case EditTypeFormula.Listbox:
-                control.RemoveAllowed = true;
-                control.Appearance = ListBoxAppearance.Listbox;
-                break;
-        }
-    }
-
-    private void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
-        //control.Enabled = Enabled;
-        //control.UnCheck();
-        control.SuggestionsClear();
-        if (column is not { IsDisposed: false }) { return; }
-
-        var r = TableView.RendererOf(column, Constants.Win11);
-
-        var item = new List<AbstractListItem>();
-        item.AddRange(ItemsOf(column, null, 10000, r));
-        control.SuggestionsAdd(item);
-        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld:
-                control.AddAllowed = AddType.Text;
-                break;
-
-            case EditTypeTable.Listbox:
-                control.AddAllowed = AddType.OnlySuggests;
-                break;
-
-            default:
-                control.AddAllowed = AddType.None;
-                break;
         }
     }
 

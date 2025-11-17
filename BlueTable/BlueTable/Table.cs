@@ -140,7 +140,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _temporaryTableMasterUser = string.Empty;
     private string _variableTmp;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -209,7 +209,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         AllFiles.Add(this);
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Destructors
 
@@ -221,13 +221,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    #endregion
+    #endregion Destructors
 
     #region Delegates
 
     public delegate string NeedPassword();
 
-    #endregion
+    #endregion Delegates
 
     #region Events
 
@@ -251,7 +251,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public event EventHandler? ViewChanged;
 
-    #endregion
+    #endregion Events
 
     #region Properties
 
@@ -502,7 +502,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 thisVar.DisposeContent();
             }
 
-            #endregion
+            #endregion Kritische Variablen Disposen
 
             ChangeData(TableDataType.TableVariables, null, _variableTmp, l.ToString(true));
         }
@@ -512,7 +512,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private string? _additionalFilesPathTemp { get; set; }
 
-    #endregion
+    #endregion Properties
 
     #region Methods
 
@@ -608,7 +608,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            #endregion
+            #endregion Schauen, ob die Tabelle bereits geladen ist
 
             foreach (var thisfolder in folder) {
                 var f = thisfolder + fileOrTableName;
@@ -641,6 +641,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return Get(fileOrTableName, needPassword, instantUpdate);
         }
     }
+
+    /// <summary>
+    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// </summary>
+    /// <param name="column">Die Spalte</param>
+    /// <param name="row">Die Zeile</param>
+    /// <param name="newChunkValue">Der neue Zellwert</param>
+    /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
+    public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
+        IO.ProcessFile(TryGrantWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel) as string ?? "Unbekannter Fehler";
 
     public static bool IsValidTableName(string tablename) {
         if (string.IsNullOrEmpty(tablename)) { return false; }
@@ -1295,7 +1305,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
         vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
-        #endregion
+        #endregion Variablen für Skript erstellen
 
         return vars;
     }
@@ -1388,7 +1398,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             AbortReason abr = extended ? ExternalAbortScriptReasonExtended : ExternalAbortScriptReason;
             var scf = sc.Parse(0, script.KeyName, attributes, abr);
 
-            #endregion
+            #endregion Script ausführen
 
             #region Fehlerprüfungen
 
@@ -1428,7 +1438,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (!produktivphase) { return scf; }
 
-            #endregion
+            #endregion Fehlerprüfungen
 
             #region Variablen zurückschreiben
 
@@ -1453,7 +1463,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            #endregion
+            #endregion Variablen zurückschreiben
 
             //  Erfolgreicher Abschluss
             if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
@@ -1586,7 +1596,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         importText = importText.Replace("\r\n", "\r").Trim("\r");
 
-        #endregion
+        #endregion Text vorbereiten
 
         #region Die Zeilen (zeil) vorbereiten
 
@@ -1609,7 +1619,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return "Abbruch, keine Zeilen zum Importieren erkannt.";
         }
 
-        #endregion
+        #endregion Die Zeilen (zeil) vorbereiten
 
         #region Spaltenreihenfolge (columns) ermitteln
 
@@ -1644,7 +1654,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             columns.Add(col);
         }
 
-        #endregion
+        #endregion Spaltenreihenfolge (columns) ermitteln
 
         #region Neue Werte in ein Dictionary schreiben (dictNeu)
 
@@ -1660,7 +1670,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        #endregion
+        #endregion Neue Werte in ein Dictionary schreiben (dictNeu)
 
         #region Zeilen, die BEACHTET werden sollen, in ein Dictionary schreiben (dictVorhanden)
 
@@ -1678,7 +1688,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        #endregion
+        #endregion Zeilen, die BEACHTET werden sollen, in ein Dictionary schreiben (dictVorhanden)
 
         #region Der eigentliche Import
 
@@ -1698,7 +1708,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return "Abbruch, Leere Zeile im Import.";
             }
 
-            #endregion
+            #endregion Spaltenanzahl zum Import ermitteln (maxColCount)
 
             #region Row zum schreiben ermitteln (row)
 
@@ -1717,7 +1727,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return "Abbruch, Import-Fehler.";
             }
 
-            #endregion
+            #endregion Row zum schreiben ermitteln (row)
 
             #region Werte in die Spalten schreiben
 
@@ -1725,7 +1735,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 row.CellSet(columns[colNo], thisD.Value[colNo].SplitAndCutBy("|").JoinWithCr(), "CSV-Import");
             }
 
-            #endregion
+            #endregion Werte in die Spalten schreiben
 
             #region Speichern und Ausgabe
 
@@ -1741,10 +1751,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
             Develop.SetUserDidSomething();
 
-            #endregion
+            #endregion Speichern und Ausgabe
         }
 
-        #endregion
+        #endregion Der eigentliche Import
 
         //_ = Save();
         DropMessage(ErrorType.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
@@ -1932,7 +1942,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         }
                     }
 
-                    #endregion
+                    #endregion Zeile suchen oder erstellen
 
                     #region Spalte suchen oder erstellen
 
@@ -1952,7 +1962,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         }
                     }
 
-                    #endregion
+                    #endregion Spalte suchen oder erstellen
 
                     #region Bei verschlüsselten Tabellen das Passwort abfragen
 
@@ -1969,7 +1979,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         }
                     }
 
-                    #endregion
+                    #endregion Bei verschlüsselten Tabellen das Passwort abfragen
 
                     if (command == TableDataType.EOF) {
                         break;
@@ -2002,7 +2012,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            #endregion
+            #endregion unbenutzte (gelöschte) Spalten entfernen
 
             Row.RemoveNullOrEmpty();
             Cell.RemoveOrphans();
@@ -2030,10 +2040,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return false;
     }
 
-    //private void OnIsTableVisibleForUser(VisibleEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    IsTableVisibleForUser?.Invoke(this, e);
-    //}
     public bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
         var tmpName = UserName.ToUpperInvariant();
         var tmpGroup = UserGroup.ToUpperInvariant();
@@ -2042,7 +2048,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (Column.SysRowCreator is { IsDisposed: false } src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
-            if (row != null && Cell.GetString(src, row).ToUpperInvariant() == tmpName) { return true; }
+            if (row != null && row.CellGetString(src).ToUpperInvariant() == tmpName) { return true; }
         } else if (string.Equals(allowed, "#USER: " + tmpName, StringComparison.OrdinalIgnoreCase)) {
             return true;
         } else if (string.Equals(allowed, "#USER:" + tmpName, StringComparison.OrdinalIgnoreCase)) {
@@ -2053,7 +2059,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return false;
     }
 
-    public virtual void ReorganizeChunks() { }
+    public virtual void ReorganizeChunks() {
+    }
 
     public virtual void RepairAfterParse() {
         if (!IsEditable(false)) { return; }
@@ -2552,6 +2559,56 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return nu;
     }
 
+    private static FileOperationResult TryGrantWriteAccess(List<string> affectingFiles, params object?[] args) {
+        if (args.Length < 5 ||
+            args[0] is not string newChunkValue ||
+            args[1] is not ColumnItem column ||
+            args[2] is not RowItem row ||
+            args[3] is not int waitforseconds ||
+             args[4] is not bool onlyTopLevel) {
+            return new("Ungültige Parameter.", false, true);
+        }
+
+        try {
+            if (column?.Table is not { IsDisposed: false } tb) { return new("Es ist keine Spalte ausgewählt.", false, true); }
+
+            if (!tb.IsEditable(false)) { return new(tb.IsNotEditableReason(false), false, true); }
+
+            var fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
+            if (fo.Failed) { return fo; }
+
+            if (row != null) {
+                fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+                if (fo.Failed) { return fo; }
+            }
+
+            if (onlyTopLevel) { return FileOperationResult.ValueStringEmpty; }
+
+            if (column.RelationType == RelationType.CellValues) {
+                var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
+                if (!string.IsNullOrEmpty(info) && !canrepair) { return new(info, false, true); }
+
+                if (lcolumn?.Table is not { IsDisposed: false } db2) { return new("Verknüpfte Tabelle verworfen.", false, true); }
+
+                db2.PowerEdit = tb.PowerEdit;
+
+                if (lrow != null) {
+                    waitforseconds = Math.Max(1, waitforseconds / 2);
+
+                    var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
+                    if (!string.IsNullOrEmpty(tmp)) { return new("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, waitforseconds > 10, false); }
+                    return FileOperationResult.ValueStringEmpty;
+                }
+
+                return new("Allgemeiner Fehler.", true, true);
+            }
+
+            return FileOperationResult.ValueStringEmpty;
+        } catch (Exception ex) {
+            return new FileOperationResult(ex.ToString(), true, false); // Retry bei Exceptions
+        }
+    }
+
     private void Column_ColumnDisposed(object sender, ColumnEventArgs e) {
         if (IsDisposed) { return; }
         RepairAfterParse();
@@ -2681,5 +2738,5 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    #endregion
+    #endregion Methods
 }

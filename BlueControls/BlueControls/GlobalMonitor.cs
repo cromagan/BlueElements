@@ -76,7 +76,7 @@ public partial class GlobalMonitor : Form {
         tblLog.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }
 
-    [StandaloneInfo("Monitoring", ImageCode.Monitor, "Admin", 900)]
+    [StandaloneInfo("Monitor-ing", ImageCode.Monitor, "Admin", 900)]
     public static void Start() {
         // Prüfe, ob Thread und Monitor bereits funktionieren
         if (_monitorThread != null && _monitorThread.IsAlive && Monitor != null && !Monitor.IsDisposed) {

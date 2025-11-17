@@ -147,7 +147,7 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
             var v = r.CellGetDateTime(srs);
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
-                var m = CellCollection.GrantWriteAccess(srs, r, fic.ChunkVal, 120, false);
+                var m = Table.GrantWriteAccess(srs, r, fic.ChunkVal, 120, false);
                 if (!string.IsNullOrEmpty(m)) { return new DoItFeedback($"Tabellesperre: {m}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {

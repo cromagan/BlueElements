@@ -862,8 +862,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (!tb.IsEditable(false)) { return (null, "Neue Zeilen nicht möglich: " + tb.IsNotEditableReason, true); }
 
-        var item = GetByKey(key);
-        if (item != null) { return (null, "Schlüssel bereits belegt!", true); }
+
+        if (GetByKey(key) != null) { return (null, "Schlüssel bereits belegt!", true); }
 
         // REPARIERT: Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
         var chunkvalue = string.Empty;
@@ -885,8 +885,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
         if (!string.IsNullOrEmpty(createResult)) { return (null, $"Erstellung fehlgeschlagen: {createResult}", false); }
 
-        item = GetByKey(key);
-        if (item == null) { return (null, $"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}", false); }
+        if (GetByKey(key) is not { } nRow) { return (null, $"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}", false); }
 
         // REPARIERT: Sichere Setzung der Initial-Werte mit Fehlerbehandlung
         var initErrors = new List<string>();
@@ -895,7 +894,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var val = FilterCollection.InitValue(thisColumn, true, false, fc);
             if (val is { } && !string.IsNullOrWhiteSpace(val)) {
                 try {
-                    var cellResult = item.Table?.Cell.Set(thisColumn, item, val, "Initialwert neuer Zeile");
+                    var cellResult = nRow.Set(thisColumn, val, "Initialwert neuer Zeile");
                     if (!string.IsNullOrEmpty(cellResult)) {
                         initErrors.Add($"Spalte {thisColumn.KeyName}: {cellResult}");
                     }
@@ -908,22 +907,22 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // REPARIERT: Bei kritischen Initialwert-Fehlern Zeile wieder löschen
         if (initErrors.Count > 0) {
             // Kritische Fehler - Zeile wieder entfernen
-            Remove(item, "Cleanup nach Initialwert-Fehler");
+            Remove(nRow, "Cleanup nach Initialwert-Fehler");
             return (null, $"Initialwert-Fehler: {string.Join("; ", initErrors)}", false);
         }
 
-        Develop.Message?.Invoke(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{item.CellFirstString()}", 0);
+        Develop.Message?.Invoke(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.CellFirstString()}", 0);
 
-        var scriptResult = item.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
+        var scriptResult = nRow.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
 
-        InvalidatedRowsManager.AddInvalidatedRow(item);
+        InvalidatedRowsManager.AddInvalidatedRow(nRow);
 
         if (scriptResult.Failed) {
             // Script-Fehler sind nicht kritisch, aber loggen
-            return (item, $"InitialValues-Skript fehlgeschlagen für Zeile {key}: {scriptResult.FailedReason}", true);
+            return (nRow, $"InitialValues-Skript fehlgeschlagen für Zeile {key}: {scriptResult.FailedReason}", true);
         }
 
-        return (item, string.Empty, true);
+        return (nRow, string.Empty, true);
     }
 
     private void OnRowAdded(RowEventArgs e) {
