@@ -31,7 +31,6 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
 
     #region Fields
 
-    private Table? _table;
 
     private List<string>? _files;
 
@@ -62,18 +61,18 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
     #region Properties
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }
@@ -99,7 +98,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
     private void cbxColDateiname_TextChanged(object sender, System.EventArgs e) => CheckButtons();
 
     private void CheckButtons() {
-        if (_table == null) {
+        if (Table == null) {
             txtInfo.Text = "Keine Tabelle gewählt.";
             btnImport.Enabled = false;
             return;
@@ -111,7 +110,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
             return;
         }
 
-        if (_table.Column[cbxColDateiname.Text] == null) {
+        if (Table.Column[cbxColDateiname.Text] == null) {
             txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
             btnImport.Enabled = false;
             return;
@@ -146,12 +145,12 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
         //}
 
         if (_files is not { Count: not 0 }) { return; }
-        if (_table == null) { return; }
+        if (Table == null) { return; }
 
         var m = "Tabellen-Fehler";
 
         if (Table is  TableFile { IsDisposed: false } tbf) {
-            m = tbf.ImportBdb(_files, _table.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);
+            m = tbf.ImportBdb(_files, Table.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {

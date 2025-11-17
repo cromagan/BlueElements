@@ -36,9 +36,6 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     #region Fields
 
-    private int _maxCount = 20;
-    private bool _mustExists = true;
-    private string _settingsManualFilename = string.Empty;
 
     #endregion
 
@@ -52,23 +49,23 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     [DefaultValue(20)]
     public int MaxCount {
-        get => _maxCount;
+        get;
         set {
-            if (_maxCount == value) { return; }
-            _maxCount = value;
+            if (field == value) { return; }
+            field = value;
             GenerateMenu();
         }
-    }
+    } = 20;
 
     [DefaultValue(true)]
     public bool MustExist {
-        get => _mustExists;
+        get;
         set {
-            if (_mustExists == value) { return; }
-            _mustExists = value;
+            if (field == value) { return; }
+            field = value;
             GenerateMenu();
         }
-    }
+    } = true;
 
     public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; } = false;
@@ -79,14 +76,14 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     ///
     [DefaultValue("")]
     public string SettingsManualFilename {
-        get => _settingsManualFilename;
+        get;
         set {
-            if (_settingsManualFilename == value) { return; }
-            _settingsManualFilename = value;
+            if (field == value) { return; }
+            field = value;
             this.LoadSettingsFromDisk(true);
             GenerateMenu();
         }
-    }
+    } = string.Empty;
 
     public bool UsesSettings => true;
 
@@ -98,7 +95,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         if (fileName != null) {
             var s = fileName + "|" + additionalText;
 
-            if (!_mustExists || FileExists(fileName)) {
+            if (!MustExist || FileExists(fileName)) {
                 this.SettingsAdd(s);
             }
         }
@@ -132,12 +129,12 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         for (var z = Settings.Count - 1; z >= 0; z--) {
             var x = Settings[z].SplitAndCutBy("|");
             if (x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && base[x[0]] is null) {
-                if (!_mustExists || FileExists(x[0])) {
+                if (!MustExist || FileExists(x[0])) {
                     nr++;
                     if (nr < MaxCount) {
                         vis = true;
                         var show = (nr + 1).ToStringInt3() + ": ";
-                        if (_mustExists) {
+                        if (MustExist) {
                             show += x[0].FileNameWithSuffix();
                         } else {
                             show += x[0];

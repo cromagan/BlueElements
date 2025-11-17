@@ -33,8 +33,6 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
     #region Fields
 
-    private ButtonArgs _enabledwhenrows;
-    private string _script = string.Empty;
 
     #endregion
 
@@ -47,11 +45,11 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
     #region Properties
 
     public ButtonArgs Drückbar_wenn {
-        get => _enabledwhenrows;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_enabledwhenrows == value) { return; }
-            _enabledwhenrows = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
     }
@@ -65,14 +63,14 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Script {
-        get => _script;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_script == value) { return; }
-            _script = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     public new string Text {
         get => mainButton.Text;
@@ -94,7 +92,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         bool enabled;
 
-        switch (_enabledwhenrows) {
+        switch (Drückbar_wenn) {
             case ButtonArgs.Egal:
                 enabled = true;
                 break;
@@ -116,7 +114,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
                 break;
         }
 
-        if (string.IsNullOrEmpty(_script)) { enabled = false; }
+        if (string.IsNullOrEmpty(Script)) { enabled = false; }
 
         Enabled = enabled;
     }

@@ -39,10 +39,8 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         new ConcurrentDictionary<Type, Variable>();
 
     private static long _dummyCount;
-    private static List<Variable>? _varTypes;
     private string _comment = string.Empty;
     private string _keyName = string.Empty;
-    private bool _readOnly;
 
     #endregion
 
@@ -66,11 +64,11 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public static List<Variable> VarTypes {
         get {
-            if (_varTypes == null) {
-                _varTypes = Generic.GetInstaceOfType<Variable>("NAME");
-                _varTypes.Sort();
+            if (field == null) {
+                field = Generic.GetInstaceOfType<Variable>("NAME");
+                field.Sort();
             }
-            return _varTypes;
+            return field;
         }
     }
 
@@ -100,10 +98,10 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     public virtual string ReadableText => "Objekt: " + MyClassId;
 
     public bool ReadOnly {
-        get => _readOnly;
+        get;
         set {
-            if (_readOnly == value) { return; }
-            _readOnly = value;
+            if (field == value) { return; }
+            field = value;
         }
     }
 

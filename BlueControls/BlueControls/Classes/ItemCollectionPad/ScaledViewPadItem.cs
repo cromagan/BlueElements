@@ -38,13 +38,6 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     #region Fields
 
     private Alignment _ausrichtung = Alignment.Top_Left;
-
-    private string _caption = string.Empty;
-
-    private ReadOnlyCollection<string> _includedjointPoints = new([]);
-
-    private float _scale = 1f;
-
     private PadStyles _style = PadStyles.Standard;
 
     private float _textScale = 3.07f;
@@ -72,39 +65,39 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     }
 
     public string Caption {
-        get => _caption;
+        get;
         internal set {
-            if (value == _caption) { return; }
-            _caption = value;
+            if (value == field) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public override string Description => string.Empty;
 
     public BlueFont? Font { get; set; }
 
     public ReadOnlyCollection<string> IncludedJointPoints {
-        get => _includedjointPoints;
+        get;
         set {
-            if (!_includedjointPoints.IsDifferentTo(value)) { return; }
-            _includedjointPoints = value;
+            if (!field.IsDifferentTo(value)) { return; }
+            field = value;
             CalculateSize();
             OnPropertyChanged();
         }
-    }
+    } = new([]);
 
     public float Scale {
-        get => _scale;
+        get;
         internal set {
             value = Math.Max(value, 0.01f);
             value = Math.Min(value, 100f);
-            if (Math.Abs(value - _scale) < Constants.DefaultTolerance) { return; }
-            _scale = value;
+            if (Math.Abs(value - field) < Constants.DefaultTolerance) { return; }
+            field = value;
             CalculateSize();
             OnPropertyChanged();
         }
-    }
+    } = 1f;
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
@@ -165,10 +158,10 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Caption", _caption);
+        result.ParseableAdd("Caption", Caption);
         result.ParseableAdd("Style", _style);
-        result.ParseableAdd("Scale", _scale);
-        result.ParseableAdd("IncludedJointPoints", _includedjointPoints.JoinWithCr());
+        result.ParseableAdd("Scale", Scale);
+        result.ParseableAdd("IncludedJointPoints", IncludedJointPoints.JoinWithCr());
         result.ParseableAdd("AdditionalScale", _textScale);
         result.ParseableAdd("Alignment", _ausrichtung);
         return result;
@@ -246,14 +239,14 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         };
         Pen whitePen = new(Color.White, (float)(8.7d * scale) + 2f);
 
-        var textSize = bFont.MeasureString(_caption);
+        var textSize = bFont.MeasureString(Caption);
 
         // Umrandung der Detailansicht
         gr.DrawRectangle(whitePen, positionModified);
         gr.DrawRectangle(colorPen, positionModified);
         if (_ausrichtung != (Alignment)(-1)) {
             gr.FillRectangle(Brushes.White, new RectangleF(positionModified.Left, positionModified.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
-            bFont.DrawString(gr, _caption, positionModified.Left, positionModified.Top - textSize.Height - (9f * scale));
+            bFont.DrawString(gr, Caption, positionModified.Left, positionModified.Top - textSize.Height - (9f * scale));
         }
 
         //Markierung in der Zeichnung
@@ -262,7 +255,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         gr.DrawRectangle(colorPen, f);
         if (_ausrichtung != (Alignment)(-1)) {
             gr.FillRectangle(Brushes.White, new RectangleF(f.Left, f.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
-            bFont.DrawString(gr, _caption, f.Left, f.Top - textSize.Height - (9f * scale));
+            bFont.DrawString(gr, Caption, f.Left, f.Top - textSize.Height - (9f * scale));
         }
 
         //base.DrawExplicit(gr,visibleArea,positionModified,scale, shiftX, shiftY);
@@ -272,7 +265,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         var points = new List<PointM>();
 
         if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
-            foreach (var thiss in _includedjointPoints) {
+            foreach (var thiss in IncludedJointPoints) {
                 if (icpi.GetJointPoints(thiss, this) is { } p) {
                     points.AddRange(p);
                 }
@@ -298,7 +291,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
     private void CalculateSize() {
         var r = CalculateShowingArea();
-        Size = new SizeF(r.Width * _scale, r.Height * _scale);
+        Size = new SizeF(r.Width * Scale, r.Height * Scale);
     }
 
     #endregion

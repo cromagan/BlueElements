@@ -63,11 +63,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     private float _länge;
 
     private PadStyles _style = PadStyles.Standard;
-
-    private string _textOben = string.Empty;
-
     private float _textScale = 3.07f;
-    private string _textUnten = string.Empty;
     private float _winkel;
 
     #endregion
@@ -143,24 +139,24 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
     public string Suffix { get; set; } = string.Empty;
 
     public string Text_Oben {
-        get => _textOben;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_textOben == Länge_In_Mm.ToStringFloat3()) { value = string.Empty; }
-            _textOben = value;
+            if (field == Länge_In_Mm.ToStringFloat3()) { value = string.Empty; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public string Text_Unten {
-        get => _textUnten;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_textUnten == value) { value = string.Empty; }
-            _textUnten = value;
+            if (field == value) { value = string.Empty; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public float TextScale {
         get => _textScale;

@@ -47,31 +47,17 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     private const string ExtCharFormat = "BlueElements.ExtChar";
     private readonly ExtText _eTxt;
-
-    private string _allowedChars = string.Empty;
-
     private int _blinkCount;
     private int _cursorCharPos = -1;
     private bool _cursorVisible;
-    private bool _formatierungErlaubt;
     private string _lastCheckedText = string.Empty;
     private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
     private int _markEnd = -1;
     private int _markStart = -1;
-    private int _maxTextLength = 4000;
     private int _mouseValue;
-    private bool _multiline;
     private bool _mustCheck = true;
     private int _raiseChangeDelay;
-    private string _regex = string.Empty;
-
     private Slider? _sliderY;
-
-    private bool _spellChecking;
-
-    private string _suffix = string.Empty;
-
-    private SteuerelementVerhalten _verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
     #endregion
 
@@ -113,35 +99,35 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     [DefaultValue("")]
     public string AllowedChars {
-        get => _allowedChars;
+        get;
         set {
-            if (value == _allowedChars) { return; }
-            _allowedChars = value;
+            if (value == field) { return; }
+            field = value;
             GenerateEtxt(false);
         }
-    }
+    } = string.Empty;
 
     public override bool Focused => base.Focused || (_sliderY != null && _sliderY.Focused());
 
     [DefaultValue(4000)]
     public int MaxTextLength {
-        get => _maxTextLength;
+        get;
         set {
-            if (value == _maxTextLength) { return; }
-            _maxTextLength = value;
+            if (value == field) { return; }
+            field = value;
             GenerateEtxt(false);
         }
-    }
+    } = 4000;
 
     /// <summary>
     /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
     /// </summary>
     [DefaultValue(false)]
     public bool MultiLine {
-        get => _multiline;
+        get;
         set {
-            if (value == _multiline) { return; }
-            _multiline = value;
+            if (value == field) { return; }
+            field = value;
             GenerateEtxt(false);
             if (_sliderY != null) {
                 _sliderY.Visible = false;
@@ -163,20 +149,20 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     [DefaultValue("")]
     public string RegexCheck {
-        get => _regex;
+        get;
         set {
-            if (value == _regex) { return; }
-            _regex = value;
+            if (value == field) { return; }
+            field = value;
             GenerateEtxt(false);
         }
-    }
+    } = string.Empty;
 
     [DefaultValue(false)]
     public bool SpellCheckingEnabled {
-        get => _spellChecking;
+        get;
         set {
-            if (_spellChecking == value) { return; }
-            _spellChecking = value;
+            if (field == value) { return; }
+            field = value;
             AbortSpellChecking();
             Invalidate();
         }
@@ -184,17 +170,17 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     [DefaultValue("")]
     public string Suffix {
-        get => _suffix;
+        get;
         set {
-            if (value == _suffix) { return; }
-            _suffix = value;
+            if (value == field) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue("")]
     public new string Text {
-        get => IsDisposed ? string.Empty : _formatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
+        get => IsDisposed ? string.Empty : TextFormatingAllowed ? _eTxt.HtmlText : _eTxt.PlainText;
         set {
             if (IsDisposed) { return; }
             if (!string.IsNullOrEmpty(value)) {
@@ -202,7 +188,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                 value = value.Replace("\r", "\r\n");
             }
 
-            if (_formatierungErlaubt) {
+            if (TextFormatingAllowed) {
                 if (value == _eTxt.HtmlText) { return; }
             } else {
                 if (value == _eTxt.PlainText) { return; }
@@ -212,7 +198,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
             GenerateEtxt(true);
 
-            if (_formatierungErlaubt) {
+            if (TextFormatingAllowed) {
                 _eTxt.HtmlText = value;
             } else {
                 _eTxt.PlainText = value;
@@ -226,27 +212,27 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     [DefaultValue(false)]
     public bool TextFormatingAllowed {
-        get => _formatierungErlaubt;
+        get;
         set {
-            if (value == _formatierungErlaubt) { return; }
-            _formatierungErlaubt = value;
+            if (value == field) { return; }
+            field = value;
             GenerateEtxt(false);
         }
     }
 
     [DefaultValue(SteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
     public SteuerelementVerhalten Verhalten {
-        get => _verhalten;
+        get;
         set {
-            if (_verhalten == value) { return; }
-            _verhalten = value;
+            if (field == value) { return; }
+            field = value;
             if (_sliderY != null) {
                 _sliderY.Visible = false;
                 _sliderY.Value = 0;
             }
             Invalidate();
         }
-    }
+    } = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
     protected virtual Design Design => Design.TextBox;
 
@@ -298,7 +284,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
             case "#SpellChecking":
                 FloatingForm.Close(this);
-                if (_spellChecking) {
+                if (SpellCheckingEnabled) {
                     _mustCheck = false;
                     Dictionary.SpellCheckingAll(_eTxt, false);
                     _mustCheck = true;
@@ -308,7 +294,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
             case "#SpellChecking2":
                 FloatingForm.Close(this);
-                if (_spellChecking) {
+                if (SpellCheckingEnabled) {
                     _mustCheck = false;
                     Dictionary.SpellCheckingAll(_eTxt, true);
                     _mustCheck = true;
@@ -373,7 +359,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
             if (e.HotItem is not List<string> tags) { return; }
             var tmpWord = tags.TagGet("word");
 
-            if (_spellChecking && !Dictionary.IsWordOk(tmpWord)) {
+            if (SpellCheckingEnabled && !Dictionary.IsWordOk(tmpWord)) {
                 e.ContextMenu.Add(ItemOf("Rechtschreibprüfung", true));
                 if (Dictionary.IsSpellChecking) {
                     e.ContextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
@@ -400,7 +386,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                 e.ContextMenu.Add(ItemOf("Kopieren", "Kopieren", QuickImage.Get(ImageCode.Kopieren), _markStart >= 0));
                 e.ContextMenu.Add(ItemOf("Einfügen", "Einfügen", QuickImage.Get(ImageCode.Clipboard), Clipboard.ContainsText() && Enabled));
 
-                if (_formatierungErlaubt) {
+                if (TextFormatingAllowed) {
                     e.ContextMenu.Add(Separator());
                     e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));
                     if (_markEnd > -1) {
@@ -521,10 +507,10 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
     protected override void DrawControl(Graphics gr, States state) {
         var effectWidth = Width;
-        var sliderVisible = _multiline ? _eTxt.Height > Height - 16 : _eTxt.Height > Height;
+        var sliderVisible = MultiLine ? _eTxt.Height > Height - 16 : _eTxt.Height > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
 
-        switch (_verhalten) {
+        switch (Verhalten) {
             case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
                 _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
                 _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
@@ -572,7 +558,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                 break;
 
             default:
-                Develop.DebugPrint(_verhalten);
+                Develop.DebugPrint(Verhalten);
                 break;
         }
 
@@ -601,13 +587,13 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
         _eTxt.Draw(gr, 1);
         MarkAndGenerateZone(gr, state);
 
-        if (!string.IsNullOrEmpty(_suffix)) {
+        if (!string.IsNullOrEmpty(Suffix)) {
             Rectangle r = new(_eTxt.Width + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
             if (_eTxt.Count > 0) {
                 r.X += 2;
-                Skin.Draw_FormatedText(gr, _suffix, null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, false);
+                Skin.Draw_FormatedText(gr, Suffix, null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, false);
             } else {
-                Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, true);
+                Skin.Draw_FormatedText(gr, "[in " + Suffix + "]", null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, true);
             }
         }
         Skin.Draw_Border(gr, Design, state, DisplayRectangle);
@@ -881,12 +867,12 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
     private void Clipboard_Paste() {
         Char_DelBereich(-1, -1);
 
-        if (_formatierungErlaubt) {
+        if (TextFormatingAllowed) {
             if (Clipboard.ContainsData(ExtCharFormat)) {
                 if (Clipboard.GetData(ExtCharFormat) is not string sd || string.IsNullOrEmpty(sd)) { return; }
 
                 foreach (var thiss in sd.SplitByCr()) {
-                    if (_eTxt.Count < _maxTextLength) {
+                    if (_eTxt.Count < MaxTextLength) {
                         var extChar = ParseableItem.NewByParsing<ExtChar>(thiss, _eTxt as ExtText, _cursorCharPos);
 
                         if (extChar != null) {
@@ -1006,8 +992,8 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
         //if (!Enabled) { state = States.Standard_Disabled; }
         //_eTxt.State = state;
 
-        _eTxt.Multiline = _multiline;
-        _eTxt.AllowedChars = _allowedChars;
+        _eTxt.Multiline = MultiLine;
+        _eTxt.AllowedChars = AllowedChars;
 
         if (resetCoords) {
             // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
@@ -1168,7 +1154,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
             if (DateTime.UtcNow.Subtract(_lastUserActionForSpellChecking).TotalSeconds < 2) { return; }
 
             Dictionary.IsSpellChecking = true;
-            if (!_spellChecking) { return; }
+            if (!SpellCheckingEnabled) { return; }
 
             if (!Dictionary.DictionaryRunning(!DesignMode)) { return; }
 

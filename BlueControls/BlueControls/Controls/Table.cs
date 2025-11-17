@@ -78,13 +78,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private readonly List<string> _collapsed = [];
     private readonly object _lockUserAction = new();
     private ColumnViewCollection? _ähnliche;
-    private string _ähnlicheAnsichtName = string.Empty;
     private string _arrangement = string.Empty;
     private AutoFilter? _autoFilter;
     private bool _controlPressing;
-    private ColumnViewCollection? _currentArrangement;
-    private bool _editButton;
-
     private bool _isFilling;
     private bool _isinClick;
     private bool _isinDoubleClick;
@@ -107,8 +103,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private List<RowData>? _rowsFilteredAndPinned;
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
     private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
-    private string _sheetStyle = Win11;
-    private bool _showNumber;
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
     private DateTime? _tableDrawError;
@@ -171,13 +165,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// </summary>
     [DefaultValue("")]
     public string ÄhnlicheAnsichtName {
-        get => _ähnlicheAnsichtName;
+        get;
         set {
-            if (_ähnlicheAnsichtName == value) { return; }
-            _ähnlicheAnsichtName = value;
+            if (field == value) { return; }
+            field = value;
             GetÄhnlich();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
@@ -202,24 +196,26 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         get {
             if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
 
-            if (_currentArrangement != null) { return _currentArrangement; }
+            if (field != null) { return field; }
 
             var tcvc = ColumnViewCollection.ParseAll(tb);
-            _currentArrangement = tcvc.GetByKey(_arrangement);
+            field = tcvc.GetByKey(_arrangement);
 
-            if (_currentArrangement == null && tcvc.Count > 1) { _currentArrangement = tcvc[1]; }
-            if (_currentArrangement == null && tcvc.Count > 0) { _currentArrangement = tcvc[0]; }
+            if (field == null && tcvc.Count > 1) { field = tcvc[1]; }
+            if (field == null && tcvc.Count > 0) { field = tcvc[0]; }
 
-            if (_currentArrangement is { } cu) {
-                cu.SheetStyle = _sheetStyle;
+            if (field is { } cu) {
+                cu.SheetStyle = SheetStyle;
                 cu.ClientWidth = (int)(DisplayRectangleWithoutSlider().Width / _zoom);
                 cu.ComputeAllColumnPositions();
             }
 
             UpdateFilterleisteVisibility();
 
-            return _currentArrangement;
+            return field;
         }
+
+        private set;
     }
 
     [Browsable(false)]
@@ -234,11 +230,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     [DefaultValue(false)]
     public bool EditButton {
-        get => _editButton;
+        get;
         set {
-            if (_editButton == value) { return; }
-            _editButton = value;
-            btnEdit.Visible = _editButton;
+            if (field == value) { return; }
+            field = value;
+            btnEdit.Visible = field;
         }
     }
 
@@ -282,23 +278,23 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     public string SheetStyle {
-        get => _sheetStyle;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_sheetStyle == value) { return; }
-            _sheetStyle = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate_CurrentArrangement();
             Invalidate();
         }
-    }
+    } = Win11;
 
     [DefaultValue(false)]
     public bool ShowNumber {
-        get => _showNumber;
+        get;
         set {
-            if (value == _showNumber) { return; }
+            if (value == field) { return; }
             CloseAllComponents();
-            _showNumber = value;
+            field = value;
             Invalidate();
         }
     }
@@ -3519,7 +3515,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         #region LaufendeNummer
 
-        if (_showNumber) {
+        if (ShowNumber) {
             viewItem.Font_Numbers.Scale(_zoom).DrawString(gr, "#" + lfdNo, realHead.X, origAutoFilterLocation.Top);
         }
 
@@ -3931,14 +3927,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         var tcvc = ColumnViewCollection.ParseAll(db);
 
-        _ähnliche = tcvc.GetByKey(_ähnlicheAnsichtName);
+        _ähnliche = tcvc.GetByKey(ÄhnlicheAnsichtName);
         DoÄhnlich();
     }
 
     private int GetPix(int pix) => (int)((pix * _zoom) + 0.5);
 
     private void Invalidate_CurrentArrangement() {
-        _currentArrangement = null;
+        CurrentArrangement = null;
         Invalidate();
     }
 

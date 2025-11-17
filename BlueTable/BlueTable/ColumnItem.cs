@@ -46,9 +46,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     internal List<string>? UcaseNamesSortedByLength;
     private const string TmpNewDummy = "TMPNEWDUMMY";
     private readonly List<string> _afterEditAutoReplace = [];
-    private readonly List<string> _columnTags = [];
     private readonly List<string> _dropDownItems = [];
-    private readonly List<string> _linkedCellFilter = [];
     private readonly object _linkedTableLock = new object();
     private readonly List<string> _permissionGroupsChangeCell = [];
     private AdditionalCheck _additionalFormatCheck;
@@ -111,7 +109,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private bool _spellCheckingEnabled;
 
     //private string _cellInitValue;
-    private Table? _table;
 
     private bool _textFormatingAllowed;
     private ChunkType _value_for_Chunk;
@@ -473,15 +470,15 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     /// Was in Textfeldern oder Tabellezeilen für ein Suffix angezeigt werden soll. Beispiel: mm
     /// </summary>
     public List<string> ColumnTags {
-        get => _columnTags;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (!_columnTags.IsDifferentTo(value)) { return; }
+            if (!field.IsDifferentTo(value)) { return; }
 
-            _ = Table?.ChangeData(TableDataType.ColumnTags, this, _columnTags.JoinWithCr(), value.JoinWithCr());
+            _ = Table?.ChangeData(TableDataType.ColumnTags, this, field.JoinWithCr(), value.JoinWithCr());
             OnPropertyChanged();
         }
-    }
+    } = [];
 
     public string DefaultRenderer {
         get => _defaultRenderer;
@@ -710,22 +707,22 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     /// Die Quell-Spalte (aus der verlinkten Tabelle) ist immer
     /// </summary>
     public List<string> LinkedCellFilter {
-        get => _linkedCellFilter;
+        get;
         set {
             if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
             value = value.SortedDistinctList();
 
-            if (!_linkedCellFilter.IsDifferentTo(value)) { return; }
+            if (!field.IsDifferentTo(value)) { return; }
 
-            _ = db.ChangeData(TableDataType.LinkedCellFilter, this, _linkedCellFilter.JoinWithCr(), value.JoinWithCr());
+            _ = db.ChangeData(TableDataType.LinkedCellFilter, this, field.JoinWithCr(), value.JoinWithCr());
             OnPropertyChanged();
 
             foreach (var thisColumn in db.Column) {
                 thisColumn.CheckIfIAmAKeyColumn();
             }
         }
-    }
+    } = [];
 
     public Table? LinkedTable {
         get {
@@ -933,18 +930,18 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }
@@ -1346,7 +1343,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (db == db2) { return "Zirkelbezug mit verknüpfter Tabelle."; }
             var c = db2.Column[_columnNameOfLinkedTable];
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-            if (_linkedCellFilter.Count == 0) {
+            if (LinkedCellFilter.Count == 0) {
                 if (_relationType != RelationType.DropDownValues) {
                     return "Keine Filter für verknüpfte Tabelle definiert.";
                 }
@@ -1876,7 +1873,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
                 _align = AlignmentHorizontal.Zentriert;
                 _dropDownItems.Clear();
-                _linkedCellFilter.Clear();
+                LinkedCellFilter.Clear();
                 _permissionGroupsChangeCell.Clear();
                 _editableWithTextInput = false;
                 _editableWithDropdown = false;
@@ -2272,7 +2269,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case TableDataType.LinkedCellFilter:
-                _linkedCellFilter.SplitAndCutByCr(newvalue);
+                LinkedCellFilter.SplitAndCutByCr(newvalue);
                 break;
 
             //case TableDataType.OpticalTextReplace:
@@ -2288,7 +2285,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case TableDataType.ColumnTags:
-                _columnTags.SplitAndCutByCr(newvalue);
+                ColumnTags.SplitAndCutByCr(newvalue);
                 break;
 
             case TableDataType.AutoFilterJoker:
@@ -2513,9 +2510,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             _afterEditAutoReplace.Clear();
             _dropDownItems.Clear();
-            _linkedCellFilter.Clear();
+            LinkedCellFilter.Clear();
             _permissionGroupsChangeCell.Clear();
-            _columnTags.Clear();
+            ColumnTags.Clear();
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen

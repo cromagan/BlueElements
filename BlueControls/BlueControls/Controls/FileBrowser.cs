@@ -44,12 +44,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     #region Fields
 
     private string _directory = string.Empty;
-    private string _directoryMin = string.Empty;
     private string _filter = "*";
-    private string _sort = "Name";
     private string _todel = string.Empty;
-    private string _var_directory = string.Empty;
-    private string _var_directorymin = string.Empty;
     private System.IO.FileSystemWatcher? _watcher;
     private string _workinDir = string.Empty;
 
@@ -102,7 +98,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     public string DirectoryMin {
-        get => IsDisposed ? string.Empty : _directoryMin;
+        get => IsDisposed ? string.Empty : field;
         set {
             if (IsDisposed) { return; }
             value = value.ToLower().TrimEnd("\\") + "\\";
@@ -111,9 +107,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
             //if (value == _directoryMin) { return; }
 
-            _directoryMin = value;
+            field = value;
         }
-    }
+    } = string.Empty;
 
     [DefaultValue(true)]
     public bool DoDefaultHandling { get; set; } = true;
@@ -142,31 +138,31 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     public string Sort {
-        get => _sort;
+        get;
         set {
-            if (_sort == value) { return; }
-            _sort = value;
+            if (field == value) { return; }
+            field = value;
             ReloadDirectory();
         }
-    }
+    } = "Name";
 
     public string Var_Directory {
-        get => _var_directory;
+        get;
         set {
-            if (_var_directory == value) { return; }
-            _var_directory = value;
+            if (field == value) { return; }
+            field = value;
             ReloadDirectory();
         }
-    }
+    } = string.Empty;
 
     public string Var_DirectoryMin {
-        get => _var_directorymin;
+        get;
         set {
-            if (_var_directorymin == value) { return; }
-            _var_directorymin = value;
+            if (field == value) { return; }
+            field = value;
             ReloadDirectory();
         }
-    }
+    } = string.Empty;
 
     #endregion
 
@@ -222,8 +218,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             var tmpDirectoryMin = string.Empty;
 
             if (RowSingleOrNull()?.CheckRow().Feedback.Variables is { } list) {
-                tmpDirectory = list.ReplaceInText(_var_directory);
-                tmpDirectoryMin = list.ReplaceInText(_var_directorymin);
+                tmpDirectory = list.ReplaceInText(Var_Directory);
+                tmpDirectoryMin = list.ReplaceInText(Var_DirectoryMin);
             }
 
             Directory = tmpDirectory;
@@ -310,7 +306,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 return (string)Invoke(new Func<string>(CheckCode));
             }
 
-            return _directory + "?" + Visible + "?" + _filter + "?" + _sort + "?" + FilterInputChangedHandled + "?" + RowsInputChangedHandled;
+            return _directory + "?" + Visible + "?" + _filter + "?" + Sort + "?" + FilterInputChangedHandled + "?" + RowsInputChangedHandled;
         } catch {
             // Manchmal verworfen
             return CheckCode();
@@ -667,7 +663,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                     Padding = 6
                 };
 
-                switch (_sort) {
+                switch (Sort) {
                     case "Größe":
                         p.UserDefCompareKey = ((int)fi.Length).ToStringInt10();
                         break;

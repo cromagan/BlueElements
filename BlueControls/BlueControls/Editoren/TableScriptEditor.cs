@@ -49,7 +49,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private bool _allowTemporay;
 
     private TableScriptDescription? _item;
-    private Table? _table;
     private bool didMessage = false;
 
     private bool loaded = false;
@@ -153,23 +152,23 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
             WriteInfosBack();
             lstEventScripts.UncheckAll();
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
-                _table.CanDoScript -= Table_CanDoScript;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
+                field.CanDoScript -= Table_CanDoScript;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
-                _table.CanDoScript += Table_CanDoScript;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
+                field.CanDoScript += Table_CanDoScript;
 
                 tbcScriptEigenschaften.Enabled = true;
             } else {
@@ -279,9 +278,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
 
     private void btnTest_Click(object sender, System.EventArgs e) {
-        if (!loaded && _table != null && _table.Row.Count == 0) {
+        if (!loaded && Table != null && Table.Row.Count == 0) {
             loaded = true;
-            _ = _table.BeSureAllDataLoaded(10);
+            _ = Table.BeSureAllDataLoaded(10);
         }
         TesteScript(true);
     }
@@ -460,7 +459,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(quickInfo: txbQuickInfo.Text);
 
     private void UpdateList() {
-        if (IsDisposed || _table is not { IsDisposed: false } db) {
+        if (IsDisposed || Table is not { IsDisposed: false } db) {
             lstEventScripts.ItemClear();
             return;
         }

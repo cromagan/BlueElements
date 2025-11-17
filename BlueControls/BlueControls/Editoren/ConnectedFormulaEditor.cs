@@ -46,7 +46,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Fields
 
-    private ConnectedFormula.ConnectedFormula? _formula;
 
     #endregion
 
@@ -88,25 +87,25 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     #region Properties
 
     public ConnectedFormula.ConnectedFormula? Formula {
-        get => _formula;
+        get;
         private set {
             if (!Generic.IsAdministrator()) { value = null; }
             if (value != null && !value.LockEditing()) { value = null; }
 
-            if (_formula == value) { return; }
+            if (field == value) { return; }
 
-            if (_formula != null) {
-                _formula.Editing -= _cFormula_Editing;
-                _formula.UnlockEditing();
+            if (field != null) {
+                field.Editing -= _cFormula_Editing;
+                field.UnlockEditing();
             }
 
-            _formula = value;
+            field = value;
 
-            if (_formula != null) {
-                _formula.Editing += _cFormula_Editing;
+            if (field != null) {
+                field.Editing += _cFormula_Editing;
             }
 
-            if (_formula?.Pages is { IsDisposed: false } pg) {
+            if (field?.Pages is { IsDisposed: false } pg) {
                 foreach (var thisp in pg) {
                     if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
                         Pad.Items = icpi;
@@ -369,7 +368,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         try {
             if (IsDisposed) { return; }
 
-            var x = _formula?.AllPages() ?? [];
+            var x = Formula?.AllPages() ?? [];
 
             TabPage? later = null;
 
@@ -441,7 +440,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //    Formula.NotAllowedChilds = l.AsReadOnly();
         //}
 
-        if (_formula?.Pages is { IsDisposed: false } pg) {
+        if (Formula?.Pages is { IsDisposed: false } pg) {
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem { IsDisposed: false } icpi && icpi.IsHead()) {
                     Pad.Items = icpi;
@@ -514,7 +513,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             s = tabSeiten.SelectedTab.Text;
         }
 
-        if (_formula?.Pages is { IsDisposed: false } pg) {
+        if (Formula?.Pages is { IsDisposed: false } pg) {
             foreach (var thisp in pg) {
                 if (thisp is ItemCollectionPadItem { IsDisposed: false } icp) {
                     if (s == icp.Caption) {

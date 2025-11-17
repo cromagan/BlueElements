@@ -48,9 +48,6 @@ namespace BlueBasics.FileSystemCaching {
         private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
 
         private volatile int _isDisposedFlag = 0;
-
-        private string _watchedDirectory = string.Empty;
-
         private FileSystemWatcher? _watcher;
 
         #endregion
@@ -78,7 +75,7 @@ namespace BlueBasics.FileSystemCaching {
         public string WatchedDirectory {
             get {
                 if (IsDisposed) { return string.Empty; }
-                return _watchedDirectory;
+                return field;
             }
             set {
                 if (IsDisposed) { return; }
@@ -90,8 +87,8 @@ namespace BlueBasics.FileSystemCaching {
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(_watchedDirectory) && !IsSubPath(value, _watchedDirectory)) {
-                    Develop.DebugPrint(Enums.ErrorType.Error, $"Unerlaubte Modifikation: {_watchedDirectory} -> {value}");
+                if (!string.IsNullOrEmpty(field) && !IsSubPath(value, field)) {
+                    Develop.DebugPrint(Enums.ErrorType.Error, $"Unerlaubte Modifikation: {field} -> {value}");
                     return;
                 }
 
@@ -99,16 +96,16 @@ namespace BlueBasics.FileSystemCaching {
                 _watcherLock.EnterWriteLock();
                 try {
                     DisposeWatcher();
-                    _instances.TryRemove(_watchedDirectory, out _);
-                    _watchedDirectory = value;
+                    _instances.TryRemove(field, out _);
+                    field = value;
                     InitializeWatcher();
-                    _instances.TryAdd(_watchedDirectory, this);
+                    _instances.TryAdd(field, this);
                 } finally {
                     _watcherLock.ExitWriteLock();
                     WarmCache();
                 }
             }
-        }
+        } = string.Empty;
 
         #endregion
 

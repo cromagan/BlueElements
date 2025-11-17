@@ -53,7 +53,6 @@ public partial class ZoomPicWithPoints : ZoomPic {
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private readonly List<PointM> _points = [];
     private Helpers _helper = Helpers.None;
-    private string _infoText = string.Empty;
     private Orientation _mittelLinie = Orientation.Ohne;
     private bool _pointAdding;
 
@@ -79,13 +78,13 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     [DefaultValue("")]
     public string InfoText {
-        get => _infoText;
+        get;
         set {
-            if (_infoText == value) { return; }
-            _infoText = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue((Orientation)(-1))]
     public Orientation Mittellinie {
@@ -240,7 +239,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
 
         // Info Text
-        if (!string.IsNullOrEmpty(_infoText)) {
+        if (!string.IsNullOrEmpty(InfoText)) {
             PrintInfoText(e.G);
         }
 
@@ -389,7 +388,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     private void PrintInfoText(Graphics gr) {
-        if (string.IsNullOrEmpty(_infoText)) { return; }
+        if (string.IsNullOrEmpty(InfoText)) { return; }
 
         // Grundlegendes Setup
         using var bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
@@ -408,7 +407,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             var controlPoint = PointToClient(new Point(screenBounds.X, screenBounds.Y));
 
             // Berechne die Position für diesen Bildschirm
-            var textSize = fn.MeasureString(_infoText);
+            var textSize = fn.MeasureString(InfoText);
 
             // Prüfe ob die Maus auf diesem Bildschirm ist
             var mouseScreenPoint = PointToScreen(new Point(MousePos11.X, MousePos11.Y));
@@ -433,7 +432,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
                 textSize.Height + 10);
 
             gr.FillRectangle(bs, rectBackground);
-            BlueFont.DrawString(gr, _infoText, fn, bf,
+            BlueFont.DrawString(gr, InfoText, fn, bf,
                 Math.Max(drawArea.Left + 2, controlPoint.X + 2),
                 yPos);
         }

@@ -42,12 +42,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     #region Fields
 
     private Bitmap? _bitmap;
-
-    private bool _editable = true;
-    private string _filename = string.Empty;
-
-    private string _originalText = string.Empty;
-
     private int _panelMoveDirection;
 
     #endregion
@@ -75,35 +69,35 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
 
     [DefaultValue(true)]
     public bool Editable {
-        get => _editable;
+        get;
         set {
-            if (_editable == value) { return; }
-            _editable = value;
+            if (field == value) { return; }
+            field = value;
             InvalidateAndCheckButtons();
         }
-    }
+    } = true;
 
     [DefaultValue("")]
     public string FileName {
-        get => _filename;
+        get;
         set {
-            if (value.Equals(_filename, StringComparison.OrdinalIgnoreCase)) { return; }
+            if (value.Equals(field, StringComparison.OrdinalIgnoreCase)) { return; }
 
-            _filename = value;
+            field = value;
 
-            _bitmap = !FileExists(_filename) ? null : (Bitmap?)Image_FromFile(_filename);
+            _bitmap = !FileExists(field) ? null : (Bitmap?)Image_FromFile(field);
             InvalidateAndCheckButtons();
         }
-    }
+    } = string.Empty;
 
     public string OriginalText {
-        get => _originalText;
+        get;
         set {
-            if (_originalText == value) { return; }
-            _originalText = value;
+            if (field == value) { return; }
+            field = value;
             InvalidateAndCheckButtons();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue(0)]
     public new int TabIndex {
@@ -124,12 +118,12 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     #region Methods
 
     public bool DeleteImageInFileSystem() {
-        if (string.IsNullOrEmpty(_filename)) { return true; }
-        if (!FileExists(_filename)) { return true; }
+        if (string.IsNullOrEmpty(FileName)) { return true; }
+        if (!FileExists(FileName)) { return true; }
 
         if (MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
 
-        if (DeleteFile(_filename, false)) {
+        if (DeleteFile(FileName, false)) {
             _bitmap = null;
             InvalidateAndCheckButtons();
             return true;
@@ -214,7 +208,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
 
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
-        if (_editable) {
+        if (Editable) {
             _panelMoveDirection = 1;
             _panelMover.Enabled = true;
         }
@@ -245,7 +239,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
             }
         }
         if (_panelMoveDirection >= 0) {
-            if (!_editable || !ContainsMouse()) { _panelMoveDirection = -1; }
+            if (!Editable || !ContainsMouse()) { _panelMoveDirection = -1; }
         }
         if (_panelMoveDirection > 0) {
             if (!EditPanelFrame.Visible) {
@@ -283,14 +277,14 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     private void DelP_Click(object sender, System.EventArgs e) => DeleteImageInFileSystem();
 
     private bool HasFileName() {
-        if (string.IsNullOrEmpty(_filename)) { return false; }
+        if (string.IsNullOrEmpty(FileName)) { return false; }
 
-        if (!_filename.FileSuffix().Equals("PNG", StringComparison.OrdinalIgnoreCase) &&
-            !_filename.FileSuffix().Equals("JPG", StringComparison.OrdinalIgnoreCase)) { return false; }
+        if (!FileName.FileSuffix().Equals("PNG", StringComparison.OrdinalIgnoreCase) &&
+            !FileName.FileSuffix().Equals("JPG", StringComparison.OrdinalIgnoreCase)) { return false; }
 
-        if (string.IsNullOrEmpty(_filename.FilePath())) { return false; }
+        if (string.IsNullOrEmpty(FileName.FilePath())) { return false; }
 
-        if (string.IsNullOrEmpty(_filename.FileNameWithoutSuffix())) { return false; }
+        if (string.IsNullOrEmpty(FileName.FileNameWithoutSuffix())) { return false; }
 
         return true;
     }
@@ -298,9 +292,9 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     private void InvalidateAndCheckButtons() {
         _panelMoveDirection = -1;
         _panelMover.Enabled = true;
-        btnDeleteImage.Enabled = _bitmap != null && _editable;
-        btnLoad.Enabled = _editable;
-        btnScreenshot.Enabled = _editable;
+        btnDeleteImage.Enabled = _bitmap != null && Editable;
+        btnLoad.Enabled = Editable;
+        btnScreenshot.Enabled = Editable;
         //Invalidate();
     }
 
@@ -320,13 +314,13 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     }
 
     private void SaveNewPicToDisc() {
-        if (!HasFileName() || _bitmap == null || !_editable) { return; }
+        if (!HasFileName() || _bitmap == null || !Editable) { return; }
 
         try {
             using var compatibleBitmap = new Bitmap(_bitmap);
             using var memory = new System.IO.MemoryStream();
             compatibleBitmap.Save(memory, ImageFormat.Png);
-            WriteAllBytes(_filename, memory.ToArray());
+            WriteAllBytes(FileName, memory.ToArray());
         } catch (Exception ex) {
             _ = System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
         }

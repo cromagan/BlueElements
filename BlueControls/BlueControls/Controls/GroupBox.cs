@@ -31,7 +31,6 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
 
     #region Fields
 
-    private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Normal;
 
     #endregion
 
@@ -45,14 +44,14 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle GroupBoxStyle {
-        get => _groupBoxStyle;
+        get;
         set {
-            if (_groupBoxStyle == value) { return; }
-            _groupBoxStyle = value;
+            if (field == value) { return; }
+            field = value;
             SetStandardValues();
             Invalidate();
         }
-    }
+    } = GroupBoxStyle.Normal;
 
     #endregion
 
@@ -151,7 +150,7 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
     }
 
     private void ChildControls_RibbonBar() {
-        if (_groupBoxStyle != GroupBoxStyle.RibbonBar) { return; }
+        if (GroupBoxStyle != GroupBoxStyle.RibbonBar) { return; }
         if (Width < 10 || Height < 10) { return; }
         if (Controls.Count == 0) { return; }
 
@@ -184,7 +183,7 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
 
     private void SetStandardValues() {
         var l = GenericControl.Typ(Parent);
-        if (_groupBoxStyle == GroupBoxStyle.RibbonBar) { l = ParentType.RibbonPage; }
+        if (GroupBoxStyle == GroupBoxStyle.RibbonBar) { l = ParentType.RibbonPage; }
         switch (l) {
             case ParentType.RibbonPage:
                 GroupBoxStyle = GroupBoxStyle.RibbonBar;

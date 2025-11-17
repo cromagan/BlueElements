@@ -32,12 +32,6 @@ namespace BlueTable;
 
 public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorCheckable, IHasTable {
 
-    #region Fields
-
-    private Table? _table;
-
-    #endregion
-
     #region Constructors
 
     public FilterItem(Table? db, FilterType filterType, string searchValue) : this(db, filterType, [searchValue]) { }
@@ -150,18 +144,18 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     /// Der Edit-Dialog braucht die Tabelle, um mit Texten die Spalte zu suchen.
     /// </summary>
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (value?.IsDisposed ?? true) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }
@@ -327,9 +321,9 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     public string ErrorReason() {
         if (FilterType == FilterType.AlwaysFalse) { return string.Empty; }
 
-        if (_table == null) { return "Keine Tabelle angegeben"; }
+        if (Table == null) { return "Keine Tabelle angegeben"; }
 
-        if (_table.IsDisposed) { return "Tabelle verworfen"; }
+        if (Table.IsDisposed) { return "Tabelle verworfen"; }
 
         if (FilterType is FilterType.GroßKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
 
@@ -533,7 +527,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     public override string ToString() => ParseableItems().FinishParseable();
 
     internal FilterItem Normalized() {
-        var db = _table ?? Column?.Table;
+        var tb = Table ?? Column?.Table;
 
         var f = FilterType;
 
@@ -542,7 +536,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             if (f.HasFlag(FilterType.UND)) { f ^= FilterType.UND; }
         }
 
-        return new FilterItem(db, Column, f, SearchValue.SortedDistinctList().AsReadOnly(), "Normalize");
+        return new FilterItem(tb, Column, f, SearchValue.SortedDistinctList().AsReadOnly(), "Normalize");
     }
 
     private static string EscapeSqlValue(string value) {

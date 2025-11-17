@@ -44,20 +44,15 @@ public partial class ComboBox : TextBox, ITranslateable {
     #region Fields
 
     private readonly List<AbstractListItem> _items = [];
-    private bool _autoSort = true;
     private bool _btnDropDownIsIn;
-    private ComboboxStyle _drawStyle = ComboboxStyle.TextBox;
     private ComboBoxStyle _dropDownStyle = ComboBoxStyle.DropDown;
     private ExtText? _eTxt;
-    private string _imageCode = string.Empty;
 
     /// <summary>
     /// Kümmert sich darum, wenn die ComboBox wie ein Button aussieht, dass immer
     /// der Button-Text stehen bleibt und nicht der Ausgewählte
     /// </summary>
     private string _initialtext = string.Empty;
-
-    private bool _itemEditAllowed;
     private string? _lastClickedText;
 
     #endregion
@@ -92,25 +87,25 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     [DefaultValue(true)]
     public bool AutoSort {
-        get => _autoSort;
+        get;
         set {
-            if (value == _autoSort) { return; }
-            _autoSort = value;
+            if (value == field) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = true;
 
     [DefaultValue(ComboboxStyle.TextBox)]
     public ComboboxStyle DrawStyle {
-        get => _drawStyle;
+        get;
         set {
-            if (_drawStyle != value) {
-                _drawStyle = value;
+            if (field != value) {
+                field = value;
                 Invalidate();
             }
             SetStyle();
         }
-    }
+    } = ComboboxStyle.TextBox;
 
     [DefaultValue(ComboBoxStyle.DropDown)]
     public ComboBoxStyle DropDownStyle {
@@ -128,24 +123,24 @@ public partial class ComboBox : TextBox, ITranslateable {
     [Category("Darstellung")]
     [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
     public string ImageCode {
-        get => _imageCode;
+        get;
         set {
-            if (_imageCode != value) {
-                _imageCode = value;
+            if (field != value) {
+                field = value;
                 Invalidate();
             }
             SetStyle();
         }
-    }
+    } = string.Empty;
 
     public int ItemCount => _items.Count;
 
     [DefaultValue(false)]
     public bool ItemEditAllowed {
-        get => _itemEditAllowed;
+        get;
         set {
-            if (_itemEditAllowed == value) { return; }
-            _itemEditAllowed = value;
+            if (field == value) { return; }
+            field = value;
             btnEdit.Visible = false;
         }
     }
@@ -216,8 +211,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
 
         List<string> itc = [];
-        if (_drawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_items, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, _autoSort);
+        if (DrawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_items, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, AutoSort);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         _btnDropDownIsIn = false;
@@ -249,13 +244,13 @@ public partial class ComboBox : TextBox, ITranslateable {
             }
         }
 
-        if (_drawStyle != ComboboxStyle.TextBox) {
+        if (DrawStyle != ComboboxStyle.TextBox) {
             btnEdit.Visible = false;
             if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
 
-            _eTxt ??= new ExtText((Design)_drawStyle, state);
+            _eTxt ??= new ExtText((Design)DrawStyle, state);
 
-            Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt, _initialtext, DisplayRectangle, Translate);
+            Button.DrawButton(this, gr, (Design)DrawStyle, state, QuickImage.Get(ImageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt, _initialtext, DisplayRectangle, Translate);
             btnDropDown.Invalidate();
             return;
         }
@@ -336,7 +331,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
 
-        if (!_itemEditAllowed) { return; }
+        if (!ItemEditAllowed) { return; }
 
         var _mouseOverItem = _items.GetByKey(Text);
 
@@ -386,7 +381,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         var _mouseOverItem = _items.GetByKey(Text);
 
-        if (_itemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
+        if (ItemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
             ie.Edit();
         }
     }

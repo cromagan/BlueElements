@@ -40,17 +40,6 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
     #region Fields
 
-    private string _action = string.Empty;
-    private string _arg1 = string.Empty;
-    private string _arg2 = string.Empty;
-    private string _arg3 = string.Empty;
-    private string _arg4 = string.Empty;
-    private string _arg5 = string.Empty;
-    private string _arg6 = string.Empty;
-    private string _arg7 = string.Empty;
-    private string _arg8 = string.Empty;
-
-    private ButtonArgs _enabledwhenrows;
 
     #endregion
 
@@ -66,125 +55,125 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Action {
-        get => _action;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_action == value) { return; }
-            _action = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg1 {
-        get => _arg1;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_arg1 == value) { return; }
-            _arg1 = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg2 {
-        get => _arg2;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_arg2 == value) { return; }
-            _arg2 = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg3 {
-        get => _arg3;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_arg3 == value) { return; }
-            _arg3 = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg4 {
-        get => _arg4;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_arg4 == value) { return; }
-            _arg4 = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg5 {
-        get => _arg5;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_arg5 == value) { return; }
-            _arg5 = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg6 {
-        get => _arg6;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_arg6 == value) { return; }
-            _arg6 = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg7 {
-        get => _arg7;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_arg7 == value) { return; }
-            _arg7 = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Arg8 {
-        get => _arg8;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_arg8 == value) { return; }
-            _arg8 = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     public ButtonArgs Drückbar_wenn {
-        get => _enabledwhenrows;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_enabledwhenrows == value) { return; }
-            _enabledwhenrows = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
     }
@@ -214,7 +203,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         bool enabled;
 
-        switch (_enabledwhenrows) {
+        switch (Drückbar_wenn) {
             case ButtonArgs.Egal:
                 enabled = true;
                 break;
@@ -236,7 +225,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
                 break;
         }
 
-        if (string.IsNullOrEmpty(_action)) { enabled = false; }
+        if (string.IsNullOrEmpty(Action)) { enabled = false; }
 
         Enabled = enabled;
     }
@@ -253,15 +242,15 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
     private void mainButton_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button != MouseButtons.Left) { return; }
 
-        var m = Method.AllMethods.GetByKey(_action);
+        var m = Method.AllMethods.GetByKey(Action);
 
         if (m is not IUseableForButton ufb) {
-            ButtonError("Aktion '" + _action + "' nicht gefunden.");
+            ButtonError("Aktion '" + Action + "' nicht gefunden.");
             return;
         }
 
         if (!ButtonPadItem.PossibleFor(m, Drückbar_wenn)) {
-            ButtonError("Aktion '" + _action + "' nicht möglich.");
+            ButtonError("Aktion '" + Action + "' nicht möglich.");
             return;
         }
 
@@ -310,7 +299,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         #endregion
 
-        List<string> args = [_arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8];
+        List<string> args = [Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8];
 
         var f = ufb.DoIt(vars, args, fis, rn, ai);
 

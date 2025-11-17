@@ -42,10 +42,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public bool ShowHead = true;
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<string> _permissionGroups_Show = [];
-    private int _clientWidth = 16;
     private int? _headSize;
-    private string _sheetStyle = Win11;
-    private Table? _table;
 
     #endregion
 
@@ -72,14 +69,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string CaptionForEditor => "Spaltenanordnung";
 
     public int ClientWidth {
-        get => _clientWidth;
+        get;
         set {
-            if (_clientWidth == value) { return; }
+            if (field == value) { return; }
 
-            _clientWidth = value;
+            field = value;
             OnStyleChanged();
         }
-    }
+    } = 16;
 
     public string ColumnQuickInfo => string.Empty;
     public int Count => _internal.Count;
@@ -105,28 +102,28 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public int RowChapterHeight { get; internal set; } = 20;
 
     public string SheetStyle {
-        get => _sheetStyle;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (_sheetStyle == value) { return; }
-            _sheetStyle = value;
+            if (field == value) { return; }
+            field = value;
             OnStyleChanged();
         }
-    }
+    } = Win11;
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }
@@ -491,7 +488,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private void OnStyleChanged() {
         Invalidate_HeadSize();
-        Font_RowChapter = Skin.GetBlueFont(_sheetStyle, PadStyles.Überschrift);
+        Font_RowChapter = Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift);
         RowChapterHeight = (int)Font_RowChapter.CharHeight + 1;
         StyleChanged?.Invoke(this, System.EventArgs.Empty);
     }

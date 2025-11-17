@@ -33,7 +33,6 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
     #region Fields
 
     private CreativePadItem? _item;
-    private Table? _table;
 
     #endregion
 
@@ -82,18 +81,18 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
     }
 
     public Table? Table {
-        get => _table;
+        get;
         set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }

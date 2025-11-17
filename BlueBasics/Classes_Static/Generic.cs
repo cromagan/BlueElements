@@ -42,13 +42,9 @@ public static class Generic {
     #region Fields
 
     public static string UserGroup = Constants.Everybody;
-
-    private static List<Type>? _allTypes;
     private static int _getUniqueKeyCount;
 
     private static string _getUniqueKeyLastTime = "InitialDummy";
-
-    private static string _gotUserName = string.Empty;
 
     #endregion
 
@@ -59,29 +55,29 @@ public static class Generic {
 
     public static string UserName {
         get {
-            if (!string.IsNullOrEmpty(_gotUserName)) { return _gotUserName; }
-            _gotUserName = WindowsIdentity.GetCurrent().Name;
-            if (_gotUserName.Contains("\\")) { _gotUserName = _gotUserName.FileNameWithSuffix(); }
-            return _gotUserName;
+            if (!string.IsNullOrEmpty(field)) { return field; }
+            field = WindowsIdentity.GetCurrent().Name;
+            if (field.Contains("\\")) { field = field.FileNameWithSuffix(); }
+            return field;
         }
-        set => _gotUserName = value;
-    }
+        set;
+    } = string.Empty;
 
     private static List<Type> AllTypes {
         get {
-            if (_allTypes != null) { return _allTypes; }
+            if (field != null) { return field; }
 
-            _allTypes = [];
+            field = [];
             foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
                 try {
                     foreach (var thist in thisas.GetTypes()) {
                         if (thist is { IsClass: true, IsAbstract: false }) {
-                            _allTypes.Add(thist);
+                            field.Add(thist);
                         }
                     }
                 } catch { }
             }
-            return _allTypes;
+            return field;
         }
     }
 

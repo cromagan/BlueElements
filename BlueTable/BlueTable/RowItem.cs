@@ -44,8 +44,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     #region Fields
 
     private RowCheckedEventArgs? _lastCheckedEventArgs;
-    private Table? _table;
-    private string? _tmpQuickInfo;
 
     #endregion
 
@@ -54,7 +52,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public RowItem(Table table, string key) {
         Table = table;
         KeyName = key;
-        _tmpQuickInfo = null;
+        QuickInfo = null;
     }
 
     #endregion
@@ -93,27 +91,29 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string QuickInfo {
         get {
-            if (_tmpQuickInfo != null) { return _tmpQuickInfo; }
+            if (field != null) { return field; }
             GenerateQuickInfo();
-            return _tmpQuickInfo!;
+            return field!;
         }
+
+        private set;
     }
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
-                _table.Cell.CellValueChanged -= Cell_CellValueChanged;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
+                field.Cell.CellValueChanged -= Cell_CellValueChanged;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
-                _table.Cell.CellValueChanged += Cell_CellValueChanged;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
+                field.Cell.CellValueChanged += Cell_CellValueChanged;
             }
         }
     }
@@ -742,7 +742,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(_table?.Cell.GetStringCore(column, this) ?? string.Empty, filterValue, typ);
+    internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(Table?.Cell.GetStringCore(column, this) ?? string.Empty, filterValue, typ);
 
     internal void DoSystemColumns(Table db, ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
         if (reason == Reason.NoUndo_NoInvalidate) { return; }
@@ -866,7 +866,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Row != this) { return; }
-        _tmpQuickInfo = null;
+        QuickInfo = null;
     }
 
     private string CellGetCompareKey(ColumnItem column) => Table?.Cell.CompareKey(column, this) ?? string.Empty;
@@ -878,7 +878,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 Table = null;
             }
             // Nicht verwaltete Ressourcen (Bitmap, Tabellenverbindungen, ...)
-            _tmpQuickInfo = null;
+            QuickInfo = null;
             InvalidateCheckData();
 
             IsDisposed = true;
@@ -888,11 +888,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     private void GenerateQuickInfo() {
         if (Table is not { IsDisposed: false } ||
             string.IsNullOrEmpty(Table.RowQuickInfo)) {
-            _tmpQuickInfo = string.Empty;
+            QuickInfo = string.Empty;
             return;
         }
 
-        _tmpQuickInfo = ReplaceVariables(Table.RowQuickInfo, false, null);
+        QuickInfo = ReplaceVariables(Table.RowQuickInfo, false, null);
     }
 
     private bool MatchesTo(ColumnItem column, FilterType filtertyp, ReadOnlyCollection<string> searchvalue) {
@@ -925,7 +925,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (!column.SaveContent) { _ = CheckRow(); }
 
-            txt = _table?.Cell.GetStringCore(column, this) ?? string.Empty;
+            txt = Table?.Cell.GetStringCore(column, this) ?? string.Empty;
 
             if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, column.DoOpticalTranslation, null); }
             // Multiline-Typ ermitteln  --------------------------------------------

@@ -45,7 +45,6 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private string _lastCode = "?";
     private string _sheetStyle = Constants.Win11;
-    private PadStyles _style = PadStyles.Standard;
 
     #endregion
 
@@ -82,14 +81,14 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     }
 
     public PadStyles Style {
-        get => _style;
+        get;
         set {
-            if (_style == value) { return; }
+            if (field == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _style = value;
+            field = value;
             this.InvalidateFont();
         }
-    }
+    } = PadStyles.Standard;
 
     #endregion
 

@@ -50,22 +50,13 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     #region Fields
 
     private readonly List<AbstractListItem> _item = [];
-    private AddType _addAlloweds = AddType.Text;
-
     private ListBoxAppearance _appearance;
-
-    private bool _autoSort = true;
-
     private CheckBehavior _checkBehavior = CheckBehavior.SingleSelection;
 
     private List<string> _checked = [];
 
     private Design _controlDesign;
-
-    private string _filterText = string.Empty;
     private Design _itemDesign;
-
-    private bool _itemEditAllowed;
     private SizeF _lastCheckedMaxSize = Size.Empty;
     private Size _maxNeededItemSize;
 
@@ -79,9 +70,6 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     /// Bei einem MouseWheel wird nichts eingeblendet
     /// </summary>
     private Point _mousepos = Point.Empty;
-
-    private bool _moveAllowed;
-    private bool _removeAllowed;
     private bool _sorted;
 
     #endregion
@@ -136,13 +124,13 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     [DefaultValue(true)]
     public AddType AddAllowed {
-        get => _addAlloweds;
+        get;
         set {
-            if (_addAlloweds == value) { return; }
-            _addAlloweds = value;
+            if (field == value) { return; }
+            field = value;
             DoMouseMovement();
         }
-    }
+    } = AddType.Text;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -163,13 +151,13 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     [DefaultValue(true)]
     public bool AutoSort {
-        get => _autoSort;
+        get;
         set {
-            if (value == _autoSort) { return; }
-            _autoSort = value;
+            if (value == field) { return; }
+            field = value;
             InvalidateItemOrder();
         }
-    }
+    } = true;
 
     public int BreakAfterItems { get; private set; }
 
@@ -187,22 +175,22 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     [DefaultValue("")]
     public string FilterText {
-        get => _filterText;
+        get;
         set {
-            if (_filterText == value) { return; }
-            _filterText = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     public int ItemCount => _item.Count;
 
     [DefaultValue(false)]
     public bool ItemEditAllowed {
-        get => _itemEditAllowed;
+        get;
         set {
-            if (_itemEditAllowed == value) { return; }
-            _itemEditAllowed = value;
+            if (field == value) { return; }
+            field = value;
             DoMouseMovement();
         }
     }
@@ -216,20 +204,20 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     [DefaultValue(false)]
     public bool MoveAllowed {
-        get => _moveAllowed;
+        get;
         set {
-            if (_moveAllowed == value) { return; }
-            _moveAllowed = value;
+            if (field == value) { return; }
+            field = value;
             DoMouseMovement();
         }
     }
 
     [DefaultValue(false)]
     public bool RemoveAllowed {
-        get => _removeAllowed;
+        get;
         set {
-            if (_removeAllowed == value) { return; }
-            _removeAllowed = value;
+            if (field == value) { return; }
+            field = value;
             DoMouseMovement();
         }
     }
@@ -525,7 +513,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     public void Swap(int index1, int index2) {
         if (index1 == index2) { return; }
-        if (_autoSort) { return; }
+        if (AutoSort) { return; }
 
         (_item[index1], _item[index2]) = (_item[index2], _item[index1]);
 
@@ -768,7 +756,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
         var addy = 0;
 
-        if (_addAlloweds != AddType.None) { addy = 33; }
+        if (AddAllowed != AddType.None) { addy = 33; }
 
         if (_item.Count == 0) {
             SliderY.Visible = false;
@@ -804,7 +792,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
                 if (CheckBehavior != CheckBehavior.AllSelected && IsChecked(currentItem)) { itemState |= States.Checked; }
 
                 lock (locker) {
-                    currentItem.Draw(gr, 0, (int)SliderY.Value, _controlDesign, _itemDesign, itemState, true, _filterText, false, checkboxDesign);
+                    currentItem.Draw(gr, 0, (int)SliderY.Value, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign);
                 }
             }
         });
@@ -908,7 +896,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     }
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
-        if (_itemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
+        if (ItemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
             ie.Edit();
         }
     }
@@ -935,7 +923,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
         AbstractListItem? toAdd = null;
 
-        switch (_addAlloweds) {
+        switch (AddAllowed) {
             case AddType.UserDef:
                 toAdd = AddMethod?.Invoke();
                 break;
@@ -952,14 +940,14 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
                 break;
 
             default:
-                Develop.DebugPrint(_addAlloweds);
+                Develop.DebugPrint(AddAllowed);
                 break;
         }
 
         if (toAdd is { } ali) {
             AddAndCheck(ali);
 
-            if (_itemEditAllowed && ali is ReadableListItem { Item: IEditable ie }) {
+            if (ItemEditAllowed && ali is ReadableListItem { Item: IEditable ie }) {
                 ie.Edit();
             }
 
@@ -1024,7 +1012,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     }
 
     private void DoItemOrder() {
-        if (!_autoSort || _sorted) { return; }
+        if (!AutoSort || _sorted) { return; }
         _item.Sort();
         _sorted = true;
     }
@@ -1067,7 +1055,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
             //btnUp.Enabled = Item[0].KeyName != nr[0];
             //btnDown.Enabled = Item[Item.Count - 1].KeyName != nr[0];
 
-            if (_moveAllowed && !_autoSort && _item.Count > 1) {
+            if (MoveAllowed && !AutoSort && _item.Count > 1) {
                 btnDown.Width = 16;
                 btnDown.Height = 16;
                 pos -= btnDown.Width;
@@ -1083,7 +1071,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
             #region Up-Button
 
-            if (_moveAllowed && !_autoSort && _item.Count > 1) {
+            if (MoveAllowed && !AutoSort && _item.Count > 1) {
                 btnUp.Width = 16;
                 btnUp.Height = 16;
                 pos -= btnUp.Width;
@@ -1099,7 +1087,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
             #region Löschen-Button
 
-            var removeok = _removeAllowed;
+            var removeok = RemoveAllowed;
 
             if (CheckboxDesign() != Design.Undefiniert) { removeok = false; }
             if (CheckBehavior == CheckBehavior.MultiSelection) { removeok = false; }
@@ -1122,7 +1110,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
             var editok = false;
 
-            if (_itemEditAllowed && _mouseOverItem is ReadableListItem rli) {
+            if (ItemEditAllowed && _mouseOverItem is ReadableListItem rli) {
                 if (rli.Item is IEditable { Editor: not null }) { editok = true; }
                 if (rli.Item is ISimpleEditor) { editok = true; }
             }

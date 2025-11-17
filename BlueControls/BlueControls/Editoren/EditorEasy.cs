@@ -36,7 +36,6 @@ public partial class EditorEasy : UserControl, IIsEditor {
 
     #region Fields
 
-    private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Nothing;
     private IEditable? _toEdit;
 
     #endregion
@@ -55,13 +54,13 @@ public partial class EditorEasy : UserControl, IIsEditor {
 
     [DefaultValue(GroupBoxStyle.Nothing)]
     public GroupBoxStyle GroupBoxStyle {
-        get => _groupBoxStyle;
+        get;
         set {
-            if (_groupBoxStyle == value) { return; }
-            _groupBoxStyle = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = GroupBoxStyle.Nothing;
 
     public IEditable? ToEdit {
         get => _toEdit;
@@ -117,7 +116,7 @@ public partial class EditorEasy : UserControl, IIsEditor {
 
         base.OnPaint(e);
 
-        if (_groupBoxStyle == GroupBoxStyle.Nothing) { return; }
+        if (GroupBoxStyle == GroupBoxStyle.Nothing) { return; }
 
         var t = "[?]";
 
@@ -126,7 +125,7 @@ public partial class EditorEasy : UserControl, IIsEditor {
         var s = States.Standard;
 
         if (!Enabled) { s = States.Standard_Disabled; }
-        GroupBox.DrawGroupBox(this, e.Graphics, s, _groupBoxStyle, t);
+        GroupBox.DrawGroupBox(this, e.Graphics, s, GroupBoxStyle, t);
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {

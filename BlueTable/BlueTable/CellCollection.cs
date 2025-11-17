@@ -36,7 +36,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Fields
 
-    private Table? _table;
 
     #endregion
 
@@ -67,18 +66,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public bool IsDisposed { get; private set; }
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }

@@ -43,7 +43,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public bool UndoDone;
     private bool _frmHeadEditorFormClosingIsin;
-    private Table? _table;
 
     #endregion Fields
 
@@ -60,18 +59,18 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     #region Properties
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }

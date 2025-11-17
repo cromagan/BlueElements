@@ -48,7 +48,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     private bool _mousePressing;
     private ParentType _myParentType = ParentType.Unbekannt;
     private Form? _pform;
-    private string _quickInfo = string.Empty;
     private bool _useBackBitmap;
 
     #endregion
@@ -98,17 +97,17 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
     [Description("QuickInfo des Steuerelementes. Es können Codes wie <b> oder <u> verwendet werden.")]
     public string QuickInfo {
-        get => _quickInfo;
+        get;
         set {
             value = value.Trim().Trim("<br>").Trim();
-            if (_quickInfo != value) {
+            if (field != value) {
                 Forms.QuickInfo.Close();
-                _quickInfo = value;
+                field = value;
                 OnQuickInfoChanged();
                 DoQuickInfo();
             }
         }
-    }
+    } = string.Empty;
 
     protected override bool ScaleChildren => false;
 
@@ -251,8 +250,8 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
             return;
         }
 
-        if (!string.IsNullOrEmpty(_quickInfo) && ContainsMouse()) {
-            Forms.QuickInfo.Show(_quickInfo);
+        if (!string.IsNullOrEmpty(QuickInfo) && ContainsMouse()) {
+            Forms.QuickInfo.Show(QuickInfo);
             return;
         }
 

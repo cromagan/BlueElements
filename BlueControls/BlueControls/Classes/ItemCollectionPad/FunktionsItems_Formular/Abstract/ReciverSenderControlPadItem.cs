@@ -39,9 +39,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     #region Fields
 
-    private int _outputColorId = -1;
-    private Table? _tableOutput;
-
     private bool _tableOutputLoaded;
 
     private string _tableOutputName = string.Empty;
@@ -57,29 +54,29 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
     #region Properties
 
     public int OutputColorId {
-        get => _outputColorId;
+        get;
 
         private set {
             if (IsDisposed) { return; }
 
-            if (_outputColorId == value) { return; }
+            if (field == value) { return; }
 
-            _outputColorId = value;
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = -1;
 
     public Table? TableOutput {
         get {
             if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false }) { return TableInput; }
 
-            if (_tableOutputLoaded) { return _tableOutput; }
+            if (_tableOutputLoaded) { return field; }
 
-            _tableOutput = Table.Get(_tableOutputName, TableView.Table_NeedPassword, false);
+            field = Table.Get(_tableOutputName, TableView.Table_NeedPassword, false);
 
             _tableOutputLoaded = true;
 
-            return _tableOutput;
+            return field;
         }
         // ReSharper disable once MemberCanBePrivate.Global -> FlexiCOntrolForProperty!
         set {
@@ -89,7 +86,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
             if (value == TableOutput) { return; }
 
-            _tableOutput = value;
+            field = value;
             _tableOutputName = value?.KeyName ?? string.Empty;
             _tableOutputLoaded = true;
             OnPropertyChanged();

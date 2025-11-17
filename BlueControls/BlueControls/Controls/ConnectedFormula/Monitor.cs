@@ -32,7 +32,6 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
     {
     #region Fields
 
-    private RowItem? _lastRow;
 
     private int _n = 99999;
 
@@ -55,20 +54,20 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
     #region Properties
 
     public RowItem? LastRow {
-        get => _lastRow;
+        get;
 
         set {
             if (value?.Table == null || value.IsDisposed) { value = null; }
 
-            if (_lastRow == value) { return; }
+            if (field == value) { return; }
 
             _n = 99999;
-            _lastRow = value;
+            field = value;
             capInfo.Text = string.Empty;
             lstDone.ItemClear();
 
-            if (_lastRow != null) {
-                capInfo.Text = "Überwache: " + _lastRow.CellFirstString();
+            if (field != null) {
+                capInfo.Text = "Überwache: " + field.CellFirstString();
                 // Simuliere eine Start-Meldung
                 _lastRow_DropMessage(ErrorType.Info, ImageCode.Monitor, "Überwachung gestartet");
             }
@@ -127,7 +126,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         message = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message;
 
         // Nur Meldungen verarbeiten, die sich auf die überwachte Row beziehen
-        if (reference == _lastRow && _lastRow != null) {
+        if (reference == LastRow && LastRow != null) {
             _lastRow_DropMessage(type, symbol, message);
             return;
         }

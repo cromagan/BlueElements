@@ -48,7 +48,6 @@ public sealed partial class ExportDialog : IHasTable {
     private readonly string _saveTo = string.Empty;
     private readonly string _zielPfad;
     private int _itemNrForPrint;
-    private Table? _table;
 
     #endregion
 
@@ -83,18 +82,18 @@ public sealed partial class ExportDialog : IHasTable {
     #region Properties
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }

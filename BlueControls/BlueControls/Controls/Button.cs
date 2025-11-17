@@ -56,12 +56,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     /// Timer-Objekt und Variablen für Dauer-Feuer-Buttonn
     /// </summary>
     private Timer? _clickFirerer;
-
-    private string _imageCode = string.Empty;
-
     private bool _isFireing;
-
-    private string _text = string.Empty;
 
     #endregion
 
@@ -125,23 +120,23 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
     [DefaultValue("")]
     public string ImageCode {
-        get => _imageCode;
+        get;
         set {
-            if (_imageCode == value) { return; }
-            _imageCode = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue("")]
     public new string Text {
-        get => _text;
+        get;
         set {
-            if (_text == value) { return; }
-            _text = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -205,7 +200,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                     ? QuickImage.Get(BlueBasics.Enums.ImageCode.Häkchen)
                     : QuickImage.Get(BlueBasics.Enums.ImageCode.Kreuz);
             } else {
-                qi = string.IsNullOrEmpty(ImageCode) ? null : QuickImage.Get(_imageCode);
+                qi = string.IsNullOrEmpty(ImageCode) ? null : QuickImage.Get(ImageCode);
             }
 
             #region State modifzieren
@@ -222,52 +217,52 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                 case ButtonStyle.Text:
                 case ButtonStyle.Borderless:
                 case ButtonStyle.Button:
-                    DrawButton(this, gr, Design.Button, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Button, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Button_Big_Borderless:
-                    DrawButton(this, gr, Design.Ribbonbar_Button, state, qi, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Ribbonbar_Button, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Button_Big:
-                    DrawButton(this, gr, Design.Button, state, qi, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Button, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.SliderButton:
-                    DrawButton(this, gr, Design.Button_SliderDesign, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Button_SliderDesign, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Yes_or_No:
                 case ButtonStyle.Checkbox:
-                    DrawButton(this, gr, Design.Button_CheckBox, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Button_CheckBox, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Checkbox_Big_Borderless:
-                    DrawButton(this, gr, Design.Ribbonbar_Button_CheckBox, state, qi, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Ribbonbar_Button_CheckBox, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Checkbox_Text:
-                    DrawButton(this, gr, Design.CheckBox_TextStyle, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.CheckBox_TextStyle, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Optionbox:
-                    DrawButton(this, gr, Design.Button_OptionButton, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Button_OptionButton, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Optionbox_Big_Borderless:
-                    DrawButton(this, gr, Design.Ribbonbar_Button_OptionButton, state, qi, Alignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Ribbonbar_Button_OptionButton, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Optionbox_Text:
-                    DrawButton(this, gr, Design.OptionButton_TextStyle, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.OptionButton_TextStyle, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.ComboBoxButton:
-                    DrawButton(this, gr, Design.Button_ComboBox, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Button_ComboBox, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.ComboBoxButton_Borderless:
-                    DrawButton(this, gr, Design.Ribbonbar_Button_Combobox, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.Ribbonbar_Button_Combobox, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 default:

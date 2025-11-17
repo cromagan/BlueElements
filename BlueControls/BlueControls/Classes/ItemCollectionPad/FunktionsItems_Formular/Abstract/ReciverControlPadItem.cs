@@ -60,8 +60,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     private readonly List<string> _getFilterFromKeys = [];
     private ReadOnlyCollection<ReciverSenderControlPadItem>? _getFilterFrom;
     private List<int> _inputColorId = [];
-    private ReadOnlyCollection<string> _visibleFor = new([]);
-
     private XPosition _xPosition = XPosition.frei;
 
     #endregion
@@ -158,17 +156,17 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ReadOnlyCollection<string> VisibleFor {
-        get => _visibleFor;
+        get;
         set {
             var tmp = Table.RepairUserGroups(value);
-            if (!_visibleFor.IsDifferentTo(tmp)) { return; }
+            if (!field.IsDifferentTo(tmp)) { return; }
 
             ConnectedFormula.ConnectedFormula.Invalidate_VisibleFor_AllUsed();
 
-            _visibleFor = tmp.AsReadOnly();
+            field = tmp.AsReadOnly();
             OnPropertyChanged();
         }
-    }
+    } = new([]);
 
     public XPosition X_Position {
         get => _xPosition;

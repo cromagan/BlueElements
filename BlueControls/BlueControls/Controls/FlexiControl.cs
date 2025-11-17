@@ -42,27 +42,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Fields
 
-    private AdditionalCheck _additionalCheck = AdditionalCheck.None;
-    private string _allowedChars = string.Empty;
     private string _caption = string.Empty;
     private Caption? _captionObject;
     private CaptionPosition _captionPosition = CaptionPosition.ohne;
 
     // None ist -1 und muss gesetzt sein!
-    private int _controlX = -1;
-
-    private string _disabledReason = string.Empty;
     private EditTypeFormula _editType;
-    private bool _formatierungErlaubt;
     private Caption? _infoCaption;
     private string _infoText = string.Empty;
-    private int _maxTextLength = 4000;
-    private bool _multiLine;
-    private string _regexCheck = string.Empty;
-    private bool _showInfoWhenDisabled;
-    private bool _spellChecking;
-    private string _suffix = string.Empty;
-    private bool _translateCaption = true;
 
     #endregion
 
@@ -112,37 +99,37 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     [DefaultValue(AdditionalCheck.None)]
     public AdditionalCheck AdditionalFormatCheck {
-        get => _additionalCheck;
+        get;
         set {
-            if (_additionalCheck == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => AdditionalFormatCheck = value));
                 return;
             }
 
-            _additionalCheck = value;
+            field = value;
             UpdateControls();
         }
-    }
+    } = AdditionalCheck.None;
 
     public bool Allinitialized { get; private set; }
 
     [DefaultValue("")]
     public string AllowedChars {
-        get => _allowedChars;
+        get;
         set {
-            if (_allowedChars == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => AllowedChars = value));
                 return;
             }
 
-            _allowedChars = value;
+            field = value;
             UpdateControls();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue("")]
     public string Caption {
@@ -181,9 +168,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     [DefaultValue(-1)]
     public int ControlX {
-        get => _controlX;
+        get;
         set {
-            if (_controlX == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => ControlX = value));
@@ -191,9 +178,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             }
 
             RemoveAll(); // Controls and Events entfernen!
-            _controlX = value;
+            field = value;
         }
-    }
+    } = -1;
 
     /// <summary>
     /// Info wird nur angezeigt, wenn ShowInfoWhenDisabled True ist
@@ -203,23 +190,23 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string DisabledReason {
-        get => _disabledReason;
+        get;
         set {
-            if (_disabledReason == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => DisabledReason = value));
                 return;
             }
 
-            _disabledReason = value;
+            field = value;
             foreach (Control thisControl in Controls) {
                 thisControl.Enabled = thisControl == _infoCaption || Enabled;
             }
-            DoInfoTextCaption(_disabledReason);
+            DoInfoTextCaption(field);
             Invalidate();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue(EditTypeFormula.None)]
     public EditTypeFormula EditType {
@@ -244,7 +231,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public new bool Enabled => !DesignMode && string.IsNullOrEmpty(_disabledReason);
+    public new bool Enabled => !DesignMode && string.IsNullOrEmpty(DisabledReason);
 
     public override bool Focused {
         get {
@@ -276,83 +263,83 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     [DefaultValue(4000)]
     public int MaxTextLength {
-        get => _maxTextLength;
+        get;
         set {
-            if (_maxTextLength == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => MaxTextLength = value));
                 return;
             }
 
-            _maxTextLength = value;
+            field = value;
             UpdateControls();
         }
-    }
+    } = 4000;
 
     /// <summary>
     /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
     /// </summary>
     [DefaultValue(false)]
     public bool MultiLine {
-        get => _multiLine;
+        get;
         set {
-            if (_multiLine == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => MultiLine = value));
                 return;
             }
 
-            _multiLine = value;
+            field = value;
             UpdateControls();
         }
     }
 
     [DefaultValue("")]
     public string RegexCheck {
-        get => _regexCheck;
+        get;
         set {
-            if (_regexCheck == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => RegexCheck = value));
                 return;
             }
 
-            _regexCheck = value;
+            field = value;
             UpdateControls();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue(false)]
     public bool ShowInfoWhenDisabled {
-        get => _showInfoWhenDisabled;
+        get;
         set {
-            if (_showInfoWhenDisabled == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => ShowInfoWhenDisabled = value));
                 return;
             }
 
-            _showInfoWhenDisabled = value;
+            field = value;
             Invalidate();
         }
     }
 
     [DefaultValue(false)]
     public bool SpellCheckingEnabled {
-        get => _spellChecking;
+        get;
         set {
-            if (_spellChecking == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => SpellCheckingEnabled = value));
                 return;
             }
 
-            _spellChecking = value;
+            field = value;
             UpdateControls();
         }
     }
@@ -362,19 +349,19 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     [DefaultValue("")]
     public string Suffix {
-        get => _suffix;
+        get;
         set {
-            if (_suffix == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => Suffix = value));
                 return;
             }
 
-            _suffix = value;
+            field = value;
             UpdateControls();
         }
-    }
+    } = string.Empty;
 
     /// <summary>
     /// Value benutzen!
@@ -388,7 +375,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     [DefaultValue(false)]
     public bool TextFormatingAllowed {
-        get => _formatierungErlaubt;
+        get;
         set {
             if (value == TextFormatingAllowed) { return; }
 
@@ -397,27 +384,27 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 return;
             }
 
-            _formatierungErlaubt = value;
+            field = value;
             UpdateControls();
         }
     }
 
     [DefaultValue(true)]
     public bool Translate {
-        get => _translateCaption;
+        get;
         set {
-            if (_translateCaption == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
                 Invoke(new Action(() => Translate = value));
                 return;
             }
 
-            _translateCaption = value;
+            field = value;
 
             UpdateControls();
         }
-    }
+    } = true;
 
     /// <summary>
     /// Info: Zum Setzen des Wertes muss ValueSet benutzt werden.
@@ -555,7 +542,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.RaiseChangeDelay = raiseChangeDelayinSec;
-        control.Verhalten = _multiLine || Height > 20
+        control.Verhalten = MultiLine || Height > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
     }
@@ -628,8 +615,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //        Skin.Draw_Border(gr, enDesign.ListBox, tmpstate, R);
         //    }
         //}
-        if (!string.IsNullOrEmpty(_disabledReason)) {
-            DoInfoTextCaption(_disabledReason);
+        if (!string.IsNullOrEmpty(DisabledReason)) {
+            DoInfoTextCaption(DisabledReason);
         } else {
             DoInfoTextCaption(state.HasFlag(States.Standard_Disabled) ? "Übergeordnetes Steuerlement ist deaktiviert." : string.Empty);
         }
@@ -779,7 +766,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _captionObject.Top = 0;
         _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         _captionObject.Visible = true; // _captionPosition != ÜberschriftAnordnung.Ohne_mit_Abstand;
-        _captionObject.Translate = _translateCaption;
+        _captionObject.Translate = Translate;
 
         // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
         // Text_abschneiden, wäre Cool, weil dann der Quickmode verfügbar ist
@@ -873,7 +860,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             symbol = "<imagecode=Information|16>";
             txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _infoText;
         }
-        if (!_showInfoWhenDisabled && !string.IsNullOrEmpty(disabledReason)) { txt = string.Empty; }
+        if (!ShowInfoWhenDisabled && !string.IsNullOrEmpty(disabledReason)) { txt = string.Empty; }
         if (!string.IsNullOrEmpty(txt) && _infoCaption != null) {
             _infoCaption.Left = Width - 18;
             _infoCaption.Top = 0;
@@ -932,7 +919,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             case CaptionPosition.Links_neben_dem_Feld:
                 var s1 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
-                control.Left = Math.Max(_controlX, s1.Width);
+                control.Left = Math.Max(ControlX, s1.Width);
                 control.Top = 0;
                 control.Width = Width - control.Left;
                 control.Height = Height;
@@ -941,7 +928,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             default:
                 var s2 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
                 control.Left = 0;
-                control.Top = Math.Max(_controlX, s2.Height);
+                control.Top = Math.Max(ControlX, s2.Height);
                 control.Width = Width;
                 control.Height = Height - s2.Height;
                 break;
@@ -956,7 +943,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void SwapListBox_ItemCheckedChanged(object sender, System.EventArgs e) => ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
 
     private void UpdateControls() {
-        if (_captionObject is { IsDisposed: false } c) { c.Translate = _translateCaption; }
+        if (_captionObject is { IsDisposed: false } c) { c.Translate = Translate; }
 
         foreach (Control control in Controls) {
             if (control != _infoCaption) {
@@ -968,7 +955,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             if (control is IInputFormat inf) { inf.GetStyleFrom(this); }
 
-            if (control is TextBox txb) { txb.Suffix = _suffix; }
+            if (control is TextBox txb) { txb.Suffix = Suffix; }
         }
     }
 

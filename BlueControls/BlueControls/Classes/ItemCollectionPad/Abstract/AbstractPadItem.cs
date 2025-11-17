@@ -64,7 +64,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
     private PointM? _jointReferenceSecond;
 
     private string _keyName;
-    private object? _parent;
     private RectangleF _usedArea;
 
     #endregion
@@ -164,12 +163,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
     //     Dispose(disposing: false);
     // }
     public object? Parent {
-        get => _parent;
+        get;
         set {
-            if (value == _parent) { return; }
+            if (value == field) { return; }
 
             OnParentChanging();
-            _parent = value;
+            field = value;
             OnParentChanged();
         }
     }

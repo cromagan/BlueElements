@@ -48,9 +48,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     #region Fields
 
     private bool _generated;
-    private GroupBoxStyle _groupBoxStyle = GroupBoxStyle.Normal;
     private RowItem? _lastRow;
-    private ItemCollectionPadItem? _page;
 
     #endregion
 
@@ -81,13 +79,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle GroupBoxStyle {
-        get => _groupBoxStyle;
+        get;
         set {
-            if (_groupBoxStyle == value) { return; }
-            _groupBoxStyle = value;
+            if (field == value) { return; }
+            field = value;
             Invalidate();
         }
-    }
+    } = GroupBoxStyle.Normal;
 
     public override string Mode {
         get => base.Mode;
@@ -99,28 +97,28 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     public ItemCollectionPadItem? Page {
-        get => _page;
+        get;
         set {
-            if (value == _page) { return; }
+            if (value == field) { return; }
 
-            if (_page != null) {
+            if (field != null) {
                 //_page.Loaded -= _cf_Loaded;
-                _page.PropertyChanged -= _page_PropertyChanged;
-                _page.ItemAdded -= _page_ItemAdded;
-                _page.ItemRemoved -= _page_ItemRemoved;
+                field.PropertyChanged -= _page_PropertyChanged;
+                field.ItemAdded -= _page_ItemAdded;
+                field.ItemRemoved -= _page_ItemRemoved;
 
-                if (_page.GetRowEntryItem()?.TableOutput is { IsDisposed: false } db1) {
+                if (field.GetRowEntryItem()?.TableOutput is { IsDisposed: false } db1) {
                     db1.DisposingEvent -= _table_Disposing;
                 }
             }
-            _page = value;
+            field = value;
 
-            if (_page != null) {
+            if (field != null) {
                 //_page.Loaded += _cf_Loaded;
-                _page.PropertyChanged += _page_PropertyChanged;
-                _page.ItemAdded += _page_ItemAdded;
-                _page.ItemRemoved += _page_ItemRemoved;
-                if (_page.GetRowEntryItem()?.TableOutput is { IsDisposed: false } db1) {
+                field.PropertyChanged += _page_PropertyChanged;
+                field.ItemAdded += _page_ItemAdded;
+                field.ItemRemoved += _page_ItemRemoved;
+                if (field.GetRowEntryItem()?.TableOutput is { IsDisposed: false } db1) {
                     db1.DisposingEvent += _table_Disposing;
                 }
             }
@@ -164,12 +162,12 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (IsDisposed) { return; }
         if (_generated) { return; }
         if (!Visible) { return; }
-        if (_page == null || Width < 30 || Height < 10) {
+        if (Page == null || Width < 30 || Height < 10) {
             _generated = true;
             return;
         }
 
-        if (_page.GetConnectedFormula()?.IsEditing() ?? true) { return; }
+        if (Page.GetConnectedFormula()?.IsEditing() ?? true) { return; }
 
         #region Zuerst alle Controls als unused markieren
 
@@ -196,10 +194,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             y2 = Skin.Padding;
         }
 
-        var l = ItemCollectionPadItem.ResizeControls(_page, Width - x1 - x2, Height - y1 - y2, Mode);
+        var l = ItemCollectionPadItem.ResizeControls(Page, Width - x1 - x2, Height - y1 - y2, Mode);
         var autoc = new List<FlexiCellControl>();
 
-        foreach (var thisit in _page) {
+        foreach (var thisit in Page) {
             if (thisit is IItemToControl thisitco) {
                 var con = SearchOrGenerate(thisitco, Mode);
 
@@ -336,7 +334,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         var s = States.Standard;
 
         if (!Enabled) { s = States.Standard_Disabled; }
-        GroupBox.DrawGroupBox(this, gr, s, _groupBoxStyle, Text);
+        GroupBox.DrawGroupBox(this, gr, s, GroupBoxStyle, Text);
         GenerateView();
 
         if (!_generated) {
@@ -359,7 +357,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         _lastRow = null;
 
         if (RowSingleOrNull() is { IsDisposed: false } r) {
-            if (_page?.GetRowEntryItem()?.TableOutput == r.Table) {
+            if (Page?.GetRowEntryItem()?.TableOutput == r.Table) {
                 _lastRow = r;
                 using var nfc = new FilterCollection(r, "ConnectedFormulaView");
 

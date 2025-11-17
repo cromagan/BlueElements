@@ -54,10 +54,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
     private readonly List<IMoveable> _itemsToMove = [];
 
     private ItemCollectionPadItem _items = new ItemCollectionPadItem();
-    private AbstractPadItem? _lastClickedItem;
     private bool _repairPrinterDataPrepaired;
-    private bool _showInPrintMode;
-    private bool _showJointPoints;
 
     #endregion
 
@@ -137,11 +134,11 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
     }
 
     public AbstractPadItem? LastClickedItem {
-        get => _lastClickedItem;
+        get;
         private set {
-            if (_lastClickedItem != value) {
+            if (field != value) {
                 OnClickedItemChanging();
-                _lastClickedItem = value;
+                field = value;
                 OnClickedItemChanged();
             }
         }
@@ -149,10 +146,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
 
     [DefaultValue(false)]
     public bool ShowInPrintMode {
-        get => _showInPrintMode;
+        get;
         set {
-            if (_showInPrintMode == value) { return; }
-            _showInPrintMode = value;
+            if (field == value) { return; }
+            field = value;
             OnDrawModeChanged();
             Unselect();
             OnPropertyChanged();
@@ -161,10 +158,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
 
     [DefaultValue(false)]
     public bool ShowJointPoint {
-        get => _showJointPoints;
+        get;
         set {
-            if (_showJointPoints == value) { return; }
-            _showJointPoints = value;
+            if (field == value) { return; }
+            field = value;
             OnDrawModeChanged();
             Unselect();
             OnPropertyChanged();
@@ -421,8 +418,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
         if (_items != null) {
-            _items.ShowJointPoints = _showJointPoints;
-            _items.ForPrinting = _showInPrintMode;
+            _items.ShowJointPoints = ShowJointPoint;
+            _items.ForPrinting = ShowInPrintMode;
             _items.ShowAlways = true;
             _items.AutoZoomFit = false;
 

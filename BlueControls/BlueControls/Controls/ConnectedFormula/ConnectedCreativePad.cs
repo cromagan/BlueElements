@@ -38,9 +38,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     {
     #region Fields
 
-    private int _autoRefreshx = -1;
     private DateTime _lastRefresh = DateTime.UtcNow;
-    private RowItem? _lastRow;
     private int _panelMoveDirection;
 
     #endregion
@@ -65,13 +63,13 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     #region Properties
 
     public int AutoRefresh {
-        get => _autoRefreshx;
+        get;
         set {
-            _autoRefreshx = value;
+            field = value;
 
-            _autoRefresh.Enabled = _autoRefreshx > 0;
+            _autoRefresh.Enabled = field > 0;
         }
-    }
+    } = -1;
 
     public float DefaultCopyScale { get; set; } = 1f;
 
@@ -82,14 +80,14 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowItem? LastRow {
-        get => _lastRow;
+        get;
 
         set {
             if (value?.Table == null || value.IsDisposed) { value = null; }
 
-            if (_lastRow == value) { return; }
+            if (field == value) { return; }
 
-            _lastRow = value;
+            field = value;
 
             RefreshPad();
         }
@@ -144,7 +142,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     }
 
     private void _autoRefresh_Tick(object sender, System.EventArgs e) {
-        if (DateTime.UtcNow.Subtract(_lastRefresh).TotalSeconds > _autoRefreshx) { RefreshPad(); }
+        if (DateTime.UtcNow.Subtract(_lastRefresh).TotalSeconds > AutoRefresh) { RefreshPad(); }
     }
 
     private void _panelMover_Tick(object sender, System.EventArgs e) {
@@ -221,7 +219,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             if (LoadAtRowChange.FileType() is FileFormat.BlueCreativeFile) {
                 pad.Items = new ItemCollectionPadItem(LoadAtRowChange);
                 _ = pad.Items.ResetVariables();
-                _ = pad.Items.ReplaceVariables(_lastRow);
+                _ = pad.Items.ReplaceVariables(LastRow);
             }
         } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
             pad.Items = [];
@@ -231,8 +229,8 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
                 pad.Items.SheetStyle = DefaultDesign;
             }
 
-            if (_lastRow != null) {
-                _ = pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, _lastRow);
+            if (LastRow != null) {
+                _ = pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, LastRow);
             }
         }
 

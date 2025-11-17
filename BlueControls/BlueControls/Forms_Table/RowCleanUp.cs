@@ -34,8 +34,6 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
     #region Fields
 
-    private Table? _table;
-    private Controls.TableView? _tableview;
 
     #endregion
 
@@ -57,7 +55,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         //Eintr.Text = ein.Count + " zum Importieren bereit.";
         //Table = table;
 
-        if (_table is { IsDisposed: false } db) {
+        if (Table is { IsDisposed: false } db) {
             //var lst =  List<AbstractListItem>();
             lstColumns.ItemAddRange(ItemsOf(db.Column, false));
             //cbxColDateiname.Item = lst;
@@ -71,35 +69,35 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
     #region Properties
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }
 
     public Controls.TableView? TableView {
-        get => _tableview;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _tableview) { return; }
+            if (value == field) { return; }
 
-            if (_tableview != null) {
-                _tableview.VisibleRowsChanged -= _table_VisibleRowsChanged;
+            if (field != null) {
+                field.VisibleRowsChanged -= _table_VisibleRowsChanged;
             }
-            _tableview = value;
+            field = value;
 
-            if (_tableview != null) {
-                _tableview.VisibleRowsChanged += _table_VisibleRowsChanged;
+            if (field != null) {
+                field.VisibleRowsChanged += _table_VisibleRowsChanged;
             }
         }
     }
@@ -123,13 +121,13 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
     private void CheckButtons() {
-        if (_table == null || _tableview == null) {
+        if (Table == null || TableView == null) {
             txtInfo.Text = "Keine Tabelle gewählt.";
             btnExecute.Enabled = false;
             return;
         }
 
-        var r = _tableview.RowsVisibleUnique().Count;
+        var r = TableView.RowsVisibleUnique().Count;
 
         if (r == 0) {
             txtInfo.Text = "Keine Zeilen angezeigt.";
@@ -160,14 +158,14 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
     }
 
     private void Fertig_Click(object sender, System.EventArgs e) {
-        var r = _tableview?.RowsVisibleUnique();
+        var r = TableView?.RowsVisibleUnique();
 
         if (r is not { Count: not 0 }) {
             MessageBox.Show("Keine Zeilen gewählt.", ImageCode.Information, "OK");
             return;
         }
 
-        if (_table is not { IsDisposed: false } db) { return; }
+        if (Table is not { IsDisposed: false } db) { return; }
         var columns = new List<ColumnItem>();
         foreach (var column in lstColumns.Checked) {
             if (db.Column[column] is { IsDisposed: false } c) {

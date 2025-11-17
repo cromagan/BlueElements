@@ -45,7 +45,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private static int _executingchangedrows;
 
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
-    private Table? _table;
 
     #endregion
 
@@ -90,18 +89,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public bool IsDisposed { get; private set; }
 
     public Table? Table {
-        get => _table;
+        get;
         private set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _table) { return; }
+            if (value == field) { return; }
 
-            if (_table != null) {
-                _table.DisposingEvent -= _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent -= _table_Disposing;
             }
-            _table = value;
+            field = value;
 
-            if (_table != null) {
-                _table.DisposingEvent += _table_Disposing;
+            if (field != null) {
+                field.DisposingEvent += _table_Disposing;
             }
         }
     }

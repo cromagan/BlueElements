@@ -19,8 +19,8 @@ namespace BlueControls.Controls
                 }
                 FloatingInputBoxListBoxStyle.Close(this);
                 _dropDownStyle = 0;
-                _imageCode = null;
-                _drawStyle = 0;
+                ImageCode = null;
+                DrawStyle = 0;
             }
             finally
             {

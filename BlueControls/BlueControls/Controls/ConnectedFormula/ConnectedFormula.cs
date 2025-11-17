@@ -52,8 +52,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     private readonly List<string> _notAllowedChilds = [];
 
-    private ItemCollectionPadItem? _pages;
-
     #endregion
 
     #region Constructors
@@ -69,8 +67,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         Repair();
 
-        if (_pages != null) {
-            foreach (var page in _pages) {
+        if (Pages != null) {
+            foreach (var page in Pages) {
                 if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
                     icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
                     icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
@@ -102,19 +100,19 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public ItemCollectionPadItem? Pages {
-        get => _pages;
+        get;
         private set {
-            if (_pages == value) { return; }
+            if (field == value) { return; }
 
-            if (_pages != null) {
-                _pages.PropertyChanged -= PadData_PropertyChanged;
+            if (field != null) {
+                field.PropertyChanged -= PadData_PropertyChanged;
             }
 
-            _pages = value;
+            field = value;
 
-            if (_pages != null) {
-                _pages.Parent = this;
-                _pages.PropertyChanged += PadData_PropertyChanged;
+            if (field != null) {
+                field.Parent = this;
+                field.PropertyChanged += PadData_PropertyChanged;
             }
 
             OnPropertyChanged();
@@ -158,7 +156,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         _visibleFor_AllUsed = [];
 
         foreach (var thisCf in AllFiles) {
-            if (thisCf is { IsDisposed: false, _pages: { IsDisposed: false } icp }) {
+            if (thisCf is { IsDisposed: false, Pages: { IsDisposed: false } icp }) {
                 _visibleFor_AllUsed.AddRange(icp.VisibleFor_AllUsed());
             }
         }
@@ -373,8 +371,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             }
         }
 
-        if (_pages != null) {
-            foreach (var thisf in _pages) {
+        if (Pages != null) {
+            foreach (var thisf in Pages) {
                 if (thisf is ItemCollectionPadItem { IsDisposed: false, HasItems: true } icpi) {
                     if (!notAllowedChilds.Contains(icpi.KeyName) && !icpi.IsHead()) {
                         list.Add(ItemOf(icpi));

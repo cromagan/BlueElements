@@ -51,8 +51,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private FilterCollection? _filterInput;
 
-    private Table? _tableInput;
-
     #endregion
 
     #region Constructors
@@ -79,7 +77,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Table? TableInput {
-        get => _tableInput;
+        get;
 
         private set {
             // Wichtig! Darf nur von HandelChangesNow befüllt werden!
@@ -87,26 +85,26 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
             if (value is { IsDisposed: true }) { value = null; }
 
-            if (value == _tableInput) { return; }
+            if (value == field) { return; }
 
             // Thread-Sicherheit: Sperren Sie den Zugriff auf _tableInput
             lock (_lockObject) {
-                if (_tableInput is { }) {
-                    _tableInput.Cell.CellValueChanged -= TableInput_CellValueChanged;
-                    _tableInput.Column.ColumnPropertyChanged -= TableInput_ColumnPropertyChanged;
-                    _tableInput.Row.RowChecked -= TableInput_RowChecked;
-                    _tableInput.Loaded -= TableInput_Loaded;
-                    _tableInput.Disposed -= TableInput_Disposed;
+                if (field is { }) {
+                    field.Cell.CellValueChanged -= TableInput_CellValueChanged;
+                    field.Column.ColumnPropertyChanged -= TableInput_ColumnPropertyChanged;
+                    field.Row.RowChecked -= TableInput_RowChecked;
+                    field.Loaded -= TableInput_Loaded;
+                    field.Disposed -= TableInput_Disposed;
                 }
 
-                _tableInput = value;
+                field = value;
 
-                if (_tableInput is { IsDisposed: false }) {
-                    _tableInput.Cell.CellValueChanged += TableInput_CellValueChanged;
-                    _tableInput.Column.ColumnPropertyChanged += TableInput_ColumnPropertyChanged;
-                    _tableInput.Row.RowChecked += TableInput_RowChecked;
-                    _tableInput.Loaded += TableInput_Loaded;
-                    _tableInput.Disposed += TableInput_Disposed;
+                if (field is { IsDisposed: false }) {
+                    field.Cell.CellValueChanged += TableInput_CellValueChanged;
+                    field.Column.ColumnPropertyChanged += TableInput_ColumnPropertyChanged;
+                    field.Row.RowChecked += TableInput_RowChecked;
+                    field.Loaded += TableInput_Loaded;
+                    field.Disposed += TableInput_Disposed;
                 }
             }
         }

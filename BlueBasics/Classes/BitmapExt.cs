@@ -43,7 +43,6 @@ public class BitmapExt : IDisposableExtended {
     #region Fields
 
     private const PixelFormat Pixelformat = PixelFormat.Format32bppArgb;
-    private static List<ImageFilter>? _imageFilter;
     private Bitmap? _bitmap;
 
     private BitmapData? _bitmapData;
@@ -85,8 +84,8 @@ public class BitmapExt : IDisposableExtended {
 
     public static List<ImageFilter> ImageFilters {
         get {
-            _imageFilter ??= Generic.GetInstaceOfType<ImageFilter>();
-            return _imageFilter;
+            field ??= Generic.GetInstaceOfType<ImageFilter>();
+            return field;
         }
     }
 

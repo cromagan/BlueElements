@@ -31,7 +31,6 @@ public class Line : GenericControl, IBackgroundNone {
 
     #region Fields
 
-    private Orientation _orientation = Orientation.Waagerecht;
 
     #endregion
 
@@ -50,16 +49,16 @@ public class Line : GenericControl, IBackgroundNone {
 
     [DefaultValue(Orientation.Waagerecht)]
     public Orientation Orientation {
-        get => _orientation;
+        get;
         set {
-            if (value == _orientation) {
+            if (value == field) {
                 return;
             }
-            _orientation = value;
+            field = value;
             CheckSize();
             Invalidate();
         }
-    }
+    } = Orientation.Waagerecht;
 
     [DefaultValue(0)]
     public new int TabIndex {
@@ -80,7 +79,7 @@ public class Line : GenericControl, IBackgroundNone {
     #region Methods
 
     public void CheckSize() {
-        if (_orientation == Orientation.Waagerecht) {
+        if (Orientation == Orientation.Waagerecht) {
             if (Width < 10) { Width = 10; }
             Height = 2;
         } else {
@@ -93,7 +92,7 @@ public class Line : GenericControl, IBackgroundNone {
         CheckSize();
         Pen dp = new(SystemColors.ControlDark);
         Pen lp = new(SystemColors.ControlLight);
-        if (_orientation == Orientation.Waagerecht) {
+        if (Orientation == Orientation.Waagerecht) {
             gr.DrawLine(dp, 0, 0, Width - 1, 0);
             gr.DrawLine(lp, 1, 1, Width, 1);
         } else {

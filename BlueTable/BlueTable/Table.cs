@@ -116,7 +116,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private readonly List<string> _tags = [];
     private readonly List<Variable> _variables = [];
     private string _additionalFilesPath;
-    private string _cachePfad = string.Empty;
     private string _caption = string.Empty;
     private Timer? _checker;
     private string _columnArrangements = string.Empty;
@@ -269,14 +268,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public string CachePfad {
-        get => _cachePfad;
-        set {
-            // ReSharper disable once RedundantCheckBeforeAssignment
-            if (_cachePfad == value) { return; }
-            _cachePfad = value;
-        }
-    }
+    public string CachePfad { get; set; } = string.Empty;
 
     [Description("Der Name der Tabelle.")]
     public string Caption {

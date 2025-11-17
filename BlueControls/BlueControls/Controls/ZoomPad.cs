@@ -55,7 +55,6 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     private Size _lastSize;
     private bool _lastSliderXVisible;
     private bool _lastSliderYVisible;
-    private bool _screenshotMode;
     private float _shiftX;
     private float _shiftY;
     private float _zoom = 1;
@@ -75,10 +74,10 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     [DefaultValue(false)]
     public bool ScreenshotMode {
-        get => _screenshotMode;
+        get;
         set {
-            if (_screenshotMode == value) { return; }
-            _screenshotMode = value;
+            if (field == value) { return; }
+            field = value;
 
             // Slider verstecken/anzeigen
             SliderX.Visible = !value;
@@ -96,7 +95,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     public float ShiftX {
         get => _shiftX;
         set {
-            if (_screenshotMode) { return; }
+            if (ScreenshotMode) { return; }
             if (Math.Abs(value - _shiftX) < DefaultTolerance) { return; }
             _shiftX = value;
             Invalidate();
@@ -107,7 +106,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     public float ShiftY {
         get => _shiftY;
         set {
-            if (_screenshotMode) { return; }
+            if (ScreenshotMode) { return; }
             if (Math.Abs(value - _shiftY) < DefaultTolerance) { return; }
             _shiftY = value;
             Invalidate();
@@ -118,7 +117,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     public float Zoom {
         get => _zoom;
         set {
-            if (_screenshotMode) { return; }
+            if (ScreenshotMode) { return; }
             value = Math.Max(_zoomFit / 10f, value);
             value = Math.Min(20, value);
 
@@ -321,7 +320,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
-        if (_screenshotMode) {
+        if (ScreenshotMode) {
             UpdateScreenshotLayout();
         } else {
             base.OnSizeChanged(e);

@@ -38,7 +38,6 @@ public abstract class Method : IReadableTextWithKey {
     public static readonly List<string> ListStringVar = [VariableListString.ShortName_Variable];
     public static readonly List<string> StringVal = [VariableString.ShortName_Plain];
     public static readonly List<string> StringVar = [VariableString.ShortName_Variable];
-    private static List<Method>? _allMethods;
 
     #endregion
 
@@ -46,8 +45,8 @@ public abstract class Method : IReadableTextWithKey {
 
     public static List<Method> AllMethods {
         get {
-            _allMethods ??= Generic.GetInstaceOfType<Method>();
-            return _allMethods;
+            field ??= Generic.GetInstaceOfType<Method>();
+            return field;
         }
     }
 

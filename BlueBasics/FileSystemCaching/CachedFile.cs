@@ -36,7 +36,6 @@ namespace BlueBasics.FileSystemCaching {
         public readonly string Filename;
         private readonly int _checkIntervalMs = 180000;
         private readonly object _lock = new object();
-        private byte[]? _content;
         private int _isDisposed = 0;
         private Timer? _staleCheckTimer;
         private string? _timestamp;
@@ -62,21 +61,23 @@ namespace BlueBasics.FileSystemCaching {
                 if (_isDisposed > 0) { return []; }
 
                 lock (_lock) {
-                    if (_timestamp != null && _content != null) { return _content; }
+                    if (_timestamp != null && field != null) { return field; }
                 }
 
                 (var content, var timestamp) = ReadContentFromFileSystem();
 
                 lock (_lock) {
-                    if (_timestamp != null && _content != null) { return _content; }
+                    if (_timestamp != null && field != null) { return field; }
 
                     _timestamp = timestamp;
-                    _content = content;
+                    field = content;
 
                     StartStaleCheckTimer();
-                    return _content;
+                    return field;
                 }
             }
+
+            private set;
         }
 
         #endregion
@@ -103,7 +104,7 @@ namespace BlueBasics.FileSystemCaching {
             lock (_lock) {
                 StopStaleCheckTimer();
                 _timestamp = null;
-                _content = null;
+                Content = null;
             }
         }
 

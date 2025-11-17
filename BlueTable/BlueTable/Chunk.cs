@@ -42,7 +42,6 @@ public class Chunk : IHasKeyName {
     public readonly string MainFileName = string.Empty;
     private DateTime _bytesloaded = DateTime.MinValue;
     private string _fileinfo = string.Empty;
-    private string _keyname = string.Empty;
     private int _minBytes = 0;
 
     #endregion
@@ -76,9 +75,9 @@ public class Chunk : IHasKeyName {
     public bool KeyIsCaseSensitive => false;
 
     public string KeyName {
-        get => _keyname;
-        private set => _keyname = value.ToLower();
-    }
+        get;
+        private set => field = value.ToLower();
+    } = string.Empty;
 
     public string LastEditApp { get; private set; } = string.Empty;
 
