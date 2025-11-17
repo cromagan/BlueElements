@@ -17,20 +17,21 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
+namespace BlueControls.EventArgs;
 
-namespace BlueControls.Interfaces;
+public class FormEventArgs : System.EventArgs {
 
-public interface IIsEditor {
-    ///// <summary>
-    ///// Gibt an, ob das Element eine eigenständige Form ist.
-    ///// Dadurch wird diese direkt initialisiert.
-    ///// Benötigt einen parameterlosen Konstruktor.
-    ///// </summary>
+    #region Constructors
+
+    public FormEventArgs(System.Windows.Forms.Form form) {
+        Form = form;
+    }
+
+    #endregion Constructors
 
     #region Properties
 
-    public IEditable? ToEdit { set; }
+    public System.Windows.Forms.Form Form { get; private set; }
 
-    #endregion
+    #endregion Properties
 }

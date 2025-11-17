@@ -38,10 +38,11 @@ using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using MessageBox = BlueControls.Forms.MessageBox;
+using BlueControls.Interfaces;
 
 namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
+public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, IIsEditor {
 
     #region Fields
 
@@ -53,7 +54,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
 
     private bool loaded = false;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -63,7 +64,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         tbcScriptEigenschaften.Enabled = false;
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Properties
 
@@ -131,9 +132,14 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         }
     }
 
-    public override object? Object {
+    public IEditable? ToEdit {
         get => Table;
-        set => Table = value is BlueTable.Table db ? db : null;
+        set => Table = value is BlueTable.Table tb ? tb : null;
+    }
+
+    public override object? Object {
+        get => ToEdit;
+        set => ToEdit = value is IEditable ie ? ie : null;
     }
 
     /// <summary>
@@ -174,7 +180,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
         }
     }
 
-    #endregion
+    #endregion Properties
 
     #region Methods
 
@@ -471,7 +477,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
             }
         }
 
-        #endregion
+        #endregion Veraltete Items ermitteln
 
         #region Veraltete Items entfernen
 
@@ -479,7 +485,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
             lstEventScripts.Remove(thisSet);
         }
 
-        #endregion
+        #endregion Veraltete Items entfernen
 
         #region Neue Items hinzufügen
 
@@ -511,8 +517,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable {
             }
         }
 
-        #endregion
+        #endregion Neue Items hinzufügen
     }
 
-    #endregion
+    #endregion Methods
 }

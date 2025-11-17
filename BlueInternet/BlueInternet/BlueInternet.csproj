@@ -28,7 +28,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -40,7 +40,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
@@ -52,7 +52,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
@@ -64,7 +64,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -74,7 +74,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -83,7 +83,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>

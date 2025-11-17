@@ -45,7 +45,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private bool _frmHeadEditorFormClosingIsin;
     private Table? _table;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -55,7 +55,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table = null;
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Properties
 
@@ -76,19 +76,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    public IEditable? ToEdit {
-        set {
-            Table? db = null;
+    public IEditable? ToEdit { set => Table = value is BlueTable.Table tb ? tb : null; }
 
-            if (value is Table dbx) {
-                db = dbx;
-            }
-
-            Table = db is { IsDisposed: false } ? db : null;
-        }
-    }
-
-    #endregion
+    #endregion Properties
 
     #region Methods
 
@@ -443,7 +433,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         var colnam = lbxSortierSpalten.Items.Select(thisk => (ColumnItem)((ReadableListItem)thisk).Item).ToList();
         Table.SortDefinition = new RowSortDefinition(Table, colnam, btnSortRichtung.Checked);
 
-        #endregion
+        #endregion Sortierung
 
         #region Variablen
 
@@ -460,8 +450,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             Table.Variables = new VariableCollection(l2);
         }
 
-        #endregion
+        #endregion Variablen
     }
 
-    #endregion
+    #endregion Methods
 }

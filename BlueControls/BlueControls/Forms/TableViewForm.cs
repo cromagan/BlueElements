@@ -29,6 +29,7 @@ using BlueControls.ItemCollectionList;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
+using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -53,7 +54,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     #region Constructors
 
-    public TableViewForm() : this(null, true, true, true) { }
+    public TableViewForm() : this(null, true, true, true) {
+    }
 
     public TableViewForm(Table? table, bool loadTabVisible, bool adminTabVisible, bool usesSettings) : base() {
         InitializeComponent();
@@ -81,6 +83,11 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         this.LoadSettingsFromDisk(false);
 
         _ = SwitchTabToTable(table);
+
+        FormManager.FormAdded += FormManager_FormsChanged;
+        FormManager.FormRemoved += FormManager_FormsChanged;
+
+        // CheckButtons(); -> OnShown
     }
 
     #endregion
@@ -231,14 +238,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
 
-    protected virtual void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
-        var frm = OpenScriptEditor(Table.Table);
-
-        Tb_Loaded(Table?.Table, null);
-        if (frm == null) { return; }
-
-        frm.FormClosed += ScriptEditor_FormClosed;
-    }
+    protected virtual void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) => OpenScriptEditor(Table.Table);
 
     protected void ChangeTableInTab(string tablename, TabPage? tabpage, string settings) {
         if (tabpage == null) { return; }
@@ -265,8 +265,11 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
 
-        if (Table.Table is { IsDisposed: false } db) {
-            this.SetSetting("View_" + db.KeyName, ViewToString());
+        FormManager.FormAdded -= FormManager_FormsChanged;
+        FormManager.FormRemoved -= FormManager_FormsChanged;
+
+        if (Table.Table is { IsDisposed: false } tb) {
+            this.SetSetting("View_" + tb.KeyName, ViewToString());
         }
 
         TableSet(null, string.Empty);
@@ -312,7 +315,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             Develop.Message?.Invoke(ErrorType.Info, null, "Tabelle", ImageCode.Tabelle, "Lade Tabelle " + tablename, 0);
         }
 
-        #endregion
+        #endregion Status-Meldung updaten?
 
         if (BlueTable.Table.Get(tablename, TableView.Table_NeedPassword, false) is { IsDisposed: false } tb) {
             if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
@@ -370,7 +373,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// <returns></returns>
     protected bool SwitchTabToTable(Table? table) => table is not null && !table.IsDisposed && SwitchTabToTable(table.KeyName);
 
-    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) { }
+    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+    }
 
     protected virtual void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
@@ -397,7 +401,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void Table_TableChanged(object sender, System.EventArgs e) {
         TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
-        Tb_Loaded(null, null);
+        CheckButtons();
     }
 
     protected void Table_ViewChanged(object sender, System.EventArgs e) =>
@@ -427,8 +431,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         if (Table.Table != tb) {
             CFO.Page = null;
         }
-
-        Tb_Loaded(null, null);
 
         var did = false;
 
@@ -471,7 +473,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             tb.InvalidateView += Tb_InvalidateView;
         }
 
-        Tb_Loaded(Table?.Table, null);
+        CheckButtons();
     }
 
     protected virtual string ViewToString() {
@@ -676,6 +678,78 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => Table.Arrangement = e.Item.KeyName;
 
+    private void CheckButtons() {
+        if (IsDisposed || IsClosed) { return; }
+
+        if (InvokeRequired) {
+            try {
+                _ = Invoke(new Action(() => CheckButtons()));
+            } catch { }
+            return;
+        }
+
+        var tb = Table?.Table;
+        var isEditable = false;
+        var isAdmin = false;
+
+        if (tb is { IsDisposed: false }) {
+            isAdmin = tb.IsAdministrator();
+            isEditable = tb.IsEditable(false);
+
+            Table?.ShowWaitScreen = false;
+            tbcTableSelector.Enabled = true;
+            Table?.Enabled = true;
+        } else {
+            Table?.ShowWaitScreen = true;
+            tbcTableSelector.Enabled = false;
+            Table?.Enabled = false;
+            tb = null;
+        }
+
+        if (isEditable) {
+            List<System.Windows.Forms.Form> f = [.. FormManager.Forms];
+
+            foreach (var thisf in f) {
+                if (thisf is IHasTable iht && iht.Table == tb && thisf is IIsEditor) {
+                    isEditable = false;
+                    break;
+                }
+            }
+        }
+
+        var combi = isEditable && isAdmin;
+
+        cbxColumnArr.ItemEditAllowed = combi;
+        DropMessages = combi;
+        grpAdminAllgemein.Enabled = combi;
+        grpImport.Enabled = combi;
+        tabAdmin.Enabled = combi;
+
+        btnNeuDB.Enabled = true;
+        btnOeffnen.Enabled = true;
+        btnDrucken.Enabled = combi;
+
+        btnTabellenSpeicherort.Enabled = combi && tb is TableFile { } tbf && !string.IsNullOrEmpty(tbf.Filename);
+
+        btnZeileLöschen.Enabled = combi;
+        lstAufgaben.Enabled = combi;
+        btnSaveAs.Enabled = combi;
+
+        btnDrucken["csv"]?.Enabled = combi;
+
+        btnDrucken["html"]?.Enabled = combi;
+
+        btnSuchenUndErsetzen.Enabled = combi;
+
+        UpdateScripts(tb);
+    }
+
+    private void FormManager_FormsChanged(object sender, FormEventArgs e) {
+        if (e.Form is IHasTable iht && iht.Table == Table?.Table) {
+            CheckButtons();
+        }
+    }
+
     private void InitView() {
         if (DesignMode) {
             tbcSidebar.Visible = true;
@@ -708,7 +782,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             FillFormula(null);
         }
 
-        Tb_Loaded(Table?.Table, null);
+        CheckButtons();
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
@@ -718,7 +792,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
 
         lstAufgaben.Enabled = false;
 
@@ -727,11 +801,11 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
             if (sc.NeedRow) {
                 m = MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0
-                    ? db.Row.ExecuteScript(null, e.Item.KeyName, Table.RowsVisibleUnique())
+                    ? tb.Row.ExecuteScript(null, e.Item.KeyName, Table.RowsVisibleUnique())
                     : "Durch Benutzer abgebrochen";
             } else {
                 //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-                var s = db.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
+                var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
                 m = s.Protocol.JoinWithCr();
             }
 
@@ -751,18 +825,17 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             switch (com[0].ToLowerInvariant()) {
                 case "#repairscript":
                 case "#editscript":
-                    OpenScriptEditor(db);
+                    OpenScriptEditor(tb);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 
                 case "#enablerowscript":
-                    db.EnableScript();
-                    UpdateScripts(db);
+                    tb.EnableScript();
+                    CheckButtons();
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 
                 case "#repaircolumn":
-                    var c = db.Column[com[1]];
+                    var c = tb.Column[com[1]];
                     Table.OpenColumnEditor(c, null);
-                    Tb_Loaded(db, null);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 
                 case "#datenüberprüfung":
@@ -773,7 +846,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                     }
 
                     foreach (var thisR in rows) {
-                        if (!db.CanDoValueChangedScript(true)) {
+                        if (!tb.CanDoValueChangedScript(true)) {
                             MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
                             RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
 
@@ -797,73 +870,9 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         lstAufgaben.Enabled = true;
     }
 
-    private void ScriptEditor_FormClosed(object sender, FormClosedEventArgs e) {
-        if (sender is Form frm) {
-            frm.FormClosed -= ScriptEditor_FormClosed;
-        }
-
-        Tb_Loaded(Table?.Table, null);
-    }
-
     private void Tb_InvalidateView(object sender, System.EventArgs e) => Table.Invalidate();
 
-    private void Tb_Loaded(object? sender, FirstEventArgs? e) {
-        if (IsDisposed) { return; }
-
-        if (InvokeRequired) {
-            try {
-                _ = Invoke(new Action(() => Tb_Loaded(sender, e)));
-            } catch { }
-            return;
-        }
-
-        var isEditable = false;
-        var isAdmin = false;
-
-        if (sender is Table db) {
-            if (db != Table?.Table) { return; }
-            isAdmin = db.IsAdministrator();
-            isEditable = db.IsEditable(false);
-
-            Table.ShowWaitScreen = false;
-            tbcTableSelector.Enabled = true;
-            Table.Enabled = true;
-        } else {
-            Table.ShowWaitScreen = true;
-            tbcTableSelector.Enabled = false;
-            Table.Enabled = false;
-        }
-
-        var combi = isEditable && isAdmin;
-
-        cbxColumnArr.ItemEditAllowed = combi;
-        DropMessages = combi;
-        grpAdminAllgemein.Enabled = combi;
-        grpImport.Enabled = combi;
-        tabAdmin.Enabled = combi;
-
-        btnNeuDB.Enabled = true;
-        btnOeffnen.Enabled = true;
-        btnDrucken.Enabled = combi;
-
-        btnTabellenSpeicherort.Enabled = combi && Table.Table is TableFile { } tbf && !string.IsNullOrEmpty(tbf.Filename);
-
-        btnZeileLöschen.Enabled = combi;
-        lstAufgaben.Enabled = combi;
-        btnSaveAs.Enabled = combi;
-
-        if (btnDrucken["csv"] is { } bli1) {
-            bli1.Enabled = combi;
-        }
-
-        if (btnDrucken["html"] is { } bli2) {
-            bli2.Enabled = combi;
-        }
-
-        btnSuchenUndErsetzen.Enabled = combi;
-
-        UpdateScripts(Table?.Table);
-    }
+    private void Tb_Loaded(object sender, FirstEventArgs e) => CheckButtons();
 
     //private string NameRepair(string istName, RowItem? vRow) {
     //    var newName = istName;

@@ -51,6 +51,14 @@ public class FormManager : ApplicationContext {
 
     #endregion
 
+    #region Events
+
+    public static event EventHandler<EventArgs.FormEventArgs>? FormAdded;
+
+    public static event EventHandler<EventArgs.FormEventArgs>? FormRemoved;
+
+    #endregion
+
     #region Properties
 
     public static bool Running { get; private set; }
@@ -165,6 +173,8 @@ public class FormManager : ApplicationContext {
 
         _ = Forms.Remove(thisForm);
 
+        FormRemoved?.Invoke(this, new EventArgs.FormEventArgs(thisForm));
+
         if (Forms.Count > 0) { return; }
 
         if (sender != _lastStartForm) {
@@ -184,6 +194,8 @@ public class FormManager : ApplicationContext {
         frm.FormClosing += OnFormClosing;
         frm.FormClosed += OnFormClosed;
         Forms.Add(frm);
+
+        FormAdded?.Invoke(this, new EventArgs.FormEventArgs(frm));
     }
 
     #endregion
