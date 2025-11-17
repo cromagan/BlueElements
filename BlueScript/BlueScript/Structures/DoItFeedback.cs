@@ -116,9 +116,7 @@ public class DoItFeedback {
         ReturnValue = null;
     }
 
-    public void ConsumeBreak() {
-        BreakFired = false;
-    }
+    public void ConsumeBreak() => BreakFired = false;
 
     public void ConsumeBreakAndReturn() {
         BreakFired = false;

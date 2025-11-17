@@ -71,8 +71,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     #region Methods
 
-    public static List<AbstractListItem> Suffixe() {
-        return [
+    public static List<AbstractListItem> Suffixe() => [
             ItemOf("µm", ImageCode.Lineal),
             ItemOf("mm", ImageCode.Lineal),
             ItemOf("cm", ImageCode.Lineal),
@@ -90,7 +89,6 @@ public class Renderer_TextOneLine : Renderer_Abstract {
             ItemOf("min", ImageCode.Uhr),
             ItemOf("St.", ImageCode.Eins)
 ];
-    }
 
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }

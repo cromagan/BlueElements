@@ -225,9 +225,7 @@ public class InvalidatedRowsManager {
         _invalidatedRows.TryRemove(rowItem.KeyName, out _);
     }
 
-    private void OnRowChecked(RowEventArgs e) {
-        RowChecked?.Invoke(this, e);
-    }
+    private void OnRowChecked(RowEventArgs e) => RowChecked?.Invoke(this, e);
 
     /// <summary>
     /// Verarbeitet eine einzelne Zeile mit der tatsächlichen Verarbeitungslogik.

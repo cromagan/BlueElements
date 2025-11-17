@@ -36,7 +36,7 @@ public class Renderer_Layout : Renderer_Abstract {
 
     #region Fields
 
-    private static readonly Dictionary<string, Bitmap> _bitmapCache = new();
+    private static readonly Dictionary<string, Bitmap> _bitmapCache = [];
     private string _file = string.Empty;
 
     #endregion

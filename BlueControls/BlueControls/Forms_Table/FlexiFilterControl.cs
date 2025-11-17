@@ -130,9 +130,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         HandleChangesNow();
     }
 
-    public void SetValueFromVariable(Variable v) {
-        Value = v.ValueForCell;
-    }
+    public void SetValueFromVariable(Variable v) => Value = v.ValueForCell;
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);

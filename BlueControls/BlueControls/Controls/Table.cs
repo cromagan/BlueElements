@@ -1203,12 +1203,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return string.Empty;
     }
 
-    public bool IsInHead(int y) {
+    public bool IsInHead(int y) =>
         // Anpassen der Kopfbereichsprüfung unter Berücksichtigung der Filterleiste
-        return CurrentArrangement is { IsDisposed: false } ca &&
+        CurrentArrangement is { IsDisposed: false } ca &&
                y <= GetPix(ca.HeadSize()) + FilterleisteHeight &&
                y >= FilterleisteHeight;
-    }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -3749,12 +3748,16 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }
 
-    private int DrawY(ColumnViewCollection ca, RowData? r) {
-        // Diese Methode berechnet die Y-Position einer Zeile auf dem Bildschirm
-        // Wir müssen die FilterleisteHeight nicht hinzufügen, da DisplayRectangleWithoutSlider
-        // bereits die Filterleiste berücksichtigt und SliderY.Value vom korrekten Offset beginnt.
-        return r == null ? FilterleisteHeight : (int)(GetPix(r.Y + ca.HeadSize()) - SliderY.Value + FilterleisteHeight);
-    }
+    /// <summary>
+    /// Diese Methode berechnet die Y-Position einer Zeile auf dem Bildschirm
+    /// Wir müssen die FilterleisteHeight nicht hinzufügen, da DisplayRectangleWithoutSlider
+    /// bereits die Filterleiste berücksichtigt und SliderY.Value vom korrekten Offset beginnt.
+    /// </summary>
+    /// <param name="ca"></param>
+    /// <param name="r"></param>
+    /// <returns></returns>
+    private int DrawY(ColumnViewCollection ca, RowData? r) =>
+        r == null ? FilterleisteHeight : (int)(GetPix(r.Y + ca.HeadSize()) - SliderY.Value + FilterleisteHeight);
 
     /// <summary>
     /// Berechent die Y-Position auf dem aktuellen Controll
@@ -3846,9 +3849,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return true;
     }
 
-    private void Filter_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-        DoFilterCombined();
-    }
+    private void Filter_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
     private void Filter_ZeilenFilterSetzen() {
         if (IsDisposed || (Table?.IsDisposed ?? true)) {
@@ -4000,12 +4001,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
-    private void OnFilterCombinedChanged() {
+    private void OnFilterCombinedChanged() =>
         // Bestehenden Code belassen
-        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
-
-        //FillFilters(); // Die Flexs reagiren nur auf FilterOutput der Table
-    }
+        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);//FillFilters(); // Die Flexs reagiren nur auf FilterOutput der Table
 
     private void OnPinnedChanged() {
         // Bestehenden Code belassen

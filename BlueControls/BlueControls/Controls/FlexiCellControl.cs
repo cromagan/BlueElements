@@ -390,7 +390,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         }
     }
 
-    private void RestartMarker() {
+    private void RestartMarker() =>
         // Fire-and-forget Pattern für Event-Handler
         Task.Run(async () => {
             try {
@@ -399,7 +399,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
                 Develop.DebugPrint("RestartMarker Fehler: " + ex.Message);
             }
         });
-    }
 
     private async Task RunMarkerAsync(CancellationToken cancellationToken) {
         if (IsDisposed || TableInput is not { IsDisposed: false } db) { return; }

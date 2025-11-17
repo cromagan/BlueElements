@@ -170,52 +170,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
         UnRegisterEvents();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        Renderer_DynamicSymbol.Method.Draw(gr, _script, null, positionModified.ToRect(), TranslationType.Original_Anzeigen, Alignment.Left, scale);
-
-        //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
-        //gr.TranslateTransform(trp.X, trp.Y);
-        //gr.RotateTransform(-Drehwinkel);
-        //GraphicsPath? p = null;
-
-        //// Wegen der Nullpunktverschiebung wird ein temporäres Rechteck benötigt
-        //var d2 = positionModified;
-        //d2.X = -positionModified.Width / 2;
-        //d2.Y = -positionModified.Height / 2;
-
-        //switch (Symbol) {
-        //    case Symbol.Ohne:
-        //        break;
-
-        //    case Symbol.Pfeil:
-        //        p = Poly_Arrow(d2.ToRect());
-        //        break;
-
-        //    case Symbol.Bruchlinie:
-        //        p = Poly_Bruchlinie(d2.ToRect());
-        //        break;
-
-        //    case Symbol.Rechteck:
-        //        p = Poly_Rechteck(d2.ToRect());
-        //        break;
-
-        //    case Symbol.Rechteck_gerundet:
-        //        p = Poly_RoundRec(d2.ToRect(), (int)(20 * zoom));
-        //        break;
-
-        //    default:
-        //        Develop.DebugPrint(Symbol);
-        //        break;
-        //}
-
-        //if (p != null && Parent != null) {
-        //    gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
-        //    gr.DrawPath(new Pen(Randfarbe, Randdicke * zoom * SheetStyleScale), p);
-        //}
-
-        //gr.TranslateTransform(-trp.X, -trp.Y);
-        //gr.ResetTransform();
-    }
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) => Renderer_DynamicSymbol.Method.Draw(gr, _script, null, positionModified.ToRect(), TranslationType.Original_Anzeigen, Alignment.Left, scale);//var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);//gr.TranslateTransform(trp.X, trp.Y);//gr.RotateTransform(-Drehwinkel);//GraphicsPath? p = null;//// Wegen der Nullpunktverschiebung wird ein temporäres Rechteck benötigt//var d2 = positionModified;//d2.X = -positionModified.Width / 2;//d2.Y = -positionModified.Height / 2;//switch (Symbol) {//    case Symbol.Ohne://        break;//    case Symbol.Pfeil://        p = Poly_Arrow(d2.ToRect());//        break;//    case Symbol.Bruchlinie://        p = Poly_Bruchlinie(d2.ToRect());//        break;//    case Symbol.Rechteck://        p = Poly_Rechteck(d2.ToRect());//        break;//    case Symbol.Rechteck_gerundet://        p = Poly_RoundRec(d2.ToRect(), (int)(20 * zoom));//        break;//    default://        Develop.DebugPrint(Symbol);//        break;//}//if (p != null && Parent != null) {//    gr.FillPath(new SolidBrush(Hintergrundfarbe), p);//    gr.DrawPath(new Pen(Randfarbe, Randdicke * zoom * SheetStyleScale), p);//}//gr.TranslateTransform(-trp.X, -trp.Y);//gr.ResetTransform();
 
     protected override void OnParentChanged() {
         base.OnParentChanged();

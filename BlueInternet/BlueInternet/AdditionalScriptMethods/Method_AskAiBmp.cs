@@ -72,10 +72,10 @@ internal class Method_AskAiBmp : Method {
                 var messages = new List<Message>();
                 messages.Add(new Message {
                     Role = RoleType.User,
-                    Content = new List<ContentBase> {
+                    Content = [
                         new ImageContent { Source = new ImageSource { MediaType = "image/jpeg", Data = base64String } },
                         new TextContent { Text = attvar.ValueStringGet(1) }
-                    }
+                    ]
                 });
 
                 var parameters = new MessageParameters {

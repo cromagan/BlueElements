@@ -422,11 +422,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public string IsNowEditable() => string.Empty;
 
-    public SizeF MeasureString(string text) {
-        return _stringSizeCache.GetOrAdd(text, _ => {
-            return _fontOl.MeasureString(text);
-        });
-    }
+    public SizeF MeasureString(string text) => _stringSizeCache.GetOrAdd(text, _ => { return _fontOl.MeasureString(text); });
 
     public QuickImage? NameInStyle() {
         if (_nameInStyleSym != null) { return _nameInStyleSym; }

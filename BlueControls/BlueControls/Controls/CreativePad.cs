@@ -53,7 +53,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenuWithInternalHandl
 
     private readonly List<IMoveable> _itemsToMove = [];
 
-    private ItemCollectionPadItem? _items = new ItemCollectionPadItem();
+    private ItemCollectionPadItem? _items = [];
     private bool _repairPrinterDataPrepaired;
 
     #endregion

@@ -788,7 +788,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         get {
             var liste = Contents();
 
-            Dictionary<string, int> zähler = new Dictionary<string, int>();
+            Dictionary<string, int> zähler = [];
 
             foreach (string wert in liste) {
                 if (!string.IsNullOrEmpty(wert)) {
@@ -1168,9 +1168,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return true;
     }
 
-    public bool CanBeCheckedByRules() {
-        return true;
-    }
+    public bool CanBeCheckedByRules() => true;
 
     /// <summary>
     ///
@@ -1295,10 +1293,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return list.SortedDistinctList();
     }
 
-    public bool CopyAble() {
+    public bool CopyAble() =>
         //if (_relationType == RelationType.DropDownValues) { return false; }
-        return true;
-    }
+        true;
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -1306,9 +1303,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         GC.SuppressFinalize(this);
     }
 
-    public bool DropdownItemsAllowed() {
-        return true;
-    }
+    public bool DropdownItemsAllowed() => true;
 
     public bool DropdownItemsOfOtherCellsAllowed() {
         if (_relationType == RelationType.DropDownValues) { return false; }
@@ -1517,9 +1512,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         Table.OnViewChanged();
     }
 
-    public bool IsAutofilterPossible() {
-        return true;
-    }
+    public bool IsAutofilterPossible() => true;
 
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }

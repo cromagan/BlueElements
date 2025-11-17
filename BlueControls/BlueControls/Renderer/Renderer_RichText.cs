@@ -64,9 +64,7 @@ public class Renderer_RichText : Renderer_Abstract {
         _txt.Draw(gr, scale);
     }
 
-    public override List<GenericControl> GetProperties(int widthOfControl) {
-        return new List<GenericControl>();
-    }
+    public override List<GenericControl> GetProperties(int widthOfControl) => [];
 
     public override List<string> ParseableItems() {
         List<string> result = [.. base.ParseableItems()];
@@ -74,9 +72,7 @@ public class Renderer_RichText : Renderer_Abstract {
         return result;
     }
 
-    public override bool ParseThis(string key, string value) {
-        return base.ParseThis(key, value);
-    }
+    public override bool ParseThis(string key, string value) => base.ParseThis(key, value);
 
     public override string ReadableText() => "Formatierter Text";
 

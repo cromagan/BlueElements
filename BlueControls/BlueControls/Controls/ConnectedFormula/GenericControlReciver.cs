@@ -362,9 +362,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected virtual void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
 
-    protected void TableInput_Disposed(object sender, System.EventArgs e) {
-        TableInput = null;
-    }
+    protected void TableInput_Disposed(object sender, System.EventArgs e) => TableInput = null;
 
     protected virtual void TableInput_Loaded(object sender, System.EventArgs e) { }
 

@@ -110,9 +110,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         OnContextMenuInit(e);
     }
 
-    public void Message(string txt) {
-        txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
-    }
+    public void Message(string txt) => txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
