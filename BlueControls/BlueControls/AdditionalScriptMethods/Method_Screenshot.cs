@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_Screenshot : Method {
 
     #region Properties
@@ -46,7 +46,7 @@ public class Method_Screenshot : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(ScreenShot.GrabAllScreens());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(ScreenShot.GrabAllScreens());
 
     #endregion
 }

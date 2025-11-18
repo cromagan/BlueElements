@@ -20,13 +20,11 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using static BlueScript.Variables.VariableWebpage;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+
 internal class Method_WebPageGetAllLinks : Method_WebPage {
 
     #region Properties

@@ -23,9 +23,7 @@ public class FirstEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public FirstEventArgs(bool isFirst) {
-        IsFirst = isFirst;
-    }
+    public FirstEventArgs(bool isFirst) => IsFirst = isFirst;
 
     #endregion
 

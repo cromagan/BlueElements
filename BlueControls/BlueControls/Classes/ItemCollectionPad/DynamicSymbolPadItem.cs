@@ -60,7 +60,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "DynamicSymbol";
 
     public override string Description => string.Empty;

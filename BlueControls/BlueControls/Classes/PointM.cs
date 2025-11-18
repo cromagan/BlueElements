@@ -193,8 +193,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
     public void Mirror(PointM? p, bool vertical, bool horizontal) {
         if (p == null) { return; }
 
-        if (vertical) { X = X - ((X - p.X) * 2); }
-        if (horizontal) { Y = Y - ((Y - p.Y) * 2); }
+        if (vertical) { X -= (X - p.X) * 2; }
+        if (horizontal) { Y -= (Y - p.Y) * 2; }
     }
 
     public void Move(float x, float y, bool isMouse) => SetTo(_x + x, _y + y, isMouse);

@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_ItemCollectionPad : Method {
 
     #region Properties
@@ -44,7 +44,7 @@ public class Method_ItemCollectionPad : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new DoItFeedback(new VariableItemCollectionPad([]));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(new VariableItemCollectionPad([]));
 
     #endregion
 }

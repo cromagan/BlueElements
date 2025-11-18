@@ -26,7 +26,7 @@ using System.Linq;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_Contains : Method {
 
     #region Properties

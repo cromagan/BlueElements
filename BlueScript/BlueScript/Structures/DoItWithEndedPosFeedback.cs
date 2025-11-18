@@ -28,9 +28,7 @@ public class DoItWithEndedPosFeedback : DoItFeedback {
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(bool needsScriptFix, int endpos, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, LogData? ld) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, ld) {
-        Position = endpos;
-    }
+    public DoItWithEndedPosFeedback(bool needsScriptFix, int endpos, bool breakFired, bool returnFired, string failedReason, Variable? returnValue, LogData? ld) : base(needsScriptFix, breakFired, returnFired, failedReason, returnValue, ld) => Position = endpos;
 
     public DoItWithEndedPosFeedback(string failedReason, bool needsScriptFix, LogData? ld) : base(failedReason, needsScriptFix, ld) { }
 

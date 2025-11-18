@@ -36,7 +36,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-// ReSharper disable once UnusedMember.Global
+
 public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
@@ -61,7 +61,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "FI-CreativePad";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;

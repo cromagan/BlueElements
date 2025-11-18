@@ -28,7 +28,7 @@ public interface IDisposableExtendedWithEvent : IDisposableExtended {
     /// <summary>
     /// Wird ausgelöst, wenn Dispose aufgerufenn wird - IsDisposed ist nmoch false!
     /// </summary>
-    public event EventHandler? DisposingEvent;
+    event EventHandler? DisposingEvent;
 
     #endregion
 }

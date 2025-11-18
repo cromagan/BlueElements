@@ -23,9 +23,7 @@ public class FormEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public FormEventArgs(System.Windows.Forms.Form form) {
-        Form = form;
-    }
+    public FormEventArgs(System.Windows.Forms.Form form) => Form = form;
 
     #endregion
 

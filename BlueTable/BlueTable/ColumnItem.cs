@@ -47,7 +47,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private const string TmpNewDummy = "TMPNEWDUMMY";
     private readonly List<string> _afterEditAutoReplace = [];
     private readonly List<string> _dropDownItems = [];
-    private readonly object _linkedTableLock = new object();
+    private readonly object _linkedTableLock = new();
     private readonly List<string> _permissionGroupsChangeCell = [];
     private AdditionalCheck _additionalFormatCheck;
     private string _adminInfo;
@@ -790,12 +790,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             Dictionary<string, int> zähler = [];
 
-            foreach (string wert in liste) {
+            foreach (var wert in liste) {
                 if (!string.IsNullOrEmpty(wert)) {
-                    if (zähler.ContainsKey(wert))
+                    if (zähler.ContainsKey(wert)) {
                         zähler[wert]++;
-                    else
+                    } else {
                         zähler[wert] = 1;
+                    }
                 }
             }
 

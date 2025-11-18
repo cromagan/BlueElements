@@ -26,7 +26,7 @@ public interface IOpenScriptEditor {
 
     #region Methods
 
-    public void OpenScriptEditor();
+    void OpenScriptEditor();
 
     #endregion
 }

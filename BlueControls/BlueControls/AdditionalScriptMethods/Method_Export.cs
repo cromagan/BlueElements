@@ -32,7 +32,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
     #region Properties

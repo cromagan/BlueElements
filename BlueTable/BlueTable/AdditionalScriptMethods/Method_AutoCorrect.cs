@@ -26,7 +26,7 @@ using static BlueBasics.Converter;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_AutoCorrect : Method_TableGeneric {
 
     #region Properties

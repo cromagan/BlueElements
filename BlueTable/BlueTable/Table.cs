@@ -121,7 +121,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _columnArrangements = string.Empty;
     private string _createDate;
     private string _creator;
-    private ReadOnlyCollection<TableScriptDescription> _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
+    private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
     private DateTime _eventScriptVersion = DateTime.MinValue;
     private string _globalShowPass = string.Empty;
     private DateTime _powerEditTime = DateTime.MinValue;
@@ -486,7 +486,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public VariableCollection Variables {
-        get => new(_variables);
+        get => [.. _variables];
         set {
             var l = new List<VariableString>();
             l.AddRange(value.ToListVariableString());
@@ -1641,9 +1641,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
 
                 col = Column.GenerateAndAdd(zeil[0][spaltNo]);
-                if (col != null) {
-                    col.Caption = zeil[0][spaltNo];
-                }
+                col?.Caption = zeil[0][spaltNo];
             }
 
             if (col == null) {
@@ -2181,10 +2179,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 UnregisterEvents();
 
                 // Timer zuerst disposen
-                if (_checker != null) {
-                    _checker.Dispose();
-                    _checker = null;
-                }
+                _checker?.Dispose();
+                _checker = null;
 
                 // Dann Collections disposen
                 Column.Dispose();

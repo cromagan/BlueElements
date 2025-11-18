@@ -30,9 +30,7 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Constructors
 
-    public SplittedAttributesFeedback(VariableCollection atts) {
-        Attributes = atts;
-    }
+    public SplittedAttributesFeedback(VariableCollection atts) => Attributes = atts;
 
     public SplittedAttributesFeedback(ScriptIssueType type, string failedReason, bool needsScriptFix) {
         Attributes = [];
@@ -110,7 +108,7 @@ public readonly struct SplittedAttributesFeedback {
     public List<string> ValueListStringGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return []; }
 
-        return Attributes[varno] is VariableListString vs ? vs.ValueList : ([]);
+        return Attributes[varno] is VariableListString vs ? vs.ValueList : [];
     }
 
     public DoItFeedback? ValueListStringSet(int varno, List<string> value, LogData ld) {

@@ -417,11 +417,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<Table?> adb:
-                var db = Table.Get(Value, TableView.Table_NeedPassword, true);
-                if (db != null) { db.Editor = typeof(TableHeadEditor); }
+                var tb = Table.Get(Value, TableView.Table_NeedPassword, true);
+                tb?.Editor = typeof(TableHeadEditor);
 
-                if (adb.Get() != db) {
-                    adb.Set(db);
+                if (adb.Get() != tb) {
+                    adb.Set(tb);
                 }
                 break;
 

@@ -302,9 +302,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
     public static void PreComputeSize(List<AbstractListItem> item, Design itemDesign) {
         try {
-            Parallel.ForEach(item, thisItem => {
-                thisItem?.SizeUntouchedForListBox(itemDesign);
-            });
+            Parallel.ForEach(item, thisItem => thisItem?.SizeUntouchedForListBox(itemDesign));
         } catch {
             Develop.AbortAppIfStackOverflow();
             PreComputeSize(item, itemDesign);

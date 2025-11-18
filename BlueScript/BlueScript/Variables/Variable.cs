@@ -35,8 +35,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     #region Fields
 
     // Mit Caching für bessere Performance bei häufigen Aufrufen
-    private static readonly ConcurrentDictionary<Type, Variable> _instanceCache =
-        new ConcurrentDictionary<Type, Variable>();
+    private static readonly ConcurrentDictionary<Type, Variable> _instanceCache = new();
 
     private static long _dummyCount;
     private string _comment = string.Empty;

@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_FilterAllValues : Method_TableGeneric {
 
     #region Properties

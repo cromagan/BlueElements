@@ -28,7 +28,7 @@ using System.Drawing.Drawing2D;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_ResizeImage : Method {
 
     #region Properties

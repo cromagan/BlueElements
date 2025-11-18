@@ -29,7 +29,7 @@ using System.Drawing;
 
 namespace BlueControls.CellRenderer;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Renderer_Button : Renderer_Abstract {
 
     #region Fields

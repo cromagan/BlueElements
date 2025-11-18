@@ -63,7 +63,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private int? _height;
 
-    private List<ExtChar> _internal = [];
+    private readonly List<ExtChar> _internal = [];
 
     private string _sheetStyle = string.Empty;
 
@@ -912,7 +912,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
             //isX = (float)(isX + Math.Truncate(_internal[akt].Size.Width + 0.5));
-            isX = isX + _internal[akt].Size.Width;
+            isX += _internal[akt].Size.Width;
 
             if (_internal[akt].IsLineBreak()) {
                 isX = vZbxPixel;

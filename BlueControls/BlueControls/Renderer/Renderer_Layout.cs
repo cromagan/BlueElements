@@ -31,7 +31,7 @@ using System.Linq;
 
 namespace BlueControls.CellRenderer;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Renderer_Layout : Renderer_Abstract {
 
     #region Fields
@@ -113,8 +113,8 @@ public class Renderer_Layout : Renderer_Abstract {
                 cachedBmp = bmp;
             }
 
-            float scale2 = Math.Min((float)scaleddrawarea.Width / cachedBmp.Width, (float)scaleddrawarea.Height / cachedBmp.Height);
-            gr.DrawImage(cachedBmp, new Rectangle(scaleddrawarea.X + (scaleddrawarea.Width - (int)(cachedBmp.Width * scale2)) / 2, scaleddrawarea.Y + (scaleddrawarea.Height - (int)(cachedBmp.Height * scale2)) / 2, (int)(cachedBmp.Width * scale2), (int)(cachedBmp.Height * scale2)));
+            var scale2 = Math.Min((float)scaleddrawarea.Width / cachedBmp.Width, (float)scaleddrawarea.Height / cachedBmp.Height);
+            gr.DrawImage(cachedBmp, new Rectangle(scaleddrawarea.X + ((scaleddrawarea.Width - (int)(cachedBmp.Width * scale2)) / 2), scaleddrawarea.Y + ((scaleddrawarea.Height - (int)(cachedBmp.Height * scale2)) / 2), (int)(cachedBmp.Width * scale2), (int)(cachedBmp.Height * scale2)));
         } catch {
             var replacedText = ValueReadable("Anzeige fehlgeschlagen.", ShortenStyle.Replaced, translate);
             Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);

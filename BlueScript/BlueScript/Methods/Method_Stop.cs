@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_Stop : Method {
 
     #region Properties

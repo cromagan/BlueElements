@@ -54,7 +54,7 @@ public static class Converter {
 
     public static Color ColorParse(string input) {
         if (string.IsNullOrEmpty(input)) { return Color.Transparent; }
-        return ColorTryParse(input, out Color color) ? color : Color.Transparent;
+        return ColorTryParse(input, out var color) ? color : Color.Transparent;
     }
 
     public static bool ColorTryParse(string input, out Color color) {
@@ -93,7 +93,7 @@ public static class Converter {
             return false;
         }
         // 1. Versuche als Integer zu parsen (ARGB)
-        if (int.TryParse(input, out int intValue)) {
+        if (int.TryParse(input, out var intValue)) {
             color = Color.FromArgb(intValue);
             return true;
         }

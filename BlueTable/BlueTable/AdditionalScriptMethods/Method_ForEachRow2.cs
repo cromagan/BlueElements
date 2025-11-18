@@ -28,7 +28,7 @@ using static BlueScript.Variables.VariableListRow;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_ForEachRow2 : Method_TableGeneric {
 
     #region Properties

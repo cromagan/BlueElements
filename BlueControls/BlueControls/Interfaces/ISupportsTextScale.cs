@@ -23,7 +23,7 @@ public interface ISupportsTextScale {
 
     #region Properties
 
-    public float TextScale { get; set; }
+    float TextScale { get; set; }
 
     #endregion
 }

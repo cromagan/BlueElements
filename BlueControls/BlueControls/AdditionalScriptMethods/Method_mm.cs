@@ -27,7 +27,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_mm : Method {
 
     #region Properties

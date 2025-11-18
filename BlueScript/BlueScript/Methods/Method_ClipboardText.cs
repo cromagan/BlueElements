@@ -25,7 +25,7 @@ using System.Windows;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_ClipboardText : Method {
 
     #region Properties

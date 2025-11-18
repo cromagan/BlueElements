@@ -28,7 +28,7 @@ using System.Drawing;
 
 namespace BlueControls.CellRenderer;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     #region Fields
@@ -84,14 +84,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stern);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) =>
-        //var font = Skin.DesignOf(design, state).BFont?.Font();
-
-        //if (font == null) { return new Size(16, 32); }
-        //var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
-
-        //return font.FormatedText_NeededSize(replacedText, QImage(content), 32);
-        new Size(48, 48);
+    protected override Size CalculateContentSize(string content, TranslationType translate) => new(48, 48);
 
     /// <summary>
     /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.

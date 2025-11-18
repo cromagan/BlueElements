@@ -47,9 +47,7 @@ public class DoItFeedback {
 
     public DoItFeedback() { }
 
-    public DoItFeedback(Variable variable) {
-        ReturnValue = variable;
-    }
+    public DoItFeedback(Variable variable) => ReturnValue = variable;
 
     public DoItFeedback(string failedReason, bool needsScriptFix, LogData? ld) : this(needsScriptFix, false, false, failedReason, null, ld) { }
 

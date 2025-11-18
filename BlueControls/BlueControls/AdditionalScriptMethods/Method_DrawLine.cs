@@ -27,7 +27,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_DrawLine : Method {
 
     #region Properties

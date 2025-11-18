@@ -27,11 +27,11 @@ public interface IComandBuilder : IHasKeyName {
 
     #region Methods
 
-    public string ComandDescription();
+    string ComandDescription();
 
-    public QuickImage ComandImage();
+    QuickImage ComandImage();
 
-    public string GetCode(Form? form);
+    string GetCode(Form? form);
 
     #endregion
 }

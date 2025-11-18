@@ -24,7 +24,7 @@ public interface ITranslateable {
     #region Properties
 
     // ReSharper disable once UnusedMemberInSuper.Global
-    public bool Translate { get; set; }
+    bool Translate { get; set; }
 
     #endregion
 }

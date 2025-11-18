@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_StringHTMLToAscii : Method {
 
     #region Properties

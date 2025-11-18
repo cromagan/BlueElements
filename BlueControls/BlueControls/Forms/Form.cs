@@ -72,7 +72,7 @@ public partial class Form : System.Windows.Forms.Form {
         set => base.AutoSize = false;
     }
 
-    public override sealed Color BackColor {
+    public sealed override Color BackColor {
         get => base.BackColor;
         // ReSharper disable once ValueParameterNotUsed
         set => base.BackColor = value;
@@ -106,7 +106,7 @@ public partial class Form : System.Windows.Forms.Form {
     public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
 
     // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-    // ReSharper disable once UnusedMember.Global
+    
     public new void PerformAutoScale() {
         // NIX TUN!!!!
     }

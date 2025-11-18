@@ -26,18 +26,18 @@ public interface IInputFormat {
 
     #region Properties
 
-    public AdditionalCheck AdditionalFormatCheck { get; set; }
-    public string AllowedChars { get; set; }
+    AdditionalCheck AdditionalFormatCheck { get; set; }
+    string AllowedChars { get; set; }
 
-    public int MaxTextLength { get; set; }
+    int MaxTextLength { get; set; }
 
-    public bool MultiLine { get; set; }
+    bool MultiLine { get; set; }
 
-    public string RegexCheck { get; set; }
+    string RegexCheck { get; set; }
 
-    public bool SpellCheckingEnabled { get; set; }
+    bool SpellCheckingEnabled { get; set; }
 
-    public bool TextFormatingAllowed { get; set; }
+    bool TextFormatingAllowed { get; set; }
 
     #endregion
 }

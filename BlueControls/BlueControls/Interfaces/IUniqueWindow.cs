@@ -29,15 +29,15 @@ public interface IUniqueWindow : IDisposableExtended {
 
     #region Properties
 
-    public object? Object { get; set; }
+    object? Object { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void BringToFront();
+    void BringToFront();
 
-    public void Show();
+    void Show();
 
     #endregion
 }

@@ -549,7 +549,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
-    private void btnNeuDB_Click(object sender, System.EventArgs e) {
+     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
         BlueTable.Table.SaveAll(false);
 
@@ -584,6 +584,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         Table.PowerEdit = true;
     }
 
+    [Obsolete]
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
         BlueTable.Table.SaveAll(false);
@@ -683,7 +684,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (InvokeRequired) {
             try {
-                Invoke(new Action(() => CheckButtons()));
+                Invoke(new Action(CheckButtons));
             } catch { }
             return;
         }
@@ -933,7 +934,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         Table.Invalidate();
         lstAufgaben.ItemClear();
 
-        bool addedit = true;
+        var addedit = true;
 
         if (tb is not { IsDisposed: false } || !tb.IsEditable(false)) {
             lstAufgaben.Enabled = false;

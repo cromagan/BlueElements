@@ -75,7 +75,7 @@ public partial class FloatingForm : Form {
     /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
     /// CreateParams gesteuert. Wenn TopMost true wäre, würde das Form den Focus bekommen.
     /// </summary>
-    // ReSharper disable once UnusedMember.Global
+    
     public new bool TopMost {
         get => false;
         // ReSharper disable once ValueParameterNotUsed

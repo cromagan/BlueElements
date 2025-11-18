@@ -119,7 +119,7 @@ public class ExtCharAscii : ExtChar {
     protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
 
     private void InitVales() {
-        _charInt = (int)_char;
+        _charInt = _char;
         _charString = _char.ToString();
         _htmlText = _charString.CreateHtmlCodes();
         _isLineBreak = _charInt is 11 or 13;

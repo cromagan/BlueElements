@@ -26,7 +26,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_IsDropDownItem : Method_TableGeneric {
 
     #region Properties

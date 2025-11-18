@@ -62,7 +62,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "FI-Column";
 
     public ColumnViewItem? CVI { get; }

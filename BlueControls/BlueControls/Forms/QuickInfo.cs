@@ -54,7 +54,7 @@ public partial class QuickInfo : FloatingForm {
 
     #region Methods
 
-    public new static void Close() => Close(false);
+    public static new void Close() => Close(false);
 
     public static void Show(string text) {
         if (text == _shownTxt) { return; }

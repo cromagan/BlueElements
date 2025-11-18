@@ -27,7 +27,7 @@ using System.Drawing;
 
 namespace BlueControls.CellRenderer;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Renderer_Font : Renderer_Abstract {
 
     #region Fields

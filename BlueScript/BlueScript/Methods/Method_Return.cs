@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_Return : Method {
 
     #region Properties
@@ -47,7 +47,7 @@ internal class Method_Return : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) =>
-        new DoItFeedback(false, false, true, string.Empty, attvar.Attributes[0], ld);
+        new(false, false, true, string.Empty, attvar.Attributes[0], ld);
 
     #endregion
 }

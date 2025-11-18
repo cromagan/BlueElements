@@ -26,7 +26,7 @@ public interface IStyleable {
 
     #region Properties
 
-    public string SheetStyle { get; }
+    string SheetStyle { get; }
 
     #endregion
 }

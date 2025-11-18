@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_MsgBox : Method {
 
     #region Properties

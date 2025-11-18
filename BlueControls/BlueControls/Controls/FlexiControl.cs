@@ -33,8 +33,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
-using Orientation = BlueBasics.Enums.Orientation;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -953,7 +953,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (string.IsNullOrEmpty(txt) && _infoCaption == null) { return; }
 
         if (string.IsNullOrEmpty(txt)) {
-            if (_infoCaption != null) { _infoCaption.Visible = false; }
+            _infoCaption?.Visible = false;
         } else {
             _infoCaption = new Caption {
                 Name = "Info",

@@ -240,20 +240,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
         JointPoints.Add(p);
     }
 
-    public object? Clone() {
-        var x = ParseableItems();
-        var i = NewByParsing<AbstractPadItem>(x.FinishParseable());
-        return i;
-    }
 
-    //    if (ItemCollectionPadItem.PadItemTypes != null) {
-    //        foreach (var thisType in ItemCollectionPadItem.PadItemTypes) {
-    //            var i = thisType.TryCreate(ding, name);
-    //            if (i != null) { return i; }
-    //        }
-    //    }
-    //    return null;
-    //}
     public int CompareTo(object obj) {
         if (obj is AbstractPadItem v) {
             return SaveOrder.CompareTo(v.SaveOrder);

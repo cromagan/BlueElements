@@ -40,10 +40,10 @@ public class InvalidatedRowsManager {
     public static DGDoUpdateRow DoUpdateRow = UpdateRow;
 
     // ConcurrentDictionary für threadsichere Sammlung der ungültigen Zeilen (Key = KeyName, Value = RowItem)
-    private readonly ConcurrentDictionary<string, RowItem> _invalidatedRows = new ConcurrentDictionary<string, RowItem>();
+    private readonly ConcurrentDictionary<string, RowItem> _invalidatedRows = new();
 
     // Lock-Objekt nur für den Verarbeitungsstatus
-    private readonly object _processingLock = new object();
+    private readonly object _processingLock = new();
 
     //// ConcurrentDictionary für threadsichere Nachverfolgung verarbeiteter Einträge
     //private readonly ConcurrentDictionary<string, bool> _processedRowIds = new ConcurrentDictionary<string, bool>();

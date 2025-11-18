@@ -853,7 +853,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
         var l = new List<string>();
         try {
-            for (int i = _markStart; i < _markEnd; i++) {
+            for (var i = _markStart; i < _markEnd; i++) {
                 l.Add(_eTxt[i].ToString());
             }
         } catch { }
@@ -873,7 +873,7 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
 
                 foreach (var thiss in sd.SplitByCr()) {
                     if (_eTxt.Count < MaxTextLength) {
-                        var extChar = ParseableItem.NewByParsing<ExtChar>(thiss, _eTxt as ExtText, _cursorCharPos);
+                        var extChar = ParseableItem.NewByParsing<ExtChar>(thiss, _eTxt, _cursorCharPos);
 
                         if (extChar != null) {
                             _eTxt.Insert(_cursorCharPos, extChar);

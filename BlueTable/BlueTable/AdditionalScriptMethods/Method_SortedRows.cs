@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_SortedRows : Method_TableGeneric {
 
     #region Properties

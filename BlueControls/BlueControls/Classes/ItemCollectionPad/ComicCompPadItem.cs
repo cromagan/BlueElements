@@ -79,7 +79,7 @@ public class ComicCompPadItem : AbstractPadItem {
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "COMIC";
 
     public Bitmap? Bitmap {

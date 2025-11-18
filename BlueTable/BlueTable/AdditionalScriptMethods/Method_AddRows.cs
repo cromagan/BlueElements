@@ -28,7 +28,7 @@ using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_AddRows : Method_TableGeneric {
 
     #region Properties

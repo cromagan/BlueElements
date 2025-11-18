@@ -32,7 +32,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
 
     private DynamicSymbolPadItem? _item;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -41,7 +41,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         InitializeComponent();
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Properties
 
@@ -68,7 +68,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         }
     }
 
-    #endregion
+    #endregion Properties
 
     #region Methods
 
@@ -89,13 +89,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         return DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp);
     }
 
-    public override void WriteInfosBack() {
-        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table == null || Table.IsDisposed) { return; }
-
-        if (_item != null) {
-            _item.Script = Script;
-        }
-    }
+    public override void WriteInfosBack() => _item?.Script = Script;
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
@@ -105,5 +99,5 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         Object = null; // erst das Item!
     }
 
-    #endregion
+    #endregion Methods
 }

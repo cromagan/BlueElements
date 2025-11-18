@@ -22,15 +22,13 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using static BlueScript.Variables.VariableAi;
 
 //using CefSharp.WinForms;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+
 internal class Method_AskAi : Method {
 
     #region Properties
@@ -61,7 +59,7 @@ internal class Method_AskAi : Method {
 
         do {
             try {
-                var messages = new List<Message> { new Message(RoleType.User, attvar.ValueStringGet(1)) };
+                var messages = new List<Message> { new(RoleType.User, attvar.ValueStringGet(1)) };
 
                 var parameters = new MessageParameters {
                     Messages = messages,

@@ -24,13 +24,11 @@ using CefSharp;
 using CefSharp.OffScreen;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+
 internal class Method_LoadUrl : Method_WebPage {
 
     #region Fields

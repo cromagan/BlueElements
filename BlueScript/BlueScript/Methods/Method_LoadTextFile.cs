@@ -28,7 +28,7 @@ using System.Text;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_LoadTextFile : Method {
 
     #region Properties

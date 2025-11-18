@@ -33,7 +33,7 @@ public class TableFile : Table {
 
     #region Fields
 
-    private static readonly object _timerLock = new object();
+    private static readonly object _timerLock = new();
     private static int _activeTableCount = 0;
 
     /// <summary>
@@ -51,9 +51,7 @@ public class TableFile : Table {
 
     #region Constructors
 
-    public TableFile(string tablename) : base(tablename) {
-        GenerateTableUpdateTimer();
-    }
+    public TableFile(string tablename) : base(tablename) => GenerateTableUpdateTimer();
 
     #endregion
 
@@ -319,10 +317,8 @@ public class TableFile : Table {
                     _activeTableCount--;
                     if (_activeTableCount <= 0) {
                         _activeTableCount = 0;
-                        if (_tableUpdateTimer != null) {
-                            _tableUpdateTimer.Dispose();
-                            _tableUpdateTimer = null;
-                        }
+                        _tableUpdateTimer?.Dispose();
+                        _tableUpdateTimer = null;
                     }
                 }
             } catch {

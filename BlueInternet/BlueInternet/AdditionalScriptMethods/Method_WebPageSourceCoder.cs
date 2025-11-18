@@ -22,15 +22,13 @@ using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using static BlueScript.Variables.VariableWebpage;
 
 //using CefSharp.WinForms;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+
 internal class Method_WebPageSourceCode : Method_WebPage {
 
     #region Properties

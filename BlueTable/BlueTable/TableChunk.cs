@@ -50,7 +50,7 @@ public class TableChunk : TableFile {
     /// </summary>
     private readonly ConcurrentDictionary<string, Chunk> _chunks = new();
 
-    private readonly ConcurrentDictionary<string, byte> chunksBeingSaved = new ConcurrentDictionary<string, byte>();
+    private readonly ConcurrentDictionary<string, byte> chunksBeingSaved = new();
 
     #endregion
 
@@ -252,12 +252,14 @@ public class TableChunk : TableFile {
         return Chunk_MainData.ToLower();
     }
 
+    [Obsolete]
     public override bool AmITemporaryMaster(int ranges, int rangee) {
         if (!LoadChunkWithChunkId(Chunk_Master, false)) { return false; }
 
         return base.AmITemporaryMaster(ranges, rangee);
     }
 
+    [Obsolete]
     public override bool BeSureAllDataLoaded(int anzahl) {
         if (!base.BeSureAllDataLoaded(anzahl)) { return false; }
 
@@ -290,6 +292,7 @@ public class TableChunk : TableFile {
     /// </summary>
     /// <param name="chunkValue">kann auch mehrere Chunkvalues mit \r\n getrennt enthalten.</param>
     /// <returns>Ob ein Load aller Chunks stattgefunden hat</returns>
+    [Obsolete]
     public override bool BeSureRowIsLoaded(string chunkValue) {
         if (!base.BeSureRowIsLoaded(chunkValue)) { return false; }
 
@@ -304,6 +307,7 @@ public class TableChunk : TableFile {
         return true;
     }
 
+    [Obsolete]
     public override bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) {
         if (!base.BeSureToBeUpToDate(firstTime, instantUpdate)) { return false; }
 
@@ -334,6 +338,7 @@ public class TableChunk : TableFile {
         }
     }
 
+    [Obsolete]
     public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
         if (f.Failed) { return f; }
@@ -373,6 +378,7 @@ public class TableChunk : TableFile {
     /// <param name="chunkId"></param>
     /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
+    [Obsolete]
     public bool LoadChunkWithChunkId(string chunkId, bool isFirst) {
         if (string.IsNullOrEmpty(chunkId)) { return false; }
         chunkId = chunkId.ToLower();
@@ -500,6 +506,7 @@ public class TableChunk : TableFile {
         return true; // Explizit true zurückgeben, wenn die Initialisierung erfolgreich ist
     }
 
+    [Obsolete]
     internal override string IsValueEditable(TableDataType type, string? chunkValue) {
         var f = base.IsValueEditable(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -525,8 +532,10 @@ public class TableChunk : TableFile {
         _chunks.Clear();
     }
 
+    [Obsolete]
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true);
 
+    [Obsolete]
     protected override FileOperationResult SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return FileOperationResult.ValueStringEmpty; }
 
@@ -636,6 +645,7 @@ public class TableChunk : TableFile {
         return rowchunk;
     }
 
+    [Obsolete]
     private bool Parse(Chunk chunk) {
         if (chunk.LoadFailed) { return false; }
 

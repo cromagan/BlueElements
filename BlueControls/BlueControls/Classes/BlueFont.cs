@@ -422,7 +422,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public string IsNowEditable() => string.Empty;
 
-    public SizeF MeasureString(string text) => _stringSizeCache.GetOrAdd(text, _ => { return _fontOl.MeasureString(text); });
+    public SizeF MeasureString(string text) => _stringSizeCache.GetOrAdd(text, _ => _fontOl.MeasureString(text));
 
     public QuickImage? NameInStyle() {
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
@@ -586,9 +586,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         const string commonChars = " abcdefghijklmnopqrstuvwxyzäöüéßABCDEFGHIJKLMNOPQRSTUVWXYÄÖÜZ0123456789.,!?-_+/*()[]{}|\\@#$%&";
 
         // Parallele Vorberechnung der häufigsten Zeichen
-        Parallel.ForEach(commonChars, c => {
-            CharSize(c);
-        });
+        Parallel.ForEach(commonChars, c => CharSize(c));
     }
 
     public string ReadableText() {
@@ -608,8 +606,9 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     }
 
     public BlueFont Scale(float scale) {
-        if (Math.Abs(1 - scale) < DefaultTolerance)
+        if (Math.Abs(1 - scale) < DefaultTolerance) {
             return this;
+        }
 
         return Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, ColorMain,
                    ColorOutline, ColorBack);

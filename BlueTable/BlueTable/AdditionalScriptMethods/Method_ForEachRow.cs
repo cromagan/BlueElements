@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_ForEachRow : Method_TableGeneric {
 
     #region Properties

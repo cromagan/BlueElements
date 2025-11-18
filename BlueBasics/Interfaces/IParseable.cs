@@ -46,7 +46,7 @@ public interface IParseable : IStringable {
 
     #region Methods
 
-    public void ParseFinished(string parsed);
+    void ParseFinished(string parsed);
 
     bool ParseThis(string key, string value);
 

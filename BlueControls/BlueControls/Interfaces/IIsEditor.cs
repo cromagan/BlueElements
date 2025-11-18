@@ -30,7 +30,7 @@ public interface IIsEditor {
 
     #region Properties
 
-    public IEditable? ToEdit { set; }
+    IEditable? ToEdit { set; }
 
     #endregion
 }

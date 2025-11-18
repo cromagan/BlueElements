@@ -167,13 +167,15 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(text)) { return 0; }
 
         var endPos = maxPosition.HasValue ? Math.Min(maxPosition.Value, text.Length) : text.Length;
-        if (endPos <= 0)
+        if (endPos <= 0) {
             return 0;
+        }
 
         var count = 0;
         for (var i = 0; i < endPos; i++) {
-            if (text[i] == character)
+            if (text[i] == character) {
                 count++;
+            }
         }
 
         return count;
@@ -183,8 +185,9 @@ public static partial class Extensions {
     /// Zählt, wie oft ein String-Wert im gesamten Text vorkommt
     /// </summary>
     public static int CountString(this string text, string value) {
-        if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(value))
+        if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(value)) {
             return 0;
+        }
 
         var count = 0;
         var index = 0;
@@ -317,8 +320,8 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(input)) { return input; }
 
         try {
-            StringBuilder result = new StringBuilder();
-            foreach (char c in input) {
+            var result = new StringBuilder();
+            foreach (var c in input) {
                 if (c > 127) { // Nicht-ASCII Zeichen
                     result.Append($"\\u{(int)c:X4}");
                 } else {
@@ -341,10 +344,10 @@ public static partial class Extensions {
 
         var result = new List<char>(txt.Length);
 
-        for (int i = 0; i < txt.Length; i++) {
+        for (var i = 0; i < txt.Length; i++) {
             // Prüfe auf Pattern [X]
             if (i <= txt.Length - 3 && txt[i] == '[' && txt[i + 2] == ']') {
-                char patternChar = txt[i + 1];
+                var patternChar = txt[i + 1];
 
                 switch (patternChar) {
                     case 'A':
@@ -844,7 +847,7 @@ public static partial class Extensions {
         var parts = textToSplit.Split([trennzeichen], StringSplitOptions.None);
 
         // Von hinten nach vorne die leeren Einträge entfernen
-        int lastNonEmpty = parts.Length - 1;
+        var lastNonEmpty = parts.Length - 1;
         while (lastNonEmpty >= 0 && string.IsNullOrEmpty(parts[lastNonEmpty])) {
             lastNonEmpty--;
         }
@@ -918,12 +921,12 @@ public static partial class Extensions {
     public static string Sprachneutral(this string isValue) {
         if (string.IsNullOrEmpty(isValue)) { return string.Empty; }
 
-        char[] result = new char[isValue.Length];
-        int writeIndex = 0;
+        var result = new char[isValue.Length];
+        var writeIndex = 0;
 
         // Normalisierung in einem Durchgang
-        for (int i = 0; i < isValue.Length; i++) {
-            char c = char.ToLowerInvariant(isValue[i]);
+        for (var i = 0; i < isValue.Length; i++) {
+            var c = char.ToLowerInvariant(isValue[i]);
 
             result[writeIndex++] = c switch {
                 'ä' or 'á' or 'à' or 'â' => 'a',
@@ -938,9 +941,9 @@ public static partial class Extensions {
         }
 
         // Trimming vom Anfang
-        int startIndex = 0;
+        var startIndex = 0;
         while (startIndex < writeIndex) {
-            char c = result[startIndex];
+            var c = result[startIndex];
             if (c is '"' or '\'' or ' ') {
                 startIndex++;
             } else {
@@ -1043,13 +1046,14 @@ public static partial class Extensions {
     }
 
     public static string ToNonCritical(this string txt) {
-        if (string.IsNullOrEmpty(txt))
+        if (string.IsNullOrEmpty(txt)) {
             return string.Empty;
+        }
 
         var result = new List<char>(txt.Length * 2);
 
-        for (int i = 0; i < txt.Length; i++) {
-            char c = txt[i];
+        for (var i = 0; i < txt.Length; i++) {
+            var c = txt[i];
 
             // Handle \r\n first (multi-character)
             if (c == '\r' && i < txt.Length - 1 && txt[i + 1] == '\n') {
@@ -1199,11 +1203,11 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(input)) { return input; }
 
         try {
-            StringBuilder result = new StringBuilder();
-            for (int i = 0; i < input.Length; i++) {
+            var result = new StringBuilder();
+            for (var i = 0; i < input.Length; i++) {
                 if (i <= input.Length - 6 && input[i] == '\\' && input[i + 1] == 'u') {
-                    string hexCode = input.Substring(i + 2, 4);
-                    if (int.TryParse(hexCode, NumberStyles.HexNumber, null, out int unicodeValue)) {
+                    var hexCode = input.Substring(i + 2, 4);
+                    if (int.TryParse(hexCode, NumberStyles.HexNumber, null, out var unicodeValue)) {
                         result.Append((char)unicodeValue);
                         i += 5; // Überspringe die nächsten 5 Zeichen (\u + 4 Hex-Zeichen)
                     } else {
@@ -1220,7 +1224,7 @@ public static partial class Extensions {
         }
     }
 
-    public static byte[] UTF8_ToByte(this string? tXt) => tXt == null || string.IsNullOrEmpty(tXt) ? ([]) : Encoding.UTF8.GetBytes(tXt);
+    public static byte[] UTF8_ToByte(this string? tXt) => tXt == null || string.IsNullOrEmpty(tXt) ? [] : Encoding.UTF8.GetBytes(tXt);
 
     #endregion
 }

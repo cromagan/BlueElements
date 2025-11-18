@@ -69,7 +69,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "IMAGE";
 
     public SizeModes Bild_Modus {

@@ -25,7 +25,7 @@ using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_FreeFileName : Method {
 
     #region Properties

@@ -23,7 +23,7 @@ public interface IMirrorable {
 
     #region Methods
 
-    public void Mirror(PointM? p, bool vertical, bool horizontal);
+    void Mirror(PointM? p, bool vertical, bool horizontal);
 
     #endregion
 }

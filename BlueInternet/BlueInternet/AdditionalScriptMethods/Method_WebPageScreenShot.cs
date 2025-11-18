@@ -23,7 +23,6 @@ using BlueTable.AdditionalScriptMethods;
 using CefSharp;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Threading;
 using static BlueScript.Variables.VariableWebpage;
@@ -32,8 +31,7 @@ using static BlueScript.Variables.VariableWebpage;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+
 internal class Method_WebPageScreenShot : Method_WebPage {
 
     #region Properties

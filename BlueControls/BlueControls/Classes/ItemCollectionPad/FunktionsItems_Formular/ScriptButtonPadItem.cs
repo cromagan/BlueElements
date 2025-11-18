@@ -73,7 +73,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "FI-ScriptButton";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
@@ -259,7 +259,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
     public void OpenScriptEditor() {
         var f = GenericControl.ParentForm(_button);
 
-        if (f != null) { f.Opacity = 0f; }
+        f?.Opacity = 0f;
 
         var tse = new TimerScriptEditor {
             Object = this
@@ -268,7 +268,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
 
-        if (f != null) { f.Opacity = 1f; }
+        f?.Opacity = 1f;
     }
 
     public override List<string> ParseableItems() {

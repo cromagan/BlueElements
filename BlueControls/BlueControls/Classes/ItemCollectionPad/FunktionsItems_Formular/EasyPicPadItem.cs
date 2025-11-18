@@ -50,7 +50,7 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "FI-EasyPic";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;

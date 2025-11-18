@@ -34,19 +34,19 @@ public interface ISimpleEditor {
 
     #region Events
 
-    public event EventHandler? DoUpdateSideOptionMenu;
+    event EventHandler? DoUpdateSideOptionMenu;
 
     #endregion
 
     #region Properties
 
-    public string Description { get; }
+    string Description { get; }
 
     #endregion
 
     #region Methods
 
-    public List<GenericControl> GetProperties(int widthOfControl);
+    List<GenericControl> GetProperties(int widthOfControl);
 
     #endregion
 }

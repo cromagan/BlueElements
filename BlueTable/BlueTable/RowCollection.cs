@@ -39,7 +39,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Fields
 
     public static readonly ConcurrentDictionary<RowItem, string> FailedRows = [];
-    public static readonly InvalidatedRowsManager InvalidatedRowsManager = new InvalidatedRowsManager();
+    public static readonly InvalidatedRowsManager InvalidatedRowsManager = new();
     public static int WaitDelay;
     private static readonly List<BackgroundWorker> Pendingworker = [];
     private static int _executingchangedrows;
@@ -861,7 +861,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen!", true); }
 
         if (!tb.IsEditable(false)) { return (null, "Neue Zeilen nicht möglich: " + tb.IsNotEditableReason, true); }
-
 
         if (GetByKey(key) != null) { return (null, "Schlüssel bereits belegt!", true); }
 

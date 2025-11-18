@@ -118,7 +118,7 @@ public class Method_CallByFilename : Method {
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        string file = attvar.ValueStringGet(0);
+        var file = attvar.ValueStringGet(0);
 
         if (!file.IsFormat(FormatHolder.FilepathAndName)) {
             file = varCol.GetString("AdditionalFilesPath") + file;

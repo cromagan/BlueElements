@@ -100,7 +100,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     public virtual ScriptEndedFeedback ExecuteScript(bool testmode) =>
-        new ScriptEndedFeedback("Fehler", false, false, "Unbekannt");
+        new("Fehler", false, false, "Unbekannt");
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {

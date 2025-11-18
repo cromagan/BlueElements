@@ -28,7 +28,7 @@ using System.Drawing;
 
 namespace BlueControls.CellRenderer;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Renderer_RichText : Renderer_Abstract {
 
     #region Properties
@@ -55,7 +55,7 @@ public class Renderer_RichText : Renderer_Abstract {
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
             //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / SheetStyleScale), -1);
             //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-            TextDimensions = new Size((int)(scaleddrawarea.Width), -1),
+            TextDimensions = new Size(scaleddrawarea.Width, -1),
             Ausrichtung = align,
             DrawingArea = scaleddrawarea,
             DrawingPos = scaleddrawarea.PointOf(Alignment.Top_Left)

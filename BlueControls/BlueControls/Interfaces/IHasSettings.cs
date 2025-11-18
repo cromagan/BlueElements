@@ -29,11 +29,11 @@ public interface IHasSettings {
 
     #region Properties
 
-    public string Name { get; }
-    public List<string> Settings { get; }
-    public bool SettingsLoaded { get; set; }
-    public string SettingsManualFilename { get; set; }
-    public bool UsesSettings { get; }
+    string Name { get; }
+    List<string> Settings { get; }
+    bool SettingsLoaded { get; set; }
+    string SettingsManualFilename { get; set; }
+    bool UsesSettings { get; }
 
     #endregion
 }

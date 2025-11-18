@@ -27,7 +27,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_LoadImage : Method {
 
     #region Properties

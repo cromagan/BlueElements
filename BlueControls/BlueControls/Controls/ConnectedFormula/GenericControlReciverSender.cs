@@ -38,9 +38,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     #region Constructors
 
-    public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) {
-        FilterOutput = new($"{_outputf} {GetType().Name}");
-    }
+    public GenericControlReciverSender(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) => FilterOutput = new($"{_outputf} {GetType().Name}");
 
     #endregion
 
@@ -83,9 +81,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            if (Parent != null) {
-                Parent.Controls.Remove(this);
-            }
+            Parent?.Controls.Remove(this);
 
             foreach (var thisChild in Childs) {
                 thisChild.Parents.Remove(this);

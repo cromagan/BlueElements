@@ -31,9 +31,9 @@ public interface IStyleableOne : IStyleable {
 
     #region Properties
 
-    public BlueFont? Font { get; set; }
+    BlueFont? Font { get; set; }
 
-    public PadStyles Style { get; }
+    PadStyles Style { get; }
 
     #endregion
 }

@@ -28,18 +28,18 @@ public interface IColumnInputFormat : IInputFormat {
 
     #region Properties
 
-    public bool AfterEditQuickSortRemoveDouble { get; set; }
-    public AlignmentHorizontal Align { get; set; }
-    public string DefaultRenderer { get; set; }
-    public TranslationType DoOpticalTranslation { get; set; }
-    public bool DropdownDeselectAllAllowed { get; set; }
-    public ReadOnlyCollection<string> DropDownItems { get; set; }
-    public bool EditableWithDropdown { get; set; }
-    public bool EditableWithTextInput { get; set; }
-    public string RendererSettings { get; set; }
-    public ScriptType ScriptType { get; set; }
-    public bool ShowValuesOfOtherCellsInDropdown { get; set; }
-    public SortierTyp SortType { get; set; }
+    bool AfterEditQuickSortRemoveDouble { get; set; }
+    AlignmentHorizontal Align { get; set; }
+    string DefaultRenderer { get; set; }
+    TranslationType DoOpticalTranslation { get; set; }
+    bool DropdownDeselectAllAllowed { get; set; }
+    ReadOnlyCollection<string> DropDownItems { get; set; }
+    bool EditableWithDropdown { get; set; }
+    bool EditableWithTextInput { get; set; }
+    string RendererSettings { get; set; }
+    ScriptType ScriptType { get; set; }
+    bool ShowValuesOfOtherCellsInDropdown { get; set; }
+    SortierTyp SortType { get; set; }
 
     #endregion
 }

@@ -30,7 +30,7 @@ using System.Drawing;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_LoadPadItem : Method {
 
     #region Properties

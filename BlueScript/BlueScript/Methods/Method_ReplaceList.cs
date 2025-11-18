@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_ReplaceList : Method {
 
     #region Properties

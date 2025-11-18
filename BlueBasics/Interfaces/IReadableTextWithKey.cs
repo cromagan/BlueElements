@@ -23,7 +23,7 @@ public interface IReadableTextWithKey : IReadableText, IHasKeyName {
 
     #region Properties
 
-    public string ColumnQuickInfo { get; }
+    string ColumnQuickInfo { get; }
 
     #endregion
 }

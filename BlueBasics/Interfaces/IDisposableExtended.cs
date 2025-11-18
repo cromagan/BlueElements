@@ -52,7 +52,7 @@ public interface IDisposableExtended : IDisposable {
     #region Properties
 
     //public bool Disposing { get; }
-    public bool IsDisposed { get; }
+    bool IsDisposed { get; }
 
     #endregion
 }

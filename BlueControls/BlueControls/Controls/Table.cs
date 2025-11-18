@@ -366,7 +366,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         get {
             if (FilterleisteZeilen < 1) { return 0; }
 
-            return btnAlleFilterAus.Top * 2 + FilterleisteZeilen * btnAlleFilterAus.Height + (FilterleisteZeilen - 1) * rowSpacing;
+            return (btnAlleFilterAus.Top * 2) + (FilterleisteZeilen * btnAlleFilterAus.Height) + ((FilterleisteZeilen - 1) * rowSpacing);
         }
     }
 
@@ -435,7 +435,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
             var added = markYellow;
 
-            var caps = tb.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : ([]);
+            var caps = tb.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
             if (caps.Count > 0) {
                 if (caps.Contains(string.Empty)) {
                     caps.Remove(string.Empty);
@@ -2318,7 +2318,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
         var contentHolderCellRow = cellInThisTableRow?.Row;
-        if (contentHolderCellRow is {IsDisposed: false } && contentHolderCellColumn.RelationType == RelationType.CellValues) {
+        if (contentHolderCellRow is { IsDisposed: false } && contentHolderCellColumn.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
         }
@@ -3134,7 +3134,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
 
-    private Rectangle DisplayRectangleWithoutSlider() => new Rectangle(DisplayRectangle.Left, DisplayRectangle.Top + FilterleisteHeight, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height - FilterleisteHeight);
+    private Rectangle DisplayRectangleWithoutSlider() => new(DisplayRectangle.Left, DisplayRectangle.Top + FilterleisteHeight, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height - FilterleisteHeight);
 
     private void DoÄhnlich() {
         if (IsDisposed || Table is not { IsDisposed: false } db || db.Column.Count == 0) { return; }
@@ -3733,8 +3733,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     private void DrawWaitScreen(Graphics gr, string info, ColumnViewCollection? ca) {
-        if (SliderX != null) { SliderX.Enabled = false; }
-        if (SliderY != null) { SliderY.Enabled = false; }
+        SliderX?.Enabled = false;
+        SliderY?.Enabled = false;
 
         Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
 
@@ -4194,7 +4194,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     private RowData? RowOnCoordinate(ColumnViewCollection ca, int pixelY) {
-        if (IsDisposed || Table is not { IsDisposed: false } || pixelY <= ca.HeadSize() * _zoom + FilterleisteHeight) { return null; }
+        if (IsDisposed || Table is not { IsDisposed: false } || pixelY <= (ca.HeadSize() * _zoom) + FilterleisteHeight) { return null; }
         var s = RowsFilteredAndPinned();
 
         return s?.FirstOrDefault(thisRowItem => thisRowItem != null && pixelY >= DrawY(ca, thisRowItem) && pixelY <= DrawY(ca, thisRowItem) + GetPix(thisRowItem.DrawHeight) && thisRowItem.Expanded);

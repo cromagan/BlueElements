@@ -46,7 +46,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageWidth=16, ImageHeight=16}"
     };
 
-    public new static readonly ColumnFormatHolder Bit = new(FormatHolder.Bit) {
+    public static new readonly ColumnFormatHolder Bit = new(FormatHolder.Bit) {
         Align = AlignmentHorizontal.Zentriert,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -61,7 +61,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageReplace=+[G]Häkchen|o[G]Kreis2|-[G]Kreuz, ImageWidth=16, ImageHeight=16}"
     };
 
-    public new static readonly ColumnFormatHolder Color = new(FormatHolder.Color) {
+    public static new readonly ColumnFormatHolder Color = new(FormatHolder.Color) {
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -76,7 +76,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"Color\", ShowSymbol=+, ShowHex=+, ShowName=+}"
     };
 
-    public new static readonly ColumnFormatHolder Date = new(FormatHolder.Date) {
+    public static new readonly ColumnFormatHolder Date = new(FormatHolder.Date) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Datum_Uhrzeit,
         DoOpticalTranslation = TranslationType.Datum,
@@ -91,7 +91,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
-    public new static readonly ColumnFormatHolder DateTime = new(FormatHolder.DateTime) {
+    public static new readonly ColumnFormatHolder DateTime = new(FormatHolder.DateTime) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Datum_Uhrzeit,
         DoOpticalTranslation = TranslationType.Datum,
@@ -106,7 +106,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"DateTime\", Style=\"Windows 11\", UTCToLocal=+, ShowSymbol=+}"
     };
 
-    public new static readonly ColumnFormatHolder Email = new(FormatHolder.Email) {
+    public static new readonly ColumnFormatHolder Email = new(FormatHolder.Email) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -121,7 +121,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
-    public new static readonly ColumnFormatHolder Float = new(FormatHolder.Float) {
+    public static new readonly ColumnFormatHolder Float = new(FormatHolder.Float) {
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertFloat,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -136,8 +136,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=2}"
     };
 
-    // ReSharper disable once UnusedMember.Global
-    public new static readonly ColumnFormatHolder FloatPositive = new(FormatHolder.FloatPositive) {
+    
+    public static new readonly ColumnFormatHolder FloatPositive = new(FormatHolder.FloatPositive) {
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertFloat,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -152,7 +152,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=2}"
     };
 
-    public new static readonly ColumnFormatHolder Long = new(FormatHolder.Long) {
+    public static new readonly ColumnFormatHolder Long = new(FormatHolder.Long) {
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertInt,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -167,7 +167,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=0}"
     };
 
-    public new static readonly ColumnFormatHolder LongPositive = new(FormatHolder.LongPositive) {
+    public static new readonly ColumnFormatHolder LongPositive = new(FormatHolder.LongPositive) {
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertInt,
         DoOpticalTranslation = TranslationType.Zahl,
@@ -182,7 +182,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=0}"
     };
 
-    public new static readonly ColumnFormatHolder PhoneNumber = new(FormatHolder.PhoneNumber) {
+    public static new readonly ColumnFormatHolder PhoneNumber = new(FormatHolder.PhoneNumber) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -197,7 +197,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
-    public new static readonly ColumnFormatHolder SystemName = new(FormatHolder.SystemName) {
+    public static new readonly ColumnFormatHolder SystemName = new(FormatHolder.SystemName) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -212,7 +212,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
-    public new static readonly ColumnFormatHolder Text = new(FormatHolder.Text) {
+    public static new readonly ColumnFormatHolder Text = new(FormatHolder.Text) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -227,8 +227,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
-    // ReSharper disable once UnusedMember.Global
-    public new static readonly ColumnFormatHolder TextMitFormatierung = new(FormatHolder.TextMitFormatierung) {
+    
+    public static new readonly ColumnFormatHolder TextMitFormatierung = new(FormatHolder.TextMitFormatierung) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -257,7 +257,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         MultiLine = true // Verhalten von Setformat überschreiben
     };
 
-    public new static readonly ColumnFormatHolder Url = new(FormatHolder.Url) {
+    public static new readonly ColumnFormatHolder Url = new(FormatHolder.Url) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,

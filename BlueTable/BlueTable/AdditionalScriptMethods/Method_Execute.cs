@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_Execte : Method, IUseableForButton {
 
     #region Properties

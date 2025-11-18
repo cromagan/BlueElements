@@ -853,7 +853,7 @@ public static class Skin {
 
     public static bool Inited { get; private set; }
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static Color RandomColor =>
         Color.FromArgb((byte)Constants.GlobalRnd.Next(0, 255),
             (byte)Constants.GlobalRnd.Next(0, 255),

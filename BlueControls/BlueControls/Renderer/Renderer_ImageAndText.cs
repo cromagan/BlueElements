@@ -31,7 +31,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.CellRenderer;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Fields

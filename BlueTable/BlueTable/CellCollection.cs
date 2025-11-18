@@ -27,8 +27,6 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using static BlueBasics.Generic;
 
 namespace BlueTable;
 
@@ -142,8 +140,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
         if (linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
-            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, false, [.. fi])))
+            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, false, [.. fi]))) {
                 return (null, "Filter des Chunk-Wertes fehlt.");
+            }
         }
 
         var fc = new FilterCollection(linkedTable, "cell get filter");

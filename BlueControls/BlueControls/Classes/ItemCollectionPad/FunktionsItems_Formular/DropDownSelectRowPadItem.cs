@@ -58,7 +58,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "FI-SelectRowWithDropDownMenu";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;

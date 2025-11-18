@@ -32,7 +32,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_CheckBitmap : Method, IComandBuilder {
 
     #region Properties

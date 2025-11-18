@@ -31,21 +31,21 @@ public interface IUseableForButton {
 
     #region Properties
 
-    public List<List<string>> ArgsForButton { get; }
-    public List<string> ArgsForButtonDescription { get; }
-    public ButtonArgs ClickableWhen { get; }
+    List<List<string>> ArgsForButton { get; }
+    List<string> ArgsForButtonDescription { get; }
+    ButtonArgs ClickableWhen { get; }
 
-    public string Command { get; }
+    string Command { get; }
 
-    public string NiceTextForUser { get; }
+    string NiceTextForUser { get; }
 
     #endregion
 
     #region Methods
 
-    public DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp);
+    DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp);
 
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg);
+    string TranslateButtonArgs(List<string> args, string filterarg, string rowarg);
 
     #endregion
 }

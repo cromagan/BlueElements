@@ -27,7 +27,7 @@ public static partial class Extensions {
 
     #region Fields
 
-    public static readonly StringFormat DefaultWithTrailingSpaces = new StringFormat(StringFormat.GenericTypographic) {
+    public static readonly StringFormat DefaultWithTrailingSpaces = new(StringFormat.GenericTypographic) {
         FormatFlags = StringFormat.GenericDefault.FormatFlags | StringFormatFlags.MeasureTrailingSpaces,
         Alignment = StringAlignment.Near,
         LineAlignment = StringAlignment.Near,

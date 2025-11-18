@@ -105,8 +105,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     public bool UsesSettings => true;
 
     public string Value {
-        get => f.Value;
-        set { f.ValueSet(value, true); }
+        get => f.Value; 
+        set => f.ValueSet(value, true);
     }
 
     #endregion

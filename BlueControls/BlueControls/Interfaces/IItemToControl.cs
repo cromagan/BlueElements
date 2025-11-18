@@ -31,7 +31,7 @@ public interface IItemToControl : IHasVersion, ICloneable, IReadableTextWithKey 
 
     #region Methods
 
-    public Control? CreateControl(ConnectedFormulaView parent, string mode);
+    Control? CreateControl(ConnectedFormulaView parent, string mode);
 
     #endregion
 }

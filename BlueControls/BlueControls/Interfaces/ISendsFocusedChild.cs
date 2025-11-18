@@ -26,7 +26,7 @@ public interface ISendsFocusedChild {
 
     #region Events
 
-    public event EventHandler<ControlEventArgs>? ChildGotFocus;
+    event EventHandler<ControlEventArgs>? ChildGotFocus;
 
     #endregion
 }

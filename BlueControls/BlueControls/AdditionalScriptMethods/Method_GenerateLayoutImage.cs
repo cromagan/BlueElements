@@ -27,7 +27,7 @@ using System.Linq;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_GenerateLayoutImage : Method_TableGeneric {
 
     #region Properties

@@ -25,87 +25,86 @@ using static BlueBasics.Converter;
 
 #nullable enable
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms;
 
-    public partial class Start : FormWithStatusBar, IUniqueWindow {
+public partial class Start : FormWithStatusBar, IUniqueWindow {
 
-        #region Constructors
+    #region Constructors
 
-        public Start() : base() {
-            InitializeComponent();
+    public Start() : base() {
+        InitializeComponent();
 
-            //var types = Generic.GetTypesOfType<IIsStandalone>();
+        //var types = Generic.GetTypesOfType<IIsStandalone>();
 
-            var methods = Generic.GetMethodsWithAttribute<StandaloneInfo>();
+        var methods = Generic.GetMethodsWithAttribute<StandaloneInfo>();
 
-            foreach (var thisType in methods) {
-                var name = thisType.Name;
-                QuickImage i = QuickImage.Get(ImageCode.Fragezeichen);
-                string kat = "Sonstiges";
-                int sort = 200;
+        foreach (var thisType in methods) {
+            var name = thisType.Name;
+            var i = QuickImage.Get(ImageCode.Fragezeichen);
+            var kat = "Sonstiges";
+            var sort = 200;
 
-                var attr = thisType.GetCustomAttribute<StandaloneInfo>();
-                if (attr != null) {
-                    name = attr.Name;
-                    i = attr.Image;
-                    kat = attr.Kategorie;
-                    sort = attr.Sort;
-                }
-
-                if (Forms[kat] is { } cap) {
-                    var tmp = Math.Min(IntParse(cap.UserDefCompareKey) / 10, sort);
-                    cap.UserDefCompareKey = tmp.ToStringInt10() + "0";
-                } else {
-                    var pk = new TextListItem(kat, kat, null, true, true, sort.ToStringInt10() + "0");
-                    Forms.ItemAdd(pk);
-                }
-
-                var p = new BitmapListItem(i, string.Empty, name) {
-                    Padding = 5,
-                    Tag = thisType,
-                    UserDefCompareKey = sort.ToStringInt10() + "1" + name
-                };
-
-                //var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToStringInt10() + "1" + name) {
-                //    Tag = thisType
-                //};
-                Forms.ItemAdd(p);
-            }
-        }
-
-        #endregion
-
-        #region Properties
-
-        public object? Object { get; set; }
-
-        #endregion
-
-        #region Methods
-
-        private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-            if (e.Item.Tag is MethodInfo methodInfo) {
-                var result = methodInfo.Invoke(null, null);
-                if (result is Form form) {
-                    FormManager.RegisterForm(form);
-                    form.Show();
-                    Close();
-                    form.BringToFront();
-                }
+            var attr = thisType.GetCustomAttribute<StandaloneInfo>();
+            if (attr != null) {
+                name = attr.Name;
+                i = attr.Image;
+                kat = attr.Kategorie;
+                sort = attr.Sort;
             }
 
-            //if (e.Item.Tag is not Type t) { return; }
+            if (Forms[kat] is { } cap) {
+                var tmp = Math.Min(IntParse(cap.UserDefCompareKey) / 10, sort);
+                cap.UserDefCompareKey = tmp.ToStringInt10() + "0";
+            } else {
+                var pk = new TextListItem(kat, kat, null, true, true, sort.ToStringInt10() + "0");
+                Forms.ItemAdd(pk);
+            }
 
-            //var instance = (IIsStandalone)Activator.CreateInstance(t);
+            var p = new BitmapListItem(i, string.Empty, name) {
+                Padding = 5,
+                Tag = thisType,
+                UserDefCompareKey = sort.ToStringInt10() + "1" + name
+            };
 
-            //if (instance is System.Windows.Forms.Form frm) {
-            //    FormManager.RegisterForm(frm);
-            //    frm.Show();
-            //    Close();
-            //    frm.BringToFront();
-            //}
+            //var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToStringInt10() + "1" + name) {
+            //    Tag = thisType
+            //};
+            Forms.ItemAdd(p);
         }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Properties
+
+    public object? Object { get; set; }
+
+    #endregion
+
+    #region Methods
+
+    private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+        if (e.Item.Tag is MethodInfo methodInfo) {
+            var result = methodInfo.Invoke(null, null);
+            if (result is Form form) {
+                FormManager.RegisterForm(form);
+                form.Show();
+                Close();
+                form.BringToFront();
+            }
+        }
+
+        //if (e.Item.Tag is not Type t) { return; }
+
+        //var instance = (IIsStandalone)Activator.CreateInstance(t);
+
+        //if (instance is System.Windows.Forms.Form frm) {
+        //    FormManager.RegisterForm(frm);
+        //    frm.Show();
+        //    Close();
+        //    frm.BringToFront();
+        //}
+    }
+
+    #endregion
 }

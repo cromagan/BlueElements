@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_Call : Method_TableGeneric, IUseableForButton {
 
     #region Properties

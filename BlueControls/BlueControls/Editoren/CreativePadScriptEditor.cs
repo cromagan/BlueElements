@@ -34,7 +34,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
 
     private CreativePadItem? _item;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -43,7 +43,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         InitializeComponent();
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Properties
 
@@ -97,7 +97,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         }
     }
 
-    #endregion
+    #endregion Properties
 
     #region Methods
 
@@ -138,13 +138,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         return f;
     }
 
-    public override void WriteInfosBack() {
-        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table == null || Table.IsDisposed) { return; }
-
-        if (_item != null) {
-            _item.Script = Script;
-        }
-    }
+    public override void WriteInfosBack() => _item?.Script = Script;
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();
@@ -161,5 +155,5 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
 
-    #endregion
+    #endregion Methods
 }

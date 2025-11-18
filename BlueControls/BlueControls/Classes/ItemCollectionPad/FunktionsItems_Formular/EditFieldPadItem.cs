@@ -61,7 +61,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "FI-EditField";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;

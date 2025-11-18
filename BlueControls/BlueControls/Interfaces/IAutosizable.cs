@@ -26,15 +26,15 @@ public interface IAutosizable {
     #region Properties
 
     bool AutoSizeableHeight { get; }
-    public RectangleF UsedArea { get; }
+    RectangleF UsedArea { get; }
 
     #endregion
 
     #region Methods
 
-    public bool IsVisibleForMe(string mode, bool nowDrawing);
+    bool IsVisibleForMe(string mode, bool nowDrawing);
 
-    public void SetCoordinates(RectangleF r);
+    void SetCoordinates(RectangleF r);
 
     #endregion
 }

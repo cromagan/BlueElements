@@ -30,7 +30,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_SaveImage : Method {
 
     #region Properties

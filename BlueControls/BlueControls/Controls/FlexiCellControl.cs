@@ -491,14 +491,14 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     }
 
     private void StyleControls(ColumnItem? column, RowItem row) {
-        ColumnItem? realColumn = column;
+        var realColumn = column;
 
         if (column?.RelationType == RelationType.CellValues) {
             (realColumn, _, _, _) = row.LinkedCellData(column, true, false);
         }
 
         f.Caption = Caption;
-        int delay = 1;
+        var delay = 1;
 
         if (realColumn != null) {
             QuickInfo = TableView.QuickInfoText(realColumn, string.Empty);

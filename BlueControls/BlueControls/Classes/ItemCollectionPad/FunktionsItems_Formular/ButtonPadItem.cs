@@ -73,7 +73,7 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "FI-FilterButton";
 
     [Description("Welches Skript ausgeführt werden soll")]

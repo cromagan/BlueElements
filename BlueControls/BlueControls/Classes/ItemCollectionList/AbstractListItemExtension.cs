@@ -150,7 +150,7 @@ public static class AbstractListItemExtension {
             l = l.SortedDistinctList();
         }
 
-        return maxItems > 0 && l.Count > maxItems ? ([]) : ItemsOf(l, column, cellRenderer);
+        return maxItems > 0 && l.Count > maxItems ? [] : ItemsOf(l, column, cellRenderer);
     }
 
     public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {

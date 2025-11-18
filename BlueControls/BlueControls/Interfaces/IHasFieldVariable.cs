@@ -25,13 +25,13 @@ public interface IHasFieldVariable {
 
     #region Properties
 
-    public string FieldName { get; }
+    string FieldName { get; }
 
     #endregion
 
     #region Methods
 
-    public Variable? GetFieldVariable();
+    Variable? GetFieldVariable();
 
     void SetValueFromVariable(Variable v);
 

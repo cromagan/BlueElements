@@ -111,9 +111,7 @@ public partial class DialogWithOkAndCancel : Form {
         wi = Math.Max(wi + BorderWidth, minWidth);
         Setup(wi, he);
 
-        if (centerControl != null) {
-            centerControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-        }
+        centerControl?.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
     }
 
     protected void Cancel() {

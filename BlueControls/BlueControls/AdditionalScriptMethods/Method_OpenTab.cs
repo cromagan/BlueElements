@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace BlueControls;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_OpenTab : Method {
 
     #region Properties

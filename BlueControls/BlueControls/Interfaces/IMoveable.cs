@@ -23,14 +23,14 @@ public interface IMoveable {
 
     #region Properties
 
-    public bool MoveXByMouse { get; }
-    public bool MoveYByMouse { get; }
+    bool MoveXByMouse { get; }
+    bool MoveYByMouse { get; }
 
     #endregion
 
     #region Methods
 
-    public void Move(float x, float y, bool isMouse);
+    void Move(float x, float y, bool isMouse);
 
     #endregion
 }

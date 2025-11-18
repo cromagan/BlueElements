@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Method_RowDelete : Method_TableGeneric, IUseableForButton {
 
     #region Properties

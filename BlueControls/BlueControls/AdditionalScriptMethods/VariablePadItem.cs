@@ -43,7 +43,7 @@ public class VariablePadItem : Variable {
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "ici";
 
     public static string ShortName_Variable => "*ici";

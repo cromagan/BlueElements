@@ -22,7 +22,6 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
 using static BlueScript.Variables.VariableAi;
 using static BlueScript.Variables.VariableBitmap;
@@ -31,8 +30,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
-[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+
 internal class Method_AskAiBmp : Method {
 
     #region Properties

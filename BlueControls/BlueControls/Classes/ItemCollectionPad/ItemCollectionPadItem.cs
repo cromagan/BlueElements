@@ -127,7 +127,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "ITEMCOLLECTION";
 
     public Color BackColor { get; set; } = Color.White;
@@ -261,7 +261,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return "C" + (icpi.UniqueId + "|" + KeyName).GetHashString();
             }
 
-            return "S" + this.KeyName.GetHashString();
+            return "S" + KeyName.GetHashString();
         }
     }
 
@@ -290,8 +290,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             newS = ZoomFitValue(usedArea, positionModified.ToRect().Size);
             newX = -positionModified.X - (positionModified.Width / 2f);
             newY = -positionModified.Y - (positionModified.Height / 2f);
-            newX = newX + ((usedArea.Left + (usedArea.Width / 2f)) * newS);
-            newY = newY + ((usedArea.Top + (usedArea.Height / 2f)) * newS);
+            newX += (usedArea.Left + (usedArea.Width / 2f)) * newS;
+            newY += (usedArea.Top + (usedArea.Height / 2f)) * newS;
         }
 
         return (newS, newX, newY);

@@ -69,7 +69,7 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Letzter Lade-Stand der Daten.
     /// </summary>
-    private DateTime _isInCache = new DateTime(0);
+    private DateTime _isInCache = new(0);
 
     private bool _masterNeeded;
     private string _myFragmentsFilename = string.Empty;

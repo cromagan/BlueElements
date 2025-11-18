@@ -536,11 +536,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         try {
             //string fileInfoBeforeSaving = GetFileState(filename, true);
 
-            string dataUncompressed = ParseableItems().FinishParseable();
+            var dataUncompressed = ParseableItems().FinishParseable();
 
             if (dataUncompressed.Length < 10) { return FileOperationResult.DoRetry; }
 
-            string tmpFileName = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+            var tmpFileName = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
             if (!WriteAllText(tmpFileName, dataUncompressed, Constants.Win1252, false)) {
                 // DeleteFile(TMPFileName, false); Darf nicht gelöscht werden. Datei konnte ja nicht erstell werden. also auch nix zu löschen

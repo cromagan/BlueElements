@@ -27,7 +27,7 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_BitmapToBase64 : Method {
 
     #region Properties

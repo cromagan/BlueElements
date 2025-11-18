@@ -112,7 +112,7 @@ public static class Generic {
     /// <param name="saveTo"></param>
     /// <param name="linkUrl"></param>
     /// <returns></returns>
-    // ReSharper disable once UnusedMember.Global
+    
     public static bool CreateInternetLink(string saveTo, string linkUrl) {
         var title = "unbekannt";
         // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -135,7 +135,7 @@ public static class Generic {
     /// Erstellt eine Datei-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
     /// </summary>
     /// <returns></returns>
-    // ReSharper disable once UnusedMember.Global
+    
     public static bool CreateShortCut(string saveTo, string linkName) {
         try {
             var app = Assembly.GetExecutingAssembly().Location;
@@ -248,8 +248,9 @@ public static class Generic {
         try {
             List<MethodInfo> l = [];
             foreach (var thisType in AllTypes) {
-                if (!thisType.IsClass || thisType.IsAbstract)
+                if (!thisType.IsClass || thisType.IsAbstract) {
                     continue;
+                }
 
                 var methods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static)
                     .Where(m => m.GetCustomAttribute<TAttribute>() != null);

@@ -116,7 +116,7 @@ public sealed partial class ScreenShot : Form {
             // Zeige die Form
             ShowDialog();
 
-            if (frm != null) { frm.Opacity = op; }
+            frm?.Opacity = op;
 
             return _feedBack;
         } catch {

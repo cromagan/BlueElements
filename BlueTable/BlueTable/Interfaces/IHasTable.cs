@@ -24,7 +24,7 @@ public interface IHasTable {
     #region Properties
 
     // ReSharper disable once UnusedMemberInSuper.Global
-    public Table? Table { get; }
+    Table? Table { get; }
 
     #endregion
 }

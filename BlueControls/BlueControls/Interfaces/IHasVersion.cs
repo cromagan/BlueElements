@@ -26,7 +26,7 @@ public interface IHasVersion : IHasKeyName {
 
     #region Properties
 
-    public int Version { get; set; }
+    int Version { get; set; }
 
     #endregion
 }

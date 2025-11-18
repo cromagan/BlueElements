@@ -42,10 +42,10 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     public readonly List<GenericControlReciverSender> Parents = [];
     protected const string _outputf = "FilterOutput";
-    private readonly object _filterInputLock = new object();
+    private readonly object _filterInputLock = new();
 
     // Ein privates Objekt zum Sperren für die Thread-Sicherheit
-    private readonly object _lockObject = new object();
+    private readonly object _lockObject = new();
 
     private string? _cachedFilterHash = null;
 
@@ -296,7 +296,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 // Wenn während der Berechnung erneut invalidiert wurde
                 if (!FilterInputChangedHandled) {
                     // Erneut aufrufen (außerhalb des Locks)
-                    System.Threading.Tasks.Task.Run(() => Invalidate_FilterInput());
+                    System.Threading.Tasks.Task.Run(Invalidate_FilterInput);
                 }
             }
         }

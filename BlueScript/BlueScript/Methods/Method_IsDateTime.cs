@@ -25,7 +25,7 @@ using static BlueBasics.Converter;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_IsDateTime : Method {
 
     #region Properties

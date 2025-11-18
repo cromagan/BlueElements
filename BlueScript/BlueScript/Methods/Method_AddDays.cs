@@ -25,7 +25,7 @@ using System.Globalization;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
+
 internal class Method_AddDays : Method {
 
     #region Properties

@@ -29,7 +29,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.CellRenderer;
 
-// ReSharper disable once UnusedMember.Global
+
 public class Renderer_Color : Renderer_Abstract {
 
     #region Fields
@@ -143,7 +143,7 @@ public class Renderer_Color : Renderer_Abstract {
         var contentSize = this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
 
         if (ShowSymbol) {
-            contentSize.Width = contentSize.Width + 18;
+            contentSize.Width += 18;
         }
 
         return contentSize;

@@ -324,7 +324,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, null, e);
         } else {
             if (_buttonStyle == ButtonStyle.SliderButton) {
-                if (_clickFirerer != null) { _clickFirerer.Interval = 500; }
+                _clickFirerer?.Interval = 500;
                 ClickFirerer_Tick(null, e);
             }
         }
@@ -370,7 +370,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                 _clickFirerer.Enabled = true;
             }
         } else {
-            if (_clickFirerer != null) { _clickFirerer.Enabled = false; }
+            _clickFirerer?.Enabled = false;
         }
     }
 

@@ -23,7 +23,7 @@ public interface IErrorCheckable {
 
     #region Methods
 
-    public string ErrorReason();
+    string ErrorReason();
 
     #endregion
 }

@@ -46,9 +46,9 @@ public static class IO {
     private static readonly ConcurrentDictionary<string, (DateTime CheckTime, bool Result)> _canWriteCache = new();
     private static readonly object _fileOperationLock = new();
 
-    private static int _retryCount = 20;
+    private static readonly int _retryCount = 20;
 
-    private static int _retrySleep = 100;
+    private static readonly int _retrySleep = 100;
 
     #endregion
 
@@ -937,10 +937,10 @@ public static class IO {
             using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
 
             // Sicheres Lesen aller Bytes
-            byte[] bytes = new byte[fs.Length];
-            int totalRead = 0;
+            var bytes = new byte[fs.Length];
+            var totalRead = 0;
             while (totalRead < bytes.Length) {
-                int read = fs.Read(bytes, totalRead, bytes.Length - totalRead);
+                var read = fs.Read(bytes, totalRead, bytes.Length - totalRead);
                 if (read == 0) { break; } // EOF erreicht
                 totalRead += read;
             }

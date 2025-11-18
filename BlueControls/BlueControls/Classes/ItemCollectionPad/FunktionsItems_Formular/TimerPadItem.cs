@@ -36,7 +36,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-// ReSharper disable once UnusedMember.Global
+
 public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpenScriptEditor {
 
     #region Fields
@@ -57,7 +57,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
 
     #region Properties
 
-    // ReSharper disable once UnusedMember.Global
+    
     public static string ClassId => "FI-Timer";
 
     public bool AutoSizeableHeight => false;
@@ -165,7 +165,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
     public void OpenScriptEditor() {
         var f = GenericControl.ParentForm(_button);
 
-        if (f != null) { f.Opacity = 0f; }
+        f?.Opacity = 0f;
 
         var tse = new TimerScriptEditor {
             Object = this
@@ -174,7 +174,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
 
         //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
 
-        if (f != null) { f.Opacity = 1f; }
+        f?.Opacity = 1f;
     }
 
     public override List<string> ParseableItems() {

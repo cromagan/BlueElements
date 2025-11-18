@@ -456,7 +456,7 @@ public class Chunk : IHasKeyName {
         return new("Speichervorgang unerwartet abgebrochen", false, true);
     }
 
-    internal FileOperationResult GrantWriteAccess() {
+     internal FileOperationResult GrantWriteAccess() {
         var f = IsEditable();
         if (f.Failed) { return f; }
 
