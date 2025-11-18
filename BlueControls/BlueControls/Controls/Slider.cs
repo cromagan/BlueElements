@@ -158,14 +158,14 @@ public partial class Slider : IBackgroundNone {
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
-        // ReSharper disable once ValueParameterNotUsed
+  
         set => base.TabIndex = 0;
     }
 
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
-        // ReSharper disable once ValueParameterNotUsed
+  
         set => base.TabStop = false;
     }
 

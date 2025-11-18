@@ -23,7 +23,6 @@ public interface ITranslateable {
 
     #region Properties
 
-    // ReSharper disable once UnusedMemberInSuper.Global
     bool Translate { get; set; }
 
     #endregion

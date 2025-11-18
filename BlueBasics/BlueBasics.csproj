@@ -49,8 +49,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <Prefer32Bit>false</Prefer32Bit>
-    <CodeAnalysisRuleSet>
-    </CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
@@ -63,8 +61,6 @@
     <DocumentationFile>
     </DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
-    <CodeAnalysisRuleSet>
-    </CodeAnalysisRuleSet>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -74,9 +70,9 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisRuleSet>
-    </CodeAnalysisRuleSet>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
     <Optimize>false</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
@@ -89,8 +85,6 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisRuleSet>
-    </CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>

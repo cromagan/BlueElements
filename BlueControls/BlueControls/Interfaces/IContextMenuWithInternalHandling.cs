@@ -31,7 +31,6 @@ public interface IContextMenuWithInternalHandling : IContextMenu {
 
     #region Events
 
-    // ReSharper disable once EventNeverSubscribedTo.Global
     event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion

@@ -32,10 +32,8 @@ public class PositionEventArgs : System.EventArgs {
 
     #region Properties
 
-    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
     public int X { get; set; }
 
-    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
     public int Y { get; set; }
 
     #endregion

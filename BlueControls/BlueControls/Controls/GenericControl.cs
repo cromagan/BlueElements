@@ -88,7 +88,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     [DefaultValue(false)]
     public override bool AutoSize {
         get => false; //MyBase.AutoSize
-        // ReSharper disable once ValueParameterNotUsed
+  
         set => base.AutoSize = false;
     }
 

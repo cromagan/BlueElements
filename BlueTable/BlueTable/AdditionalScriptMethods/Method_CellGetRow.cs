@@ -25,7 +25,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-// ReSharper disable once UnusedType.Global
 public class Method_CellGetRow : Method_TableGeneric {
 
     #region Properties

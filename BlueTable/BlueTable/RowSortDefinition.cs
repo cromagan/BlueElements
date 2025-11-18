@@ -23,8 +23,6 @@ using BlueBasics.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
-// ReSharper disable All
-
 namespace BlueTable;
 
 public sealed class RowSortDefinition : IParseable {

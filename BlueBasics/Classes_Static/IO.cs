@@ -33,7 +33,6 @@ using static BlueBasics.Generic;
 
 namespace BlueBasics;
 
-// ReSharper disable once InconsistentNaming
 public static class IO {
 
     #region Fields

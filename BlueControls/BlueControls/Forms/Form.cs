@@ -68,13 +68,13 @@ public partial class Form : System.Windows.Forms.Form {
     [DefaultValue(false)]
     public override bool AutoSize {
         get => false; //MyBase.AutoSize
-        // ReSharper disable once ValueParameterNotUsed
+  
         set => base.AutoSize = false;
     }
 
     public sealed override Color BackColor {
         get => base.BackColor;
-        // ReSharper disable once ValueParameterNotUsed
+  
         set => base.BackColor = value;
     }
 

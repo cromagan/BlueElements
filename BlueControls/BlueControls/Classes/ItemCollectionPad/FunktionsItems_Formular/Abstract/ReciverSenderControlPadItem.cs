@@ -78,7 +78,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
             return field;
         }
-        // ReSharper disable once MemberCanBePrivate.Global -> FlexiCOntrolForProperty!
         set {
             if (IsDisposed) { return; }
 

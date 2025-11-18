@@ -78,7 +78,7 @@ public partial class FloatingForm : Form {
     
     public new bool TopMost {
         get => false;
-        // ReSharper disable once ValueParameterNotUsed
+  
         set => base.TopMost = false;
     }
 

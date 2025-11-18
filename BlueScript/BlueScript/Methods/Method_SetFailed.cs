@@ -24,7 +24,6 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedType.Global
 public class Method_SetFailed : Method {
 
     #region Properties

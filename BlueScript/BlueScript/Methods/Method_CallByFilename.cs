@@ -30,7 +30,7 @@ using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+
 public class Method_CallByFilename : Method {
 
     #region Properties

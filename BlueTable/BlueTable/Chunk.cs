@@ -109,7 +109,6 @@ public class Chunk : IHasKeyName {
         do {
             byteCount--;
             var te = (long)Math.Pow(255, byteCount);
-            // ReSharper disable once PossibleLossOfFraction
             var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
 
             bytes.Add(mu);
@@ -456,7 +455,7 @@ public class Chunk : IHasKeyName {
         return new("Speichervorgang unerwartet abgebrochen", false, true);
     }
 
-     internal FileOperationResult GrantWriteAccess() {
+    internal FileOperationResult GrantWriteAccess() {
         var f = IsEditable();
         if (f.Failed) { return f; }
 
