@@ -1,244 +1,71 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <LangVersion>preview</LangVersion>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E7E05BAC-07CB-478D-861A-DB24A27BBF75}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BlueBasics</RootNamespace>
-    <AssemblyName>BlueBasics</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <MyType>Windows</MyType>
-    <StartupObject>
-    </StartupObject>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>
-    </DocumentationFile>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
-    <Optimize>true</Optimize>
-    <OutputPath>Bin\</OutputPath>
-    <DocumentationFile>
-    </DocumentationFile>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>BlueBasics</AssemblyName>
+    <RootNamespace>BlueBasics</RootNamespace>
+    <AssemblyTitle>BlueBasics</AssemblyTitle>
+    <Product>BlueBasics</Product>
+    <Company>Christian Peter</Company>
+    <Copyright>Copyright (c) 2025 Christian Peter</Copyright>
+    <AssemblyVersion>9.0.21022.0</AssemblyVersion>
+    <FileVersion>9.0.21022.0</FileVersion>
+    <Version>9.0.21022</Version>
+    <ComVisible>false</ComVisible>
+    <Guid>E7E05BAC-07CB-478D-861A-DB24A27BBF75</Guid>
+    <FileAlignment>512</FileAlignment>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutputPath>bin\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <Optimize>false</Optimize>
+    <WarningLevel>4</WarningLevel>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
-    <Optimize>false</Optimize>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>Bin\</OutputPath>
+    <DebugType>pdbonly</DebugType>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x86'">
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Accessor.cs" />
-    <Compile Include="Classes\BackupVerwalter.cs" />
-    <Compile Include="Classes\BitmapExt.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Intensify.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Ausdünnen.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_AllePixelZuSchwarz.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Grayscale.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Median.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Blur.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Brightness.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Contrast.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Gamma.cs" />
-    <Compile Include="Classes\BitmapExt_ImageFilters\ImageFilter_Invert.cs" />
-    <Compile Include="Classes\ByteData.cs" />
-    <Compile Include="Classes\FileOperationResult.cs" />
-    <Compile Include="Enums\AdditionalCheck.cs" />
-    <Compile Include="Enums\MouseEventFlags.cs" />
-    <Compile Include="Enums\ScriptEventTypes.cs" />
-    <Compile Include="Enums\SortierTyp.cs" />
-    <Compile Include="EventArgs\CancelReasonEventArgs.cs" />
-    <Compile Include="EventArgs\EditingEventArgs.cs" />
-    <Compile Include="Extensions\DateExtensions.cs" />
-    <Compile Include="Extensions\FloatExtensions.cs" />
-    <Compile Include="Extensions\IntExtensions.cs" />
-    <Compile Include="Extensions\FontExtensions.cs" />
-    <Compile Include="Classes\FormatHolder.cs" />
-    <Compile Include="EventArgs\NeedImageEventArgs.cs" />
-    <Compile Include="Extensions\RectangleFExtension.cs" />
-    <Compile Include="Classes_Static\HTML.cs" />
-    <Compile Include="FileSystemCaching\CachedFile.cs" />
-    <Compile Include="FileSystemCaching\CachedFileSystem.cs" />
-    <Compile Include="Interfaces\IEditable.cs" />
-    <Compile Include="Interfaces\IDisposableExtendedWithEvent.cs" />
-    <Compile Include="Interfaces\IHasKeyName.cs" />
-    <Compile Include="Interfaces\IErrorCheckable.cs" />
-    <Compile Include="Interfaces\IDisposableExtended.cs" />
-    <Compile Include="Interfaces\IInputFormat.cs" />
-    <Compile Include="Interfaces\IReadableTextWithKey.cs" />
-    <Compile Include="Interfaces\IReadableTextWithPropertyChangingAndKey.cs" />
-    <Compile Include="Interfaces\IStringable.cs" />
-    <Compile Include="Interfaces\IReadableText.cs" />
-    <Compile Include="Classes\MultiUserFile.cs" />
-    <Compile Include="Enums\SW.cs" />
-    <Compile Include="Enums\ErrorType.cs" />
-    <Compile Include="Extensions\GraphicsExtensions.cs" />
-    <Compile Include="Classes\ParseableItem.cs" />
-    <Compile Include="Classes_Static\Polygons.cs" />
-    <Compile Include="Classes\QuickImage.cs" />
-    <Compile Include="Extensions\BitmapExtensions.cs" />
-    <Compile Include="Extensions\ByteArrayExtension.cs" />
-    <Compile Include="Extensions\ConcurrentDictionaryExtension.cs" />
-    <Compile Include="Classes_Static\Constants.cs" />
-    <Compile Include="Classes_Static\Develop.cs" />
-    <Compile Include="Enums\Alignment.cs" />
-    <Compile Include="Enums\Direction.cs" />
-    <Compile Include="Enums\FileFormat.cs" />
-    <Compile Include="Enums\ImageCode.cs" />
-    <Compile Include="Enums\ImageCodeEffect.cs" />
-    <Compile Include="Enums\Orientation.cs" />
-    <Compile Include="Enums\KeyCode.cs" />
-    <Compile Include="Classes_Static\IO.cs" />
-    <Compile Include="Extensions\CollectionExtension.cs" />
-    <Compile Include="Interfaces\IParseable.cs" />
-    <Compile Include="Interfaces\IReadableTextWithPropertyChanging.cs" />
-    <Compile Include="Extensions\ListOfExtension.cs" />
-    <Compile Include="Classes_Static\Geometry.cs" />
-    <Compile Include="Extensions\PaddingExtension.cs" />
-    <Compile Include="Extensions\PointExtension.cs" />
-    <Compile Include="Extensions\PointFExtension.cs" />
-    <Compile Include="Extensions\RectangleExtension.cs" />
-    <Compile Include="Extensions\SizeFExtension.cs" />
-    <Compile Include="Extensions\SortExtensions.cs" />
-    <Compile Include="Extensions\StringExtension.cs" />
-    <Compile Include="Classes_Static\MathFormulaParser.cs" />
-    <Compile Include="Extensions\BooleanExtensions.cs" />
-    <Compile Include="Interfaces\ICanBeEmpty.cs" />
-    <Compile Include="Classes_Static\Generic.cs" />
-    <Compile Include="Enums\ThumbnailOptions.cs" />
-    <Compile Include="Classes_Static\WindowsRemoteControl.cs" />
-    <Compile Include="Enums\SizeModes.cs" />
-    <Compile Include="Extensions\ColorExtension.cs" />
-    <Compile Include="Classes_Static\Converter.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Application.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Application.myapp</DependentUpon>
-    </Compile>
-    <Compile Include="Classes\WindowsThumbnailProvider.cs" />
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+    <Compile Remove="Properties\Application.Designer.cs" />
+    <None Remove="Properties\Application.myapp" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Classes\MultiUserFile.resx">
-      <DependentUpon>MultiUserFile.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Properties\Application.myapp">
-      <Generator>MyApplicationCodeGenerator</Generator>
-      <LastGenOutput>Application.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Import Include="System" />
-    <Import Include="System.Collections.Generic" />
-    <Import Include="System.Diagnostics" />
-    <Import Include="System.Drawing" />
-    <Import Include="System.IO" />
-    <Import Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\BeCreative\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\BeCreative\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusAbschneiden.png" />
@@ -369,93 +196,42 @@
     <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox_Disabled.png" />
     <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox_Disabled_Checked.png" />
     <EmbeddedResource Include="Ressourcen\Image\Steuerelemente\OptionBox_MouseOver.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Clipboard.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\DrehenLinks.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\DrehenRechts.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\SpiegelnHorizontal.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\SpiegelnVertikal.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Stern.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Papierkorb.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Anwendung.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Bild.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Redo.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Undo.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Schild.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Telefon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\XML.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Rechts_Scrollbar.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Pfeil_Unten_Scrollbar.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Feder.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Zahnrad.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Balken.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Klee.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Register.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Registersammlung.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Textfeld2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Monitor.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Apfel.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Gruppe.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Verschieben.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Groupbox.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Schaltfläche.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Schriftart.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Puzzle.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Geldscheine.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Haus.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Einkaufswagen.png" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
 </Project>
