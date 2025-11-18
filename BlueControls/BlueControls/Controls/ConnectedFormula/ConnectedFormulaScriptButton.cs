@@ -35,7 +35,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
     public ConnectedFormulaScriptButton() : base(false, false, false) => InitializeComponent();
 
-    #endregion
+    #endregion Constructors
 
     #region Properties
 
@@ -72,7 +72,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         set => mainButton.Text = value;
     }
 
-    #endregion
+    #endregion Properties
 
     #region Methods
 
@@ -127,12 +127,16 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         VariableCollection vars;
 
         var row = RowSingleOrNull();
+        BlueTable.Table? tb = null;
 
-        if (row?.Table is { IsDisposed: false } tb) {
-            vars = tb.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+        if (row?.Table is { IsDisposed: false } rtb) {
+            tb = rtb;
+            vars = tb.CreateVariableCollection(row, false, false, true, true);
         } else {
             vars = [];
         }
+
+        var rowstamp = row?.RowStamp();
 
         if (Parent is IHasFieldVariable hfvp && hfvp.GetFieldVariable() is { } v2) {
             vars.Add(v2);
@@ -144,28 +148,36 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
             }
         }
 
-        #endregion
+        #endregion Variablen erstellen
 
         var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, vars);
 
-        if (t.Failed) {
-            Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Fehler: " + t.Protocol, 0);
-            MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + t.ProtocolText, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
-        }
+        var errorreason = string.Empty;
 
-        #region Variablen zurückschreiben
+        if (row?.RowStamp() != rowstamp) { errorreason = "Die Zeile wurde während des Ausführens verändert."; }
 
-        foreach (var thisCon in Parent.Controls) {
-            if (thisCon is IHasFieldVariable hfv && vars.GetByKey(hfv.FieldName) is Variable v && !v.ReadOnly) {
-                hfv.SetValueFromVariable(v);
+        if (t.Failed) { errorreason = t.ProtocolText; }
+
+        if (string.IsNullOrEmpty(errorreason)) {
+
+            #region Variablen zurückschreiben
+
+            foreach (var thisCon in Parent.Controls) {
+                if (thisCon is IHasFieldVariable hfv && vars.GetByKey(hfv.FieldName) is Variable v && !v.ReadOnly) {
+                    hfv.SetValueFromVariable(v);
+                }
             }
+            tb?.WriteBackVariables(row, vars, false, true, "Script-Button-Press", !t.Failed);
+
+            #endregion Variablen zurückschreiben
+        } else {
+            Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Fehler: " + t.Protocol, 0);
+            MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{errorreason}", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
 
-        #endregion
+        #endregion Methods
 
         mainButton.Enabled = true;
         mainButton.Refresh();
     }
-
-    #endregion
 }

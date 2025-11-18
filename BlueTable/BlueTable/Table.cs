@@ -1251,6 +1251,29 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
+    public void WriteBackVariables(RowItem? row, VariableCollection vars, bool virtualcolumns, bool dbVariables, string comment, bool doWriteBack) {
+        if (doWriteBack) {
+            if (row is { IsDisposed: false }) {
+                foreach (var thisCol in Column) {
+                    row.VariableToCell(thisCol, vars, comment);
+                }
+            }
+            if (dbVariables) {
+                Variables = VariableCollection.Combine(Variables, vars, "DB_");
+            }
+        }
+
+        if (virtualcolumns) {
+            if (row is { IsDisposed: false } ro) {
+                foreach (var thisCol in Column) {
+                    if (!thisCol.SaveContent) {
+                        ro.VariableToCell(thisCol, vars, comment);
+                    }
+                }
+            }
+        }
+    }
+
     public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable) {
 
         #region Variablen für Skript erstellen
@@ -1431,7 +1454,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (row != null) {
-                if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworden", false, false, script.KeyName); }
+                if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworfen", false, false, script.KeyName); }
                 if (Column.SysRowChangeDate is null) { return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName); }
                 if (row.RowStamp() != rowstamp) { return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName); }
             }
@@ -1440,30 +1463,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #endregion Fehlerprüfungen
 
-            #region Variablen zurückschreiben
-
-            if (script.ChangeValuesAllowed && produktivphase) {
-                if (row is { IsDisposed: false }) {
-                    foreach (var thisCol in Column) {
-                        row.VariableToCell(thisCol, vars, script.KeyName);
-                    }
-                }
-                if (dbVariables) {
-                    Variables = VariableCollection.Combine(Variables, vars, "DB_");
-                }
-            }
-
-            if (script.VirtalColumns) {
-                if (row is { IsDisposed: false } ro) {
-                    foreach (var thisCol in Column) {
-                        if (!thisCol.SaveContent) {
-                            ro.VariableToCell(thisCol, vars, script.KeyName);
-                        }
-                    }
-                }
-            }
-
-            #endregion Variablen zurückschreiben
+            WriteBackVariables(row, vars, script.VirtalColumns, dbVariables, script.KeyName, script.ChangeValuesAllowed && produktivphase);
 
             //  Erfolgreicher Abschluss
             if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
