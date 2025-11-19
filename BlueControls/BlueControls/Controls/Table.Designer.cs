@@ -40,7 +40,6 @@ namespace BlueControls.Controls {
             this.BCB.Esc += new EventHandler(this.BB_ESC);
             this.BCB.Tab += new EventHandler(this.BB_TAB);
             this.BCB.LostFocus += new EventHandler(this.BB_LostFocus);
-            this.BCB.NeedTableOfAdditinalSpecialChars += new EventHandler<TableFileGiveBackEventArgs>(this.BB_NeedTableOfAdditinalSpecialChars);
             // 
             // BTB
             // 
@@ -55,7 +54,6 @@ namespace BlueControls.Controls {
             this.BTB.Esc += new EventHandler(this.BB_ESC);
             this.BTB.Tab += new EventHandler(this.BB_TAB);
             this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
-            this.BTB.NeedTableOfAdditinalSpecialChars += new EventHandler<TableFileGiveBackEventArgs>(this.BB_NeedTableOfAdditinalSpecialChars);
             // 
             // SliderX
             // 

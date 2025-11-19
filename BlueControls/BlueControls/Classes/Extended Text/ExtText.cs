@@ -341,25 +341,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    public void Insert(int position, ExtChar c) {
+    public bool Insert(int position, ExtChar c) {
         if (position < 0) { position = 0; }
         if (position > _internal.Count) { position = _internal.Count; }
 
         _internal.Insert(position, c);
         ResetPosition(true);
-    }
-
-    public bool InsertChar(AsciiKey ascii, int position) {
-        if ((int)ascii < 13) { return false; }
-        var c = new ExtCharAscii(this, position, (char)ascii);
-        Insert(position, c);
-        return true;
-    }
-
-    public bool InsertImage(QuickImage? qi, int position) {
-        if (qi == null) { return false; }
-        var c = new ExtCharImageCode(this, position, qi);
-        Insert(position, c);
         return true;
     }
 
@@ -391,8 +378,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             return ConvertCharToPlainText(first, last);
         }
     }
-
-    internal void InsertCrlf(int position) => Insert(position, new ExtCharCrlfCode(this, position));
 
     internal void Mark(MarkState markstate, int first, int last) {
         try {
@@ -483,17 +468,17 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         if (ls.Style == newStufe.Style) { return string.Empty; }
 
-        if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Überschrift) { return "<h3>"; }
-        if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Standard) { return "</h3>"; }
+        if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Überschrift) { return "<h1>"; }
+        if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Standard) { return "</h1>"; }
         if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Hervorgehoben) { return "<strong>"; }
         if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Kapitel) { return "<strong>"; }
 
         if (ls.Style == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
-        if (ls.Style == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Überschrift) { return "</strong><h3>"; }
+        if (ls.Style == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Überschrift) { return "</strong><h1>"; }
         if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
-        if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Überschrift) { return "</strong><h3>"; }
+        if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Überschrift) { return "</strong><h1>"; }
 
-        if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Hervorgehoben) { return "</h3><strong>"; }
+        if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Hervorgehoben) { return "</h1><strong>"; }
 
         return string.Empty;
     }

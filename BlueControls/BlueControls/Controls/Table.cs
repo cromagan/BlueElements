@@ -2648,8 +2648,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         CloseAllComponents();
     }
 
-    private void BB_NeedTableOfAdditinalSpecialChars(object sender, TableFileGiveBackEventArgs e) => e.Table = Table;
-
     private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {

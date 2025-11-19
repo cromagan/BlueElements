@@ -42,7 +42,8 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
-    public ExtCharAscii(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+    public ExtCharAscii(ExtText parent, int styleFromPos) : base(parent, styleFromPos) {
+    }
 
     internal ExtCharAscii(ExtText parent, PadStyles style, BlueFont font, char charcode) : base(parent, style, font) {
         _char = charcode;

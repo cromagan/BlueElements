@@ -328,8 +328,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     private void F_ControlAdded(object sender, ControlEventArgs e) {
         switch (e.Control) {
             case TextBox textBox:
-                textBox.NeedTableOfAdditinalSpecialChars += textBox_NeedTableOfAdditinalSpecialChars;
-                //textBox.GotFocus += GotFocus_TextBox;
                 textBox.TextChanged += TextBox_TextChanged;
                 break;
 
@@ -355,7 +353,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     private void F_ControlRemoved(object sender, ControlEventArgs e) {
         switch (e.Control) {
             case TextBox textBox:
-                textBox.NeedTableOfAdditinalSpecialChars -= textBox_NeedTableOfAdditinalSpecialChars;
                 textBox.TextChanged -= TextBox_TextChanged;
                 break;
 
