@@ -499,7 +499,6 @@
     <Compile Include="Forms\FloatingInputBoxListBoxStyle.Designer.cs">
       <DependentUpon>FloatingInputBoxListBoxStyle.cs</DependentUpon>
     </Compile>
-    <Compile Include="EventArgs\ContextMenuItemClickedEventArgs.cs" />
     <Compile Include="Forms\FloatingForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -699,7 +698,6 @@
       <DependentUpon>GroupBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\ICanHaveVariables.cs" />
-    <Compile Include="Interfaces\IContextMenuWithInternalHandling.cs" />
     <Compile Include="Classes\ItemCollectionList\AbstractListItem.cs" />
     <Compile Include="Classes\ItemCollectionList\BitmapListItem.cs" />
     <Compile Include="Classes\ItemCollectionList\CellLikeListItem.cs" />

@@ -47,10 +47,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
-    private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) : base(connectedControl, (Design)controlDesign) {
+    private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) : base(connectedControl, (Design)controlDesign) {
         InitializeComponent();
-        Tag = hotitem;
-        // Design = _internal.ControlDesign;
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
         Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate, controlDesign, itemDesign, autosort);
@@ -69,7 +67,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     public event EventHandler? Cancel;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs>? ItemClicked;
+    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
 
     #endregion
 
@@ -90,14 +88,13 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
             Develop.SetUserDidSomething();
             var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, ce.HotItem, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
-            contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         }
     }
 
-    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, object? tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
-            connectedControl, translate, controlDesign, itemDesign, autosort);
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, object? tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
+            translate, controlDesign, itemDesign, autosort);
 
-    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, xpos, ypos, steuerWi, tag, connectedControl, translate, controlDesign, itemDesign, autosort);
+    public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, xpos, ypos, steuerWi, connectedControl, translate, controlDesign, itemDesign, autosort);
 
     public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) {
         var (biggestItemX, _, heightAdded, _) = ListBox.ItemData(items, itemDesign);
@@ -141,31 +138,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         OnPaint(null);
     }
 
-    private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem == null) { return; }
-
-        //var infos = (List<object>)e.HotItem;
-        ////var userMmenu = (List<AbstractListItem>)infos[0];
-        //var hotItem = infos[1];
-        //var ob = (IContextMenu)infos[2];
-        Close(ListBoxAppearance.KontextMenu);
-        Close(e.Control);
-        //if (e.Item.KeyName.ToLowerInvariant() == "weiterebefehle") {
-        //    var par = ob.ParentControlWithCommands();
-        //    if (par != null) {
-        //        ContextMenuShow(par, null);
-        //    }
-        //    return;
-        //}
-        if (e.Item.KeyName.ToLowerInvariant() == "abbruch") { return; }
-
-        ContextMenuItemClickedEventArgs ex = new(e.Item, e.HotItem, e.Control);
-
-        if (e.Control is IContextMenuWithInternalHandling cm) {
-            cm.DoContextMenuItemClick(ex);
-        }
-    }
-
     private void ListBox1_ItemClicked(object sender, AbstractListItemEventArgs e) {
         // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
         // Nur Listboxen können überhaupt erst Checked werden!
@@ -175,14 +147,14 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (!e.Item.IsClickable()) { return; }
 
         if (lstbx.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes and not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem and not ListBoxAppearance.ButtonList) {
-            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item, Tag, _connectedControl)); // Das Control.Tag hier ist eigentlich das HotItem
+            OnItemClicked(e); // Das Control.Tag hier ist eigentlich das HotItem
             if (!IsDisposed) { Close(); }
         }
     }
 
-    private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
+    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
-    private void OnItemClicked(ContextMenuItemClickedEventArgs e) => ItemClicked?.Invoke(this, e);
+    private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
 
     private void timer1_Tick(object sender, System.EventArgs e) {
         var mouseIsDown = !string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton());

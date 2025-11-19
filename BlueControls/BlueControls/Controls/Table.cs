@@ -2827,8 +2827,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var t = new List<AbstractListItem>();
 
         var r = viewItem.GetRenderer(SheetStyle);
+        var cell = new CellExtEventArgs(viewItem, cellInThisTableRow);
 
-        t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r));
+        t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r, cell));
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
             if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(ca, viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal); } else {
@@ -2853,7 +2854,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             toc.AddRange(contentHolderCellRow.CellGetList(contentHolderCellColumn));
         }
 
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CheckBehavior.MultiSelection, toc, new CellExtEventArgs(viewItem, cellInThisTableRow), this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CheckBehavior.MultiSelection, toc, cell, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         Develop.Debugprint_BackgroundThread();
     }
@@ -2894,7 +2895,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (box is ComboBox cbox) {
             cbox.ItemClear();
-            cbox.ItemAddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, viewItem.GetRenderer(SheetStyle)));
+            cbox.ItemAddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, viewItem.GetRenderer(SheetStyle), null));
             if (cbox.ItemCount == 0) {
                 return Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
             }
@@ -3740,13 +3741,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// Berechent die Y-Position auf dem aktuellen Controll
     /// </summary>
     /// <returns></returns>
-    private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+    private void DropDownMenu_ItemClicked(object sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
         CellExtEventArgs? ck = null;
-        if (e.HotItem is CellExtEventArgs tmp) { ck = tmp; }
+        if (e.Item.Tag is CellExtEventArgs tmp) { ck = tmp; }
 
         if (ck?.ColumnView?.Column is not { IsDisposed: false } c) { return; }
 

@@ -572,7 +572,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         var item = new List<AbstractListItem>();
         if (column.EditableWithDropdown) {
             var r = TableView.RendererOf(column, Constants.Win11);
-            item.AddRange(ItemsOf(column, null, 10000, r));
+            item.AddRange(ItemsOf(column, null, 10000, r, null));
             if (!column.ShowValuesOfOtherCellsInDropdown) {
                 bool again;
                 do {
@@ -626,7 +626,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         var r = TableView.RendererOf(column, Constants.Win11);
 
         var item = new List<AbstractListItem>();
-        item.AddRange(ItemsOf(column, null, 10000, r));
+        item.AddRange(ItemsOf(column, null, 10000, r, null));
         control.SuggestionsAdd(item);
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld:

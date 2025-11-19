@@ -38,8 +38,6 @@ namespace BlueControls.Forms {
             // Pad
             // 
             this.Pad.Size = new Size(1290, 528);
-            this.Pad.ContextMenuInit += new EventHandler<ContextMenuInitEventArgs>(this.Pad_ContextMenuInit);
-            this.Pad.ContextMenuItemClicked += new EventHandler<ContextMenuItemClickedEventArgs>(this.Pad_ContextMenuItemClicked);
             // 
             // Ribbon
             // 

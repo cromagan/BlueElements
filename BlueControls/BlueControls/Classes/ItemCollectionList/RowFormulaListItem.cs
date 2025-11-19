@@ -47,16 +47,17 @@ public class RowFormulaListItem : AbstractListItem {
     /// <param name="row"></param>
     /// <param name="layoutId"></param>
     /// <param name="userDefCompareKey"></param>
-    public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey) : base(row.KeyName, true) {
+    public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey, object? tag) : base(row.KeyName, true) {
         _row = row;
         _layoutFileName = layoutId;
         UserDefCompareKey = userDefCompareKey;
+        Tag = tag;
     }
 
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public RowFormulaListItem(RowItem row, string layoutId) : this(row, layoutId, string.Empty) { }
+    public RowFormulaListItem(RowItem row, string layoutId, object? tag) : this(row, layoutId, string.Empty, tag) { }
 
     #endregion
 

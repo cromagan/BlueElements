@@ -37,7 +37,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInternalHandling //  UserControl //
+public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  UserControl //
                                                   {
     #region Fields
 
@@ -60,8 +60,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     #region Events
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion
 
@@ -102,14 +100,14 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
-  
+
         set => base.TabIndex = 0;
     }
 
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
-  
+
         set => base.TabStop = false;
     }
 
@@ -132,32 +130,9 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
         return false;
     }
 
-    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
-        switch (e.Item.KeyName) {
-            case "ExF":
-                PictureView epv = new(_bitmap);
-                epv.Show();
-                return;
-
-                //case "Speichern":
-                //    System.Windows.Forms.FolderBrowserDialog savOrt = new();
-                //    savOrt.ShowDialog();
-                //    if (!DirectoryExists(savOrt.SelectedPath)) {
-                //        MessageBox.Show("Abbruch!", ImageCode.Warnung, "OK");
-                //        return true;
-                //    }
-                //    var ndt = TempFile(savOrt.SelectedPath + "\\Bild.png");
-                //    _bitmap.Save(ndt, ImageFormat.Png);
-                //    ExecuteFile(ndt);
-                //    return true;
-        }
-
-        OnContextMenuItemClicked(e);
-    }
-
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (_bitmap != null) {
-            e.ContextMenu.Add(ItemOf("Externes Fenster öffnen", "ExF"));
+            e.ContextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, _bitmap, true));
         }
 
         OnContextMenuInit(e);
@@ -303,8 +278,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenuWithInt
         if (!HasFileName()) { return; }
         OpenDia.ShowDialog();
     }
-
-    private void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     private void OpenDia_FileOk(object sender, CancelEventArgs e) {
         if (!HasFileName()) { return; }

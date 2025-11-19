@@ -358,26 +358,26 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         //RepairLinesAndFullProcessing();
     }
 
-    private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
-        if (e.HotItem is not RowFormulaPadItem) { return; }
-        e.ContextMenu.Add(ItemOf("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", ImageCode.PlusZeichen));
-    }
+    //private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+    //    //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
+    //    if (e.HotItem is not RowFormulaPadItem) { return; }
+    //    e.ContextMenu.Add(ItemOf("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", ImageCode.PlusZeichen));
+    //}
 
-    private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not RowFormulaPadItem i) { return; }
+    //private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+    //    if (e.HotItem is not RowFormulaPadItem i) { return; }
 
-        switch (e.Item.KeyName) {
-            case "Bez+":
-                BezPlus(i);
-                break;
+    //    switch (e.Item.KeyName) {
+    //        case "Bez+":
+    //            BezPlus(i);
+    //            break;
 
-            default:
-                Develop.DebugPrint(e.Item);
-                break;
-        }
-        //RepairLinesAndFullProcessing();
-    }
+    //        default:
+    //            Develop.DebugPrint(e.Item);
+    //            break;
+    //    }
+    //    //RepairLinesAndFullProcessing();
+    //}
 
     #endregion
 

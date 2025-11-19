@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -38,9 +39,11 @@ public partial class PictureView : Form, IDisposableExtended {
 
     #region Constructors
 
-    public PictureView() : this(null, false, string.Empty, -1, -1) { }
+    public PictureView() : this(null, false, string.Empty, -1, -1) {
+    }
 
-    public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int imageno) : this(fileList, mitScreenResize, windowCaption, -1, imageno) { }
+    public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int imageno) : this(fileList, mitScreenResize, windowCaption, -1, imageno) {
+    }
 
     public PictureView(Bitmap? bmp) : this(null, false, string.Empty, -1, -1) {
         Pad.Bmp = bmp;
@@ -145,6 +148,12 @@ public partial class PictureView : Form, IDisposableExtended {
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
+    }
+
+    internal static void Contextmenu_OpenImage(object sender, ObjectEventArgs e) {
+        if (e.Data is not Bitmap bitmap) { return; }
+        var epv = new PictureView(bitmap);
+        epv.Show();
     }
 
     #endregion

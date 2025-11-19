@@ -45,7 +45,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("ItemClicked")]
-public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHandling, IBackgroundNone, ITranslateable {
+public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
     #region Fields
 
@@ -108,8 +108,6 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     public event EventHandler? AddClicked;
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
 
@@ -366,8 +364,6 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
         return l.AsReadOnly();
     }
 
-    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
-
     public new void Focus() {
         if (Focused()) { return; }
         base.Focus();
@@ -474,8 +470,6 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void Remove(string keyName) {
         if (string.IsNullOrEmpty(keyName)) { return; }

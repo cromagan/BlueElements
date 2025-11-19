@@ -373,75 +373,50 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (e.HotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
-        e.ContextMenu.Add(ItemOf("Umbenennen", "Umbenennen", QuickImage.Get(ImageCode.Stift), FileExists(it.KeyName)));
-        e.ContextMenu.Add(ItemOf("Löschen", "Löschen", QuickImage.Get(ImageCode.Kreuz), FileExists(it.KeyName)));
+        e.ContextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), Contextmenu_Rename, e.HotItem, FileExists(it.KeyName)));
+        e.ContextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, e.HotItem, FileExists(it.KeyName)));
         e.ContextMenu.Add(Separator());
-        e.ContextMenu.Add(ItemOf("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner)));
+        e.ContextMenu.Add(ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, e.HotItem, true));
     }
 
-    private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not BitmapListItem it) { return; }
+    private void Contextmenu_Delete(object sender, ObjectEventArgs e) {
+        if (e.Data is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
-        switch (e.Item.KeyName) {
-            case "Löschen":
-                var I = GetFileInfo(it.KeyName);
-                if (I == null) {
-                    ReloadDirectory();
-                    return;
-                }
-
-                var silent = !I.Attributes.HasFlag(System.IO.FileAttributes.ReadOnly);
-                if (FileDialogs.DeleteFile(I.FullName, !silent)) {
-                    ReloadDirectory();
-                }
-                break;
-
-            case "Explorer":
-                ExecuteFile(it.KeyName);
-                break;
-
-            case "Umbenennen":
-                var n = it.KeyName;
-
-                var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder.Text);
-
-                if (n.FileNameWithoutSuffix() == n) { return; }
-
-                nn = n.FilePath() + nn + "." + n.FileSuffix();
-
-                MoveFile(it.KeyName, nn, true);
-
-                ReloadDirectory();
-
-                break;
-
-            //case "Ausschneiden":
-            //    _ausschneiden = it.KeyName;
-            //    break;
-
-            //case "Einfügen":
-            //    var ziel = it.KeyName + "\\" + _ausschneiden.FileNameWithSuffix();
-
-            //    if (FileExists(ziel)) {
-            //        MessageBox.Show("Datei existiert am Zielort bereits, abbruch.", ImageCode.Information);
-            //        return;
-            //    }
-
-            //    MoveFile(_ausschneiden, ziel, true);
-
-            //    //if (FileExists(ThumbFile(_ausschneiden))) {
-            //    //    RenameFile(ThumbFile(_ausschneiden), ThumbFile(ziel), true);
-            //    //}
-            //    _ausschneiden = string.Empty;
-            //    Reload();
-
-            //    break;
-
-            default:
-                Develop.DebugPrint(e.Item);
-                break;
+        var I = GetFileInfo(it.KeyName);
+        if (I == null) {
+            ReloadDirectory();
+            return;
         }
+
+        var silent = !I.Attributes.HasFlag(System.IO.FileAttributes.ReadOnly);
+        if (FileDialogs.DeleteFile(I.FullName, !silent)) {
+            ReloadDirectory();
+        }
+    }
+
+    private void Contextmenu_OpenExplorer(object sender, ObjectEventArgs e) {
+        if (e.Data is not BitmapListItem it) { return; }
+        if (!AllowEdit) { return; }
+
+        ExecuteFile(it.KeyName);
+    }
+
+    private void Contextmenu_Rename(object sender, ObjectEventArgs e) {
+        if (e.Data is not BitmapListItem it) { return; }
+        if (!AllowEdit) { return; }
+
+        var n = it.KeyName;
+
+        var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder.Text);
+
+        if (n.FileNameWithoutSuffix() == n) { return; }
+
+        nn = n.FilePath() + nn + "." + n.FileSuffix();
+
+        MoveFile(it.KeyName, nn, true);
+
+        ReloadDirectory();
     }
 
     private void lsbFiles_DragDrop(object sender, DragEventArgs e) {
@@ -764,7 +739,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
     }
 
-    private void ThumbGenerator_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) { }
+    private void ThumbGenerator_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+    }
 
     private void txbPfad_Enter(object? sender, System.EventArgs? e) {
         if (IsDisposed) { return; }

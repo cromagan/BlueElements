@@ -51,17 +51,17 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithKey)column);
 
-    public static CellLikeListItem ItemOf(string value, ColumnItem columnStyle, Renderer_Abstract cellRenderer) => new(value, cellRenderer, true, columnStyle.DoOpticalTranslation, (Alignment)columnStyle.Align, columnStyle.SortType);
+    public static CellLikeListItem ItemOf(string value, ColumnItem columnStyle, Renderer_Abstract cellRenderer, object? tag) => new(value, cellRenderer, true, columnStyle.DoOpticalTranslation, (Alignment)columnStyle.Align, columnStyle.SortType, tag);
 
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public static RowFormulaListItem ItemOf(RowItem row, string layoutId, string userDefCompareKey) => new(row, layoutId, userDefCompareKey);
+    public static RowFormulaListItem ItemOf(RowItem row, string layoutId, string userDefCompareKey, object? tag) => new(row, layoutId, userDefCompareKey);
 
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public static RowFormulaListItem ItemOf(RowItem row, string layoutId) => ItemOf(row, layoutId, string.Empty);
+    public static RowFormulaListItem ItemOf(RowItem row, string layoutId, object? tag) => ItemOf(row, layoutId, string.Empty, tag);
 
     public static BitmapListItem ItemOf(string filename, string keyName, string caption) => new(filename, keyName, caption);
 
@@ -112,7 +112,7 @@ public static class AbstractListItemExtension {
 
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject, string userDefCompareKey) => new(readableObject, false, true, userDefCompareKey);
 
-    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer_Abstract cellRenderer) {
+    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer_Abstract cellRenderer, object? tag) {
         List<string> l = [];
 
         if (column.IsDisposed) { return []; }
@@ -150,7 +150,7 @@ public static class AbstractListItemExtension {
             l = l.SortedDistinctList();
         }
 
-        return maxItems > 0 && l.Count > maxItems ? [] : ItemsOf(l, column, cellRenderer);
+        return maxItems > 0 && l.Count > maxItems ? [] : ItemsOf(l, column, cellRenderer, tag);
     }
 
     public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
@@ -192,7 +192,7 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem columnStyle, Renderer_Abstract renderer) {
+    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem columnStyle, Renderer_Abstract renderer, object? tag) {
         var l = new List<AbstractListItem>();
 
         if (values == null) { return l; }
@@ -202,7 +202,7 @@ public static class AbstractListItemExtension {
         }
 
         foreach (var thisstring in values) {
-            l.Add(ItemOf(thisstring, columnStyle, renderer));
+            l.Add(ItemOf(thisstring, columnStyle, renderer, tag));
         }
 
         return l;

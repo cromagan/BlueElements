@@ -39,11 +39,12 @@ public class CellLikeListItem : AbstractListItem {
 
     #region Constructors
 
-    public CellLikeListItem(string keyNameAndReadableText, Renderer_Abstract cellRenderer, bool enabled, TranslationType translate, Alignment align, SortierTyp sortType) : base(keyNameAndReadableText, enabled) {
+    public CellLikeListItem(string keyNameAndReadableText, Renderer_Abstract cellRenderer, bool enabled, TranslationType translate, Alignment align, SortierTyp sortType, object? tag) : base(keyNameAndReadableText, enabled) {
         _cellRenderer = cellRenderer;
         _translate = translate;
         _align = align;
         _sortType = sortType;
+        Tag = tag;
     }
 
     #endregion

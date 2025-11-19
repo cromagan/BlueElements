@@ -388,7 +388,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         Invalidate();
     }
 
-    private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+    private void DropDownMenu_ItemClicked(object sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
 
         if (e.Item is ReadableListItem { Item: AdderItem ai }) {

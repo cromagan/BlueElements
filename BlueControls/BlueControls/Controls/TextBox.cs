@@ -41,7 +41,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(TextBoxDesigner))]
 [DefaultEvent("TextChanged")]
-public partial class TextBox : GenericControl, IContextMenuWithInternalHandling, IInputFormat {
+public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Fields
 
@@ -77,8 +77,6 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
     #region Events
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     public new event EventHandler? Enter;
 
@@ -252,106 +250,6 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
         _eTxt.Delete(von, bis);
     }
 
-    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
-        Focus();
-        var newWord = string.Empty;
-
-        if (e.HotItem is not List<string> tags) { return; }
-
-        _markStart = IntParse(tags.TagGet("MarkStart"));
-        _markEnd = IntParse(tags.TagGet("MarkEnd"));
-        _cursorCharPos = IntParse(tags.TagGet("Cursorpos"));
-        var word = tags.TagGet("Word");
-
-        var tmp = e.Item.KeyName;
-        if (tmp.StartsWith("#ChangeTo:")) {
-            newWord = tmp.Substring(10);
-            tmp = "#ChangeTo";
-        }
-
-        switch (tmp) {
-            case "#SpellAdd":
-                Dictionary.WordAdd(word);
-                _mustCheck = true;
-                Invalidate();
-                return;
-
-            case "#SpellAddLower":
-                Dictionary.WordAdd(word.ToLowerInvariant());
-                _mustCheck = true;
-                Invalidate();
-                return;
-
-            case "#SpellChecking":
-                FloatingForm.Close(this);
-                if (SpellCheckingEnabled) {
-                    _mustCheck = false;
-                    Dictionary.SpellCheckingAll(_eTxt, false);
-                    _mustCheck = true;
-                    Invalidate();
-                }
-                return;
-
-            case "#SpellChecking2":
-                FloatingForm.Close(this);
-                if (SpellCheckingEnabled) {
-                    _mustCheck = false;
-                    Dictionary.SpellCheckingAll(_eTxt, true);
-                    _mustCheck = true;
-                    Invalidate();
-                }
-                break;
-
-            case "Ausschneiden":
-                Clipboard_Copy();
-                Char_DelBereich(-1, -1);
-                return;
-
-            case "Kopieren":
-                Clipboard_Copy();
-                return;
-
-            case "Einfügen":
-                Clipboard_Paste();
-                return;
-
-            case "#Caption":
-                if (_markStart < 0 || _markEnd < 0) { return; }
-                Selection_Repair(true);
-                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Überschrift);
-                RaiseEventIfTextChanged(false);
-                return;
-
-            case "#NoCaption":
-                if (_markStart < 0 || _markEnd < 0) { return; }
-                Selection_Repair(true);
-                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Standard);
-                RaiseEventIfTextChanged(false);
-                return;
-
-            case "#Bold":
-                if (_markStart < 0 || _markEnd < 0) { return; }
-                Selection_Repair(true);
-                _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
-                RaiseEventIfTextChanged(false);
-                return;
-
-            case "#Sonderzeichen":
-                AddSpecialChar();
-                return;
-
-            case "#ChangeTo":
-                var ws = _eTxt.WordStart(_cursorCharPos);
-                var we = _eTxt.WordEnd(_cursorCharPos);
-                Char_DelBereich(ws, we);
-                _cursorCharPos = ws;
-                InsertText(newWord);
-                _cursorCharPos = _eTxt.WordEnd(_cursorCharPos);
-                return;
-        }
-        OnContextMenuItemClicked(e);
-    }
-
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         AbortSpellChecking();
 
@@ -368,38 +266,126 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                     var sim = Dictionary.SimilarTo(tmpWord);
                     if (sim != null) {
                         foreach (var thisS in sim) {
-                            e.ContextMenu.Add(ItemOf(" - " + thisS, "#ChangeTo:" + thisS));
+                            e.ContextMenu.Add(ItemOf(" - " + thisS, QuickImage.Get("ImagePlaceHolder|16"), Contextmenu_ChangeTo, new { word = thisS, Start = _markStart, End = _markEnd }, true));
                         }
                         e.ContextMenu.Add(Separator());
                     }
-                    e.ContextMenu.Add(ItemOf("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable()));
+                    e.ContextMenu.Add(ItemOf("'" + tmpWord + "' ins Wörterbuch aufnehmen", QuickImage.Get("ImagePlaceHolder|16"), Contextmenu_SpellAdd, e.HotItem, Dictionary.IsWriteable()));
                     if (tmpWord.ToLowerInvariant() != tmpWord) {
-                        e.ContextMenu.Add(ItemOf("'" + tmpWord.ToLowerInvariant() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable()));
+                        e.ContextMenu.Add(ItemOf("'" + tmpWord.ToLowerInvariant() + "' ins Wörterbuch aufnehmen", QuickImage.Get("ImagePlaceHolder|16"), Contextmenu_SpellAddLower, e.HotItem, Dictionary.IsWriteable()));
                     }
-                    e.ContextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable()));
-                    e.ContextMenu.Add(ItemOf("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable()));
+                    e.ContextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", QuickImage.Get("ImagePlaceHolder|16"), Contextmenu_SpellChecking, e.HotItem, Dictionary.IsWriteable()));
+                    e.ContextMenu.Add(ItemOf("Alle Wörter sind ok", QuickImage.Get("ImagePlaceHolder|16"), Contextmenu_SpellChecking2, e.HotItem, Dictionary.IsWriteable()));
                     e.ContextMenu.Add(Separator());
                 }
             }
             if (this is not ComboBox { DropDownStyle: not ComboBoxStyle.DropDown }) {
-                e.ContextMenu.Add(ItemOf("Ausschneiden", "Ausschneiden", QuickImage.Get(ImageCode.Schere), (_markStart >= 0) && Enabled));
-                e.ContextMenu.Add(ItemOf("Kopieren", "Kopieren", QuickImage.Get(ImageCode.Kopieren), _markStart >= 0));
-                e.ContextMenu.Add(ItemOf("Einfügen", "Einfügen", QuickImage.Get(ImageCode.Clipboard), Clipboard.ContainsText() && Enabled));
+                e.ContextMenu.Add(ItemOf("Ausschneiden", QuickImage.Get(ImageCode.Schere), Contextmenu_Ausschneiden, e.HotItem, (_markStart >= 0) && Enabled));
+                e.ContextMenu.Add(ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_Kopieren, e.HotItem, _markStart >= 0));
+                e.ContextMenu.Add(ItemOf("Einfügen", QuickImage.Get(ImageCode.Clipboard), Contextmenu_Einfügen, e.HotItem, Clipboard.ContainsText() && Enabled));
 
                 if (TextFormatingAllowed) {
                     e.ContextMenu.Add(Separator());
-                    e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1));
+                    e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", QuickImage.Get(ImageCode.Sonne, 16), Contextmenu_Sonderzeichen, e.HotItem, _cursorCharPos > -1));
                     if (_markEnd > -1) {
                         e.ContextMenu.Add(Separator());
-                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Constants.Win11, PadStyles.Überschrift).SymbolForReadableText(), _markEnd > -1));
-                        e.ContextMenu.Add(ItemOf("Fettschrift", "#Bold", Skin.GetBlueFont(Constants.Win11, PadStyles.Hervorgehoben).SymbolForReadableText(), _markEnd > -1));
-                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Überschrift).SymbolForReadableText(), Contextmenu_Caption, e.HotItem, _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Hervorgehoben).SymbolForReadableText(), Contextmenu_Bold, e.HotItem, _markEnd > -1));
+                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, e.HotItem, _markEnd > -1));
                     }
                 }
             }
         }
 
         OnContextMenuInit(e);
+    }
+
+    private void Contextmenu_SpellAdd(object sender, ObjectEventArgs e) {
+        if (e.Data is not List<string> tags) { return; }
+        var word = tags.TagGet("Word");
+        Dictionary.WordAdd(word);
+        _mustCheck = true;
+        Invalidate();
+    }
+
+    private void Contextmenu_SpellAddLower(object sender, ObjectEventArgs e) {
+        if (e.Data is not List<string> tags) { return; }
+        var word = tags.TagGet("Word");
+        Dictionary.WordAdd(word.ToLowerInvariant());
+        _mustCheck = true;
+        Invalidate();
+    }
+
+    private void Contextmenu_SpellChecking(object sender, ObjectEventArgs e) {
+        FloatingForm.Close(this);
+        if (SpellCheckingEnabled) {
+            _mustCheck = false;
+            Dictionary.SpellCheckingAll(_eTxt, false);
+            _mustCheck = true;
+            Invalidate();
+        }
+    }
+
+    private void Contextmenu_SpellChecking2(object sender, ObjectEventArgs e) {
+        FloatingForm.Close(this);
+        if (SpellCheckingEnabled) {
+            _mustCheck = false;
+            Dictionary.SpellCheckingAll(_eTxt, true);
+            _mustCheck = true;
+            Invalidate();
+        }
+    }
+
+    private void Contextmenu_Ausschneiden(object sender, ObjectEventArgs e) {
+        Clipboard_Copy();
+        Char_DelBereich(-1, -1);
+    }
+
+    private void Contextmenu_Kopieren(object sender, ObjectEventArgs e) {
+        Clipboard_Copy();
+    }
+
+    private void Contextmenu_Einfügen(object sender, ObjectEventArgs e) {
+        Clipboard_Paste();
+    }
+
+    private void Contextmenu_Caption(object sender, ObjectEventArgs e) {
+        if (_markStart < 0 || _markEnd < 0) { return; }
+        Selection_Repair(true);
+        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Überschrift);
+        RaiseEventIfTextChanged(false);
+    }
+
+    private void Contextmenu_NoCaption(object sender, ObjectEventArgs e) {
+        if (_markStart < 0 || _markEnd < 0) { return; }
+        Selection_Repair(true);
+        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Standard);
+        RaiseEventIfTextChanged(false);
+    }
+
+    private void Contextmenu_Bold(object sender, ObjectEventArgs e) {
+        if (_markStart < 0 || _markEnd < 0) { return; }
+        Selection_Repair(true);
+        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
+        RaiseEventIfTextChanged(false);
+    }
+
+    private void Contextmenu_Sonderzeichen(object sender, ObjectEventArgs e) {
+        AddSpecialChar();
+    }
+
+    private void Contextmenu_ChangeTo(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var word = data.GetType().GetProperty("word")?.GetValue(data)?.ToString() ?? string.Empty;
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+
+        if (string.IsNullOrEmpty(word) || start < 0 || end < 0) { return; }
+
+        Char_DelBereich(start, end);
+        _cursorCharPos = start;
+        InsertText(word);
+        _cursorCharPos = _eTxt.WordEnd(_cursorCharPos);
     }
 
     public void InsertText(string? nt) {
@@ -612,8 +598,6 @@ public partial class TextBox : GenericControl, IContextMenuWithInternalHandling,
                 return false;
         }
     }
-
-    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnDoubleClick(System.EventArgs e) {
         base.OnDoubleClick(e);

@@ -105,7 +105,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
 
         if (listFilterString.Count < 400) {
-            lsbFilterItems.ItemAddRange(ItemsOf(listFilterString, _column, renderer));
+            lsbFilterItems.ItemAddRange(ItemsOf(listFilterString, _column, renderer, null));
             //lsbFilterItems.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
             lsbFilterItems.ItemAdd(ItemOf("Zu viele Einträge", "x", ImageCode.Kreuz, false));

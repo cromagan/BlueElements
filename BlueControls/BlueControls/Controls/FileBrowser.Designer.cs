@@ -54,7 +54,6 @@ namespace BlueControls.Controls {
             this.lsbFiles.Size = new Size(414, 307);
             this.lsbFiles.TabIndex = 4;
             this.lsbFiles.ContextMenuInit += new EventHandler<ContextMenuInitEventArgs>(this.lsbFiles_ContextMenuInit);
-            this.lsbFiles.ContextMenuItemClicked += new EventHandler<ContextMenuItemClickedEventArgs>(this.lsbFiles_ContextMenuItemClicked);
             this.lsbFiles.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.lsbFiles_ItemClicked);
             this.lsbFiles.DragDrop += new DragEventHandler(this.lsbFiles_DragDrop);
             this.lsbFiles.DragEnter += new DragEventHandler(this.lsbFiles_DragEnter);

@@ -37,7 +37,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("Click")]
-public partial class Caption : GenericControl, IContextMenuWithInternalHandling, IBackgroundNone, ITranslateable {
+public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
     #region Fields
 
@@ -61,8 +61,6 @@ public partial class Caption : GenericControl, IContextMenuWithInternalHandling,
     #region Events
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion
 
@@ -94,7 +92,7 @@ public partial class Caption : GenericControl, IContextMenuWithInternalHandling,
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
-  
+
         set => base.TabIndex = 0;
     }
 
@@ -104,7 +102,7 @@ public partial class Caption : GenericControl, IContextMenuWithInternalHandling,
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
-  
+
         set => base.TabStop = false;
     }
 
@@ -162,8 +160,6 @@ public partial class Caption : GenericControl, IContextMenuWithInternalHandling,
 
         return eText.LastSize();
     }
-
-    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) => OnContextMenuItemClicked(e);
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
@@ -239,8 +235,6 @@ public partial class Caption : GenericControl, IContextMenuWithInternalHandling,
             if (!string.IsNullOrEmpty(Text)) { _eText?.Draw(gr, 1); }
         } catch { }
     }
-
-    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);

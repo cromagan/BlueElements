@@ -253,11 +253,26 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
             if (FileExists(t.KeyName)) {
-                e.ContextMenu.Add(ItemOf("Öffnen / Ausführen", "DateiÖffnen", QuickImage.Get(ImageCode.Blitz)));
+                e.ContextMenu.Add(ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, e.HotItem, true));
             }
         }
         if (e.HotItem is BitmapListItem) {
-            e.ContextMenu.Add(ItemOf("Bild öffnen"));
+            e.ContextMenu.Add(ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, e.HotItem, true));
+        }
+    }
+
+    private static void Contextmenu_DateiÖffnen(object sender, ObjectEventArgs e) {
+        if (e.Data is not TextListItem t) { return; }
+        if (FileExists(t.KeyName)) {
+            ExecuteFile(t.KeyName);
+        }
+    }
+
+    private static void Contextmenu_BildÖffnen(object sender, ObjectEventArgs e) {
+        if (e.Data is not BitmapListItem bi) { return; }
+        if (bi.ImageLoaded()) {
+            PictureView x = new(bi.Bitmap);
+            x.Show();
         }
     }
 
@@ -320,7 +335,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
             case ListBox listBox:
                 listBox.ContextMenuInit += ListBox_ContextMenuInit;
-                listBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
                 break;
 
             case BlueControls.Controls.Caption:
@@ -347,7 +361,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
 
             case ListBox listBox:
                 listBox.ContextMenuInit -= ListBox_ContextMenuInit;
-                listBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
                 break;
 
             case SwapListBox:
@@ -368,27 +381,6 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     private void F_ValueChanged(object sender, System.EventArgs e) => ValueToCell();
 
     private void F_VisibleChanged(object sender, System.EventArgs e) => RestartMarker();
-
-    private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.Item.KeyName.ToLowerInvariant()) {
-            case "dateiöffnen":
-                if (e.HotItem is TextListItem t) {
-                    if (FileExists(t.KeyName)) {
-                        ExecuteFile(t.KeyName);
-                    }
-                }
-                break;
-
-            case "bild öffnen":
-                if (e.HotItem is BitmapListItem bi) {
-                    if (bi.ImageLoaded()) {
-                        PictureView x = new(bi.Bitmap);
-                        x.Show();
-                    }
-                }
-                break;
-        }
-    }
 
     private void RestartMarker() =>
         // Fire-and-forget Pattern für Event-Handler
@@ -517,7 +509,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
                     var item2 = new List<AbstractListItem>();
                     if (realColumn != null) {
                         var r = TableView.RendererOf(column, Constants.Win11);
-                        item2.AddRange(ItemsOf(realColumn, null, 10000, r));
+                        item2.AddRange(ItemsOf(realColumn, null, 10000, r, null));
                     }
 
                     if (realColumn is { IsDisposed: false, EditableWithTextInput: true }) {

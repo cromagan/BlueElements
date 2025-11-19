@@ -53,9 +53,11 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Constructors
 
-    public ExportDialog(Table db, string autosaveFile) : this(db, null, autosaveFile) { }
+    public ExportDialog(Table db, string autosaveFile) : this(db, null, autosaveFile) {
+    }
 
-    public ExportDialog(Table db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
+    public ExportDialog(Table db, List<RowItem>? rows) : this(db, rows, string.Empty) {
+    }
 
     public ExportDialog(Table db, List<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.
@@ -313,25 +315,19 @@ public sealed partial class ExportDialog : IHasTable {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.ContextMenu.Add(ItemOf("Dateipfad öffnen", "DateiPfadÖffnen", QuickImage.Get(ImageCode.Ordner)));
-        e.ContextMenu.Add(ItemOf("Kopieren", "Kopieren", QuickImage.Get(ImageCode.Kopieren)));
+        e.ContextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, e.HotItem, true));
+        e.ContextMenu.Add(ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, e.HotItem, true));
     }
 
-    private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (e.HotItem is not TextListItem tl) { return; }
+    private void Contextmenu_OpenPath(object sender, ObjectEventArgs e) {
+        if (e.Data is not TextListItem tl) { return; }
+        ExecuteFile(tl.KeyName.FilePath());
+    }
 
-        switch (e.Item.KeyName) {
-            case "DateiPfadÖffnen":
-                ExecuteFile(tl.KeyName.FilePath());
-                break;
-
-            case "Kopieren":
-                var x = new StringCollection {
-                    tl.KeyName
-                };
-                Clipboard.SetFileDropList(x);
-                break;
-        }
+    private void Contextmenu_CopyPath(object sender, ObjectEventArgs e) {
+        if (e.Data is not TextListItem tl) { return; }
+        var x = new StringCollection { tl.KeyName };
+        Clipboard.SetFileDropList(x);
     }
 
     private void NurStartEnablen() {

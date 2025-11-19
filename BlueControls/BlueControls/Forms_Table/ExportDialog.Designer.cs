@@ -476,7 +476,6 @@ namespace BlueControls.Forms {
             this.lstExported.TabIndex = 88;
             this.lstExported.Text = "Exported";
             this.lstExported.ContextMenuInit += new EventHandler<ContextMenuInitEventArgs>(this.lstExported_ContextMenuInit);
-            this.lstExported.ContextMenuItemClicked += new EventHandler<ContextMenuItemClickedEventArgs>(this.lstExported_ContextMenuItemClicked);
             this.lstExported.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.Exported_ItemClicked);
             // 
             // ExportDialog

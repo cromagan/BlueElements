@@ -33,7 +33,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
-public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, IContextMenuWithInternalHandling {
+public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, IContextMenu {
 
     #region Fields
 
@@ -64,13 +64,11 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
-    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
-
     #endregion
 
     #region Properties
 
-    public string LastFailedReason { get; set; }
+    public string LastFailedReason { get; set; } = string.Empty;
 
     public virtual object? Object { get; set; }
 
@@ -89,25 +87,19 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Methods
 
-    public void DoContextMenuItemClick(ContextMenuItemClickedEventArgs e) {
-        switch (e.Item.KeyName.ToLowerInvariant()) {
-            case "variableninhalt kopieren":
-                Generic.CopytoClipboard(_lastVariableContent);
-                return;
-        }
-
-        OnContextMenuItemClicked(e);
-    }
-
-    public virtual ScriptEndedFeedback ExecuteScript(bool testmode) =>
-        new("Fehler", false, false, "Unbekannt");
+    public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-            e.ContextMenu.Add(ItemOf("Variableninhalt kopieren"));
+            e.ContextMenu.Add(ItemOf("Variableninhalt kopieren", null, Contextmenu_CopyVariableContent, _lastVariableContent, true));
         }
 
         OnContextMenuInit(e);
+    }
+
+    private void Contextmenu_CopyVariableContent(object sender, ObjectEventArgs e) {
+        if (e.Data is not string content) { return; }
+        Generic.CopytoClipboard(content);
     }
 
     public void Message(string txt) => txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
@@ -145,7 +137,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
     }
 
-    public virtual void WriteInfosBack() { }
+    public virtual void WriteInfosBack() {
+    }
 
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
@@ -154,8 +147,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             txbErrorInfo.Text = "Letzter gespeicherte Skript-Fehler:\r\r" + LastFailedReason;
         }
     }
-
-    protected void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         WriteInfosBack();

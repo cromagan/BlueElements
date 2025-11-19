@@ -105,7 +105,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     public bool UsesSettings => true;
 
     public string Value {
-        get => f.Value; 
+        get => f.Value;
         set => f.ValueSet(value, true);
     }
 
@@ -205,7 +205,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         if (listFilterString.Count == 0) {
             cbx.ItemAdd(ItemOf("Keine (weiteren) Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 200) {
-            cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer));
+            cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer, null));
         } else {
             cbx.ItemAdd(ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
         }
