@@ -90,7 +90,8 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <param name="captionText"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
 
-    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
+    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) {
+    }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
@@ -113,7 +114,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             Caption = captionText.TrimEnd(":") + ":";
         }
 
-        #endregion Caption setzen
+        #endregion
 
         #region Art des Steuerelements bestimmen
 
@@ -205,7 +206,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 }
         }
 
-        #endregion Art des Steuerelements bestimmen
+        #endregion
 
         QuickInfo = _accessor.QuickInfo;
 

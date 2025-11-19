@@ -17,59 +17,51 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Interfaces;
+using BlueControls;
+using BlueControls.Forms;
+using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable;
 using System.Collections.Generic;
+using static BlueTable.AdditionalScriptMethods.Method_TableGeneric;
 
-namespace BlueControls;
-
+namespace BlueTable.AdditionalScriptMethods;
 
 internal class Method_OpenTab : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [TableVar];
     public override string Command => "opentab";
     public override List<string> Constants => [];
     public override string Description => "Öffent einen neuen Tab in allen TableViews.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
+    public override MethodType MethodLevel => MethodType.GUI;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "OpenTab(FileName);";
+    public override string Syntax => "OpenTab(Table);";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var pf = attvar.ValueStringGet(0);
-
-        if (!pf.IsFormat(FormatHolder.FilepathAndName)) {
-            return new DoItFeedback("Datei ungültig: " + pf, true, ld);
+        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) {
+            return new DoItFeedback("Tabelle nicht vorhanden", true, ld);
         }
 
-        if (!IO.FileExists(pf)) {
-            return new DoItFeedback("Datei nicht vorhanden: " + pf, true, ld);
-        }
-
-        var tb = Table.Get(pf, null, false);
-
-        if (tb is not Table { IsDisposed: false }) {
-            return new DoItFeedback("Datei konnte nicht geladen werden: " + pf, true, ld);
+        if (string.IsNullOrWhiteSpace(tb.Caption)) {
+            return new DoItFeedback("Die Benenneung der Tabelle fehlt.", true, ld);
         }
 
         foreach (var thisForm in FormManager.Forms) {
-            if (thisForm is Forms.TableViewForm tbf && tbf.TabExists(pf) == null) {
+            if (thisForm is TableViewForm tbf && tbf.TabExists(tb.Caption) == null) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
-                tbf.AddTabPage(pf);
+                tbf.AddTabPage(tb.Caption);
             }
         }
 

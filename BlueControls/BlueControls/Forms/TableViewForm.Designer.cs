@@ -305,7 +305,6 @@ namespace BlueControls.Forms {
             this.lstAufgaben.Name = "lstAufgaben";
             this.lstAufgaben.Size = new System.Drawing.Size(208, 66);
             this.lstAufgaben.TabIndex = 0;
-            this.lstAufgaben.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstAufgaben_ItemClicked);
             // 
             // grpAnsicht
             // 
@@ -654,7 +653,7 @@ namespace BlueControls.Forms {
             this.btnSkripteBearbeiten.Size = new System.Drawing.Size(56, 66);
             this.btnSkripteBearbeiten.TabIndex = 45;
             this.btnSkripteBearbeiten.Text = "Skripte";
-            this.btnSkripteBearbeiten.Click += new System.EventHandler(this.btnSkripteBearbeiten_Click);
+            this.btnSkripteBearbeiten.Click += new System.EventHandler(this.ContextMenu_OpenScriptEditor);
             // 
             // btnFormular
             // 

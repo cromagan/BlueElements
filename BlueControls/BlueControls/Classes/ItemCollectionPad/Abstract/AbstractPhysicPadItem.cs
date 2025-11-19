@@ -29,7 +29,8 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
 
     #region Constructors
 
-    public AbstractPhysicPadItem() : this(string.Empty) { }
+    public AbstractPhysicPadItem() : this(string.Empty) {
+    }
 
     protected AbstractPhysicPadItem(string keyName) : base(keyName) {
         MovablePoint.Add(new PointM(5, 0));
@@ -154,23 +155,6 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         if (result.WillIntersect) {
             result.MinimumTranslationVector = translationAxis * minIntervalDistance;
         }
-
-        #region Example
-
-        //var playerTranslation = velocity;
-        //foreach (var polygon in polygons)
-        //{
-        //    if (polygon == player) continue;
-        //    var r = player.ColidesWith(polygon, velocity);
-        //    if (r.WillIntersect)
-        //    {
-        //        playerTranslation = velocity + r.MinimumTranslationVector;
-        //        break;
-        //    }
-        //}
-        //player.MoveAllItems(playerTranslation);
-
-        #endregion Example
 
         return result;
     }

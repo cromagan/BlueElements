@@ -281,33 +281,28 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return null;
     }
 
-    public static bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
-        var allrows = new List<RowItem>();
-        if (fc?.Rows is { Count: > 0 } rows) { allrows.AddRange(rows); }
-        if (pinned is { Count: > 0 }) { allrows.AddRange(pinned); }
+    public static bool Remove(FilterCollection? fc, string comment) => Remove(fc?.Rows, comment);
+    
 
-        return Remove(allrows, comment);
-    }
-
-    public static bool Remove(List<RowItem>? allrows, string comment) {
-        if (allrows == null || allrows.Count == 0) { return false; }
+    public static bool Remove(ICollection<RowItem>? rows, string comment) {
+        if (rows == null || rows.Count == 0) { return false; }
 
         var did = false;
 
-        Table? db = null;
+        Table? tb = null;
 
-        allrows = [.. allrows.Distinct()];
+        rows = [.. rows.Distinct()];
 
-        foreach (var thisr in allrows) {
-            db ??= thisr.Table;
+        foreach (var thisr in rows) {
+            tb ??= thisr.Table;
 
-            if (db != thisr.Table) {
+            if (tb != thisr.Table) {
                 Develop.DebugPrint(ErrorType.Error, "Tabellen inkonsitent");
                 return false;
             }
         }
 
-        foreach (var thisRow in allrows) {
+        foreach (var thisRow in rows) {
             if (Remove(thisRow, comment)) { did = true; }
         }
 
@@ -404,7 +399,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public bool Clear(string comment) {
         using var fc = new FilterCollection(Table, "rowcol clear");
-        return Remove(fc, null, comment);
+        return Remove(fc, comment);
     }
 
     /// <summary>

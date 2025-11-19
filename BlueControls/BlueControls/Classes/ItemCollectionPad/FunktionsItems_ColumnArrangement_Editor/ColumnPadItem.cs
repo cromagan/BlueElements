@@ -62,7 +62,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Properties
 
-    
     public static string ClassId => "FI-Column";
 
     public ColumnViewItem? CVI { get; }
@@ -126,18 +125,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Spalte, 16);
 
-    ///// <summary>
-    ///// Für FlexOptions
-    ///// </summary>
-    //public bool Permanent {
-    //    get => _viewType == ViewType.PermanentColumn;
-    //    set {
-    //        if (!PermanentPossible() && Permanent) { return; }
-    //        if (!NonPermanentPossible() && !value) { return; }
-    //public void Spalte_bearbeiten() {
-    //    if (Column is not { IsDisposed: false }) { return; }
-    //    TableView.OpenColumnEditor(Column, null, null);
-    //}
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         if (disposing) {

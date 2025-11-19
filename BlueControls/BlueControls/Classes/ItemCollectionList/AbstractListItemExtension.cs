@@ -22,13 +22,13 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueTable;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueControls.ItemCollectionList.AbstractListItem;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -45,7 +45,7 @@ public static class AbstractListItemExtension {
         return ld2;
     }
 
-    public static TextListItem ItemOf(IEditable edit) => ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, OpenEditor, edit, true);
+    public static TextListItem ItemOf(IEditable edit) => ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, Conextmenu_OpenEditor, edit, true);
 
     public static TextListItem ItemOf(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
 
@@ -81,12 +81,12 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, ImageCode symbol, ExecuteClick click, object? tag, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, tag, enabled);
+    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, tag, enabled);
 
-    public static TextListItem ItemOf(string readableText, QuickImage? symbol, ExecuteClick click, object? tag, bool enabled) {
+    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled) {
         var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
         i.Tag = tag;
-        i.LeftClickExecute = click;
+        i.LeftClickExecute += click;
         return i;
     }
 
@@ -245,8 +245,8 @@ public static class AbstractListItemExtension {
 
     public static LineListItem SeparatorWith(string userDefCompareKey) => new(string.Empty, userDefCompareKey);
 
-    private static void OpenEditor(AbstractListItem item) {
-        if (item.Tag is not IEditable edit) { return; }
+    public static void Conextmenu_OpenEditor(object sender, ObjectEventArgs e) {
+        if (e.Data is not IEditable edit) { return; }
         edit.Edit();
     }
 

@@ -34,7 +34,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
 
     private CreativePadItem? _item;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -43,7 +43,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         InitializeComponent();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -97,7 +97,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         }
     }
 
-    #endregion Properties
+   #endregion
 
     #region Methods
 
@@ -155,5 +155,5 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
 
-    #endregion Methods
+    #endregion
 }

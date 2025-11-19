@@ -238,8 +238,9 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
 
-    protected virtual void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) => OpenScriptEditor(Table.Table);
+    protected virtual void ContextMenu_OpenScriptEditor(object sender, System.EventArgs e) => OpenScriptEditor(Table.Table);
 
+    [Obsolete]
     protected void ChangeTableInTab(string tablename, TabPage? tabpage, string settings) {
         if (tabpage == null) { return; }
 
@@ -315,7 +316,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             Develop.Message?.Invoke(ErrorType.Info, null, "Tabelle", ImageCode.Tabelle, "Lade Tabelle " + tablename, 0);
         }
 
-        #endregion Status-Meldung updaten?
+        #endregion
 
         if (BlueTable.Table.Get(tablename, TableView.Table_NeedPassword, false) is { IsDisposed: false } tb) {
             if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
@@ -490,21 +491,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
 
-    //    Table.Table = db;
-    //    if (Table.Table != null) {
-    //        tbcTableSelector.TabPages[toIndex].Text = db.Filename.FileNameWithoutSuffix();
-    //        ParseView(DBView[toIndex]);
-    //    }
-    //    tbcTableSelector.Enabled = true;
-    //    Table.Enabled = true;
-    //}
-    //private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeTable(null);
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
 
     private void btnAufräumen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db || !db.IsAdministrator()) {
-            return;
-        }
+        if (IsDisposed || Table.Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
 
         Table.RowCleanUp();
     }
@@ -549,7 +539,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
-     private void btnNeuDB_Click(object sender, System.EventArgs e) {
+    private void btnNeuDB_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
         BlueTable.Table.SaveAll(false);
 
@@ -659,17 +649,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         t.Show();
     }
 
-    private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db) { return; }
-        if (!db.IsAdministrator()) { return; }
-
-        var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
-        if (m != 0) {
-            return;
-        }
-
-        RowCollection.Remove(Table.FilterCombined, Table.PinnedRows, "Benutzer: Zeile löschen");
-    }
+    private void btnZeileLöschen_Click(object sender, System.EventArgs e) => TableView.ContextMenu_DeleteRow(sender, new ObjectEventArgs(Table.RowsVisibleUnique()));
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Table.Zoom = 1f;
 
@@ -792,125 +772,9 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         SwitchTabToTable(LoadTab.FileName);
     }
 
-    private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
-
-        lstAufgaben.Enabled = false;
-
-        if (e.Item is ReadableListItem { Item: TableScriptDescription sc }) {
-            string m;
-
-            if (sc.NeedRow) {
-                m = MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0
-                    ? tb.Row.ExecuteScript(null, e.Item.KeyName, Table.RowsVisibleUnique())
-                    : "Durch Benutzer abgebrochen";
-            } else {
-                //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-                var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
-                m = s.Protocol.JoinWithCr();
-            }
-
-            lstAufgaben.Enabled = true;
-
-            if (!string.IsNullOrEmpty(m)) {
-                MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
-            } else {
-                MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen, "OK");
-            }
-            return;
-        }
-
-        if (e.Item is TextListItem tli) {
-            var com = (tli.KeyName + "|||").SplitBy("|");
-
-            switch (com[0].ToLowerInvariant()) {
-                case "#repairscript":
-                case "#editscript":
-                    OpenScriptEditor(tb);
-                    return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
-
-                case "#enablerowscript":
-                    tb.EnableScript();
-                    CheckButtons();
-                    return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
-
-                case "#repaircolumn":
-                    var c = tb.Column[com[1]];
-                    Table.OpenColumnEditor(c, null);
-                    return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
-
-                case "#datenüberprüfung":
-                    var rows = Table.RowsVisibleUnique();
-                    if (rows.Count == 0) {
-                        MessageBox.Show("Keine Zeilen angezeigt.", ImageCode.Kreuz, "OK");
-                        return;
-                    }
-
-                    foreach (var thisR in rows) {
-                        if (!tb.CanDoValueChangedScript(true)) {
-                            MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
-                            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-
-                            lstAufgaben.Enabled = true;
-                            return;
-                        }
-
-                        thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-                        thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
-                    }
-
-                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-
-                    MessageBox.Show("Alle angezeigten Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
-                    lstAufgaben.Enabled = true;
-                    return;
-            }
-        }
-
-        MessageBox.Show("Befehl unbekannt!", ImageCode.Kritisch, "OK");
-        lstAufgaben.Enabled = true;
-    }
-
     private void Tb_InvalidateView(object sender, System.EventArgs e) => Table.Invalidate();
 
     private void Tb_Loaded(object sender, FirstEventArgs e) => CheckButtons();
-
-    //private string NameRepair(string istName, RowItem? vRow) {
-    //    var newName = istName;
-    //    var istZ = 0;
-    //    do {
-    //        var changed = false;
-    //        if (Table.Table != null && Table.Table.Row.Any(thisRow =>
-    //                thisRow != null && thisRow != vRow && string.Equals(thisRow.CellFirstString(), newName,
-    //                    StringComparison.OrdinalIgnoreCase))) {
-    //            istZ++;
-    //            newName = istName + " (" + istZ + ")";
-    //            changed = true;
-    //        }
-
-    //        if (!changed) {
-    //            return newName;
-    //        }
-    //    } while (true);
-    //}
-
-    //private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
-    //    column = Table.View_ColumnFirst();
-    //    row = null;
-
-    //    if (Table.Table is not Table db || db.Row.Count < 1) { return; }
-
-    //    // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
-    //    if (richtung.HasFlag(Direction.Unten)) {
-    //        row = Table.View_NextRow(Table.CursorPosRow) ?? Table.View_RowFirst();
-    //    }
-
-    //    if (richtung.HasFlag(Direction.Oben)) {
-    //        row = Table.View_PreviousRow(Table.CursorPosRow) ?? Table.View_RowLast();
-    //    }
-
-    //    row ??= Table.View_RowFirst();
-    //}
 
     private void tbcTableSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
         var s = (List<object>)e.TabPage.Tag;
@@ -934,8 +798,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         Table.Invalidate();
         lstAufgaben.ItemClear();
 
-        var addedit = true;
-
         if (tb is not { IsDisposed: false } || !tb.IsEditable(false)) {
             lstAufgaben.Enabled = false;
             return;
@@ -945,10 +807,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         var ok = true;
         foreach (var thisColumnItem in tb.Column) {
             if (!thisColumnItem.IsOk()) {
-                var d = ItemOf("Spalte ' " + thisColumnItem.KeyName + " ' reparieren", "#repaircolumn|" + thisColumnItem.KeyName, ImageCode.Kritisch);
-                d.Enabled = tb.IsAdministrator();
-                lstAufgaben.ItemAdd(d);
-
+                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, thisColumnItem, tb.IsAdministrator()));
                 ok = false;
             }
             if (!ok) {
@@ -961,48 +820,69 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (l.Count > 1) {
             foreach (var thisColumnItem in l) {
-                var d = ItemOf("Spalte ' " + thisColumnItem.KeyName + " ' ist die erste Spalte", "#repaircolumn|" + thisColumnItem.KeyName, ImageCode.Kritisch);
-                d.Enabled = tb.IsAdministrator();
-                lstAufgaben.ItemAdd(d);
+                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, thisColumnItem, tb.IsAdministrator()));
             }
 
             lstAufgaben.Enabled = true;
             return;
         }
 
+        var addedit = true;
         if (!string.IsNullOrEmpty(tb.CheckScriptError())) {
-            var d = ItemOf("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
-            d.Enabled = tb.IsAdministrator();
-            lstAufgaben.ItemAdd(d);
-            lstAufgaben.Enabled = true;
+            lstAufgaben.ItemAdd(ItemOf("Skripte reparieren", ImageCode.Kritisch, ContextMenu_OpenScriptEditor, null, tb.IsAdministrator()));
             addedit = false;
-            //return;
         }
 
         if (!tb.IsRowScriptPossible()) {
-            var d = ItemOf("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
-            d.Enabled = tb.IsAdministrator();
-            lstAufgaben.ItemAdd(d);
-            lstAufgaben.Enabled = true;
+            lstAufgaben.ItemAdd(ItemOf("Zeilen-Skripte erlauben", ImageCode.Spalte, ContextMenu_EnableRowScript, null, tb.IsAdministrator()));
         }
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
-            var item = ItemOf(script);
-            lstAufgaben.ItemAdd(item);
-            item.Enabled = tb.PermissionCheck(script.UserGroups, null)
-                            && script.IsOk()
-                            && (!script.NeedRow || tb.IsRowScriptPossible());
+            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), ContextMenu_ExecuteScript, new { Script = script, Rows = Table.RowsVisibleUnique() }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible())));
         }
 
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", "#datenüberprüfung", ImageCode.HäkchenDoppelt, tb.CanDoValueChangedScript(true)));
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, Table.RowsVisibleUnique(), tb.CanDoValueChangedScript(true)));
 
         if (addedit) {
-            var d = ItemOf("Skripte bearbeiten", "#editscript", ImageCode.Skript);
-            lstAufgaben.ItemAdd(d);
-            d.Enabled = tb.IsAdministrator();
+            lstAufgaben.ItemAdd(ItemOf("Skripte bearbeiten", ImageCode.Skript, ContextMenu_OpenScriptEditor, null, tb.IsAdministrator()));
         }
 
         lstAufgaben.Enabled = lstAufgaben.ItemCount > 0;
+    }
+
+    public static void ContextMenu_ExecuteScript(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+
+        var type = data.GetType();
+
+        if (type.GetProperty("Script")?.GetValue(data) is not TableScriptDescription sc || sc.Table is not { } tb) { return; }
+
+        if (TableViewForm.EditabelErrorMessage(sc.Table)) { return; }
+
+        string m;
+
+        if (sc.NeedRow) {
+            if (type.GetProperty("Rows")?.GetValue(data) is not List<RowItem> row || row.Count == 0) { return; }
+
+            m = MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0
+                ? tb.Row.ExecuteScript(null, sc.KeyName, row)
+                : "Durch Benutzer abgebrochen";
+        } else {
+            var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
+            m = s.Protocol.JoinWithCr();
+        }
+
+        if (!string.IsNullOrEmpty(m)) {
+            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
+        } else {
+            MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen, "OK");
+        }
+        return;
+    }
+
+    internal void ContextMenu_EnableRowScript(object sender, System.EventArgs e) {
+        Table.Table?.EnableScript();
+        CheckButtons();
     }
 
     #endregion

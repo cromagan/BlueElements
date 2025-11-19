@@ -252,11 +252,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                 }
             }
         }
-        using (ColumnEditor w = new(newc, null)) {
-            w.ShowDialog();
-            newc.Invalidate_ColumAndContent();
-            //w.Dispose();
-        }
+
+        newc.Editor = typeof(ColumnEditor);
+        newc.Edit();
+        newc.Invalidate_ColumAndContent();
+
         tb.Column.Repair();
 
         var ca = CloneOfCurrentArrangement();

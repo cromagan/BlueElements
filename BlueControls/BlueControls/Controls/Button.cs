@@ -212,7 +212,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                 if (_checked || MousePressing()) { state |= States.Checked; }
             }
 
-            #endregion State modifzieren
+            #endregion
 
             switch (_buttonStyle) {
                 case ButtonStyle.Text:

@@ -140,7 +140,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _temporaryTableMasterUser = string.Empty;
     private string _variableTmp;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -209,7 +209,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         AllFiles.Add(this);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Destructors
 
@@ -221,13 +221,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    #endregion Destructors
+    #endregion
 
     #region Delegates
 
     public delegate string NeedPassword();
 
-    #endregion Delegates
+    #endregion
 
     #region Events
 
@@ -251,7 +251,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public event EventHandler? ViewChanged;
 
-    #endregion Events
+    #endregion
 
     #region Properties
 
@@ -502,7 +502,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 thisVar.DisposeContent();
             }
 
-            #endregion Kritische Variablen Disposen
+            #endregion
 
             ChangeData(TableDataType.TableVariables, null, _variableTmp, l.ToString(true));
         }
@@ -512,7 +512,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private string? _additionalFilesPathTemp { get; set; }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -608,7 +608,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            #endregion Schauen, ob die Tabelle bereits geladen ist
+            #endregion
 
             foreach (var thisfolder in folder) {
                 var f = thisfolder + fileOrTableName;
@@ -1328,7 +1328,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
         vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
-        #endregion Variablen für Skript erstellen
+        #endregion
 
         return vars;
     }
@@ -1421,7 +1421,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             AbortReason abr = extended ? ExternalAbortScriptReasonExtended : ExternalAbortScriptReason;
             var scf = sc.Parse(0, script.KeyName, attributes, abr);
 
-            #endregion Script ausführen
+            #endregion
 
             #region Fehlerprüfungen
 
@@ -1461,7 +1461,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (!produktivphase) { return scf; }
 
-            #endregion Fehlerprüfungen
+            #endregion
 
             WriteBackVariables(row, vars, script.VirtalColumns, dbVariables, script.KeyName, script.ChangeValuesAllowed && produktivphase);
 
@@ -1596,7 +1596,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         importText = importText.Replace("\r\n", "\r").Trim("\r");
 
-        #endregion Text vorbereiten
+        #endregion
 
         #region Die Zeilen (zeil) vorbereiten
 
@@ -1619,7 +1619,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return "Abbruch, keine Zeilen zum Importieren erkannt.";
         }
 
-        #endregion Die Zeilen (zeil) vorbereiten
+        #endregion
 
         #region Spaltenreihenfolge (columns) ermitteln
 
@@ -1652,7 +1652,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             columns.Add(col);
         }
 
-        #endregion Spaltenreihenfolge (columns) ermitteln
+        #endregion
 
         #region Neue Werte in ein Dictionary schreiben (dictNeu)
 
@@ -1668,7 +1668,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        #endregion Neue Werte in ein Dictionary schreiben (dictNeu)
+        #endregion
 
         #region Zeilen, die BEACHTET werden sollen, in ein Dictionary schreiben (dictVorhanden)
 
@@ -1686,7 +1686,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        #endregion Zeilen, die BEACHTET werden sollen, in ein Dictionary schreiben (dictVorhanden)
+        #endregion
 
         #region Der eigentliche Import
 
@@ -1706,7 +1706,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return "Abbruch, Leere Zeile im Import.";
             }
 
-            #endregion Spaltenanzahl zum Import ermitteln (maxColCount)
+            #endregion
 
             #region Row zum schreiben ermitteln (row)
 
@@ -1725,7 +1725,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return "Abbruch, Import-Fehler.";
             }
 
-            #endregion Row zum schreiben ermitteln (row)
+            #endregion
 
             #region Werte in die Spalten schreiben
 
@@ -1733,7 +1733,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 row.CellSet(columns[colNo], thisD.Value[colNo].SplitAndCutBy("|").JoinWithCr(), "CSV-Import");
             }
 
-            #endregion Werte in die Spalten schreiben
+            #endregion
 
             #region Speichern und Ausgabe
 
@@ -1749,10 +1749,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
             Develop.SetUserDidSomething();
 
-            #endregion Speichern und Ausgabe
+            #endregion
         }
 
-        #endregion Der eigentliche Import
+        #endregion
 
         //_ = Save();
         DropMessage(ErrorType.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
@@ -1940,7 +1940,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         }
                     }
 
-                    #endregion Zeile suchen oder erstellen
+                    #endregion
 
                     #region Spalte suchen oder erstellen
 
@@ -1960,7 +1960,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         }
                     }
 
-                    #endregion Spalte suchen oder erstellen
+                    #endregion
 
                     #region Bei verschlüsselten Tabellen das Passwort abfragen
 
@@ -1977,7 +1977,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         }
                     }
 
-                    #endregion Bei verschlüsselten Tabellen das Passwort abfragen
+                    #endregion
 
                     if (command == TableDataType.EOF) {
                         break;
@@ -2010,7 +2010,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            #endregion unbenutzte (gelöschte) Spalten entfernen
+            #endregion
 
             Row.RemoveNullOrEmpty();
             Cell.RemoveOrphans();
@@ -2734,5 +2734,5 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    #endregion Methods
+    #endregion
 }

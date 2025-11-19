@@ -112,7 +112,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private float _zoom = 1f;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -127,7 +127,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         OnEnabledChanged(System.EventArgs.Empty);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Events
 
@@ -153,7 +153,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public event EventHandler? VisibleRowsChanged;
 
-    #endregion Events
+    #endregion
 
     #region Properties
 
@@ -190,6 +190,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     [DefaultValue(false)]
     public bool AutoPin { get; set; }
 
+    /// <summary>
+    /// Gibt an, ob das Standard-Kontextmenu der Tabellenansicht angezeitgt werden soll oder nicht
+    /// </summary>
     public bool ContextMenuDefault { get; set; } = true;
 
     public ColumnViewCollection? CurrentArrangement {
@@ -370,7 +373,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -391,7 +394,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
+        #endregion
 
         #region Refresh
 
@@ -401,7 +404,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         //if (db.Column.SysChapter is { IsDisposed: false } csc) { colsToRefresh.AddIfNotExists(csc); }
         if (tb.Column.First is { IsDisposed: false } cf) { colsToRefresh.AddIfNotExists(cf); }
 
-        #endregion Refresh
+        #endregion
 
         var lockMe = new object();
 
@@ -424,7 +427,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             });
         }
 
-        #endregion _Angepinnten Zeilen erstellen (_pinnedData)
+        #endregion
 
         #region Gefiltere Zeilen erstellen (_rowData)
 
@@ -459,7 +462,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         });
 
-        #endregion Gefiltere Zeilen erstellen (_rowData)
+        #endregion
 
         pinnedData.Sort();
         rowData.Sort();
@@ -1015,7 +1018,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         da.RowEnd();
 
-        #endregion Spaltenköpfe
+        #endregion
 
         #region Zeilen
 
@@ -1044,7 +1047,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion Zeilen
+        #endregion
 
         da.TableEnd();
         da.AddFoot();
@@ -1063,7 +1066,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        if (ContextMenuDefault && Table is { IsDisposed: false } db) {
+        if (ContextMenuDefault && Table is { IsDisposed: false } tb) {
 
             #region Pinnen
 
@@ -1076,7 +1079,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 }
             }
 
-            #endregion Pinnen
+            #endregion
 
             #region Sortierung
 
@@ -1087,7 +1090,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 e.ContextMenu.Add(ItemOf("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, column, true));
             }
 
-            #endregion Sortierung
+            #endregion
 
             #region Zelle
 
@@ -1099,40 +1102,40 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 e.ContextMenu.Add(ItemOf("Inhalt einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, null, editable && column2.CanBeChangedByRules()));
                 e.ContextMenu.Add(ItemOf("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, new { Column = column2, Row = row2 }, editable && column2.CanBeChangedByRules()));
                 e.ContextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, new { Column = column2, Row = row2 }, editable && column2.CanBeChangedByRules() && column2.SaveContent));
-                e.ContextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, null, db.IsAdministrator()));
-                e.ContextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, row2, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, null, tb.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, row2, tb.IsAdministrator()));
             }
 
-            #endregion Zelle
+            #endregion
 
             #region Spalte
 
             if (_mouseOverColumn?.Column is { IsDisposed: false } column3) {
                 e.ContextMenu.Add(ItemOf("Spalte", true));
-                e.ContextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", QuickImage.Get(ImageCode.Stift, 16), ContextMenu_EditColumnProperties, column3, db.IsAdministrator()));
-                e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, column3, db.IsAdministrator()));
-                e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, column3, db.IsAdministrator()));
-                e.ContextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, column3, db.IsAdministrator()));
-                e.ContextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, column3, db.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, new { Column = column3, _mouseOverRow?.Row, View = Table }, tb.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, column3, tb.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, column3, tb.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, column3, tb.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, column3, tb.IsAdministrator()));
 
                 if (_mouseOverRow?.Row is { IsDisposed: false } row3) {
                     var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column3, row3, row3?.ChunkValue));
-                    e.ContextMenu.Add(ItemOf("Voting", ImageCode.Herz, ContextMenu_Voting, column3, db.IsAdministrator() && editable && column3.CanBeChangedByRules()));
+                    e.ContextMenu.Add(ItemOf("Voting", ImageCode.Herz, ContextMenu_Voting, column3, tb.IsAdministrator() && editable && column3.CanBeChangedByRules()));
                 }
             }
 
-            #endregion Spalte
+            #endregion
 
             #region Zeile
 
             if (_mouseOverRow?.Row is { IsDisposed: false } row4) {
                 e.ContextMenu.Add(ItemOf("Zeile", true));
-                e.ContextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, row4, db.IsAdministrator() && db.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)));
-                e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, row4, db.CanDoValueChangedScript(true)));
+                e.ContextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, row4, tb.IsAdministrator() && tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)));
+                e.ContextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, row4, tb.CanDoValueChangedScript(true)));
 
                 var didmenu = false;
-                foreach (var thiss in db.EventScript) {
-                    if (thiss is { UserGroups.Count: > 0 } && db.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {
+                foreach (var thiss in tb.EventScript) {
+                    if (thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {
                         if (!didmenu) {
                             e.ContextMenu.Add(ItemOf("Skripte", true));
                             didmenu = true;
@@ -1142,7 +1145,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 }
             }
 
-            #endregion Zeile
+            #endregion
         }
 
         OnContextMenuInit(e);
@@ -1210,47 +1213,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                y >= FilterleisteHeight;
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OpenColumnEditor(ColumnItem? column, RowItem? row) {
-        if (column is not { IsDisposed: false }) { return; }
-
-        column.Editor = typeof(ColumnEditor);
-
-        if (row is not { IsDisposed: false }) {
-            column.Edit();
-            return;
-        }
-
-        ColumnItem? columnLinked = null;
-        var posError = false;
-
-        if (column.RelationType == RelationType.CellValues) {
-            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false);
-            posError = true;
-        }
-
-        var bearbColumn = column;
-        if (columnLinked != null) {
-            columnLinked.Repair();
-            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle",
-                    "Verlinkte Spalte") == 1) {
-                bearbColumn = columnLinked;
-            }
-        } else {
-            if (posError) {
-                Notification.Show(
-                    "Keine aktive Verlinkung.<br>Spalte in dieser Tabelle wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Tabelle vorhanden?",
-                    ImageCode.Information);
-            }
-        }
-
-        column.Repair();
-
-        using ColumnEditor w = new(bearbColumn, this);
-        w.ShowDialog();
-
-        bearbColumn.Repair();
-    }
 
     public void OpenScriptEditor() {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
@@ -1376,7 +1338,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         thisRowData.ShowCap = false;
                     }
 
-                    #endregion Caption bestimmen
+                    #endregion
 
                     #region Expaned (oder pinned) bestimmen
 
@@ -1386,7 +1348,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         maxY += thisRowData.DrawHeight;
                     }
 
-                    #endregion Expaned (oder pinned) bestimmen
+                    #endregion
 
                     sortedRowDataTmp.Add(thisRowData);
                 }
@@ -1614,7 +1576,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                                 ? Filter.RowFilterText
                                 : string.Empty;
 
-        #endregion ZeilenFilter befüllen
+        #endregion
 
         var consthe = btnAlleFilterAus.Height;
 
@@ -1631,7 +1593,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var right = constwi + Skin.PaddingSmal;
         const AnchorStyles anchor = AnchorStyles.Top | AnchorStyles.Left;
 
-        #endregion Variablen für Waagerecht / Senkrecht bestimmen
+        #endregion
 
         List<FlexiFilterControl> flexsToDelete = [];
 
@@ -1641,7 +1603,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (thisControl is FlexiFilterControl flx) { flexsToDelete.Add(flx); }
         }
 
-        #endregion Vorhandene Flexis ermitteln
+        #endregion
 
         var cu = CurrentArrangement;
 
@@ -1670,7 +1632,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 columSort.AddIfNotExists(thisColumn);
             }
 
-            #endregion Reihenfolge der Spalten bestimmen
+            #endregion
 
             var currentRow = 1; // Die erste Zeile ist bereits belegt mit den Hauptsteuerelementen
             var count = 0;
@@ -1692,7 +1654,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         if (FilterInput?[thisColumn] is { }) { showMe = true; }
                     }
 
-                    #endregion Sichtbarkeit des Filterelements bestimmen
+                    #endregion
 
                     if (showMe && currentRow <= availableRows) {
                         var flx = FlexiItemOf(thisColumn);
@@ -1737,7 +1699,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion Neue Flexis erstellen / updaten
+        #endregion
 
         #region Unnötige Flexis löschen
 
@@ -1748,7 +1710,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             thisFlexi.Dispose();
         }
 
-        #endregion Unnötige Flexis löschen
+        #endregion
 
         _isFilling = false;
     }
@@ -1882,7 +1844,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         SliderX.LargeChange = displayRectangleWoSlider.Width;
         SliderX.Enabled = SliderX.Maximum > 0;
 
-        #endregion Slider
+        #endregion
 
         Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement);
 
@@ -2323,7 +2285,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (contentHolderCellColumn == null || contentHolderCellRow == null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
         }
 
-        #endregion Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
+        #endregion
 
         #region Format prüfen
 
@@ -2335,7 +2297,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion Format prüfen
+        #endregion
 
         newValue = contentHolderCellColumn.AutoCorrect(newValue, false);
 
@@ -2374,15 +2336,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             return string.Empty;
         }
 
-        #endregion neue Zeile anlegen? (Das ist niemals in der ein LinkedCell-Tabelle)
-
-        //using var filterColNewChunk = new FilterCollection(table.Table, "Edit-Filter");
-        //filterColNewChunk.AddIfNotExists(table.FilterCombined.ToList());
-        //if (contentHolderCellRow == cellInThisTableRow.Row) {
-        //    if (cellInThisTableColumn.Column == cellInThisTableColumn.Column.Table?.Column.ChunkValueColumn) {
-        //        filterColNewChunk.RemoveOtherAndAdd(new FilterItem(cellInThisTableColumn.Column, FilterType.Istgleich_GroßKleinEgal, newValue));
-        //    }
-        //}
+        #endregion
 
         if (contentHolderCellRow != null) {
             var oldval = contentHolderCellRow.CellGetString(contentHolderCellColumn);
@@ -2983,25 +2937,25 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return null;
     }
 
-    private void ContextMenu_ContentCopy(AbstractListItem item) {
-        if (item.Tag is not { } tag) { return; }
-        var column = (ColumnItem)tag.GetType().GetProperty("Column")?.GetValue(tag);
-        var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);
+    private void ContextMenu_ContentCopy(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var column = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
+        var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
         CopyToClipboard(column, row, true);
     }
 
-    private void ContextMenu_ContentDelete(AbstractListItem item) {
-        if (item.Tag is not { } tag) { return; }
-        var column = (ColumnItem)tag.GetType().GetProperty("Column")?.GetValue(tag);
-        var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);
+    private void ContextMenu_ContentDelete(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var column = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
+        var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
         if (TableViewForm.EditabelErrorMessage(Table)) { return; }
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
     }
 
-    private void ContextMenu_ContentPaste(AbstractListItem item) => PasteToCursor();
+    private void ContextMenu_ContentPaste(object sender, ObjectEventArgs e) => PasteToCursor();
 
-    private void ContextMenu_CopyAll(AbstractListItem item) {
-        if (item.Tag is not ColumnItem column || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+    private void ContextMenu_CopyAll(object sender, ObjectEventArgs e) {
+        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
@@ -3009,8 +2963,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
-    private void ContextMenu_CopyAllSorted(AbstractListItem item) {
-        if (item.Tag is not ColumnItem column || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+    private void ContextMenu_CopyAllSorted(object sender, ObjectEventArgs e) {
+        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
@@ -3019,42 +2973,65 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
-    private void ContextMenu_DataValidation(AbstractListItem item) {
-        if (item.Tag is not RowItem row || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
-        row.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-        row.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
-        RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, true, null);
-        MessageBox.Show("Datenüberprüfung:\r\n" + row.CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
-    }
+    public static void ContextMenu_DataValidation(object sender, ObjectEventArgs e) {
+        var rows = new List<RowItem>();
+        if (e.Data is RowItem row) { rows.Add(row); }
+        if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
 
-    private void ContextMenu_DeleteRow(AbstractListItem item) {
-        if (item.Tag is not RowItem row || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
-        if (TableViewForm.EditabelErrorMessage(Table)) { return; }
-        if (row is not { IsDisposed: false }) { return; }
+        if (rows.Count == 0) {
+            MessageBox.Show("Keine Zeilen zum Prüfen vorhanden.", ImageCode.Kreuz, "OK");
+            return;
+        }
 
-        var valueCol0 = row.CellFirstString();
-        if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
-            RowCollection.Remove(row, "Benutzer: löschen Befehl");
+        foreach (var thisR in rows) {
+            if (thisR.Table is { IsDisposed: false } tb && !tb.IsAdministrator()) {
+                if (!tb.CanDoValueChangedScript(true)) {
+                    MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
+                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+                    return;
+                }
+
+                thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
+                thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
+            }
+        }
+
+        if (rows.Count == 1) {
+            MessageBox.Show("Datenüberprüfung:\r\n" + rows[0].CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
+        } else {
+            MessageBox.Show($"Alle {rows.Count} Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
         }
     }
 
-    private void ContextMenu_EditColumnProperties(AbstractListItem item) {
-        if (item.Tag is not ColumnItem column) { return; }
+    public static void ContextMenu_DeleteRow(object sender, ObjectEventArgs e) {
+        var rows = new List<RowItem>();
+        if (e.Data is RowItem row) { rows.Add(row); }
+        if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
 
-        if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
+        if (rows.Count == 0) {
+            MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
+            return;
+        }
 
-        OpenColumnEditor(column, _mouseOverRow?.Row);
+        if (rows[0].Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+
+        if (rows.Count == 1) {
+            if (MessageBox.Show($"Zeile wirklich löschen? (<b>{rows[0].CellFirstString()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+        } else {
+            if (MessageBox.Show($"{rows.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+        }
+        RowCollection.Remove(rows[0], "Benutzer: löschen Befehl");
     }
 
-    private void ContextMenu_ExecuteScript(AbstractListItem item) {
+    public static void ContextMenu_ExecuteScript(object sender, ObjectEventArgs e) {
         Develop.SetUserDidSomething();
-        if (item.Tag is not { } tag) { return; }
-        var script = tag.GetType().GetProperty("Script")?.GetValue(tag);
-        var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);
+        if (e.Data is not { } data) { return; }
+        var script = data.GetType().GetProperty("Script")?.GetValue(data) as TableScriptDescription;
+        var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
 
-        if (row is not { IsDisposed: false } || script is not TableScriptDescription scriptItem) { return; }
+        if (row is not { IsDisposed: false } || script is not { IsDisposed: false }) { return; }
 
-        var t = row.ExecuteScript(null, scriptItem.KeyName, true, 10, null, true, true);
+        var t = row.ExecuteScript(null, script.KeyName, true, 10, null, true, true);
         if (t is { Failed: false }) {
             MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
         } else {
@@ -3062,44 +3039,44 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private void ContextMenu_KeyCopy(AbstractListItem item) {
-        if (item.Tag is not RowItem row) { return; }
+    private void ContextMenu_KeyCopy(object sender, ObjectEventArgs e) {
+        if (e.Data is not RowItem row) { return; }
         CopytoClipboard(row?.KeyName ?? string.Empty);
         Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
     }
 
-    private void ContextMenu_Pin(AbstractListItem item) {
-        if (item.Tag is not RowItem row) { return; }
+    private void ContextMenu_Pin(object sender, ObjectEventArgs e) {
+        if (e.Data is not RowItem row) { return; }
         PinAdd(row);
     }
 
-    private void ContextMenu_ResetSort(AbstractListItem item) => SortDefinitionTemporary = null;
+    private void ContextMenu_ResetSort(object sender, ObjectEventArgs e) => SortDefinitionTemporary = null;
 
-    private void ContextMenu_RestorePreviousContent(AbstractListItem item) {
-        if (item.Tag is not { } tag) { return; }
-        var column = (ColumnItem)tag.GetType().GetProperty("Column")?.GetValue(tag);
-        var row = (RowItem)tag.GetType().GetProperty("Row")?.GetValue(tag);
+    private void ContextMenu_RestorePreviousContent(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var column = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
+        var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
         if (TableViewForm.EditabelErrorMessage(Table)) { return; }
         DoUndo(column, row);
     }
 
-    private void ContextMenu_SearchAndReplace(AbstractListItem item) {
+    private void ContextMenu_SearchAndReplace(object sender, ObjectEventArgs e) {
         if (Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
         OpenSearchAndReplaceInCells();
     }
 
-    private void ContextMenu_SortAZ(AbstractListItem item) {
-        if (item.Tag is not ColumnItem column || column.Table is not { IsDisposed: false } db) { return; }
-        SortDefinitionTemporary = new RowSortDefinition(db, column, false);
+    private void ContextMenu_SortAZ(object sender, ObjectEventArgs e) {
+        if (e.Data is not ColumnItem column || column.Table is not { IsDisposed: false } tb) { return; }
+        SortDefinitionTemporary = new RowSortDefinition(tb, column, false);
     }
 
-    private void ContextMenu_SortZA(AbstractListItem item) {
-        if (item.Tag is not ColumnItem column || column.Table is not { IsDisposed: false } db) { return; }
-        SortDefinitionTemporary = new RowSortDefinition(db, column, true);
+    private void ContextMenu_SortZA(object sender, ObjectEventArgs e) {
+        if (e.Data is not ColumnItem column || column.Table is not { IsDisposed: false } tb) { return; }
+        SortDefinitionTemporary = new RowSortDefinition(tb, column, true);
     }
 
-    private void ContextMenu_Statistics(AbstractListItem item) {
-        if (item.Tag is not ColumnItem column || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+    private void ContextMenu_Statistics(object sender, ObjectEventArgs e) {
+        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var split = false;
         if (column.MultiLine) {
             split = MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
@@ -3107,9 +3084,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         column.Statistik(RowsVisibleUnique(), !split);
     }
 
-    private void ContextMenu_Sum(AbstractListItem item) {
-        if (item.Tag is not ColumnItem column || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
-        var summe = column?.Summe(FilterCombined);
+    private void ContextMenu_Sum(object sender, ObjectEventArgs e) {
+        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+        var summe = column.Summe(FilterCombined);
         if (!summe.HasValue) {
             MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
         } else {
@@ -3117,13 +3094,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private void ContextMenu_Unpin(AbstractListItem item) {
-        if (item.Tag is not RowItem row) { return; }
+    private void ContextMenu_Unpin(object sender, ObjectEventArgs e) {
+        if (e.Data is not RowItem row) { return; }
         PinRemove(row);
     }
 
-    private void ContextMenu_Voting(AbstractListItem item) {
-        if (item.Tag is not ColumnItem column || Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+    private void ContextMenu_Voting(object sender, ObjectEventArgs e) {
+        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var v = new Voting(column, [.. FilterCombined.Rows]);
         v.ShowDialog();
     }
@@ -3359,7 +3336,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 var toDrawd = cellInThisTableRow.CellGetString(cellInThisTableColumn);
                 viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, cellrectangle, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
 
-                #endregion Draw_CellTransparent
+                #endregion
 
                 if (_unterschiede != null && _unterschiede != cellInThisTableRow) {
                     if (cellInThisTableRow.CellGetString(cellInThisTableColumn) != _unterschiede.CellGetString(cellInThisTableColumn)) {
@@ -3426,7 +3403,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             );
         }
 
-        #endregion Recude-Button zeichnen
+        #endregion
 
         #region Trichter-Text && trichterState
 
@@ -3444,7 +3421,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        #endregion Trichter-Text && trichterState
+        #endregion
 
         #region Roten Rand für Split-Spalten
 
@@ -3456,7 +3433,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             trichterText = string.Empty;
         }
 
-        #endregion Roten Rand für Split-Spalten
+        #endregion
 
         #region Filter-Knopf mit Trichter
 
@@ -3501,7 +3478,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 origAutoFilterLocation.Top + ((paf - s.Height) / 2));
         }
 
-        #endregion Filter-Knopf mit Trichter
+        #endregion
 
         #region LaufendeNummer
 
@@ -3509,7 +3486,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             viewItem.Font_Numbers.Scale(_zoom).DrawString(gr, "#" + lfdNo, realHead.X, origAutoFilterLocation.Top);
         }
 
-        #endregion LaufendeNummer
+        #endregion
 
         var tx = viewItem.Caption;
         tx = LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
@@ -3526,7 +3503,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             viewItem.Font_Head_Colored.Scale(_zoom).DrawString(gr, tx, 0, 0);
             gr.TranslateTransform(-pos.X, -pos.Y);
 
-            #endregion Spalte mit Bild zeichnen
+            #endregion
         } else {
 
             #region Spalte ohne Bild zeichnen
@@ -3538,7 +3515,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             gr.TranslateTransform(-pos.X, -pos.Y);
             gr.ResetTransform();
 
-            #endregion Spalte ohne Bild zeichnen
+            #endregion
         }
 
         #region Sortierrichtung Zeichnen
@@ -3550,7 +3527,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 realHead.Bottom - p6 - paf);
         }
 
-        #endregion Sortierrichtung Zeichnen
+        #endregion
     }
 
     /// <summary>
@@ -3587,7 +3564,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                     prevViewItemWithOtherCaption = thisViewItem;
 
-                    #endregion Ende einer Gruppierung gefunden
+                    #endregion
                 }
 
                 prevViewItem = thisViewItem;
@@ -4320,5 +4297,60 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return tb.IsNowNewRowPossible(chunkValue, true);
     }
 
-    #endregion Methods
+    public static void ContextMenu_EditColumnProperties(object sender, ObjectEventArgs e) {
+        ColumnItem? column = null;
+        RowItem? row = null;
+        TableView? view = null;
+
+        if (e.Data is ColumnItem c) { column = c; }
+
+        if (e.Data is { } data) {
+            var type = data.GetType();
+            column = type.GetProperty("Column")?.GetValue(data) as ColumnItem;
+
+            row = type.GetProperty("Row")?.GetValue(data) as RowItem;
+            view = type.GetProperty("View")?.GetValue(data) as TableView;
+        }
+
+        if (column is not { IsDisposed: false }) { return; }
+        column.Editor = typeof(ColumnEditor);
+
+        if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
+
+        if (row is not { IsDisposed: false }) {
+            column.Edit();
+            return;
+        }
+
+        ColumnItem? columnLinked = null;
+        var posError = false;
+
+        if (column.RelationType == RelationType.CellValues) {
+            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false);
+            posError = true;
+        }
+
+        var bearbColumn = column;
+        if (columnLinked != null) {
+            columnLinked.Repair();
+            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
+                bearbColumn = columnLinked;
+            }
+        } else {
+            if (posError) {
+                Notification.Show(
+                    "Keine aktive Verlinkung.<br>Spalte in dieser Tabelle wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Tabelle vorhanden?",
+                    ImageCode.Information);
+            }
+        }
+
+        column.Repair();
+
+        using var w = new ColumnEditor(bearbColumn, view);
+        w.ShowDialog();
+
+        bearbColumn.Repair();
+    }
+
+    #endregion
 }

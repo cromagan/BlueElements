@@ -165,7 +165,7 @@ public class Script {
             }
         }
 
-        #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
+        #endregion
 
         #region Prüfen für bessere Fehlermeldung, alle Befehle prüfen
 

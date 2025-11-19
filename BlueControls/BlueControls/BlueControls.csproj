@@ -137,6 +137,7 @@
     <Compile Include="Controls\ConnectedFormula\ConnectedFormulaScriptButton.Designer.cs">
       <DependentUpon>ConnectedFormulaScriptButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="EventArgs\ObjectEventArgs.cs" />
     <Compile Include="EventArgs\FormEventArgs.cs" />
     <Compile Include="Export.cs" />
     <Compile Include="Forms\Start.cs">

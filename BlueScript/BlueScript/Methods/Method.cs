@@ -724,7 +724,7 @@ public abstract class Method : IReadableTextWithKey {
             posc = pos + 1;
         } while (true);
 
-        #endregion Liste der Attribute splitten
+        #endregion
 
         return attributes;
     }

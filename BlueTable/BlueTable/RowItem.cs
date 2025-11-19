@@ -45,7 +45,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private RowCheckedEventArgs? _lastCheckedEventArgs;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -55,7 +55,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         QuickInfo = null;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Destructors
 
@@ -63,13 +63,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         Dispose(false);
     }
 
-    #endregion Destructors
+    #endregion
 
     #region Events
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
-    #endregion Events
+    #endregion
 
     #region Properties
 
@@ -130,7 +130,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    #endregion Properties
+   #endregion
 
     #region Methods
 
@@ -1299,5 +1299,5 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return false;
     }
 
-    #endregion Methods
+    #endregion
 }

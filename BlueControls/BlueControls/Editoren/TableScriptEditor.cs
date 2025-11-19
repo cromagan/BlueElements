@@ -476,7 +476,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             }
         }
 
-        #endregion Veraltete Items ermitteln
+        #endregion
 
         #region Veraltete Items entfernen
 
@@ -484,7 +484,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             lstEventScripts.Remove(thisSet);
         }
 
-        #endregion Veraltete Items entfernen
+        #endregion
 
         #region Neue Items hinzufügen
 
@@ -516,7 +516,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             }
         }
 
-        #endregion Neue Items hinzufügen
+        #endregion
     }
 
     #endregion

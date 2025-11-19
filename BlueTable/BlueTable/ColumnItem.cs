@@ -113,7 +113,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private bool _textFormatingAllowed;
     private ChunkType _value_for_Chunk;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -195,12 +195,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         UcaseNamesSortedByLength = null;
         Am_A_Key_For_Other_Column = string.Empty;
 
-        #endregion Standard-Werte
+        #endregion
 
         Invalidate_LinkedTable();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Destructors
 
@@ -209,7 +209,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         Dispose(false);
     }
 
-    #endregion Destructors
+    #endregion
 
     #region Events
 
@@ -219,7 +219,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    #endregion Events
+    #endregion
 
     #region Properties
 
@@ -980,7 +980,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -2594,7 +2594,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    #endregion Methods
+    #endregion
 
     //private void ManipulateRendererSettings(string settingname, string newvalue) {
     //    if (string.IsNullOrEmpty(newvalue)) { return; }

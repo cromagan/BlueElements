@@ -432,7 +432,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         var colnam = lbxSortierSpalten.Items.Select(thisk => (ColumnItem)((ReadableListItem)thisk).Item).ToList();
         Table.SortDefinition = new RowSortDefinition(Table, colnam, btnSortRichtung.Checked);
 
-        #endregion Sortierung
+        #endregion
 
         #region Variablen
 
@@ -449,7 +449,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             Table.Variables = new VariableCollection(l2);
         }
 
-        #endregion Variablen
+        #endregion
     }
 
     #endregion

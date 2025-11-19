@@ -847,7 +847,7 @@ public sealed partial class ListBox : GenericControl, IContextMenuWithInternalHa
 
                     // Erst Item Clicked. Zb. geht dann das Kontextmenu zu.
                     OnItemClicked(new AbstractListItemEventArgs(nd));
-                    nd.LeftClickExecute?.Invoke(nd);
+                    nd.OnLeftClickExecute();
                 }
                 break;
 

@@ -21,6 +21,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -66,12 +67,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #endregion
 
-    #region Delegates
-
-    public delegate void ExecuteClick(AbstractListItem item);
-
-    #endregion
-
     #region Events
 
     public event EventHandler? CompareKeyChanged;
@@ -113,7 +108,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
-    public ExecuteClick? LeftClickExecute { get; set; }
+    public event EventHandler<ObjectEventArgs>? LeftClickExecute;
+
     public abstract string QuickInfo { get; }
 
     public string UserDefCompareKey {
@@ -209,6 +205,10 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     protected abstract string GetCompareKey();
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    internal void OnLeftClickExecute() {
+        LeftClickExecute?.Invoke(this, new ObjectEventArgs(Tag));
+    }
 
     #endregion
 }

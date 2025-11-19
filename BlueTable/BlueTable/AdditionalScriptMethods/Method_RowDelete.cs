@@ -73,7 +73,7 @@ public class Method_RowDelete : Method_TableGeneric, IUseableForButton {
             return DoItFeedback.TestModusInaktiv(ld);
         }
 
-        var r = RowCollection.Remove(allFi, null, "Script Command: RowDelete");
+        var r = RowCollection.Remove(allFi, "Script Command: RowDelete");
         allFi.Dispose();
         return new DoItFeedback(r);
     }

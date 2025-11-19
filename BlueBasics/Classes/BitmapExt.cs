@@ -49,7 +49,7 @@ public class BitmapExt : IDisposableExtended {
     private byte[]? _bits;
     private bool _isLocked;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -72,7 +72,7 @@ public class BitmapExt : IDisposableExtended {
 
     protected BitmapExt() => EmptyBitmap(1, 1);
 
-    #endregion Constructors
+    #endregion
 
     #region Destructors
 
@@ -80,7 +80,7 @@ public class BitmapExt : IDisposableExtended {
         Dispose(disposing: false);
     }
 
-    #endregion Destructors
+    #endregion
 
     #region Properties
 
@@ -97,7 +97,7 @@ public class BitmapExt : IDisposableExtended {
 
     public int Width { get; private set; }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -631,5 +631,5 @@ public class BitmapExt : IDisposableExtended {
         LockBits();
     }
 
-    #endregion Methods
+    #endregion
 }

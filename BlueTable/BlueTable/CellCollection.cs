@@ -36,7 +36,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public CellCollection(Table table) : base() => Table = table;
 
-    #endregion Constructors
+    #endregion
 
     #region Destructors
 
@@ -46,13 +46,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         Dispose(false);
     }
 
-    #endregion Destructors
+    #endregion
 
     #region Events
 
     public event EventHandler<CellEventArgs>? CellValueChanged;
 
-    #endregion Events
+    #endregion
 
     #region Properties
 
@@ -75,7 +75,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    #endregion Properties
+    #endregion
 
     #region Indexers
 
@@ -99,7 +99,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    #endregion Indexers
+    #endregion
 
     #region Methods
 
@@ -429,5 +429,5 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    #endregion Methods
+    #endregion
 }

@@ -32,7 +32,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
 
     private DynamicSymbolPadItem? _item;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -41,7 +41,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         InitializeComponent();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -68,7 +68,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         }
     }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -99,5 +99,5 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         Object = null; // erst das Item!
     }
 
-    #endregion Methods
+    #endregion
 }

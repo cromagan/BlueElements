@@ -35,7 +35,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
     public ConnectedFormulaScriptButton() : base(false, false, false) => InitializeComponent();
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -72,7 +72,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         set => mainButton.Text = value;
     }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -148,7 +148,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
             }
         }
 
-        #endregion Variablen erstellen
+        #endregion
 
         var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, vars);
 
@@ -169,13 +169,13 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
             }
             tb?.WriteBackVariables(row, vars, false, true, "Script-Button-Press", !t.Failed);
 
-            #endregion Variablen zurückschreiben
+            #endregion
         } else {
             Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Fehler: " + t.Protocol, 0);
             MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{errorreason}", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
 
-        #endregion Methods
+        #endregion
 
         mainButton.Enabled = true;
         mainButton.Refresh();
