@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch BeCreative",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/BeCreative/BeCreative/obj/Debug/net48/BeCreative.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/BeCreative/BeCreative",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        }
+    ]
+}

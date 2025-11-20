@@ -240,7 +240,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void ContextMenu_OpenScriptEditor(object sender, System.EventArgs e) => OpenScriptEditor(Table.Table);
 
-    [Obsolete]
     protected void ChangeTableInTab(string tablename, TabPage? tabpage, string settings) {
         if (tabpage == null) { return; }
 
@@ -574,7 +573,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         Table.PowerEdit = true;
     }
 
-    [Obsolete]
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
         BlueTable.Table.SaveAll(false);
