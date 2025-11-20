@@ -342,8 +342,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     public bool Insert(int position, ExtChar c) {
-        if (position < 0) { position = 0; }
-        if (position > _internal.Count) { position = _internal.Count; }
+        if (position < 0) { return false; }
+        if (position > _internal.Count) { return false; }
 
         _internal.Insert(position, c);
         ResetPosition(true);

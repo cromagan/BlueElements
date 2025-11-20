@@ -238,7 +238,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private int Char_DelBereich(int von, int bis, bool raiseEvent) {
         _cursorVisible = true;
-        if (von < 0 || bis < 0) { return von; }
+        if (von < 0 && bis <= 0) { return 0; }
+        if (von < 0 || bis < 0 || von == bis) { return von; }
+
         _eTxt.Delete(von, bis);
 
         if (raiseEvent) {
@@ -334,7 +336,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         switch (keyAscii) {
             case AsciiKey.DEL:
                 // Eigentlich auch noch Ascii Code - steht bei ISO als Del
-                _markStart = Char_DelBereich(_markStart, Math.Max(_markStart, _markEnd + 1), true);
+                _markStart = Char_DelBereich(_markStart, Math.Max(_markStart + 1, _markEnd), true);
                 _markEnd = -1;
                 break;
 
@@ -347,7 +349,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 break;
 
             case AsciiKey.BackSpace:
-                _markStart = Char_DelBereich(_markStart - 1, Math.Max(_markStart, _markEnd), true);
+
+                if (_markEnd < 0) {
+                    _markStart = Char_DelBereich(Math.Max(_markStart - 1, 0), _markStart, true);
+                } else {
+                    _markStart = Char_DelBereich(_markStart, _markEnd, true);
+                }
+
                 _markEnd = -1;
                 break;
 
@@ -775,7 +783,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
             case Keys.Delete:
                 KeyPress(AsciiKey.DEL);
-                RaiseEventIfTextChanged(false);
                 break;
         }
 
@@ -830,6 +837,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         base.OnMouseDown(e);
         _lastUserActionForSpellChecking = DateTime.UtcNow;
         if (!Enabled) { return; }
+        _cursorVisible = true;
         if (e.Button == MouseButtons.Right) { return; }
         _mouseValue = 1;
         _markStart = Cursor_PosAt(e.X, e.Y);
@@ -855,15 +863,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (_mouseValue == 9999) {
                 //es Wurde Doppelgeklickt
             } else {
-
-
-        
                 if (e.Button == MouseButtons.Right) {
                     var tags = new List<string>();
                     tags.TagSet("MarkStart", _markStart.ToString());
                     tags.TagSet("MarkEnd", _markEnd.ToString());
                     FloatingInputBoxListBoxStyle.ContextMenuShow(this, tags, e);
-                } else if( e.Button == MouseButtons.Left) {
+                } else if (e.Button == MouseButtons.Left) {
                     _markEnd = Cursor_PosAt(e.X, e.Y);
                     Selection_Repair(true);
                 }
@@ -1114,7 +1119,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// <param name="swapThem">Bei True werden MarkStart und MarkEnd richtig angeordnet. (Start kleiner/gleich End) </param>
     /// <remarks></remarks>
     private void Selection_Repair(bool swapThem) {
-        if (_eTxt.Count == 0) { _markStart = -1; _markEnd = -1; }
         if (_markStart < 0 && _markEnd < 0) { return; }
 
         _markStart = Math.Max(_markStart, 0);
