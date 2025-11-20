@@ -231,7 +231,4 @@
     <EmbeddedResource Include="Ressourcen\Image\Icons\Haus.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Einkaufswagen.png" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
 </Project>

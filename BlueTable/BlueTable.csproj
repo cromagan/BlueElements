@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CE8BE078-DDAE-47F5-AAA9-685564B898C9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BlueTable</RootNamespace>
+    <AssemblyName>BlueTable</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AdditionalScriptMethods\Method_AddRows.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CallTable.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_ForEachRow2.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_RowUpdate.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_SortedRows.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_SumFilter.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_TableGeneric.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Execute.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CellGetRow.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_AutoCorrect.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Table.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_ForEachRow.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_ImportLinked.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_FilterAllValues.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_FilterFirstValue.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_RowDelete.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_SoftMessage.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Call.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CallRow.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CellSetRow.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CellSetFilter.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CallFilter.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_ImportCSV.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_IsDropDownItem.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_RowCount.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_UniqueRowKey.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_RowIsNull.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Row.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_MatchColumnFormat.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CellGetFilter.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_CellGetKey.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_Filter.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_SetError.cs" />
+    <Compile Include="AdditionalScriptVariables\VariableListRow.cs" />
+    <Compile Include="AdditionalScriptVariables\VariableTable.cs" />
+    <Compile Include="AdditionalScriptVariables\VariableRowItem.cs" />
+    <Compile Include="AdditionalScriptVariables\VariableFilterItem.cs" />
+    <Compile Include="Classes\Chunk.cs" />
+    <Compile Include="Classes\TableFile.cs" />
+    <Compile Include="Classes\TableChunk.cs" />
+    <Compile Include="Classes\TableFragments.cs" />
+    <Compile Include="Classes\Table.cs" />
+    <Compile Include="Enums\ButtonArgs.cs" />
+    <Compile Include="Enums\RelationType.cs" />
+    <Compile Include="Enums\ChunkType.cs" />
+    <Compile Include="Enums\Reason.cs" />
+    <Compile Include="EventArgs\FirstEventArgs.cs" />
+    <Compile Include="EventArgs\CellNullableEventArgs.cs" />
+    <Compile Include="EventArgs\ColumnEventArgs.cs" />
+    <Compile Include="Classes\ColumnFormatHolder.cs" />
+    <Compile Include="Classes\TableScriptDescription.cs" />
+    <Compile Include="EventArgs\RowNullableEventArgs.cs" />
+    <Compile Include="Interfaces\IColumnInputFormat.cs" />
+    <Compile Include="Interfaces\IHasTable.cs" />
+    <Compile Include="Classes\CellCollection.cs" />
+    <Compile Include="Classes\CellItem.cs" />
+    <Compile Include="Enums\AlignmentHorizontal.cs" />
+    <Compile Include="Enums\EditTypeFormula.cs" />
+    <Compile Include="Enums\ScriptType.cs" />
+    <Compile Include="Enums\TranslationType.cs" />
+    <Compile Include="Enums\CaptionPosition.cs" />
+    <Compile Include="EventArgs\TableFileGiveBackEventArgs.cs" />
+    <Compile Include="Interfaces\ITranslateAble.cs" />
+    <Compile Include="Classes\ColumnCollection.cs" />
+    <Compile Include="Classes\ColumnItem.cs" />
+    <Compile Include="Enums\FilterOptions.cs" />
+    <Compile Include="Enums\FilterType.cs" />
+    <Compile Include="Enums\ShortenStyle.cs" />
+    <Compile Include="Enums\ColumnLineStyle.cs" />
+    <Compile Include="Enums\EditTypeTable.cs" />
+    <Compile Include="Enums\FirstRow.cs" />
+    <Compile Include="Enums\Routinen.cs" />
+    <Compile Include="Enums\TableDataType.cs" />
+    <Compile Include="Enums\ViewType.cs" />
+    <Compile Include="EventArgs\CellEventArgs.cs" />
+    <Compile Include="EventArgs\FilterEventArgs.cs" />
+    <Compile Include="EventArgs\RowCheckedEventArgs.cs" />
+    <Compile Include="EventArgs\ProgressbarEventArgs.cs" />
+    <Compile Include="EventArgs\RowEventArgs.cs" />
+    <Compile Include="Classes\FilterCollection.cs" />
+    <Compile Include="Classes\FilterItem.cs" />
+    <Compile Include="Interfaces\IUseableForButton.cs" />
+    <Compile Include="Classes\InvalidatedRowsManager.cs" />
+    <Compile Include="Classes\LanguageTool.cs" />
+    <Compile Include="Classes\RowCollection.cs" />
+    <Compile Include="Classes\RowItem.cs" />
+    <Compile Include="Classes\RowSortDefinition.cs" />
+    <Compile Include="Classes\UndoItem.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Classes\TableFile.resx">
+      <DependentUpon>TableFile.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Classes\Table.resx">
+      <DependentUpon>Table.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BlueBasics\BlueBasics.csproj">
+      <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
+      <Name>BlueBasics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BlueScript\BlueScript.csproj">
+      <Project>{3acc6ee6-b919-4952-8502-f62baeeefc60}</Project>
+      <Name>BlueScript</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+      <Version>10.0.100</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
