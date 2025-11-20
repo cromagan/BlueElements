@@ -50,7 +50,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Constructors
 
-    public FilterCollection(string c) : this(null as Table, c) { }
+    public FilterCollection(string c) : this(null as Table, c) {
+    }
 
     public FilterCollection(Table? table, string coment) {
         Table = table;
@@ -126,7 +127,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Destructors
 
-    ~FilterCollection() { Dispose(disposing: false); }
+    ~FilterCollection() {
+        Dispose(disposing: false);
+    }
 
     #endregion
 
@@ -247,6 +250,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
             OnPropertyChanged();
         }
+    }
+
+    public bool HasFilterToLinkedCell() {
+        foreach (var filter in _internal) {
+            if (filter.Column is { } c && c.RelationType == RelationType.CellValues) { return true; }
+        }
+        return false;
     }
 
     #endregion
@@ -572,7 +582,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public void ParseFinished(string parsed) {
+    }
 
     public bool ParseThis(string key, string value) {
         switch (key) {

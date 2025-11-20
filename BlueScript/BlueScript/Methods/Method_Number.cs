@@ -25,7 +25,6 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_Number : Method {
 
     #region Properties
@@ -47,15 +46,11 @@ internal class Method_Number : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is VariableDouble vf) { return new DoItFeedback(vf.ValueNum); }
-
-        if (attvar.Attributes[0] is VariableString vs) {
-            if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {
-                return new DoItFeedback(dbl);
-            }
+        if (Converter.DoubleTryParse(attvar.ValueStringGet(0), out var dbl)) {
+            return new DoItFeedback(dbl);
         }
 
-        return attvar.Attributes[1] is { } v ? new DoItFeedback(v) : new DoItFeedback(attvar.ValueNumGet(1));
+        return new DoItFeedback(attvar.ValueNumGet(1));
     }
 
     #endregion

@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
@@ -384,12 +385,12 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<ReadOnlyCollection<string>> roc:
-                var listnewro = Value.SplitAndCutByCrToList().AsReadOnly();
+                var listnewro = Value.SplitAndCutByCr().ToList().AsReadOnly();
                 if (listnewro.IsDifferentTo(roc.Get())) { roc.Set(listnewro); }
                 break;
 
             case Accessor<List<string>> ls:
-                var listnew = Value.SplitAndCutByCrToList();
+                var listnew = Value.SplitAndCutByCr().ToList();
                 if (listnew.IsDifferentTo(ls.Get())) { ls.Set(listnew); }
                 break;
 

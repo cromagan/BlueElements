@@ -868,8 +868,7 @@ public static partial class Extensions {
     /// <param name="textToSplit"></param>
     /// <returns></returns>
     public static string[] SplitAndCutByCr(this string textToSplit) {
-        var w = Array.Empty<string>();
-        if (string.IsNullOrEmpty(textToSplit)) { return w; }
+        if (string.IsNullOrEmpty(textToSplit)) { return []; }
         textToSplit = textToSplit.Replace("\r\n", "\r").Replace("\n", "\r");
         return textToSplit.SplitAndCutBy("\r");
     }
@@ -880,43 +879,18 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Erstellt eine Liste aus dem String, wobei als Trenner \r\n, \r oder \n benutzt werden. Leere Einträge am Ende werden gelöscht.
-    /// </summary>
-    /// <param name="textToSplit"></param>
-    /// <returns></returns>
-    public static List<string> SplitAndCutByCrToList(this string textToSplit) {
-        List<string> w = [];
-        if (string.IsNullOrEmpty(textToSplit)) { return w; }
-        w.AddRange(textToSplit.SplitAndCutByCr());
-        return w;
-    }
-
-    /// <summary>
-    /// Splittet den String, ohne etwas zu kürzen.ACHTUNG: Wenn der Text leer ist, wird ein Array mit der Länge 0 zurückgegeben.
+    /// Splittet den String, ohne etwas zu kürzen.
     /// </summary>
     /// <param name="textToSplit"></param>
     /// <param name="trennzeichen"></param>
     /// <returns></returns>
-    public static string[] SplitBy(this string textToSplit, string trennzeichen) => string.IsNullOrEmpty(textToSplit) ? [] : textToSplit.Split([trennzeichen], StringSplitOptions.None);
+    public static string[] SplitBy(this string textToSplit, string trennzeichen) => textToSplit.Split([trennzeichen], StringSplitOptions.None);
 
     /// <summary>
-    /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird ein Array mit der Länge 0 zurückgegeben.
-    /// </summary>
+    /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r).
     /// <param name="textToSplit"></param>
     /// <returns></returns>
-    public static string[] SplitByCr(this string textToSplit) => string.IsNullOrEmpty(textToSplit) ? [] : textToSplit.Replace("\r\n", "\r").Replace("\n", "\r").SplitBy("\r");
-
-    /// <summary>
-    /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird eine Liste mit der Länge 0 zurückgegeben.
-    /// </summary>
-    /// <param name="textToSplit"></param>
-    /// <returns></returns>
-    public static List<string> SplitByCrToList(this string textToSplit) {
-        List<string> w = [];
-        if (string.IsNullOrEmpty(textToSplit)) { return w; }
-        w.AddRange(textToSplit.SplitByCr());
-        return w;
-    }
+    public static string[] SplitByCr(this string textToSplit) => textToSplit.Replace("\r\n", "\r").Replace("\n", "\r").SplitBy("\r");
 
     public static string Sprachneutral(this string isValue) {
         if (string.IsNullOrEmpty(isValue)) { return string.Empty; }

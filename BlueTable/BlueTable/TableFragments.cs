@@ -79,13 +79,16 @@ public class TableFragments : TableFile {
 
     #region Constructors
 
-    public TableFragments(string tablename) : base(tablename) { }
+    public TableFragments(string tablename) : base(tablename) {
+    }
 
     #endregion
 
     #region Destructors
 
-    ~TableFragments() { Dispose(false); }
+    ~TableFragments() {
+        Dispose(false);
+    }
 
     #endregion
 
@@ -362,7 +365,7 @@ public class TableFragments : TableFile {
 
             foreach (var thisf in frgma) {
                 var fil = filesystem.ReadAllText(thisf, Encoding.UTF8);
-                var fils = fil.SplitAndCutByCrToList();
+                var fils = fil.SplitAndCutByCr().ToList();
 
                 foreach (var thist in fils) {
                     if (!thist.StartsWith("-")) {

@@ -397,7 +397,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "permissiongroups":
                 _permissionGroups_Show.Clear();
-                _permissionGroups_Show.AddRange(value.FromNonCritical().SplitByCrToList());
+                _permissionGroups_Show.AddRange(value.FromNonCritical().SplitByCr());
                 return true;
 
             case "showhead":

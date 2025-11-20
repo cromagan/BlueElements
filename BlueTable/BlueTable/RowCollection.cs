@@ -189,7 +189,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (row.Table == l[0]) {
                     if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 1) { break; }
                 } else {
-                    if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 5 + WaitDelay) { break; }
+                    if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 10) { break; }
                 }
 
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
@@ -282,7 +282,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static bool Remove(FilterCollection? fc, string comment) => Remove(fc?.Rows, comment);
-    
 
     public static bool Remove(ICollection<RowItem>? rows, string comment) {
         if (rows == null || rows.Count == 0) { return false; }
@@ -350,7 +349,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static (RowItem? newrow, string message, bool stoptrying) UniqueRow(FilterCollection filter, string coment) {
-        if (filter.Table is not { IsDisposed: false } db) { return (null, "Tabelle verworfen", true); }
+        if (filter.Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen", true); }
 
         if (filter.Count < 1) { return (null, "Kein Filter angekommen.", true); }
 
@@ -361,20 +360,22 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (r.Count == 0) {
-            if (!db.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return (null, $"In der Tabelle '{db.Caption}' sind die Skripte defekt", true); }
+            if (!tb.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return (null, $"In der Tabelle '{tb.Caption}' sind die Skripte defekt", true); }
+
+            if (filter.HasFilterToLinkedCell()) { return (null, $"Es kann keine neue Zeile mit einen Zeiger auf LinkedCell erstellt werden.", true); }
         }
 
         if (r.Count > 1) {
-            if (!db.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)) { return (null, $"In der Tabelle '{db.Caption}' sind die Skripte defekt", true); }
+            if (!tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)) { return (null, $"In der Tabelle '{tb.Caption}' sind die Skripte defekt", true); }
 
-            db.Row.Combine(r);
-            db.Row.RemoveYoungest(r, true);
+            tb.Row.Combine(r);
+            tb.Row.RemoveYoungest(r, true);
 
             r = filter.Rows;
             if (r.Count != 1) {
                 return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText(), false);
             }
-            if (db.Column.SysRowState is { IsDisposed: false } srs) {
+            if (tb.Column.SysRowState is { IsDisposed: false } srs) {
                 r[0].CellSet(srs, string.Empty, "'UniqueRow' Aufräumen mehrerer Zeilen.");
             }
         }
@@ -382,7 +383,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? myRow;
 
         if (r.Count == 0) {
-            var (newrow, message, stoptrying) = db.Row.GenerateAndAdd([.. filter], coment);
+            if (filter.HasFilterToLinkedCell()) { return (null, $"Es kann keine neue Zeile mit einen Zeiger auf LinkedCell erstellt werden.", true); }
+            var (newrow, message, stoptrying) = tb.Row.GenerateAndAdd([.. filter], coment);
             if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message, stoptrying); }
             myRow = newrow;
         } else {
@@ -528,7 +530,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
                 var inval = FilterCollection.InitValue(thisColum, true, false, filter);
                 if (inval is not { } || string.IsNullOrWhiteSpace(inval)) {
-                    return (null, "Initalwert fehlt.", false);
+                    return (null, $"Initialwert der Spalte '{thisColum.Caption}' fehlt.", true);
                 }
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {

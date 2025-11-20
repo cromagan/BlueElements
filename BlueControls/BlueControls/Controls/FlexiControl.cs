@@ -1078,10 +1078,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     private void UpdateValueTo_ListBox(ListBox main) {
         main.UncheckAll();
-        main.Check(Value.SplitAndCutByCrToList());
+        main.Check(Value.SplitAndCutByCr());
     }
 
-    private void UpdateValueTo_SwapListBox(SwapListBox main) => main.Check(Value.SplitAndCutByCrToList());
+    private void UpdateValueTo_SwapListBox(SwapListBox main) => main.Check(Value.SplitAndCutByCr());
 
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.

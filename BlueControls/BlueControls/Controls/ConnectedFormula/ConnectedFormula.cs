@@ -56,7 +56,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Constructors
 
-    public ConnectedFormula() : this(string.Empty) { }
+    public ConnectedFormula() : this(string.Empty) {
+    }
 
     private ConnectedFormula(string filename) : base() {
         AllFiles.Add(this);
@@ -228,7 +229,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         switch (key.ToLowerInvariant()) {
             case "notallowedchilds":
                 _notAllowedChilds.Clear();
-                _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCrToList());
+                _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCr());
                 return true;
 
             case "page":

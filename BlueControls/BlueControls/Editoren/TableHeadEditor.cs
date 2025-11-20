@@ -419,7 +419,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table.StandardFormulaFile = txbStandardFormulaFile.Text;
         Table.RowQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 
-        Table.Tags = new(txbTags.Text.SplitAndCutByCrToList());
+        Table.Tags = new(txbTags.Text.SplitAndCutByCr());
 
         Table.TableAdmin = new(lbxTableAdmin.Checked);
 

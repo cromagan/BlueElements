@@ -68,7 +68,7 @@ public class Method_If : Method {
 
         var scpt = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, scp.Chain);
 
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
         if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, infos.LogData); }
 
         if (attvar.ValueBoolGet(0)) {

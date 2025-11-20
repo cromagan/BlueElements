@@ -26,7 +26,6 @@ using static BlueBasics.Converter;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 internal class Method_AutoCorrect : Method_TableGeneric {
 
     #region Properties
@@ -93,7 +92,7 @@ internal class Method_AutoCorrect : Method_TableGeneric {
                     break;
 
                 case VariableListString vl:
-                    vl.ValueList = [.. s.SplitByCrToList()];
+                    vl.ValueList = [.. s.SplitByCr()];
                     break;
 
                 case VariableBool vb:

@@ -57,7 +57,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     public void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    internal void Check(List<string> toCheck) {
+    internal void Check(ICollection<string> toCheck) {
         var didChange = false;
 
         foreach (var thisCheck in toCheck) {
@@ -99,7 +99,8 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         if (didChange) { OnItemCheckedChanged(); }
     }
 
-    protected override void DrawControl(Graphics gr, States state) { }
+    protected override void DrawControl(Graphics gr, States state) {
+    }
 
     protected bool MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove, bool fireEvent = true) {
         var sourceItem = source[@internal];

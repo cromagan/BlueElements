@@ -56,13 +56,16 @@ public class TableChunk : TableFile {
 
     #region Constructors
 
-    public TableChunk(string tablename) : base(tablename) { }
+    public TableChunk(string tablename) : base(tablename) {
+    }
 
     #endregion
 
     #region Destructors
 
-    ~TableChunk() { Dispose(false); }
+    ~TableChunk() {
+        Dispose(false);
+    }
 
     #endregion
 
@@ -296,7 +299,7 @@ public class TableChunk : TableFile {
     public override bool BeSureRowIsLoaded(string chunkValue) {
         if (!base.BeSureRowIsLoaded(chunkValue)) { return false; }
 
-        var chunkValues = chunkValue.SplitAndCutByCrToList().SortedDistinctList();
+        var chunkValues = chunkValue.SplitAndCutByCr().ToList().SortedDistinctList();
 
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);

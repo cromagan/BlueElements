@@ -838,46 +838,16 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
-            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), ContextMenu_ExecuteScript, new { Script = script, Rows = Table.RowsVisibleUnique() }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible())));
+            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, new { Script = script, Rows = (Func<List<RowItem>>)Table.RowsVisibleUnique }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible())));
         }
 
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, Table.RowsVisibleUnique(), tb.CanDoValueChangedScript(true)));
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, (Func<List<RowItem>>)Table.RowsVisibleUnique, tb.CanDoValueChangedScript(true)));
 
         if (addedit) {
             lstAufgaben.ItemAdd(ItemOf("Skripte bearbeiten", ImageCode.Skript, ContextMenu_OpenScriptEditor, null, tb.IsAdministrator()));
         }
 
         lstAufgaben.Enabled = lstAufgaben.ItemCount > 0;
-    }
-
-    public static void ContextMenu_ExecuteScript(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-
-        var type = data.GetType();
-
-        if (type.GetProperty("Script")?.GetValue(data) is not TableScriptDescription sc || sc.Table is not { } tb) { return; }
-
-        if (TableViewForm.EditabelErrorMessage(sc.Table)) { return; }
-
-        string m;
-
-        if (sc.NeedRow) {
-            if (type.GetProperty("Rows")?.GetValue(data) is not List<RowItem> row || row.Count == 0) { return; }
-
-            m = MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0
-                ? tb.Row.ExecuteScript(null, sc.KeyName, row)
-                : "Durch Benutzer abgebrochen";
-        } else {
-            var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
-            m = s.Protocol.JoinWithCr();
-        }
-
-        if (!string.IsNullOrEmpty(m)) {
-            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
-        } else {
-            MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen, "OK");
-        }
-        return;
     }
 
     internal void ContextMenu_EnableRowScript(object sender, System.EventArgs e) {

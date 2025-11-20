@@ -1067,7 +1067,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public void AddSystemInfo(string type, string user) {
-        var t = ColumnSystemInfo.SplitAndCutByCrToList();
+        var t = ColumnSystemInfo.SplitAndCutByCr().ToList();
         t.Add(type + ": " + user);
 
         //t.TagSet(type, user);

@@ -25,7 +25,6 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_Exists : Method {
 
     #region Properties
@@ -48,7 +47,7 @@ internal class Method_Exists : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         return attvar.Failed ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 

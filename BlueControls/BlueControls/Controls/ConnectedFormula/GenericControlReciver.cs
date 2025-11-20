@@ -37,7 +37,6 @@ using System.Drawing;
 namespace BlueControls.Controls;
 
 public class GenericControlReciver : GenericControl, IBackgroundNone {
-
     #region Fields
 
     public readonly List<GenericControlReciverSender> Parents = [];
@@ -55,9 +54,11 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    public GenericControlReciver() : base(false, false, false) { }
+    public GenericControlReciver() : base(false, false, false) {
+    }
 
-    public GenericControlReciver(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) { }
+    public GenericControlReciver(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) {
+    }
 
     #endregion
 
@@ -358,9 +359,11 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate_RowsInput();
     }
 
-    protected virtual void TableInput_CellValueChanged(object sender, CellEventArgs e) { }
+    protected virtual void TableInput_CellValueChanged(object sender, CellEventArgs e) {
+    }
 
-    protected virtual void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) { }
+    protected virtual void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) {
+    }
 
     protected void TableInput_Disposed(object sender, System.EventArgs e) => TableInput = null;
 

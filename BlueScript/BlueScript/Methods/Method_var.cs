@@ -25,7 +25,6 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_Var : Method {
 
     #region Properties
@@ -54,7 +53,7 @@ internal class Method_Var : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
-        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+        // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();

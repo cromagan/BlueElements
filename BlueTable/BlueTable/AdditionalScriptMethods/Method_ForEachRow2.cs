@@ -28,7 +28,6 @@ using static BlueScript.Variables.VariableListRow;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 internal class Method_ForEachRow2 : Method_TableGeneric {
 
     #region Properties
@@ -50,7 +49,7 @@ internal class Method_ForEachRow2 : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var varnam = "value";

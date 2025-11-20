@@ -30,6 +30,7 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
@@ -52,7 +53,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     #region Constructors
 
-    public ColumnEditor() : this(null, null) { }
+    public ColumnEditor() : this(null, null) {
+    }
 
     public ColumnEditor(ColumnItem? column, TableView? table) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -479,15 +481,15 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.FilterOptions = tmpf;
         _column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
         _column.PermissionGroupsChangeCell = new(lbxCellEditor.Checked);
-        _column.DropDownItems = txbAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList().AsReadOnly();
-        _column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCrToList());
+        _column.DropDownItems = txbAuswaehlbareWerte.Text.SplitAndCutByCr().SortedDistinctList().AsReadOnly();
+        _column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCr());
 
         _column.AutoFilterJoker = txbJoker.Text;
         _column.CaptionGroup1 = txbUeberschift1.Text;
         _column.CaptionGroup2 = txbUeberschift2.Text;
         _column.CaptionGroup3 = txbUeberschift3.Text;
         _column.CaptionBitmapCode = txbSpaltenbild.Text;
-        _column.ColumnTags = txbTags.Text.SplitAndCutByCrToList();
+        _column.ColumnTags = txbTags.Text.SplitAndCutByCr().ToList();
         _column.RegexCheck = txbRegex.Text;
         _column.EditableWithTextInput = btnEditableStandard.Checked;
         _column.EditableWithDropdown = btnEditableDropdown.Checked;

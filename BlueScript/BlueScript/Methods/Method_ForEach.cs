@@ -27,7 +27,6 @@ using System.Diagnostics;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_ForEach : Method {
 
     #region Properties
@@ -49,7 +48,7 @@ internal class Method_ForEach : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
+        var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
 
         var l = attvar.ValueListStringGet(1);

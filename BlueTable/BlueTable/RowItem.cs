@@ -130,7 +130,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-   #endregion
+    #endregion
 
     #region Methods
 
@@ -156,7 +156,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new VariableBool(varname, value.FromPlusMinus(), readOnly, coment);
 
             case ScriptType.List:
-                return new VariableListString(varname, value.SplitAndCutByCrToList(), readOnly, coment);
+                return new VariableListString(varname, value.SplitAndCutByCr().ToList(), readOnly, coment);
 
             case ScriptType.Numeral:
                 return new VariableDouble(varname, DoubleParse(value), readOnly, coment);
@@ -174,7 +174,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new VariableBool(varname, value.FromPlusMinus(), true, coment);
 
             case ScriptType.List_Readonly:
-                return new VariableListString(varname, value.SplitAndCutByCrToList(), true, coment);
+                return new VariableListString(varname, value.SplitAndCutByCr().ToList(), true, coment);
 
             case ScriptType.Nicht_vorhanden:
                 return null;
@@ -254,7 +254,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return [.. CellGetString(column).SplitAndCutBy("<br>")];
         }
 
-        return CellGetString(column).SplitAndCutByCrToList();
+        return CellGetString(column).SplitAndCutByCr().ToList();
     }
 
     public List<string> CellGetList(string columnName) => CellGetList(Table?.Column[columnName]);
@@ -402,7 +402,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
+    /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initialwerte der Zellen.
     /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
     /// </summary>
     /// <param name="scriptname"></param>
@@ -1244,11 +1244,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (!string.IsNullOrEmpty(oldValue) && t.ToUpperInvariant().Contains(oldValue.ToUpperInvariant())) {
                     t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
                     t = ChangeTextFromRowId(t);
-                    var t2 = t.SplitAndCutByCrToList().SortedDistinctList();
+                    var t2 = t.SplitAndCutByCr().ToList().SortedDistinctList();
                     thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
                 }
                 if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {
-                    MakeNewRelations(columnToRepair, thisRowItem, [], t.SplitAndCutByCrToList());
+                    MakeNewRelations(columnToRepair, thisRowItem, [], t.SplitAndCutByCr().ToList());
                 }
             }
         }

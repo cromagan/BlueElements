@@ -2547,7 +2547,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                     Filter.Remove(e.Column);
 
                     var searchValue = e.Column.Contents();//  db.Export_CSV(FirstRow.Without, e.Column, null).SplitAndCutByCrToList().SortedDistinctList();
-                    searchValue.RemoveString(clipTmp.SplitAndCutByCrToList().SortedDistinctList(), false);
+                    searchValue.RemoveString(clipTmp.SplitAndCutByCr().SortedDistinctList(), false);
 
                     if (searchValue.Count > 0) {
                         Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, searchValue));
@@ -2967,7 +2967,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
-        var l = txt.SplitAndCutByCrToList().SortedDistinctList().JoinWithCr();
+        var l = txt.SplitAndCutByCr().SortedDistinctList().JoinWithCr();
         CopytoClipboard(l);
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
@@ -2976,6 +2976,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var rows = new List<RowItem>();
         if (e.Data is RowItem row) { rows.Add(row); }
         if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
+        if (e.Data is Func<List<RowItem>> fRows) { rows.AddRange(fRows()); }
 
         if (rows.Count == 0) {
             MessageBox.Show("Keine Zeilen zum Prüfen vorhanden.", ImageCode.Kreuz, "OK");
@@ -2983,7 +2984,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         foreach (var thisR in rows) {
-            if (thisR.Table is { IsDisposed: false } tb && !tb.IsAdministrator()) {
+            if (thisR.Table is { IsDisposed: false } tb) {
                 if (!tb.CanDoValueChangedScript(true)) {
                     MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
                     RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
@@ -3019,22 +3020,50 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         } else {
             if (MessageBox.Show($"{rows.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
         }
-        RowCollection.Remove(rows[0], "Benutzer: löschen Befehl");
+        RowCollection.Remove(rows, "Benutzer: löschen Befehl");
     }
 
     public static void ContextMenu_ExecuteScript(object sender, ObjectEventArgs e) {
         Develop.SetUserDidSomething();
         if (e.Data is not { } data) { return; }
-        var script = data.GetType().GetProperty("Script")?.GetValue(data) as TableScriptDescription;
-        var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
 
-        if (row is not { IsDisposed: false } || script is not { IsDisposed: false }) { return; }
+        var type = data.GetType();
 
-        var t = row.ExecuteScript(null, script.KeyName, true, 10, null, true, true);
-        if (t is { Failed: false }) {
-            MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
+        if (type.GetProperty("Script")?.GetValue(data) is not TableScriptDescription sc || sc.Table is not { } tb) { return; }
+
+        if (TableViewForm.EditabelErrorMessage(sc.Table)) { return; }
+
+        string m;
+
+        if (sc.NeedRow) {
+            var rows = new List<RowItem>();
+
+            if (type.GetProperty("Row")?.GetValue(data) is RowItem singleRow) {
+                rows.Add(singleRow);
+            } else if (type.GetProperty("Rows")?.GetValue(data) is List<RowItem> rowList) {
+                rows.AddRange(rowList);
+            } else if (type.GetProperty("Rows")?.GetValue(data) is Func<List<RowItem>> fRows) {
+                rows.AddRange(fRows());
+            }
+
+            if (rows.Count > 0) {
+                if (MessageBox.Show($"Skript für {rows.Count} Zeile(n) ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
+                    m = tb.Row.ExecuteScript(null, sc.KeyName, rows);
+                } else {
+                    m = "Durch Benutzer abgebrochen";
+                }
+            } else {
+                m = "Keine Zeile zum Ausführen des Skriptes vorhanden.";
+            }
         } else {
-            MessageBox.Show($"Während der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>{t.FailedReason}<br><br>{t.Protocol.JoinWithCr()}", ImageCode.Kreuz, "Ok");
+            var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
+            m = s.Protocol.JoinWithCr();
+        }
+
+        if (string.IsNullOrEmpty(m)) {
+            MessageBox.Show("Skript erfolgreich ausgeführt.", ImageCode.Häkchen, "Ok");
+        } else {
+            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
         }
     }
 
