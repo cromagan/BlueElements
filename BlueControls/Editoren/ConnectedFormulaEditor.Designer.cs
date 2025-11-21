@@ -20,7 +20,6 @@ namespace BlueControls.Forms {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConnectedFormulaEditor));
             this.tabEditorStd = new System.Windows.Forms.TabPage();
             this.grpVorschau = new BlueControls.Controls.GroupBox();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
@@ -292,7 +291,6 @@ namespace BlueControls.Forms {
             this.btnRegisterKarte.ImageCode = "Register|16|||||||||PlusZeichen";
             this.btnRegisterKarte.Location = new System.Drawing.Point(72, 2);
             this.btnRegisterKarte.Name = "btnRegisterKarte";
-            this.btnRegisterKarte.QuickInfo = resources.GetString("btnRegisterKarte.QuickInfo");
             this.btnRegisterKarte.Size = new System.Drawing.Size(80, 66);
             this.btnRegisterKarte.TabIndex = 6;
             this.btnRegisterKarte.Text = "Neue Registerkarte";

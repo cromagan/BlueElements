@@ -19,7 +19,6 @@ namespace BlueControls.BlueTableDialogs {
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditorGeneric));
             this.ribMain = new BlueControls.Controls.RibbonBar();
             this.tabStart = new System.Windows.Forms.TabPage();
             this.grpAktionen = new BlueControls.Controls.GroupBox();
@@ -260,7 +259,6 @@ namespace BlueControls.BlueTableDialogs {
             this.txtSkript.RightBracket = ')';
             this.txtSkript.RightBracket2 = '}';
             this.txtSkript.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-            this.txtSkript.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("txtSkript.ServiceColors")));
             this.txtSkript.Size = new System.Drawing.Size(754, 156);
             this.txtSkript.TabIndex = 2;
             this.txtSkript.Zoom = 100;

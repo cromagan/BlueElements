@@ -29,7 +29,6 @@ namespace BlueControls.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Progressbar));
             this.capTXT = new BlueControls.Controls.Caption();
             this.SuspendLayout();
             // 

@@ -31,7 +31,6 @@ namespace BlueControls.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QuickInfo));
             this.capTXT = new BlueControls.Controls.Caption();
             this.timQI = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();

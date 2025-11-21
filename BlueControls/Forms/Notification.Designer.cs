@@ -26,7 +26,6 @@ namespace BlueControls.Forms {
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Notification));
             this.capTXT = new BlueControls.Controls.Caption();
             this.timNote = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();

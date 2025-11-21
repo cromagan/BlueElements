@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueControls;
 using BlueControls.Forms;
 using BlueScript;
@@ -55,7 +56,12 @@ internal class Method_OpenTab : Method {
         }
 
         if (string.IsNullOrWhiteSpace(tb.Caption)) {
-            return new DoItFeedback("Die Benenneung der Tabelle fehlt.", true, ld);
+
+            if(tb is TableFile tbf) {
+                return new DoItFeedback($"Die Benennung der Tabelle '{tbf.Filename.FileNameWithSuffix()}' fehlt.", true, ld);
+            }
+
+            return new DoItFeedback("Die Benennung der Tabelle fehlt.", true, ld);
         }
 
         foreach (var thisForm in FormManager.Forms) {

@@ -14,7 +14,6 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            ComponentResourceManager resources = new ComponentResourceManager(typeof(CreativePad));
             this.PrintPreviewDialog1 = new PrintPreviewDialog();
             this.DruckerDokument = new PrintDocument();
             this.PrintDialog1 = new PrintDialog();

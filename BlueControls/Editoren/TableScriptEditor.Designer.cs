@@ -21,7 +21,6 @@ namespace BlueControls.BlueTableDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TableScriptEditor));
             this.tabKopfdaten = new System.Windows.Forms.TabPage();
             this.capFehler = new BlueControls.Controls.Caption();
             this.txbQuickInfo = new BlueControls.Controls.TextBox();
@@ -301,7 +300,6 @@ namespace BlueControls.BlueTableDialogs {
             this.chkAuslöser_valuechanged.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkAuslöser_valuechanged.Location = new System.Drawing.Point(8, 80);
             this.chkAuslöser_valuechanged.Name = "chkAuslöser_valuechanged";
-            this.chkAuslöser_valuechanged.QuickInfo = resources.GetString("chkAuslöser_valuechanged.QuickInfo");
             this.chkAuslöser_valuechanged.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_valuechanged.TabIndex = 18;
             this.chkAuslöser_valuechanged.Text = "Wert geändert";
@@ -312,7 +310,6 @@ namespace BlueControls.BlueTableDialogs {
             this.chkAuslöser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 160);
             this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
-            this.chkAuslöser_prepaireformula.QuickInfo = resources.GetString("chkAuslöser_prepaireformula.QuickInfo");
             this.chkAuslöser_prepaireformula.Size = new System.Drawing.Size(175, 16);
             this.chkAuslöser_prepaireformula.TabIndex = 19;
             this.chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
@@ -450,7 +447,6 @@ namespace BlueControls.BlueTableDialogs {
             this.chkExtendend.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkExtendend.Location = new System.Drawing.Point(128, 46);
             this.chkExtendend.Name = "chkExtendend";
-            this.chkExtendend.QuickInfo = resources.GetString("chkExtendend.QuickInfo");
             this.chkExtendend.Size = new System.Drawing.Size(184, 22);
             this.chkExtendend.TabIndex = 8;
             this.chkExtendend.Tag = "";

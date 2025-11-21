@@ -22,7 +22,6 @@ namespace BlueControls.BlueTableDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RowAdderScriptEditor));
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.btnTabelleKopf = new BlueControls.Controls.Button();
@@ -129,7 +128,7 @@ namespace BlueControls.BlueTableDialogs {
             this.capScriptMenu.Location = new System.Drawing.Point(8, 136);
             this.capScriptMenu.Name = "capScriptMenu";
             this.capScriptMenu.Size = new System.Drawing.Size(274, 220);
-            this.capScriptMenu.Text = resources.GetString("capScriptMenu.Text");
+            this.capScriptMenu.Text = "<b>Diese Skript wird ausgeführt, um die Menü-punkte zu generieren.</b><br>In die Variable MENU muss das Menu erstellt werden. Dieses muss folgendes Format haben:<br><i>Backen<br>Backen\\Zutaten<br>Backen\\Zutaten\\Mehl</i><br><br>Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.<br><br>Parallel dazu kann die Variable Infos erstellt werden - freie Wahl des Textes.";
             this.capScriptMenu.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnScriptAfter

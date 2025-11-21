@@ -31,7 +31,6 @@ namespace BlueControls.BlueTableDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabAnzeige = new System.Windows.Forms.TabPage();
             this.cbxRenderer = new BlueControls.Controls.ComboBox();
@@ -695,7 +694,6 @@ namespace BlueControls.BlueTableDialogs {
             this.txbAutoReplace.Location = new System.Drawing.Point(16, 192);
             this.txbAutoReplace.MultiLine = true;
             this.txbAutoReplace.Name = "txbAutoReplace";
-            this.txbAutoReplace.QuickInfo = resources.GetString("txbAutoReplace.QuickInfo");
             this.txbAutoReplace.RegexCheck = null;
             this.txbAutoReplace.Size = new System.Drawing.Size(1073, 392);
             this.txbAutoReplace.SpellCheckingEnabled = true;
@@ -717,7 +715,6 @@ namespace BlueControls.BlueTableDialogs {
             this.txbMaxCellLength.Location = new System.Drawing.Point(216, 88);
             this.txbMaxCellLength.MaxTextLength = 255;
             this.txbMaxCellLength.Name = "txbMaxCellLength";
-            this.txbMaxCellLength.QuickInfo = resources.GetString("txbMaxCellLength.QuickInfo");
             this.txbMaxCellLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
             this.txbMaxCellLength.Size = new System.Drawing.Size(96, 24);
             this.txbMaxCellLength.TabIndex = 45;
@@ -1263,7 +1260,6 @@ namespace BlueControls.BlueTableDialogs {
             this.txbMaxTextLength.Location = new System.Drawing.Point(720, 232);
             this.txbMaxTextLength.MaxTextLength = 255;
             this.txbMaxTextLength.Name = "txbMaxTextLength";
-            this.txbMaxTextLength.QuickInfo = resources.GetString("txbMaxTextLength.QuickInfo");
             this.txbMaxTextLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
             this.txbMaxTextLength.Size = new System.Drawing.Size(96, 24);
             this.txbMaxTextLength.TabIndex = 47;

@@ -40,7 +40,6 @@ namespace BlueControls.BlueTableDialogs
         private void InitializeComponent()
         {
             this.components = new Container();
-            ComponentResourceManager resources = new ComponentResourceManager(typeof(AutoFilter));
             this.txbEingabe = new TextBox();
             this.Timer1x = new Timer(this.components);
             this.Line = new Line();
@@ -142,7 +141,6 @@ namespace BlueControls.BlueTableDialogs
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.BackgroundImage = ((Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new Size(165, 159);
             this.Controls.Add(this.capInfo);
             this.Controls.Add(this.butFertig);
