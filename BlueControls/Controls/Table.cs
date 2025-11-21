@@ -2842,7 +2842,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 Cell_Edit(ca, viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
                 return;
             }
-            t.Add(ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1"));
+            var erw = ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1");
+            erw.Tag = cell;
+
+            t.Add(erw);
             t.Add(SeparatorWith(FirstSortChar + "2"));
         }
 

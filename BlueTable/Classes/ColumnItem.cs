@@ -1716,7 +1716,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
 
         _saveContent = true;
-        _relationType = RelationType.None;
+        //_relationType = RelationType.None;
 
         switch (_keyName.ToUpperInvariant()) {
             case "SYS_CREATOR":
@@ -1806,7 +1806,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _isKeyColumn = false;
                 _isFirst = false;
                 _relationship_to_First = false;
-                _relationType = RelationType.None;
+                //_relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
