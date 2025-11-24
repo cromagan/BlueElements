@@ -31,7 +31,7 @@ public class ObjectEventArgs : System.EventArgs {
 
     #region Properties
 
-    public object? Data { get; } = null;
+    public object? Data { get; }
 
 
     #endregion

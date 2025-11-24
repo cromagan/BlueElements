@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
@@ -52,8 +53,8 @@ public sealed class QuickImage : IReadableText, IEditable {
         var w = (imageCode + "||||||||||").Split('|');
 
         Name = w[0];
-        int.TryParse(w[1], out var width);
-        int.TryParse(w[2], out var height);
+        var width=  IntParse(w[1]);
+        var height = IntParse(w[2]);
 
         Effekt = (ImageCodeEffect)IntParse(w[3]);
         Färbung = string.IsNullOrEmpty(w[4]) ? null : ColorParse(w[4]);
@@ -214,26 +215,26 @@ public sealed class QuickImage : IReadableText, IEditable {
         var c = new StringBuilder();
 
         c.Append(name);
-        c.Append("|");
+        c.Append('|');
         if (width > 0) { c.Append(width); }
-        c.Append("|");
+        c.Append('|');
         if (height > 0 && width != height) { c.Append(height); }
-        c.Append("|");
+        c.Append('|');
         if (effekt != ImageCodeEffect.Ohne) { c.Append((int)effekt); }
-        c.Append("|");
+        c.Append('|');
         if (färbung.HasValue && färbung.Value != Color.Transparent) { c.Append(färbung.Value.ToHtmlCode()); }
 
-        c.Append("|");
+        c.Append('|');
         if (changeGreenTo.HasValue && changeGreenTo.Value != Color.Transparent) { c.Append(changeGreenTo.Value.ToHtmlCode()); }
-        c.Append("|");
+        c.Append('|');
         if (helligkeit != 100) { c.Append(helligkeit); }
-        c.Append("|");
+        c.Append('|');
         if (sättigung != 100) { c.Append(sättigung); }
-        c.Append("|");
+        c.Append('|');
         if (drehwinkel > 0) { c.Append(drehwinkel); }
-        c.Append("|");
+        c.Append('|');
         if (transparenz > 0) { c.Append(transparenz); }
-        c.Append("|");
+        c.Append('|');
         if (!string.IsNullOrEmpty(zweitsymbol)) { c.Append(zweitsymbol); }
         return c.ToString().TrimEnd('|');
     }
@@ -264,7 +265,7 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
-    public static List<string> Images() {
+    public static ReadOnlyCollection<string> Images() {
         var type = typeof(ImageCode);
         var l = new List<string>();
 
@@ -275,7 +276,7 @@ public sealed class QuickImage : IReadableText, IEditable {
             }
         }
 
-        return l;
+        return l.AsReadOnly();
     }
 
     public static implicit operator Bitmap(QuickImage qi) => qi._bitmap;

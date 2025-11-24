@@ -267,7 +267,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : Win11;
 
-    public int? TmpIfFilterRemoved { get; set; } = null;
+    public int? TmpIfFilterRemoved { get; set; }
 
     public ViewType ViewType {
         get;

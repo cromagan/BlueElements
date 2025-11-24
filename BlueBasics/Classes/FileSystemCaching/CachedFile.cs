@@ -36,7 +36,7 @@ public sealed class CachedFile : IDisposable {
     public readonly string Filename;
     private readonly int _checkIntervalMs = 180000;
     private readonly object _lock = new();
-    private int _isDisposed = 0;
+    private int _isDisposed;
     private Timer? _staleCheckTimer;
     private string? _timestamp;
 

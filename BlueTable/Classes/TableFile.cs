@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -34,10 +34,10 @@ public class TableFile : Table {
     #region Fields
 
     private static readonly object _timerLock = new();
-    private static int _activeTableCount = 0;
+    private static int _activeTableCount;
 
     /// <summary>
-    /// Der Globale Timer, der die Tabellen regelmäßig updated
+    /// Der Globale Timer, der die Tabellen regelmÃ¤ÃŸig updated
     /// </summary>
     private static System.Threading.Timer? _tableUpdateTimer;
 
@@ -45,7 +45,7 @@ public class TableFile : Table {
 
     private int _checkerTickCount = -5;
 
-    private bool _saveRequired_File = false;
+    private bool _saveRequired_File;
 
     #endregion
 
@@ -86,35 +86,22 @@ public class TableFile : Table {
         return [.. GetFiles(path, "*." + fx, System.IO.SearchOption.TopDirectoryOnly)];
     }
 
-    public override bool AmITemporaryMaster(int ranges, int rangee) => base.AmITemporaryMaster(ranges, rangee);
-
-    public override bool BeSureAllDataLoaded(int anzahl) => base.BeSureAllDataLoaded(anzahl);
-
-    public override bool BeSureRowIsLoaded(string chunkValue) => base.BeSureRowIsLoaded(chunkValue);
-
-    public override bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) => base.BeSureToBeUpToDate(firstTime, instantUpdate);
-
-    /// <summary>
-    /// Konkrete Prüfung, ob jetzt gespeichert werden kann
+     /// <summary>
+    /// Konkrete PrÃ¼fung, ob jetzt gespeichert werden kann
     /// </summary>
     /// <returns></returns>
     public FileOperationResult CanSaveMainChunk() {
         if (!IsEditable(false)) { return new(IsNotEditableReason(false), false, true); }
 
-        if (Row.HasPendingWorker()) { return new("Es müssen noch Daten überprüft werden.", true, true); }
+        if (RowCollection.HasPendingWorker()) { return new("Es mÃ¼ssen noch Daten Ã¼berprÃ¼ft werden.", true, true); }
 
-        //if (ExecutingScriptThreadsAnyTable.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
+        //if (ExecutingScriptThreadsAnyTable.Count > 0) { return "Es wird noch ein Skript ausgefÃ¼hrt."; }
 
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return new("Kürzlich vorgenommene Änderung muss verarbeitet werden.", true, true); }
-
-        //if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return new("KÃ¼rzlich vorgenommene Ã„nderung muss verarbeitet werden.", true, true); }
 
         return CanSaveFile(Filename, 5);
     }
 
-    public override void Freeze(string reason) => base.Freeze(reason);
-
-    public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) => base.GrantWriteAccess(type, chunkValue);
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
@@ -157,18 +144,18 @@ public class TableFile : Table {
                 if (!ok) { return "Speicher-Fehler!"; }
                 db.Dispose();
                 var d = DeleteFile(thisFile, false);
-                if (!d) { return "Lösch-Fehler!"; }
+                if (!d) { return "LÃ¶sch-Fehler!"; }
             }
         }
 
         return string.Empty;
     }
 
-    public override string IsNotEditableReason(bool isLoading) {
+    public override string IsNotEditableReason(bool isloading) {
         if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
-        // Das ist eins super schnelle Prüfung, also vorziehen.
-        var m = base.IsNotEditableReason(isLoading);
+        // Das ist eins super schnelle PrÃ¼fung, also vorziehen.
+        var m = base.IsNotEditableReason(isloading);
         if (!string.IsNullOrWhiteSpace(m)) { return m; }
 
         if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
@@ -178,7 +165,7 @@ public class TableFile : Table {
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool instantUpdate) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien kÃ¶nnen nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
@@ -219,7 +206,6 @@ public class TableFile : Table {
         DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
     }
 
-    public override void ReorganizeChunks() => base.ReorganizeChunks();
 
     public override void RepairAfterParse() {
         // Nicht IsInCache setzen, weil ansonsten TableFragments nicht mehr funktioniert
@@ -252,9 +238,6 @@ public class TableFile : Table {
         MainChunkLoadDone = true;
     }
 
-    public override string ToString() => base.ToString();
-
-    public override void TryToSetMeTemporaryMaster() => base.TryToSetMeTemporaryMaster();
 
     protected static FileOperationResult SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.CanSaveMainChunk();
@@ -283,7 +266,7 @@ public class TableFile : Table {
         _checkerTickCount++;
         _checkerTickCount = Math.Min(_checkerTickCount, 5000);
 
-        // Zeitliche Bedingungen prüfen
+        // Zeitliche Bedingungen prÃ¼fen
         //var timeSinceLastChange = DateTime.UtcNow.Subtract(LastChange).TotalSeconds;
         var timeSinceLastAction = DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds;
 
@@ -298,21 +281,21 @@ public class TableFile : Table {
             if (mustSave && RowCollection.InvalidatedRowsManager.PendingRowsCount > 0) { mustSave = false; }
         }
 
-        // Speichern wenn nötig
+        // Speichern wenn nÃ¶tig
         if (mustSave) { Save(false); }
 
         if (!SaveRequired) { _checkerTickCount = 0; }
     }
 
     protected override void Dispose(bool disposing) {
-        // Keine Zusatzlogik – bewusst transparent.
+        // Keine Zusatzlogik - bewusst transparent.
 
         if (IsDisposed) { return; }
 
         if (disposing) {
             try {
                 _saveSemaphore?.Dispose();
-                // LÖSUNG: Static Timer verwalten basierend auf aktiven Table-Instanzen
+                // LÃ–SUNG: Static Timer verwalten basierend auf aktiven Table-Instanzen
                 lock (_timerLock) {
                     _activeTableCount--;
                     if (_activeTableCount <= 0) {
@@ -382,17 +365,17 @@ public class TableFile : Table {
         BeSureToBeUpToDate(AllFiles, false);
     }
 
-    private void GenerateTableUpdateTimer() {
+    private static void GenerateTableUpdateTimer() {
         lock (_timerLock) {
             _activeTableCount++;
 
             if (_tableUpdateTimer != null) { return; }
 
-            _tableUpdateTimer = new System.Threading.Timer(TableUpdater, null, 10000, UpdateTable * 60 * 1000);
+            _tableUpdateTimer = new Timer(TableUpdater, null, 10000, UpdateTable * 60 * 1000);
         }
     }
 
-    private bool IsFileAllowedToLoad(string fileName) {
+    private static bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
             if (thisFile is TableFile { IsDisposed: false } tbf) {
                 if (string.Equals(tbf.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
@@ -415,7 +398,7 @@ public class TableFile : Table {
 
         if (!SaveRequired) { return FileOperationResult.ValueTrue; }
 
-        // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
+        // Sofortiger Exit wenn bereits ein Save lÃ¤uft (non-blocking check)
         if (!_saveSemaphore.Wait(0)) { return FileOperationResult.DoRetry; }
 
         try {

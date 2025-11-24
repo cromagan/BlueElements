@@ -39,10 +39,10 @@ public static class Develop {
 
     #region Fields
 
-    public static bool AllReadOnly = false;
+    public static bool AllReadOnly;
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
-    public static MessageDelegate? Message = null;
+    public static MessageDelegate? Message;
     public static string MonitorMessage = "Monitor-Message";
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
 
@@ -52,7 +52,7 @@ public static class Develop {
 
     private static bool _deleteTraceLog = true;
 
-    private static ErrorType? _isTraceLogging = null;
+    private static ErrorType? _isTraceLogging;
 
     private static string _lastDebugMessage = string.Empty;
 

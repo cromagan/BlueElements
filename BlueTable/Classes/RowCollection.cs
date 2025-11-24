@@ -578,7 +578,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
 
-    public bool HasPendingWorker() => Pendingworker.Count > 0;
+    public static bool HasPendingWorker() => Pendingworker.Count > 0;
 
     public void InvalidateAllCheckData() {
         foreach (var thisRow in this) {

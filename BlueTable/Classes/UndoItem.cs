@@ -58,7 +58,7 @@ public class UndoItem : IParseable {
 
     public string ChunkValue { get; private set; } = string.Empty;
     public string ColName { get; private set; } = string.Empty;
-    public TableDataType Command { get; private set; } = 0;
+    public TableDataType Command { get; private set; }
 
     public string Comment { get; private set; } = string.Empty;
 

@@ -42,7 +42,7 @@ public class Chunk : IHasKeyName {
     public readonly string MainFileName = string.Empty;
     private DateTime _bytesloaded = DateTime.MinValue;
     private string _fileinfo = string.Empty;
-    private int _minBytes = 0;
+    private int _minBytes;
 
     #endregion
 
@@ -89,9 +89,9 @@ public class Chunk : IHasKeyName {
 
     public string LastEditUser { get; private set; } = string.Empty;
 
-    public bool LoadFailed { get; set; } = false;
+    public bool LoadFailed { get; set; }
 
-    public bool SaveRequired { get; set; } = false;
+    public bool SaveRequired { get; set; }
 
     #endregion
 
@@ -582,7 +582,7 @@ public class Chunk : IHasKeyName {
     /// </summary>
     /// <param name="bytes">Die zu verarbeitenden Bytes</param>
     /// <returns>Eine Liste von Bytes ohne Header-Daten oder null bei Fehlern</returns>
-    private List<byte>? RemoveHeaderDataTypes(byte[]? bytes) {
+    private static List<byte>? RemoveHeaderDataTypes(byte[]? bytes) {
         if (bytes == null) { return null; }
         if (bytes.Length == 0) { return []; }
 

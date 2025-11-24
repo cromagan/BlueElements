@@ -540,7 +540,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (linkdb == null) { return; }
 
         if (tblFilterliste.Table == null) {
-            var tb = new Table();
+            var tb = Table.Get();
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
             spn.IsFirst = true;

@@ -18,7 +18,7 @@ public partial class GlobalMonitor : Form {
     private static CancellationTokenSource? _cancellationTokenSource;
     private static Thread? _monitorThread;
     private static GlobalMonitor? Monitor;
-    private int _n = 0;
+    private int _n;
 
     #endregion
 
@@ -37,7 +37,7 @@ public partial class GlobalMonitor : Form {
 
     public static void GenerateLogTable(Controls.TableView tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
-        var tb = new Table();
+        var tb =  Table.Get();
         var dbi = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         dbi.IsFirst = true;
         tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);

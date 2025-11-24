@@ -47,7 +47,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
 
-    private volatile int _isDisposedFlag = 0;
+    private volatile int _isDisposedFlag;
     private FileSystemWatcher? _watcher;
 
     #endregion

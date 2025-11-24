@@ -49,7 +49,7 @@ public abstract class Method_TableGeneric : Method {
         return null;
     }
 
-    protected ColumnItem? Column(ScriptProperties scp, SplittedAttributesFeedback attvar, int no) {
+    protected static ColumnItem? Column(ScriptProperties scp, SplittedAttributesFeedback attvar, int no) {
         var c = attvar.Attributes[no];
         if (c == null) { return null; }
 

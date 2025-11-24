@@ -69,13 +69,13 @@ public class DoItFeedback {
 
     #region Properties
 
-    public bool BreakFired { get; private set; } = false;
+    public bool BreakFired { get; private set; }
 
     public virtual bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason);
     public string FailedReason { get; private set; } = string.Empty;
-    public bool NeedsScriptFix { get; private set; } = false;
-    public bool ReturnFired { get; private set; } = false;
-    public Variable? ReturnValue { get; private set; } = null;
+    public bool NeedsScriptFix { get; private set; }
+    public bool ReturnFired { get; private set; }
+    public Variable? ReturnValue { get; private set; }
 
     #endregion
 

@@ -6,6 +6,8 @@
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <StartupObject>BeCreative.Program</StartupObject>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <AnalysisMode>All</AnalysisMode>
     
     <!-- Assembly-Metadaten -->
     <AssemblyTitle>BeCreative</AssemblyTitle>
@@ -30,16 +32,6 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>portable</DebugType>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup> 
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DebugType>pdbonly</DebugType>
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup> 
-
   <ItemGroup>
     <!-- NuGet-Pakete -->
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />

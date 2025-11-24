@@ -49,9 +49,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private bool _allowTemporay;
 
     private TableScriptDescription? _item;
-    private bool didMessage = false;
+    private bool didMessage;
 
-    private bool loaded = false;
+    private bool loaded;
 
     #endregion
 

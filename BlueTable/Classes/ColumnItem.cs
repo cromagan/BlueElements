@@ -1294,9 +1294,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return list.SortedDistinctList();
     }
 
-    public bool CopyAble() =>
-        //if (_relationType == RelationType.DropDownValues) { return false; }
-        true;
+
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.

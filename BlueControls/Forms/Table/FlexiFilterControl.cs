@@ -94,7 +94,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
     /// <summary>
     /// Bei True werden die zuletzt eingegebenen Werte auf Festplatte gespeichert und geladen.
     /// </summary>
-    public bool SavesSettings { get; internal set; } = false;
+    public bool SavesSettings { get; internal set; }
 
     public List<string> Settings { get; } = [];
 

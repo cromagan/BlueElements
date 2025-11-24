@@ -32,7 +32,7 @@ public class GenericControlReciverSender : GenericControlReciver {
     #region Fields
 
     private const int MaxRecursionDepth = 10;
-    private int _recursionDepth = 0;
+    private int _recursionDepth;
 
     #endregion
 

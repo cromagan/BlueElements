@@ -63,7 +63,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     } = true;
 
     public List<string> Settings { get; } = [];
-    public bool SettingsLoaded { get; set; } = false;
+    public bool SettingsLoaded { get; set; }
 
     /// <summary>
     /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.

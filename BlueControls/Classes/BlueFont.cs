@@ -428,7 +428,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
 
         var n = "FontName-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol(FontName, true)); }
+        //if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol(FontName, true)); }
 
         _nameInStyleSym = QuickImage.Get(n);
         return _nameInStyleSym;
@@ -623,7 +623,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
 
         var n = "Font-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol("Abc", false)); }
+        //if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol("Abc", false)); }
 
         _symbolForReadableTextSym = QuickImage.Get(n);
         return _symbolForReadableTextSym;

@@ -5,6 +5,8 @@
     <TargetFramework>net48</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <AnalysisMode>All</AnalysisMode>
    
     <!-- Assembly-Metadaten -->
     <RootNamespace>BluePaint</RootNamespace>
@@ -28,16 +30,6 @@
     <Platforms>AnyCPU;x86;x64</Platforms>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>portable</DebugType>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup> 
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DebugType>pdbonly</DebugType>
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup> 
 
   <ItemGroup>
     <!-- NuGet-Pakete -->

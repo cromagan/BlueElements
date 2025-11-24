@@ -520,7 +520,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
-            if (row != null && column != null && column.CopyAble() && column.Table is { } tb) {
+            if (row != null && column != null && column.Table is { } tb) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
@@ -585,7 +585,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         tmp = tmp.Replace(" |", "|");
                         tmp = tmp.Replace("| ", "|");
                         sb.Append(tmp);
-                        if (colNr < columnListtmp.Count - 1) { sb.Append(";"); }
+                        if (colNr < columnListtmp.Count - 1) { sb.Append(';'); }
                     }
                 }
                 sb.Append("\r\n");

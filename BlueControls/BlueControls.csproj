@@ -5,6 +5,8 @@
     <TargetFramework>net48</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <AnalysisMode>All</AnalysisMode>
 
     <!-- Assembly-Metadaten -->
     <RootNamespace>BlueControls</RootNamespace>
@@ -28,16 +30,6 @@
     <Prefer32Bit>false</Prefer32Bit>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>portable</DebugType>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup> 
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DebugType>pdbonly</DebugType>
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup> 
 
   <ItemGroup>
     <None Remove="Ressources\Dictionary\Deutsch.BDB" />

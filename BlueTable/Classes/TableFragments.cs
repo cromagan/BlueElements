@@ -64,7 +64,7 @@ public class TableFragments : TableFile {
     /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemacht werden.
     /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
     /// </summary>
-    private int _doingChanges = 0;
+    private int _doingChanges;
 
     /// <summary>
     /// Letzter Lade-Stand der Daten.
@@ -95,7 +95,7 @@ public class TableFragments : TableFile {
     #region Properties
 
     public bool CanDeleteWriter { get; private set; } = true;
-    public bool FirstTimAlleFragmentsLoaded { get; private set; } = false;
+    public bool FirstTimAlleFragmentsLoaded { get; private set; }
 
     /// <summary>
     /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt

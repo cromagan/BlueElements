@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -58,22 +58,22 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static readonly ObservableCollection<Table> AllFiles = [];
 
     /// <summary>
-    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
+    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen mÃ¶glich
     /// </summary>
     public static readonly int MasterBlockedMax = 180;
 
     /// <summary>
-    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
+    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen mÃ¶glich
     /// </summary>
-    public static readonly int MasterBlockedMin = 0;
+    public static readonly int MasterBlockedMin;
 
     /// <summary>
-    /// Wert in Minuten. Ist man selbst Master in diesen Range, dann zählt das, dass man ein Master ist
+    /// Wert in Minuten. Ist man selbst Master in diesen Range, dann zÃ¤hlt das, dass man ein Master ist
     /// </summary>
     public static readonly int MasterCount = 150;
 
     /// <summary>
-    /// Wert in Minuten. Solange dürfen werden und Masters willkürlich gesetzt.
+    /// Wert in Minuten. Solange dÃ¼rfen werden und Masters willkÃ¼rlich gesetzt.
     /// </summary>
     public static readonly int MasterTry = 7;
 
@@ -83,30 +83,30 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static readonly int MasterUntil = 175;
 
     /// <summary>
-    /// Wert in Minuten. Ab diesen Wert dürfen Master die Zeilenberechnung übernehmen
+    /// Wert in Minuten. Ab diesen Wert dÃ¼rfen Master die Zeilenberechnung Ã¼bernehmen
     /// </summary>
     public static readonly int MyRowLost = 6;
 
     /// <summary>
-    /// Wert in Minuten, in welchem Intervall die Tabellen auf Aktualität geprüft werden.
+    /// Wert in Minuten, in welchem Intervall die Tabellen auf AktualitÃ¤t geprÃ¼ft werden.
     /// </summary>
     public static readonly int UpdateTable = 5;
 
     /// <summary>
     /// So viele Master of Table darf man sein
     /// </summary>
-    public static int MaxMasterCount = 3;
+    public static int MaxMasterCount { get; set; } = 3;
 
     /// <summary>
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
     /// </summary>
-    public readonly List<UndoItem> Undo;
+    public List<UndoItem> Undo { get; private set; }
 
     /// <summary>
-    /// Wann die Tabelle zuletzt angeschaut / geöffnet / geladen wurde.
+    /// Wann die Tabelle zuletzt angeschaut / geÃ¶ffnet / geladen wurde.
     /// Bestimmt die Reihenfolge der Reparaturen
     /// </summary>
-    public DateTime LastUsedDate = DateTime.UtcNow;
+    public DateTime LastUsedDate { get; set; } = DateTime.UtcNow;
 
     protected NeedPassword? _needPassword;
     private static List<string> _allavailableTables = [];
@@ -129,7 +129,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
-    /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
+    /// Die Eingabe des Benutzers. Ist der Pfad gewÃ¼nscht, muss FormulaFileName benutzt werden.
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
@@ -144,26 +144,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     #region Constructors
 
-    public Table() : this(Table.UniqueKeyValue()) {
-        LogUndo = false;
-        DropMessages = false;
-        MainChunkLoadDone = true;
-
-        OnLoading();
-
-        MainChunkLoadDone = true;
-        BeSureToBeUpToDate(true, true);
-
-        RepairAfterParse();
-
-        OnLoaded(true);
-
-        CreateWatcher();
-    }
-
     protected Table(string tablename) {
         // Keine Konstruktoren mit Dateiname, Filestreams oder sonst was.
-        // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
+        // Weil das OnLoaded-Ereigniss nicht richtig ausgelÃ¶st wird.
         Develop.StartService();
 
         QuickImage.NeedImage += QuickImage_NeedImage;
@@ -171,7 +154,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         KeyName = MakeValidTableName(tablename);
 
         if (!IsValidTableName(KeyName)) {
-            Develop.DebugPrint(ErrorType.Error, "Tabellenname ungültig: " + tablename);
+            Develop.DebugPrint(ErrorType.Error, "Tabellenname ungÃ¼ltig: " + tablename);
         }
 
         Cell = new CellCollection(this);
@@ -202,10 +185,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _variableTmp = string.Empty;
         //Undo.Clear();
 
-        // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
+        // Muss vor dem Laden der Datan zu Allfiles hinzugfÃ¼gt werde, weil das bei OnAdded
         // Die Events registriert werden, um z.B: das Passwort abzufragen
-        // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Tabelle finden können.
-        // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
+        // ZusÃ¤tzlich werden z.B: Filter fÃ¼r den Export erstellt - auch der muss die Tabelle finden kÃ¶nnen.
+        // ZusÃ¤tzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
         AllFiles.Add(this);
     }
 
@@ -257,7 +240,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static List<string> ExecutingScriptThreadsAnyTable { get; } = [];
 
-    [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
+    [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusÃ¤tzlichen Dateien.")]
     public string AdditionalFilesPath {
         get => _additionalFilesPath;
         set {
@@ -337,8 +320,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Der FreezedReason kann niemals wieder rückgängig gemacht werden.
-    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehen.
+    /// Der FreezedReason kann niemals wieder rÃ¼ckgÃ¤ngig gemacht werden.
+    /// Weil keine Undos mehr geladen werden, wÃ¼rde da nur Chaos entstehen.
     /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
@@ -362,15 +345,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
 
     /// Der Wert wird im System verankert und gespeichert.
-    /// Bei Tabellen, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
-    /// Kann hier nur gelesen werden! Da eine Änderung über die Property die Datei wieder auf ungespeichert setzen würde, würde hier eine
-    /// Kettenreaktion ausgelöst werden.
+    /// Bei Tabellen, die Daten nachladen kÃ¶nnen, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
+    /// Kann hier nur gelesen werden! Da eine Ã„nderung Ã¼ber die Property die Datei wieder auf ungespeichert setzen wÃ¼rde, wÃ¼rde hier eine
+    /// Kettenreaktion ausgelÃ¶st werden.
     /// </summary>
     public DateTime LastSaveMainFileUtcDate { get; protected set; }
 
     public bool LogUndo { get; set; } = true;
 
-    public bool MainChunkLoadDone { get; protected set; } = false;
+    public bool MainChunkLoadDone { get; protected set; }
 
     public virtual bool MasterNeeded => false;
 
@@ -418,9 +401,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
+    /// Die Eingabe des Benutzers. Ist der Pfad gewÃ¼nscht, muss FormulaFileName benutzt werden.
     /// </summary>
-    [Description("Das standardmäßige Formular - dessen Dateiname -, das angezeigt werden soll.")]
+    [Description("Das standardmÃ¤ÃŸige Formular - dessen Dateiname -, das angezeigt werden soll.")]
     public string StandardFormulaFile {
         get => _standardFormulaFile;
         set {
@@ -518,15 +501,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static List<string> AllAvailableTables() {
         if (DateTime.UtcNow.Subtract(_lastAvailableTableCheck).TotalMinutes < 20) {
-            return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+            return _allavailableTables.Clone(); // Als Clone, damit bezÃ¼ge gebrochen werden und sich die Auflistung nicht mehr verÃ¤ndern kann
         }
 
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
         // Wenn eine Tabelle z.B. im gleichen Verzeichnis liegt,
-        // reicht es, das Verzeichnis einmal zu prüfen
+        // reicht es, das Verzeichnis einmal zu prÃ¼fen
         var allreadychecked = new List<Table>();
 
-        var allfiles = new List<Table>();// könnte sich ändern, deswegen Zwischenspeichern
+        var allfiles = new List<Table>();// kÃ¶nnte sich Ã¤ndern, deswegen Zwischenspeichern
         allfiles.AddRange(AllFiles);
 
         foreach (var thisTb in allfiles) {
@@ -540,7 +523,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
         _allavailableTables = _allavailableTables.SortedDistinctList();
         _lastAvailableTableCheck = DateTime.UtcNow;
-        return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+        return _allavailableTables.Clone(); // Als Clone, damit bezÃ¼ge gebrochen werden und sich die Auflistung nicht mehr verÃ¤ndern kann
     }
 
     public static void BeSureToBeUpToDate(ObservableCollection<Table> ofTables, bool instantUpdate) {
@@ -556,11 +539,37 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         foreach (var thisFile in AllFiles) {
             thisFile.Freeze(reason);
             if (x != AllFiles.Count) {
-                // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                // Die Auflistung wurde verÃ¤ndert! Selten, aber kann passieren!
                 FreezeAll(reason);
                 return;
             }
         }
+    }
+
+    public static Table Get() {
+        var t = new Table(Table.UniqueKeyValue());
+        t.InitDummyTable();
+        return t;
+    }
+
+    private void InitDummyTable() {
+
+
+        LogUndo = false;
+        DropMessages = false;
+        MainChunkLoadDone = true;
+
+        OnLoading();
+
+        MainChunkLoadDone = true;
+        BeSureToBeUpToDate(true, true);
+
+        RepairAfterParse();
+
+        OnLoaded(true);
+
+        CreateWatcher();
+
     }
 
     public static Table? Get(string fileOrTableName, NeedPassword? needPassword, bool instantUpdate) {
@@ -643,7 +652,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// Gibt einen Fehlergrund zurÃ¼ck, ob die Zelle bearbeitet werden kann.
     /// </summary>
     /// <param name="column">Die Spalte</param>
     /// <param name="row">Die Zeile</param>
@@ -730,7 +739,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     db.LoadFromFile(pf, false, null, string.Empty, false);
                     return db;
                 }
-            } while (pf != string.Empty);
+            } while (!string.IsNullOrEmpty(pf));
         }
         var d = GetEmmbedResource(assembly, name);
         if (d != null) {
@@ -746,8 +755,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public static string MakeValidTableName(string tablename) {
-        var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
-        tmp = tmp.FileNameWithoutSuffix().ToLowerInvariant().Replace(" ", "_").Replace("-", "_");
+        var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stÃ¼rzt FileNameWithoutSuffix ab
+        tmp = tmp.FileNameWithoutSuffix().Replace(" ", "_").Replace("-", "_");
         tmp = tmp.StarkeVereinfachung("_", false).ToUpperInvariant();
 
         while (tmp.Contains("__")) {
@@ -757,13 +766,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return tmp;
     }
 
-    public static (int pointer, TableDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
+    public static (int pointer, TableDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointerIn) {
         var colName = string.Empty;
         var rowKey = string.Empty;
         string value;
         TableDataType type;
 
-        switch ((Routinen)bLoaded[pointer]) {
+        switch ((Routinen)bLoaded[pointerIn]) {
             //case Routinen.CellFormat: {
             //        type = (TableDataType)bLoaded[pointer + 1];
             //        var les = NummerCode3(bLoaded, pointer + 2);
@@ -804,13 +813,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             //        break;
             //    }
             case Routinen.CellFormatUTF8_V401: {
-                    type = (TableDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    rowKey = NummerCode7(bLoaded, pointer + 5).ToString();
+                    type = (TableDataType)bLoaded[pointerIn + 1];
+                    var les = NummerCode3(bLoaded, pointerIn + 2);
+                    rowKey = NummerCode7(bLoaded, pointerIn + 5).ToString();
                     var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 12, b, 0, les);
                     value = b.ToStringUtf8();
-                    pointer += 12 + les;
+                    pointerIn += 12 + les;
                     //colKey = -1;
                     break;
                 }
@@ -829,15 +838,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             //        break;
             //    }
             case Routinen.DatenAllgemeinUTF8: {
-                    type = (TableDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
+                    type = (TableDataType)bLoaded[pointerIn + 1];
+                    var les = NummerCode3(bLoaded, pointerIn + 2);
                     rowKey = string.Empty;
                     var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 5, b, 0, les);
                     value = b.ToStringUtf8();
                     //width = 0;
                     //height = 0;
-                    pointer += 5 + les;
+                    pointerIn += 5 + les;
                     break;
                 }
             //case Routinen.Column: {
@@ -880,36 +889,36 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             //        break;
             //    }
             case Routinen.ColumnUTF8_V401: {
-                    type = (TableDataType)bLoaded[pointer + 1];
+                    type = (TableDataType)bLoaded[pointerIn + 1];
 
-                    var cles = NummerCode1(bLoaded, pointer + 2);
+                    var cles = NummerCode1(bLoaded, pointerIn + 2);
                     var cb = new byte[cles];
-                    Buffer.BlockCopy(bLoaded, pointer + 3, cb, 0, cles);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 3, cb, 0, cles);
                     colName = cb.ToStringUtf8();
 
-                    var les = NummerCode3(bLoaded, pointer + 3 + cles);
+                    var les = NummerCode3(bLoaded, pointerIn + 3 + cles);
                     var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 6 + cles, b, 0, les);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 6 + cles, b, 0, les);
                     value = b.ToStringUtf8();
 
-                    pointer += 6 + les + cles;
+                    pointerIn += 6 + les + cles;
                     break;
                 }
 
             case Routinen.CellFormatUTF8_V402: {
                     type = TableDataType.UTF8Value_withoutSizeData;
 
-                    var lengthRowKey = NummerCode1(bLoaded, pointer + 1);
+                    var lengthRowKey = NummerCode1(bLoaded, pointerIn + 1);
                     var rowKeyByte = new byte[lengthRowKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lengthRowKey);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 2, rowKeyByte, 0, lengthRowKey);
                     rowKey = rowKeyByte.ToStringUtf8();
 
-                    var lengthValue = NummerCode2(bLoaded, pointer + 2 + lengthRowKey);
+                    var lengthValue = NummerCode2(bLoaded, pointerIn + 2 + lengthRowKey);
                     var valueByte = new byte[lengthValue];
-                    Buffer.BlockCopy(bLoaded, pointer + 2 + lengthRowKey + 2, valueByte, 0, lengthValue);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 2 + lengthRowKey + 2, valueByte, 0, lengthValue);
                     value = valueByte.ToStringUtf8();
 
-                    pointer += 2 + lengthRowKey + 2 + lengthValue;
+                    pointerIn += 2 + lengthRowKey + 2 + lengthValue;
 
                     break;
                 }
@@ -917,22 +926,22 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             case Routinen.CellFormatUTF8_V403: {
                     type = TableDataType.UTF8Value_withoutSizeData;
 
-                    var lengthColumnKey = NummerCode1(bLoaded, pointer + 1);
+                    var lengthColumnKey = NummerCode1(bLoaded, pointerIn + 1);
                     var columnKeyByte = new byte[lengthColumnKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 2, columnKeyByte, 0, lengthColumnKey);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 2, columnKeyByte, 0, lengthColumnKey);
                     colName = columnKeyByte.ToStringUtf8();
 
-                    var lengthRowKey = NummerCode1(bLoaded, pointer + 2 + lengthColumnKey);
+                    var lengthRowKey = NummerCode1(bLoaded, pointerIn + 2 + lengthColumnKey);
                     var rowKeyByte = new byte[lengthRowKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 3 + lengthColumnKey, rowKeyByte, 0, lengthRowKey);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 3 + lengthColumnKey, rowKeyByte, 0, lengthRowKey);
                     rowKey = rowKeyByte.ToStringUtf8();
 
-                    var lengthValue = NummerCode2(bLoaded, pointer + 3 + lengthRowKey + lengthColumnKey);
+                    var lengthValue = NummerCode2(bLoaded, pointerIn + 3 + lengthRowKey + lengthColumnKey);
                     var valueByte = new byte[lengthValue];
-                    Buffer.BlockCopy(bLoaded, pointer + 5 + lengthRowKey + lengthColumnKey, valueByte, 0, lengthValue);
+                    Buffer.BlockCopy(bLoaded, pointerIn + 5 + lengthRowKey + lengthColumnKey, valueByte, 0, lengthValue);
                     value = valueByte.ToStringUtf8();
 
-                    pointer += 5 + lengthRowKey + lengthValue + lengthColumnKey;
+                    pointerIn += 5 + lengthRowKey + lengthValue + lengthColumnKey;
 
                     break;
                 }
@@ -942,16 +951,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     value = string.Empty;
                     //width = 0;
                     //height = 0;
-                    Develop.DebugPrint(ErrorType.Error, $"Laderoutine nicht definiert: {bLoaded[pointer]}");
+                    Develop.DebugPrint(ErrorType.Error, $"Laderoutine nicht definiert: {bLoaded[pointerIn]}");
                     break;
                 }
         }
 
-        return (pointer, type, value, colName, rowKey);
+        return (pointerIn, type, value, colName, rowKey);
     }
 
     /// <summary>
-    /// Standardisiert Benutzergruppen und eleminiert unterschiedliche Groß/Klein-Schreibweisen
+    /// Standardisiert Benutzergruppen und eleminiert unterschiedliche GroÃŸ/Klein-Schreibweisen
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
@@ -971,9 +980,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             } else if (thisUser.StartsWith("#USER:", StringComparison.OrdinalIgnoreCase)) {
                 var th = thisUser.Substring(6).Trim(" ");
 
-                l.Add("#User: " + th.ToUpper());
+                l.Add("#User: " + th.ToUpperInvariant());
             } else {
-                l.Add(thisUser.ToUpper());
+                l.Add(thisUser.ToUpperInvariant());
             }
         }
 
@@ -983,7 +992,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blokiert ist.</param>
+    /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie mÃ¶glich zu speichern - falls eine Datei blokiert ist.</param>
     public static void SaveAll(bool mustSave) {
         if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
@@ -992,7 +1001,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (thisFile is TableFile tbf) {
                 tbf.Save(mustSave);
                 if (x != AllFiles.Count) {
-                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
+                    // Die Auflistung wurde verÃ¤ndert! Selten, aber kann passieren!
                     SaveAll(mustSave);
                     return;
                 }
@@ -1030,7 +1039,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (IsValidTableName(unique)) {
                 foreach (var thisfile in AllFiles) {
-                    if (string.Equals(unique, thisfile.KeyName)) { ok = false; break; }
+                    if (string.Equals(unique, thisfile.KeyName, StringComparison.Ordinal)) { ok = false; break; }
                 }
             } else {
                 ok = false;
@@ -1054,7 +1063,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 found = true;
 
                 if (!isDisposed) {
-                    // Prüfe ob sich wirklich etwas geändert hat
+                    // PrÃ¼fe ob sich wirklich etwas geÃ¤ndert hat
                     var hasChanges = (keyname != null && keyname != existingScript.KeyName) ||
                                     (scriptContent != null && scriptContent != existingScript.Script) ||
                                     (image != null && image != existingScript.Image) ||
@@ -1111,11 +1120,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var newRunTimeID = ExecutingScriptThreadsAnyTable.JoinWithCr();
 
                 if (runTimeID != newRunTimeID) {
-                    // Aktivität erkannt - Timer zurücksetzen
+                    // AktivitÃ¤t erkannt - Timer zurÃ¼cksetzen
                     sw.Restart();
                     runTimeID = newRunTimeID;
                 } else if (sw.ElapsedMilliseconds > 10 * 60 * 1000) {
-                    // Nur bei Inaktivität abbrechen
+                    // Nur bei InaktivitÃ¤t abbrechen
                     break;
                 }
             } catch { }
@@ -1123,7 +1132,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Der komplette Pfad mit abschließenden \
+    /// Der komplette Pfad mit abschlieÃŸenden \
     /// </summary>
     /// <returns></returns>
     public string AdditionalFilesPathWhole() {
@@ -1153,10 +1162,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="ranges">Unter 5 Minuten wird auch geprüft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
+    /// <param name="ranges">Unter 5 Minuten wird auch geprÃ¼ft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
     /// <param name="rangee">Bis 55 Minuten ist sicher, dass es der Master ist.
-    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
-    /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
+    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald auslÃ¤uft.
+    /// Werden grÃ¶ÃŸerer Werte abgefragt, kann ermittel werden, ob man Master war,
     /// </param>
     /// <returns></returns>
     public virtual bool AmITemporaryMaster(int ranges, int rangee) {
@@ -1173,7 +1182,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         //rangee = Math.Min(rangee, 55);
 
         // Info:
-        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
+        // 5 Minuten, weil alle 3 Minuten SysUndogeprÃ¼ft wird
         // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
         return mins > ranges && mins < rangee;
     }
@@ -1190,7 +1199,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     //    if (!FileExists(ci.AdditionalData)) { return null; }
     /// <summary>
-    /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
+    /// Diese Methode setzt einen Wert dauerhaft und kÃ¼mmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
     /// Der Wert wird intern fest verankert - bei ReadOnly werden aber weitere Schritte ignoriert.
     /// </summary>
     /// <param name="type"></param>
@@ -1238,7 +1247,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (LogUndo) {
-            AddUndo(type, colName, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", newchunkvalue);
+            AddUndo(type, colName, row, previousValue, changedTo, user, datetimeutc, comment, "[Ã„nderung in dieser Session]", newchunkvalue);
         }
 
         return string.Empty;
@@ -1276,7 +1285,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable) {
 
-        #region Variablen für Skript erstellen
+        #region Variablen fÃ¼r Skript erstellen
 
         VariableCollection vars = [];
 
@@ -1285,7 +1294,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
                 if (v != null) { vars.Add(v); }
             }
-            vars.Add(new VariableString("CurrentRowKey", row.KeyName, true, "Der interne Zeilenschlüssel der Zeile,\r\nmit der das Skript aufgerufen wurde."));
+            vars.Add(new VariableString("CurrentRowKey", row.KeyName, true, "Der interne ZeilenschlÃ¼ssel der Zeile,\r\nmit der das Skript aufgerufen wurde."));
             vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
         }
 
@@ -1296,14 +1305,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
-        vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-        vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-        vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Tabelle ist."));
+        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geÃ¶ffnet ist."));
+        vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dÃ¼rfen benutzerabhÃ¤ngig Werte verÃ¤ndert werden."));
+        vars.Add(new VariableString("UserGroup", UserGroup, true, "ACHTUNG: Keinesfalls dÃ¼rfen gruppenabhÃ¤ngig Werte verÃ¤ndert werden."));
+        vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dÃ¼rfen gruppenabhÃ¤ngig Werte verÃ¤ndert werden.\r\nDiese Variable gibt zurÃ¼ck, ob der Benutzer Admin fÃ¼r diese Tabelle ist."));
         vars.Add(new VariableString("Tablename", KeyName, true, "Der aktuelle Tabellenname."));
         vars.Add(new VariableTable("CurrentTable", this, true, "Die aktuelle Tabelle"));
         //_ = vars.Add(new VariableString("Type", Filename.FileSuffix().ToUpperInvariant(), true, "Der Tabellentyp."));
-        vars.Add(new VariableBool("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
+        vars.Add(new VariableBool("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschÃ¼tzt ist."));
         vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle")); // RowCount als Befehl belegt
         vars.Add(new VariableString("StartTimeUTC", DateTime.UtcNow.ToString7(), true, "Die Uhrzeit, wann das Skript gestartet wurde.")); // RowCount als Befehl belegt
         //var r = SortDefinition?.SortetdRows(this.Row) ?? new RowSortDefinition(this, this.Column.First, false).SortetdRows(this.Row);
@@ -1321,7 +1330,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        vars.Add(new VariableString("AdditionalFilesPath", (AdditionalFilesPathWhole().Trim("\\") + "\\").NormalizePath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+        vars.Add(new VariableString("AdditionalFilesPath", (AdditionalFilesPathWhole().Trim("\\") + "\\").NormalizePath(), true, "Der Dateipfad, in dem zusÃ¤tzliche Daten gespeichert werden."));
 
         //_ = vars.Add(new VariableBool("Successful", true, true, "Marker, ob das Skript erfolgreich abgeschlossen wurde."));
         //_ = vars.Add(new VariableString("NotSuccessfulReason", string.Empty, true, "Die letzte Meldung, warum es nicht erfolgreich war."));
@@ -1335,7 +1344,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     //    EventScript = sourceTable.EventScript;
     /// <summary>
-    /// AdditionalFiles/Tabellepfad mit Layouts und abschließenden \
+    /// AdditionalFiles/Tabellepfad mit Layouts und abschlieÃŸenden \
     /// </summary>
     public string DefaultLayoutPath() {
         if (!string.IsNullOrEmpty(AdditionalFilesPathWhole())) { return AdditionalFilesPathWhole() + "Layouts\\"; }
@@ -1346,7 +1355,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     //    TabelleAdmin = new(sourceTable.TabelleAdmin.Clone());
     //    PermissionGroupsNewRow = new(sourceTable.PermissionGroupsNewRow.Clone());
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Ã„ndern Sie diesen Code nicht. FÃ¼gen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -1364,11 +1373,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
-        // Vorab-Prüfungen
+        // Vorab-PrÃ¼fungen
         var f = ExternalAbortScriptReason(extended);
-        if (!string.IsNullOrEmpty(f)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + f, false, false, script.KeyName); }
+        if (!string.IsNullOrEmpty(f)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht mÃ¶glich: " + f, false, false, script.KeyName); }
 
-        if (!IsEditable(false)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + IsNotEditableReason(false), false, false, script.KeyName); }
+        if (!IsEditable(false)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht mÃ¶glich: " + IsNotEditableReason(false), false, false, script.KeyName); }
 
         //if (!MainChunkLoadDone) { return new ScriptEndedFeedback("Tabelle noch nicht geladen.", false, false, script.KeyName); }
 
@@ -1406,7 +1415,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
 
-            #region Script ausführen
+            #region Script ausfÃ¼hren
 
             var ki = Caption;
 
@@ -1423,7 +1432,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #endregion
 
-            #region Fehlerprüfungen
+            #region FehlerprÃ¼fungen
 
             if (scf.NeedsScriptFix && string.IsNullOrEmpty(script.FailedReason)) {
                 var t = "Tabelle: " + Caption + "\r\n" +
@@ -1433,7 +1442,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 if (row is { IsDisposed: false } r) {
                     t = t + "Zeile: " + r.CellFirstString() + "\r\n";
-                    t = t + "Zeile-Schlüssel: " + r.KeyName + "\r\n";
+                    t = t + "Zeile-SchlÃ¼ssel: " + r.KeyName + "\r\n";
                     if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
                         t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
                     }
@@ -1454,9 +1463,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (row != null) {
-                if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworfen", false, false, script.KeyName); }
-                if (Column.SysRowChangeDate is null) { return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName); }
-                if (row.RowStamp() != rowstamp) { return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName); }
+                if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprÃ¼fte Zeile wurde verworfen", false, false, script.KeyName); }
+                if (Column.SysRowChangeDate is null) { return new ScriptEndedFeedback("Zeilen kÃ¶nnen nur geprÃ¼ft werden, wenn Ã„nderungen der Zeile geloggt werden.", false, false, script.KeyName); }
+                if (row.RowStamp() != rowstamp) { return new ScriptEndedFeedback("Zeile wurde wÃ¤hrend des Skriptes verÃ¤ndert.", false, false, script.KeyName); }
             }
 
             if (!produktivphase) { return scf; }
@@ -1476,7 +1485,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             Develop.AbortAppIfStackOverflow();
             return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, ignoreError);
         } finally {
-            //  ExecutingScriptAnyTable wird IMMER aufgeräumt - egal was passiert
+            //  ExecutingScriptAnyTable wird IMMER aufgerÃ¤umt - egal was passiert
             if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
         }
     }
@@ -1509,7 +1518,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
                 if (!IsThisScriptBroken(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
-                DropMessage(ErrorType.DevelopInfo, $"Ereignis ausgelöst: {eventname}");
+                DropMessage(ErrorType.DevelopInfo, $"Ereignis ausgelÃ¶st: {eventname}");
 
                 var l = EventScript.Get(ev);
 
@@ -1545,7 +1554,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Friert die Tabelle komplett ein, nur noch Ansicht möglich.
+    /// Friert die Tabelle komplett ein, nur noch Ansicht mÃ¶glich.
     /// Setzt auch ReadOnly.
     /// </summary>
     /// <param name="reason"></param>
@@ -1636,8 +1645,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             var col = Column[zeil[0][spaltNo]];
             if (col == null) {
                 if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
-                    DropMessage(ErrorType.Warning, "Abbruch, ungültiger Spaltenname.");
-                    return "Abbruch,<br>ungültiger Spaltenname.";
+                    DropMessage(ErrorType.Warning, "Abbruch, ungÃ¼ltiger Spaltenname.");
+                    return "Abbruch,<br>ungÃ¼ltiger Spaltenname.";
                 }
 
                 col = Column.GenerateAndAdd(zeil[0][spaltNo]);
@@ -1768,8 +1777,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Überprüft, ob ein generelles Bearbeiten eine Wertes möglich ist.
-    /// Dieser Wert kann sich im Laufe der Ausführung ändern. (z.B. wenn eine Tabelle komplett geladen wurde)
+    /// ÃœberprÃ¼ft, ob ein generelles Bearbeiten eine Wertes mÃ¶glich ist.
+    /// Dieser Wert kann sich im Laufe der AusfÃ¼hrung Ã¤ndern. (z.B. wenn eine Tabelle komplett geladen wurde)
     /// </summary>
     public virtual bool IsEditable(bool isloading) => string.IsNullOrEmpty(IsNotEditableReason(isloading));
 
@@ -1787,7 +1796,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Prüft und holt sich sicher die Rechte zum Bearbeiten.
+    /// PrÃ¼ft und holt sich sicher die Rechte zum Bearbeiten.
     /// </summary>
     /// <returns></returns>
     public string IsNowEditable() => GrantWriteAccess(TableDataType.Caption, TableChunk.Chunk_Master).StringValue;
@@ -1796,7 +1805,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsDisposed) { return "Tabelle verworfen"; }
         if (Column.Count == 0) { return "Keine Spalten vorhanden"; }
 
-        if (!IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
+        if (!IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausfÃ¼hrbar"; }
 
         if (!checkUserRights) { return string.Empty; }
 
@@ -1934,8 +1943,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         }
 
                         if (row is not { IsDisposed: false }) {
-                            Develop.DebugPrint(ErrorType.Error, "Zeile hinzufügen Fehler");
-                            Freeze("Zeile hinzufügen Fehler");
+                            Develop.DebugPrint(ErrorType.Error, "Zeile hinzufÃ¼gen Fehler");
+                            Freeze("Zeile hinzufÃ¼gen Fehler");
                             return false;
                         }
                     }
@@ -1951,8 +1960,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                                 Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
                                 column = Column[columname];
                                 if (column is not { IsDisposed: false }) {
-                                    Develop.DebugPrint(ErrorType.Error, "Spalte hinzufügen Fehler");
-                                    Freeze("Spalte hinzufügen Fehler");
+                                    Develop.DebugPrint(ErrorType.Error, "Spalte hinzufÃ¼gen Fehler");
+                                    Freeze("Spalte hinzufÃ¼gen Fehler");
                                     return false;
                                 }
                             }
@@ -1962,7 +1971,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     #endregion
 
-                    #region Bei verschlüsselten Tabellen das Passwort abfragen
+                    #region Bei verschlÃ¼sselten Tabellen das Passwort abfragen
 
                     if (command == TableDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
                         var pwd = string.Empty;
@@ -1997,7 +2006,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (isMain) {
 
-            #region unbenutzte (gelöschte) Spalten entfernen
+            #region unbenutzte (gelÃ¶schte) Spalten entfernen
 
             var l = new List<ColumnItem>();
             foreach (var thisColumn in Column) {
@@ -2129,7 +2138,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
+    /// BefÃ¼llt den Undo Speicher und schreibt den auch im Filesystem
     /// </summary>
     /// <param name="type"></param>
     /// <param name="column"></param>
@@ -2150,10 +2159,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected virtual void Checker_Tick(object state) {
-        // Grundlegende Überprüfungen
+        // Grundlegende ÃœberprÃ¼fungen
         if (!IsEditable(false)) { return; }
 
-        // Script-Überprüfung
+        // Script-ÃœberprÃ¼fung
         var e = new CanDoScriptEventArgs(false);
         OnCanDoScript(e);
         if (!e.Cancel) { RowCollection.ExecuteValueChangedEvent(); }
@@ -2228,8 +2237,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Commands aus.
-    /// Es wird WriteValueToDiscOrServer aufgerufen - echtzeitbasierte Systeme können dort den Wert speichern
+    /// Diese Routine setzt Werte auf den richtigen Speicherplatz und fÃ¼hrt Commands aus.
+    /// Es wird WriteValueToDiscOrServer aufgerufen - echtzeitbasierte Systeme kÃ¶nnen dort den Wert speichern
     /// </summary>
     /// <param name="type"></param>
     /// <param name="value"></param>
@@ -2290,7 +2299,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     if (!string.IsNullOrEmpty(f2)) { return f2; }
 
                     var thisColumn = Column[value];
-                    if (thisColumn == null) { return "Hinzufügen fehlgeschlagen"; }
+                    if (thisColumn == null) { return "HinzufÃ¼gen fehlgeschlagen"; }
 
                     return string.Empty;
 
@@ -2498,7 +2507,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgeführt wurde
+    /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgefÃ¼hrt wurde
     /// </summary>
     protected void WaitInitialDone() {
         var t = Stopwatch.StartNew();
@@ -2562,11 +2571,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             args[2] is not RowItem row ||
             args[3] is not int waitforseconds ||
              args[4] is not bool onlyTopLevel) {
-            return new("Ungültige Parameter.", false, true);
+            return new("UngÃ¼ltige Parameter.", false, true);
         }
 
         try {
-            if (column?.Table is not { IsDisposed: false } tb) { return new("Es ist keine Spalte ausgewählt.", false, true); }
+            if (column?.Table is not { IsDisposed: false } tb) { return new("Es ist keine Spalte ausgewÃ¤hlt.", false, true); }
 
             if (!tb.IsEditable(false)) { return new(tb.IsNotEditableReason(false), false, true); }
 
@@ -2584,7 +2593,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
                 if (!string.IsNullOrEmpty(info) && !canrepair) { return new(info, false, true); }
 
-                if (lcolumn?.Table is not { IsDisposed: false } db2) { return new("Verknüpfte Tabelle verworfen.", false, true); }
+                if (lcolumn?.Table is not { IsDisposed: false } db2) { return new("VerknÃ¼pfte Tabelle verworfen.", false, true); }
 
                 db2.PowerEdit = tb.PowerEdit;
 
@@ -2616,11 +2625,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// AdditionalFiles/Tabellepfad mit Backup und abschließenden \
+    /// AdditionalFiles/Tabellepfad mit Backup und abschlieÃŸenden \
     /// </summary>
     /// <returns></returns>
     /// <summary>
-    /// AdditionalFiles/Tabellepfad mit Forms und abschließenden \
+    /// AdditionalFiles/Tabellepfad mit Forms und abschlieÃŸenden \
     /// </summary>
     /// <returns></returns>
     private string DefaultFormulaPath() {
@@ -2729,7 +2738,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (updatedArrangements != _columnArrangements) {
             _columnArrangements = updatedArrangements;
-            // Speichern ohne ChangeData aufzurufen (würde Endlosschleife verursachen)
+            // Speichern ohne ChangeData aufzurufen (wÃ¼rde Endlosschleife verursachen)
             WriteValueToDiscOrServer(TableDataType.ColumnArrangement, _columnArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
         }
     }

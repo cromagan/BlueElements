@@ -91,7 +91,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         }
     }
 
-    public ScriptEventTypes EventTypes { get; private set; } = 0;
+    public ScriptEventTypes EventTypes { get; private set; }
 
     public bool NeedRow { get; private set; }
 

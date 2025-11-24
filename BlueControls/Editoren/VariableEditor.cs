@@ -64,7 +64,7 @@ public partial class VariableEditor : EditorEasy {
     public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Table is not { IsDisposed: false } db ? null : db.Row[variable.KeyName];
 
     protected override void InitializeComponentDefaultValues() {
-        var tb = new Table();
+        var tb = Table.Get();
         var na = tb.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         na.IsFirst = true;
         tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");

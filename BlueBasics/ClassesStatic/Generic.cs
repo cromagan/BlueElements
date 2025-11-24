@@ -50,7 +50,7 @@ public static class Generic {
 
     #region Properties
 
-    public static bool Ending { get; set; } = false;
+    public static bool Ending { get; set; }
     public static string MyId { get; } = Guid.NewGuid().ToString();
 
     public static string UserName {

@@ -234,7 +234,7 @@ public static partial class Extensions {
 
         foreach (var thisString in value) {
             l.Append(thisString.ToNonCritical());
-            l.Append("|");
+            l.Append('|');
         }
 
         if (l.Length > 0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden

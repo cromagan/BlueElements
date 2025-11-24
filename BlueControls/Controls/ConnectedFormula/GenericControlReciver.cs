@@ -46,7 +46,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     // Ein privates Objekt zum Sperren für die Thread-Sicherheit
     private readonly object _lockObject = new();
 
-    private string? _cachedFilterHash = null;
+    private string? _cachedFilterHash;
 
     private FilterCollection? _filterInput;
 

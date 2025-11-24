@@ -48,7 +48,7 @@ public class InvalidatedRowsManager {
     //// ConcurrentDictionary für threadsichere Nachverfolgung verarbeiteter Einträge
     //private readonly ConcurrentDictionary<string, bool> _processedRowIds = new ConcurrentDictionary<string, bool>();
     // Flag für laufende Verarbeitung
-    private volatile bool _isProcessing = false;
+    private volatile bool _isProcessing;
 
     #endregion
 

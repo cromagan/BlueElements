@@ -34,7 +34,7 @@ public class FormManager : ApplicationContext {
     #region Fields
 
     public static readonly List<Form> Forms = [];
-    public static DExecuteAtEnd? ExecuteAtEnd = null;
+    public static DExecuteAtEnd? ExecuteAtEnd;
 
     public static Type? FormBeforeEnd;
 
