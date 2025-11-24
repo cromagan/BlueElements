@@ -124,7 +124,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Filter.PropertyChanged += Filter_PropertyChanged;
         FilterCombined.RowsChanged += FilterCombined_RowsChanged;
         FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
-        OnEnabledChanged(System.EventArgs.Empty);
     }
 
     #endregion
@@ -156,9 +155,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     #endregion
 
     #region Properties
-
-    [DefaultValue(1.0f)]
-    public float AdditionalScale => 1f;
 
     /// <summary>
     /// Wenn "Ähnliche" als Schaltfläche vorhanden sein soll, muss hier der Name einer Spaltenanordnung stehen
@@ -2807,7 +2803,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         colDia.ShowDialog();
         colDia.Dispose();
 
-        NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToString(), viewItem, cellInThisTableRow, false));
+        NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToStringInt1(), viewItem, cellInThisTableRow, false));
     }
 
     private void Cell_Edit_Dropdown(ColumnViewCollection ca, ColumnViewItem viewItem, RowData? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
@@ -3446,7 +3442,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (fi != null) {
                 trichterState = States.Checked;
                 var anz = Autofilter_Text(viewItem);
-                trichterText = anz > -100 ? (anz * -1).ToString() : "∞";
+                trichterText = anz > -100 ? (anz * -1).ToStringInt1() : "∞";
             } else {
                 trichterState = States.Standard;
             }
@@ -4333,9 +4329,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         RowItem? row = null;
         TableView? view = null;
 
-        if (e.Data is ColumnItem c) { column = c; }
-
-        if (e.Data is { } data) {
+        if (e.Data is ColumnItem c) {
+            column = c;
+        } else if (e.Data is { } data) {
             var type = data.GetType();
             column = type.GetProperty("Column")?.GetValue(data) as ColumnItem;
 

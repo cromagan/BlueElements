@@ -288,17 +288,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CellSet(ColumnItem column, double value, string comment) => Set(column, value.ToStringFloat5(), comment);
 
-    public void CellSet(string columnName, int value, string comment) => Set(Table?.Column[columnName], value.ToString(), comment);
+    public void CellSet(string columnName, int value, string comment) => Set(Table?.Column[columnName], value.ToStringInt1(), comment);
 
-    public void CellSet(ColumnItem column, int value, string comment) => Set(column, value.ToString(), comment);
+    public void CellSet(ColumnItem column, int value, string comment) => Set(column, value.ToStringInt1(), comment);
 
     public void CellSet(string columnName, Point value, string comment) => Set(Table?.Column[columnName], value.ToString(), comment);
 
     public void CellSet(ColumnItem column, Point value, string comment) => Set(column, value.ToString(), comment);
 
-    public void CellSet(string columnName, List<string>? value, string comment) => Set(Table?.Column[columnName], value.JoinWithCr(), comment);
+    public void CellSet(string columnName, IEnumerable<string>? value, string comment) => Set(Table?.Column[columnName], value.JoinWithCr(), comment);
 
-    public void CellSet(ColumnItem column, List<string>? value, string comment) => Set(column, value.JoinWithCr(), comment);
+    public void CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => Set(column, value.JoinWithCr(), comment);
 
     public void CellSet(string columnName, DateTime value, string comment) => Set(Table?.Column[columnName], value.ToString5(), comment);
 

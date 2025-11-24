@@ -27,8 +27,6 @@ using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueTable.EventArgs;
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

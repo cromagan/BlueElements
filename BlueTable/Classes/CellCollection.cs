@@ -106,7 +106,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <summary>
     ///
     /// </summary>
+    /// <param name="inputRow"></param>
     /// <param name="varcol">Wird eine Collection angegeben, werden zuerst diese Werte benutzt - falls vorhanden - anstelle des Wertes in der Zeile </param>
+    /// <param name="linkedTable"></param>
+    /// <param name="inputColumn"></param>
     /// <returns></returns>
     public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(Table? linkedTable, ColumnItem inputColumn, RowItem? inputRow, VariableCollection? varcol) {
         if (linkedTable is not { IsDisposed: false }) { return (null, "Verlinkte Tabelle verworfen."); }
@@ -133,6 +136,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (value != c.AutoCorrect(value, true)) { return (null, "Wert kann nicht gesetzt werden."); }
+
+            if (value.Contains("~")) { return (null, "Eine Variable konnte nicht aufgelöst werden."); }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }

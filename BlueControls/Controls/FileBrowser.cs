@@ -101,7 +101,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         get => IsDisposed ? string.Empty : field;
         set {
             if (IsDisposed) { return; }
-            value = value.ToLower().TrimEnd("\\") + "\\";
+            value = value.ToLowerInvariant().TrimEnd("\\") + "\\";
 
             if (value == "\\") { value = string.Empty; }
 
@@ -128,7 +128,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
             if (string.IsNullOrEmpty(value)) { value = "*"; }
 
-            value = value.ToLower();
+            value = value.ToLowerInvariant();
             if (value == _filter) { return; }
 
             _filter = value;
@@ -549,7 +549,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 _watcher.Deleted -= Watcher_Deleted;
                 _watcher.Renamed -= Watcher_Renamed;
                 _watcher.Error -= Watcher_Error;
-                //_watcher?.Dispose();
+                _watcher?.Dispose();
                 _watcher = null;
             }
         } catch { }

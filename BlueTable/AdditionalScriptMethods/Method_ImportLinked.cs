@@ -56,11 +56,11 @@ public class Method_ImportLinked : Method_TableGeneric {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(scp);
-        if (r?.Table is not { IsDisposed: false } db) { return new DoItFeedback("Zeilenfehler!", true, ld); }
+        if (r?.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Zeilenfehler!", true, ld); }
 
         #endregion
 
-        foreach (var thisColumn in db.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (thisColumn.IsDisposed) { continue; }
 
             if (thisColumn.RelationType != RelationType.CellValues) { continue; }

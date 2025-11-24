@@ -22,8 +22,6 @@ using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;

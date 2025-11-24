@@ -17,25 +17,27 @@
 
 #nullable enable
 
+using System.Globalization;
+
 namespace BlueBasics;
 
 public static partial class Extensions {
 
     #region Methods
 
-    public static string ToStringInt1(this int value) => value.ToString("0");
+    public static string ToStringInt1(this int value) => value.ToString("0", CultureInfo.InvariantCulture);
 
-    public static string ToStringInt10(this int value) => value.ToString("0000000000");
+    public static string ToStringInt10(this int value) => value.ToString("0000000000", CultureInfo.InvariantCulture);
 
-    public static string ToStringInt2(this int value) => value.ToString("00");
+    public static string ToStringInt2(this int value) => value.ToString("00", CultureInfo.InvariantCulture);
 
-    public static string ToStringInt3(this int value) => value.ToString("000");
+    public static string ToStringInt3(this int value) => value.ToString("000", CultureInfo.InvariantCulture);
 
-    public static string ToStringInt4(this int value) => value.ToString("0000");
+    public static string ToStringInt4(this int value) => value.ToString("0000", CultureInfo.InvariantCulture);
 
-    public static string ToStringInt5(this int value) => value.ToString("00000");
+    public static string ToStringInt5(this int value) => value.ToString("00000", CultureInfo.InvariantCulture);
 
-    public static string ToStringInt7(this int value) => value.ToString("0000000");
+    public static string ToStringInt7(this int value) => value.ToString("0000000", CultureInfo.InvariantCulture);
 
     #endregion
 }

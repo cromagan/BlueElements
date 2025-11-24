@@ -25,7 +25,6 @@ using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.EventArgs;

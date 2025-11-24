@@ -153,7 +153,7 @@ internal static class Dictionary {
 
     private static void Init() {
         var tmp = Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.BDB", "Dictionary", false, false);
-        if (tmp is { IsDisposed: false } db) { _dictWords = db; }
+        if (tmp is { IsDisposed: false } tb) { _dictWords = tb; }
     }
 
     #endregion

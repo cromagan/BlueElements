@@ -229,7 +229,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_additionalFormatCheck == value) { return; }
 
-            Table?.ChangeData(TableDataType.AdditionalFormatCheck, this, ((int)_additionalFormatCheck).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.AdditionalFormatCheck, this, ((int)_additionalFormatCheck).ToStringInt1(), ((int)value).ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -313,7 +313,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_afterEditRound == value) { return; }
 
-            Table?.ChangeData(TableDataType.AfterEditRound, this, _afterEditRound.ToString(), value.ToString());
+            Table?.ChangeData(TableDataType.AfterEditRound, this, _afterEditRound.ToStringInt1(), value.ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -324,7 +324,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_align == value) { return; }
 
-            Table?.ChangeData(TableDataType.ColumnAlign, this, ((int)_align).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.ColumnAlign, this, ((int)_align).ToStringInt1(), ((int)value).ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -359,7 +359,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_backColor.ToArgb() == value.ToArgb()) { return; }
 
-            Table?.ChangeData(TableDataType.BackColor, this, _backColor.ToArgb().ToString(), value.ToArgb().ToString());
+            Table?.ChangeData(TableDataType.BackColor, this, _backColor.ToArgb().ToStringInt1(), value.ToArgb().ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -497,7 +497,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_doOpticalTranslation == value) { return; }
 
-            Table?.ChangeData(TableDataType.DoOpticalTranslation, this, ((int)_doOpticalTranslation).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.DoOpticalTranslation, this, ((int)_doOpticalTranslation).ToStringInt1(), ((int)value).ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -565,7 +565,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_filterOptions == value) { return; }
 
-            Table?.ChangeData(TableDataType.FilterOptions, this, ((int)_filterOptions).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.FilterOptions, this, ((int)_filterOptions).ToStringInt1(), ((int)value).ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -575,7 +575,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (_fixedColumnWidth == value) { return; }
-            Table?.ChangeData(TableDataType.FixedColumnWidth, this, _fixedColumnWidth.ToString(), value.ToString());
+            Table?.ChangeData(TableDataType.FixedColumnWidth, this, _fixedColumnWidth.ToStringInt1(), value.ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -586,7 +586,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_foreColor.ToArgb() == value.ToArgb()) { return; }
 
-            Table?.ChangeData(TableDataType.ForeColor, this, _foreColor.ToArgb().ToString(), value.ToArgb().ToString());
+            Table?.ChangeData(TableDataType.ForeColor, this, _foreColor.ToArgb().ToStringInt1(), value.ToArgb().ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -679,7 +679,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_lineStyleLeft == value) { return; }
 
-            Table?.ChangeData(TableDataType.LineStyleLeft, this, ((int)_lineStyleLeft).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.LineStyleLeft, this, ((int)_lineStyleLeft).ToStringInt1(), ((int)value).ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -698,7 +698,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_lineStyleRight == value) { return; }
 
-            Table?.ChangeData(TableDataType.LineStyleRight, this, ((int)_lineStyleRight).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.LineStyleRight, this, ((int)_lineStyleRight).ToStringInt1(), ((int)value).ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -769,7 +769,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (_maxCellLength == value) { return; }
-            Table?.ChangeData(TableDataType.MaxCellLength, this, _maxCellLength.ToString(), value.ToString());
+            Table?.ChangeData(TableDataType.MaxCellLength, this, _maxCellLength.ToStringInt1(), value.ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -779,7 +779,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (_maxTextLength == value) { return; }
-            Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToString(), value.ToString());
+            Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToStringInt1(), value.ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -858,7 +858,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_relationType == value) { return; }
 
-            Table?.ChangeData(TableDataType.RelationType, this, ((int)_value_for_Chunk).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.RelationType, this, ((int)_value_for_Chunk).ToStringInt1(), ((int)value).ToStringInt1());
             Invalidate_ColumAndContent();
 
             OnPropertyChanged();
@@ -892,7 +892,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_scriptType == value) { return; }
 
-            Table?.ChangeData(TableDataType.ScriptType, this, ((int)_scriptType).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.ScriptType, this, ((int)_scriptType).ToStringInt1(), ((int)value).ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -914,7 +914,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_sortType == value) { return; }
 
-            Table?.ChangeData(TableDataType.SortType, this, ((int)_sortType).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.SortType, this, ((int)_sortType).ToStringInt1(), ((int)value).ToStringInt1());
             OnPropertyChanged();
         }
     }
@@ -969,7 +969,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             var oldd = _value_for_Chunk;
 
-            Table?.ChangeData(TableDataType.Value_for_Chunk, this, ((int)_value_for_Chunk).ToString(), ((int)value).ToString());
+            Table?.ChangeData(TableDataType.Value_for_Chunk, this, ((int)_value_for_Chunk).ToStringInt1(), ((int)value).ToStringInt1());
             Invalidate_ColumAndContent();
 
             if (oldd != _value_for_Chunk) {
@@ -1294,8 +1294,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return list.SortedDistinctList();
     }
 
-
-
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
@@ -1316,7 +1314,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public string ErrorReason() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
         if (string.IsNullOrEmpty(_keyName)) { return "Der Spaltenname ist nicht definiert."; }
 
         if (!IsValidColumnName(_keyName)) { return "Der Spaltenname ist ungültig."; }
@@ -1332,15 +1330,29 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (string.IsNullOrEmpty(_caption)) { return "Spalten Beschriftung fehlt."; }
 
+        if (_scriptType == ScriptType.undefiniert) { return "Der Typ im Skript ist nicht definiert."; }
+
+        if (string.IsNullOrEmpty(_defaultRenderer)) { return "Es ist kein Renderer angebeben"; }
+
         if (_relationType != RelationType.None) {
             if (LinkedTable is not { IsDisposed: false } db2) { return "Verknüpfte Tabelle fehlt oder existiert nicht."; }
-            if (db == db2) { return "Zirkelbezug mit verknüpfter Tabelle."; }
+            if (tb == db2) { return "Zirkelbezug mit verknüpfter Tabelle."; }
             var c = db2.Column[_columnNameOfLinkedTable];
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
             if (LinkedCellFilter.Count == 0) {
                 if (_relationType != RelationType.DropDownValues) {
                     return "Keine Filter für verknüpfte Tabelle definiert.";
                 }
+            }
+
+            if (_relationType == RelationType.CellValues) {
+                if (_scriptType is not ScriptType.Nicht_vorhanden) {
+                    return "Spalten mit Verlinkungen zu anderen Tabellen können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
+                }
+
+                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, this, db2.Row.First(), null);
+                if (!string.IsNullOrWhiteSpace(info)) { return $"Zell-Verlinkung fehlerhaft: {info}"; }
+                fc?.Dispose();
             }
         } else {
             if (!string.IsNullOrEmpty(_columnNameOfLinkedTable)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
@@ -1401,7 +1413,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 return "Beziehungen zu anderen Zeilen und Schlüsselspalte nicht kombinierbar.";
             }
 
-            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly &&
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly and not ScriptType.Nicht_vorhanden &&
                 _relationType != RelationType.CellValues) {
                 return "Schlüsselspalten müssen im Script als Readonly vorhanden sein.";
             }
@@ -1430,15 +1442,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (_relationship_to_First) {
             if (!_multiLine) { return "Bei dieser Funktion muss mehrzeilig ausgewählt werden."; }
             //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-            if (db.Column.First == this) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt."; }
+            if (tb.Column.First == this) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt."; }
             //if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
             //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
-        }
-
-        if (_relationType == RelationType.CellValues) {
-            if (_scriptType is not ScriptType.Nicht_vorhanden) {
-                return "Spalten mit Verlinkungen zu anderen Tabellen können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
-            }
         }
 
         if (_multiLine) {
@@ -2425,7 +2431,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             default:
-                if (!string.Equals(type.ToString(), ((int)type).ToString(), StringComparison.Ordinal)) {
+                if (!string.Equals(type.ToString(), ((int)type).ToStringInt1(), StringComparison.Ordinal)) {
                     return "Interner Fehler: Für den Datentyp '" + type + "' wurde keine Laderegel definiert.";
                 }
                 break;
@@ -2498,7 +2504,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    private string KleineFehlerCorrect(string txt) {
+    private static string KleineFehlerCorrect(string txt) {
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
         //if (TextFormatingAllowed) { txt = txt.HtmlSpecialToNormalChar(false); }
         string oTxt;

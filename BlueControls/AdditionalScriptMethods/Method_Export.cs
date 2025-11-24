@@ -25,20 +25,17 @@ using BlueScript.Variables;
 using BlueTable;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using static BlueBasics.IO;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-
 internal class Method_Export : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
-
 
     public override string Command => "export";
 
@@ -52,7 +49,6 @@ internal class Method_Export : Method_TableGeneric {
     public override MethodType MethodLevel => MethodType.LongTime;
 
     public override bool MustUseReturnValue => false;
-
 
     public override string Returns => string.Empty;
 
@@ -156,7 +152,6 @@ internal class Method_Export : Method_TableGeneric {
 
         return DoItFeedback.Null();
     }
-
 
     #endregion
 }

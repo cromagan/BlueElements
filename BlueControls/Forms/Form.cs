@@ -50,7 +50,8 @@ public partial class Form : System.Windows.Forms.Form {
 
     #region Constructors
 
-    public Form() : this(Design.Form_Standard) { }
+    public Form() : this(Design.Form_Standard) {
+    }
 
     public Form(Design design) : base() {
         Allgemein.CheckMemory();
@@ -61,6 +62,18 @@ public partial class Form : System.Windows.Forms.Form {
         BackColor = Skin.Color_Back(Design, States.Standard);
     }
 
+    public new DialogResult ShowDialog() {
+        BlueControls.FormManager.RegisterForm(this);
+        var t = base.ShowDialog();
+
+        return t;
+    }
+
+    public new void Show() {
+        BlueControls.FormManager.RegisterForm(this);
+        base.Show();
+    }
+
     #endregion
 
     #region Properties
@@ -68,13 +81,13 @@ public partial class Form : System.Windows.Forms.Form {
     [DefaultValue(false)]
     public override bool AutoSize {
         get => false; //MyBase.AutoSize
-  
+
         set => base.AutoSize = false;
     }
 
     public sealed override Color BackColor {
         get => base.BackColor;
-  
+
         set => base.BackColor = value;
     }
 
@@ -106,7 +119,7 @@ public partial class Form : System.Windows.Forms.Form {
     public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
 
     // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-    
+
     public new void PerformAutoScale() {
         // NIX TUN!!!!
     }

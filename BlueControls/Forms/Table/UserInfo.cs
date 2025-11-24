@@ -28,7 +28,7 @@ public sealed partial class UserInfo : FormWithStatusBar {
     #region Constructors
 
     public UserInfo() : base() =>
-        // Dieser Aufruf ist für den Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Designer erforderlich.
         InitializeComponent();
 
     #endregion

@@ -39,7 +39,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueTableDialogs;
 
-internal sealed partial class ColumnEditor : IIsEditor {
+internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     #region Fields
 
@@ -97,6 +97,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
     }
 
+    public Table? Table => _column?.Table;
+
     #endregion
 
     #region Methods
@@ -145,12 +147,12 @@ internal sealed partial class ColumnEditor : IIsEditor {
     private void btnCalculateMaxCellLength_Click(object sender, System.EventArgs e) {
         if (_column == null) { return; }
 
-        txbMaxCellLength.Text = _column.CalculatePreveredMaxCellLength(1.2f).ToString();
+        txbMaxCellLength.Text = _column.CalculatePreveredMaxCellLength(1.2f).ToStringInt1();
     }
 
     private void btnMaxTextLength_Click(object sender, System.EventArgs e) {
         if (_column == null) { return; }
-        txbMaxTextLength.Text = _column.CalculatePreveredMaxTextLength(1.2f).ToString();
+        txbMaxTextLength.Text = _column.CalculatePreveredMaxTextLength(1.2f).ToStringInt1();
     }
 
     private void btnOk_Click(object sender, System.EventArgs e) {

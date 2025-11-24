@@ -688,8 +688,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 x++;
                 pf = string.Empty;
                 switch (x) {
-                    case 0:
-                        // BeCreative, At Home, 31.11.2021
+                    case 2:
+
                         pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
@@ -697,7 +697,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\..\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
-                    case 2:
+                    case 0:                         // BeCreative, At Home, 31.11.2021
                         pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
@@ -732,21 +732,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         break;
                 }
                 if (FileExists(pf)) {
-                    var db = new TableFile(name);
-                    db.DropMessages = false;
-                    db.LoadFromFile(pf, false, null, string.Empty, false);
-                    return db;
+                    var tb = new TableFile(name);
+                    tb.DropMessages = false;
+                    tb.LoadFromFile(pf, false, null, string.Empty, false);
+                    return tb;
                 }
             } while (!string.IsNullOrEmpty(pf));
         }
         var d = GetEmmbedResource(assembly, name);
         if (d != null) {
-            var db = new Table(name) {
-                LogUndo = false,
-                DropMessages = false
-            };
-            db.LoadFromStream(d);
-            return db;
+            var tb = new Table(name);
+            tb.LoadFromStream(d);
+            return tb;
         }
         if (fehlerAusgeben) { Develop.DebugPrint(ErrorType.Error, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
         return null;
@@ -1829,6 +1826,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public void LoadFromStream(System.IO.Stream stream) {
+        LogUndo = false;
+        DropMessages = false;
+
         //OnLoading();
         byte[] bLoaded;
         using (var r = new System.IO.BinaryReader(stream)) {
