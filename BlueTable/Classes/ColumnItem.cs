@@ -1274,7 +1274,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public List<string> Contents(IEnumerable<RowItem>? rows) {
-        if (rows == null || !rows.Any()) { return []; }
+        if (rows?.Any() != true) { return []; }
 
         var list = new List<string>();
         foreach (var thisRowItem in rows) {

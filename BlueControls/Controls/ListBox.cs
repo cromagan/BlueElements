@@ -627,12 +627,11 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                     var cx = 0;
                     var cy = 0;
                     var wi = colWidth;
-                    int he;
                     itenc++;
                     if (senkrechtAllowed == Orientation.Waagerecht) {
                         if (thisItem.IsCaption) { wi = controlDrawingArea.Width - sliderWidth; }
                     }
-                    he = thisItem.HeightForListBox(_appearance, colHeight, _itemDesign);
+                    var he = thisItem.HeightForListBox(_appearance, colHeight, _itemDesign);
 
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
@@ -1144,7 +1143,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
     private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
 
-    private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem != null && thisItem.Contains(x, y + (int)SliderY.Value));
+    private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem?.Contains(x, y + (int)SliderY.Value) == true);
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 

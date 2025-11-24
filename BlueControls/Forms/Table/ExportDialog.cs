@@ -53,17 +53,17 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Constructors
 
-    public ExportDialog(Table db, string autosaveFile) : this(db, null, autosaveFile) {
+    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) {
     }
 
-    public ExportDialog(Table db, List<RowItem>? rows) : this(db, rows, string.Empty) {
+    public ExportDialog(Table tb, List<RowItem>? rows) : this(tb, rows, string.Empty) {
     }
 
-    public ExportDialog(Table db, List<RowItem>? rows, string autosaveFile) {
-        // Dieser Aufruf ist für den Designer erforderlich.
+    public ExportDialog(Table tb, List<RowItem>? rows, string autosaveFile) {
+        // Dieser Aufruf ist fÃ¼r den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        Table = db;
+        // FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        Table = tb;
         _rowsForExport = rows;
         if (!string.IsNullOrEmpty(autosaveFile)) {
             _zielPfad = autosaveFile.FilePath();
@@ -74,7 +74,7 @@ public sealed partial class ExportDialog : IHasTable {
 
         CreateDirectory(_zielPfad);
 
-        BefülleLayoutDropdowns();
+        BefÃ¼lleLayoutDropdowns();
         EintragsText();
         NurStartEnablen();
     }
@@ -104,9 +104,9 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Methods
 
-    public static void AddLayoutsOff(ComboBox addHere, Table? db) {
-        if (db is null || db.IsDisposed) { return; }
-        var r = db.GetAllLayoutsFileNames();
+    public static void AddLayoutsOff(ComboBox addHere, Table? tb) {
+        if (tb?.IsDisposed != false) { return; }
+        var r = tb.GetAllLayoutsFileNames();
 
         foreach (var thisFile in r) {
             if (addHere[thisFile] == null) { addHere.ItemAdd(ItemOf(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16))); }
@@ -121,7 +121,7 @@ public sealed partial class ExportDialog : IHasTable {
     /// <param name="layoutFileName"></param>
     /// <param name="rowsForExport"></param>
     /// <param name="abstandMm"></param>
-    /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
+    /// <returns>Gibt das Item zurÃ¼ck, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gÃ¼ltige) Liste Ã¼bergeben wurde.</returns>
     public static int GeneratePrintPad(CreativePad pad, int startNr, string layoutFileName, List<RowItem>? rowsForExport, float abstandMm) {
         if (pad.Items == null) { return -1; }
 
@@ -188,7 +188,7 @@ public sealed partial class ExportDialog : IHasTable {
 
     private void Attribute_Changed(object? sender, System.EventArgs? e) {
         FloatTryParse(flxBreite.Value, out var b);
-        FloatTryParse(flxHöhe.Value, out var h);
+        FloatTryParse(flxHÃ¶he.Value, out var h);
         FloatTryParse(flxAbstand.Value, out var ab);
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
@@ -196,7 +196,7 @@ public sealed partial class ExportDialog : IHasTable {
 
         if (padSchachteln.Items != null) {
             padSchachteln.Items.Breite = b;
-            padSchachteln.Items.Höhe = h;
+            padSchachteln.Items.HÃ¶he = h;
             padSchachteln.Items.RandinMm = Padding.Empty;
             padSchachteln.Items.BackColor = Color.Transparent;
         }
@@ -204,7 +204,7 @@ public sealed partial class ExportDialog : IHasTable {
         GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _rowsForExport, ab);
     }
 
-    private void BefülleLayoutDropdowns() {
+    private void BefÃ¼lleLayoutDropdowns() {
         cbxLayoutWahl.ItemClear();
         AddLayoutsOff(cbxLayoutWahl, Table);
     }
@@ -215,13 +215,13 @@ public sealed partial class ExportDialog : IHasTable {
         switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "A4 Printer", "Abbrechen")) {
             case 0:
                 flxBreite.ValueSet("210", true);
-                flxHöhe.ValueSet("297", true);
+                flxHÃ¶he.ValueSet("297", true);
                 flxAbstand.ValueSet("0", true);
                 break;
 
             case 1:
                 flxBreite.ValueSet("190", true);
-                flxHöhe.ValueSet("277", true);
+                flxHÃ¶he.ValueSet("277", true);
                 flxAbstand.ValueSet("1", true);
                 break;
         }
@@ -231,13 +231,13 @@ public sealed partial class ExportDialog : IHasTable {
         if (padSchachteln.Items is not { IsDisposed: false }) { return; }
 
         FloatTryParse(flxBreite.Value, out var b);
-        FloatTryParse(flxHöhe.Value, out var h);
+        FloatTryParse(flxHÃ¶he.Value, out var h);
         FloatTryParse(flxAbstand.Value, out var ab);
         if (ab < 1) { ab = 0; }
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
         padSchachteln.Items.Breite = b;
-        padSchachteln.Items.Höhe = h;
+        padSchachteln.Items.HÃ¶he = h;
         padSchachteln.Items.RandinMm = Padding.Empty;
         List<string> l = [];
         _itemNrForPrint = 0;
@@ -269,7 +269,7 @@ public sealed partial class ExportDialog : IHasTable {
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
-        if (Table == null || string.IsNullOrEmpty(cbxLayoutWahl.Text) || _rowsForExport == null || !_rowsForExport.Any()) {
+        if (Table == null || string.IsNullOrEmpty(cbxLayoutWahl.Text) || _rowsForExport?.Any() != true) {
             padVorschau.Items?.Clear();
         } else {
             padVorschau.ShowInPrintMode = true;
@@ -281,19 +281,19 @@ public sealed partial class ExportDialog : IHasTable {
     }
 
     private void EintragsText() => capAnzahlInfo.Text = _rowsForExport is not { Count: not 0 }
-        ? "Bitte wählen sie die Einträge für den Export."
+        ? "Bitte wÃ¤hlen sie die EintrÃ¤ge fÃ¼r den Export."
         : _rowsForExport.Count == 1
-            ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
-            : "Es sind <b>" + _rowsForExport.Count + "</b> Einträge gewählt.";
+            ? "Es ist genau ein Eintrag gewÃ¤hlt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
+            : "Es sind <b>" + _rowsForExport.Count + "</b> EintrÃ¤ge gewÃ¤hlt.";
 
     private void Exported_ItemClicked(object sender, AbstractListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
-        if (_rowsForExport is not { Count: not 0 }) { return "Es sind keine Einträge für den Export gewählt."; }
-        if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
+        if (_rowsForExport is not { Count: not 0 }) { return "Es sind keine EintrÃ¤ge fÃ¼r den Export gewÃ¤hlt."; }
+        if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout fÃ¼r den Export gewÃ¤hlt."; }
         ////TODO: Schachteln implementieren
-        //if (!optSpezialFormat.Checked && !optEinzelnSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
+        //if (!optSpezialFormat.Checked && !optEinzelnSpeichern.Checked) { return "Das gewÃ¤hlte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
 
         return string.Empty;
     }
@@ -307,7 +307,7 @@ public sealed partial class ExportDialog : IHasTable {
         var n = cbxLayoutWahl.Text;
         cbxLayoutWahl.Text = string.Empty;
         TableViewForm.OpenLayoutEditor(db, n);
-        BefülleLayoutDropdowns();
+        BefÃ¼lleLayoutDropdowns();
         if (cbxLayoutWahl[n] != null) {
             cbxLayoutWahl.Text = n;
         }
@@ -315,7 +315,7 @@ public sealed partial class ExportDialog : IHasTable {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.ContextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, e.HotItem, true));
+        e.ContextMenu.Add(ItemOf("Dateipfad Ã¶ffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, e.HotItem, true));
         e.ContextMenu.Add(ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, e.HotItem, true));
     }
 

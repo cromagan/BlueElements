@@ -103,7 +103,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     } = string.Empty;
 
-    public override bool Focused => base.Focused || (_sliderY != null && _sliderY.Focused());
+    public override bool Focused => base.Focused || _sliderY?.Focused() == true;
 
     [DefaultValue(4000)]
     public int MaxTextLength {

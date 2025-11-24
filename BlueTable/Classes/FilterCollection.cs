@@ -264,7 +264,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     #region Indexers
 
     public FilterItem? this[ColumnItem? column] =>
-        _internal.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.IsOk())
+        _internal.Where(thisFilterItem => thisFilterItem?.IsOk() == true)
         .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
     public FilterItem? this[int no] => no < 0 || no >= _internal.Count ? null : _internal[no];
@@ -274,7 +274,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     #region Methods
 
     public static List<RowItem> CalculateFilteredRows(Table? db, params FilterItem[] filter) {
-        if (db == null || db.IsDisposed) { return []; }
+        if (db?.IsDisposed != false) { return []; }
 
         if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, true, filter) is { } i) {
@@ -323,9 +323,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// Gibt den Wert zurück, der in eine neue Zeile reingeschrieben wird
     /// </summary>
     /// <param name="column"></param>
+    /// <param name="firstToo"></param>
+    /// <param name="isForSerach"></param>
+    /// <param name="filter"></param>
     /// <returns></returns>
     public static string? InitValue(ColumnItem column, bool firstToo, bool isForSerach, params FilterItem[] filter) {
-        if (filter == null || !filter.Any()) { return null; }
+        if (filter is not { Length: not 0 }) { return null; }
         if (column is not { IsDisposed: false }) { return null; }
         if (column.Table is not { IsDisposed: false } db) { return null; }
 
@@ -339,7 +342,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             column == db.Column.SysLocked ||
             column == db.Column.SysRowState) { return null; }
 
-        var fi = filter.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.IsOk())
+        var fi = filter.Where(thisFilterItem => thisFilterItem?.IsOk() == true)
                               .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
         if (fi is not {
@@ -376,11 +379,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void AddIfNotExists(List<FilterItem> filterItems) {
-        if (IsDisposed || !filterItems.Any()) { return; }
+        if (IsDisposed || filterItems.Count == 0) { return; }
 
         var newItems = filterItems.Where(item => !Exists(item)).ToList();
 
-        if (newItems.Any()) {
+        if (newItems.Count != 0) {
             OnChanging();
             AddInternal(newItems);
             Invalidate_FilteredRows();
@@ -575,7 +578,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         List<string> result = [];
 
         foreach (var thisFilterItem in _internal) {
-            if (thisFilterItem is { } && thisFilterItem.IsOk()) {
+            if (thisFilterItem?.IsOk() == true) {
                 result.ParseableAdd("Filter", thisFilterItem);
             }
         }
@@ -626,7 +629,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Equals(filter)).ToList();
 
-        if (existingColumnFilter.Any()) {
+        if (existingColumnFilter.Count != 0) {
             OnChanging();
             foreach (var thisItem in existingColumnFilter) {
                 _internal.Remove(thisItem);

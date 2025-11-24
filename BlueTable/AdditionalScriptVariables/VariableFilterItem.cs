@@ -63,7 +63,7 @@ public class VariableFilterItem : Variable {
     }
 
     public override bool GetFromStringPossible => false;
-    public override bool IsNullOrEmpty => _filter == null || !_filter.IsOk();
+    public override bool IsNullOrEmpty => _filter?.IsOk() != true;
     public override string ReadableText => _lastText;
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
@@ -89,7 +89,7 @@ public class VariableFilterItem : Variable {
         return false;
     }
 
-    private void GetText() => _lastText = _filter == null || !_filter.IsOk() ? "Filter: [ERROR]" : "Filter: " + _filter.ReadableText();
+    private void GetText() => _lastText = _filter?.IsOk() != true ? "Filter: [ERROR]" : "Filter: " + _filter.ReadableText();
 
     #endregion
 }

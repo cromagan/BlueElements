@@ -559,7 +559,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public RowItem? GetByKey(string? key) {
-        if (Table is not { IsDisposed: false } || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
+        if (Table is not { IsDisposed: false } || string.IsNullOrWhiteSpace(key)) { return null; }
         try {
             var r = _internal.TryGetValue(key, out var value) ? value : null;
             if (r is { IsDisposed: true }) {
@@ -602,26 +602,26 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="oldestTo"></param>
     /// <returns></returns>
     public RowItem? NextRowToCheck(bool oldestTo) {
-        if (Table is not { IsDisposed: false } tbl) { return null; }
+        if (Table is not { IsDisposed: false } tb) { return null; }
 
-        if (!tbl.CanDoValueChangedScript(false)) { return null; }
+        if (!tb.CanDoValueChangedScript(false)) { return null; }
 
-        var rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5, false));
+        var rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5, false));
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !tbl.MultiUserPossible));
+        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !tb.MultiUserPossible));
         if (rowToCheck != null) { return rowToCheck; }
 
-        rowToCheck = tbl.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !tbl.MultiUserPossible));
+        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !tb.MultiUserPossible));
         if (rowToCheck != null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
 
-        if (tbl.Column.SysRowState is not { IsDisposed: false } srs) { return null; }
+        if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return null; }
         var datefoundmax = new DateTime(2100, 1, 1);
         RowItem? foundrow = null;
 
-        foreach (var thisRow in tbl.Row) {
+        foreach (var thisRow in tb.Row) {
             var dateofmyrow = thisRow.CellGetDateTime(srs);
             if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow(15, true)) {
                 datefoundmax = dateofmyrow;
@@ -888,7 +888,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisColumn in orderedColumns) {
             var val = FilterCollection.InitValue(thisColumn, true, false, fc);
-            if (val is { } && !string.IsNullOrWhiteSpace(val)) {
+            if (!string.IsNullOrWhiteSpace(val)) {
                 try {
                     var cellResult = nRow.Set(thisColumn, val, "Initialwert neuer Zeile");
                     if (!string.IsNullOrEmpty(cellResult)) {

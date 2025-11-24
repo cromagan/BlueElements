@@ -182,14 +182,14 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
     public bool ShowAlways {
         get {
             if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ShowAlways; }
-            return this is ItemCollectionPadItem { IsDisposed: false } icip2 && icip2.ShowAlways; // Wichtig, wegen NEW!
+            return this is ItemCollectionPadItem { IsDisposed: false, ShowAlways: true }; // Wichtig, wegen NEW!
         }
     }
 
     public bool ShowJointPoints {
         get {
             if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ShowJointPoints; }
-            return this is ItemCollectionPadItem { IsDisposed: false } icip2 && icip2.ShowJointPoints; // Wichtig, wegen NEW!
+            return this is ItemCollectionPadItem { IsDisposed: false, ShowJointPoints: true }; // Wichtig, wegen NEW!
         }
     }
 

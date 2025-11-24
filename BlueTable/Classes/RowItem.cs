@@ -89,11 +89,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public bool KeyIsCaseSensitive => true;
     public string KeyName { get; }
 
-    public string QuickInfo {
+    public string? QuickInfo {
         get {
-            if (field != null) { return field; }
-            GenerateQuickInfo();
-            return field!;
+            if (Table is not { IsDisposed: false }) { return string.Empty; }
+            field ??= ReplaceVariables(Table.RowQuickInfo, false, null);
+            return field;
         }
 
         private set;
@@ -684,7 +684,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var column in tb.Column) {
             if (!erg.Contains("~")) { return erg; }
 
-            if (column != null && column.RelationType == RelationType.None) {
+            if (column is { RelationType: RelationType.None }) {
                 if (erg.ToUpperInvariant().Contains("~" + column.KeyName.ToUpperInvariant())) {
                     var replacewith = CellGetString(column);
                     //if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
@@ -1019,7 +1019,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return allRows;
     }
 
-    private static void MakeNewRelations(ColumnItem? column, RowItem? row, ICollection<string> oldBz, IEnumerable<string> newBz) {
+    private static void MakeNewRelations(ColumnItem? column, RowItem? row, List<string> oldBz, IEnumerable<string> newBz) {
         if (row is not { IsDisposed: false }) { return; }
         if (column is not { IsDisposed: false }) { return; }
 
@@ -1142,16 +1142,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    private void GenerateQuickInfo() {
-        if (Table is not { IsDisposed: false } ||
-            string.IsNullOrEmpty(Table.RowQuickInfo)) {
-            QuickInfo = string.Empty;
-            return;
-        }
-
-        QuickInfo = ReplaceVariables(Table.RowQuickInfo, false, null);
-    }
-
     private bool MatchesTo(ColumnItem column, FilterType filtertyp, ReadOnlyCollection<string> searchvalue) {
         //Grundlegendes zu UND und ODER:
         //Ein Filter kann mehrere Werte haben, diese müssen ein Attribut UND oder ODER haben.
@@ -1178,11 +1168,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
             //if (Und && Oder) { Develop.DebugPrint(ErrorType.Error, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
             // Tatsächlichen String ermitteln --------------------------------------------
-            string txt;
 
             if (!column.SaveContent) { CheckRow(); }
 
-            txt = CellGetStringCore(column) ?? string.Empty;
+            var txt = CellGetStringCore(column);
 
             if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, column.DoOpticalTranslation, null); }
             // Multiline-Typ ermitteln  --------------------------------------------

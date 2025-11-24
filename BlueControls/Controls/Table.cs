@@ -384,7 +384,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
 
-        var capName = pinnedRows != null && pinnedRows.Any();
+        var capName = pinnedRows?.Any() == true;
         if (!capName && tb.Column.SysChapter is { IsDisposed: false } cap) {
             foreach (var thisRow in filteredRows) {
                 if (thisRow.Table != null && !string.IsNullOrEmpty(thisRow.CellGetString(cap))) {
@@ -435,7 +435,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Parallel.ForEach(filteredRows, thisRow => {
             var adk = thisRow.CompareKey(colsToRefresh);
 
-            var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
+            var markYellow = pinnedRows?.Contains(thisRow) == true;
             var added = markYellow;
 
             var caps = tb.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
@@ -704,7 +704,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     public static Renderer_Abstract RendererOf(ColumnItem? column, string style) {
-        if (column == null || string.IsNullOrEmpty(column.DefaultRenderer)) { return Renderer_Abstract.Default; }
+        if (string.IsNullOrEmpty(column?.DefaultRenderer)) { return Renderer_Abstract.Default; }
 
         var renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
         if (renderer == null) { return Renderer_Abstract.Default; }
@@ -3271,7 +3271,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Draw_Border(gr, cellInThisTableColumn, realHead, displayRectangleWoSlider.Bottom);
     }
 
-    private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, bool firstOnScreen, ColumnViewCollection ca, Rectangle realHead) {
+    private void Draw_Column_Cells(Graphics gr, List<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, bool firstOnScreen, ColumnViewCollection ca, Rectangle realHead) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
         if (viewItem.Column is not { IsDisposed: false } cellInThisTableColumn) { return; }
 
@@ -3966,8 +3966,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var rowY = DrawY(ca, vrow);
 
         // Vergleiche mit dem sichtbaren Bereich unter Berücksichtigung der Filterleiste
-        return rowY + vrow.DrawHeight >= (GetPix(ca.HeadSize()) + FilterleisteHeight) &&
-               rowY <= (displayRectangleWoSlider.Height + FilterleisteHeight);
+        return rowY + vrow.DrawHeight >= GetPix(ca.HeadSize()) + FilterleisteHeight &&
+               rowY <= displayRectangleWoSlider.Height + FilterleisteHeight;
     }
 
     private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(_zoom, SliderX.Value, FilterleisteHeight).Contains(e.Location);

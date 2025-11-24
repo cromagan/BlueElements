@@ -371,7 +371,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
     /// </summary>
     /// <returns></returns>
-    protected bool SwitchTabToTable(Table? table) => table is not null && !table.IsDisposed && SwitchTabToTable(table.KeyName);
+    protected bool SwitchTabToTable(Table? table) => table?.IsDisposed == false && SwitchTabToTable(table.KeyName);
 
     protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
     }

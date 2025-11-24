@@ -344,6 +344,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
 
+    /// <summary>
     /// Der Wert wird im System verankert und gespeichert.
     /// Bei Tabellen, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
     /// Kann hier nur gelesen werden! Da eine Änderung über die Property die Datei wieder auf ungespeichert setzen würde, würde hier eine
@@ -553,8 +554,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     private void InitDummyTable() {
-
-
         LogUndo = false;
         DropMessages = false;
         MainChunkLoadDone = true;
@@ -569,7 +568,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         OnLoaded(true);
 
         CreateWatcher();
-
     }
 
     public static Table? Get(string fileOrTableName, NeedPassword? needPassword, bool instantUpdate) {
@@ -1071,7 +1069,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                                     (adminInfo != null && adminInfo != existingScript.AdminInfo) ||
                                     (eventTypes != null && !eventTypes.Equals(existingScript.EventTypes)) ||
                                     (needRow != null && needRow != existingScript.NeedRow) ||
-                                    (userGroups != null && !userGroups.SequenceEqual(existingScript.UserGroups)) ||
+                                    userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
                                     (failedReason != null && failedReason != existingScript.FailedReason);
 
                     if (hasChanges) {
@@ -2250,7 +2248,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
-        if ((reason != Reason.NoUndo_NoInvalidate) && !IsEditable(false)) { return "Tabelle eingefroren: " + IsNotEditableReason(false); }
+        if (reason != Reason.NoUndo_NoInvalidate && !IsEditable(false)) { return "Tabelle eingefroren: " + IsNotEditableReason(false); }
         if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;
@@ -2550,13 +2548,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
+    private static int NummerCode1(byte[] b, int pointer) => b[pointer];
 
-    private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
+    private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
-    private static int NummerCode3(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
+    private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
-    private static long NummerCode7(IReadOnlyList<byte> b, int pointer) {
+    private static long NummerCode7(byte[] b, int pointer) {
         long nu = 0;
         for (var n = 0; n < 7; n++) {
             nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);

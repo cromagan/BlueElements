@@ -1,4 +1,4 @@
-// Authors:
+Ôªø// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -50,7 +50,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private readonly ConcurrentDictionary<string, string> _transformCache = new();
 
     /// <summary>
-    /// Die Schriftart, mit allen Attributen, die nativ unterst¸tzt werden.
+    /// Die Schriftart, mit allen Attributen, die nativ unterst√ºtzt werden.
     /// </summary>
     private Font _font = new("Arial", 9);
 
@@ -60,7 +60,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private Font _fontOl = new("Arial", 9);
 
     private QuickImage? _nameInStyleSym;
-    private float _oberl‰nge = -1;
+    private float _oberl√§nge = -1;
     private Bitmap? _sampleTextSym;
     private float _sizeTestedAndFailed = float.MaxValue;
     private float _sizeTestedAndOk = float.MinValue;
@@ -167,7 +167,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                     return broken;
                 } // Alles untergebracht
                 if (broken.Count == maxLines - 1) {
-                    // Ok, werden zu viele Zeilen. Also diese K¸rzen.
+                    // Ok, werden zu viele Zeilen. Also diese K√ºrzen.
                     broken.Add(TrimByWidth(font, rest, maxWidth));
                     return broken;
                 }
@@ -178,7 +178,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                 }
                 broken.Add(toTEst);
                 rest = rest.Substring(pos);
-                pos = -1; // wird gleich erhˆht
+                pos = -1; // wird gleich erh√∂ht
             }
         } while (true);
     }
@@ -198,7 +198,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (_blueFontCache.Count > maxFonts) {
             var keysToRemove = _blueFontCache.Keys
                 .OrderBy(k => {
-                    // DefaultFont hat hˆchste Priorit‰t und wird nie entfernt
+                    // DefaultFont hat h√∂chste Priorit√§t und wird nie entfernt
                     if (_blueFontCache.TryGetValue(k, out var font) && font == DefaultFont) {
                         return int.MinValue;
                     }
@@ -220,7 +220,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             }
         }
 
-        // Zus‰tzlich die statischen Caches aufr‰umen
+        // Zus√§tzlich die statischen Caches aufr√§umen
         if (_brushCache.Count > maxItemsPerFont) {
             var keysToRemove = _brushCache.Keys
                 .Take(_brushCache.Count - maxItemsPerFont)
@@ -292,7 +292,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         var size = SizeF.Empty;
         if (Underline || StrikeOut || BackColor) {
-            size = (text.Length == 1) ? CharSize(text[0]) : MeasureString(text);
+            size = text.Length == 1 ? CharSize(text[0]) : MeasureString(text);
 
             // Hintergrund
             //if (BackColor) {
@@ -323,7 +323,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             for (var px = -outlineSize; px <= outlineSize; px++) {
                 for (var py = -outlineSize; py <= outlineSize; py++) {
                     if (px == 0 && py == 0) {
-                        continue; // ‹berspringen der Mitte
+                        continue; // √úberspringen der Mitte
                     }
 
                     var dx = x + (px * scale);
@@ -343,7 +343,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             using var scaledPen = new Pen(ColorMain, lineWidth);
 
             if (Underline) {
-                var underlineY = y + Oberl‰nge(scale) + lineWidth + scale + 0.5f;
+                var underlineY = y + Oberl√§nge(scale) + lineWidth + scale + 0.5f;
                 gr.DrawLine(scaledPen, x, (int)underlineY, x + ((1 + size.Width) * scale), (int)underlineY);
             }
             if (StrikeOut) {
@@ -461,7 +461,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         _stringSizeCache.Clear();
         _transformCache.Clear();
 
-        // Oberl‰ngenberechnung
+        // Oberl√§ngenberechnung
         var multi = 50 / _fontOl.Size;
         using var tmpfont = new Font(_fontOl.Name, _fontOl.Size * multi / Skin.Scale, _fontOl.Style);
         var f = tmpfont.MeasureString("Z");
@@ -507,7 +507,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
 
             if (du == 0) {
-                _oberl‰nge = miny / multi;
+                _oberl√§nge = miny / multi;
 
                 break;
             }
@@ -586,11 +586,11 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return GetPen(ColorMain, lineWidth);
     }
 
-    // Optional: Batch-Verarbeitung f¸r Performancegewinn bei vielen Zeichen
+    // Optional: Batch-Verarbeitung f√ºr Performancegewinn bei vielen Zeichen
     public void PreloadCommonChars() {
-        const string commonChars = " abcdefghijklmnopqrstuvwxyz‰ˆ¸ÈﬂABCDEFGHIJKLMNOPQRSTUVWXYƒ÷‹Z0123456789.,!?-_+/*()[]{}|\\@#$%&";
+        const string commonChars = " abcdefghijklmnopqrstuvwxyz√§√∂√º√©√üABCDEFGHIJKLMNOPQRSTUVWXY√Ñ√ñ√úZ0123456789.,!?-_+/*()[]{}|\\@#$%&";
 
-        // Parallele Vorberechnung der h‰ufigsten Zeichen
+        // Parallele Vorberechnung der h√§ufigsten Zeichen
         Parallel.ForEach(commonChars, c => CharSize(c));
     }
 
@@ -606,7 +606,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public Bitmap? SampleText() {
         if (_sampleTextSym != null) { return _sampleTextSym; }
-        _sampleTextSym = Symbol("AaBbCcƒ‰.,?!", false);
+        _sampleTextSym = Symbol("AaBbCc√Ñ√§.,?!", false);
         return _sampleTextSym;
     }
 
@@ -640,7 +640,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
 
         var n = "Line-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { new QuickImage(n, bmp); }
+        //if (!QuickImage.Exists(n)) { new QuickImage(n, bmp); }
 
         _symbolOfLineSym = QuickImage.Get(n);
         return _symbolOfLineSym;
@@ -659,7 +659,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             _charSizeCache.TryRemove(key, out _);
         }
 
-        // Auch String-Cache aufr‰umen
+        // Auch String-Cache aufr√§umen
         var stringsToRemove = _stringSizeCache.Count - maxItems;
         if (stringsToRemove > 0) {
             var stringKeysToRemove = _stringSizeCache.Keys.Take(stringsToRemove).ToList();
@@ -674,7 +674,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return new SizeF(_fontOl.MeasureString($".{c}.").Width - _widthOf2Points, _zeilenabstand);
     });
 
-    internal float Oberl‰nge(float scale) => _oberl‰nge * scale;
+    internal float Oberl√§nge(float scale) => _oberl√§nge * scale;
 
     private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) {
         List<string> result = [];
@@ -702,7 +702,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private bool SizeOk(float sizeToCheck) {
-        // Windwows macht seltsamerweiﬂe bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015
+        // Windwows macht seltsamerwei√üe bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015
         if (sizeToCheck <= _sizeTestedAndOk) { return true; }
         if (sizeToCheck >= _sizeTestedAndFailed) { return false; }
         try {

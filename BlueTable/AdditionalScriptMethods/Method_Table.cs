@@ -54,7 +54,7 @@ internal class Method_Table : Method {
         //if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
 
         if (Table.Get(filn, null, true) is { IsDisposed: false } tb) {
-            if (tb is TableFragments tbf && !tbf.FirstTimAlleFragmentsLoaded) {
+            if (tb is TableFragments { FirstTimAlleFragmentsLoaded: false }) {
                 tb.BeSureToBeUpToDate(false, true);
             }
 

@@ -127,7 +127,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     #region Properties
 
-    
     public static string ClassId => "ITEMCOLLECTION";
 
     public Color BackColor { get; set; } = Color.White;
@@ -275,7 +274,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public AbstractPadItem? this[int nr] => _internal[nr];
 
-    public List<AbstractPadItem> this[Point p] => [.. _internal.Where(thisItem => thisItem != null && thisItem.Contains(p, 1))];
+    public List<AbstractPadItem> this[Point p] => [.. _internal.Where(thisItem => thisItem?.Contains(p, 1) == true)];
 
     #endregion
 
@@ -645,12 +644,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         //if (!_endless && !UsedArea.Contains(unscaledPoint)) { return null; }
 
         // Finde alle Items, die den Punkt enthalten
-        var hotItems = _internal.Where(item => item != null && item.Contains(unscaledPoint, scale))
+        var hotItems = _internal.Where(item => item?.Contains(unscaledPoint, scale) == true)
                                         .OrderBy(item => item.UsedArea.Width * item.UsedArea.Height)
                                         .ToList();
 
         // Wenn kein Item gefunden wurde, return null
-        if (!hotItems.Any()) { return null; }
+        if (hotItems.Count == 0) { return null; }
 
         // Nehme das kleinste Item (das oberste in der Z-Reihenfolge bei gleicher Größe)
         var smallestHotItem = hotItems.First();

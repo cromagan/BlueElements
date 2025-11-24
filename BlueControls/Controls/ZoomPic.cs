@@ -81,7 +81,7 @@ public partial class ZoomPic : ZoomPad {
     #region Methods
 
     public Point PointInsidePic(int x, int y) {
-        if (Bmp == null || !Bmp.IsValid()) { return Point.Empty; }
+        if (Bmp?.IsValid() != true) { return Point.Empty; }
         x = Math.Max(0, x);
         y = Math.Max(0, y);
         x = Math.Min(Bmp.Width - 1, x);
@@ -99,7 +99,7 @@ public partial class ZoomPic : ZoomPad {
         using LinearGradientBrush lgb = new(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, drawArea);
 
-        if (Bmp != null && Bmp.IsValid()) {
+        if (Bmp?.IsValid() == true) {
             // Calculate image rectangle considering scrollbars
             var imageRect = new RectangleF(0, 0, Bmp.Width, Bmp.Height)
                 .ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
@@ -125,7 +125,7 @@ public partial class ZoomPic : ZoomPad {
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, drawArea);
     }
 
-    protected override RectangleF MaxBounds() => Bmp != null && Bmp.IsValid() ? new RectangleF(0, 0, Bmp.Width, Bmp.Height) : new RectangleF(0, 0, 0, 0);
+    protected override RectangleF MaxBounds() => Bmp?.IsValid() == true ? new RectangleF(0, 0, Bmp.Width, Bmp.Height) : new RectangleF(0, 0, 0, 0);
 
     protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e) => DoAdditionalDrawing?.Invoke(this, e);
 
@@ -168,7 +168,7 @@ public partial class ZoomPic : ZoomPad {
         return new MouseEventArgs1_1(e.Button, e.Clicks, en.X, en.Y, e.Delta, p.X, p.Y, IsInBitmap(en.X, en.Y));
     }
 
-    private bool IsInBitmap(int x, int y) => Bmp != null && Bmp.IsValid() && x >= 0 && y >= 0 && x <= Bmp.Width && y <= Bmp.Height;
+    private bool IsInBitmap(int x, int y) => Bmp?.IsValid() == true && x >= 0 && y >= 0 && x <= Bmp.Width && y <= Bmp.Height;
 
     private void OnImageMouseDown(MouseEventArgs1_1 e) => ImageMouseDown?.Invoke(this, e);
 

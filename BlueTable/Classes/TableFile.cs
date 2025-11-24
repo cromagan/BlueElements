@@ -228,7 +228,7 @@ public class TableFile : Table {
         var currentTime = DateTime.UtcNow;
         var chunks = TableChunk.GenerateNewChunks(this, 100, currentTime, false);
 
-        if (chunks == null || chunks.Count != 1 || chunks[0] is not { } mainchunk) { return; }
+        if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return; }
 
         mainchunk.Save(newFileName);
 
@@ -243,7 +243,7 @@ public class TableFile : Table {
         Develop.SetUserDidSomething();
 
         var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false);
-        if (chunksnew == null || chunksnew.Count != 1) { return new("Fehler bei der Chunk Erzeugung", false, true); }
+        if (chunksnew?.Count != 1) { return new("Fehler bei der Chunk Erzeugung", false, true); }
 
         f = chunksnew[0].DoExtendedSave();
         if (f.Failed) { return f; }

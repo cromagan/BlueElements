@@ -233,7 +233,7 @@ public class BitmapExt : IDisposableExtended {
     public static Bitmap? Image_Clone(Bitmap? sourceBmp) {
         //TODO: Unused
         try {
-            if (sourceBmp == null || !sourceBmp.IsValid()) { return null; }
+            if (sourceBmp?.IsValid() != true) { return null; }
             Bitmap bmp = new(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
             using var g = Graphics.FromImage(bmp);
             g.DrawImage(sourceBmp, 0, 0, sourceBmp.Width, sourceBmp.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!

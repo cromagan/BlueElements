@@ -345,7 +345,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     private void Childs_ParentChanged(object sender, System.EventArgs e) {
-        if (sender is ListBox childs && childs.Parent == null) {
+        if (sender is ListBox { Parent: null } childs) {
             childs.Dispose();
         }
     }

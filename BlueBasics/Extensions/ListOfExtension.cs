@@ -92,7 +92,7 @@ public static partial class Extensions {
     public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName {
         if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
 
-        if (items == null || items.Count() == 0 || items.First() is not { } i) { return default; }
+        if (items == null || !items.Any() || items.First() is not { } i) { return default; }
 
         if (i.KeyIsCaseSensitive) {
             return items.FirstOrDefault(thisp =>
@@ -139,7 +139,7 @@ public static partial class Extensions {
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
-        if (value == null || string.IsNullOrEmpty(value)) { return; }
+        if (string.IsNullOrEmpty(value)) { return; }
         col.Add(tagname + "=\"" + value.ToNonCritical() + "\"");
     }
 
@@ -207,7 +207,7 @@ public static partial class Extensions {
     /// <param name="value"></param>
     /// <param name="ignoreEmpty"></param>
     public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value, bool ignoreEmpty) {
-        if (value == null || !value.Any()) { return; }
+        if (value?.Any() != true) { return; }
         ParseableAdd(col, tagname, value.ToListOfString(), ignoreEmpty);
     }
 
@@ -248,12 +248,12 @@ public static partial class Extensions {
         var underlyingType = Enum.GetUnderlyingType(typeof(T));
 
         if (underlyingType == typeof(int)) {
-            col.Add(tagname + "=" + ((int)(object)value));
+            col.Add(tagname + "=" + (int)(object)value);
             return;
         }
 
         if (underlyingType == typeof(byte)) {
-            col.Add(tagname + "=" + ((byte)(object)value));
+            col.Add(tagname + "=" + (byte)(object)value);
             return;
         }
 

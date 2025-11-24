@@ -212,7 +212,6 @@ public partial class Slider : IBackgroundNone {
 
         Rectangle clickArea;
         Rectangle slider;
-        bool clickAreaContainsMouse;
         bool sliderContainsMouse;
         float value, minimum, maximum;
         Orientation orientation;
@@ -226,7 +225,7 @@ public partial class Slider : IBackgroundNone {
         }
 
         var mousePos = MousePos();
-        clickAreaContainsMouse = clickArea.Contains(mousePos.X, mousePos.Y);
+        var clickAreaContainsMouse = clickArea.Contains(mousePos.X, mousePos.Y);
 
         var proz = maximum - minimum > 0 ? (value - minimum) / (maximum - minimum) : 0;
 

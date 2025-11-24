@@ -659,7 +659,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             if (x.Length == 3) {
                 var r = db.Row[new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, x[0])];
 
-                if (r != null && r.CellGetBoolean("Visible")) {
+                if (r?.CellGetBoolean("Visible") == true) {
                     r.CellSet("Such", x[2].FromNonCritical(), string.Empty);
                 }
             }

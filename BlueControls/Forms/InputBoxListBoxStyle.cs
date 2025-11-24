@@ -64,7 +64,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         x.AddRange(ItemsOf(items));
         //x.Sort();
         var erg = Show(txt, x, CheckBehavior.SingleSelection, null, AddType.None);
-        return erg is null || erg.Count != 1 ? string.Empty : erg[0];
+        return erg?.Count != 1 ? string.Empty : erg[0];
     }
 
     public static List<string>? Show(string txt, List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {

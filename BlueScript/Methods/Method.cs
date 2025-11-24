@@ -204,7 +204,7 @@ public abstract class Method : IReadableTextWithKey {
                 return scx;
             }
 
-            if (scx.ReturnValue is VariableBool bo1 && !bo1.ValueBool) { return scx; }
+            if (scx.ReturnValue is VariableBool { ValueBool: false }) { return scx; }
             return GetVariableByParsing(txt.Substring(uu + 2), ld, varCol, scp);
         }
 
@@ -215,7 +215,7 @@ public abstract class Method : IReadableTextWithKey {
                 return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, ld);
             }
 
-            if (txt1.ReturnValue is VariableBool bo2 && bo2.ValueBool) { return txt1; }
+            if (txt1.ReturnValue is VariableBool { ValueBool: true }) { return txt1; }
             return GetVariableByParsing(txt.Substring(oo + 2), ld, varCol, scp);
         }
 
@@ -355,7 +355,7 @@ public abstract class Method : IReadableTextWithKey {
         if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
         if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
         if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu viele Attribute bei '{comand}' erhalten.", true); }
-        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
+        if (lastArgMinCount >= 1 && attributes.Count < types.Count + lastArgMinCount - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
 
         //  Variablen und Routinen ersetzen
         VariableCollection feedbackVariables = [];

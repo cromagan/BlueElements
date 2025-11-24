@@ -136,8 +136,8 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
             if (!Visible) { return; }
 
             var tmp = TabDefaultOrder;
-            if (tmp != null && tmp.GetUpperBound(0) == -1) { tmp = null; }
-            if (tmp != null && tmp.GetUpperBound(0) == 0 && string.IsNullOrEmpty(tmp[0])) { tmp = null; }
+            if (tmp?.GetUpperBound(0) == -1) { tmp = null; }
+            if (tmp?.GetUpperBound(0) == 0 && string.IsNullOrEmpty(tmp[0])) { tmp = null; }
 
             if (tmp != null) {
                 var neworder = new List<TabPage>();

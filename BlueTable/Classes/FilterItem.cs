@@ -312,8 +312,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     #region Methods
 
-    public bool Equals(FilterItem? thisFilter) => thisFilter != null &&
-                                                  thisFilter.FilterType == FilterType &&
+    public bool Equals(FilterItem? thisFilter) => thisFilter?.FilterType == FilterType &&
                                                   thisFilter.Column == Column &&
                                                   thisFilter.Origin == Origin &&
                                                   thisFilter.SearchValue.JoinWithCr() == SearchValue.JoinWithCr();

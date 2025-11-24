@@ -275,7 +275,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     //            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
     private void DrawHelpers(AdditionalDrawing eg) {
-        if (Bmp == null || !Bmp.IsValid()) { return; }
+        if (Bmp?.IsValid() != true) { return; }
 
         var drawArea = AvailablePaintArea();
         eg.G.SetClip(drawArea);
@@ -417,7 +417,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             float yPos;
             if (mouseOnThisScreen) {
                 var relativeMouseY = mouseScreenPoint.Y - screenBounds.Y;
-                yPos = relativeMouseY < (screenBounds.Height / 2)
+                yPos = relativeMouseY < screenBounds.Height / 2
                     ? Math.Min(drawArea.Bottom - textSize.Height, controlPoint.Y + screenBounds.Height - textSize.Height)
                     : Math.Max(drawArea.Top, controlPoint.Y);
             } else {

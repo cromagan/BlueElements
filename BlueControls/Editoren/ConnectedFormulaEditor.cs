@@ -85,7 +85,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         get;
         private set {
             if (!Generic.IsAdministrator()) { value = null; }
-            if (value != null && !value.LockEditing()) { value = null; }
+            if (value?.LockEditing() == false) { value = null; }
 
             if (field == value) { return; }
 

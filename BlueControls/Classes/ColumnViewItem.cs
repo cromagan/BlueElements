@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -115,7 +115,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public QuickImage? CaptionBitmap {
         get {
-            if (Column == null || string.IsNullOrEmpty(Column.CaptionBitmapCode)) { return null; }
+            if (string.IsNullOrEmpty(Column?.CaptionBitmapCode)) { return null; }
             if (field != null) { return field; }
 
             field = QuickImage.Get(Column.CaptionBitmapCode + "|100");
@@ -170,7 +170,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         private set;
     }
 
-    public BlueFont Font_Head_Default { get => IsDisposed ? BlueFont.DefaultFont : (field ??= Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben)); private set; }
+    public BlueFont Font_Head_Default { get => IsDisposed ? BlueFont.DefaultFont : field ??= Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben); private set; }
 
     public BlueFont Font_Numbers {
         get {
@@ -220,7 +220,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public bool IsDisposed { get; private set; }
 
-    public ColumnLineStyle LineLeft => Column?.LineStyleLeft ?? ColumnLineStyle.Dünn;
+    public ColumnLineStyle LineLeft => Column?.LineStyleLeft ?? ColumnLineStyle.DÃ¼nn;
 
     public ColumnLineStyle LineRight => Column?.LineStyleRight ?? ColumnLineStyle.Ohne;
 
@@ -297,7 +297,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
 
         try {
-            //  Parallel.ForEach führt ab und zu zu DeadLocks
+            //  Parallel.ForEach fÃ¼hrt ab und zu zu DeadLocks
             foreach (var thisRowItem in db.Row) {
                 var wx = renderer.ContentSize(thisRowItem.CellGetString(column), column.DoOpticalTranslation).Width;
                 newContentWidth = Math.Max(newContentWidth, wx);
@@ -351,7 +351,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public void Dispose() =>
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Ã„ndern Sie diesen Code nicht. FÃ¼gen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);//GC.SuppressFinalize(this);
 
     public void Dispose(bool disposing) {
@@ -391,7 +391,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 : Math.Min(Contentwidth, (int)(Parent.ClientWidth * 0.6));
         }
 
-        _drawWidth = Math.Max((int)_drawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
+        _drawWidth = Math.Max((int)_drawWidth, AutoFilterSize); // Mindestens so groÃŸ wie der Autofilter;
         return (int)_drawWidth;
     }
 
@@ -581,10 +581,4 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #endregion
 
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~ColumnViewItem()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
 }

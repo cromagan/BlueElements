@@ -556,7 +556,7 @@ public static partial class Extensions {
             return string.Empty;
         }
 
-        return (length < value.Length) ? value.Substring(0, length) : value;
+        return length < value.Length ? value.Substring(0, length) : value;
     }
 
     public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<string>>? klammern) {
@@ -832,7 +832,7 @@ public static partial class Extensions {
             return string.Empty;
         }
 
-        return (length < value.Length) ? value.Substring(value.Length - length) : value;
+        return length < value.Length ? value.Substring(value.Length - length) : value;
     }
 
     /// <summary>
@@ -1013,7 +1013,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static List<string> ToListOfString(this IEnumerable<IHasKeyName?>? items) {
         List<string> w = [];
-        if (items == null || !items.Any()) { return w; }
+        if (items?.Any() != true) { return w; }
 
         w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.KeyName) select thisItem.KeyName);
         return w;
@@ -1198,7 +1198,7 @@ public static partial class Extensions {
         }
     }
 
-    public static byte[] UTF8_ToByte(this string? tXt) => tXt == null || string.IsNullOrEmpty(tXt) ? [] : Encoding.UTF8.GetBytes(tXt);
+    public static byte[] UTF8_ToByte(this string? tXt) => string.IsNullOrEmpty(tXt) ? [] : Encoding.UTF8.GetBytes(tXt);
 
     #endregion
 }

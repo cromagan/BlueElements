@@ -35,7 +35,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
     #region Methods
 
     public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
-        if (originalPic == null || !originalPic.IsValid()) { return; }
+        if (originalPic?.IsValid() != true) { return; }
 
         using var picPreview = new BitmapExt(originalPic);
 

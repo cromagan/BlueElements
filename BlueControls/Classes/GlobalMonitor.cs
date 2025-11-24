@@ -79,7 +79,7 @@ public partial class GlobalMonitor : Form {
     [StandaloneInfo("Monitor-ing", ImageCode.Monitor, "Admin", 900)]
     public static void Start() {
         // Prüfe, ob Thread und Monitor bereits funktionieren
-        if (_monitorThread != null && _monitorThread.IsAlive && Monitor != null && !Monitor.IsDisposed) {
+        if (_monitorThread is { IsAlive: true } && Monitor is { IsDisposed: false }) {
             // Thread läuft und Fenster existiert, bringe es in den Vordergrund
             try {
                 Monitor.BeginInvoke(new Action(() => {
@@ -175,7 +175,7 @@ public partial class GlobalMonitor : Form {
         }
 
         // Warte eine kurze Zeit, damit der Thread auf die Abbruchanforderung reagieren kann
-        if (_monitorThread != null && _monitorThread.IsAlive) {
+        if (_monitorThread is { IsAlive: true }) {
             try {
                 // Kurze Wartezeit für geordnetes Beenden
                 if (!_monitorThread.Join(100)) {
@@ -211,7 +211,7 @@ public partial class GlobalMonitor : Form {
             // Registriere die Formularschließung beim CancellationToken
             cancellationToken.Register(() => {
                 try {
-                    if (Monitor != null && !Monitor.IsDisposed) {
+                    if (Monitor is { IsDisposed: false }) {
                         Monitor.BeginInvoke(new Action(() => Monitor.Close()));
                     }
                 } catch {

@@ -79,10 +79,10 @@ public class TableChunk : TableFile {
 
     #region Methods
 
-    public static List<Chunk>? GenerateNewChunks(TableFile db, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
+    public static List<Chunk>? GenerateNewChunks(TableFile tb, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed) {
         var chunks = new List<Chunk>();
 
-        var mainChunk = new Chunk(db.Filename, Chunk_MainData);
+        var mainChunk = new Chunk(tb.Filename, Chunk_MainData);
         mainChunk.InitByteList();
         chunks.Add(mainChunk);
 
@@ -92,66 +92,66 @@ public class TableChunk : TableFile {
         var unknownDataChunk = mainChunk;
 
         if (chunksAllowed) {
-            usesChunk = new Chunk(db.Filename, Chunk_AdditionalUseCases);
+            usesChunk = new Chunk(tb.Filename, Chunk_AdditionalUseCases);
             usesChunk.InitByteList();
             chunks.Add(usesChunk);
 
-            varChunk = new Chunk(db.Filename, Chunk_Variables);
+            varChunk = new Chunk(tb.Filename, Chunk_Variables);
             varChunk.InitByteList();
             chunks.Add(varChunk);
 
-            masterUserChunk = new Chunk(db.Filename, Chunk_Master);
+            masterUserChunk = new Chunk(tb.Filename, Chunk_Master);
             masterUserChunk.InitByteList();
             chunks.Add(masterUserChunk);
 
-            unknownDataChunk = new Chunk(db.Filename, Chunk_UnknownData);
+            unknownDataChunk = new Chunk(tb.Filename, Chunk_UnknownData);
             unknownDataChunk.InitByteList();
             chunks.Add(unknownDataChunk);
         }
 
         try {
-            var x = db.LastChange;
+            var x = tb.LastChange;
 
-            mainChunk.SaveToByteList(TableDataType.GlobalShowPass, db.GlobalShowPass);
-            mainChunk.SaveToByteList(TableDataType.Creator, db.Creator);
-            mainChunk.SaveToByteList(TableDataType.CreateDateUTC, db.CreateDate);
+            mainChunk.SaveToByteList(TableDataType.GlobalShowPass, tb.GlobalShowPass);
+            mainChunk.SaveToByteList(TableDataType.Creator, tb.Creator);
+            mainChunk.SaveToByteList(TableDataType.CreateDateUTC, tb.CreateDate);
             mainChunk.SaveToByteList(TableDataType.LastSaveMainFileUtcDate, fileStateUtcDateToSave.ToString7());
-            mainChunk.SaveToByteList(TableDataType.Caption, db.Caption);
+            mainChunk.SaveToByteList(TableDataType.Caption, tb.Caption);
 
-            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterUser, db.TemporaryTableMasterUser);
-            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterTimeUTC, db.TemporaryTableMasterTimeUtc);
-            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterApp, db.TemporaryTableMasterApp);
-            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterMachine, db.TemporaryTableMasterMachine);
-            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterId, db.TemporaryTableMasterId);
+            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterUser, tb.TemporaryTableMasterUser);
+            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterTimeUTC, tb.TemporaryTableMasterTimeUtc);
+            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterApp, tb.TemporaryTableMasterApp);
+            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterMachine, tb.TemporaryTableMasterMachine);
+            masterUserChunk.SaveToByteList(TableDataType.TemporaryTableMasterId, tb.TemporaryTableMasterId);
 
-            mainChunk.SaveToByteList(TableDataType.Tags, db.Tags.JoinWithCr());
-            mainChunk.SaveToByteList(TableDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
-            mainChunk.SaveToByteList(TableDataType.TableAdminGroups, db.TableAdmin.JoinWithCr());
+            mainChunk.SaveToByteList(TableDataType.Tags, tb.Tags.JoinWithCr());
+            mainChunk.SaveToByteList(TableDataType.PermissionGroupsNewRow, tb.PermissionGroupsNewRow.JoinWithCr());
+            mainChunk.SaveToByteList(TableDataType.TableAdminGroups, tb.TableAdmin.JoinWithCr());
 
-            mainChunk.SaveToByteList(TableDataType.AdditionalFilesPath, db.AdditionalFilesPath);
-            mainChunk.SaveToByteList(TableDataType.RowQuickInfo, db.RowQuickInfo);
-            mainChunk.SaveToByteList(TableDataType.StandardFormulaFile, db.StandardFormulaFile);
+            mainChunk.SaveToByteList(TableDataType.AdditionalFilesPath, tb.AdditionalFilesPath);
+            mainChunk.SaveToByteList(TableDataType.RowQuickInfo, tb.RowQuickInfo);
+            mainChunk.SaveToByteList(TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
 
             //Table.SaveToByteList(List, enTableDataType.LastColumnKey, _LastColumnKey.ToString(false));
-            foreach (var columnitem in db.Column) {
-                if (columnitem != null && !string.IsNullOrEmpty(columnitem.KeyName) && !columnitem.IsDisposed) {
+            foreach (var columnitem in tb.Column) {
+                if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
                     mainChunk.SaveToByteList(columnitem);
                     usesChunk.SaveToByteList(TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
                 }
             }
 
-            mainChunk.SaveToByteList(TableDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ParseableItems().FinishParseable());
+            mainChunk.SaveToByteList(TableDataType.SortDefinition, tb.SortDefinition == null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
 
-            mainChunk.SaveToByteList(TableDataType.ColumnArrangement, db.ColumnArrangements);
+            mainChunk.SaveToByteList(TableDataType.ColumnArrangement, tb.ColumnArrangements);
 
-            mainChunk.SaveToByteList(TableDataType.EventScript, db.EventScript.ToString(true));
+            mainChunk.SaveToByteList(TableDataType.EventScript, tb.EventScript.ToString(true));
             //mainChunk.SaveToByteList(TableDataType.EventScriptEdited, db.EventScriptEdited.ToString(true));
-            mainChunk.SaveToByteList(TableDataType.EventScriptVersion, db.EventScriptVersion.ToString5());
+            mainChunk.SaveToByteList(TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
 
             //mainChunk.SaveToByteList(TableDataType.NeedsScriptFix, db.NeedsScriptFix);
-            varChunk.SaveToByteList(TableDataType.TableVariables, db.Variables.ToList().ToString(true));
+            varChunk.SaveToByteList(TableDataType.TableVariables, tb.Variables.ToList().ToString(true));
 
-            foreach (var thisRow in db.Row) {
+            foreach (var thisRow in tb.Row) {
 
                 #region Chunk bestimmen
 
@@ -159,7 +159,7 @@ public class TableChunk : TableFile {
                 if (chunksAllowed) {
                     var chunkId = GetChunkId(thisRow);
                     if (string.IsNullOrEmpty(chunkId)) { return null; }
-                    rowchunk = GetOrMakechunk(chunks, db, chunkId);
+                    rowchunk = GetOrMakechunk(chunks, tb, chunkId);
                 }
 
                 #endregion
@@ -167,7 +167,7 @@ public class TableChunk : TableFile {
                 rowchunk.SaveToByteList(thisRow);
             }
 
-            if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
+            if (x != tb.LastChange) { return null; } // Works haben sich evtl. geändert
 
             #region Undos
 
@@ -175,18 +175,18 @@ public class TableChunk : TableFile {
             var undoCount = 0;
             List<string> works2 = [];
 
-            var sortedUndoItems = db.Undo.Where(item => item != null && item.LogsUndo(db)).OrderByDescending(item => item.DateTimeUtc);
+            var sortedUndoItems = tb.Undo.Where(item => item?.LogsUndo(tb) == true).OrderByDescending(item => item.DateTimeUtc);
 
             foreach (var thisWorkItem in sortedUndoItems) {
-                if (thisWorkItem != null && thisWorkItem.LogsUndo(db)) {
+                if (thisWorkItem?.LogsUndo(tb) == true) {
                     if (undoCount < 1000 || (thisWorkItem.Command == TableDataType.EventScript && important < 10)) {
                         undoCount++;
                         if (thisWorkItem.Command == TableDataType.EventScript) { important++; }
 
                         if (chunksAllowed) {
-                            var targetChunkId = GetChunkId(db, thisWorkItem.Command, thisWorkItem.ChunkValue);
+                            var targetChunkId = GetChunkId(tb, thisWorkItem.Command, thisWorkItem.ChunkValue);
                             if (!string.IsNullOrEmpty(targetChunkId)) {
-                                var targetChunk = GetOrMakechunk(chunks, db, targetChunkId);
+                                var targetChunk = GetOrMakechunk(chunks, tb, targetChunkId);
                                 targetChunk.SaveToByteList(TableDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
                             }
                         } else {
@@ -210,10 +210,10 @@ public class TableChunk : TableFile {
 
             if (l < minLen) { return null; }
 
-            return x != db.LastChange ? null : chunks; // Stand stimmt nicht mehr
+            return x != tb.LastChange ? null : chunks; // Stand stimmt nicht mehr
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return GenerateNewChunks(db, minLen, fileStateUtcDateToSave, chunksAllowed);
+            return GenerateNewChunks(tb, minLen, fileStateUtcDateToSave, chunksAllowed);
         }
     }
 
@@ -261,7 +261,6 @@ public class TableChunk : TableFile {
         return base.AmITemporaryMaster(ranges, rangee);
     }
 
-
     public override bool BeSureAllDataLoaded(int anzahl) {
         if (!base.BeSureAllDataLoaded(anzahl)) { return false; }
 
@@ -308,7 +307,6 @@ public class TableChunk : TableFile {
         return true;
     }
 
-
     public override bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) {
         if (!base.BeSureToBeUpToDate(firstTime, instantUpdate)) { return false; }
 
@@ -338,7 +336,6 @@ public class TableChunk : TableFile {
             return chunk.ChunkFolder();
         }
     }
-
 
     public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
@@ -531,7 +528,6 @@ public class TableChunk : TableFile {
         _chunks.Clear();
     }
 
-
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true);
 
     protected override FileOperationResult SaveInternal(DateTime setfileStateUtcDateTo) {
@@ -556,7 +552,7 @@ public class TableChunk : TableFile {
         var chunksToSave = new List<Chunk>();
         foreach (var thisChunk in chunksnew) {
             _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
-            if (existingChunk == null || existingChunk.SaveRequired) {
+            if (existingChunk?.SaveRequired != false) {
                 chunksBeingSaved.TryAdd(thisChunk.KeyName, 0);
                 chunksToSave.Add(thisChunk);
             }
@@ -642,6 +638,7 @@ public class TableChunk : TableFile {
 
         return rowchunk;
     }
+
     private bool Parse(Chunk chunk) {
         if (chunk.LoadFailed) { return false; }
 

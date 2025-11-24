@@ -87,10 +87,8 @@ public static class MathFormulaParser {
         if (formel.Replace(".", ",").IsNumeral()) { return DoubleParse(formel.Replace(".", ",")); }
 
         // Operator-Suche nach Priorität: + - (letztes binäres), dann * /, dann ^ (rechtsassoziativ)
-        int tmp;
-
         // Ebene 1: + -
-        tmp = Math.Max(formel.LastIndexOf("+", StringComparison.Ordinal), LastMinusIndex(formel));
+        var tmp = Math.Max(formel.LastIndexOf("+", StringComparison.Ordinal), LastMinusIndex(formel));
         if (tmp > 0) {
             var sep = formel.Substring(tmp, 1);
             var w1 = ErgebnisCore(formel.Substring(0, tmp));

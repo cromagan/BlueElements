@@ -75,8 +75,6 @@ public class Method_CallByFilename : Method {
     /// <param name="attributes"></param>
     /// <returns></returns>
     public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, int lineadd, string subname, List<Variable>? addMe, List<string>? attributes, string chainlog, LogData ld) {
-        ScriptEndedFeedback scx;
-
         if (scp.Stufe > 10) {
             return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
         }
@@ -92,7 +90,7 @@ public class Method_CallByFilename : Method {
             }
         }
 
-        scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes, null);
+        var scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes, null);
 
         #region Kritische Variablen Disposen
 

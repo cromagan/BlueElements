@@ -218,7 +218,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             return "Spalte, in der die Herkunft-ID geschrieben werden soll, fehlt";
         }
 
-        if (!oic.IsKeyColumn && !oic.IsFirst) {
+        if (oic is { IsKeyColumn: false, IsFirst: false }) {
             return $"Die Herkunft-ID-Spalte '{oic.Caption}' muss eine Schlüsselspalte oder die erste Spalte sein.";
         }
 
@@ -226,7 +226,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             return "Spalte, in der die Zusatzinfo geschrieben werden soll, fehlt";
         }
 
-        if (!aci.IsKeyColumn && !aci.IsFirst) {
+        if (aci is { IsKeyColumn: false, IsFirst: false }) {
             return $"Die Zusatzinfo-Spalte '{aci.Caption}' muss eine Schlüsselspalte oder die erste Spalte sein.";
         }
 

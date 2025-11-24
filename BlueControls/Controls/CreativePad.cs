@@ -392,8 +392,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     internal Point MiddleOfVisiblesScreen() {
-        var valx = (((float)Width) / 2) + ShiftX;
-        var valy = (((float)Height) / 2) + ShiftY;
+        var valx = ((float)Width / 2) + ShiftX;
+        var valy = ((float)Height / 2) + ShiftY;
 
         return new((int)(valx / Zoom), (int)(valy / Zoom));
     }
@@ -591,7 +591,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     private void _Items_ItemAdded(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged("Items");
-        if (_items.Count() == 0 || Fitting) { ZoomFit(); }
+        if (!_items.Any() || Fitting) { ZoomFit(); }
         Invalidate();
     }
 
@@ -608,7 +608,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     private void _Items_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(e.PropertyName);
-        if (_items.Count() == 0 || Fitting) { ZoomFit(); }
+        if (!_items.Any() || Fitting) { ZoomFit(); }
         Invalidate();
     }
 

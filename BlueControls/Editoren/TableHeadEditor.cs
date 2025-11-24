@@ -41,7 +41,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     #region Fields
 
-    public bool UndoDone;
     private bool _frmHeadEditorFormClosingIsin;
 
     #endregion
@@ -57,6 +56,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     #endregion
 
     #region Properties
+
+    public bool UndoDone { get; set; }
 
     public Table? Table {
         get;
@@ -82,13 +83,13 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     #region Methods
 
     public static void AddUndosToTable(TableView tblUndo, Table? table, float maxAgeInDays) {
-        if (table is { IsDisposed: false } db) {
-            Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{db.Caption}'", 0);
+        if (table is { IsDisposed: false } tb) {
+            Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{tb.Caption}'", 0);
 
-            List<UndoItem> un = [.. db.Undo]; // Kann und wird verändert!
+            List<UndoItem> un = [.. tb.Undo]; // Kann und wird verändert!
 
             foreach (var thisUndo in un) {
-                AddUndoToTable(tblUndo, thisUndo, db, maxAgeInDays);
+                AddUndoToTable(tblUndo, thisUndo, tb, maxAgeInDays);
             }
         }
     }
