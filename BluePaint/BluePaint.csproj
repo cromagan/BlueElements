@@ -1,68 +1,55 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
    
     <!-- Assembly-Metadaten -->
     <RootNamespace>BluePaint</RootNamespace>
     <AssemblyName>BluePaint</AssemblyName>
-    <Company>BluePaint</Company>
     <Product>BluePaint</Product>
-    <Copyright>Copyright © 2025</Copyright>
+    <Company>Christian Peter</Company>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2025 Christian Peter</Copyright>
     
     <!-- Versionierung -->
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    
-    <!-- Plattformen -->
-    <Platforms>AnyCPU;x86;x64</Platforms>
-    <RuntimeIdentifiers>win-x64;win-x86;win</RuntimeIdentifiers>
-    
-    <!-- Moderne Build-Optimierungen -->
+
+    <!-- Moderne Optimierungen -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>preview</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    
+    <!-- Plattformen -->
+    <Platforms>AnyCPU;x86;x64</Platforms>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
+    <DebugType>portable</DebugType>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
+  </PropertyGroup> 
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
+  </PropertyGroup> 
 
   <ItemGroup>
     <!-- NuGet-Pakete -->
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
 
-  <ItemGroup>
     <!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- WPF-Referenzen -->
-    <Reference Include="PresentationCore" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" />
-    
+	 <Reference Include="PresentationCore" />
+	 <Reference Include="System.Windows.Forms" />
+	 <Reference Include="WindowsBase" />
     <!-- Standard-Referenzen -->
     <Reference Include="System" />
     <Reference Include="System.Core" />

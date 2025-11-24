@@ -3,15 +3,23 @@
     "tasks": [
         {
             "label": "build",
-            "command": "dotnet",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "type": "process",
             "args": [
-                "build",
-                "${workspaceFolder}/BeCreative/BeCreative/BeCreative.csproj",
+                "${workspaceFolder}\\BeCreative\\BeCreative.csproj",
+                "/property:Configuration=Debug",
+                "/property:Platform=AnyCPU",
+                "/property:DebugType=portable",
+                "/property:DebugSymbols=true",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:Verbosity=minimal",
+                "/t:Build"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

@@ -305,10 +305,9 @@ public class BitmapExt : IDisposableExtended {
         gR.DrawLine(Pens.Red, mitte.X - 6, mitte.Y, mitte.X + 5, mitte.Y);
     }
 
-    public static unsafe Bitmap? ReplaceColor(Bitmap? source, Color toReplace, Color replacement) {
+    public static Bitmap? ReplaceColor(Bitmap? source, Color toReplace, Color replacement) {
         if (source == null) { return null; }
 
-        // https://stackoverflow.com/questions/17208254/how-to-change-pixel-color-of-an-image-in-c-net
         const int pixelSize = 4; // 32 bits per pixel
         Bitmap target = new(source.Width, source.Height, PixelFormat.Format32bppArgb);
         BitmapData? sourceData = null;
@@ -316,32 +315,44 @@ public class BitmapExt : IDisposableExtended {
         try {
             sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             targetData = target.LockBits(new Rectangle(0, 0, target.Width, target.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            int bytes = Math.Abs(sourceData.Stride) * source.Height;
+            byte[] sourceBuffer = new byte[bytes];
+            byte[] targetBuffer = new byte[bytes];
+
+            System.Runtime.InteropServices.Marshal.Copy(sourceData.Scan0, sourceBuffer, 0, bytes);
+
             for (var y = 0; y < source.Height; ++y) {
-                var sourceRow = (byte*)sourceData.Scan0 + (y * sourceData.Stride);
-                var targetRow = (byte*)targetData.Scan0 + (y * targetData.Stride);
+                int rowOffset = y * sourceData.Stride;
                 for (var x = 0; x < source.Width; ++x) {
-                    var b = sourceRow[(x * pixelSize) + 0];
-                    var g = sourceRow[(x * pixelSize) + 1];
-                    var r = sourceRow[(x * pixelSize) + 2];
-                    var a = sourceRow[(x * pixelSize) + 3];
+                    int pixelOffset = rowOffset + (x * pixelSize);
+                    var b = sourceBuffer[pixelOffset + 0];
+                    var g = sourceBuffer[pixelOffset + 1];
+                    var r = sourceBuffer[pixelOffset + 2];
+                    var a = sourceBuffer[pixelOffset + 3];
+
                     if (toReplace.R == r && toReplace.G == g && toReplace.B == b && toReplace.A == a) {
                         r = replacement.R;
                         g = replacement.G;
                         b = replacement.B;
                         a = replacement.A;
                     }
-                    targetRow[(x * pixelSize) + 0] = b;
-                    targetRow[(x * pixelSize) + 1] = g;
-                    targetRow[(x * pixelSize) + 2] = r;
-                    targetRow[(x * pixelSize) + 3] = a;
+
+                    targetBuffer[pixelOffset + 0] = b;
+                    targetBuffer[pixelOffset + 1] = g;
+                    targetBuffer[pixelOffset + 2] = r;
+                    targetBuffer[pixelOffset + 3] = a;
                 }
             }
+
+            System.Runtime.InteropServices.Marshal.Copy(targetBuffer, 0, targetData.Scan0, bytes);
         } finally {
             if (sourceData != null) { source.UnlockBits(sourceData); }
             if (targetData != null) { target.UnlockBits(targetData); }
         }
         return target;
     }
+
 
     public static void SetPixel(BitmapData bitmapData, byte[] bits, int x, int y, Color color) {
         var index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format

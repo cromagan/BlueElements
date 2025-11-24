@@ -1,68 +1,58 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
+    <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Assembly-Metadaten -->
     <RootNamespace>BlueControls</RootNamespace>
     <AssemblyName>BlueControls</AssemblyName>
-    <OutputType>Library</OutputType>
-    <Platforms>AnyCPU;x86;x64</Platforms>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
-    
-    <!-- Ressourcen-Handling für .NET Framework -->
-    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
-    
+    <Company>Christian Peter</Company>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2025 Christian Peter</Copyright>
+
     <!-- Assembly-Informationen -->
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Company>BlueControls</Company>
-    <Product>BlueControls</Product>
-    <Copyright>Copyright © 2025</Copyright>
-    
-    <!-- Runtime Identifiers -->
-    <RuntimeIdentifiers>win-x64;win-x86;win</RuntimeIdentifiers>
+
+    <!-- Moderne Optimierungen -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>preview</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Plattformen -->
+    <Platforms>AnyCPU;x86;x64</Platforms>
+    <Prefer32Bit>false</Prefer32Bit>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
+    <DebugType>portable</DebugType>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
+  </PropertyGroup> 
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
+  </PropertyGroup> 
 
   <ItemGroup>
     <None Remove="Ressources\Dictionary\Deutsch.BDB" />
     <None Remove="Ressources\Styles\Styles.BDB" />
-  </ItemGroup>
 
-  <ItemGroup>
     <EmbeddedResource Include="Ressources\Dictionary\Deutsch.BDB" />
     <EmbeddedResource Include="Ressources\Styles\Styles.BDB" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <!-- Ressourcen-Serialisierung -->
+    <!-- NuGet-Pakete -->
     <PackageReference Include="FCTB" Version="2.16.24" />
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
     
     <!-- Code-Analyse -->
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
 
-  <ItemGroup>
     <!-- .NET Framework Referenzen -->
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -73,13 +63,11 @@
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
 
   <!-- App Manifest -->
-  <ItemGroup>
+
     <None Include="app.manifest" />
-  </ItemGroup>
-  <ItemGroup>
+
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />

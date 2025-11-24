@@ -483,23 +483,28 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
             var bmpData = bmp.LockBits(rect, ImageLockMode.ReadOnly, bmp.PixelFormat);
 
-            unsafe {
-                var ptr = (byte*)bmpData.Scan0;
+            try {
                 var stride = bmpData.Stride;
+                var bytes = Math.Abs(stride) * bmp.Height;
+                var rgbValues = new byte[bytes];
+
+                // Kopiere die Bitmap-Daten in das Array
+                System.Runtime.InteropServices.Marshal.Copy(bmpData.Scan0, rgbValues, 0, bytes);
 
                 for (var x = 1; x < f.Width - 1; x++) {
                     for (var y = (int)(f.Height - 1); y >= miny; y--) {
                         // Bei 32bpp ist jedes Pixel 4 Bytes
-                        var pixel = ptr[(y * stride) + (x * 4)];
+                        var pixel = rgbValues[(y * stride) + (x * 4)];
                         if (y > miny && pixel == 0) {
                             miny = y;
                             break;
                         }
                     }
                 }
+            } finally {
+                bmp.UnlockBits(bmpData);
             }
 
-            bmp.UnlockBits(bmpData);
 
             if (du == 0) {
                 _oberlänge = miny / multi;

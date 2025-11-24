@@ -1,55 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
+
+    <!-- Assembly-Metadaten -->
     <AssemblyName>BlueBasics</AssemblyName>
     <RootNamespace>BlueBasics</RootNamespace>
     <AssemblyTitle>BlueBasics</AssemblyTitle>
     <Product>BlueBasics</Product>
     <Company>Christian Peter</Company>
-    <Copyright>Copyright (c) 2025 Christian Peter</Copyright>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2025 Christian Peter</Copyright>
+
+    <!-- Versionierung -->
     <AssemblyVersion>9.0.21022.0</AssemblyVersion>
     <FileVersion>9.0.21022.0</FileVersion>
     <Version>9.0.21022</Version>
-    <ComVisible>false</ComVisible>
-    <Guid>E7E05BAC-07CB-478D-861A-DB24A27BBF75</Guid>
-    <FileAlignment>512</FileAlignment>
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <OutputPath>bin\Debug\</OutputPath>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <Optimize>false</Optimize>
-    <WarningLevel>4</WarningLevel>
+
+    <!-- Moderne Optimierungen -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisLevel>latest</AnalysisLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <OutputPath>Bin\</OutputPath>
-    <DebugType>pdbonly</DebugType>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)' == 'x86'">
-    <PlatformTarget>x86</PlatformTarget>
+    <AnalysisLevel>preview</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+     <!-- Plattformen -->
+    <Platforms>AnyCPU;x86;x64</Platforms>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Properties\AssemblyInfo.cs" />
-    <Compile Remove="Properties\Application.Designer.cs" />
-    <None Remove="Properties\Application.myapp" />
-  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DebugType>portable</DebugType>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup> 
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>pdbonly</DebugType>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup> 
+  
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -62,12 +53,11 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-  </ItemGroup>
-  <ItemGroup>
+
+    <!-- NuGet-Pakete -->
     <PackageReference Include="System.Memory" Version="4.5.5" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup>
+
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusAbschneiden.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusEinpassen.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusVerzerren.png" />

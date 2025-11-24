@@ -1,89 +1,61 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWindowsForms>true</UseWindowsForms>
-    
+
     <!-- Assembly-Metadaten -->
     <RootNamespace>BlueTable</RootNamespace>
     <AssemblyName>BlueTable</AssemblyName>
-    <Company>BlueTable</Company>
     <Product>BlueTable</Product>
-    <Copyright>Copyright © 2025</Copyright>
+    <Company>Christian Peter</Company>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2025 Christian Peter</Copyright>
     
     <!-- Versionierung -->
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    
-    <!-- Plattformen -->
-    <Platforms>AnyCPU;x86</Platforms>
-    <RuntimeIdentifiers>win-x64;win-x86;win</RuntimeIdentifiers>
-    
-    <!-- Moderne Build-Optimierungen -->
+
+    <!-- Moderne Optimierungen -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>preview</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Plattformen -->
+    <Platforms>AnyCPU;x86</Platforms>
+    <Prefer32Bit>false</Prefer32Bit>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
+    <DebugType>portable</DebugType>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="TableSQLLite.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Remove="TableSQLLite.resx" />
-  </ItemGroup>
 
-  <ItemGroup>
     <!-- NuGet-Pakete -->
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
+    
     <!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
-  </ItemGroup>
 
-  <ItemGroup>
     <!-- System-Referenzen -->
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   
-  <ItemGroup>
-    <!-- Implicit Usings -->
-    <Using Include="System" />
-    <Using Include="System.Collections.Generic" />
-    <Using Include="System.Drawing" />
-    <Using Include="System.Windows.Forms" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- app.config wird nicht mehr benötigt, aber falls vorhanden -->
-    <None Include="app.config" Condition="Exists('app.config')" />
-  </ItemGroup>
 
 </Project>

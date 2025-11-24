@@ -5,57 +5,47 @@
     <OutputType>Library</OutputType>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ImplicitUsings>enable</ImplicitUsings>
     
     <!-- Assembly-Metadaten -->
     <RootNamespace>BlueScript</RootNamespace>
     <AssemblyName>BlueScript</AssemblyName>
-    <Company>BlueScript</Company>
     <Product>BlueScript</Product>
-    <Copyright>Copyright © 2025</Copyright>
+    <Company>Christian Peter</Company>
+    <Authors>Christian Peter</Authors>
+    <Copyright>Copyright © 2025 Christian Peter</Copyright>
     
     <!-- Versionierung -->
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    
-    <!-- Plattformen -->
-    <Platforms>AnyCPU</Platforms>
-    
-    <!-- Moderne Build-Optimierungen -->
+
+    <!-- Moderne Optimierungen -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>preview</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Plattformen -->
+    <Platforms>AnyCPU</Platforms>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
+    <DebugType>portable</DebugType>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- NuGet-Pakete -->
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
 
-  <ItemGroup>
     <!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
-  </ItemGroup>
 
-  <ItemGroup>
     <!-- System-Referenzen -->
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
@@ -63,11 +53,5 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   
-  <ItemGroup>
-    <!-- Implicit Usings -->
-    <Using Include="System" />
-    <Using Include="System.Collections.Generic" />
-    <Using Include="System.Linq" />
-  </ItemGroup>
 
 </Project>

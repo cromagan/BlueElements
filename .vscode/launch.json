@@ -3,14 +3,20 @@
     "configurations": [
         {
             "name": "Launch BeCreative",
-            "type": "coreclr",
+            "type": "clr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BeCreative/BeCreative/obj/Debug/net48/BeCreative.exe",
+            "program": "${workspaceFolder}\\BeCreative\\bin\\Debug\\net48\\BeCreative.exe",
             "args": [],
-            "cwd": "${workspaceFolder}/BeCreative/BeCreative",
-            "console": "internalConsole",
-            "stopAtEntry": false
+            "cwd": "${workspaceFolder}\\BeCreative",
+            "stopAtEntry": false,
+            "symbolOptions": {
+                "searchPaths": [
+                    "${workspaceFolder}\\BeCreative\\bin\\Debug\\net48"
+                ],
+                "searchMicrosoftSymbolServer": false
+            },
+            "justMyCode": false
         }
     ]
 }
