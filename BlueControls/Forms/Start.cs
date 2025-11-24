@@ -60,7 +60,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
                 Forms.ItemAdd(pk);
             }
 
-            var p = new BitmapListItem(i, string.Empty, name) {
+            var bli = new BitmapListItem(i, string.Empty, name) {
                 Padding = 5,
                 Tag = thisType,
                 UserDefCompareKey = sort.ToStringInt10() + "1" + name
@@ -69,7 +69,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
             //var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToStringInt10() + "1" + name) {
             //    Tag = thisType
             //};
-            Forms.ItemAdd(p);
+            Forms.ItemAdd(bli);
         }
     }
 

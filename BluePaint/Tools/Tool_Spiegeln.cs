@@ -97,12 +97,12 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         var maxY = Math.Max(Math.Max(p[0].Y, p[1].Y), Math.Max(p[2].Y, p[3].Y));
         var b = (int)Math.Round(maxX - minX, MidpointRounding.AwayFromZero);
         var h = (int)Math.Round(maxY - minY, MidpointRounding.AwayFromZero);
-        Bitmap nBmp = new(b, h);
+        var bmp = new Bitmap(b, h);
         // Create the real rotation transformation.
         Matrix rotateAtCenter = new();
         rotateAtCenter.RotateAt(wink, new PointF(b / 2f, h / 2f));
         // Draw the image onto the new bitmap rotated.
-        using (var gr = Graphics.FromImage(nBmp)) {
+        using (var gr = Graphics.FromImage(bmp)) {
             gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
             gr.Clear(Color.Magenta);
             gr.Transform = rotateAtCenter;
@@ -111,7 +111,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
             var y = (h - pic.Height) / 2;
             gr.DrawImage(pic, x, y, pic.Width, pic.Height);
         }
-        OnOverridePic(nBmp, true);
+        OnOverridePic(bmp, true);
     }
 
     private void btnAusrichten_Click(object sender, System.EventArgs e) {

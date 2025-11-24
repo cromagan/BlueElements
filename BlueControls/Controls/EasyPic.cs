@@ -290,9 +290,9 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         if (!HasFileName() || _bitmap == null || !Editable) { return; }
 
         try {
-            using var compatibleBitmap = new Bitmap(_bitmap);
+            using var bmp = new Bitmap(_bitmap);
             using var memory = new System.IO.MemoryStream();
-            compatibleBitmap.Save(memory, ImageFormat.Png);
+            bmp.Save(memory, ImageFormat.Png);
             WriteAllBytes(FileName, memory.ToArray());
         } catch (Exception ex) {
             System.Windows.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");

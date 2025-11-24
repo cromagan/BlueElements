@@ -39,11 +39,11 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICloneable, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
+public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
 
     #region Fields
 
-    public string Page = string.Empty;
+    public string Page { get; set; } = string.Empty;
 
     /// <summary>
     /// Soll es gedruckt werden?
@@ -240,7 +240,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
         JointPoints.Add(p);
     }
 
-
     public int CompareTo(object obj) {
         if (obj is AbstractPadItem v) {
             return SaveOrder.CompareTo(v.SaveOrder);
@@ -393,7 +392,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
     /// <param name="height"></param>
     public abstract void InitialPosition(int x, int y, int width, int height);
 
-    public bool IsInDrawingArea(RectangleF drawingKoordinates, Rectangle visibleArea) => visibleArea.IsEmpty || drawingKoordinates.IntersectsWith(visibleArea);
+    public static bool IsInDrawingArea(RectangleF drawingKoordinates, Rectangle visibleArea) => visibleArea.IsEmpty || drawingKoordinates.IntersectsWith(visibleArea);
 
     public void Move(float x, float y, bool isMouse) {
         if (x == 0 && y == 0) { return; }
@@ -534,9 +533,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
             }
         } while (true);
 
-        Bitmap I = new((int)(r.Width * scale), (int)(r.Height * scale));
+        var bmp = new Bitmap((int)(r.Width * scale), (int)(r.Height * scale));
 
-        DrawToBitmap(I, scale, r.Left * scale, r.Top * scale);
+        DrawToBitmap(bmp, scale, r.Left * scale, r.Top * scale);
 
         //using var gr = Graphics.FromImage(I);
         //gr.Clear(BackColor);
@@ -544,7 +543,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, ICl
         //    return ToBitmap(scale);
         //}
 
-        return I;
+        return bmp;
     }
 
     public void Verbindungspunkt_hinzu() => AddJointPointAbsolute("Neuer Verbindungspunkt", JointMiddle.X, JointMiddle.Y);

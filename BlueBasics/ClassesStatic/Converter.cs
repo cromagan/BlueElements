@@ -33,9 +33,9 @@ public static class Converter {
     public static Bitmap? Base64ToBitmap(string base64) {
         try {
             using var memory = new System.IO.MemoryStream(Convert.FromBase64String(base64));
-            Bitmap oBitmap = new(memory);
+            var bmp = new Bitmap(memory);
             memory.Close();
-            return oBitmap;
+            return bmp;
         } catch {
             return null;
         }
@@ -62,7 +62,7 @@ public static class Converter {
 
         if (string.IsNullOrWhiteSpace(input)) { return false; }
 
-        input = input.Trim().ToLower();
+        input = input.Trim().ToLowerInvariant();
 
         if (input.StartsWith("#")) { input = input.Substring(1); }
 
@@ -128,7 +128,7 @@ public static class Converter {
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
-    public static double DoubleParse(string? s) => string.IsNullOrEmpty(s) ? 0 : DoubleTryParse(s, out var v) ? v : (double)0f;
+    public static double DoubleParse(string? s) => string.IsNullOrEmpty(s) ? 0 : DoubleTryParse(s, out var v) ? v : 0f;
 
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
@@ -174,7 +174,7 @@ public static class Converter {
     /// <returns></returns>
     public static int IntParse(string? s) => int.TryParse(s, out var v) ? v : 0;
 
-    public static int IntParse(int? s) => s == null ? 0 : (int)s;
+    public static int IntParse(int? s) => s ?? 0;
 
     public static int IntParse(double? s) => s == null ? 0 : (int)Math.Round((double)s, 0, MidpointRounding.AwayFromZero);
 

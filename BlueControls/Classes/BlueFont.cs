@@ -47,7 +47,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private static readonly ConcurrentDictionary<(int color, float width), Pen> _penCache = new();
     private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
     private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();
-    private readonly ConcurrentDictionary<string, string> _transformCache = new();
 
     /// <summary>
     /// Die Schriftart, mit allen Attributen, die nativ unterstützt werden.
@@ -123,7 +122,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, colorMain, colorOutline, colorBack).FinishParseable());
 
     public static BlueFont Get(string toParse) {
-        if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{") || _blueFontCache == null) {
+        if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) {
             return DefaultFont;
         }
 
@@ -138,7 +137,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         });
     }
 
-    public static Brush GetBrush(Color color) => _brushCache.GetOrAdd(color.ToArgb(), c => new SolidBrush(color));
+    public static Brush GetBrush(Color color) => _brushCache.GetOrAdd(color.ToArgb(), _ => new SolidBrush(color));
 
     public static Font GetFont(string fontName, float emSize, FontStyle style, GraphicsUnit unit, Func<Font> createFont) {
         var key = $"{fontName}_{emSize}_{style}_{unit}";
@@ -428,7 +427,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
 
         var n = "FontName-" + ParseableItems().FinishParseable();
-        //if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol(FontName, true)); }
+        if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol(FontName, true)); }
 
         _nameInStyleSym = QuickImage.Get(n);
         return _nameInStyleSym;
@@ -459,8 +458,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         _charSizeCache.Clear();
         _stringSizeCache.Clear();
-        _transformCache.Clear();
-
         // Oberlängenberechnung
         var multi = 50 / _fontOl.Size;
         using var tmpfont = new Font(_fontOl.Name, _fontOl.Size * multi / Skin.Scale, _fontOl.Style);
@@ -505,7 +502,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                 bmp.UnlockBits(bmpData);
             }
 
-
             if (du == 0) {
                 _oberlänge = miny / multi;
 
@@ -534,7 +530,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             case "fontsize":
                 Size = FloatParse(value.FromNonCritical());
                 if (Size < 0.1f) { Size = 0.1f; }
-                Size = (float)Math.Round((double)Size, 3, MidpointRounding.AwayFromZero);
+                Size = (float)Math.Round(Size, 3, MidpointRounding.AwayFromZero);
                 needsCacheReset = true;
                 break;
 
@@ -574,7 +570,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (needsCacheReset) {
             _charSizeCache.Clear();
             _stringSizeCache.Clear();
-            _transformCache.Clear();
             return true;
         }
 
@@ -623,7 +618,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
 
         var n = "Font-" + ParseableItems().FinishParseable();
-        //if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol("Abc", false)); }
+        if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol("Abc", false)); }
 
         _symbolForReadableTextSym = QuickImage.Get(n);
         return _symbolForReadableTextSym;
@@ -632,7 +627,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public QuickImage? SymbolOfLine() {
         if (_symbolOfLineSym != null) { return _symbolOfLineSym; }
 
-        Bitmap bmp = new(32, 12);
+        var bmp = new Bitmap(32, 12);
         using (var gr = Graphics.FromImage(bmp)) {
             gr.Clear(ColorMain.GetBrightness() > 0.9F ? Color.FromArgb(200, 200, 200) : Color.White);
             gr.SmoothingMode = SmoothingMode.HighQuality;
@@ -640,7 +635,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
 
         var n = "Line-" + ParseableItems().FinishParseable();
-        //if (!QuickImage.Exists(n)) { new QuickImage(n, bmp); }
+        if (!QuickImage.Exists(n)) { new QuickImage(n, bmp); }
 
         _symbolOfLineSym = QuickImage.Get(n);
         return _symbolOfLineSym;
@@ -723,7 +718,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     private Bitmap Symbol(string text, bool transparent) {
         var s = MeasureString(text);
-        Bitmap bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
+        var bmp = new Bitmap((int)(s.Width + 1), (int)(s.Height + 1));
         using (var gr = Graphics.FromImage(bmp)) {
             if (transparent) {
                 gr.Clear(Color.FromArgb(180, 180, 180));

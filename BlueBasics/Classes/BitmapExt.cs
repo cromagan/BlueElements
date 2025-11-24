@@ -104,125 +104,125 @@ public class BitmapExt : IDisposableExtended {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="bmp"></param>
+    /// <param name="sourceBmp"></param>
     /// <param name="left">Positiver Wert schneidet diese Anzahl von Pixel vom linken Rand weg.</param>
     /// <param name="right">Negativer Wert schneidet diese Anzahl von Pixel vom rechten Rand weg.</param>
     /// <param name="top">Positiver Wert schneidet diese Anzahl von Pixel vom oberen Rand weg.</param>
     /// <param name="bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
     /// <returns></returns>
-    public static Bitmap? Crop(Bitmap? bmp, int left, int right, int top, int bottom) {
-        if (bmp == null || (left == 0 && right == 0 && top == 0 && bottom == 0)) { return bmp; }
+    public static Bitmap? Crop(Bitmap? sourceBmp, int left, int right, int top, int bottom) {
+        if (sourceBmp == null || (left == 0 && right == 0 && top == 0 && bottom == 0)) { return sourceBmp; }
 
         Generic.CollectGarbage();
-        var w = Math.Max(bmp.Width - left + right, 1);
-        var h = Math.Max(bmp.Height - top + bottom, 1);
-        Bitmap bmp2 = new(w, h);
-        using (var gr = Graphics.FromImage(bmp2)) {
-            gr.DrawImage(bmp, -left, -top, bmp.Width, bmp.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
+        var w = Math.Max(sourceBmp.Width - left + right, 1);
+        var h = Math.Max(sourceBmp.Height - top + bottom, 1);
+        var bmp = new Bitmap(w, h);
+        using (var gr = Graphics.FromImage(bmp)) {
+            gr.DrawImage(sourceBmp, -left, -top, sourceBmp.Width, sourceBmp.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
         }
         Generic.CollectGarbage();
-        return bmp2;
+        return bmp;
     }
 
-    public static void FillCircle(Bitmap? bmp, Color c, int x, int y, int r) {
-        if (bmp == null) { return; }
+    public static void FillCircle(Bitmap? sourceBmp, Color c, int x, int y, int r) {
+        if (sourceBmp == null) { return; }
 
         for (var adx = -r; adx <= r; adx++) {
             for (var ady = -r; ady <= r; ady++) {
                 var d = Math.Sqrt(Convert.ToDouble((adx * adx) + (ady * ady))) - 0.5;
                 var px = x + adx;
                 var py = y + ady;
-                if (px >= 0 && py >= 0 && px < bmp.Width && py < bmp.Height && d <= r) {
-                    bmp.SetPixel(px, py, c);
+                if (px >= 0 && py >= 0 && px < sourceBmp.Width && py < sourceBmp.Height && d <= r) {
+                    sourceBmp.SetPixel(px, py, c);
                 }
             }
         }
     }
 
-    public static Padding GetAutoValuesForCrop(Bitmap? pic, double minBrightness) {
+    public static Padding GetAutoValuesForCrop(Bitmap? sourceBmp, double minBrightness) {
         Padding pa = new(0, 0, 0, 0);
-        if (pic == null) { return pa; }
+        if (sourceBmp == null) { return pa; }
         var x = 0;
         var exitNow = false;
         int y;
         while (true) {
-            for (y = 0; y < pic.Height; y++) {
-                if (!pic.GetPixel(x, y).IsNearWhite(minBrightness)) {
+            for (y = 0; y < sourceBmp.Height; y++) {
+                if (!sourceBmp.GetPixel(x, y).IsNearWhite(minBrightness)) {
                     exitNow = true;
                     break;
                 }
             }
             if (exitNow) { break; }
             x++;
-            if (x > pic.Width * 0.9) { break; }
+            if (x > sourceBmp.Width * 0.9) { break; }
         }
         pa.Left = x;
         // -------------
-        x = pic.Width - 1;
+        x = sourceBmp.Width - 1;
         exitNow = false;
         while (true) {
-            for (y = 0; y < pic.Height; y++) {
-                if (!pic.GetPixel(x, y).IsNearWhite(minBrightness)) {
+            for (y = 0; y < sourceBmp.Height; y++) {
+                if (!sourceBmp.GetPixel(x, y).IsNearWhite(minBrightness)) {
                     exitNow = true;
                     break;
                 }
             }
             if (exitNow) { break; }
             x--;
-            if (x < pic.Width * 0.1) { break; }
+            if (x < sourceBmp.Width * 0.1) { break; }
         }
-        pa.Right = x - pic.Width + 1;
+        pa.Right = x - sourceBmp.Width + 1;
         // -------------
         y = 0;
         exitNow = false;
         while (true) {
-            for (x = 0; x < pic.Width; x++) {
-                if (!pic.GetPixel(x, y).IsNearWhite(minBrightness)) {
+            for (x = 0; x < sourceBmp.Width; x++) {
+                if (!sourceBmp.GetPixel(x, y).IsNearWhite(minBrightness)) {
                     exitNow = true;
                     break;
                 }
             }
             if (exitNow) { break; }
             y++;
-            if (y > pic.Height * 0.9) { break; }
+            if (y > sourceBmp.Height * 0.9) { break; }
         }
         pa.Top = y;
         // -------------
-        y = pic.Height - 1;
+        y = sourceBmp.Height - 1;
         exitNow = false;
         while (true) {
-            for (x = 0; x < pic.Width; x++) {
-                if (!pic.GetPixel(x, y).IsNearWhite(minBrightness)) {
+            for (x = 0; x < sourceBmp.Width; x++) {
+                if (!sourceBmp.GetPixel(x, y).IsNearWhite(minBrightness)) {
                     exitNow = true;
                     break;
                 }
             }
             if (exitNow) { break; }
             y--;
-            if (y < pic.Height * 0.1) { break; }
+            if (y < sourceBmp.Height * 0.1) { break; }
         }
-        pa.Bottom = y - pic.Height + 1;
+        pa.Bottom = y - sourceBmp.Height + 1;
         return pa;
     }
 
-    public static Bitmap GetBitmap(BitmapSource bitmapsource, int maxSize) {
+    public static Bitmap GetBitmap(BitmapSource sourceBmp, int maxSize) {
         Generic.CollectGarbage();
         Generic.Pause(0.1, true);
-        Bitmap? bitmap;
+        Bitmap? bmp;
         using (var outStream = new System.IO.MemoryStream()) {
             BitmapEncoder enc = new BmpBitmapEncoder();
-            enc.Frames.Add(BitmapFrame.Create(bitmapsource));
+            enc.Frames.Add(BitmapFrame.Create(sourceBmp));
             enc.Save(outStream);
-            bitmap = new Bitmap(outStream);
+            bmp = new Bitmap(outStream);
         }
         if (maxSize > 0) {
-            bitmap = bitmap.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+            bmp = bmp.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
         }
-        return bitmap;
+        return bmp;
     }
 
-    public static Color GetPixel(BitmapData bitmapData, byte[] bits, int x, int y) {
-        var index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
+    public static Color GetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y) {
+        var index = (y * sourceBmpData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
         var b = bits[index];
         var g = bits[index + 1];
         var r = bits[index + 2];
@@ -234,7 +234,8 @@ public class BitmapExt : IDisposableExtended {
         //TODO: Unused
         try {
             if (sourceBmp?.IsValid() != true) { return null; }
-            Bitmap bmp = new(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
+
+            var bmp = new Bitmap(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
             using var g = Graphics.FromImage(bmp);
             g.DrawImage(sourceBmp, 0, 0, sourceBmp.Width, sourceBmp.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
             return bmp;
@@ -247,23 +248,23 @@ public class BitmapExt : IDisposableExtended {
     /// <summary>
     /// Pixelgenaue Collisionsanalyse zweier Bitmaps
     /// </summary>
-    /// <param name="image1"></param>
+    /// <param name="bmp1"></param>
     /// <param name="pos1">Linke obere Eckte des 1. Bildes</param>
-    /// <param name="image2"></param>
+    /// <param name="bmp2"></param>
     /// <param name="pos2">Linke obere Eckte des 2. Bildes</param>
     /// <param name="accuracy">Genauigkeit der Prüfung. Bei 1 wird jeder Pixel geprüft. Bei z.B. 3 wird nur jeder dritte Pixel geprüft.</param>
     /// <returns></returns>
-    public static bool IntersectsWith(Bitmap? image1, Point pos1, Bitmap? image2, Point pos2, int accuracy) {
+    public static bool IntersectsWith(Bitmap? bmp1, Point pos1, Bitmap? bmp2, Point pos2, int accuracy) {
         //Used: Only BZL
-        if (image1 == null || image2 == null) { return false; }
-        Rectangle koord1 = new(pos1, image1.Size);
-        Rectangle koord2 = new(pos2, image2.Size);
+        if (bmp1 == null || bmp2 == null) { return false; }
+        Rectangle koord1 = new(pos1, bmp1.Size);
+        Rectangle koord2 = new(pos2, bmp2.Size);
         if (!koord1.IntersectsWith(koord2)) { return false; }
         Rectangle schnitt = new(koord1.Location, koord1.Size);
         schnitt.Intersect(koord2);
         for (var x = schnitt.Left; x < schnitt.Right; x += accuracy) {
             for (var y = schnitt.Top; y < schnitt.Bottom; y += accuracy) {
-                if (!image1.GetPixel(x - koord1.X, y - koord1.Y).IsNearWhite(0.9) && !image2.GetPixel(x - koord2.X, y - koord2.Y).IsNearWhite(0.9)) {
+                if (!bmp1.GetPixel(x - koord1.X, y - koord1.Y).IsNearWhite(0.9) && !bmp2.GetPixel(x - koord2.X, y - koord2.Y).IsNearWhite(0.9)) {
                     return true;
                 }
             }
@@ -271,60 +272,60 @@ public class BitmapExt : IDisposableExtended {
         return false;
     }
 
-    public static void Magnify(Bitmap screenshot, Point point, Graphics gR, bool swapX) {
+    public static void Magnify(Bitmap sourceBmp, Point point, Graphics gr, bool swapX) {
         const int w1 = 200; // Größe des Rechteckes
         const int w5 = 10; // Pixel zum vergrößerm
         int x;
         if (!swapX) {
             x = 150 - (int)(w1 / 2.0);
-            if (point.X < screenshot.Width / 2.0) { x = screenshot.Width - 150 - (int)(w1 / 2.0); }
+            if (point.X < sourceBmp.Width / 2.0) { x = sourceBmp.Width - 150 - (int)(w1 / 2.0); }
         } else {
-            x = screenshot.Width - 150 - (int)(w1 / 2.0);
-            if (point.X < screenshot.Width / 2.0) { x = 150 - (int)(w1 / 2.0); }
+            x = sourceBmp.Width - 150 - (int)(w1 / 2.0);
+            if (point.X < sourceBmp.Width / 2.0) { x = 150 - (int)(w1 / 2.0); }
         }
         var y = 150 - (int)(w1 / 2.0);
-        if (point.Y < screenshot.Height / 2.0) { y = screenshot.Height - 150 - (int)(w1 / 2.0); }
+        if (point.Y < sourceBmp.Height / 2.0) { y = sourceBmp.Height - 150 - (int)(w1 / 2.0); }
         Rectangle r = new(x, y, w1, w1);
         for (var z = 5; z >= 0; z--) {
             r.Inflate(1, 1);
             // r.Expand(0, 0, 1, 1)
             var w = Convert.ToByte(255 / (double)10 * z);
-            gR.DrawRectangle(new Pen(Color.FromArgb(w, 0, 0, 0)), r);
+            gr.DrawRectangle(new Pen(Color.FromArgb(w, 0, 0, 0)), r);
         }
         r.Inflate(-5, -5);
-        gR.InterpolationMode = InterpolationMode.NearestNeighbor;
-        gR.PixelOffsetMode = PixelOffsetMode.Half;
-        gR.DrawImage(screenshot, r, new Rectangle(point.X - w5, point.Y - w5, (w5 * 2) + 1, (w5 * 2) + 1), GraphicsUnit.Pixel);
-        gR.DrawRectangle(Pens.Black, r);
+        gr.InterpolationMode = InterpolationMode.NearestNeighbor;
+        gr.PixelOffsetMode = PixelOffsetMode.Half;
+        gr.DrawImage(sourceBmp, r, new Rectangle(point.X - w5, point.Y - w5, (w5 * 2) + 1, (w5 * 2) + 1), GraphicsUnit.Pixel);
+        gr.DrawRectangle(Pens.Black, r);
         var mitte = r.PointOf(Alignment.Horizontal_Vertical_Center);
-        gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);
-        gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X - 7, mitte.Y, mitte.X + 6, mitte.Y);
-        gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), mitte.X, r.Top, mitte.X, r.Bottom);
-        gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, mitte.Y, r.Right, mitte.Y);
-        gR.DrawLine(Pens.Red, mitte.X, mitte.Y - 6, mitte.X, mitte.Y + 5);
-        gR.DrawLine(Pens.Red, mitte.X - 6, mitte.Y, mitte.X + 5, mitte.Y);
+        gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);
+        gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X - 7, mitte.Y, mitte.X + 6, mitte.Y);
+        gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), mitte.X, r.Top, mitte.X, r.Bottom);
+        gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, mitte.Y, r.Right, mitte.Y);
+        gr.DrawLine(Pens.Red, mitte.X, mitte.Y - 6, mitte.X, mitte.Y + 5);
+        gr.DrawLine(Pens.Red, mitte.X - 6, mitte.Y, mitte.X + 5, mitte.Y);
     }
 
-    public static Bitmap? ReplaceColor(Bitmap? source, Color toReplace, Color replacement) {
-        if (source == null) { return null; }
+    public static Bitmap? ReplaceColor(Bitmap? sourceBmp, Color toReplace, Color replacement) {
+        if (sourceBmp == null) { return null; }
 
         const int pixelSize = 4; // 32 bits per pixel
-        Bitmap target = new(source.Width, source.Height, PixelFormat.Format32bppArgb);
+        var bmp = new Bitmap(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
         BitmapData? sourceData = null;
         BitmapData? targetData = null;
         try {
-            sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            targetData = target.LockBits(new Rectangle(0, 0, target.Width, target.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            sourceData = sourceBmp.LockBits(new Rectangle(0, 0, sourceBmp.Width, sourceBmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            targetData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
-            int bytes = Math.Abs(sourceData.Stride) * source.Height;
+            int bytes = Math.Abs(sourceData.Stride) * sourceBmp.Height;
             byte[] sourceBuffer = new byte[bytes];
             byte[] targetBuffer = new byte[bytes];
 
             Marshal.Copy(sourceData.Scan0, sourceBuffer, 0, bytes);
 
-            for (var y = 0; y < source.Height; ++y) {
+            for (var y = 0; y < sourceBmp.Height; ++y) {
                 int rowOffset = y * sourceData.Stride;
-                for (var x = 0; x < source.Width; ++x) {
+                for (var x = 0; x < sourceBmp.Width; ++x) {
                     int pixelOffset = rowOffset + (x * pixelSize);
                     var b = sourceBuffer[pixelOffset + 0];
                     var g = sourceBuffer[pixelOffset + 1];
@@ -347,15 +348,14 @@ public class BitmapExt : IDisposableExtended {
 
             Marshal.Copy(targetBuffer, 0, targetData.Scan0, bytes);
         } finally {
-            if (sourceData != null) { source.UnlockBits(sourceData); }
-            if (targetData != null) { target.UnlockBits(targetData); }
+            if (sourceData != null) { sourceBmp.UnlockBits(sourceData); }
+            if (targetData != null) { bmp.UnlockBits(targetData); }
         }
-        return target;
+        return bmp;
     }
 
-
-    public static void SetPixel(BitmapData bitmapData, byte[] bits, int x, int y, Color color) {
-        var index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
+    public static void SetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y, Color color) {
+        var index = (y * sourceBmpData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
         bits[index] = color.B;
         bits[index + 1] = color.G;
         bits[index + 2] = color.R;
@@ -383,20 +383,20 @@ public class BitmapExt : IDisposableExtended {
                 }
 
                 if (frames > 1) {
-                    Bitmap x2 = new(200, 200);
-                    var gr = Graphics.FromImage(x2);
+                    var bmp = new Bitmap(200, 200);
+                    var gr = Graphics.FromImage(bmp);
                     gr.Clear(Color.White);
                     gr.DrawString("Weitere Blätter vorhanden!", new Font("Arial", 9), Brushes.Red, new Point(0, 0), DefaultWithTrailingSpaces);
-                    l.Add(x2);
+                    l.Add(bmp);
                 }
             } catch (Exception ex) {
                 l.Clear();
                 Generic.CollectGarbage();
-                Bitmap x2 = new(200, 200);
-                var gr = Graphics.FromImage(x2);
+                var bmp = new Bitmap(200, 200);
+                var gr = Graphics.FromImage(bmp);
                 gr.Clear(Color.White);
                 gr.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0), DefaultWithTrailingSpaces);
-                l.Add(x2);
+                l.Add(bmp);
                 Develop.DebugPrint("Vorschaubild fehlgeschlagen", ex);
             }
         }
@@ -422,12 +422,12 @@ public class BitmapExt : IDisposableExtended {
 
     public void ApplyFilter(string name) => ApplyFilter(name, 0);
 
-    public void CloneFromBitmap(Bitmap? bmp) {
+    public void CloneFromBitmap(Bitmap? sourceBmp) {
         UnlockBits(false);
         _bitmap?.Dispose(); // Dispose of any existing bitmap
         _bitmap = null;
 
-        if (bmp == null) {
+        if (sourceBmp == null) {
             Width = -1;
             Height = -1;
             return;
@@ -437,12 +437,12 @@ public class BitmapExt : IDisposableExtended {
         var tim = Stopwatch.StartNew();
         do {
             try {
-                Width = bmp.Width;
-                Height = bmp.Height;
+                Width = sourceBmp.Width;
+                Height = sourceBmp.Height;
 
                 _bitmap = new Bitmap(Width, Height, Pixelformat);
                 using var gr = Graphics.FromImage(_bitmap);
-                gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
+                gr.DrawImage(sourceBmp, new Rectangle(0, 0, Width, Height));
 
                 LockBits();
             } catch (Exception ex) {
@@ -473,16 +473,16 @@ public class BitmapExt : IDisposableExtended {
 
     public Bitmap Crop(Rectangle re) {
         UnlockBits(true);
-        Bitmap newBmp = new(re.Width, re.Height);
+        var bmp = new Bitmap(re.Width, re.Height);
 
-        using var gr = Graphics.FromImage(newBmp);
+        using var gr = Graphics.FromImage(bmp);
         gr.Clear(Color.Transparent);
         gr.PixelOffsetMode = PixelOffsetMode.Half;
         UnlockBits(true);
         if (_bitmap != null) { gr.DrawImage(_bitmap, re with { X = 0, Y = 0 }, re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel); }
 
         LockBits();
-        return newBmp;
+        return bmp;
     }
 
     /// <summary>
@@ -499,7 +499,6 @@ public class BitmapExt : IDisposableExtended {
             if (y < 0) { y = 0; }
             if (x + width > _bitmap.Width) { width = _bitmap.Width - x; }
             if (y + height > _bitmap.Height) { height = _bitmap.Height - y; }
-            return Crop(new Rectangle(x, y, width, height));
         }
 
         return Crop(new Rectangle(x, y, width, height));
@@ -511,9 +510,9 @@ public class BitmapExt : IDisposableExtended {
         GC.SuppressFinalize(this);
     }
 
-    public void FromFile(string dateiName, bool setDummyPicIfFails) {
+    public void FromFile(string filename, bool setDummyPicIfFails) {
         //TODO: Unused
-        var x = (Bitmap?)Image_FromFile(dateiName);
+        var x = (Bitmap?)Image_FromFile(filename);
         if (x == null && setDummyPicIfFails) {
             x = QuickImage.Get(ImageCode.Warnung);
         }

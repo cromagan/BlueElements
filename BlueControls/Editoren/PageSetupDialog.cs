@@ -181,12 +181,12 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
             var o = (float)(FloatParse(Oben.Text) * z);
             var r = (float)(FloatParse(Rechts.Text) * z);
             var u = (float)(FloatParse(Unten.Text) * z);
-            Bitmap i = new((int)((br * z) - 1), (int)((ho * z) - 1));
-            var gr = Graphics.FromImage(i);
+            var bmp = new Bitmap((int)((br * z) - 1), (int)((ho * z) - 1));
+            var gr = Graphics.FromImage(bmp);
             gr.Clear(Color.White);
-            gr.DrawRectangle(Pens.Black, 0, 0, i.Width - 1, i.Height - 1);
-            gr.DrawRectangle(Pens.Gray, l, o, i.Width - r - l, i.Height - u - o);
-            Sample.Image = i;
+            gr.DrawRectangle(Pens.Black, 0, 0, bmp.Width - 1, bmp.Height - 1);
+            gr.DrawRectangle(Pens.Gray, l, o, bmp.Width - r - l, bmp.Height - u - o);
+            Sample.Image = bmp;
         } else {
             OK_Enabled = false;
             Sample.Image = null;

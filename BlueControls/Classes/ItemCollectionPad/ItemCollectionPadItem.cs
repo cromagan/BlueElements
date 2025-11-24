@@ -519,7 +519,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         foreach (var thisc in padData._internal) {
             if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
-                thisc.IsInDrawingArea(thisc.UsedArea, padData.UsedArea.ToRect())) {
+                AbstractPadItem.IsInDrawingArea(thisc.UsedArea, padData.UsedArea.ToRect())) {
                 its.Add(aas);
             }
         }
@@ -981,9 +981,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         var t = sc.Parse(0, "Main", null, null);
 
         if (t.Failed) {
-            var ep = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));
-
-            Add(ep);
+            var bpi = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));
+            Add(bpi);
         }
         return t;
     }

@@ -31,15 +31,15 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static Bitmap CloneFromBitmap(this Bitmap bmp) {
+    public static Bitmap CloneFromBitmap(this Bitmap sourceBmp) {
         try { // wird an anderer stelle verwendet
-            var bitmap = new Bitmap(bmp.Width, bmp.Height);
-            using var gr = Graphics.FromImage(bitmap);
-            gr.DrawImage(bmp, new Rectangle(0, 0, bmp.Width, bmp.Height));
-            return bitmap;
+            var bmp = new Bitmap(sourceBmp.Width, sourceBmp.Height);
+            using var gr = Graphics.FromImage(bmp);
+            gr.DrawImage(sourceBmp, new Rectangle(0, 0, sourceBmp.Width, sourceBmp.Height));
+            return bmp;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return bmp.CloneFromBitmap();
+            return sourceBmp.CloneFromBitmap();
         }
     }
 
@@ -67,7 +67,6 @@ public static partial class Extensions {
         if (!FileExists(filename)) { return null; }
         try {
             var bytes = ReadAllBytes(filename, 3);
-            if (bytes == null) { return null; }
             using var ms = new System.IO.MemoryStream(bytes);
             var im = Image.FromStream(ms);
             return im;
@@ -91,7 +90,7 @@ public static partial class Extensions {
         }
     }
 
-    public static Bitmap Resize(this Bitmap bmp, int maxwidth, int maxheight, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
+    public static Bitmap Resize(this Bitmap sourceBmp, int maxwidth, int maxheight, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
         if (collectGarbage) { Generic.CollectGarbage(); }
         if (maxwidth < 1) { maxwidth = 1; }
         if (maxheight < 1) { maxheight = 1; }
@@ -102,24 +101,24 @@ public static partial class Extensions {
         switch (sizeMode) {
             case SizeModes.EmptySpace:
             case SizeModes.BildAbschneiden:
-                var scale3 = Math.Min(maxwidth / (double)bmp.Width, maxheight / (double)bmp.Height);
-                calcwidth = (int)(scale3 * bmp.Width);
-                calcheight = (int)(scale3 * bmp.Height);
+                var scale3 = Math.Min(maxwidth / (double)sourceBmp.Width, maxheight / (double)sourceBmp.Height);
+                calcwidth = (int)(scale3 * sourceBmp.Width);
+                calcheight = (int)(scale3 * sourceBmp.Height);
                 break;
 
             case SizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
-                var scale1 = Math.Min(maxwidth / (double)bmp.Width, maxheight / (double)bmp.Height);
-                maxwidth = (int)(scale1 * bmp.Width);
-                maxheight = (int)(scale1 * bmp.Height);
+                var scale1 = Math.Min(maxwidth / (double)sourceBmp.Width, maxheight / (double)sourceBmp.Height);
+                maxwidth = (int)(scale1 * sourceBmp.Width);
+                maxheight = (int)(scale1 * sourceBmp.Height);
                 calcwidth = maxwidth;
                 calcheight = maxheight;
                 break;
 
             case SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
-                var scale2 = Math.Min(maxwidth / (double)bmp.Width, maxheight / (double)bmp.Height);
+                var scale2 = Math.Min(maxwidth / (double)sourceBmp.Width, maxheight / (double)sourceBmp.Height);
                 if (scale2 >= 1) { scale2 = 1; }
-                maxwidth = (int)(scale2 * bmp.Width);
-                maxheight = (int)(scale2 * bmp.Height);
+                maxwidth = (int)(scale2 * sourceBmp.Width);
+                maxheight = (int)(scale2 * sourceBmp.Height);
                 calcwidth = maxwidth;
                 calcheight = maxheight;
                 break;
@@ -139,41 +138,41 @@ public static partial class Extensions {
         // Um abstürzte zu vermeiden, einen Faktor berechnen
         Bitmap tmp;
 
-        switch (bmp.Width) {
+        switch (sourceBmp.Width) {
             case > 20000 when calcwidth < 4000:
-                tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
+                tmp = (Bitmap)sourceBmp.GetThumbnailImage((int)(sourceBmp.Width / 4.0), (int)(sourceBmp.Height / 4.0), null, IntPtr.Zero);
                 break;
 
             case > 15000 when calcwidth < 4000:
             case > 10000 when calcwidth < 2500:
-                tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+                tmp = (Bitmap)sourceBmp.GetThumbnailImage((int)(sourceBmp.Width / 3.0), (int)(sourceBmp.Height / 3.0), null, IntPtr.Zero);
                 break;
 
             case > 8000 when calcwidth < 2000:
-                tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
+                tmp = (Bitmap)sourceBmp.GetThumbnailImage((int)(sourceBmp.Width / 2.5), (int)(sourceBmp.Height / 2.5), null, IntPtr.Zero);
                 break;
 
             default:
-                tmp = bmp;
+                tmp = sourceBmp;
                 break;
         }
 
         try {
-            Bitmap imageResize = new(maxwidth, maxheight); // Kein Format32bppPArgb --> Fehler
-            using var gr = Graphics.FromImage(imageResize);
+            var bmp = new Bitmap(maxwidth, maxheight); // Kein Format32bppPArgb --> Fehler
+            using var gr = Graphics.FromImage(bmp);
             gr.InterpolationMode = interpolationMode;
             gr.PixelOffsetMode = PixelOffsetMode.Half;
             // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
 
             gr.DrawImage(tmp, (int)((maxwidth - calcwidth) / 2.0), (int)((maxheight - calcheight) / 2.0), calcwidth, calcheight);
-            return imageResize;
+            return bmp;
         } catch { }
 
         try {
             if (!collectGarbage) { Generic.CollectGarbage(); }
 
             if (sizeMode == SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern) {
-                return (Bitmap)bmp.GetThumbnailImage(calcwidth, calcheight, null, IntPtr.Zero);
+                return (Bitmap)sourceBmp.GetThumbnailImage(calcwidth, calcheight, null, IntPtr.Zero);
             }
         } catch { }
 

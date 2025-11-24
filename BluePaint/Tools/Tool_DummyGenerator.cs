@@ -37,18 +37,18 @@ public partial class Tool_DummyGenerator {
     #region Methods
 
     public static Bitmap CreateDummy(string text, int width, int height) {
-        Bitmap newPic = new(width, height);
-        var gr = Graphics.FromImage(newPic);
+        var bmp = new Bitmap(width, height);
+        var gr = Graphics.FromImage(bmp);
         gr.Clear(Color.White);
-        gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);
+        gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, bmp.Width - 2, bmp.Height - 2);
         if (!string.IsNullOrEmpty(text)) {
             Font f = new("Arial", 50, FontStyle.Bold);
             var fs = f.MeasureString(text);
-            gr.TranslateTransform((float)(newPic.Width / 2.0), (float)(newPic.Height / 2.0));
+            gr.TranslateTransform((float)(bmp.Width / 2.0), (float)(bmp.Height / 2.0));
             gr.RotateTransform(-90);
             BlueFont.DrawString(gr, text, f, new SolidBrush(Color.Black), (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
         }
-        return newPic;
+        return bmp;
     }
 
     private void CreateDummy() {

@@ -53,7 +53,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         var w = (imageCode + "||||||||||").Split('|');
 
         Name = w[0];
-        var width=  IntParse(w[1]);
+        var width = IntParse(w[1]);
         var height = IntParse(w[2]);
 
         Effekt = (ImageCodeEffect)IntParse(w[3]);
@@ -92,7 +92,7 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         CorrectSize(-1, -1, bmp);
 
-        if (Pics.Count == 0) {
+        if (Pics.IsEmpty) {
             BindingOperations.EnableCollectionSynchronization(Pics, new object());
         }
 
@@ -466,10 +466,10 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         var bmp = bmpTmp.CloneOfBitmap()?.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
 
-        return bmp == null ? ((Bitmap bmp, bool isError))(new Bitmap(Width, Height), true) : ((Bitmap bmp, bool isError))(bmp, false);
+        return bmp == null ? (new Bitmap(Width, Height), true) : (bmp, false);
     }
 
-    private Bitmap GenerateErrorImage(int width, int height) {
+    private static Bitmap GenerateErrorImage(int width, int height) {
         var bmp = new Bitmap(width, height);
 
         using var gr = Graphics.FromImage(bmp);

@@ -717,6 +717,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             case "/STRONG":
             case "/H3":
+            case "/H1":
             case "P":
             case "H0":
             case "H4":

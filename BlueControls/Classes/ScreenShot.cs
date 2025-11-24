@@ -59,10 +59,10 @@ public sealed partial class ScreenShot : Form {
         do {
             try {
                 var r = Generic.RectangleOfAllScreens();
-                Bitmap b = new(r.Width, r.Height, PixelFormat.Format32bppPArgb);
-                using var gr = Graphics.FromImage(b);
-                gr.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
-                return b;
+                var bmp = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
+                using var gr = Graphics.FromImage(bmp);
+                gr.CopyFromScreen(r.X, r.Y, 0, 0, bmp.Size);
+                return bmp;
             } catch {
                 Generic.CollectGarbage();
             }
@@ -70,13 +70,13 @@ public sealed partial class ScreenShot : Form {
     }
 
     /// <summary>
-    /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.
+    /// Erstellt einen Screenshot, dann kann der User einen Bereich wÃ¤hlen - und gibt diesen zurÃ¼ck.
     /// </summary>
     /// <param name="frm">Diese Form wird automatisch minimiert und wieder maximiert.</param>
     /// <returns></returns>
     /// <remarks></remarks>
     public static ScreenData GrabArea(Form? frm) {
-        using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, Helpers.DrawRectangle | Helpers.Magnifier);
+        using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewÃ¼nschten Bereich.", false, Helpers.DrawRectangle | Helpers.Magnifier);
         return x.Start(frm);
     }
 
@@ -100,14 +100,14 @@ public sealed partial class ScreenShot : Form {
             // Hole das Rectangle aller Screens
             var r = Generic.RectangleOfAllScreens();
 
-            // Setze die Form-Position und Größe VOR dem Screen-Grab
+            // Setze die Form-Position und GrÃ¶ÃŸe VOR dem Screen-Grab
             StartPosition = FormStartPosition.Manual;
             Left = r.Left;
             Top = r.Top;
             Width = r.Width;
             Height = r.Height;
 
-            // Führe den Screenshot durch
+            // FÃ¼hre den Screenshot durch
             _feedBack.Screen = GrabAllScreens();
             zoomPic.Bmp = _feedBack.Screen;
             zoomPic.InfoText = _drawText;

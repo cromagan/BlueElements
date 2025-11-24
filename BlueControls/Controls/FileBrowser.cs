@@ -168,7 +168,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     #region Methods
 
-    public string GetStandardCommand(string extension) {
+    public static string GetStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }
         var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
         var type = mainkey?.GetValue(""); // GetValue("") read the standard value of a key
@@ -634,29 +634,29 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             if (AddThis(fi)) {
                 if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
 
-                var p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix()) {
+                var bli = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix()) {
                     Padding = 6
                 };
 
                 switch (Sort) {
                     case "Größe":
-                        p.UserDefCompareKey = ((int)fi.Length).ToStringInt10();
+                        bli.UserDefCompareKey = ((int)fi.Length).ToStringInt10();
                         break;
 
                     case "Erstelldatum":
-                        p.UserDefCompareKey = fi.CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
+                        bli.UserDefCompareKey = fi.CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
                         break;
 
                     default:
-                        p.UserDefCompareKey = Constants.SecondSortChar + p.Caption.ToUpperInvariant();
+                        bli.UserDefCompareKey = Constants.SecondSortChar + bli.Caption.ToUpperInvariant();
                         break;
                 }
 
                 var tags = new List<string>();
                 tags.TagSet("Folder", bool.FalseString);
-                p.Tag = tags;
+                bli.Tag = tags;
 
-                feedBack = ["Add", p];
+                feedBack = ["Add", bli];
                 ThumbGenerator.ReportProgress(1, feedBack);
             }
         }
@@ -670,12 +670,12 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             var fi = GetFileInfo(thisString);
             if (AddThis(fi)) {
                 var tags = new List<string>();
-                var p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
+                var bli = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
                 tags.TagSet("Folder", bool.TrueString);
-                p.Padding = 10;
-                p.UserDefCompareKey = Constants.FirstSortChar + thisString.ToUpperInvariant();
-                p.Tag = tags;
-                feedBack = ["Add", p];
+                bli.Padding = 10;
+                bli.UserDefCompareKey = Constants.FirstSortChar + thisString.ToUpperInvariant();
+                bli.Tag = tags;
+                feedBack = ["Add", bli];
                 ThumbGenerator.ReportProgress(1, feedBack);
             }
         }

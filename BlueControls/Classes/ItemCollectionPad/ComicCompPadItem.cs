@@ -126,8 +126,8 @@ public class ComicCompPadItem : AbstractPadItem {
 
     public Bitmap GetTransformedBitmap() {
         var r = UsedArea;
-        var i = new Bitmap((int)r.Width, (int)r.Height);
-        var gr = Graphics.FromImage(i);
+        var bmp = new Bitmap((int)r.Width, (int)r.Height);
+        var gr = Graphics.FromImage(bmp);
         gr.Clear(Color.White);
         var p = new PointF[4];
         p[0] = (PointF)_ber_Lo;
@@ -149,7 +149,7 @@ public class ComicCompPadItem : AbstractPadItem {
             gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
         }
         gr.Dispose();
-        return i;
+        return bmp;
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {
