@@ -266,13 +266,13 @@ public class TableFragments : TableFile {
             }
 
             if (CanDeleteWriter) {
-                IO.DeleteFile(_myFragmentsFilename, false);
+                DeleteFile(_myFragmentsFilename, false);
             }
         }
     }
 
     private void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc) {
-        if (Generic.Ending) { return; }
+        if (Ending) { return; }
         if (!IsEditable(false)) { return; }
         if (files is not { Count: >= 1 }) { return; }
         if (!FirstTimAlleFragmentsLoaded) { return; }

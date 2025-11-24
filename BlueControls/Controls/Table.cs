@@ -644,13 +644,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     public static List<string> Permission_AllUsed(bool mitRowCreator) {
         var l = new List<string>();
 
-        foreach (var thisTb in Table.AllFiles) {
+        foreach (var thisTb in AllFiles) {
             if (!thisTb.IsDisposed) {
                 l.AddRange(Permission_AllUsedInThisTable(thisTb, mitRowCreator));
             }
         }
 
-        return Table.RepairUserGroups(l);
+        return RepairUserGroups(l);
     }
 
     public static List<string> Permission_AllUsedInThisTable(Table tb, bool mitRowCreator) {
@@ -683,7 +683,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         e.Add(UserGroup);
         e.RemoveString(Administrator, false);
 
-        return Table.RepairUserGroups(e);
+        return RepairUserGroups(e);
     }
 
     public static string QuickInfoText(ColumnItem col, string additionalText) {
@@ -1417,7 +1417,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             db1.ProgressbarInfo -= _Table_ProgressbarInfo;
             db1.DisposingEvent -= _table_Disposing;
             db1.InvalidateView -= Table_InvalidateView;
-            Table.SaveAll(false);
+            SaveAll(false);
             MultiUserFile.SaveAll(false);
         }
         ShowWaitScreen = true;
@@ -2167,7 +2167,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                             QuickInfo = "Verknüpfung zur Ziel-Tabelle fehlerhaft.";
                         }
                     } else if (db.IsAdministrator()) {
-                        QuickInfo = Table.UndoText(_mouseOverColumn?.Column, _mouseOverRow?.Row);
+                        QuickInfo = UndoText(_mouseOverColumn?.Column, _mouseOverRow?.Row);
                     }
                 }
             }
@@ -3910,7 +3910,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private void FlexSingeFilter_FilterOutputPropertyChanged(object sender, System.EventArgs e) {
         if (sender is not FlexiFilterControl ffc) { return; }
 
-        if (ffc.FilterOutput is not FilterCollection fc) { return; }
+        if (ffc.FilterOutput is not { } fc) { return; }
 
         var fi = fc[ffc.FilterSingleColumn];
 

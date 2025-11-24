@@ -524,7 +524,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (IsDisposed) { return FileOperationResult.ValueFailed; }
         if (Develop.AllReadOnly) { return FileOperationResult.ValueFailed; }
 
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFalse; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFalse; }
 
         if (string.IsNullOrEmpty(filename)) { return FileOperationResult.ValueFalse; }
 

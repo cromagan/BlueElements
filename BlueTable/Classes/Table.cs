@@ -100,7 +100,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <summary>
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
     /// </summary>
-    public List<UndoItem> Undo { get; private set; }
+    public List<UndoItem> Undo { get; }
 
     /// <summary>
     /// Wann die Tabelle zuletzt angeschaut / geöffnet / geladen wurde.
@@ -547,7 +547,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public static Table Get() {
-        var t = new Table(Table.UniqueKeyValue());
+        var t = new Table(UniqueKeyValue());
         t.InitDummyTable();
         return t;
     }
@@ -659,7 +659,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="newChunkValue">Der neue Zellwert</param>
     /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
     public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
-        IO.ProcessFile(TryGrantWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel) as string ?? "Unbekannter Fehler";
+        ProcessFile(TryGrantWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel) as string ?? "Unbekannter Fehler";
 
     public static bool IsValidTableName(string tablename) {
         if (string.IsNullOrEmpty(tablename)) { return false; }
@@ -2105,7 +2105,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public void UnMasterMe() {
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax)) {
-            TemporaryTableMasterUser = "Unset: " + Generic.UserName;
+            TemporaryTableMasterUser = "Unset: " + UserName;
             TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
         }
     }

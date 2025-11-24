@@ -28,7 +28,7 @@ using System.Collections.Generic;
 namespace BlueTable.AdditionalScriptMethods;
 
 
-public class Method_RowUpdate : Method_TableGeneric, IUseableForButton {
+public class Method_RowUpdate : Method_TableGeneric {
 
     #region Properties
 

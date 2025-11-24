@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -163,8 +163,8 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     }
 
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) {
-        // Komplett keine Skalierung durchführen - Tab-Größen bleiben unverändert
-        // Nur die Position kann sich ändern, aber nicht die Größe der Tabs
+        // Komplett keine Skalierung durchfÃ¼hren - Tab-GrÃ¶ÃŸen bleiben unverÃ¤ndert
+        // Nur die Position kann sich Ã¤ndern, aber nicht die GrÃ¶ÃŸe der Tabs
     }
 
     protected override void ScaleCore(float dx, float dy) {

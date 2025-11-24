@@ -55,13 +55,13 @@ internal class Method_SetIfHasValue : Method {
             switch (attvar.Attributes[z]) {
                 case VariableDouble vf:
                     if (vf.ValueNum != 0) {
-                        return attvar.ValueNumSet(0, vf.ValueNum, ld) is { } dif ? dif : DoItFeedback.Null();
+                        return attvar.ValueNumSet(0, vf.ValueNum, ld) ?? DoItFeedback.Null();
                     }
                     break;
 
                 case VariableString vs:
                     if (!string.IsNullOrEmpty(vs.ValueString)) {
-                        return attvar.ValueStringSet(0, vs.ValueString, ld) is { } dif2 ? dif2 : DoItFeedback.Null();
+                        return attvar.ValueStringSet(0, vs.ValueString, ld) ?? DoItFeedback.Null();
                     }
                     break;
 

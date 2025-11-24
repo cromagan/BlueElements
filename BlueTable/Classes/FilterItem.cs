@@ -1,4 +1,4 @@
-// Authors:
+Ôªø// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -94,7 +94,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     /// Erstellt ein FilterItem aus einer SQL-WHERE-Bedingung
     /// Beispiel: "Name = 'Mueller'" oder "Age BETWEEN 18 AND 65"
     /// </summary>
-    /// <param name="table">Die Tabelle f¸r die Spaltenreferenzen</param>
+    /// <param name="table">Die Tabelle f√ºr die Spaltenreferenzen</param>
     /// <param name="whereCondition">Die SQL-WHERE-Bedingung</param>
     public FilterItem(Table? table, string whereCondition, string origin) {
         Table = table;
@@ -176,7 +176,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             if (Column == null) { return string.Empty; } // Row-Filter ist kein SQL-Filter
 
             var columnName = Column.KeyName;
-            var caseSensitive = !FilterType.HasFlag(FilterType.GroﬂKleinEgal);
+            var caseSensitive = !FilterType.HasFlag(FilterType.Gro√üKleinEgal);
 
             switch (FilterType) {
                 case FilterType.Istgleich:
@@ -189,8 +189,8 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                     }
                     break;
 
-                case FilterType.Istgleich_GroﬂKleinEgal:
-                case FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
+                case FilterType.Istgleich_Gro√üKleinEgal:
+                case FilterType.Istgleich_Gro√üKleinEgal_MultiRowIgnorieren:
                     if (SearchValue.Count == 1) {
                         if (string.IsNullOrEmpty(SearchValue[0])) {
                             return $"{columnName} IS NULL";
@@ -211,7 +211,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                     }
                     break;
 
-                case FilterType.Istgleich_ODER_GroﬂKleinEgal:
+                case FilterType.Istgleich_ODER_Gro√üKleinEgal:
                     if (SearchValue.Count > 1) {
                         var values = SearchValue.Select(v => $"UPPER('{EscapeSqlValue(v)}')").ToList();
                         return $"UPPER({columnName}) IN ({string.Join(", ", values)})";
@@ -236,7 +236,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                     }
                     break;
 
-                case FilterType.Istgleich_UND_GroﬂKleinEgal:
+                case FilterType.Istgleich_UND_Gro√üKleinEgal:
                     if (SearchValue.Count > 1) {
                         var conditions = SearchValue.Select(v =>
                             string.IsNullOrEmpty(v) ? $"{columnName} IS NULL" : $"UPPER({columnName}) = UPPER('{EscapeSqlValue(v)}')");
@@ -258,8 +258,8 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                     }
                     break;
 
-                case FilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
-                case FilterType.Ungleich_MultiRowIgnorieren_UND_GroﬂKleinEgal:
+                case FilterType.Ungleich_MultiRowIgnorieren_Gro√üKleinEgal:
+                case FilterType.Ungleich_MultiRowIgnorieren_UND_Gro√üKleinEgal:
                     if (SearchValue.Count == 1) {
                         if (string.IsNullOrEmpty(SearchValue[0])) {
                             return $"{columnName} IS NOT NULL";
@@ -274,8 +274,8 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                     }
                     break;
 
-                case FilterType.Instr_GroﬂKleinEgal:
-                case FilterType.Instr_UND_GroﬂKleinEgal:
+                case FilterType.Instr_Gro√üKleinEgal:
+                case FilterType.Instr_UND_Gro√üKleinEgal:
                     if (SearchValue.Count == 1 && !string.IsNullOrEmpty(SearchValue[0])) {
                         return $"UPPER({columnName}) LIKE UPPER('%{EscapeSqlValue(SearchValue[0])}%')";
                     }
@@ -287,7 +287,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                     }
                     break;
 
-                case FilterType.BeginntMit_GroﬂKleinEgal:
+                case FilterType.BeginntMit_Gro√üKleinEgal:
                     if (SearchValue.Count == 1 && !string.IsNullOrEmpty(SearchValue[0])) {
                         return $"UPPER({columnName}) LIKE UPPER('{EscapeSqlValue(SearchValue[0])}%')";
                     }
@@ -325,7 +325,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
         if (Table.IsDisposed) { return "Tabelle verworfen"; }
 
-        if (FilterType is FilterType.GroﬂKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
+        if (FilterType is FilterType.Gro√üKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
 
         if (Column != null && Column?.Table != Table) { return "Tabellen inkonsistent"; }
 
@@ -333,11 +333,11 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
         if (FilterType == FilterType.RowKey) {
             if (Column != null) { return "RowKey suche mit Spaltenangabe"; }
-            if (SearchValue.Count != 1) { return "RowKey mit ung¸ltiger Suche"; }
+            if (SearchValue.Count != 1) { return "RowKey mit ung√ºltiger Suche"; }
             return string.Empty;
         }
 
-        if (Column == null && !FilterType.HasFlag(FilterType.Instr_GroﬂKleinEgal)) { return "Fehlerhafter Zeilenfilter"; }
+        if (Column == null && !FilterType.HasFlag(FilterType.Instr_Gro√üKleinEgal)) { return "Fehlerhafter Zeilenfilter"; }
 
         if (FilterType.HasFlag(FilterType.Instr)) {
             foreach (var thisV in SearchValue) {
@@ -346,16 +346,16 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         }
 
         if (Column?.Value_for_Chunk != null && Column.Value_for_Chunk != ChunkType.None) {
-            if (SearchValue.Count == 0) { return "Split-Spalte mit ung¸ltiger Suche"; }
+            if (SearchValue.Count == 0) { return "Split-Spalte mit ung√ºltiger Suche"; }
             if (FilterType is not FilterType.Istgleich
-                and not FilterType.Istgleich_GroﬂKleinEgal
+                and not FilterType.Istgleich_Gro√üKleinEgal
                 and not FilterType.Istgleich_MultiRowIgnorieren
-                and not FilterType.Istgleich_ODER_GroﬂKleinEgal
-                and not FilterType.Istgleich_UND_GroﬂKleinEgal) { return "Falscher Typ"; }
+                and not FilterType.Istgleich_ODER_Gro√üKleinEgal
+                and not FilterType.Istgleich_UND_Gro√üKleinEgal) { return "Falscher Typ"; }
         }
 
         foreach (var thisV in SearchValue) {
-            if (thisV.Contains("~")) { return $"Unaufgelˆste Variable {thisV}"; }
+            if (thisV.Contains("~")) { return $"Unaufgel√∂ste Variable {thisV}"; }
         }
 
         return string.Empty;
@@ -365,7 +365,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     public List<string> ParseableItems() {
         try {
-            // F¸r FlexiForFilter werden auch "ung¸ltige" Filter benˆtigt
+            // F√ºr FlexiForFilter werden auch "ung√ºltige" Filter ben√∂tigt
             // z.B. Instr ohn Text
             //if (!this.IsOk()) { return string.Empty; }
 
@@ -433,7 +433,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     }
 
     public string ReadableText() {
-        // Bei Nich OK schˆn en Text zur¸ck geben f¸r FlexiControlForFilter
+        // Bei Nich OK sch√∂n en Text zur√ºck geben f√ºr FlexiControlForFilter
         if (!this.IsOk()) { return "Filter ohne Funktion"; }
 
         if (FilterType == FilterType.AlwaysFalse) {
@@ -451,11 +451,11 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
         if (SearchValue.Count > 1) {
             switch (FilterType) {
-                case FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroﬂKleinEgal
-                    or FilterType.Istgleich_ODER_GroﬂKleinEgal:
+                case FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_Gro√üKleinEgal
+                    or FilterType.Istgleich_ODER_Gro√üKleinEgal:
                     return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
 
-                case FilterType.IstGleich_UND or FilterType.Istgleich_UND_GroﬂKleinEgal:
+                case FilterType.IstGleich_UND or FilterType.Istgleich_UND_Gro√üKleinEgal:
                     return nam + " - alle: '" + SearchValue.JoinWith("', '") + "'";
 
                 default:
@@ -471,11 +471,11 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         switch (FilterType) {
             case FilterType.Istgleich:
 
-            case FilterType.Istgleich_GroﬂKleinEgal:
+            case FilterType.Istgleich_Gro√üKleinEgal:
 
-            case FilterType.Istgleich_ODER_GroﬂKleinEgal:
+            case FilterType.Istgleich_ODER_Gro√üKleinEgal:
 
-            case FilterType.Istgleich_UND_GroﬂKleinEgal:
+            case FilterType.Istgleich_UND_Gro√üKleinEgal:
                 if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
 
                 if (Column == null) { return "Unbekannter Filter"; }
@@ -483,14 +483,14 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
             case FilterType.Ungleich_MultiRowIgnorieren:
 
-            case FilterType.Ungleich_MultiRowIgnorieren_UND_GroﬂKleinEgal:
+            case FilterType.Ungleich_MultiRowIgnorieren_UND_Gro√üKleinEgal:
 
-            case FilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
-                if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef¸llt sein"; }
+            case FilterType.Ungleich_MultiRowIgnorieren_Gro√üKleinEgal:
+                if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef√ºllt sein"; }
                 if (Column == null) { return "Unbekannter Filter"; }
                 return nam + " ist nicht '" + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, string.Empty, string.Empty, Column.DoOpticalTranslation, null) + "'";
 
-            case FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
+            case FilterType.Istgleich_Gro√üKleinEgal_MultiRowIgnorieren:
 
             case FilterType.Istgleich_MultiRowIgnorieren:
                 if (SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
@@ -498,7 +498,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
             case FilterType.Instr:
 
-            case FilterType.Instr_GroﬂKleinEgal:
+            case FilterType.Instr_Gro√üKleinEgal:
                 if (SearchValue.Count == 0 || string.IsNullOrEmpty(SearchValue[0])) { return "Filter aktuell ohne Funktion"; }
                 return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
 
@@ -508,7 +508,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 return nam + ": von " + SearchValue[0].Replace("|", " bis ");
 
             case FilterType.BeginntMit:
-            case FilterType.BeginntMit_GroﬂKleinEgal:
+            case FilterType.BeginntMit_Gro√üKleinEgal:
                 return nam + " beginnt mit '" + SearchValue[0] + "'";
 
             case FilterType.AlwaysFalse:
@@ -542,7 +542,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     private static string EscapeSqlValue(string value) {
         if (string.IsNullOrEmpty(value)) { return value; }
 
-        // Einfacher SQL-Escape: Verdopple einfache Anf¸hrungszeichen
+        // Einfacher SQL-Escape: Verdopple einfache Anf√ºhrungszeichen
         return value.Replace("'", "''");
     }
 
@@ -552,16 +552,16 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     private static List<string> ParseInValues(string valuesString) {
         var values = new List<string>();
 
-        // Einfache Implementierung: Split bei Komma und entferne Anf¸hrungszeichen
+        // Einfache Implementierung: Split bei Komma und entferne Anf√ºhrungszeichen
         var parts = valuesString.Split(',');
 
         foreach (var part in parts) {
             var trimmed = part.Trim();
             if (trimmed.StartsWith("'") && trimmed.EndsWith("'") && trimmed.Length >= 2) {
-                // Entferne Anf¸hrungszeichen
+                // Entferne Anf√ºhrungszeichen
                 values.Add(trimmed.Substring(1, trimmed.Length - 2));
             } else {
-                // Ohne Anf¸hrungszeichen
+                // Ohne Anf√ºhrungszeichen
                 values.Add(trimmed);
             }
         }
@@ -631,16 +631,16 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 if (value.StartsWith("%") && value.EndsWith("%")) {
                     // %value% -> INSTR
                     var searchValue = value.Substring(1, value.Length - 2);
-                    FilterType = FilterType.Instr_GroﬂKleinEgal;
+                    FilterType = FilterType.Instr_Gro√üKleinEgal;
                     SearchValue = new List<string> { searchValue }.AsReadOnly();
                 } else if (value.EndsWith("%")) {
                     // value% -> BeginntMit
                     var searchValue = value.Substring(0, value.Length - 1);
-                    FilterType = FilterType.BeginntMit_GroﬂKleinEgal;
+                    FilterType = FilterType.BeginntMit_Gro√üKleinEgal;
                     SearchValue = new List<string> { searchValue }.AsReadOnly();
                 } else {
-                    // Exakte ‹bereinstimmung
-                    FilterType = FilterType.Istgleich_GroﬂKleinEgal;
+                    // Exakte √úbereinstimmung
+                    FilterType = FilterType.Istgleich_Gro√üKleinEgal;
                     SearchValue = new List<string> { value }.AsReadOnly();
                 }
                 return;
@@ -660,7 +660,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 // Parse die Werte in der IN-Klausel
                 var values = ParseInValues(valuesString);
                 if (values.Count > 0) {
-                    FilterType = FilterType.Istgleich_ODER_GroﬂKleinEgal;
+                    FilterType = FilterType.Istgleich_ODER_Gro√üKleinEgal;
                     SearchValue = new ReadOnlyCollection<string>(values);
                     return;
                 }
@@ -676,13 +676,13 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             var value = equalMatch.Groups[2].Value;
             Column = Table.Column[columnName];
             if (Column != null) {
-                FilterType = FilterType.Istgleich_GroﬂKleinEgal;
+                FilterType = FilterType.Istgleich_Gro√üKleinEgal;
                 SearchValue = new List<string> { value }.AsReadOnly();
                 return;
             }
         }
 
-        // Einfache Gleichheit ohne Anf¸hrungszeichen: column = value
+        // Einfache Gleichheit ohne Anf√ºhrungszeichen: column = value
         var equalMatchNoQuotes = System.Text.RegularExpressions.Regex.Match(condition,
             @"(\w+)\s*=\s*([^'\s]+)",
             System.Text.RegularExpressions.RegexOptions.IgnoreCase);
@@ -691,7 +691,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             var value = equalMatchNoQuotes.Groups[2].Value;
             Column = Table.Column[columnName];
             if (Column != null) {
-                FilterType = FilterType.Istgleich_GroﬂKleinEgal;
+                FilterType = FilterType.Istgleich_Gro√üKleinEgal;
                 SearchValue = new List<string> { value }.AsReadOnly();
                 return;
             }

@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -46,7 +46,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     #region Constructors
 
     public RowAdderScriptEditor() : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
     }
 
@@ -107,7 +107,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         }
 
         if (_item == null) {
-            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Kein Skript gewÃ¤hlt.", false, false, "Allgemein");
         }
 
         WriteInfosBack();
@@ -117,7 +117,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         }
 
         if (Table.Row.Count == 0) {
-            return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benÃ¶tigt.", false, false, "Allgemein");
         }
         if (string.IsNullOrEmpty(txbTestZeile.Text)) {
             txbTestZeile.Text = Table?.Row.First()?.CellFirstString() ?? string.Empty;
@@ -194,7 +194,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
 
     private void ShowScript() {
-        if (_item is RowAdderPadItem cpi) {
+        if (_item is { } cpi) {
             tbcScriptEigenschaften.Enabled = true;
 
             switch (scriptNo) {

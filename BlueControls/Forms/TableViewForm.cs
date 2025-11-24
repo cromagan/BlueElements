@@ -104,7 +104,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     public string SettingsManualFilename { get => Application.StartupPath + "\\" + Name + "-Settings.ini"; set { } }
 
-    public bool UsesSettings { get; private set; }
+    public bool UsesSettings { get; }
 
     #endregion
 

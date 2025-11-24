@@ -57,7 +57,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     public ColumnEditor(ColumnItem? column, TableView? table) : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
         _table = table;
         _column = column;
@@ -92,7 +92,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
             if (_column is { IsDisposed: false }) { AllOk(); }
 
-            _column = value is ColumnItem c ? c : null;
+            _column = value as ColumnItem;
             Column_DatenAuslesen();
         }
     }
@@ -123,7 +123,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         }
 
         if (string.IsNullOrEmpty(feh)) {
-            Column_DatenZurückschreiben();
+            Column_DatenZurÃ¼ckschreiben();
             if (string.IsNullOrEmpty(feh)) { feh = _column!.ErrorReason(); }
         }
 
@@ -271,7 +271,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     /// <summary>
-    /// Kümmert sich um erlaubte Spalten für LinkedCell
+    /// KÃ¼mmert sich um erlaubte Spalten fÃ¼r LinkedCell
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -288,7 +288,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             //    if (ThisColumn.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetTable()) {
             //        cbxRowKeyInColumn.ItemAdd(ThisColumn);
             //    }
-            //    //if (ThisColumn.Format == DataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedTable() == _Column.LinkedTable()) {
+            //    //if (ThisColumn.Format == DataFormat.Values_fÃ¼r_LinkedCellDropdownx && ThisColumn.LinkedTable() == _Column.LinkedTable()) {
             //    //    cbxRowKeyInColumn.ItemAdd(ThisColumn);
             //    //}
             //}
@@ -421,11 +421,11 @@ internal sealed partial class ColumnEditor : IIsEditor {
     }
 
     /// <summary>
-    /// Schreibt die Werte hart zurück.
+    /// Schreibt die Werte hart zurÃ¼ck.
     /// Diese Routine sollte nicht benutzt werden, sondern AllOk
     /// </summary>
 
-    private void Column_DatenZurückschreiben() {
+    private void Column_DatenZurÃ¼ckschreiben() {
         if (TableViewForm.EditabelErrorMessage(_column?.Table)) { return; }
 
         if (_column is not { IsDisposed: false }) { return; }
@@ -475,7 +475,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         if (btnAutoFilterErweitertErlaubt.Checked) { tmpf |= FilterOptions.ExtendedFilterEnabled; }
         if (chkFilterOnlyOr.Checked) { tmpf |= FilterOptions.OnlyOrAllowed; }
         if (chkFilterOnlyAND.Checked) { tmpf |= FilterOptions.OnlyAndAllowed; }
-        //_Column.AutoFilterErlaubt = AutoFilterMöglich.Checked;
+        //_Column.AutoFilterErlaubt = AutoFilterMÃ¶glich.Checked;
         //_Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled) = AutoFilterTXT.Checked;
         //_Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) = AutoFilterErw.Checked;
         _column.FilterOptions = tmpf;
@@ -499,7 +499,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
         _column.AllowedChars = txbAllowedChars.Text;
         _column.MaxTextLength = IntParse(txbMaxTextLength.Text);
         _column.MaxCellLength = IntParse(txbMaxCellLength.Text);
-        _column.LinkedTableTableName = cbxLinkedTable.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
+        _column.LinkedTableTableName = cbxLinkedTable.Text; // Muss vor LinkedCell_RowKey zurÃ¼ckgeschrieben werden
         _column.ColumnNameOfLinkedTable = cbxTargetColumn.Text; // LINKED TABLE
         _column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
         _column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
@@ -553,7 +553,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
             var b = tb.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
             if (b is not { IsDisposed: false }) { return; }
-            b.ColumnQuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
+            b.ColumnQuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstÃ¼tzt.";
             b.MultiLine = false;
             b.EditableWithTextInput = true;
             b.DropdownDeselectAllAllowed = true;
@@ -564,8 +564,8 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
             foreach (var thisColumn in db2.Column) {
                 if (thisColumn.CanBeCheckedByRules() && !thisColumn.MultiLine) {
-                    dd.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~");
-                    or.Add("~" + thisColumn.KeyName.ToLowerInvariant() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
+                    dd.Add("~" + thisColumn.KeyName.ToUpperInvariant() + "~");
+                    or.Add("~" + thisColumn.KeyName.ToUpperInvariant() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
                 }
             }
 
@@ -621,7 +621,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
 
     /// <summary>
     /// Holt die Werte aus tblFilterliste und schreibt sie in _Column.LinkedCellFilter
-    /// Hat tblFilterliste keine Tabelle, bleibt die Variable _Column.LinkedCellFilter unverändert
+    /// Hat tblFilterliste keine Tabelle, bleibt die Variable _Column.LinkedCellFilter unverÃ¤ndert
     /// </summary>
 
     private void GetLinkedCellFilter() {
@@ -657,7 +657,7 @@ internal sealed partial class ColumnEditor : IIsEditor {
             var x = thisFi.SplitBy("|");
 
             if (x.Length == 3) {
-                var r = db.Row[new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, x[0])];
+                var r = db.Row[new FilterItem(c, FilterType.Istgleich_GroÃŸKleinEgal, x[0])];
 
                 if (r != null && r.CellGetBoolean("Visible")) {
                     r.CellSet("Such", x[2].FromNonCritical(), string.Empty);

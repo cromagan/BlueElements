@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -88,7 +88,7 @@ public static partial class Extensions {
             return color.ToKnownColor().ToString();
         }
 
-        // Für custom colors, versuche die nächstliegende bekannte Farbe zu finden
+        // FÃ¼r custom colors, versuche die nÃ¤chstliegende bekannte Farbe zu finden
         var knownColors = Enum.GetValues(typeof(KnownColor))
             .Cast<KnownColor>()
             .Where(k => k != KnownColor.Transparent)

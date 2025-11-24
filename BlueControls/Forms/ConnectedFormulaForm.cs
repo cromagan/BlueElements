@@ -231,7 +231,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void SetItem(object? control) {
         if (control is GenericControlReciver grc) {
             _lastItem = grc.GeneratedFrom;
-            _lastObject = control is IOpenScriptEditor ose ? ose : null;
+            _lastObject = control as IOpenScriptEditor;
         } else if (control is Control c) {
             SetItem(c.Parent);
             return;

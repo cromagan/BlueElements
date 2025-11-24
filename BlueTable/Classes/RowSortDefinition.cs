@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -59,7 +59,7 @@ public sealed class RowSortDefinition : IParseable {
 
         if (column != null) {
             foreach (var thisColumn in column) {
-                if (thisColumn is ColumnItem { IsDisposed: false } c) { Columns.Add(c); }
+                if (thisColumn is { IsDisposed: false } c) { Columns.Add(c); }
             }
         }
     }
@@ -99,13 +99,13 @@ public sealed class RowSortDefinition : IParseable {
 
             case "column":
             case "columnname": // ColumnName wichtig wegen CopyLayout
-                if (Table.Column[value] is ColumnItem c) { Columns.Add(c); }
+                if (Table.Column[value] is { } c) { Columns.Add(c); }
                 return true;
 
             case "columns":
                 var cols = value.FromNonCritical().SplitBy("|");
                 foreach (var thisc in cols) {
-                    if (Table.Column[thisc] is ColumnItem c2) { Columns.Add(c2); }
+                    if (Table.Column[thisc] is { } c2) { Columns.Add(c2); }
                 }
                 return true;
 
@@ -125,7 +125,7 @@ public sealed class RowSortDefinition : IParseable {
         if (!tb.IsEditable(false)) { return; }
 
         for (var i = 0; i < Columns.Count; i++) {
-            if (Columns[i] is not ColumnItem { IsDisposed: false }) {
+            if (Columns[i] is not { IsDisposed: false }) {
                 Columns.RemoveAt(i);
                 //OnPropertyChanged(string propertyname);
                 Repair();

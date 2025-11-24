@@ -54,7 +54,7 @@ internal class Method_AddPrefix : Method {
             tmpList[z] = attvar.ReadableText(1) + tmpList[z];
         }
 
-        return attvar.ValueListStringSet(0, tmpList, ld) is { } dif ? dif : DoItFeedback.Null();
+        return attvar.ValueListStringSet(0, tmpList, ld) ?? DoItFeedback.Null();
     }
 
     #endregion

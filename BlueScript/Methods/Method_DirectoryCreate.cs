@@ -45,8 +45,6 @@ internal class Method_DirectoryCreate : Method {
 
     public override bool MustUseReturnValue => false;
 
-    public string NiceTextForUser => "Ein Verzeichnis im Dateisystem erstellen";
-
     public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";

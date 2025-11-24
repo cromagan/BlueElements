@@ -39,7 +39,7 @@ public class TableFile : Table {
     /// <summary>
     /// Der Globale Timer, der die Tabellen regelmäßig updated
     /// </summary>
-    private static System.Threading.Timer? _tableUpdateTimer;
+    private static Timer? _tableUpdateTimer;
 
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
@@ -59,9 +59,6 @@ public class TableFile : Table {
 
     public string Filename { get; protected set; } = string.Empty;
 
-    public override bool MasterNeeded => base.MasterNeeded;
-
-    public override bool MultiUserPossible => base.MultiUserPossible;
     protected virtual bool SaveRequired => _saveRequired_File;
 
     #endregion
@@ -390,7 +387,7 @@ public class TableFile : Table {
     }
 
     private FileOperationResult TrySave(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         if (!string.Equals(filename, Filename, StringComparison.OrdinalIgnoreCase)) { return FileOperationResult.ValueFailed; }
 

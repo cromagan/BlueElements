@@ -31,7 +31,6 @@ internal class Method_MoveDirectory : Method {
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
-    public List<List<string>> ArgsForButton => Args;
     public override string Command => "movedirectory";
     public override List<string> Constants => [];
     public override string Description => "Verschiebt einen Ordner.";

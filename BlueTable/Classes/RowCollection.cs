@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -80,7 +80,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     /// <summary>
     /// Wert in Minuten.
-    /// Gibt an, wieviel Minuten maximal vergangen sein dürfen, um eine Zeile direkt zu INITIALISIEREN
+    /// Gibt an, wieviel Minuten maximal vergangen sein dÃ¼rfen, um eine Zeile direkt zu INITIALISIEREN
     /// </summary>
     public static double NewRowTolerance { get; set; } = 1;
 
@@ -110,20 +110,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Indexers
 
     /// <summary>
-    /// Durchsucht die erste (interne) Spalte der Tabelle nach dem hier angegebenen Prmärschlüssel.
+    /// Durchsucht die erste (interne) Spalte der Tabelle nach dem hier angegebenen PrmÃ¤rschlÃ¼ssel.
     /// </summary>
-    /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
-    public RowItem? this[string primärSchlüssel] {
+    /// <returns>Die Zeile, dessen erste Spalte den PrimÃ¤rschlÃ¼ssel enthÃ¤lt oder - falls nicht gefunden - NULL.</returns>
+    public RowItem? this[string primÃ¤rSchlÃ¼ssel] {
         get {
             if (Table?.Column.First is { IsDisposed: false } c) {
                 if (c.Value_for_Chunk != ChunkType.None) {
-                    var ok = Table.BeSureRowIsLoaded(primärSchlüssel);
+                    var ok = Table.BeSureRowIsLoaded(primÃ¤rSchlÃ¼ssel);
                     if (!ok) { return null; }
                 }
 
                 var parallelQuery = _internal.Values.AsParallel()
                                     .Where(thisRow => thisRow != null)
-                                    .FirstOrDefault(thisRow => thisRow.CompareValues(c, primärSchlüssel, FilterType.Istgleich_GroßKleinEgal));
+                                    .FirstOrDefault(thisRow => thisRow.CompareValues(c, primÃ¤rSchlÃ¼ssel, FilterType.Istgleich_GroÃŸKleinEgal));
 
                 return parallelQuery;
             }
@@ -165,13 +165,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Pendingworker.Add(l);
         l.RunWorkerAsync(row);
 
-        Develop.Message?.Invoke(ErrorType.Info, db, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString(), 0);
+        Develop.Message?.Invoke(ErrorType.Info, db, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgefÃ¼hrt: " + row.CellFirstString(), 0);
     }
 
     public static void ExecuteValueChangedEvent() {
-        // Lock-freie Implementierung mit Interlocked für bessere Performance und Deadlock-Vermeidung
+        // Lock-freie Implementierung mit Interlocked fÃ¼r bessere Performance und Deadlock-Vermeidung
         if (Interlocked.CompareExchange(ref _executingchangedrows, 1, 0) != 0) {
-            return; // Bereits in Ausführung
+            return; // Bereits in AusfÃ¼hrung
         }
 
         try {
@@ -217,7 +217,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    /// Sucht dopplete Einträge in der angegebenen Spalte. Dabei werden Multiline-Einträge auggesplittet.
+    /// Sucht dopplete EintrÃ¤ge in der angegebenen Spalte. Dabei werden Multiline-EintrÃ¤ge auggesplittet.
     /// </summary>
     /// <param name="column"></param>
     /// <param name="rows"></param>
@@ -244,7 +244,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
+    /// PrÃ¼ft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurÃ¼ck.
     /// </summary>
     /// <returns></returns>
     public static RowItem? NextRowToCeck() {
@@ -271,7 +271,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                         var rowToCheck = db.Row?.NextRowToCheck(false);
                         if (rowToCheck != null) { return rowToCheck; }
                     } catch (ObjectDisposedException) {
-                        // Table disposed während Verwendung - skip
+                        // Table disposed wÃ¤hrend Verwendung - skip
                         continue;
                     }
                 }
@@ -312,7 +312,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                                                             && string.IsNullOrEmpty(r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty, r.ChunkValue));
 
     /// <summary>
-    /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
+    /// PrÃ¼ft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurÃ¼ck.
     /// </summary>
     /// <returns></returns>
     public static List<RowItem> RowListToCheck() {
@@ -373,10 +373,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             r = filter.Rows;
             if (r.Count != 1) {
-                return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText(), false);
+                return (null, "RowUnique gescheitert, AufrÃ¤umen fehlgeschlagen: " + filter.ReadableText(), false);
             }
             if (tb.Column.SysRowState is { IsDisposed: false } srs) {
-                r[0].CellSet(srs, string.Empty, "'UniqueRow' Aufräumen mehrerer Zeilen.");
+                r[0].CellSet(srs, string.Empty, "'UniqueRow' AufrÃ¤umen mehrerer Zeilen.");
             }
         }
 
@@ -413,7 +413,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (Table is not { IsDisposed: false } db) { return; }
 
-        #region Leere Werte befüllen
+        #region Leere Werte befÃ¼llen
 
         foreach (var thisC in db.Column) {
 
@@ -441,7 +441,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     ///// <summary>
-    ///// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Tabellen einzigartig ist.
+    ///// Gibt einen ZeilenschlÃ¼ssel zurÃ¼ck, der bei allen aktuell geladenen Tabellen einzigartig ist.
     ///// </summary>
     ///// <returns></returns>
     //public List<RowData> AllRows() {
@@ -466,7 +466,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
-        var txt = "Skript wird ausgeführt: " + scriptname;
+        var txt = "Skript wird ausgefÃ¼hrt: " + scriptname;
 
         Table.OnProgressbarInfo(new ProgressbarEventArgs(txt, 0, rows.Count, true, false));
 
@@ -501,10 +501,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
 
     /// <summary>
-    /// Erstellt eine neue Zeile mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
-    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
-    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
-    /// Am Schluss wird noch das Skript ausgeführt.
+    /// Erstellt eine neue Zeile mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstÃ¼tzt.
+    /// SchÃ¤gt irgendetwas fehl, wird NULL zurÃ¼ckgegeben.
+    /// Ist ein Filter mehrfach vorhanden, erhÃ¤lt die Zelle den LETZTEN Wert.
+    /// Am Schluss wird noch das Skript ausgefÃ¼hrt.
     /// REPARIERT: Exception-Handling und sichere Initialwert-Setzung
     /// </summary>
     /// <param name="filter"></param>
@@ -523,7 +523,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (tb2 is not { IsDisposed: false }) { return (null, "Tabellen verworfen", true); }
 
         var s = tb2.NextRowKey();
-        if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
+        if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim ZeilenschlÃ¼ssel erstellen, Systeminterner Fehler", false); }
 
         var chunkval = string.Empty;
         foreach (var thisColum in tb2.Column) {
@@ -545,7 +545,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
         var m = tb2.IsNowNewRowPossible(chunkval, false);
-        if (!string.IsNullOrEmpty(m)) { return (null, $"In der Tabelle sind keine neuen Zeilen möglich: {m}", true); }
+        if (!string.IsNullOrEmpty(m)) { return (null, $"In der Tabelle sind keine neuen Zeilen mÃ¶glich: {m}", true); }
 
         return GenerateAndAddInternal(s, filter, comment);
     }
@@ -587,7 +587,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         // Thread-sicherer Ansatz: Snapshot erstellen und dann versuchen zu entfernen
         // ToArray() erstellt eine Kopie zum Zeitpunkt des Aufrufs
-        // TryRemove ist atomar und gibt einfach false zurück wenn Key nicht mehr existiert
+        // TryRemove ist atomar und gibt einfach false zurÃ¼ck wenn Key nicht mehr existiert
         foreach (var kvp in FailedRows.ToArray()) {
             if (kvp.Key.Table == Table) {
                 FailedRows.TryRemove(kvp.Key, out _);
@@ -596,8 +596,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    /// Gibt Zeilen Zurück, die ein Update benötigen.
-    /// wenn oldestTo=True ist, wird nach den dringenen Updates die älteste Zeile zurückgegeben, Benutzerunabhängig
+    /// Gibt Zeilen ZurÃ¼ck, die ein Update benÃ¶tigen.
+    /// wenn oldestTo=True ist, wird nach den dringenen Updates die Ã¤lteste Zeile zurÃ¼ckgegeben, BenutzerunabhÃ¤ngig
     /// </summary>
     /// <param name="oldestTo"></param>
     /// <returns></returns>
@@ -654,7 +654,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //}
 
     /// <summary>
-    /// Löscht die Jüngste Zeile
+    /// LÃ¶scht die JÃ¼ngste Zeile
     /// </summary>
     /// <param name="rows"></param>
     /// <param name="reduceToOne"></param>
@@ -665,7 +665,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (l.Count < 2) { return; }
 
-        #region Jüngste löschen
+        #region JÃ¼ngste lÃ¶schen
 
         var toDel = l.First();
 
@@ -695,7 +695,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         using var fic = new FilterCollection(db, "UnqiueRow");
 
-        var fi = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal, value);
+        var fi = new FilterItem(co, FilterType.Istgleich_GroÃŸKleinEgal, value);
 
         fic.Add(fi);
 
@@ -752,7 +752,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
             }
 
-            if (!_internal.TryRemove(row.KeyName, out _)) { return "Löschen nicht erfolgreich"; }
+            if (!_internal.TryRemove(row.KeyName, out _)) { return "LÃ¶schen nicht erfolgreich"; }
 
             if (reason != Reason.NoUndo_NoInvalidate) {
                 OnRowRemoved(new RowEventArgs(row));
@@ -769,7 +769,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //}
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
-    //    // Zeilen erzeugen und Format übertragen
+    //    // Zeilen erzeugen und Format Ã¼bertragen
     //    foreach (var thisRow in sourceTable.Row) {
     //        var l = GetByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
     //        l.CloneFrom(thisRow, true);
@@ -780,7 +780,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    //    // Zeilen, die zu viel sind, löschen
+    //    // Zeilen, die zu viel sind, lÃ¶schen
     //    foreach (var thisRow in this) {
     //        var l = sourceTable.Row.GetByKey(thisRow.KeyName);
     //        if (l == null) { Remove(thisRow, "Clone - Zeile zuviel"); }
@@ -799,7 +799,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //    var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
     //    if (!string.IsNullOrEmpty(f)) {
-    //        Develop.DebugPrint(ErrorType.Error, "Neue Zeilen nicht möglich: " + f);
+    //        Develop.DebugPrint(ErrorType.Error, "Neue Zeilen nicht mÃ¶glich: " + f);
     //        throw new Exception();
     //    }
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -816,13 +816,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
     /// <summary>
-    /// Fügt eine Zeile hinzu, die im System fest verankert ist.
+    /// FÃ¼gt eine Zeile hinzu, die im System fest verankert ist.
     /// </summary>
     /// <param name="row"></param>
     /// <param name="reason"></param>
     /// <returns></returns>
     private string Add(RowItem row, Reason reason) {
-        if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
+        if (!_internal.TryAdd(row.KeyName, row)) { return "HinzufÃ¼gen fehlgeschlagen."; }
 
         if (reason != Reason.NoUndo_NoInvalidate) {
             OnRowAdded(new RowEventArgs(row));
@@ -848,7 +848,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    /// REPARIERT: Interne Methode gibt jetzt Tupel zurück statt Exceptions zu werfen
+    /// REPARIERT: Interne Methode gibt jetzt Tupel zurÃ¼ck statt Exceptions zu werfen
     /// </summary>
     /// <param name="key"></param>
     /// <param name="fc"></param>
@@ -857,9 +857,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen!", true); }
 
-        if (!tb.IsEditable(false)) { return (null, "Neue Zeilen nicht möglich: " + tb.IsNotEditableReason, true); }
+        if (!tb.IsEditable(false)) { return (null, "Neue Zeilen nicht mÃ¶glich: " + tb.IsNotEditableReason, true); }
 
-        if (GetByKey(key) != null) { return (null, "Schlüssel bereits belegt!", true); }
+        if (GetByKey(key) != null) { return (null, "SchlÃ¼ssel bereits belegt!", true); }
 
         // REPARIERT: Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
         var chunkvalue = string.Empty;
@@ -877,7 +877,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var u = Generic.UserName;
         var d = DateTime.UtcNow;
 
-        // REPARIERT: Fehlerbehandlung für Zeilen-Erstellung
+        // REPARIERT: Fehlerbehandlung fÃ¼r Zeilen-Erstellung
         var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
         if (!string.IsNullOrEmpty(createResult)) { return (null, $"Erstellung fehlgeschlagen: {createResult}", false); }
 
@@ -900,7 +900,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        // REPARIERT: Bei kritischen Initialwert-Fehlern Zeile wieder löschen
+        // REPARIERT: Bei kritischen Initialwert-Fehlern Zeile wieder lÃ¶schen
         if (initErrors.Count > 0) {
             // Kritische Fehler - Zeile wieder entfernen
             Remove(nRow, "Cleanup nach Initialwert-Fehler");
@@ -915,7 +915,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (scriptResult.Failed) {
             // Script-Fehler sind nicht kritisch, aber loggen
-            return (nRow, $"InitialValues-Skript fehlgeschlagen für Zeile {key}: {scriptResult.FailedReason}", true);
+            return (nRow, $"InitialValues-Skript fehlgeschlagen fÃ¼r Zeile {key}: {scriptResult.FailedReason}", true);
         }
 
         return (nRow, string.Empty, true);

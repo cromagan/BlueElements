@@ -495,7 +495,7 @@ public static class IO {
     }
 
     public static FileOperationResult TryGetFileInfo(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         if (string.IsNullOrWhiteSpace(filename)) { return FileOperationResult.ValueFailed; }
 
@@ -624,7 +624,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryCanWrite(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         filename = filename.NormalizeFile();
 
@@ -668,7 +668,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryCreateDirectory(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return FileOperationResult.ValueFailed; }
         directory = directory.NormalizePath();
 
         if (string.IsNullOrEmpty(directory) || !directory.IsFormat(FormatHolder.Filepath)) { return FileOperationResult.ValueFalse; }
@@ -686,7 +686,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryDeleteDir(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return FileOperationResult.ValueFailed; }
 
         directory = directory.NormalizePath();
         if (TryDirectoryExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
@@ -708,7 +708,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryDeleteFile(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         if (TryFileExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
 
@@ -743,7 +743,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryDirectoryExists(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return FileOperationResult.ValueFailed; }
 
         if (directory.Length < 3) { return FileOperationResult.ValueFalse; }
 
@@ -763,7 +763,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryFileCopy(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 2 || affectingFiles[0] is not string source || affectingFiles[1] is not string target) { return FileOperationResult.ValueFalse; }
+        if (affectingFiles.Count != 2 || affectingFiles[0] is not { } source || affectingFiles[1] is not { } target) { return FileOperationResult.ValueFalse; }
 
         source = source.NormalizeFile();
         target = target.NormalizeFile();
@@ -793,7 +793,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryFileExists(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         if (string.IsNullOrEmpty(filename) || !filename.IsFormat(FormatHolder.FilepathAndName)) { return FileOperationResult.ValueFalse; }
 
@@ -809,7 +809,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryGetDirectories(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return FileOperationResult.ValueFailed; }
 
         if (args.Length < 2) { return FileOperationResult.ValueFailed; }
         var pattern = args[0] as string;
@@ -829,7 +829,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryGetFiles(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string directory) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return FileOperationResult.ValueFailed; }
 
         if (args.Length < 2) { return FileOperationResult.ValueFailed; }
         var pattern = args[0] as string;
@@ -849,7 +849,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryGetFileState(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         try {
             FileInfo f = new(filename);
@@ -862,7 +862,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryMoveDirectory(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count < 2 || affectingFiles[0] is not string oldName || affectingFiles[1] is not string newName) { return FileOperationResult.ValueFalse; }
+        if (affectingFiles.Count < 2 || affectingFiles[0] is not { } oldName || affectingFiles[1] is not { } newName) { return FileOperationResult.ValueFalse; }
 
         oldName = oldName.NormalizePath();
         newName = newName.NormalizePath();
@@ -891,7 +891,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryMoveFile(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count < 2 || affectingFiles[0] is not string oldName || affectingFiles[1] is not string newName) { return FileOperationResult.ValueFalse; }
+        if (affectingFiles.Count < 2 || affectingFiles[0] is not { } oldName || affectingFiles[1] is not { } newName) { return FileOperationResult.ValueFalse; }
 
         oldName = oldName.NormalizeFile();
         newName = newName.NormalizeFile();
@@ -924,7 +924,7 @@ public static class IO {
     }
 
     private static FileOperationResult TryReadAllBytes(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         if (string.IsNullOrWhiteSpace(filename)) { return FileOperationResult.ValueFailed; }
 
@@ -981,7 +981,7 @@ public static class IO {
     //}
 
     private static FileOperationResult TryReadAndUnzipAllBytes(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         try {
             // Direkter Aufruf der Try-Methode anstatt GetFileInfo
@@ -1013,7 +1013,7 @@ public static class IO {
     /// <param name="args">Filename, Byte[]</param>
     /// <returns></returns>
     private static FileOperationResult TryWriteAllBytes(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFalse; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFalse; }
 
         if (args.Length != 1 || args[0] is not byte[] bytes) { return FileOperationResult.ValueFalse; }
 

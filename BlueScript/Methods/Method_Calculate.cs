@@ -46,7 +46,7 @@ internal class Method_Calculate : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MathFormulaParser.Ergebnis(attvar.ValueStringGet(0)) is double dbl) {
+        if (MathFormulaParser.Ergebnis(attvar.ValueStringGet(0)) is { } dbl) {
             return new DoItFeedback(dbl);
         }
 

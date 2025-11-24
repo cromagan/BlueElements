@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -49,7 +49,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     #region Constructors
 
     public TableHeadEditor() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
         Table = null;
     }
@@ -75,7 +75,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    public IEditable? ToEdit { set => Table = value is BlueTable.Table tb ? tb : null; }
+    public IEditable? ToEdit { set => Table = value as Table; }
 
     #endregion
 
@@ -85,7 +85,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (table is { IsDisposed: false } db) {
             Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{db.Caption}'", 0);
 
-            List<UndoItem> un = [.. db.Undo]; // Kann und wird verändert!
+            List<UndoItem> un = [.. db.Undo]; // Kann und wird verÃ¤ndert!
 
             foreach (var thisUndo in un) {
                 AddUndoToTable(tblUndo, thisUndo, db, maxAgeInDays);
@@ -106,7 +106,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (db.Row.GetByKey(work.RowKey) is { IsDisposed: false } row) {
             r.CellSet("RowFirst", row.CellFirstString(), string.Empty);
         } else if (!string.IsNullOrEmpty(work.RowKey)) {
-            r.CellSet("RowFirst", "[gelöscht]", string.Empty);
+            r.CellSet("RowFirst", "[gelÃ¶scht]", string.Empty);
         }
         r.CellSet("Aenderer", work.User, string.Empty);
         r.CellSet("AenderZeit", work.DateTimeUtc, string.Empty);
@@ -202,12 +202,12 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
-        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
+        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>SchlÃ¼ssel", ColumnFormatHolder.LongPositive);
         tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
-        var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
-        tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        var az = tb.Column.GenerateAndAdd("Aenderzeit", "Ã„nder-<br>Zeit", ColumnFormatHolder.DateTime);
+        tb.Column.GenerateAndAdd("Aenderer", "Ã„nderer", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
-        tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("Aenderung", "Ã„nderung", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
@@ -380,7 +380,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         var t = "<b>Tabelle:</b> <tab>" + tbl.KeyName + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (tbl.Row.Count() - 1) + "<br>";
-        t += $"<b>Temporärer Master:</b>  <tab>{tbl.TemporaryTableMasterTimeUtc} {Table.TemporaryTableMasterUser} {Table.TemporaryTableMasterMachine}<br>";
+        t += $"<b>TemporÃ¤rer Master:</b>  <tab>{tbl.TemporaryTableMasterTimeUtc} {Table.TemporaryTableMasterUser} {Table.TemporaryTableMasterMachine}<br>";
 
         t += "<b>Letzte Speicherung der Hauptdatei:</b> <tab>" + tbl.LastSaveMainFileUtcDate.ToString7() + " UTC<br>";
 

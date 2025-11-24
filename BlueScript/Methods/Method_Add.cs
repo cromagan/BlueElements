@@ -61,7 +61,7 @@ internal class Method_Add : Method {
             }
         }
 
-        return attvar.ValueListStringSet(0, tmpList, ld) is { } dif ? dif : DoItFeedback.Null();
+        return attvar.ValueListStringSet(0, tmpList, ld) ?? DoItFeedback.Null();
     }
 
     #endregion

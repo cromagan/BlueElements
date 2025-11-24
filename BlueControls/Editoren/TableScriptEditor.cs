@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -49,16 +49,16 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private bool _allowTemporay;
 
     private TableScriptDescription? _item;
-    private bool didMessage;
+    private bool _didMessage;
 
-    private bool loaded;
+    private bool _loaded;
 
     #endregion
 
     #region Constructors
 
     public TableScriptEditor() : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
         tbcScriptEigenschaften.Enabled = false;
     }
@@ -73,7 +73,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             if (IsDisposed || Table is not { IsDisposed: false }) { value = null; }
             if (_item == value) { return; }
 
-            _item = null; // Um keine werte zurück zu Schreiben während des Anzeigens
+            _item = null; // Um keine werte zurÃ¼ck zu Schreiben wÃ¤hrend des Anzeigens
 
             if (value != null) {
                 tbcScriptEigenschaften.Enabled = true;
@@ -84,13 +84,13 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
-                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
-                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
-                chkExtendend.Visible = chkAuslöser_valuechanged.Checked;
-                chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
-                chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
-                chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
-                chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
+                chkAuslÃ¶ser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
+                chkAuslÃ¶ser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
+                chkExtendend.Visible = chkAuslÃ¶ser_valuechanged.Checked;
+                chkAuslÃ¶ser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
+                chkAuslÃ¶ser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
+                chkAuslÃ¶ser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
+                chkAuslÃ¶ser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
                 Script = value.Script;
                 LastFailedReason = value.FailedReason;
 
@@ -104,9 +104,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 _item = value;
 
                 btnVerlauf.Enabled = true;
-                base.btnAnzeigen_Click(null, System.EventArgs.Empty);
+                btnAnzeigen_Click(null, System.EventArgs.Empty);
                 if (value.IsOk()) {
-                    capFehler.Text = "<imagecode=Häkchen|16> Keine Skript-Konflikte.";
+                    capFehler.Text = "<imagecode=HÃ¤kchen|16> Keine Skript-Konflikte.";
                 } else {
                     capFehler.Text = "<imagecode=Warnung|16> " + value.ErrorReason();
                 }
@@ -120,11 +120,11 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 txbQuickInfo.Text = string.Empty;
                 Script = string.Empty;
                 LastFailedReason = string.Empty;
-                chkAuslöser_newrow.Checked = false;
-                chkAuslöser_valuechanged.Checked = false;
-                chkAuslöser_prepaireformula.Checked = false;
-                chkAuslöser_valuechangedThread.Checked = false;
-                chkAuslöser_export.Checked = false;
+                chkAuslÃ¶ser_newrow.Checked = false;
+                chkAuslÃ¶ser_valuechanged.Checked = false;
+                chkAuslÃ¶ser_prepaireformula.Checked = false;
+                chkAuslÃ¶ser_valuechangedThread.Checked = false;
+                chkAuslÃ¶ser_export.Checked = false;
                 btnVerlauf.Enabled = false;
                 capFehler.Text = string.Empty;
             }
@@ -133,7 +133,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     public override object? Object {
         get => ToEdit;
-        set => ToEdit = value is IEditable ie ? ie : null;
+        set => ToEdit = value as IEditable;
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     public IEditable? ToEdit {
         get => Table;
-        set => Table = value is BlueTable.Table tb ? tb : null;
+        set => Table = value as Table;
     }
 
     #endregion
@@ -189,7 +189,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
 
         if (_item == null) {
-            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Kein Skript gewÃ¤hlt.", false, false, "Allgemein");
         }
 
         //if (!_item.IsOk()) {
@@ -202,7 +202,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
         if (_item.NeedRow) {
             if (db.Row.Count == 0) {
-                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
+                return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benÃ¶tigt.", false, false, "Allgemein");
             }
 
             if (string.IsNullOrEmpty(txbTestZeile.Text)) {
@@ -220,7 +220,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
 
         if (!testmode) {
-            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
+            if (MessageBox.Show("Skript Ã¤ndert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
                 return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein");
             }
         }
@@ -278,18 +278,18 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
 
     private void btnTest_Click(object sender, System.EventArgs e) {
-        if (!loaded && Table != null && Table.Row.Count == 0) {
-            loaded = true;
+        if (!_loaded && Table is { Row.Count: 0 }) {
+            _loaded = true;
             Table.BeSureAllDataLoaded(10);
         }
         TesteScript(true);
     }
 
     private void btnVerlauf_Click(object sender, System.EventArgs e) {
-        // Überprüfen, ob die Tabelle oder die Instanz selbst verworfen wurde
+        // ÃœberprÃ¼fen, ob die Tabelle oder die Instanz selbst verworfen wurde
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
-        // Das ausgewählte Skript aus der Liste abrufen
+        // Das ausgewÃ¤hlte Skript aus der Liste abrufen
         var selectedlstEventScripts = lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem item ? (TableScriptDescription)item.Item : null;
         var l = new List<string>();
         // Durchlaufen aller Undo-Operationen in der Tabelle
@@ -303,7 +303,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 l.Add(thisUndo.DateTimeUtc.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + thisUndo.User);
 
                 l.Add("Art: " + thisUndo.Command.ToString());
-                // Überprüfen, ob das Skript geändert wurde
+                // ÃœberprÃ¼fen, ob das Skript geÃ¤ndert wurde
                 var ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
                 var found = false;
                 foreach (var t in ai) {
@@ -315,18 +315,18 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                     }
                 }
                 if (!found) {
-                    l.Add("    -> Keine Änderung am gewählten Skript");
+                    l.Add("    -> Keine Ã„nderung am gewÃ¤hlten Skript");
                 }
             }
         }
-        // Schreiben der Liste in eine temporäre Datei
+        // Schreiben der Liste in eine temporÃ¤re Datei
         l.WriteAllText(TempFile(string.Empty, "Scrip.txt"), Win1252, true);
     }
 
-    private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {
+    private void btnVersionErhÃ¶hen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        btnVersionErhöhen.Enabled = false;
+        btnVersionErhÃ¶hen.Enabled = false;
 
         Table.EventScriptVersion = DateTime.UtcNow;
     }
@@ -338,16 +338,16 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void cbxPic_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(image: cbxPic.Text.TrimEnd("|16"));
 
-    private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
+    private void chkAuslÃ¶ser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (_item == null) { return; }
 
         ScriptEventTypes tmp = 0;
-        if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.InitialValues; }
-        if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
-        if (chkAuslöser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
-        if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
-        if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
-        if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
+        if (chkAuslÃ¶ser_newrow.Checked) { tmp |= ScriptEventTypes.InitialValues; }
+        if (chkAuslÃ¶ser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
+        if (chkAuslÃ¶ser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
+        if (chkAuslÃ¶ser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
+        if (chkAuslÃ¶ser_export.Checked) { tmp |= ScriptEventTypes.export; }
+        if (chkAuslÃ¶ser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
 
         UpdateSelectedItem(eventTypes: tmp);
     }
@@ -370,7 +370,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private bool EnableScript() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return false; }
 
-        var s = MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
+        var s = MessageBox.Show("FÃ¼r Zeilenskripte werden bestimmte Systemspalten benÃ¶tigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
 
         if (s == 1) { return false; }
 
@@ -440,7 +440,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void Table_CanDoScript(object sender, CanDoScriptEventArgs e) {
         if (_allowTemporay) { return; }
-        e.CancelReason = "Skript-Editor geöffnet";
+        e.CancelReason = "Skript-Editor geÃ¶ffnet";
     }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
@@ -486,7 +486,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
         #endregion
 
-        #region Neue Items hinzufügen
+        #region Neue Items hinzufÃ¼gen
 
         foreach (var thisSet in db.EventScript) {
             if (thisSet != null) {
@@ -494,7 +494,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
                 if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
 
-                // Prüfen ob das Item bereits existiert
+                // PrÃ¼fen ob das Item bereits existiert
                 var existingItem = lstEventScripts[thisSet.KeyName];
                 if (existingItem == null) {
                     existingItem = ItemOf(thisSet);
@@ -506,11 +506,11 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                     rli.Item = thisSet;
                 }
 
-                // Kategorie-Item hinzufügen falls nicht vorhanden
+                // Kategorie-Item hinzufÃ¼gen falls nicht vorhanden
                 if (lstEventScripts[cap] == null) { lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar)); }
 
-                if (!didMessage && thisSet.NeedRow && !db.IsRowScriptPossible()) {
-                    didMessage = true;
+                if (!_didMessage && thisSet.NeedRow && !db.IsRowScriptPossible()) {
+                    _didMessage = true;
                     EnableScript();
                 }
             }

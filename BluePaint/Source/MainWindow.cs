@@ -213,7 +213,7 @@ public partial class MainWindow : BlueControls.Forms.Form {
             GC.Collect();
         }
 
-        if (P.Bmp is not Bitmap bmp) {
+        if (P.Bmp is not { } bmp) {
             btnRückgänig.Enabled = false;
             return;
         }

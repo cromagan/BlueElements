@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -101,7 +101,7 @@ public static class Converter {
     }
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird DateTime.UtcNow zurückgegeben.
+    /// LÃ¶st nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird DateTime.UtcNow zurÃ¼ckgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
@@ -124,14 +124,14 @@ public static class Converter {
     }
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+    /// LÃ¶st nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurÃ¼ckgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
     public static double DoubleParse(string? s) => string.IsNullOrEmpty(s) ? 0 : DoubleTryParse(s, out var v) ? v : (double)0f;
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+    /// LÃ¶st nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurÃ¼ckgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <param name="result"></param>
@@ -146,14 +146,14 @@ public static class Converter {
     }
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+    /// LÃ¶st nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurÃ¼ckgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
     public static float FloatParse(string? s) => string.IsNullOrEmpty(s) ? 0 : FloatTryParse(s, out var v) ? v : 0f;
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+    /// LÃ¶st nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurÃ¼ckgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <param name="result"></param>
@@ -168,7 +168,7 @@ public static class Converter {
     }
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+    /// LÃ¶st nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurÃ¼ckgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
@@ -179,7 +179,7 @@ public static class Converter {
     public static int IntParse(double? s) => s == null ? 0 : (int)Math.Round((double)s, 0, MidpointRounding.AwayFromZero);
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+    /// LÃ¶st nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurÃ¼ckgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>

@@ -320,7 +320,7 @@ public class BitmapExt : IDisposableExtended {
             byte[] sourceBuffer = new byte[bytes];
             byte[] targetBuffer = new byte[bytes];
 
-            System.Runtime.InteropServices.Marshal.Copy(sourceData.Scan0, sourceBuffer, 0, bytes);
+            Marshal.Copy(sourceData.Scan0, sourceBuffer, 0, bytes);
 
             for (var y = 0; y < source.Height; ++y) {
                 int rowOffset = y * sourceData.Stride;
@@ -345,7 +345,7 @@ public class BitmapExt : IDisposableExtended {
                 }
             }
 
-            System.Runtime.InteropServices.Marshal.Copy(targetBuffer, 0, targetData.Scan0, bytes);
+            Marshal.Copy(targetBuffer, 0, targetData.Scan0, bytes);
         } finally {
             if (sourceData != null) { source.UnlockBits(sourceData); }
             if (targetData != null) { target.UnlockBits(targetData); }
@@ -468,7 +468,7 @@ public class BitmapExt : IDisposableExtended {
         UnlockBits(true);
         var bmp = _bitmap.Clone();
         LockBits();
-        return bmp is Bitmap bitmap ? bitmap : null;
+        return bmp as Bitmap;
     }
 
     public Bitmap Crop(Rectangle re) {

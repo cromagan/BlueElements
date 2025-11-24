@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -40,9 +40,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Destructors
 
-    // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // TODO: Finalizer nur Ã¼berschreiben, wenn "Dispose(bool disposing)" Code fÃ¼r die Freigabe nicht verwalteter Ressourcen enthÃ¤lt
     ~CellCollection() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Ã„ndern Sie diesen Code nicht. FÃ¼gen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(false);
     }
 
@@ -80,8 +80,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     #region Indexers
 
     /// <summary>
-    /// Gibt die Zelle zurück.
-    /// Da leere Zellen nicht gespeichert werden, kann null zuück gebeben werden, obwohl die Zelle an sich gültig ist.
+    /// Gibt die Zelle zurÃ¼ck.
+    /// Da leere Zellen nicht gespeichert werden, kann null zuÃ¼ck gebeben werden, obwohl die Zelle an sich gÃ¼ltig ist.
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
@@ -121,10 +121,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var c = linkedTable.Column[x[0]];
             if (c == null) { return (null, $"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
 
-            if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
+            if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstÃ¼tzt."); }
 
             var value = x[2].FromNonCritical();
-            if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
+            if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstÃ¼tzt."); }
 
             if (inputRow is { IsDisposed: false }) {
                 // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
@@ -137,7 +137,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }
 
-        if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return (null, "Keine gültigen Suchkriterien definiert."); }
+        if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return (null, "Keine gÃ¼ltigen Suchkriterien definiert."); }
 
         if (linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
             if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, false, [.. fi]))) {
@@ -167,16 +167,16 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var c = ldb.Column[x[0]];
             if (c == null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
 
-            if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
+            if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstÃ¼tzt."); }
 
             var value = x[2].FromNonCritical().ToUpperInvariant();
-            if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
+            if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstÃ¼tzt."); }
 
             foreach (var thisColumn in db.Column) {
                 if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
                     var l = linkedrow.CellGetList(c);
                     if (l.Count == 0) { l.Add(string.Empty); }
-                    fc.Add(new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, l));
+                    fc.Add(new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroÃŸKleinEgal, l));
                 }
             }
         }
@@ -223,38 +223,38 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     /// <summary>
-    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// Gibt einen Fehlergrund zurÃ¼ck, ob die Zelle bearbeitet werden kann.
     /// </summary>
     /// <param name="row"></param>
     /// <param name="column"></param>
     /// <param name="mode"></param>
     /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei internen Prozessen angeben.</param>
-    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Tabelleansicht empfohlen.</param>
+    /// <param name="checkEditmode">Ob gewÃ¼nscht wird, dass die intern programmierte Routine geprÃ¼ft werden soll. Nur in Tabelleansicht empfohlen.</param>
     /// <param name="repairallowed"></param>
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
     public static string IsCellEditable(ColumnItem? column, RowItem? row, string? newChunkValue) {
-        if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
+        if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewÃ¤hlt."; }
 
         if (row is { IsDisposed: true }) { return "Die Zeile wurde verworfen."; }
 
         var oldChunk = newChunkValue;
 
         if (!column.EditableWithTextInput && !column.EditableWithDropdown && !tb.PowerEdit) {
-            return "Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
+            return "Die Inhalte dieser Spalte kÃ¶nnen nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.";
         }
 
         if (ColumnItem.UserEditDialogTypeInTable(column, false, true) == EditTypeTable.None) {
-            return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für die Spalte definiert.";
+            return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode fÃ¼r die Spalte definiert.";
         }
 
         if (row == null) {
             if (tb.Column.First is not { IsDisposed: false } firstcol || firstcol != column) {
-                return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
+                return "Neue Zeilen mÃ¼ssen mit der ersten Spalte beginnen.";
             }
 
             if (!tb.PermissionCheck(tb.PermissionGroupsNewRow, null)) {
-                return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
+                return "Sie haben nicht die nÃ¶tigen Rechte, um neue Zeilen anzulegen.";
             }
 
             if (tb.Column.ChunkValueColumn is { } cvc && newChunkValue != null) {
@@ -270,7 +270,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (!tb.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
-            return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
+            return "Sie haben nicht die nÃ¶tigen Rechte, um diesen Wert zu Ã¤ndern.";
         }
 
         if (!tb.IsEditable(false)) { return $"Tabellesperre: {tb.IsNotEditableReason(false)}"; }
@@ -280,7 +280,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
 
-            if (lcolumn?.Table is not { IsDisposed: false } db2) { return "Verknüpfte Tabelle verworfen."; }
+            if (lcolumn?.Table is not { IsDisposed: false } db2) { return "VerknÃ¼pfte Tabelle verworfen."; }
 
             db2.PowerEdit = tb.PowerEdit;
 
@@ -310,7 +310,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     /// <summary>
     /// Diese Routine erstellt den umgekehrten Linked-Cell-Filter:
-    /// Es versucht rauszufinden, welche Zeile in der Tabelle von mycolumn von der Zeile linkedrow befüllt werden.
+    /// Es versucht rauszufinden, welche Zeile in der Tabelle von mycolumn von der Zeile linkedrow befÃ¼llt werden.
     /// </summary>
     /// <param name="mycolumn"></param>
     /// <param name="linkedcolumn"></param>
@@ -337,13 +337,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
         var cd = cellKey.SplitBy("|");
-        if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(ErrorType.Error, "Falscher CellKey übergeben: " + cellKey); }
+        if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(ErrorType.Error, "Falscher CellKey Ã¼bergeben: " + cellKey); }
         column = Table?.Column[cd[0]];
         row = Table?.Row.GetByKey(cd[1]);
     }
 
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Ã„ndern Sie diesen Code nicht. FÃ¼gen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Table = null;
         Dispose(true);
         GC.SuppressFinalize(this);
@@ -410,7 +410,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
             }
         } catch {
-            Develop.AbortAppIfStackOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
+            Develop.AbortAppIfStackOverflow(); // Um Rauszufinden, ob endlos-Schleifen Ã¶fters  vorkommen. Zuletzt 24.11.2020
         }
     }
 
@@ -421,8 +421,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer Ã¼berschreiben
+            // TODO: GroÃŸe Felder auf NULL setzen
             Table = null;
             Clear();
             IsDisposed = true;

@@ -29,14 +29,12 @@ using static BlueBasics.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal class Method_SetClipboard : Method, IUseableForButton {
+internal class Method_SetClipboard : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
-    public List<List<string>> ArgsForButton => [StringVal];
-    public List<string> ArgsForButtonDescription => ["Text"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
+
     public override string Command => "setclipboard";
     public override List<string> Constants => [];
     public override string Description => "Speichert den Text im Clipboard.";
@@ -48,7 +46,7 @@ internal class Method_SetClipboard : Method, IUseableForButton {
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
-    public string NiceTextForUser => "Text in die Zwischenablage kopieren";
+
 
     public override string Returns => string.Empty;
 
@@ -67,7 +65,6 @@ internal class Method_SetClipboard : Method, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0];
 
     #endregion
 }

@@ -12,7 +12,7 @@ namespace BlueControls.BlueTableDialogs
     {
     public sealed partial class Search 
         {
-			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+			//Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]
 			protected override void Dispose(bool disposing)
 			{
@@ -21,9 +21,9 @@ namespace BlueControls.BlueTableDialogs
 				}
 				base.Dispose(disposing);
 			}
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+			//Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+			//Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+			//Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
 			[DebuggerStepThrough()]
 			private void InitializeComponent()
 			{
@@ -92,7 +92,7 @@ namespace BlueControls.BlueTableDialogs
             this.btnAehnliches.Name = "btnAehnliches";
             this.btnAehnliches.Size = new Size(384, 16);
             this.btnAehnliches.TabIndex = 6;
-            this.btnAehnliches.Text = "auch Ähnliches finden (z.B. ue = ü)";
+            this.btnAehnliches.Text = "auch Ã„hnliches finden (z.B. ue = Ã¼)";
             // 
             // btnSuchSpalte
             // 

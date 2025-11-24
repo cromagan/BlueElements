@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -67,7 +67,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public ColumnItem? First { get; private set; }
 
     ///// <summary>
-    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
+    ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelÃ¶st.
     ///// </summary>
     ///// <param name="column"></param>
     ///// <returns></returns>
@@ -77,7 +77,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    base.GenerateAndAdd(column);
     //}
     //    /// <summary>
-    //    /// Gib erste Spalte des ersten Arrangements zurück, die nicht mit "SYS_" beginnt
+    //    /// Gib erste Spalte des ersten Arrangements zurÃ¼ck, die nicht mit "SYS_" beginnt
     //    /// </summary>
     //    /// <returns></returns>
     public bool IsDisposed { get; private set; }
@@ -89,9 +89,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public ColumnItem? SysLocked { get; private set; }
 
     /// <summary>
-    /// Wichtige Spalte auch für Zeilenskripte:
-    /// Vor einem Zeilenskript wird der Status der Zeile geloggt. Wird die Zeile während es Skriptes
-    /// verändert, wird das Skript abgebrochen
+    /// Wichtige Spalte auch fÃ¼r Zeilenskripte:
+    /// Vor einem Zeilenskript wird der Status der Zeile geloggt. Wird die Zeile wÃ¤hrend es Skriptes
+    /// verÃ¤ndert, wird das Skript abgebrochen
     /// </summary>
     public ColumnItem? SysRowChangeDate { get; private set; }
 
@@ -199,7 +199,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         //var item = GetByKey(key);
         //if (item != null) {
-        //    Develop.DebugPrint(ErrorType.Error, "Schlüssel belegt!");
+        //    Develop.DebugPrint(ErrorType.Error, "SchlÃ¼ssel belegt!");
         //    return null;
         //}
 
@@ -251,12 +251,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         da.CellAdd("#");
         da.CellAdd("Name");
         da.CellAdd("Beschriftung");
-        da.CellAdd("Überschriften");
+        da.CellAdd("Ãœberschriften");
         da.CellAdd("Datenformat");
         da.CellAdd("Quickinfo");
         da.CellAdd("Admin-Info");
         da.CellAdd("Tags");
-        da.CellAdd("Änderungs-Rechte");
+        da.CellAdd("Ã„nderungs-Rechte");
         da.RowEnd();
         var lfdn = 0;
         foreach (var thisColumnItem in this) {
@@ -397,7 +397,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    } else {
         //        var thisc1 = this[colN + 1];
         //        if (thisc1 == null) {
-        //            // Dummy, um nachfoldgnd nicht abfragen zu müssen
+        //            // Dummy, um nachfoldgnd nicht abfragen zu mÃ¼ssen
         //        } else if (thisc.IsSystemColumn() && !thisc1.IsSystemColumn()) {
         //            Swap(colN, colN + 1);
         //            colN = -1;
@@ -426,16 +426,16 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (!ok) { return "Entfernen fehlgeschlagen"; }
 
         ok = _internal.TryAdd(newName.ToUpperInvariant(), vcol);
-        if (!ok) { return "Hinzufügen fehlgeschlagen"; }
+        if (!ok) { return "HinzufÃ¼gen fehlgeschlagen"; }
 
         ok = Table.Cell.ChangeColumnName(oldName, newName);
-        if (!ok) { return "Namensänderung fehlgeschlagen"; }
+        if (!ok) { return "NamensÃ¤nderung fehlgeschlagen"; }
         //Table?.RepairColumnArrangements(Reason.SetCommand);
         return string.Empty;
     }
 
     internal void CloneFrom(Table sourceTable) {
-        // Spalten, die zu viel sind, löschen
+        // Spalten, die zu viel sind, lÃ¶schen
         var names = new List<ColumnItem>();
         foreach (var thisColumn in this) {
             var l = sourceTable.Column[thisColumn.KeyName];
@@ -445,7 +445,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             Remove(thisname, "Clone - Spalte zu viel");
         }
 
-        // Spalten erzeugen und Format übertragen
+        // Spalten erzeugen und Format Ã¼bertragen
         foreach (var thisColumn in sourceTable.Column) {
             var l = this[thisColumn.KeyName] ??
                 GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, null, thisColumn.ColumnQuickInfo);
@@ -494,7 +494,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (c == null) { return "Spalte nicht gefunden!"; }
 
             OnColumnRemoving(new ColumnEventArgs(c));
-            if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
+            if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "LÃ¶schen nicht erfolgreich"; }
             OnColumnRemoved();
 
             //if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
@@ -515,9 +515,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private string Add(ColumnItem column) {
-        if (this[column.KeyName] != null) { return "Hinzufügen fehlgeschlagen."; }
+        if (this[column.KeyName] != null) { return "HinzufÃ¼gen fehlgeschlagen."; }
 
-        if (!_internal.TryAdd(column.KeyName.ToUpperInvariant(), column)) { return "Hinzufügen fehlgeschlagen."; }
+        if (!_internal.TryAdd(column.KeyName.ToUpperInvariant(), column)) { return "HinzufÃ¼gen fehlgeschlagen."; }
 
         GetSystems();
 
@@ -585,7 +585,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    if (!originalString.Contains(o)) { return originalString; }
     //    var n = ParsableColumnKey(newKey);
     //    if (oldKey == newKey) {
-    //        Develop.DebugPrint(ErrorType.Error, "Schlüssel gleich:  " + oldKey);
+    //        Develop.DebugPrint(ErrorType.Error, "SchlÃ¼ssel gleich:  " + oldKey);
     //        return originalString;
     //    }
     //    originalString = originalString.Replace(o + "}", n + "}");

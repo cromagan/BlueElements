@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -59,7 +59,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Erstellt einen Filter, der den Zeilenschlüssel sucht. Mit der SplitColumn als zweiten Filter
+    /// Erstellt einen Filter, der den ZeilenschlÃ¼ssel sucht. Mit der SplitColumn als zweiten Filter
     /// </summary>
     public FilterCollection(RowItem r, string coment) {
         Coment = coment;
@@ -82,11 +82,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Erstellt eine FilterCollection aus einer vollständigen SQL-SELECT-Anweisung
+    /// Erstellt eine FilterCollection aus einer vollstÃ¤ndigen SQL-SELECT-Anweisung
     /// Beispiel: "SELECT * FROM Kunden WHERE Name = 'Mueller' AND Status = 'Aktiv'"
     /// </summary>
-    /// <param name="sql">Die vollständige SQL-SELECT-Anweisung</param>
-    /// <param name="comment">Kommentar für den Filter</param>
+    /// <param name="sql">Die vollstÃ¤ndige SQL-SELECT-Anweisung</param>
+    /// <param name="comment">Kommentar fÃ¼r den Filter</param>
     public FilterCollection(string sql, string comment) {
         Coment = comment;
 
@@ -96,7 +96,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
 
         try {
-            // SQL normalisieren und in Großbuchstaben konvertieren
+            // SQL normalisieren und in GroÃŸbuchstaben konvertieren
             (var normalizedSql, var error) = sql.NormalizedText(true, true, true, false, ' ');
 
             if (!string.IsNullOrEmpty(error)) {
@@ -175,7 +175,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 Remove(f);
             }
 
-            var fi = new FilterItem(Table, FilterType.Instr_UND_GroßKleinEgal, value);
+            var fi = new FilterItem(Table, FilterType.Instr_UND_GroÃŸKleinEgal, value);
             Add(fi);
         }
     }
@@ -320,7 +320,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Gibt den Wert zurück, der in eine neue Zeile reingeschrieben wird
+    /// Gibt den Wert zurÃ¼ck, der in eine neue Zeile reingeschrieben wird
     /// </summary>
     /// <param name="column"></param>
     /// <returns></returns>
@@ -344,14 +344,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (fi is not {
             FilterType: not (not FilterType.Istgleich
-                and not FilterType.Istgleich_GroßKleinEgal
-                and not FilterType.Istgleich_ODER_GroßKleinEgal
-                and not FilterType.Istgleich_UND_GroßKleinEgal
+                and not FilterType.Istgleich_GroÃŸKleinEgal
+                and not FilterType.Istgleich_ODER_GroÃŸKleinEgal
+                and not FilterType.Istgleich_UND_GroÃŸKleinEgal
                 and not FilterType.Instr
-                and not FilterType.Instr_GroßKleinEgal
-                and not FilterType.Instr_UND_GroßKleinEgal
+                and not FilterType.Instr_GroÃŸKleinEgal
+                and not FilterType.Instr_UND_GroÃŸKleinEgal
                 and not FilterType.Istgleich_MultiRowIgnorieren
-                and not FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren)
+                and not FilterType.Istgleich_GroÃŸKleinEgal_MultiRowIgnorieren)
         }) { return null; }
 
         if (isForSerach) { return fi.SearchValue.SortedDistinctList().JoinWithCr(); }
@@ -411,7 +411,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Effizente Methode um wenige Events auszulösen
+    /// Effizente Methode um wenige Events auszulÃ¶sen
     /// </summary>
     /// <param name="fc"></param>
     public void ChangeTo(FilterCollection? fc) {
@@ -419,7 +419,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         OnChanging();
 
-        // Tabellewechsel nur bei Unterschieden durchführen
+        // Tabellewechsel nur bei Unterschieden durchfÃ¼hren
         if (_table != fc?.Table) {
             UnRegisterTableEvents();
             _table = fc?.Table;
@@ -429,12 +429,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _internal.Clear();
 
         if (fc != null) {
-            // Vorhandene Filterliste direkt übernehmen statt einzeln zu prüfen und hinzuzufügen
+            // Vorhandene Filterliste direkt Ã¼bernehmen statt einzeln zu prÃ¼fen und hinzuzufÃ¼gen
             foreach (var thisf in fc.Where(f => f.IsOk())) {
                 AddInternal(thisf);
             }
 
-            // Rows-Übernahme optimieren - bei null einfach ungültig machen
+            // Rows-Ãœbernahme optimieren - bei null einfach ungÃ¼ltig machen
             if (fc._rows != null) {
                 _rows = [.. fc.Rows];
                 OnRowsChanged();
@@ -471,7 +471,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Ã„ndern Sie diesen Code nicht. FÃ¼gen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
@@ -494,7 +494,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Prüft, ob der Filter sinngemäß vorhanden ist.
+    /// PrÃ¼ft, ob der Filter sinngemÃ¤ÃŸ vorhanden ist.
     /// </summary>
     /// <param name="filter"></param>
     /// <returns></returns>
@@ -545,7 +545,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public bool IsRowFilterActiv() {
         var fi = this[null];
 
-        return fi is { FilterType: FilterType.Instr or FilterType.Instr_UND_GroßKleinEgal or FilterType.Instr_GroßKleinEgal };
+        return fi is { FilterType: FilterType.Instr or FilterType.Instr_UND_GroÃŸKleinEgal or FilterType.Instr_GroÃŸKleinEgal };
     }
 
     public bool MayHaveRowFilter(ColumnItem? column) => column is { IsDisposed: false, IgnoreAtRowFilter: false } && IsRowFilterActiv();
@@ -651,7 +651,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
+    /// Ã„ndert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie mÃ¶glich auszulÃ¶sen
     /// </summary>
     public void RemoveOtherAndAdd(FilterItem? fi) {
         if (fi == null) { return; }
@@ -679,7 +679,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void RemoveOtherAndAdd(FilterCollection? fc, string? newOrigin) {
         if (fc == null || IsDisposed || fc.Count == 0) { return; }
 
-        // Sammle alle Filter, die hinzugefügt werden sollen
+        // Sammle alle Filter, die hinzugefÃ¼gt werden sollen
         var filtersToAdd = new List<FilterItem>();
 
         foreach (var thisFi in fc) {
@@ -694,7 +694,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (filtersToAdd.Count == 0) { return; }
 
-        // Prüfe, ob tatsächlich Änderungen erforderlich sind und entferne bestehende Filter
+        // PrÃ¼fe, ob tatsÃ¤chlich Ã„nderungen erforderlich sind und entferne bestehende Filter
         var needChanges = false;
         var toRemove = new List<FilterItem>();
 
@@ -716,7 +716,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             _internal.Remove(filter);
         }
 
-        // Füge neue Filter hinzu
+        // FÃ¼ge neue Filter hinzu
         foreach (var filter in filtersToAdd) {
             AddInternal(filter);
         }
@@ -803,7 +803,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Extrahiert den Tabellennamen aus einer bereits normalisierten SQL-SELECT-Anweisung und gibt die Tabelle zurück
+    /// Extrahiert den Tabellennamen aus einer bereits normalisierten SQL-SELECT-Anweisung und gibt die Tabelle zurÃ¼ck
     /// </summary>
     /// <param name="normalizedSql">Die bereits normalisierte SQL-Anweisung</param>
     /// <returns>Die Tabelle oder null wenn nicht gefunden</returns>
@@ -817,7 +817,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fromMatch.Success) {
             var tableName = fromMatch.Groups[1].Value;
 
-            // Eventuelle Anführungszeichen oder eckige Klammern entfernen
+            // Eventuelle AnfÃ¼hrungszeichen oder eckige Klammern entfernen
             tableName = tableName.Trim('[', ']', '"', '\'');
 
             var validTableName = Table.MakeValidTableName(tableName);
@@ -829,7 +829,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     /// <summary>
     /// Teilt die WHERE-Klausel in einzelne Bedingungen auf
-    /// Vereinfachte Implementierung ohne Klammern-Unterstützung
+    /// Vereinfachte Implementierung ohne Klammern-UnterstÃ¼tzung
     /// </summary>
     private static List<string> SplitConditions(string whereClause) {
         var conditions = new List<string>();
@@ -866,7 +866,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void _table_Loaded(object sender, System.EventArgs e) => Invalidate_FilteredRows();
 
     /// <summary>
-    /// Löst keine Ereignisse aus, rows werden NICHT invalidiert
+    /// LÃ¶st keine Ereignisse aus, rows werden NICHT invalidiert
     /// </summary>
     /// <param name="fi"></param>
     private void AddInternal(FilterItem fi) {
@@ -893,7 +893,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Es werden keine Events ausgelöst und Zeilen nicht invalidiert
+    /// Es werden keine Events ausgelÃ¶st und Zeilen nicht invalidiert
     /// </summary>
     /// <param name="fi"></param>
     private void AddInternal(List<FilterItem> fi) {

@@ -29,16 +29,13 @@ using System.Collections.Generic;
 namespace BlueTable.AdditionalScriptMethods;
 
 
-public class Method_SoftMessage : Method_TableGeneric, IUseableForButton {
+public class Method_SoftMessage : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
 
-    public List<List<string>> ArgsForButton => Args;
 
-    public List<string> ArgsForButtonDescription => ["Text"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "softmessage";
 
@@ -53,7 +50,7 @@ public class Method_SoftMessage : Method_TableGeneric, IUseableForButton {
 
     public override bool MustUseReturnValue => false;
 
-    public string NiceTextForUser => "Text in der unteren Statusleiste ausgeben";
+
 
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
@@ -71,7 +68,7 @@ public class Method_SoftMessage : Method_TableGeneric, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0];
+ 
 
     #endregion
 }

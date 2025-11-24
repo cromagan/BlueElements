@@ -33,16 +33,12 @@ using static BlueBasics.IO;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal class Method_Export : Method_TableGeneric, IUseableForButton {
+internal class Method_Export : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
 
-    public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
-
-    public List<string> ArgsForButtonDescription => ["Dateiname", "Format", "Ansichtname"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
 
     public override string Command => "export";
 
@@ -57,7 +53,6 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
     public override bool MustUseReturnValue => false;
 
-    public string NiceTextForUser => "Die gefilterten Zeilen ins Dateisystem exportieren";
 
     public override string Returns => string.Empty;
 
@@ -81,7 +76,7 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
 
         var r = allFi.Rows;
 
-        #region  Tabelle ermitteln (db)
+        #region  Tabelle prüfen
 
         if (myTb == null || allFi.Table != myTb) {
             allFi.Dispose();
@@ -162,7 +157,6 @@ internal class Method_Export : Method_TableGeneric, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1] + "," + args[2] + "," + filterarg;
 
     #endregion
 }

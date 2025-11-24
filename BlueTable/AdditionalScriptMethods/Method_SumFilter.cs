@@ -66,7 +66,7 @@ public class Method_SumFilter : Method_TableGeneric {
 
         var x = returncolumn.Summe(r);
 
-        return x is not double xd ? new DoItFeedback("Summe konnte nicht berechnet werden.", true, ld) : new DoItFeedback(xd);
+        return x is not { } xd ? new DoItFeedback("Summe konnte nicht berechnet werden.", true, ld) : new DoItFeedback(xd);
     }
 
     #endregion

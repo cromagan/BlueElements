@@ -531,7 +531,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
                 Unselect();
             }
 
-            LastClickedItem = hotitem is AbstractPadItem api ? api : null;
+            LastClickedItem = hotitem as AbstractPadItem;
         }
     }
 

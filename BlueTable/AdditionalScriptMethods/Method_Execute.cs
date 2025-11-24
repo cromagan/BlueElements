@@ -28,17 +28,13 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 
-internal class Method_Execte : Method, IUseableForButton {
+internal class Method_Execute : Method {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
 
-    public List<List<string>> ArgsForButton => Args;
 
-    public List<string> ArgsForButtonDescription => ["Befehl", "Attribute"];
-
-    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "execute";
 
     public override List<string> Constants => [];
@@ -51,7 +47,7 @@ internal class Method_Execte : Method, IUseableForButton {
     public override MethodType MethodLevel => MethodType.GUI;
 
     public override bool MustUseReturnValue => false;
-    public string NiceTextForUser => "Einen Befehl an Windows übergeben";
+
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "Execute(Command, Attribut);";
@@ -66,7 +62,7 @@ internal class Method_Execte : Method, IUseableForButton {
         return DoItFeedback.Null();
     }
 
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + ", " + args[1];
+
 
     #endregion
 }

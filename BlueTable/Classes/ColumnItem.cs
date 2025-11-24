@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -90,7 +90,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private ColumnLineStyle _lineStyleRight;
 
     /// <summary>
-    /// Diese Variable ist der temporäre Wert und wird von _linkedTableFile abgeleitet.
+    /// Diese Variable ist der temporÃ¤re Wert und wird von _linkedTableFile abgeleitet.
     /// </summary>
     private Table? _linkedTable;
 
@@ -133,7 +133,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         _keyName = name;
         _caption = string.Empty;
-        _lineStyleLeft = ColumnLineStyle.Dünn;
+        _lineStyleLeft = ColumnLineStyle.DÃ¼nn;
         _lineStyleRight = ColumnLineStyle.Ohne;
         _multiLine = false;
         _isKeyColumn = false;
@@ -205,7 +205,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     #region Destructors
 
     ~ColumnItem() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Ã„ndern Sie diesen Code nicht. FÃ¼gen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(false);
     }
 
@@ -216,7 +216,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public event EventHandler? DisposingEvent;
 
     //private string _vorschlagsColumn;
-    // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // TODO: Finalizer nur Ã¼berschreiben, wenn "Dispose(bool disposing)" Code fÃ¼r die Freigabe nicht verwalteter Ressourcen enthÃ¤lt
     public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
@@ -234,7 +234,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    [Description("Ein Information für Administratoren. Freier Text.\r\nWird als Quickinfo angezeigt, wenn der Admininstror\r\n mit der Maus über den Spaltenkopf fährt.")]
+    [Description("Ein Information fÃ¼r Administratoren. Freier Text.\r\nWird als Quickinfo angezeigt, wenn der Admininstror\r\n mit der Maus Ã¼ber den Spaltenkopf fÃ¤hrt.")]
     public string AdminInfo {
         get => _adminInfo;
         set {
@@ -467,7 +467,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     /// <summary>
-    /// Was in Textfeldern oder Tabellezeilen für ein Suffix angezeigt werden soll. Beispiel: mm
+    /// Was in Textfeldern oder Tabellezeilen fÃ¼r ein Suffix angezeigt werden soll. Beispiel: mm
     /// </summary>
     public List<string> ColumnTags {
         get;
@@ -733,7 +733,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 if (_linkedTable is { IsDisposed: false }) { return _linkedTable; }
             }
 
-            // Außerhalb des Locks um Deadlock zu vermeiden
+            // AuÃŸerhalb des Locks um Deadlock zu vermeiden
 
             Invalidate_LinkedTable(); // Events sicher abmelden
 
@@ -788,19 +788,19 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         get {
             var liste = Contents();
 
-            Dictionary<string, int> zähler = [];
+            Dictionary<string, int> zÃ¤hler = [];
 
             foreach (var wert in liste) {
                 if (!string.IsNullOrEmpty(wert)) {
-                    if (zähler.ContainsKey(wert)) {
-                        zähler[wert]++;
+                    if (zÃ¤hler.ContainsKey(wert)) {
+                        zÃ¤hler[wert]++;
                     } else {
-                        zähler[wert] = 1;
+                        zÃ¤hler[wert] = 1;
                     }
                 }
             }
 
-            return zähler.OrderByDescending(kvp => kvp.Value).FirstOrDefault().Key;
+            return zÃ¤hler.OrderByDescending(kvp => kvp.Value).FirstOrDefault().Key;
         }
     }
 
@@ -992,9 +992,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (!Char_AZ.Contains(name.Substring(0, 1).ToUpperInvariant())) { return false; }
         if (name.Length > 128) { return false; }
 
-        // Illegale Namen definieren (nur Oracle + SQL Server relevante Wörter)
+        // Illegale Namen definieren (nur Oracle + SQL Server relevante WÃ¶rter)
         string[] illegalNames = {
-        // SQL Standard Schlüsselwörter (beide Systeme)
+        // SQL Standard SchlÃ¼sselwÃ¶rter (beide Systeme)
         //"SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "JOIN", "INNER", "LEFT", "RIGHT", "FULL", "OUTER",
         //"ON", "AS", "AND", "OR", "NOT", "NULL", "IS", "IN", "EXISTS", "BETWEEN", "LIKE", "ORDER", "BY", "GROUP",
         //"HAVING", "UNION", "ALL", "DISTINCT", "COUNT", "SUM", "AVG", "MIN", "MAX", "CASE", "WHEN", "THEN", "ELSE",
@@ -1034,7 +1034,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         TmpNewDummy
     };
 
-        // Prüfen ob Name in der Liste der illegalen Namen steht
+        // PrÃ¼fen ob Name in der Liste der illegalen Namen steht
         return !illegalNames.Contains(name, StringComparer.OrdinalIgnoreCase);
     }
 
@@ -1130,7 +1130,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public int CalculatePreveredMaxCellLength(double prozentZuschlag) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return 0; }
 
-        //if (Format == DataFormat.Verknüpfung_zu_anderer_Tabellex) { return 35; }
+        //if (Format == DataFormat.VerknÃ¼pfung_zu_anderer_Tabellex) { return 35; }
         //if (Format == DataFormat.Werte_aus_anderer_Tabelle_als_DropDownItemsx) { return 15; }
         var m = 0;
 
@@ -1148,7 +1148,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public int CalculatePreveredMaxTextLength(double prozentZuschlag) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return 0; }
 
-        ////if (Format == DataFormat.Verknüpfung_zu_anderer_Tabellex) { return 35; }
+        ////if (Format == DataFormat.VerknÃ¼pfung_zu_anderer_Tabellex) { return 35; }
         ////if (Format == DataFormat.Werte_aus_anderer_Tabelle_als_DropDownItemsx) { return 15; }
         var m = 0;
 
@@ -1297,7 +1297,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
 
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Ã„ndern Sie diesen Code nicht. FÃ¼gen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -1319,12 +1319,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (IsDisposed || Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
         if (string.IsNullOrEmpty(_keyName)) { return "Der Spaltenname ist nicht definiert."; }
 
-        if (!IsValidColumnName(_keyName)) { return "Der Spaltenname ist ungültig."; }
+        if (!IsValidColumnName(_keyName)) { return "Der Spaltenname ist ungÃ¼ltig."; }
 
-        if (_maxCellLength < _maxTextLength) { return "Zellengröße zu klein!"; }
-        if (_maxCellLength < 1) { return "Zellengröße zu klein!"; }
-        if (_maxCellLength > 4000) { return "Zellengröße zu groß!"; }
-        if (_maxTextLength > 4000) { return "Maximallänge zu groß!"; }
+        if (_maxCellLength < _maxTextLength) { return "ZellengrÃ¶ÃŸe zu klein!"; }
+        if (_maxCellLength < 1) { return "ZellengrÃ¶ÃŸe zu klein!"; }
+        if (_maxCellLength > 4000) { return "ZellengrÃ¶ÃŸe zu groÃŸ!"; }
+        if (_maxTextLength > 4000) { return "MaximallÃ¤nge zu groÃŸ!"; }
 
         if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
             return "Spalten-Name bereits vorhanden.";
@@ -1333,26 +1333,26 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (string.IsNullOrEmpty(_caption)) { return "Spalten Beschriftung fehlt."; }
 
         if (_relationType != RelationType.None) {
-            if (LinkedTable is not { IsDisposed: false } db2) { return "Verknüpfte Tabelle fehlt oder existiert nicht."; }
-            if (db == db2) { return "Zirkelbezug mit verknüpfter Tabelle."; }
+            if (LinkedTable is not { IsDisposed: false } db2) { return "VerknÃ¼pfte Tabelle fehlt oder existiert nicht."; }
+            if (db == db2) { return "Zirkelbezug mit verknÃ¼pfter Tabelle."; }
             var c = db2.Column[_columnNameOfLinkedTable];
-            if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
+            if (c == null) { return "Die verknÃ¼pfte SchlÃ¼sselspalte existiert nicht."; }
             if (LinkedCellFilter.Count == 0) {
                 if (_relationType != RelationType.DropDownValues) {
-                    return "Keine Filter für verknüpfte Tabelle definiert.";
+                    return "Keine Filter fÃ¼r verknÃ¼pfte Tabelle definiert.";
                 }
             }
         } else {
-            if (!string.IsNullOrEmpty(_columnNameOfLinkedTable)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+            if (!string.IsNullOrEmpty(_columnNameOfLinkedTable)) { return "Nur verlinkte Zellen kÃ¶nnen Daten Ã¼ber verlinkte Zellen enthalten."; }
         }
 
         if (!IsAutofilterPossible()) {
             if (_filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
             if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
         }
-        if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
-        if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return "Filter Kombination nicht möglich."; }
-        if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return "Filter Kombination nicht möglich."; }
+        if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Filter Kombination nicht mÃ¶glich."; }
+        if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return "Filter Kombination nicht mÃ¶glich."; }
+        if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return "Filter Kombination nicht mÃ¶glich."; }
         if (_filterOptions.HasFlag(FilterOptions.OnlyAndAllowed) || _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) {
             if (!_multiLine) {
                 return "Dieser Filter kann nur bei mehrzeiligen Spalten benutzt werden.";
@@ -1362,12 +1362,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (!_saveContent) {
             if (_fixedColumnWidth < 16) { return "Bei Spalten ohne Inhaltsspeicherung muss eine feste Spaltenbreite angegeben werden."; }
             //if (_scriptType is not ScriptType.Bool and not ScriptType.String and not ScriptType.Numeral and not ScriptType.List) {
-            //    return "Spalten ohne Inhaltsspeicherung müssen im Skript gesetzt werden und deswegen vorhanden sein.";
+            //    return "Spalten ohne Inhaltsspeicherung mÃ¼ssen im Skript gesetzt werden und deswegen vorhanden sein.";
             //}
-            if (!_ignoreAtRowFilter) { return "Spalten ohne Inhaltsspeicherung müssen bei Zeilenfiltern ignoriert werden."; }
+            if (!_ignoreAtRowFilter) { return "Spalten ohne Inhaltsspeicherung mÃ¼ssen bei Zeilenfiltern ignoriert werden."; }
 
             if (_isKeyColumn) {
-                return "Bei Schlüsselspalten muss der Inhalt gespeichert werden.";
+                return "Bei SchlÃ¼sselspalten muss der Inhalt gespeichert werden.";
             }
             if (_isFirst) {
                 return "Bei der ersten Spalte muss der Inhalt gespeichert werden.";
@@ -1378,7 +1378,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             }
 
             if (_relationType != RelationType.None) {
-                return "Bei Spalten mit Verknüpfung zu anderen Tabellen der Inhalt gespeichert werden.";
+                return "Bei Spalten mit VerknÃ¼pfung zu anderen Tabellen der Inhalt gespeichert werden.";
             }
 
             if (_relationship_to_First) {
@@ -1398,12 +1398,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (_isKeyColumn) {
             if (_relationship_to_First) {
-                return "Beziehungen zu anderen Zeilen und Schlüsselspalte nicht kombinierbar.";
+                return "Beziehungen zu anderen Zeilen und SchlÃ¼sselspalte nicht kombinierbar.";
             }
 
             if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly &&
                 _relationType != RelationType.CellValues) {
-                return "Schlüsselspalten müssen im Script als Readonly vorhanden sein.";
+                return "SchlÃ¼sselspalten mÃ¼ssen im Script als Readonly vorhanden sein.";
             }
         }
 
@@ -1417,10 +1417,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             }
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Der Autofilter-Joker darf bei dieser Spalte nicht gesetzt sein."; }
             if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return "Erweiterte Filter sind bei dieser Spalte nicht erlaubt."; }
-            if (!_filterOptions.HasFlag(FilterOptions.TextFilterEnabled)) { return "Texteingabe-Filter sind bei dieser Spalte nötig."; }
+            if (!_filterOptions.HasFlag(FilterOptions.TextFilterEnabled)) { return "Texteingabe-Filter sind bei dieser Spalte nÃ¶tig."; }
             if (!_ignoreAtRowFilter) { return "Diese Spalte muss bei Zeilenfiltern ignoriert werden."; }
 
-            if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Auto-Filter müssen bei dieser Spalte erlaubt sein."; }
+            if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Auto-Filter mÃ¼ssen bei dieser Spalte erlaubt sein."; }
 
             if (_relationship_to_First || _relationType != RelationType.None) {
                 return "Beziehungen zu anderen Zeilen und Chunk-Wert nicht kombinierbar.";
@@ -1428,8 +1428,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
 
         if (_relationship_to_First) {
-            if (!_multiLine) { return "Bei dieser Funktion muss mehrzeilig ausgewählt werden."; }
-            //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
+            if (!_multiLine) { return "Bei dieser Funktion muss mehrzeilig ausgewÃ¤hlt werden."; }
+            //if (_keyColumnKey > -1) { return "Diese Format darf keine VerknÃ¼pfung zu einer SchlÃ¼sselspalte haben."; }
             if (db.Column.First == this) { return "Diese Funktion ist bei der ersten Spalte nicht erlaubt."; }
             //if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
             //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
@@ -1437,58 +1437,58 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (_relationType == RelationType.CellValues) {
             if (_scriptType is not ScriptType.Nicht_vorhanden) {
-                return "Spalten mit Verlinkungen zu anderen Tabellen können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
+                return "Spalten mit Verlinkungen zu anderen Tabellen kÃ¶nnen im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
             }
         }
 
         if (_multiLine) {
-            if (!MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
-            if (_afterEditRound != -1) { return "Runden nur bei einzeiligen Texten möglich"; }
+            if (!MultilinePossible()) { return "Format unterstÃ¼tzt keine mehrzeiligen Texte."; }
+            if (_afterEditRound != -1) { return "Runden nur bei einzeiligen Texten mÃ¶glich"; }
         } else {
             if (_afterEditQuickSortRemoveDouble) { return "Sortierung kann nur bei mehrzeiligen Feldern erfolgen."; }
         }
 
-        if (_spellCheckingEnabled && !SpellCheckingPossible()) { return "Rechtschreibprüfung bei diesem Format nicht möglich."; }
+        if (_spellCheckingEnabled && !SpellCheckingPossible()) { return "RechtschreibprÃ¼fung bei diesem Format nicht mÃ¶glich."; }
         if (_editAllowedDespiteLock && !_editableWithTextInput && !_editableWithDropdown) { return "Wenn die Zeilensperre ignoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
         var tmpEditDialog = UserEditDialogTypeInTable(this, false, true);
         if (_editableWithTextInput) {
-            if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
-            if (tmpEditDialog == EditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
+            if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return "Format unterstÃ¼tzt nur Dropdown-MenÃ¼."; }
+            if (tmpEditDialog == EditTypeTable.None) { return "Format unterstÃ¼tzt keine Standard-Bearbeitung."; }
         }
 
         if (_editableWithDropdown) {
-            //if (_SpellCheckingEnabled) { return "Entweder Dropdownmenü oder Rechtschreibprüfung."; }
-            if (tmpEditDialog == EditTypeTable.None) { return "Format unterstützt keine Auswahlmenü-Bearbeitung."; }
+            //if (_SpellCheckingEnabled) { return "Entweder DropdownmenÃ¼ oder RechtschreibprÃ¼fung."; }
+            if (tmpEditDialog == EditTypeTable.None) { return "Format unterstÃ¼tzt keine AuswahlmenÃ¼-Bearbeitung."; }
         }
         if (!_editableWithDropdown && !_editableWithTextInput) {
             if (_permissionGroupsChangeCell.Count > 0) { return "Bearbeitungsberechtigungen entfernen, wenn keine Bearbeitung erlaubt ist."; }
         }
 
         foreach (var thisS in _permissionGroupsChangeCell) {
-            if (thisS.Contains("|")) { return "Unerlaubtes Zeichen bei den Gruppen, die eine Zelle bearbeiten dürfen."; }
+            if (thisS.Contains("|")) { return "Unerlaubtes Zeichen bei den Gruppen, die eine Zelle bearbeiten dÃ¼rfen."; }
             if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return "'#Administrator' bei den Bearbeitern entfernen."; }
         }
         if (_editableWithDropdown || tmpEditDialog == EditTypeTable.Dropdown_Single) {
             if (_relationType != RelationType.DropDownValues) {
-                if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
+                if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufÃ¼gen nicht angewÃ¤hlt."; }
             }
         } else {
-            if (_showValuesOfOtherCellsInDropdown) { return "Dropdownmenu nicht ausgewählt, 'alles hinzufügen' prüfen."; }
-            if (_dropdownDeselectAllAllowed) { return "Dropdownmenu nicht ausgewählt, 'alles abwählen' prüfen."; }
-            if (_dropDownItems.Count > 0) { return "Dropdownmenu nicht ausgewählt, Dropdown-Items vorhanden."; }
+            if (_showValuesOfOtherCellsInDropdown) { return "Dropdownmenu nicht ausgewÃ¤hlt, 'alles hinzufÃ¼gen' prÃ¼fen."; }
+            if (_dropdownDeselectAllAllowed) { return "Dropdownmenu nicht ausgewÃ¤hlt, 'alles abwÃ¤hlen' prÃ¼fen."; }
+            if (_dropDownItems.Count > 0) { return "Dropdownmenu nicht ausgewÃ¤hlt, Dropdown-Items vorhanden."; }
         }
-        if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return "'Dropdownmenu alles hinzufügen' bei diesem Format nicht erlaubt."; }
-        if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
+        if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return "'Dropdownmenu alles hinzufÃ¼gen' bei diesem Format nicht erlaubt."; }
+        if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwÃ¤hlen' bei diesem Format nicht erlaubt."; }
         if (_dropDownItems.Count > 0 && !DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
 
-        if (_afterEditRound > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
+        if (_afterEditRound > 5) { return "Beim Runden maximal 5 Nachkommastellen mÃ¶glich"; }
         if (_filterOptions == FilterOptions.None) {
             if (!string.IsNullOrEmpty(_autoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
         }
 
         if (_relationType == RelationType.DropDownValues) {
             if (_afterEditRound != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
-                return "Dieses Format unterstützt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer Großbuchstaben, Erlaubte Zeichen oder Sortierung.";
+                return "Dieses Format unterstÃ¼tzt keine automatischen Bearbeitungen wie Runden, Ersetzungen, Fehlerbereinigung, immer GroÃŸbuchstaben, Erlaubte Zeichen oder Sortierung.";
             }
         }
 
@@ -1520,11 +1520,11 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     //}
     ///// <summary>
-    ///// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
+    ///// FÃ¼llt die Ersetzungen mittels eines Ã¼bergebenen Enums aus.
     ///// </summary>
     ///// <param name="t">Beispiel: GetType(enDesign)</param>
-    ///// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
-    ///// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
+    ///// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der HinzugefÃ¼gt werden soll. Inklusive deses Wertes</param>
+    ///// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefÃ¼gt wird, also exklusives diese Wertes</param>
     //public void GetValuesFromEnum(Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
     //    List<string> NewReplacer = new();
     //    List<string> NewAuswahl = new();
@@ -1550,7 +1550,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     //    }
     //}
     /// <summary>
-    /// Der Invalidate, der am meisten invalidiert: Alle temporären Variablen und auch jede Zell-Größe der Spalte.
+    /// Der Invalidate, der am meisten invalidiert: Alle temporÃ¤ren Variablen und auch jede Zell-GrÃ¶ÃŸe der Spalte.
     /// </summary>
 
     public bool IsSystemColumn() =>
@@ -1626,12 +1626,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //        _function = ColumnFunction.Normal;
         //        break;
 
-        //    case ColumnFunction.Schlüsselspalte:
+        //    case ColumnFunction.SchlÃ¼sselspalte:
         //        IsKeyColumn = true;
         //        _function = ColumnFunction.Normal;
         //        break;
 
-        //    case ColumnFunction.Verknüpfung_zu_anderer_Tabelle:
+        //    case ColumnFunction.VerknÃ¼pfung_zu_anderer_Tabelle:
         //        RelationType = RelationType.CellValues;
         //        _function = ColumnFunction.Normal;
 
@@ -1705,9 +1705,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public void ResetSystemToDefault(bool setOpticalToo) {
         if (!IsSystemColumn()) { return; }
-        // ACHTUNG: Die setOpticalToo Befehle OHNE _, die müssen geloggt werden.
+        // ACHTUNG: Die setOpticalToo Befehle OHNE _, die mÃ¼ssen geloggt werden.
         if (setOpticalToo) {
-            LineStyleLeft = ColumnLineStyle.Dünn;
+            LineStyleLeft = ColumnLineStyle.DÃ¼nn;
             LineStyleRight = ColumnLineStyle.Ohne;
             ForeColor = Color.FromArgb(0, 0, 0);
             //CaptionBitmapCode = null;
@@ -1742,12 +1742,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _spellCheckingEnabled = false;
                 _editableWithTextInput = false;
                 _editableWithDropdown = false;
-                _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                _scriptType = ScriptType.Nicht_vorhanden;  // um Script-PrÃ¼fung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
                 _maxTextLength = 20;
                 _maxCellLength = 20;
                 if (setOpticalToo) {
-                    Caption = "Änderer";
+                    Caption = "Ã„nderer";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
                 }
@@ -1769,7 +1769,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
-                this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verÃ¤ndert
                 MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
                     Caption = "Erstell-Datum";
@@ -1788,7 +1788,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _value_for_Chunk = ChunkType.None;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verÃ¤ndert
                 MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
                     Caption = "Zeilen-Status";
@@ -1796,7 +1796,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                     BackColor = Color.FromArgb(255, 185, 185);
                     //LineLeft = ColumnLineStyle.Dick;
                 }
-                //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-PrÃ¼fung zu reduzieren
 
                 break;
 
@@ -1808,7 +1808,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _value_for_Chunk = ChunkType.None;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                this.GetStyleFrom(ColumnFormatHolder.Color); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(ColumnFormatHolder.Color); // Ja, FormatHolder, da wird der Script-Type nicht verÃ¤ndert
                 MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
                     Caption = "Zeilenfarbe";
@@ -1817,7 +1817,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                     //LineLeft = ColumnLineStyle.Dick;
                     AdminInfo = "Muss Werte im Format RGB oder ARGB enthalten.\r\nBeispiel: #ff0000 oder #ff120320";
                 }
-                //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-PrÃ¼fung zu reduzieren
 
                 break;
 
@@ -1830,16 +1830,16 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
-                this.GetStyleFrom(FormatHolder.DateTimeWithMilliSeconds); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                this.GetStyleFrom(FormatHolder.DateTimeWithMilliSeconds); // Ja, FormatHolder, da wird der Script-Type nicht verÃ¤ndert
                 MaxCellLength = MaxTextLength;
                 _editableWithTextInput = false;
                 _spellCheckingEnabled = false;
                 _editableWithDropdown = false;
-                _scriptType = ScriptType.Nicht_vorhanden; // um Script-Prüfung zu reduzieren
+                _scriptType = ScriptType.Nicht_vorhanden; // um Script-PrÃ¼fung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
 
                 if (setOpticalToo) {
-                    Caption = "Änder-Datum";
+                    Caption = "Ã„nder-Datum";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
                     LineStyleLeft = ColumnLineStyle.Dick;
@@ -1860,7 +1860,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _filterOptions = FilterOptions.Enabled;
 
                 if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly) {
-                    _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
+                    _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslÃ¶st
                 }
 
                 _align = AlignmentHorizontal.Zentriert;
@@ -1872,7 +1872,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _maxTextLength = 1;
                 _maxCellLength = 1;
                 _showValuesOfOtherCellsInDropdown = false;
-                _adminInfo = "Diese Spalte kann nur über ein Skript bearbeitet<br>werden, mit dem Befehl 'SetError'";
+                _adminInfo = "Diese Spalte kann nur Ã¼ber ein Skript bearbeitet<br>werden, mit dem Befehl 'SetError'";
 
                 if (setOpticalToo) {
                     ForeColor = Color.FromArgb(128, 0, 0);
@@ -1914,19 +1914,19 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             //case "System: State":
             //    _name = "SYS_RowState";
-            //    _caption = "veraltet und kann gelöscht werden: Zeilenstand";
+            //    _caption = "veraltet und kann gelÃ¶scht werden: Zeilenstand";
             //    _identifierx = string.Empty;
             //    break;
 
             //case "System: ID":
             //    _name = "SYS_ID";
-            //    _caption = "veraltet und kann gelöscht werden: Zeilen-ID";
+            //    _caption = "veraltet und kann gelÃ¶scht werden: Zeilen-ID";
             //    _identifierx = string.Empty;
             //    break;
 
             //case "System: Last Used Layout":
             //    _name = "SYS_Layout";
-            //    _caption = "veraltet und kann gelöscht werden:  Letztes Layout";
+            //    _caption = "veraltet und kann gelÃ¶scht werden:  Letztes Layout";
             //    _identifierx = string.Empty;
             //    break;
 
@@ -2030,7 +2030,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (this == db.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
 
         if (_isFirst) { return QuickImage.Get(ImageCode.Stern, 16); }
-        if (_isKeyColumn) { return QuickImage.Get(ImageCode.Schlüssel, 16); }
+        if (_isKeyColumn) { return QuickImage.Get(ImageCode.SchlÃ¼ssel, 16); }
 
         if (_value_for_Chunk != ChunkType.None) { return QuickImage.Get(ImageCode.Diskette, 16); }
 
@@ -2071,7 +2071,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public override string ToString() => IsDisposed ? string.Empty : _keyName + " -> " + Caption;
 
     /// <summary>
-    /// CallByFileName Aufrufe werden nicht geprüft
+    /// CallByFileName Aufrufe werden nicht geprÃ¼ft
     /// </summary>
     /// <returns></returns>
     public bool UsedInScript() {
@@ -2089,12 +2089,12 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     //            break;
     public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
         if (!_saveContent) {
-            if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
+            if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Ãœbersichtlichktei
             return false;
         }
 
         if (_value_for_Chunk != ChunkType.None) {
-            if (editTypeToCheck == EditTypeFormula.als_Überschrift_anzeigen) { return true; }
+            if (editTypeToCheck == EditTypeFormula.als_Ãœberschrift_anzeigen) { return true; }
             return false;
         }
 
@@ -2110,7 +2110,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             return false;
         }
 
-        if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
+        if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Ãœbersichtlichktei
         if (_multiLine && editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
         if (_editableWithDropdown && editTypeToCheck == EditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
         if (_editableWithDropdown && _showValuesOfOtherCellsInDropdown && editTypeToCheck == EditTypeFormula.SwapListBox) { return true; }
@@ -2125,20 +2125,20 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     internal void Optimize() {
         if (!IsSystemColumn()) {
-            // Maximale Text-Länge beeinflusst stark die Ladezeit vom Server
+            // Maximale Text-LÃ¤nge beeinflusst stark die Ladezeit vom Server
             var l = CalculatePreveredMaxCellLength(1.2f);
             if (l < MaxCellLength) { MaxCellLength = l; }
 
             if (MaxTextLength > MaxCellLength) { MaxTextLength = MaxCellLength; }
 
-            // ScriptType beeinflusst, ob eine Zeile neu durchgerechnet werden muss nach einer Änderung dieser Zelle
+            // ScriptType beeinflusst, ob eine Zeile neu durchgerechnet werden muss nach einer Ã„nderung dieser Zelle
             if (!UsedInScript()) {
                 ScriptType = ScriptType.Nicht_vorhanden;
             }
 
-            //// Beeinflussst stark den Áufbau bei großen Zeilen.
-            //// Aber erst ab 20, da es ansonsten wenige verschiedene Einträge sind, es und es sich nicht reniert.
-            //// Zudem können zu kleine Werte ein Berechnungsfehler sein
+            //// Beeinflussst stark den Ãufbau bei groÃŸen Zeilen.
+            //// Aber erst ab 20, da es ansonsten wenige verschiedene EintrÃ¤ge sind, es und es sich nicht reniert.
+            //// Zudem kÃ¶nnen zu kleine Werte ein Berechnungsfehler sein
             //Invalidate_ContentWidth();
             //if (_contentwidth is int v && v > 20 && FixedColumnWidth == 0) {
             //    FixedColumnWidth = v;
@@ -2147,7 +2147,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     /// <summary>
-    /// Setzt den Wert in die dazugehörige Variable.
+    /// Setzt den Wert in die dazugehÃ¶rige Variable.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="newvalue"></param>
@@ -2426,7 +2426,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             default:
                 if (!string.Equals(type.ToString(), ((int)type).ToString(), StringComparison.Ordinal)) {
-                    return "Interner Fehler: Für den Datentyp '" + type + "' wurde keine Laderegel definiert.";
+                    return "Interner Fehler: FÃ¼r den Datentyp '" + type + "' wurde keine Laderegel definiert.";
                 }
                 break;
         }
@@ -2454,7 +2454,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 }
             }
         }
-        //if (_format == DataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
+        //if (_format == DataFormat.Columns_fÃ¼r_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
     }
 
     private void Dispose(bool disposing) {
@@ -2472,8 +2472,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             _permissionGroupsChangeCell.Clear();
             ColumnTags.Clear();
 
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer Ã¼berschreiben
+            // TODO: GroÃŸe Felder auf NULL setzen
             IsDisposed = true;
         }
     }
@@ -2486,7 +2486,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             _linkedTable = null; // Sofort auf null setzen (fail-fast)
         }
 
-        // Event-Abmeldung außerhalb des Locks um Deadlocks zu vermeiden
+        // Event-Abmeldung auÃŸerhalb des Locks um Deadlocks zu vermeiden
         if (tableToCleanup != null) {
             try {
                 tableToCleanup.Cell.CellValueChanged -= LinkedTable_CellValueChanged;
@@ -2515,8 +2515,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             txt = txt.Replace("\r\n", "\r");
             // 1/2 l Milch
             // 3-5 Stunden
-            // 180°C
-            // Nach Zahlen KEINE leerzeichen einfügen. Es gibt so viele dinge.... 90er Schichtsalat
+            // 180Â°C
+            // Nach Zahlen KEINE leerzeichen einfÃ¼gen. Es gibt so viele dinge.... 90er Schichtsalat
             txt = txt.Insert(" ", ",", "1234567890, \r");
             txt = txt.Insert(" ", "!", " !?)\r");
             txt = txt.Insert(" ", "?", " !?)\r");
@@ -2528,20 +2528,20 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                                                             //txt = txt.Replace(" " + TempH4, TempH4 + " "); // H4 = Normaler Text, nach links rutschen
                                                             //txt = txt.Replace("\r" + TempH4, TempH4 + "\r");
                                                             // Die restlichen Hs'
-                                                            //txt = txt.Replace(TempH3 + " ", " " + TempH3); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempH2 + " ", " " + TempH2); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempH1 + " ", " " + TempH1); // Überschrift, nach Rechts
+                                                            //txt = txt.Replace(TempH3 + " ", " " + TempH3); // Ãœberschrift, nach Rechts
+                                                            //txt = txt.Replace(TempH2 + " ", " " + TempH2); // Ãœberschrift, nach Rechts
+                                                            //txt = txt.Replace(TempH1 + " ", " " + TempH1); // Ãœberschrift, nach Rechts
                                                             //txt = txt.Replace(TempBold + " ", " " + TempBold); // Bold, nach Rechts
-                                                            //txt = txt.Replace(TempH3 + "\r", "\r" + TempH3); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempH2 + "\r", "\r" + TempH2); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempH1 + "\r", "\r" + TempH1); // Überschrift, nach Rechts
+                                                            //txt = txt.Replace(TempH3 + "\r", "\r" + TempH3); // Ãœberschrift, nach Rechts
+                                                            //txt = txt.Replace(TempH2 + "\r", "\r" + TempH2); // Ãœberschrift, nach Rechts
+                                                            //txt = txt.Replace(TempH1 + "\r", "\r" + TempH1); // Ãœberschrift, nach Rechts
                                                             //txt = txt.Replace(TempBold + "\r", "\r" + TempBold); // Bold, nach Rechts
                                                             //txt = txt.Replace(TempBold + TempH4.ToString(), TempH4.ToString());
                                                             //txt = txt.Replace(TempH3 + TempH4.ToString(), TempH4.ToString());
                                                             //txt = txt.Replace(TempH2 + TempH4.ToString(), TempH4.ToString());
                                                             //txt = txt.Replace(TempH1 + TempH4.ToString(), TempH4.ToString());
                                                             //txt = txt.Replace(TempH4 + TempH4.ToString(), TempH4.ToString());
-            txt = txt.Replace(" °", "°");
+            txt = txt.Replace(" Â°", "Â°");
             txt = txt.Replace(" .", ".");
             txt = txt.Replace(" ,", ",");
             txt = txt.Replace(" :", ":");

@@ -104,7 +104,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
     }
 
     public object Clone() {
-        if (NewByParsing<ParseableItem>(ParseableItems().FinishParseable()) is ParseableItem clone) {
+        if (NewByParsing<ParseableItem>(ParseableItems().FinishParseable()) is { } clone) {
             return clone;
         }
         Develop.DebugPrint(ErrorType.Error, "Clonen fehlgeschlagen");

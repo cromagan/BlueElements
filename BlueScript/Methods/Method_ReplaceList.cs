@@ -94,7 +94,7 @@ internal class Method_ReplaceList : Method {
             }
         } while (again);
 
-        return attvar.ValueListStringSet(0, tmpList, ld) is { } dif ? dif : DoItFeedback.Null();
+        return attvar.ValueListStringSet(0, tmpList, ld) ?? DoItFeedback.Null();
     }
 
     #endregion

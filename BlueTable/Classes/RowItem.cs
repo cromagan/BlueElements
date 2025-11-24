@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -87,7 +87,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public Type? Editor { get; set; }
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => true;
-    public string KeyName { get; private set; }
+    public string KeyName { get; }
 
     public string QuickInfo {
         get {
@@ -222,7 +222,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <summary>
     ///
     /// </summary>
-    /// <param name="column"></param>
+    /// <param name="columnName"></param>
     /// <returns>0 bei Fehlern</returns>
     public double CellGetDouble(string columnName) => CellGetDouble(Table?.Column[columnName]);
 
@@ -236,7 +236,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <summary>
     ///
     /// </summary>
-    /// <param name="column"></param>
+    /// <param name="columnName"></param>
     /// <returns>0 bei Fehlern</returns>
     public int CellGetInteger(string columnName) => CellGetInteger(Table?.Column[columnName]);
 
@@ -344,7 +344,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (Table?.Column.SysCorrect is { IsDisposed: false } sc) {
             if (cols.Count == 0 != CellGetBoolean(sc)) {
                 if (string.IsNullOrEmpty(Table.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) {
-                    CellSet(sc, cols.Count == 0, "Fehlerprüfung");
+                    CellSet(sc, cols.Count == 0, "FehlerprÃ¼fung");
                 }
             }
         }
@@ -402,8 +402,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initialwerte der Zellen.
-    /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
+    /// FÃ¼hrt Regeln aus, lÃ¶st Ereignisses, setzt SysCorrect und auch die initialwerte der Zellen.
+    /// Z.b: Runden, GroÃŸschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
     /// </summary>
     /// <param name="scriptname"></param>
     /// <param name="produktivphase"></param>
@@ -424,7 +424,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (!erg.Failed) { return erg; }
 
-            // Mehrere Ausstiegsbedingungen für Robustheit
+            // Mehrere Ausstiegsbedingungen fÃ¼r Robustheit
             if (!erg.GiveItAnotherTry || attempt >= maxAttempts || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) {
                 return erg;
             }
@@ -438,19 +438,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                                                                                                 {
         try {
             if (IsDisposed) {
-                Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Table.KeyName);
+                Develop.DebugPrint(ErrorType.Error, "Zeile ungÃ¼ltig!<br>" + Table.KeyName);
                 return string.Empty;
             }
 
             if (IsDisposed || Table is not { IsDisposed: false }) {
-                Table?.DevelopWarnung("Tabelle ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Tabelle ungültig!");
+                Table?.DevelopWarnung("Tabelle ungÃ¼ltig!");
+                Develop.DebugPrint(ErrorType.Error, "Tabelle ungÃ¼ltig!");
                 return string.Empty;
             }
 
             if (column is not { IsDisposed: false }) {
-                Table?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Spalte ungültig!<br>" + Table?.KeyName);
+                Table?.DevelopWarnung("Spalte ungÃ¼ltig!");
+                Develop.DebugPrint(ErrorType.Error, "Spalte ungÃ¼ltig!<br>" + Table?.KeyName);
                 return string.Empty;
             }
 
@@ -507,11 +507,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (inputColumn?.Table is not { IsDisposed: false } tb) { return (null, null, "Eigene Tabelle verworfen.", false); }
         if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }
         if (inputColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkte Spalte darf keine ChunkValue-Spalte sein.", false); }
-        if (inputColumn.LinkedTable is not { IsDisposed: false } linkedTable) { return (null, null, "Verknüpfte Tabelle verworfen.", false); }
-        if (IsDisposed) { return (null, null, "Keine Zeile zum Finden des Zeilenschlüssels angegeben.", false); }
+        if (inputColumn.LinkedTable is not { IsDisposed: false } linkedTable) { return (null, null, "VerknÃ¼pfte Tabelle verworfen.", false); }
+        if (IsDisposed) { return (null, null, "Keine Zeile zum Finden des ZeilenschlÃ¼ssels angegeben.", false); }
 
         if (linkedTable.Column[inputColumn.ColumnNameOfLinkedTable] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieltabelle nicht vorhanden.", false); }
-        if (targetColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkungen auf Chunk-Spalten nicht möglich.", false); }
+        if (targetColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkungen auf Chunk-Spalten nicht mÃ¶glich.", false); }
 
         var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedTable, inputColumn, this, null);
         if (!string.IsNullOrEmpty(info)) { return (targetColumn, null, info, false); }
@@ -548,7 +548,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         var editableError = Table.GrantWriteAccess(inputColumn, this, chunkValue, 2, true);
 
                         if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
-                        //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
+                        //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verÃ¤ndert
                         //row.CellSet(column, targetRow.KeyName);
                         //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
@@ -610,7 +610,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Gibt true zurück, wenn eine Zeile initialisiert werden muss.
+    /// Gibt true zurÃ¼ck, wenn eine Zeile initialisiert werden muss.
     /// </summary>
     /// <returns></returns>
     public bool NeedsRowInitialization() {
@@ -620,7 +620,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Gibt true zurück, wenn eine Zeile aktualisiert oder initialisiert werden muss.
+    /// Gibt true zurÃ¼ck, wenn eine Zeile aktualisiert oder initialisiert werden muss.
     /// </summary>
     /// <returns></returns>
     public bool NeedsRowUpdate() {
@@ -722,18 +722,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// Lenkt den Wert evtl. auf die verlinkte Zelle um
     /// </summary>
     /// <param name="column"></param>
-    /// <param name="row"></param>
     /// <param name="value"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
     public string Set(ColumnItem? column, string value, string comment) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungÃ¼ltig!"; }
 
         if (!string.IsNullOrEmpty(tb.FreezedReason)) { return "Tabelle eingefroren!"; }
 
-        if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
+        if (column is not { IsDisposed: false }) { return "Spalte ungÃ¼ltig!"; }
 
-        if (tb != Table || tb != column.Table) { return "Tabelle ungültig!"; }
+        if (tb != Table || tb != column.Table) { return "Tabelle ungÃ¼ltig!"; }
 
         if (column.RelationType == RelationType.CellValues) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value));
@@ -764,7 +763,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!string.IsNullOrEmpty(message)) { return message; }
 
-        if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
+        if (value != CellGetStringCore(column)) { return "NachprÃ¼fung fehlgeschlagen"; }
 
         DoSpecialFormats(column, oldValue, value);
 
@@ -803,7 +802,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new ScriptEndedFeedback([], reas);
             }
 
-            CellSet(srs, DateTime.UtcNow, "Erfolgreiche Datenüberprüfung"); // Nicht System set, diese Änderung muss geloggt werden
+            CellSet(srs, DateTime.UtcNow, "Erfolgreiche DatenÃ¼berprÃ¼fung"); // Nicht System set, diese Ã„nderung muss geloggt werden
 
             InvalidateCheckData();
             RowCollection.AddBackgroundWorker(this);
@@ -827,11 +826,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     internal static bool CompareValues(string istValue, string filterValue, FilterType typ) {
-        var comparisonType = typ.HasFlag(FilterType.GroßKleinEgal) ? StringComparison.OrdinalIgnoreCase
+        var comparisonType = typ.HasFlag(FilterType.GroÃŸKleinEgal) ? StringComparison.OrdinalIgnoreCase
                                                                    : StringComparison.Ordinal;
 
-        // Entfernen des GroßKleinEgal-Flags, da es nicht mehr benötigt wird
-        typ &= ~FilterType.GroßKleinEgal;
+        // Entfernen des GroÃŸKleinEgal-Flags, da es nicht mehr benÃ¶tigt wird
+        typ &= ~FilterType.GroÃŸKleinEgal;
 
         switch (typ) {
             case FilterType.Istgleich:
@@ -852,14 +851,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 // Wenn kein Datum, dann als numerischen Wert behandeln
                 if (DoubleTryParse(istValue, out var numericValue)) {
                     if (!DoubleTryParse(rangeParts[0], out var minNumeric) || !DoubleTryParse(rangeParts[1], out var maxNumeric)) {
-                        return false; // Mindestens einer der Werte ist keine gültige Zahl
+                        return false; // Mindestens einer der Werte ist keine gÃ¼ltige Zahl
                     }
                     return numericValue >= minNumeric && numericValue <= maxNumeric;
                 }
 
                 if (DateTimeTryParse(istValue, out var dateValue)) {
                     if (!DateTimeTryParse(rangeParts[0], out var minDate) || !DateTimeTryParse(rangeParts[1], out var maxDate)) {
-                        return false; // Mindestens einer der Bereichswerte ist kein gültiges Datum
+                        return false; // Mindestens einer der Bereichswerte ist kein gÃ¼ltiges Datum
                     }
                     return dateValue >= minDate && dateValue <= maxDate;
                 }
@@ -916,7 +915,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
-        return t.TotalSeconds > 3 && t.TotalMinutes < maxminutes; // 3 Sekunde deswegen, weil machne Routinen gleich die Prüfung machen und ansonsten die Routine reingrätscht
+        return t.TotalSeconds > 3 && t.TotalMinutes < maxminutes; // 3 Sekunde deswegen, weil machne Routinen gleich die PrÃ¼fung machen und ansonsten die Routine reingrÃ¤tscht
     }
 
     internal void Repair() {
@@ -939,7 +938,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// Setzt den Wert ohne Undo Logging
     /// </summary>
     /// <param name="column"></param>
-    /// <param name="row"></param>
     /// <param name="value"></param>
     /// <param name="reason"></param>
     internal string SetValueInternal(ColumnItem column, string value, Reason reason) {
@@ -954,9 +952,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         while (true) {
             tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures
 
-            if (IsDisposed || column.Table is not { IsDisposed: false } db) { return "Tabelle ungültig"; }
+            if (IsDisposed || column.Table is not { IsDisposed: false } db) { return "Tabelle ungÃ¼ltig"; }
 
-            // Timeout-Prüfung ODER tries-Limit - doppelte Sicherheit
+            // Timeout-PrÃ¼fung ODER tries-Limit - doppelte Sicherheit
             if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20 || tries > 100) {
                 return "Timeout: Wert konnte nicht gesetzt werden.";
             }
@@ -1016,7 +1014,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
             }
 
-            if (rows.Count == 1 || rows.Contains(row)) { allRows.AddIfNotExists(rows); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
+            if (rows.Count == 1 || rows.Contains(row)) { allRows.AddIfNotExists(rows); } // Bei mehr als einer verknÃ¼pften Reihe MUSS die die eigene Reihe dabei sein.
         }
         return allRows;
     }
@@ -1090,7 +1088,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
         if (string.IsNullOrEmpty(newValue)) { return completeRelationText; }
-        // Nochmal am Schluss, wenn die Wörter alle lang sind, und die nicht mehr zum ZUg kommen.
+        // Nochmal am Schluss, wenn die WÃ¶rter alle lang sind, und die nicht mehr zum ZUg kommen.
         if (oldValue.Length > newValue.Length) {
             DoReplace(oldValue, keyOfCHangedRow);
             DoReplace(newValue, keyOfCHangedRow);
@@ -1156,8 +1154,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private bool MatchesTo(ColumnItem column, FilterType filtertyp, ReadOnlyCollection<string> searchvalue) {
         //Grundlegendes zu UND und ODER:
-        //Ein Filter kann mehrere Werte haben, diese müssen ein Attribut UND oder ODER haben.
-        //Bei UND müssen alle Werte des Filters im Multiline vorkommen.
+        //Ein Filter kann mehrere Werte haben, diese mÃ¼ssen ein Attribut UND oder ODER haben.
+        //Bei UND mÃ¼ssen alle Werte des Filters im Multiline vorkommen.
         //Bei ODER muss ein Wert des Filters im Multiline vorkommen.
         //Beispiel: UND-Filter mit C & D
         //Wenn die Zelle       A B C D hat, trifft der UND-Filter zwar nicht bei den ersten beiden zu, aber bei den letzten.
@@ -1179,7 +1177,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
             }
             //if (Und && Oder) { Develop.DebugPrint(ErrorType.Error, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
-            // Tatsächlichen String ermitteln --------------------------------------------
+            // TatsÃ¤chlichen String ermitteln --------------------------------------------
             string txt;
 
             if (!column.SaveContent) { CheckRow(); }
@@ -1193,31 +1191,31 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 tmpMultiLine = false;
                 typ ^= FilterType.MultiRowIgnorieren;
             }
-            if (tmpMultiLine && !txt.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandelt werden.
+            if (tmpMultiLine && !txt.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag kÃ¶nnen ohne Multiline behandelt werden.
 
             if (!tmpMultiLine) {
-                var bedingungErfüllt = false;
+                var bedingungErfÃ¼llt = false;
                 foreach (var t in searchvalue) {
-                    bedingungErfüllt = CompareValues(txt, t, typ);
-                    if (oder && bedingungErfüllt) { return true; }
-                    if (und && !bedingungErfüllt) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
+                    bedingungErfÃ¼llt = CompareValues(txt, t, typ);
+                    if (oder && bedingungErfÃ¼llt) { return true; }
+                    if (und && !bedingungErfÃ¼llt) { return false; } // Bei diesem UND hier mÃ¼ssen allezutreffen, deshalb kann getrost bei einem False dieses zurÃ¼ckgegeben werden.
                 }
-                return bedingungErfüllt;
+                return bedingungErfÃ¼llt;
             }
             List<string> vorhandenWerte = [.. txt.SplitAndCutByCr()];
             if (vorhandenWerte.Count == 0) { vorhandenWerte.Add(""); }// Um den Filter, der nach 'Leere' Sucht, zu befriediegen
 
             // Diese Reihenfolge der For Next ist unglaublich wichtig:
-            // Sind wenigere VORHANDEN vorhanden als FilterWerte, dann durchsucht diese Routine zu wenig Einträge,
-            // bevor sie bei einem UND ein False zurückgibt
+            // Sind wenigere VORHANDEN vorhanden als FilterWerte, dann durchsucht diese Routine zu wenig EintrÃ¤ge,
+            // bevor sie bei einem UND ein False zurÃ¼ckgibt
             foreach (var t1 in searchvalue) {
-                var bedingungErfüllt = false;
+                var bedingungErfÃ¼llt = false;
                 foreach (var t in vorhandenWerte) {
-                    bedingungErfüllt = CompareValues(t, t1, typ);
-                    if (oder && bedingungErfüllt) { return true; }// Irgendein vorhandener Value trifft zu!!! Super!!!
-                    if (und && bedingungErfüllt) { break; }// Irgend ein vorhandener Value trifft zu, restliche Prüfung uninteresant
+                    bedingungErfÃ¼llt = CompareValues(t, t1, typ);
+                    if (oder && bedingungErfÃ¼llt) { return true; }// Irgendein vorhandener Value trifft zu!!! Super!!!
+                    if (und && bedingungErfÃ¼llt) { break; }// Irgend ein vorhandener Value trifft zu, restliche PrÃ¼fung uninteresant
                 }
-                if (und && !bedingungErfüllt) // Einzelne UND konnte nicht erfüllt werden...
+                if (und && !bedingungErfÃ¼llt) // Einzelne UND konnte nicht erfÃ¼llt werden...
                 {
                     return false;
                 }
@@ -1245,7 +1243,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
                     t = ChangeTextFromRowId(t);
                     var t2 = t.SplitAndCutByCr().ToList().SortedDistinctList();
-                    thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
+                    thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, NamensÃ¤nderung: " + oldValue + " -> " + newValue);
                 }
                 if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {
                     MakeNewRelations(columnToRepair, thisRowItem, [], t.SplitAndCutByCr().ToList());
@@ -1259,12 +1257,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
         currentString = ChangeTextFromRowId(currentString);
         if (currentString != CellGetString(column)) {
-            Set(column, currentString, "Bezugstextänderung");
+            Set(column, currentString, "BezugstextÃ¤nderung");
             return;
         }
         var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();
         var newBz = new List<string>(currentString.SplitAndCutByCr()).SortedDistinctList();
-        // Zuerst Beziehungen LÖSCHEN
+        // Zuerst Beziehungen LÃ–SCHEN
         foreach (var t in oldBz) {
             if (!newBz.Contains(t)) {
                 var x = ConnectedRowsOfRelations(t, this);
@@ -1274,7 +1272,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         _ = x.Contains(this)
                             ? ex.Remove(t)
                             : ex.Remove(t.ReplaceWord(thisRow.CellFirstString(), CellFirstString(), RegexOptions.IgnoreCase));
-                        thisRow.CellSet(column, ex.SortedDistinctList(), "Bezugstextänderung / Löschung");
+                        thisRow.CellSet(column, ex.SortedDistinctList(), "BezugstextÃ¤nderung / LÃ¶schung");
                     }
                 }
             }

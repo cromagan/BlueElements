@@ -1,4 +1,4 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2025 Christian Peter
@@ -134,9 +134,9 @@ public static class WindowsRemoteControl {
     /// </summary>
     /// <param name="x">X Koordinate der Position als absoluter Pixelwert</param>
     /// <param name="y">Y Koordinate der Position als absoluter Pixelwert</param>
-    /// <returns>Liefert 1 bei Erfolg und 0, wenn der Eingabestream schon blockiert war zurück.</returns>
+    /// <returns>Liefert 1 bei Erfolg und 0, wenn der Eingabestream schon blockiert war zurÃ¼ck.</returns>
     public static uint MoveMouse(int x, int y) {
-        // Bildschirm Auflösung
+        // Bildschirm AuflÃ¶sung
         float screenWidth = Screen.PrimaryScreen.Bounds.Width;
         float screenHeight = Screen.PrimaryScreen.Bounds.Height;
         var input_Move = new Input {
@@ -219,7 +219,7 @@ public static class WindowsRemoteControl {
     }
 
     /// <summary>
-    /// Liest den vollständigen Pfad und den Exe-Dateinamen aus.
+    /// Liest den vollstÃ¤ndigen Pfad und den Exe-Dateinamen aus.
     /// </summary>
     /// <param name="handle"></param>
     /// <returns></returns>
@@ -305,10 +305,10 @@ public static class WindowsRemoteControl {
     /// </summary>
     /// <param name="hWnd">Handle des Fensters, das verschoben werden soll.</param>
     /// <param name="hWndInsertAfter">Eine der HWND Konstanten um die neue Position des Fensters festzulegen</param>
-    /// <param name="x">Wenn eine neue X-Position festgelegt werden soll, in der Regel wird hier jedoch eine NULL übergeben</param>
-    /// <param name="y">Wenn eine neue Y-Position festgelegt werden soll, in der Regel wird hier jedoch eine NULL übergeben</param>
-    /// <param name="cx">Die neue Breite des Fensters, inder Regel wird hier jedoch NULL übergeben</param>
-    /// <param name="cy">Die neue Höhe des Fensters, in der Regel wird hier jedoch NULL übergeben</param>
+    /// <param name="x">Wenn eine neue X-Position festgelegt werden soll, in der Regel wird hier jedoch eine NULL Ã¼bergeben</param>
+    /// <param name="y">Wenn eine neue Y-Position festgelegt werden soll, in der Regel wird hier jedoch eine NULL Ã¼bergeben</param>
+    /// <param name="cx">Die neue Breite des Fensters, inder Regel wird hier jedoch NULL Ã¼bergeben</param>
+    /// <param name="cy">Die neue HÃ¶he des Fensters, in der Regel wird hier jedoch NULL Ã¼bergeben</param>
     /// <param name="wFlags">einen oder mehrere SWP Konstanten</param>
     /// <returns></returns>
     /// <remarks></remarks>
