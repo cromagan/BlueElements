@@ -616,7 +616,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         x.Show();
     }
 
-    private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInDBScripts();
+    private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInTbScripts();
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) {
         if (EditabelErrorMessage(Table.Table)) { return; }

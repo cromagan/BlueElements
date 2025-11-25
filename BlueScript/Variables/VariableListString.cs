@@ -48,7 +48,7 @@ public class VariableListString : Variable {
 
     public VariableListString(IReadOnlyCollection<string>? value) : this(DummyName(), value, true, string.Empty) { }
 
-    public VariableListString(IEnumerable<string> value) : this(value.ToList()) { }
+    public VariableListString(IEnumerable<string> value) : this([.. value]) { }
 
     #endregion
 

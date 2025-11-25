@@ -607,7 +607,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public bool IgnoreAtRowFilter {
-        get => !IsAutofilterPossible() || _ignoreAtRowFilter;
+        get => _ignoreAtRowFilter;
         set {
             if (IsDisposed) { return; }
             if (_ignoreAtRowFilter == value) { return; }
@@ -1077,9 +1077,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public void AddSystemInfo(string type, Table sourcetable, string user) => AddSystemInfo(type, sourcetable.Caption + " -> " + user);
 
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return value; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return value; }
 
-        if (IsSystemColumn() && this != db.Column.SysChapter) { return value; }
+        if (IsSystemColumn() && this != tb.Column.SysChapter) { return value; }
         //if (Function == ColumnFunction.Virtelle_Spalte) { return value; }
 
         if (exitifLinkedFormat && _relationType != RelationType.None) { return value; }
@@ -1125,7 +1125,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return value.CutToUtf8Length(_maxCellLength);
     }
 
-    public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && IsAutofilterPossible();
+    public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled);
 
     public int CalculatePreveredMaxCellLength(double prozentZuschlag) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return 0; }
@@ -1300,8 +1300,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         GC.SuppressFinalize(this);
     }
 
-    public bool DropdownItemsAllowed() => true;
-
     public bool DropdownItemsOfOtherCellsAllowed() {
         if (_relationType == RelationType.DropDownValues) { return false; }
         return true;
@@ -1358,10 +1356,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (!string.IsNullOrEmpty(_columnNameOfLinkedTable)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
         }
 
-        if (!IsAutofilterPossible()) {
-            if (_filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
-            if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
-        }
+        //if (_filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
+        //if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
+
         if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return "Filter Kombination nicht möglich."; }
         if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return "Filter Kombination nicht möglich."; }
         if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return "Filter Kombination nicht möglich."; }
@@ -1485,7 +1482,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
         if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return "'Dropdownmenu alles hinzufügen' bei diesem Format nicht erlaubt."; }
         if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
-        if (_dropDownItems.Count > 0 && !DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
+        //if (_dropDownItems.Count > 0 && !DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
 
         if (_afterEditRound > 5) { return "Beim Runden maximal 5 Nachkommastellen möglich"; }
         if (_filterOptions == FilterOptions.None) {
@@ -1502,10 +1499,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public List<string> GetUcaseNamesSortedByLength() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return []; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return []; }
 
         if (UcaseNamesSortedByLength != null) { return UcaseNamesSortedByLength; }
-        var tmp = Contents(db.Row.ToList());
+        var tmp = Contents([.. tb.Row]);
         tmp.Sort((s1, s2) => s2.Length.CompareTo(s1.Length));
         UcaseNamesSortedByLength = tmp;
         return UcaseNamesSortedByLength;
@@ -1516,8 +1513,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         Invalidate_LinkedTable();
         Table.OnViewChanged();
     }
-
-    public bool IsAutofilterPossible() => true;
 
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
@@ -1736,6 +1731,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                     ForeColor = Color.FromArgb(0, 0, 128);
                     BackColor = Color.FromArgb(185, 186, 255);
                 }
+
                 break;
 
             case "SYS_CHANGER":
@@ -2024,16 +2020,16 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     public QuickImage? SymbolForReadableText() {
         if (IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return QuickImage.Get(ImageCode.Warnung); }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return QuickImage.Get(ImageCode.Warnung); }
 
-        if (this == db.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
-        if (this == db.Column.SysRowCreator) { return QuickImage.Get(ImageCode.Person); }
-        if (this == db.Column.SysRowCreateDate) { return QuickImage.Get(ImageCode.Uhr); }
-        if (this == db.Column.SysRowChangeDate) { return QuickImage.Get(ImageCode.Uhr); }
+        if (this == tb.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
+        if (this == tb.Column.SysRowCreator) { return QuickImage.Get(ImageCode.Person); }
+        if (this == tb.Column.SysRowCreateDate) { return QuickImage.Get(ImageCode.Uhr); }
+        if (this == tb.Column.SysRowChangeDate) { return QuickImage.Get(ImageCode.Uhr); }
 
-        if (this == db.Column.SysLocked) { return QuickImage.Get(ImageCode.Schloss); }
+        if (this == tb.Column.SysLocked) { return QuickImage.Get(ImageCode.Schloss); }
 
-        if (this == db.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
+        if (this == tb.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
 
         if (_isFirst) { return QuickImage.Get(ImageCode.Stern, 16); }
         if (_isKeyColumn) { return QuickImage.Get(ImageCode.Schlüssel, 16); }

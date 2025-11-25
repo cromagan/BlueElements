@@ -81,14 +81,15 @@ public abstract class ParseableItem : IParseable, ICloneable {
     /// null ist, wird der Konstruktor aufgerufen, der keine Parameter akzeptiert, d.   h. der Standardkonstruktor.
     ///</param>
     /// <returns></returns>
-    public static T? NewByTypeName<T>(string typname, params object[] args) where T : ParseableItem {
+    public static T? NewByTypeName<T>(string? typname, params object[] args) where T : ParseableItem {
+          if(string.IsNullOrEmpty(typname)){return  null;}
         var types = Generic.GetEnumerableOfType<T>();
 
-        if (types.Count == 0) { return default; }
+        if (types.Count == 0) { return null; }
 
         if (string.IsNullOrEmpty(typname)) {
             Develop.DebugPrint(ErrorType.Error, "Typ unbekannt: " + typname);
-            return default;
+            return null;
         }
 
         foreach (var thist in types) {
@@ -100,7 +101,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
                 }
             }
         }
-        return default;
+        return null;
     }
 
     public object Clone() {

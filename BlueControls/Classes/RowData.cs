@@ -77,7 +77,8 @@ public sealed class RowData : IComparable, IDisposableExtended {
         Row = row;
         PinStateSortAddition = "2";
         Y = -1;
-        RowChapter = chapter;
+        RowChapter = string.Empty;
+        if (!string.IsNullOrEmpty(chapter)) { RowChapter = chapter.Trim('\\') + '\\'; }
         Expanded = true;
         DrawHeight = 18;
         CaptionPos = Rectangle.Empty;
@@ -123,7 +124,9 @@ public sealed class RowData : IComparable, IDisposableExtended {
         DrawHeight = Math.Max(DrawHeight, 18);
     }
 
-    public string CompareKey() => PinStateSortAddition + ";" + RowChapter + ";" + AdditionalSort;
+    public string CompareKey() => PinStateSortAddition + ";" + AdditionalSort + ";" + RowChapter;
+
+    //public string CompareKey() => PinStateSortAddition + ";" + RowChapter + ";" + AdditionalSort;
 
     public int CompareTo(object obj) {
         if (obj is RowData robj) {

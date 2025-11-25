@@ -491,7 +491,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         _column.CaptionGroup2 = txbUeberschift2.Text;
         _column.CaptionGroup3 = txbUeberschift3.Text;
         _column.CaptionBitmapCode = txbSpaltenbild.Text;
-        _column.ColumnTags = txbTags.Text.SplitAndCutByCr().ToList();
+        _column.ColumnTags = [.. txbTags.Text.SplitAndCutByCr()];
         _column.RegexCheck = txbRegex.Text;
         _column.EditableWithTextInput = btnEditableStandard.Checked;
         _column.EditableWithDropdown = btnEditableDropdown.Checked;
@@ -522,7 +522,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         _column.Repair();
 
-        cbxRenderer.Text = string.Empty;
+        //cbxRenderer.Text = string.Empty;
     }
 
     private void GeneratFilterListe() {
@@ -530,16 +530,16 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         _column.LinkedTableTableName = cbxLinkedTable.Text;
 
-        var linkdb = _column.LinkedTable;
+        var linkedTb = _column.LinkedTable;
 
-        if (linkdb == null || tblFilterliste.Table != null) { tblFilterliste.TableSet(null, string.Empty); }
+        if (linkedTb == null || tblFilterliste.Table != null) { tblFilterliste.TableSet(null, string.Empty); }
 
         if (tblFilterliste.Table != null &&
-            !string.Equals(tblFilterliste.Table.Tags.TagGet("Filename").FileNameWithoutSuffix(), linkdb?.KeyName, StringComparison.OrdinalIgnoreCase)) {
+            !string.Equals(tblFilterliste.Table.Tags.TagGet("Filename").FileNameWithoutSuffix(), linkedTb?.KeyName, StringComparison.OrdinalIgnoreCase)) {
             tblFilterliste.TableSet(null, string.Empty);
         }
 
-        if (linkdb == null) { return; }
+        if (linkedTb == null) { return; }
 
         if (tblFilterliste.Table == null) {
             var tb = Table.Get();
@@ -593,24 +593,24 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             //tblFilterliste.Arrangement = 1;
 
             var t = tb.Tags.Clone();
-            t.TagSet("Filename", linkdb.KeyName);
+            t.TagSet("Filename", linkedTb.KeyName);
             tb.Tags = t.AsReadOnly();
 
             tblFilterliste?.Filter.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
         }
 
-        linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
+        linkedTb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
 
-        var spalteauDb = linkdb.Column[cbxTargetColumn.Text];
+        var columnFromLinkedTb = linkedTb.Column[cbxTargetColumn.Text];
 
-        foreach (var col in linkdb.Column) {
+        foreach (var col in linkedTb.Column) {
             var r = tblFilterliste?.Table?.Row[col.KeyName] ?? tblFilterliste?.Table?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
 
             if (r != null) {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
                 r.CellSet("SpalteName", col.KeyName, string.Empty);
 
-                if (col.IsAutofilterPossible() && col != spalteauDb && col.RelationType == RelationType.None && !col.IsSystemColumn()) {
+                if (col != columnFromLinkedTb && col.RelationType == RelationType.None && !col.IsSystemColumn()) {
                     r.CellSet("visible", true, string.Empty);
                 } else {
                     r.CellSet("visible", false, string.Empty);

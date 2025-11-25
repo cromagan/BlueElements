@@ -23,6 +23,17 @@ using System.Collections.ObjectModel;
 using static BlueBasics.IO;
 
 namespace BlueBasics;
+/*  [1]
+ *  [2]
+ *   3  löschen, wenn 4 vorhanden
+ *  [4]
+ *   5  löschen, wenn 6, 7 oder 8 vorhanden
+ *   6  löschen, wenn 7 oder 8 vorhanden
+ *   7  löschen, wenn 8 vorhanden
+ *  [8]
+ *   9
+ *   ...
+ */
 
 public class BackupVerwalter {
 
@@ -67,10 +78,10 @@ public class BackupVerwalter {
     }
 
     /// <summary>
-    /// Macht eine Reinigung des Verzeichnisses -a usschlaggebend ist LastWriteTimeUtc
+    /// Macht eine Reinigung des Verzeichnisses -ausschlaggebend ist LastWriteTimeUtc
     /// </summary>
     /// <param name="path">Das Verzeichnis, das bereinigt werden soll</param>
-    /// <param name="search">Der Dateipattern, nach dem gesucht werden soll z.b. table_20*.bdb</param>
+    /// <param name="search">Der Dateipattern, nach dem gesucht werden soll z. B. table_20*.bdb</param>
     /// <returns></returns>
     public string CleanUpDirectory(string path, string search) {
         if (string.IsNullOrEmpty(path)) { return "Kein Verzeichnis angebeben."; }
@@ -141,16 +152,4 @@ public class BackupVerwalter {
     }
 
     #endregion
-
-    /*  [1]
-     *  [2]
-     *   3  löschen, wenn 4 vorhanden
-     *  [4]
-     *   5  löschen, wenn 6, 7 oder 8 vorhanden
-     *   6  löschen, wenn 7 oder 8 vorhanden
-     *   7  löschen, wenn 8 vorhanden
-     *  [8]
-     *   9
-     *   ...
-     */
 }

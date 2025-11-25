@@ -47,7 +47,7 @@ public class VariableListRow : Variable {
 
     public VariableListRow(IReadOnlyCollection<RowItem>? value) : this(DummyName(), value, true, string.Empty) { }
 
-    public VariableListRow(IEnumerable<RowItem> value) : this(value.ToList()) { }
+    public VariableListRow(IEnumerable<RowItem> value) : this([.. value]) { }
 
     #endregion
 

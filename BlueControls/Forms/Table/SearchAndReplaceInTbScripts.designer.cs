@@ -8,17 +8,17 @@ using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs {
-    internal sealed partial class SearchAndReplaceInDBScripts {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+    internal sealed partial class SearchAndReplaceInTbScripts {
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.btnErsetzen = new BlueControls.Controls.Button();
@@ -132,7 +132,7 @@ namespace BlueControls.BlueTableDialogs {
             this.capSonderzeichen.Size = new System.Drawing.Size(128, 32);
             this.capSonderzeichen.Text = "\\r = Zeilenumbruch<br>\\t = Tabulator";
             // 
-            // SearchAndReplaceInDBScripts
+            // SearchAndReplaceInTbScripts
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -141,7 +141,7 @@ namespace BlueControls.BlueTableDialogs {
             this.Controls.Add(this.grpErsetzen);
             this.Controls.Add(this.grpSuche);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "SearchAndReplaceInDBScripts";
+            this.Name = "SearchAndReplaceInTbScripts";
             this.ShowInTaskbar = false;
             this.Text = "Suchen und Ersetzen in allen Tabelle Skripten";
             this.TopMost = true;

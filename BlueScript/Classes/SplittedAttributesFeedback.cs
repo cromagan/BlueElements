@@ -91,7 +91,7 @@ public readonly struct SplittedAttributesFeedback {
     }
 
     public DateTime? ValueDateGet(int varno) {
-        if (varno < 0 || varno >= Attributes.Count) { return default; }
+        if (varno < 0 || varno >= Attributes.Count) { return null; }
 
         if (Attributes[varno] is VariableString vs) {
             if (DateTimeTryParse(vs.ValueString, out var d)) { return d; }

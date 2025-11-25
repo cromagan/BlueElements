@@ -66,14 +66,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     #region Fields
 
-    public static string CellDataFormat = "BlueElements.CellLink";
-    public readonly FilterCollection Filter = new("DefaultTableFilter");
-    public readonly FilterCollection FilterCombined = new("TableFilterCombined");
+    public const string CellDataFormat = "BlueElements.CellLink";
+    public FilterCollection Filter { get; } = new("DefaultTableFilter");
+    public FilterCollection FilterCombined { get; } = new("TableFilterCombined");
 
     /// <summary>
     ///  Abstand zwischen den Zeilen
     /// </summary>
-    private const int rowSpacing = 4;
+    private const int RowSpacing = 4;
 
     private readonly List<string> _collapsed = [];
     private readonly object _lockUserAction = new();
@@ -102,7 +102,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private Progressbar? _pg;
     private List<RowData>? _rowsFilteredAndPinned;
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
-    private SearchAndReplaceInDBScripts? _searchAndReplaceInDBScripts;
+    private SearchAndReplaceInTbScripts? _searchAndReplaceInTbScripts;
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
     private DateTime? _tableDrawError;
@@ -365,7 +365,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         get {
             if (FilterleisteZeilen < 1) { return 0; }
 
-            return (btnAlleFilterAus.Top * 2) + (FilterleisteZeilen * btnAlleFilterAus.Height) + ((FilterleisteZeilen - 1) * rowSpacing);
+            return (btnAlleFilterAus.Top * 2) + (FilterleisteZeilen * btnAlleFilterAus.Height) + ((FilterleisteZeilen - 1) * RowSpacing);
         }
     }
 
@@ -373,14 +373,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     #region Methods
 
-    public static (List<RowData> rows, long visiblerowcount) CalculateSortedRows(Table tb, IEnumerable<RowItem> filteredRows, IEnumerable<RowItem>? pinnedRows, RowSortDefinition? sortused) {
+    public static (List<RowData> rows, long visiblerowcount) CalculateSortedRows(Table tb, ICollection<RowItem> filteredRows, ICollection<RowItem> pinnedRows, RowSortDefinition? sortused) {
         if (tb.IsDisposed) { return ([], 0); }
 
         var vrc = 0;
 
         #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
 
-        var capName = pinnedRows?.Any() == true;
+        var capName = pinnedRows.Count > 0;
         if (!capName && tb.Column.SysChapter is { IsDisposed: false } cap) {
             foreach (var thisRow in filteredRows) {
                 if (thisRow.Table != null && !string.IsNullOrEmpty(thisRow.CellGetString(cap))) {
@@ -408,20 +408,18 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         List<RowData> pinnedData = [];
 
-        if (pinnedRows != null) {
-            Parallel.ForEach(pinnedRows, thisRow => {
-                var rd = new RowData(thisRow, "Angepinnt") {
-                    PinStateSortAddition = "1",
-                    MarkYellow = true,
-                    AdditionalSort = thisRow.CompareKey(colsToRefresh)
-                };
+        Parallel.ForEach(pinnedRows, thisRow => {
+            var rd = new RowData(thisRow, "Angepinnt") {
+                PinStateSortAddition = "1",
+                MarkYellow = true,
+                AdditionalSort = thisRow.CompareKey(colsToRefresh)
+            };
 
-                lock (lockMe) {
-                    vrc++;
-                    pinnedData.Add(rd);
-                }
-            });
-        }
+            lock (lockMe) {
+                vrc++;
+                pinnedData.Add(rd);
+            }
+        });
 
         #endregion
 
@@ -431,7 +429,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Parallel.ForEach(filteredRows, thisRow => {
             var adk = thisRow.CompareKey(colsToRefresh);
 
-            var markYellow = pinnedRows?.Contains(thisRow) == true;
+            var markYellow = pinnedRows.Contains(thisRow);
             var added = markYellow;
 
             var caps = tb.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
@@ -605,10 +603,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         foreach (var thisRow in sortedRows) {
             if (thisRow is { IsDisposed: false }) {
                 for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
-                    if (columnListtmp[colNr] != null) {
-                        var tmp = thisRow.CellGetString(columnListtmp[colNr]);
+                    if (columnListtmp[colNr] is { } columnItem) {
+                        var tmp = thisRow.CellGetString(columnItem);
 
-                        if (columnListtmp[colNr].TextFormatingAllowed) {
+                        if (columnItem.TextFormatingAllowed) {
                             using var t = new ExtText() { HtmlText = tmp };
                             tmp = t.PlainText;
                         }
@@ -702,7 +700,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     public static Renderer_Abstract RendererOf(ColumnItem? column, string style) {
         if (string.IsNullOrEmpty(column?.DefaultRenderer)) { return Renderer_Abstract.Default; }
 
-        var renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(column.DefaultRenderer);
+        var renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(column?.DefaultRenderer);
         if (renderer == null) { return Renderer_Abstract.Default; }
 
         if (!renderer.Parse(column.RendererSettings)) { return Renderer_Abstract.Default; }
@@ -712,7 +710,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     public static void SearchNextText(string searchTxt, TableView tableView, ColumnViewItem? column, RowData? row, out ColumnViewItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
-        if (tableView.Table is not { IsDisposed: false } db) {
+        if (tableView.Table is not { IsDisposed: false } tb) {
             MessageBox.Show("Tabellen-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
@@ -744,7 +742,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
             if (column is not { }) {
                 column = ca.First();
-                if (rowsChecked > db.Row.Count() + 1) {
+                if (rowsChecked > tb.Row.Count + 1) {
                     foundColumn = null;
                     foundRow = null;
                     return;
@@ -1091,7 +1089,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             #region Zelle
 
             if (_mouseOverColumn?.Column is { IsDisposed: false } column2 && _mouseOverRow?.Row is { IsDisposed: false } row2) {
-                var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column2, row2, row2?.ChunkValue));
+                var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column2, row2, row2.ChunkValue));
 
                 e.ContextMenu.Add(ItemOf("Zelle", true));
                 e.ContextMenu.Add(ItemOf("Inhalt kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, new { Column = column2, Row = row2 }, column2.CanBeChangedByRules()));
@@ -1115,7 +1113,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 e.ContextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, column3, tb.IsAdministrator()));
 
                 if (_mouseOverRow?.Row is { IsDisposed: false } row3) {
-                    var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column3, row3, row3?.ChunkValue));
+                    var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column3, row3, row3.ChunkValue));
                     e.ContextMenu.Add(ItemOf("Voting", ImageCode.Herz, ContextMenu_Voting, column3, tb.IsAdministrator() && editable && column3.CanBeChangedByRules()));
                 }
             }
@@ -1228,12 +1226,12 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    public void OpenSearchAndReplaceInDBScripts() {
+    public void OpenSearchAndReplaceInTbScripts() {
         if (!IsAdministrator()) { return; }
 
-        if (_searchAndReplaceInDBScripts is not { IsDisposed: false } || !_searchAndReplaceInDBScripts.Visible) {
-            _searchAndReplaceInDBScripts = new SearchAndReplaceInDBScripts();
-            _searchAndReplaceInDBScripts.Show();
+        if (_searchAndReplaceInTbScripts is not { IsDisposed: false } || !_searchAndReplaceInTbScripts.Visible) {
+            _searchAndReplaceInTbScripts = new SearchAndReplaceInTbScripts();
+            _searchAndReplaceInTbScripts.Show();
         }
     }
 
@@ -1299,11 +1297,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             var expanded = true;
             var lastCap = string.Empty;
 
-            if (IsDisposed || Table is not { IsDisposed: false } db) {
+            if (IsDisposed || Table is not { IsDisposed: false } tb) {
                 VisibleRowCount = 0;
                 _rowsFilteredAndPinned = [];
             } else {
-                (var sortedRowDataNew, VisibleRowCount) = CalculateSortedRows(db, RowsFiltered, PinnedRows, SortUsed());
+                (var sortedRowDataNew, VisibleRowCount) = CalculateSortedRows(tb, RowsFiltered, PinnedRows, SortUsed());
 
                 var sortedRowDataTmp = new List<RowData>();
 
@@ -1326,7 +1324,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                     if (thisRow.RowChapter != lastCap) {
                         thisRowData.Y += ca.RowChapterHeight;
-                        expanded = !_collapsed.Contains(thisRowData.RowChapter);
+                        expanded = !_collapsed.Any(thisRowData.RowChapter.StartsWith);
                         maxY += ca.RowChapterHeight;
                         thisRowData.ShowCap = true;
                         lastCap = thisRow.RowChapter;
@@ -1393,8 +1391,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return [.. l];
     }
 
-    public void TableSet(Table? db, string viewCode) {
-        if (Table == db && string.IsNullOrEmpty(viewCode)) { return; }
+    public void TableSet(Table? tb, string viewCode) {
+        if (Table == tb && string.IsNullOrEmpty(viewCode)) { return; }
 
         CloseAllComponents();
 
@@ -1418,11 +1416,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
-        Table = db;
+        Table = tb;
         Invalidate_CurrentArrangement();
         Invalidate_SortedRowData();
-        Filter.Table = db;
-        FilterCombined.Table = db;
+        Filter.Table = tb;
+        FilterCombined.Table = tb;
 
         _tableDrawError = null;
         //InitializeSkin(); // Neue Schriftgrößen
@@ -1631,7 +1629,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             #endregion
 
             var currentRow = 1; // Die erste Zeile ist bereits belegt mit den Hauptsteuerelementen
-            var count = 0;
+                                // var count = 0;
             var itemsInCurrentRow = 0;
 
             foreach (var thisColumn in columSort) {
@@ -1671,7 +1669,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         // Prüfen, ob wir in eine neue Zeile wechseln müssen
                         if (leftpos + constwi > Width && itemsInCurrentRow > 0) {
                             leftpos = beginnx;
-                            toppos = btnAlleFilterAus.Top + (currentRow * (consthe + rowSpacing));
+                            toppos = btnAlleFilterAus.Top + (currentRow * (consthe + RowSpacing));
                             currentRow++;
                             itemsInCurrentRow = 0;
 
@@ -1688,7 +1686,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         flx.Height = consthe;
                         flx.Anchor = anchor;
                         leftpos += right;
-                        count++;
                         itemsInCurrentRow++;
                     }
                 }
@@ -1726,6 +1723,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
                 FilterCombined.RowsChanged -= FilterCombined_RowsChanged;
                 TableSet(null, string.Empty); // Wichtig (nicht _Table) um Events zu lösen
+                _ähnliche?.Dispose();
+                _pg?.Dispose();
+                _searchAndReplaceInCells?.Dispose();
+                _searchAndReplaceInTbScripts?.Dispose();
             }
         } finally {
             base.Dispose(disposing);
@@ -1806,7 +1807,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var lastVisibleRow = -1;
 
         foreach (var thisRow in sortedRowData) {
-            if (thisRow?.Row is { IsDisposed: false } r) {
+            if (thisRow?.Row is { IsDisposed: false }) {
                 if (IsOnScreen(ca, thisRow, displayRectangleWoSlider)) {
                     var T = sortedRowData.IndexOf(thisRow);
                     firstVisibleRow = Math.Min(T, firstVisibleRow);
@@ -1970,7 +1971,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (CursorPosColumn?.Column is not { IsDisposed: false } c) { return; }
-        if (CursorPosRow?.Row is not { IsDisposed: false } r) { return; }
+        if (CursorPosRow?.Row is not { IsDisposed: false }) { return; }
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
@@ -1982,7 +1983,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
             //_table.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
-            var chunkval = r.ChunkValue;
+            // var chunkval = r.ChunkValue;
 
             switch (e.KeyCode) {
                 //case Keys.Oemcomma: // normales ,
@@ -2067,7 +2068,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                     break;
 
                 case Keys.F2:
-                    Cell_Edit(ca, CursorPosColumn, CursorPosRow, true, CursorPosRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
+                    Cell_Edit(ca, CursorPosColumn, CursorPosRow, true, CursorPosRow?.Row.ChunkValue ?? FilterCombined.ChunkVal);
                     break;
 
                 case Keys.V:
@@ -2301,8 +2302,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (cellInThisTableRow == null) {
             if (string.IsNullOrEmpty(newValue)) { return string.Empty; }
-            if (cellInThisTableColumn.Column?.Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
-            if (table?.Table?.Column.First is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
+            if (cellInThisTableColumn.Column?.Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
+            if (table.Table?.Column.First is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
 
             using var filterColNewRow = new FilterCollection(table.Table, "Edit-Filter");
             filterColNewRow.AddIfNotExists([.. table.FilterCombined]);
@@ -2312,7 +2313,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             var fe = table.GrantWriteAccess(cellInThisTableColumn, null, newChunkVal);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
-            var (newrow, message, _) = db.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
+            var (newrow, message, _) = tb.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
 
             if (!string.IsNullOrEmpty(message)) { return message; }
 
@@ -2566,7 +2567,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (columnviewitem.Column == null) { return; }
         if (!ca.ShowHead) { return; }
         if (!columnviewitem.AutoFilterSymbolPossible) { return; }
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
         if (!FilterInputChangedHandled) { HandleChangesNow(); }
 
@@ -2826,7 +2827,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r, cell));
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
-            if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(ca, viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal); } else {
+            if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(ca, viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row.ChunkValue ?? FilterCombined.ChunkVal); } else {
                 NotEditableInfo("Keine Items zum Auswählen vorhanden.");
             }
             return;
@@ -2835,7 +2836,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (contentHolderCellColumn.EditableWithTextInput) {
             if (t.Count == 0 && string.IsNullOrWhiteSpace(cellInThisTableRow?.Row.CellGetString(viewItem.Column))) {
                 // Bei nur einem Wert, wenn Texteingabe erlaubt, Dropdown öffnen
-                Cell_Edit(ca, viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
+                Cell_Edit(ca, viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row.ChunkValue ?? FilterCombined.ChunkVal);
                 return;
             }
             var erw = ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1");
@@ -3068,7 +3069,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void ContextMenu_KeyCopy(object sender, ObjectEventArgs e) {
         if (e.Data is not RowItem row) { return; }
-        CopytoClipboard(row?.KeyName ?? string.Empty);
+        CopytoClipboard(row.KeyName);
         Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
     }
 
@@ -3377,11 +3378,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 // Überschrift in der ersten Spalte zeichnen
                 cellInThisTableRowData.CaptionPos = Rectangle.Empty;
                 if (cellInThisTableRowData.ShowCap) {
-                    var si = chpF.MeasureString(cellInThisTableRowData.RowChapter);
+                    var tmp = cellInThisTableRowData.RowChapter.Trim('\\');
+
+                    var si = chpF.MeasureString(tmp);
                     gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), 1, DrawY(ca, cellInThisTableRowData) - prc, displayRectangleWoSlider.Width - 2, prc);
                     cellInThisTableRowData.CaptionPos = new Rectangle(1, DrawY(ca, cellInThisTableRowData) - prc, (int)si.Width + p28, (int)si.Height);
 
-                    if (_collapsed.Contains(cellInThisTableRowData.RowChapter)) {
+                    if (_collapsed.Any(cellInThisTableRowData.RowChapter.StartsWith)) {
                         var x = new ExtText(Design.Button_CheckBox, States.Checked);
                         Button.DrawButton(this, gr, Design.Button_CheckBox, States.Checked, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, cellInThisTableRowData.CaptionPos, false);
                         gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, DrawY(ca, cellInThisTableRowData) - prc + p6);
@@ -3390,7 +3393,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         Button.DrawButton(this, gr, Design.Button_CheckBox, States.Standard, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, cellInThisTableRowData.CaptionPos, false);
                         gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, DrawY(ca, cellInThisTableRowData) - prc + p6);
                     }
-                    chpF.DrawString(gr, cellInThisTableRowData.RowChapter, p23, DrawY(ca, cellInThisTableRowData) - prc);
+                    chpF.DrawString(gr, tmp, p23, DrawY(ca, cellInThisTableRowData) - prc);
                     gr.DrawLine(Skin.PenLinieDick, 0, DrawY(ca, cellInThisTableRowData), displayRectangleWoSlider.Width, DrawY(ca, cellInThisTableRowData));
                 }
             }
@@ -3547,8 +3550,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         #region Sortierrichtung Zeichnen
 
-        var tmpSortDefinition = SortUsed();
-        if (tmpSortDefinition != null && (tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Table?.Column.SysChapter)) {
+        if (SortUsed() is { } tmpSortDefinition && tmpSortDefinition.UsedForRowSort(viewItem.Column)) {
             gr.DrawImage(tmpSortDefinition.Reverse ? QuickImage.Get("ZA|" + p11 + "|" + p5 + "||||50") : QuickImage.Get("AZ|" + p11 + "|" + p5 + "||||50"),
                 (float)(realHead.X + (realHead.Width / 2.0) - p6),
                 realHead.Bottom - p6 - paf);
@@ -3780,7 +3782,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var toAdd = e.Item.KeyName;
         var toRemove = string.Empty;
         if (toAdd == "#Erweitert") {
-            Cell_Edit(ca, ck.ColumnView, ck.RowData, false, ck.RowData?.Row?.ChunkValue ?? FilterCombined.ChunkVal);
+            Cell_Edit(ca, ck.ColumnView, ck.RowData, false, ck.RowData?.Row.ChunkValue ?? FilterCombined.ChunkVal);
             return;
         }
         if (ck.RowData?.Row is not { IsDisposed: false } r) {
@@ -4037,7 +4039,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private void ParseView(string toParse) {
         ResetView();
 
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
             foreach (var pair in x) {
@@ -4071,7 +4073,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                         break;
 
                     case "cursorpos":
-                        db.Cell.DataOfCellKey(pair.Value.FromNonCritical(), out var column, out var row);
+                        tb.Cell.DataOfCellKey(pair.Value.FromNonCritical(), out var column, out var row);
                         CursorPos_Set(CurrentArrangement?[column], RowsFilteredAndPinned().Get(row), false);
                         break;
 
@@ -4081,14 +4083,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                     case "pin":
                         foreach (var thisk in pair.Value.FromNonCritical().SplitBy("|")) {
-                            var r = db.Row.GetByKey(thisk);
+                            var r = tb.Row.GetByKey(thisk);
                             if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
                         }
 
                         break;
 
                     case "collapsed":
-                        _collapsed.AddRange(pair.Value.FromNonCritical().SplitBy("|"));
+                        _collapsed.AddRange(pair.Value.FromNonCritical().SplitAndCutBy("|"));
                         break;
 
                     case "reduced":
@@ -4313,7 +4315,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (tb.Column.First is not { IsDisposed: false } fc) { return "Erste Spalte nicht definiert"; }
 
-        if (CurrentArrangement?[fc] is not { IsDisposed: false } fcv) { return "Erste Spalte nicht sichtbar"; }
+        if (CurrentArrangement?[fc] is not { IsDisposed: false }) { return "Erste Spalte nicht sichtbar"; }
 
         string? chunkValue = null;
 

@@ -29,7 +29,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.BlueTableDialogs;
 
-internal sealed partial class SearchAndReplaceInDBScripts : Form {
+internal sealed partial class SearchAndReplaceInTbScripts : Form {
 
     #region Fields
 
@@ -39,13 +39,13 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
 
     #region Constructors
 
-    public SearchAndReplaceInDBScripts() =>
-        // Dieser Aufruf ist für den Designer erforderlich.
+    public SearchAndReplaceInTbScripts() =>
+        // Dieser Aufruf ist fÃ¼r den Designer erforderlich.
         InitializeComponent();
 
     #endregion
 
-    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.//_table = table;//_table.SelectedCellChanged += SelectedCellChanged;//SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
+    // FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.//_table = table;//_table.SelectedCellChanged += SelectedCellChanged;//SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
 
     #region Methods
 
@@ -59,7 +59,7 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
 
         foreach (var thisTb in Table.AllFiles) {
             if (thisTb is { IsDisposed: false } tb && tb.IsEditable(false)) {
-                foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
+                foreach (var script in tb.EventScript.ToList()) { // ToList() fÃ¼r sichere Iteration
                     var newScriptContent = script.Script.Replace(txbAlt.Text, txbNeu.Text);
                     if (newScriptContent != script.Script) {
                         count++;
@@ -82,15 +82,15 @@ internal sealed partial class SearchAndReplaceInDBScripts : Form {
         foreach (var thisTb in Table.AllFiles) {
             if (thisTb is { IsDisposed: false } db) {
                 foreach (var thiss in db.EventScript) {
-                    // Prüfen, ob der Suchtext im Skript vorkommt
+                    // PrÃ¼fen, ob der Suchtext im Skript vorkommt
                     if (thiss.Script.Contains(txbAlt.Text)) {
-                        // Tabellename -> Skriptname zur Liste hinzufügen
+                        // Tabellename -> Skriptname zur Liste hinzufÃ¼gen
                         txt.Add(string.Empty);
                         txt.Add(string.Empty);
                         txt.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                         txt.Add($"{db.Caption} -> {thiss.KeyName}");
 
-                        // Alle Zeilen durchgehen und die mit dem Suchtext zur Liste hinzufügen
+                        // Alle Zeilen durchgehen und die mit dem Suchtext zur Liste hinzufÃ¼gen
                         var lines = thiss.Script.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
                         foreach (var line in lines) {
                             if (line.Contains(txbAlt.Text)) {

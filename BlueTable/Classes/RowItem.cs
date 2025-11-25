@@ -39,7 +39,7 @@ using static BlueTable.Table;
 
 namespace BlueTable;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IComparable, IEditable {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable {
 
     #region Fields
 
@@ -156,7 +156,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new VariableBool(varname, value.FromPlusMinus(), readOnly, coment);
 
             case ScriptType.List:
-                return new VariableListString(varname, value.SplitAndCutByCr().ToList(), readOnly, coment);
+                return new VariableListString(varname, [.. value.SplitAndCutByCr()], readOnly, coment);
 
             case ScriptType.Numeral:
                 return new VariableDouble(varname, DoubleParse(value), readOnly, coment);
@@ -174,7 +174,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return new VariableBool(varname, value.FromPlusMinus(), true, coment);
 
             case ScriptType.List_Readonly:
-                return new VariableListString(varname, value.SplitAndCutByCr().ToList(), true, coment);
+                return new VariableListString(varname, [.. value.SplitAndCutByCr()], true, coment);
 
             case ScriptType.Nicht_vorhanden:
                 return null;
@@ -254,7 +254,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return [.. CellGetString(column).SplitAndCutBy("<br>")];
         }
 
-        return CellGetString(column).SplitAndCutByCr().ToList();
+        return [.. CellGetString(column).SplitAndCutByCr()];
     }
 
     public List<string> CellGetList(string columnName) => CellGetList(Table?.Column[columnName]);
@@ -357,35 +357,35 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public string CompareKey(List<ColumnItem> columns) {
-        StringBuilder r = new();
+        var key = new StringBuilder();
 
-        foreach (var t in columns) {
-            r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
+        foreach (var thisColumn in columns) {
+            key.Append(CellGetCompareKey(thisColumn) + Constants.FirstSortChar);
         }
 
-        r.Append(Constants.SecondSortChar + KeyName);
-        return r.ToString();
+        key.Append(Constants.SecondSortChar + KeyName);
+        return key.ToString();
     }
 
     public string CompareKey() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return string.Empty; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
 
-        var colsToRefresh = new List<ColumnItem>();
-        if (db.SortDefinition?.Columns is { } lc) { colsToRefresh.AddRange(lc); }
-        if (db.Column.SysChapter is { IsDisposed: false } csc) { colsToRefresh.AddIfNotExists(csc); }
-        if (db.Column.First is { IsDisposed: false } cf) { colsToRefresh.AddIfNotExists(cf); }
+        var columns = new List<ColumnItem>();
+        if (tb.SortDefinition?.Columns is { } lc) { columns.AddRange(lc); }
+        if (tb.Column.SysChapter is { IsDisposed: false } csc) { columns.AddIfNotExists(csc); }
+        if (tb.Column.First is { IsDisposed: false } cf) { columns.AddIfNotExists(cf); }
 
-        return CompareKey(colsToRefresh);
+        return CompareKey(columns);
     }
 
-    public int CompareTo(object obj) {
-        if (obj is RowItem tobj) {
-            return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
-        }
+    //public int CompareTo(object obj) {
+    //    if (obj is RowItem tobj) {
+    //        return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
+    //    }
 
-        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
-        return 0;
-    }
+    //    Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
+    //    return 0;
+    //}
 
     public void Dispose() {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -1235,7 +1235,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
                 }
                 if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {
-                    MakeNewRelations(columnToRepair, thisRowItem, [], t.SplitAndCutByCr().ToList());
+                    MakeNewRelations(columnToRepair, thisRowItem, [], [.. t.SplitAndCutByCr()]);
                 }
             }
         }
