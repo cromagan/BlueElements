@@ -33,36 +33,26 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #region Fields
 
-    public Rectangle Position;
+    public Rectangle Position { get; set; }
 
     /// <summary>
-    /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
+    /// Falls eine spezielle Information gespeichert und zurückgegeben werden soll
     /// </summary>
     /// <remarks></remarks>
-    public object? Tag;
+    public object? Tag { get; set; }
 
-    protected bool _isCaption;
-
-    /// <summary>
-    /// Ist das Item enabled?
-    /// </summary>
-    /// <remarks></remarks>
-    private bool _enabled;
-
-    private string _keyName;
     private Size _sizeUntouchedForListBox = Size.Empty;
-    private string _userDefCompareKey;
 
     #endregion
 
     #region Constructors
 
     protected AbstractListItem(string keyName, bool enabled) {
-        _keyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
-        if (string.IsNullOrEmpty(_keyName)) { Develop.DebugPrint(ErrorType.Error, "Interner Name nicht vergeben."); }
-        _enabled = enabled;
+        KeyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
+        if (string.IsNullOrEmpty(KeyName)) { Develop.DebugPrint(ErrorType.Error, "Interner Name nicht vergeben."); }
+        Enabled = enabled;
         Position = Rectangle.Empty;
-        _userDefCompareKey = string.Empty;
+        UserDefCompareKey = string.Empty;
     }
 
     #endregion
@@ -78,21 +68,19 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     #region Properties
 
     public bool Enabled {
-        get => _enabled;
+        get;
         set {
-            if (_enabled == value) { return; }
-            _enabled = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
 
-    public int Indent { get; set; }
-
-    public bool IsCaption {
-        get => _isCaption;
-        protected set {
-            if (_isCaption == value) { return; }
-            _isCaption = value;
+    public int Indent {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
@@ -100,10 +88,10 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     public bool KeyIsCaseSensitive => false;
 
     public string KeyName {
-        get => _keyName;
+        get;
         set {
-            if (_keyName == value) { return; }
-            _keyName = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
@@ -113,10 +101,10 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     public abstract string QuickInfo { get; }
 
     public string UserDefCompareKey {
-        get => _userDefCompareKey;
+        get;
         set {
-            if (_userDefCompareKey == value) { return; }
-            _userDefCompareKey = value;
+            if (field == value) { return; }
+            field = value;
             OnCompareKeyChanged();
             OnPropertyChanged();
         }
@@ -126,11 +114,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #region Methods
 
-    ///// <summary>
-    ///// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
-    ///// </summary>
-    ///// <param name="newParent"></param>
-    //public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
     public string CompareKey() {
         if (!string.IsNullOrEmpty(UserDefCompareKey)) {
             if (UserDefCompareKey.Length > 0 && UserDefCompareKey[0] < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
@@ -150,11 +133,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     }
 
     public bool Contains(int x, int y) => Position.Contains(x, y);
-
-    /// <summary>
-    /// Vereinfacung für Null Conditional Operator.
-    /// </summary>
-    public void Disable() => Enabled = false;
 
     public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign) {
         if (itemdesign == Design.Undefiniert) { return; }
@@ -182,7 +160,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign);
 
-    public virtual bool IsClickable() => !IsCaption;
+    public virtual bool IsClickable() => true;
 
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
 

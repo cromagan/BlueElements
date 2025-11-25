@@ -628,14 +628,17 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                     var cy = 0;
                     var wi = colWidth;
                     itenc++;
+
+                    var isCaption = thisItem is TextListItem { IsCaption: true };
+
                     if (senkrechtAllowed == Orientation.Waagerecht) {
-                        if (thisItem.IsCaption) { wi = controlDrawingArea.Width - sliderWidth; }
+                        if (isCaption) { wi = controlDrawingArea.Width - sliderWidth; }
                     }
                     var he = thisItem.HeightForListBox(_appearance, colHeight, _itemDesign);
 
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
-                            if (previtem.Position.Right + colWidth > controlDrawingArea.Width || thisItem.IsCaption) {
+                            if (previtem.Position.Right + colWidth > controlDrawingArea.Width || isCaption) {
                                 cx = 0;
                                 cy = previtem.Position.Bottom;
                             } else {

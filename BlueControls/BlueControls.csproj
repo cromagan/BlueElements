@@ -30,7 +30,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <None Remove="Ressources\Dictionary\Deutsch.BDB" />
     <None Remove="Ressources\Styles\Styles.BDB" />
@@ -63,6 +63,12 @@
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Controls\Table_Legacy.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>

@@ -313,11 +313,11 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                     _negativAuswahl = true;
                     _multiAuswahlUnd = false;
                     _multiAuswahlOder = false;
-                    lsbStandardFilter["FilterLeere"]?.Disable();
-                    lsbStandardFilter["FilterNichtLeere"]?.Disable();
-                    lsbStandardFilter["Clipboard"]?.Disable();
-                    lsbStandardFilter["ModusMultiUnd"]?.Disable();
-                    lsbStandardFilter["ModusMultiOder"]?.Disable();
+                    lsbStandardFilter["FilterLeere"]?.Enabled = false;
+                    lsbStandardFilter["FilterNichtLeere"]?.Enabled = false;
+                    lsbStandardFilter["Clipboard"]?.Enabled = false;
+                    lsbStandardFilter["ModusMultiUnd"]?.Enabled = false;
+                    lsbStandardFilter["ModusMultiOder"]?.Enabled = false;
                     break;
                 }
 

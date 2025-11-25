@@ -40,7 +40,6 @@ public class DropDownListItem : AbstractListItem {
     #region Constructors
 
     public DropDownListItem(string keyName, bool enabled, string userDefCompareKey) : base(keyName, enabled) {
-        IsCaption = false;
         UserDefCompareKey = userDefCompareKey;
     }
 

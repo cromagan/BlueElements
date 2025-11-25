@@ -36,7 +36,6 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-
 public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Fields
@@ -53,15 +52,16 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Constructors
 
-    public CreativePadItem() : this(string.Empty, null) { }
+    public CreativePadItem() : this(string.Empty, null) {
+    }
 
-    public CreativePadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
+    public CreativePadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
+    }
 
     #endregion
 
     #region Properties
 
-    
     public static string ClassId => "FI-CreativePad";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
@@ -166,7 +166,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new ConnectedCreativePad();
 
-        switch (_typ.ToLower()) {
+        switch (_typ.ToLowerInvariant()) {
             case "load":
                 con.LoadAtRowChange = _formular;
                 break;
@@ -186,7 +186,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     }
 
     public override string ErrorReason() {
-        switch (_typ.ToLower()) {
+        switch (_typ.ToLowerInvariant()) {
             case "load":
 
                 if (string.IsNullOrEmpty(_formular)) { return "Kein Layout gewählt."; }
@@ -251,7 +251,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
                 new FlexiControlForProperty<int>(() => AutoRefresh)
             ];
 
-        switch (_typ.ToLower()) {
+        switch (_typ.ToLowerInvariant()) {
             case "load":
                 result.Add(new FlexiControl("Lädt folgendes Skript vom Dateisystem und ersetzt die Variablen", widthOfControl, false));
                 result.Add(new FlexiControlForProperty<string>(() => Formular, layouts));

@@ -26,20 +26,21 @@ namespace BlueControls.ItemCollectionList;
 
 public class TextListItem : AbstractListItem {
 
-    #region Fields
-
-    private QuickImage? _symbol;
-
-    private string _text;
-
-    #endregion
+    public bool IsCaption {
+        get;
+        protected set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     #region Constructors
 
     public TextListItem(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(keyName, enabled) {
-        _isCaption = isCaption;
-        _text = readableText;
-        _symbol = symbol;
+        IsCaption = isCaption;
+        Text = readableText;
+        Symbol = symbol;
         UserDefCompareKey = userDefCompareKey;
     }
 
@@ -50,19 +51,19 @@ public class TextListItem : AbstractListItem {
     public override string QuickInfo => Text.CreateHtmlCodes();
 
     public QuickImage? Symbol {
-        get => _symbol;
+        get;
         set {
-            if (_symbol == value) { return; }
-            _symbol = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
 
     public string Text {
-        get => _text;
+        get;
         set {
-            if (_text == value) { return; }
-            _text = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
@@ -70,6 +71,8 @@ public class TextListItem : AbstractListItem {
     #endregion
 
     #region Methods
+
+    public override bool IsClickable() => !IsCaption && base.IsClickable();
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
