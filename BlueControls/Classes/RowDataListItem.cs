@@ -20,6 +20,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Enums;
+using BlueControls.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -27,41 +29,13 @@ using System.Linq;
 
 namespace BlueTable;
 
-public static class RowDrawDataExtensions {
+public static class RowDataListItemExtensions {
 
     #region Methods
 
-    public static RowData? Get(this List<RowData>? l, RowItem? row) => row == null ? null : l?.FirstOrDefault(thisr => thisr?.Row == row);
+    public static RowDataListItem? Get(this List<RowDataListItem>? l, RowItem? row) => row == null ? null : l?.FirstOrDefault(thisr => thisr?.Row == row);
 
     #endregion
-
-    //public static RowData? Get(this List<RowData>? l, RowItem? row, string? chapter) {
-    //    if (l == null || row == null) { return null; }
-
-    //    chapter ??= string.Empty;
-
-    //    return l.FirstOrDefault(thisr => thisr?.Row == row && thisr.Chapter == chapter);
-    //}
-
-    //public static List<RowItem> ToUniqueRowList(this List<RowData> l) {
-    //    if (l == null) { return null; }
-
-    //    var n = new List<RowItem>();
-
-    //    foreach (var thisr in l) {
-    //        if (thisr != null && thisr.Row != null) {
-    //            n.AddIfNotExists(thisr.Row);
-    //        }
-    //    }
-    //    return n;
-    //}
-
-    //public static int IndexOf(this List<clsRowDrawData> l, RowItem row) {
-    //    for (var z = 0; z < l.Count; z++) {
-    //        if (l[z].Row == row) { return z; }
-    //    }
-    //    return -1;
-    //}
 }
 
 /// <summary>
@@ -69,11 +43,11 @@ public static class RowDrawDataExtensions {
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public sealed class RowData : IComparable, IDisposableExtended {
+public sealed class RowDataListItem : AbstractListItem, IComparable, IDisposableExtended {
 
     #region Constructors
 
-    public RowData(RowItem row, string chapter) {
+    public RowDataListItem(RowItem row, string chapter) : base(string.Empty, true) {
         Row = row;
         PinStateSortAddition = "2";
         Y = -1;
@@ -99,6 +73,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
     public bool IsDisposed { get; private set; }
     public bool MarkYellow { get; set; }
     public string PinStateSortAddition { get; set; }
+    public override string QuickInfo => Row?.QuickInfo ?? string.Empty;
     public RowItem Row { get; }
     public string RowChapter { get; }
     public bool ShowCap { get; set; }
@@ -124,19 +99,6 @@ public sealed class RowData : IComparable, IDisposableExtended {
         DrawHeight = Math.Max(DrawHeight, 18);
     }
 
-    public string CompareKey() => PinStateSortAddition + ";" + AdditionalSort + ";" + RowChapter;
-
-    //public string CompareKey() => PinStateSortAddition + ";" + RowChapter + ";" + AdditionalSort;
-
-    public int CompareTo(object obj) {
-        if (obj is RowData robj) {
-            return string.Compare(CompareKey(), robj.CompareKey(), StringComparison.OrdinalIgnoreCase);
-        }
-
-        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
-        return 0;
-    }
-
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
@@ -144,7 +106,7 @@ public sealed class RowData : IComparable, IDisposableExtended {
         GC.SuppressFinalize(this);
     }
 
-    public void GetDataFrom(RowData thisRowData) {
+    public void GetDataFrom(RowDataListItem thisRowData) {
         if (Row != thisRowData.Row || RowChapter != thisRowData.RowChapter) {
             Develop.DebugPrint(ErrorType.Warning, "RowData Kopie fehlgeschlagen!");
         }
@@ -160,7 +122,15 @@ public sealed class RowData : IComparable, IDisposableExtended {
         MarkYellow = thisRowData.MarkYellow;
     }
 
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => throw new NotImplementedException();
+
     public override string ToString() => Row.IsDisposed ? RowChapter + " -> null" : RowChapter + " -> " + Row.CellFirstString();
+
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => throw new NotImplementedException();
+
+    protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) => throw new NotImplementedException();
+
+    protected override string GetCompareKey() => PinStateSortAddition + ";" + AdditionalSort + ";" + RowChapter;
 
     private void Dispose(bool disposing) {
         if (!IsDisposed) {

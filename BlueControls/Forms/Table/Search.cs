@@ -34,7 +34,7 @@ public sealed partial class Search : Form {
 
     private readonly TableView _tableView;
     private ColumnViewItem? _col;
-    private RowData? _row;
+    private RowDataListItem? _row;
 
     #endregion
 

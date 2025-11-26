@@ -67,8 +67,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     #region Fields
 
     public const string CellDataFormat = "BlueElements.CellLink";
-    public FilterCollection Filter { get; } = new("DefaultTableFilter");
-    public FilterCollection FilterCombined { get; } = new("TableFilterCombined");
 
     /// <summary>
     ///  Abstand zwischen den Zeilen
@@ -97,19 +95,17 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// </summary>
     private ColumnViewItem? _mouseOverColumn;
 
-    private RowData? _mouseOverRow;
+    private RowDataListItem? _mouseOverRow;
     private string _newRowsAllowed = string.Empty;
     private Progressbar? _pg;
-    private List<RowData>? _rowsFilteredAndPinned;
+    private List<RowDataListItem>? _rowsFilteredAndPinned;
     private SearchAndReplaceInCells? _searchAndReplaceInCells;
     private SearchAndReplaceInTbScripts? _searchAndReplaceInTbScripts;
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
     private DateTime? _tableDrawError;
     private Rectangle _tmpCursorRect = Rectangle.Empty;
-
     private RowItem? _unterschiede;
-
     private float _zoom = 1f;
 
     #endregion
@@ -225,7 +221,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowData? CursorPosRow { get; private set; }
+    public RowDataListItem? CursorPosRow { get; private set; }
 
     [DefaultValue(false)]
     public bool EditButton {
@@ -237,12 +233,15 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
+    public FilterCollection Filter { get; } = new("DefaultTableFilter");
+
     /// <summary>
     /// Welche Knöpfe angezeigt werden sollen. Muss der Name einer Spaltenanordnung sein.
     /// </summary>
     [DefaultValue("")]
     public string FilterAnsichtName { get; set; } = string.Empty;
 
+    public FilterCollection FilterCombined { get; } = new("TableFilterCombined");
     public int FilterleisteZeilen => CurrentArrangement?.FilterRows ?? 1;
 
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
@@ -373,7 +372,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     #region Methods
 
-    public static (List<RowData> rows, long visiblerowcount) CalculateSortedRows(Table tb, ICollection<RowItem> filteredRows, ICollection<RowItem> pinnedRows, RowSortDefinition? sortused) {
+    public static (List<RowDataListItem> rows, long visiblerowcount) CalculateSortedRows(Table tb, ICollection<RowItem> filteredRows, ICollection<RowItem> pinnedRows, RowSortDefinition? sortused) {
         if (tb.IsDisposed) { return ([], 0); }
 
         var vrc = 0;
@@ -406,10 +405,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         #region _Angepinnten Zeilen erstellen (_pinnedData)
 
-        List<RowData> pinnedData = [];
+        List<RowDataListItem> pinnedData = [];
 
         Parallel.ForEach(pinnedRows, thisRow => {
-            var rd = new RowData(thisRow, "Angepinnt") {
+            var rd = new RowDataListItem(thisRow, "Angepinnt") {
                 PinStateSortAddition = "1",
                 MarkYellow = true,
                 AdditionalSort = thisRow.CompareKey(colsToRefresh)
@@ -425,7 +424,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         #region Gefiltere Zeilen erstellen (_rowData)
 
-        List<RowData> rowData = [];
+        List<RowDataListItem> rowData = [];
         Parallel.ForEach(filteredRows, thisRow => {
             var adk = thisRow.CompareKey(colsToRefresh);
 
@@ -444,7 +443,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             if (caps.Count == 0) { caps.Add(string.Empty); }
 
             foreach (var thisCap in caps) {
-                var rd = new RowData(thisRow, thisCap) {
+                var rd = new RowDataListItem(thisRow, thisCap) {
                     PinStateSortAddition = "2",
                     MarkYellow = markYellow,
                     AdditionalSort = adk
@@ -510,6 +509,156 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         return t;
+    }
+
+    public static void ContextMenu_DataValidation(object sender, ObjectEventArgs e) {
+        var rows = new List<RowItem>();
+        if (e.Data is RowItem row) { rows.Add(row); }
+        if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
+        if (e.Data is Func<List<RowItem>> fRows) { rows.AddRange(fRows()); }
+
+        if (rows.Count == 0) {
+            MessageBox.Show("Keine Zeilen zum Prüfen vorhanden.", ImageCode.Kreuz, "OK");
+            return;
+        }
+
+        foreach (var thisR in rows) {
+            if (thisR.Table is { IsDisposed: false } tb) {
+                if (!tb.CanDoValueChangedScript(true)) {
+                    MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
+                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+                    return;
+                }
+
+                thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
+                thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
+            }
+        }
+
+        if (rows.Count == 1) {
+            MessageBox.Show("Datenüberprüfung:\r\n" + rows[0].CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
+        } else {
+            MessageBox.Show($"Alle {rows.Count} Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
+        }
+    }
+
+    public static void ContextMenu_DeleteRow(object sender, ObjectEventArgs e) {
+        var rows = new List<RowItem>();
+        if (e.Data is RowItem row) { rows.Add(row); }
+        if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
+
+        if (rows.Count == 0) {
+            MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
+            return;
+        }
+
+        if (rows[0].Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+
+        if (rows.Count == 1) {
+            if (MessageBox.Show($"Zeile wirklich löschen? (<b>{rows[0].CellFirstString()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+        } else {
+            if (MessageBox.Show($"{rows.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+        }
+        RowCollection.Remove(rows, "Benutzer: löschen Befehl");
+    }
+
+    public static void ContextMenu_EditColumnProperties(object sender, ObjectEventArgs e) {
+        ColumnItem? column = null;
+        RowItem? row = null;
+        TableView? view = null;
+
+        if (e.Data is ColumnItem c) {
+            column = c;
+        } else if (e.Data is { } data) {
+            var type = data.GetType();
+            column = type.GetProperty("Column")?.GetValue(data) as ColumnItem;
+
+            row = type.GetProperty("Row")?.GetValue(data) as RowItem;
+            view = type.GetProperty("View")?.GetValue(data) as TableView;
+        }
+
+        if (column is not { IsDisposed: false }) { return; }
+        column.Editor = typeof(ColumnEditor);
+
+        if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
+
+        if (row is not { IsDisposed: false }) {
+            column.Edit();
+            return;
+        }
+
+        ColumnItem? columnLinked = null;
+        var posError = false;
+
+        if (column.RelationType == RelationType.CellValues) {
+            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false);
+            posError = true;
+        }
+
+        var bearbColumn = column;
+        if (columnLinked != null) {
+            columnLinked.Repair();
+            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
+                bearbColumn = columnLinked;
+            }
+        } else {
+            if (posError) {
+                Notification.Show(
+                    "Keine aktive Verlinkung.<br>Spalte in dieser Tabelle wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Tabelle vorhanden?",
+                    ImageCode.Information);
+            }
+        }
+
+        column.Repair();
+
+        using var w = new ColumnEditor(bearbColumn, view);
+        w.ShowDialog();
+
+        bearbColumn.Repair();
+    }
+
+    public static void ContextMenu_ExecuteScript(object sender, ObjectEventArgs e) {
+        Develop.SetUserDidSomething();
+        if (e.Data is not { } data) { return; }
+
+        var type = data.GetType();
+
+        if (type.GetProperty("Script")?.GetValue(data) is not TableScriptDescription sc || sc.Table is not { } tb) { return; }
+
+        if (TableViewForm.EditabelErrorMessage(sc.Table)) { return; }
+
+        string m;
+
+        if (sc.NeedRow) {
+            var rows = new List<RowItem>();
+
+            if (type.GetProperty("Row")?.GetValue(data) is RowItem singleRow) {
+                rows.Add(singleRow);
+            } else if (type.GetProperty("Rows")?.GetValue(data) is List<RowItem> rowList) {
+                rows.AddRange(rowList);
+            } else if (type.GetProperty("Rows")?.GetValue(data) is Func<List<RowItem>> fRows) {
+                rows.AddRange(fRows());
+            }
+
+            if (rows.Count > 0) {
+                if (MessageBox.Show($"Skript für {rows.Count} Zeile(n) ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
+                    m = tb.Row.ExecuteScript(null, sc.KeyName, rows);
+                } else {
+                    m = "Durch Benutzer abgebrochen";
+                }
+            } else {
+                m = "Keine Zeile zum Ausführen des Skriptes vorhanden.";
+            }
+        } else {
+            var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
+            m = s.Protocol.JoinWithCr();
+        }
+
+        if (string.IsNullOrEmpty(m)) {
+            MessageBox.Show("Skript erfolgreich ausgeführt.", ImageCode.Häkchen, "Ok");
+        } else {
+            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
+        }
     }
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
@@ -709,7 +858,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return renderer;
     }
 
-    public static void SearchNextText(string searchTxt, TableView tableView, ColumnViewItem? column, RowData? row, out ColumnViewItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
+    public static void SearchNextText(string searchTxt, TableView tableView, ColumnViewItem? column, RowDataListItem? row, out ColumnViewItem? foundColumn, out RowDataListItem? foundRow, bool vereinfachteSuche) {
         if (tableView.Table is not { IsDisposed: false } tb) {
             MessageBox.Show("Tabellen-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
@@ -922,7 +1071,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
-    public void CursorPos_Set(ColumnViewItem? column, RowData? row, bool ensureVisible) {
+    public void CursorPos_Set(ColumnViewItem? column, RowDataListItem? row, bool ensureVisible) {
         if (IsDisposed || Table is not { IsDisposed: false } || row == null || column == null ||
             CurrentArrangement is not { IsDisposed: false } ca2 || !ca2.Contains(column) ||
             RowsFilteredAndPinned() is not { } s || !s.Contains(row)) {
@@ -969,7 +1118,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Zoom = nz;
     }
 
-    public bool EnsureVisible(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? row) => EnsureVisible(viewItem) && EnsureVisible(ca, row);
+    public bool EnsureVisible(ColumnViewCollection ca, ColumnViewItem? viewItem, RowDataListItem? row) => EnsureVisible(viewItem) && EnsureVisible(ca, row);
 
     public void ExpandAll() {
         if (Table?.Column.SysChapter is null) { return; }
@@ -1145,7 +1294,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         OnContextMenuInit(e);
     }
 
-    public string GrantWriteAccess(ColumnViewItem? cellInThisTableColumn, RowData? cellInThisTableRow, string newChunkVal) {
+    public string GrantWriteAccess(ColumnViewItem? cellInThisTableColumn, RowDataListItem? cellInThisTableRow, string newChunkVal) {
         var f = IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
@@ -1176,7 +1325,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         ImportCsv(db, csvtxt);
     }
 
-    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowData? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
+    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowDataListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
         var f = CellCollection.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
@@ -1283,7 +1432,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         OnViewChanged();
     }
 
-    public List<RowData>? RowsFilteredAndPinned() {
+    public List<RowDataListItem>? RowsFilteredAndPinned() {
         if (IsDisposed) { return null; }
         if (CurrentArrangement is not { IsDisposed: false } ca) { return null; }
 
@@ -1303,7 +1452,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             } else {
                 (var sortedRowDataNew, VisibleRowCount) = CalculateSortedRows(tb, RowsFiltered, PinnedRows, SortUsed());
 
-                var sortedRowDataTmp = new List<RowData>();
+                var sortedRowDataTmp = new List<RowDataListItem>();
 
                 foreach (var thisRow in sortedRowDataNew) {
                     var thisRowData = thisRow;
@@ -1463,7 +1612,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public ColumnViewItem? View_ColumnFirst() => IsDisposed || Table is not { IsDisposed: false } ? null : CurrentArrangement is { Count: not 0 } ca ? ca[0] : null;
 
-    public RowData? View_NextRow(RowData? row) {
+    public RowDataListItem? View_NextRow(RowDataListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
 
@@ -1473,7 +1622,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return rowNr < 0 || rowNr >= sr.Count - 1 ? null : sr[rowNr + 1];
     }
 
-    public RowData? View_PreviousRow(RowData? row) {
+    public RowDataListItem? View_PreviousRow(RowDataListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
         if (RowsFilteredAndPinned() is not { } sr) { return null; }
@@ -1481,13 +1630,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return rowNr < 1 ? null : sr[rowNr - 1];
     }
 
-    public RowData? View_RowFirst() {
+    public RowDataListItem? View_RowFirst() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (RowsFilteredAndPinned() is not { } sr) { return null; }
         return sr.Count == 0 ? null : sr[0];
     }
 
-    public RowData? View_RowLast() {
+    public RowDataListItem? View_RowLast() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (RowsFilteredAndPinned() is not { } sr) { return null; }
         return sr.Count == 0 ? null : sr[sr.Count - 1];
@@ -2271,7 +2420,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
     }
 
-    private static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowData? cellInThisTableRow, bool formatWarnung) {
+    private static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowDataListItem? cellInThisTableRow, bool formatWarnung) {
         if (cellInThisTableColumn?.Column is not { IsDisposed: false } contentHolderCellColumn) { return "Spalte nicht vorhanden"; } // Dummy prüfung
 
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
@@ -2706,7 +2855,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
-    private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? cellInThisTableRow, bool preverDropDown, string? chunkval) {
+    private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowDataListItem? cellInThisTableRow, bool preverDropDown, string? chunkval) {
         var f = IsCellEditable(viewItem, cellInThisTableRow, chunkval, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
@@ -2782,7 +2931,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private void Cell_Edit_Color(ColumnViewItem viewItem, RowData? cellInThisTableRow) {
+    private void Cell_Edit_Color(ColumnViewItem viewItem, RowDataListItem? cellInThisTableRow) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
         var colDia = new ColorDialog();
@@ -2807,7 +2956,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToStringInt1(), viewItem, cellInThisTableRow, false));
     }
 
-    private void Cell_Edit_Dropdown(ColumnViewCollection ca, ColumnViewItem viewItem, RowData? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
+    private void Cell_Edit_Dropdown(ColumnViewCollection ca, ColumnViewItem viewItem, RowDataListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
         if (viewItem.Column != contentHolderCellColumn) {
             if (contentHolderCellRow == null) {
                 NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
@@ -2857,7 +3006,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Develop.Debugprint_BackgroundThread();
     }
 
-    private bool Cell_Edit_TextBox(ColumnViewCollection ca, ColumnViewItem viewItem, RowData? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow, TextBox box, int addWith, int isHeight) {
+    private bool Cell_Edit_TextBox(ColumnViewCollection ca, ColumnViewItem viewItem, RowDataListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow, TextBox box, int addWith, int isHeight) {
         if (IsDisposed) { return false; }
 
         if (contentHolderCellColumn != viewItem.Column) {
@@ -2905,7 +3054,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return true;
     }
 
-    private (ColumnViewItem?, RowData?) CellOnCoordinate(ColumnViewCollection ca, int xpos, int ypos) => (ColumnOnCoordinate(ca, xpos), RowOnCoordinate(ca, ypos));
+    private (ColumnViewItem?, RowDataListItem?) CellOnCoordinate(ColumnViewCollection ca, int xpos, int ypos) => (ColumnOnCoordinate(ca, xpos), RowOnCoordinate(ca, ypos));
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -2970,101 +3119,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var l = txt.SplitAndCutByCr().SortedDistinctList().JoinWithCr();
         CopytoClipboard(l);
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
-    }
-
-    public static void ContextMenu_DataValidation(object sender, ObjectEventArgs e) {
-        var rows = new List<RowItem>();
-        if (e.Data is RowItem row) { rows.Add(row); }
-        if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
-        if (e.Data is Func<List<RowItem>> fRows) { rows.AddRange(fRows()); }
-
-        if (rows.Count == 0) {
-            MessageBox.Show("Keine Zeilen zum Prüfen vorhanden.", ImageCode.Kreuz, "OK");
-            return;
-        }
-
-        foreach (var thisR in rows) {
-            if (thisR.Table is { IsDisposed: false } tb) {
-                if (!tb.CanDoValueChangedScript(true)) {
-                    MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
-                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-                    return;
-                }
-
-                thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-                thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
-            }
-        }
-
-        if (rows.Count == 1) {
-            MessageBox.Show("Datenüberprüfung:\r\n" + rows[0].CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
-        } else {
-            MessageBox.Show($"Alle {rows.Count} Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
-        }
-    }
-
-    public static void ContextMenu_DeleteRow(object sender, ObjectEventArgs e) {
-        var rows = new List<RowItem>();
-        if (e.Data is RowItem row) { rows.Add(row); }
-        if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
-
-        if (rows.Count == 0) {
-            MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
-            return;
-        }
-
-        if (rows[0].Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
-
-        if (rows.Count == 1) {
-            if (MessageBox.Show($"Zeile wirklich löschen? (<b>{rows[0].CellFirstString()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
-        } else {
-            if (MessageBox.Show($"{rows.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
-        }
-        RowCollection.Remove(rows, "Benutzer: löschen Befehl");
-    }
-
-    public static void ContextMenu_ExecuteScript(object sender, ObjectEventArgs e) {
-        Develop.SetUserDidSomething();
-        if (e.Data is not { } data) { return; }
-
-        var type = data.GetType();
-
-        if (type.GetProperty("Script")?.GetValue(data) is not TableScriptDescription sc || sc.Table is not { } tb) { return; }
-
-        if (TableViewForm.EditabelErrorMessage(sc.Table)) { return; }
-
-        string m;
-
-        if (sc.NeedRow) {
-            var rows = new List<RowItem>();
-
-            if (type.GetProperty("Row")?.GetValue(data) is RowItem singleRow) {
-                rows.Add(singleRow);
-            } else if (type.GetProperty("Rows")?.GetValue(data) is List<RowItem> rowList) {
-                rows.AddRange(rowList);
-            } else if (type.GetProperty("Rows")?.GetValue(data) is Func<List<RowItem>> fRows) {
-                rows.AddRange(fRows());
-            }
-
-            if (rows.Count > 0) {
-                if (MessageBox.Show($"Skript für {rows.Count} Zeile(n) ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
-                    m = tb.Row.ExecuteScript(null, sc.KeyName, rows);
-                } else {
-                    m = "Durch Benutzer abgebrochen";
-                }
-            } else {
-                m = "Keine Zeile zum Ausführen des Skriptes vorhanden.";
-            }
-        } else {
-            var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
-            m = s.Protocol.JoinWithCr();
-        }
-
-        if (string.IsNullOrEmpty(m)) {
-            MessageBox.Show("Skript erfolgreich ausgeführt.", ImageCode.Häkchen, "Ok");
-        } else {
-            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
-        }
     }
 
     private void ContextMenu_KeyCopy(object sender, ObjectEventArgs e) {
@@ -3268,7 +3322,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Draw_Border(gr, cellInThisTableColumn, realHead, displayRectangleWoSlider.Bottom);
     }
 
-    private void Draw_Column_Cells(Graphics gr, List<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, bool firstOnScreen, ColumnViewCollection ca, Rectangle realHead) {
+    private void Draw_Column_Cells(Graphics gr, List<RowDataListItem> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, bool firstOnScreen, ColumnViewCollection ca, Rectangle realHead) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
         if (viewItem.Column is not { IsDisposed: false } cellInThisTableColumn) { return; }
 
@@ -3635,7 +3689,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private void Draw_Table_Std(Graphics gr, List<RowData> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
+    private void Draw_Table_Std(Graphics gr, List<RowDataListItem> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
         try {
             if (IsDisposed || Table is not { IsDisposed: false } db || ca == null) { return; }
 
@@ -3670,7 +3724,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private void Draw_Table_What(Graphics gr, List<RowData> sr, TableDrawColumn col, TableDrawType type, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection ca) {
+    private void Draw_Table_What(Graphics gr, List<RowDataListItem> sr, TableDrawColumn col, TableDrawType type, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection ca) {
         if (IsDisposed) { return; }
 
         var lfdno = 0;
@@ -3762,7 +3816,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// <param name="ca"></param>
     /// <param name="r"></param>
     /// <returns></returns>
-    private int DrawY(ColumnViewCollection ca, RowData? r) =>
+    private int DrawY(ColumnViewCollection ca, RowDataListItem? r) =>
         r == null ? FilterleisteHeight : (int)(GetPix(r.Y + ca.HeadSize()) - SliderY.Value + FilterleisteHeight);
 
     /// <summary>
@@ -3814,7 +3868,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private bool EnsureVisible(ColumnViewCollection ca, RowData? rowdata) {
+    private bool EnsureVisible(ColumnViewCollection ca, RowDataListItem? rowdata) {
         if (rowdata?.Row is not { IsDisposed: false }) { return false; }
         var dispR = DisplayRectangleWithoutSlider();
 
@@ -3947,14 +4001,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private bool IsOnScreen(Rectangle realHead, Rectangle displayRectangleWoSlider) => !IsDisposed && realHead.Right > 0 && realHead.Left <= displayRectangleWoSlider.Width;
 
-    private bool IsOnScreen(ColumnViewCollection ca, ColumnViewItem? viewItem, RowData? row, Rectangle displayRectangleWoSlider) {
+    private bool IsOnScreen(ColumnViewCollection ca, ColumnViewItem? viewItem, RowDataListItem? row, Rectangle displayRectangleWoSlider) {
         if (viewItem?.Column == null) { return false; }
         var realHead = viewItem.RealHead(_zoom, SliderX.Value);
 
         return IsOnScreen(realHead, displayRectangleWoSlider) && IsOnScreen(ca, row, displayRectangleWoSlider);
     }
 
-    private bool IsOnScreen(ColumnViewCollection ca, RowData? vrow, Rectangle displayRectangleWoSlider) {
+    private bool IsOnScreen(ColumnViewCollection ca, RowDataListItem? vrow, Rectangle displayRectangleWoSlider) {
         // Diese Methode prüft, ob eine Zeile im sichtbaren Bereich der Tabelle liegt
         if (vrow == null) {
             return false;
@@ -3970,7 +4024,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(_zoom, SliderX.Value, FilterleisteHeight).Contains(e.Location);
 
-    private void Neighbour(ColumnViewItem? column, RowData? row, Direction direction, out ColumnViewItem? newColumn, out RowData? newRow) {
+    private void Neighbour(ColumnViewItem? column, RowDataListItem? row, Direction direction, out ColumnViewItem? newColumn, out RowDataListItem? newRow) {
         if (CurrentArrangement is not { IsDisposed: false } ca) {
             newColumn = null;
             newRow = null;
@@ -4199,7 +4253,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return string.Empty;
     }
 
-    private RowData? RowOnCoordinate(ColumnViewCollection ca, int pixelY) {
+    private RowDataListItem? RowOnCoordinate(ColumnViewCollection ca, int pixelY) {
         if (IsDisposed || Table is not { IsDisposed: false } || pixelY <= (ca.HeadSize() * _zoom) + FilterleisteHeight) { return null; }
         var s = RowsFilteredAndPinned();
 
@@ -4250,10 +4304,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var w = textbox.Text;
 
         ColumnViewItem? column = null;
-        RowData? row = null;
+        RowDataListItem? row = null;
 
         if (tags[0] is ColumnViewItem c) { column = c; }
-        if (tags[1] is RowData r) { row = r; }
+        if (tags[1] is RowDataListItem r) { row = r; }
 
         textbox.Tag = null;
         textbox.Visible = false;
@@ -4324,61 +4378,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         return tb.IsNowNewRowPossible(chunkValue, true);
-    }
-
-    public static void ContextMenu_EditColumnProperties(object sender, ObjectEventArgs e) {
-        ColumnItem? column = null;
-        RowItem? row = null;
-        TableView? view = null;
-
-        if (e.Data is ColumnItem c) {
-            column = c;
-        } else if (e.Data is { } data) {
-            var type = data.GetType();
-            column = type.GetProperty("Column")?.GetValue(data) as ColumnItem;
-
-            row = type.GetProperty("Row")?.GetValue(data) as RowItem;
-            view = type.GetProperty("View")?.GetValue(data) as TableView;
-        }
-
-        if (column is not { IsDisposed: false }) { return; }
-        column.Editor = typeof(ColumnEditor);
-
-        if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
-
-        if (row is not { IsDisposed: false }) {
-            column.Edit();
-            return;
-        }
-
-        ColumnItem? columnLinked = null;
-        var posError = false;
-
-        if (column.RelationType == RelationType.CellValues) {
-            (columnLinked, _, _, _) = row.LinkedCellData(column, true, false);
-            posError = true;
-        }
-
-        var bearbColumn = column;
-        if (columnLinked != null) {
-            columnLinked.Repair();
-            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
-                bearbColumn = columnLinked;
-            }
-        } else {
-            if (posError) {
-                Notification.Show(
-                    "Keine aktive Verlinkung.<br>Spalte in dieser Tabelle wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Tabelle vorhanden?",
-                    ImageCode.Information);
-            }
-        }
-
-        column.Repair();
-
-        using var w = new ColumnEditor(bearbColumn, view);
-        w.ShowDialog();
-
-        bearbColumn.Repair();
     }
 
     #endregion
