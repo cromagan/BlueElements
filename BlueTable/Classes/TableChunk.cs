@@ -356,8 +356,8 @@ public class TableChunk : TableFile {
         }
     }
 
-    public override string IsNotEditableReason(bool isLoading) {
-        var f = base.IsNotEditableReason(isLoading);
+    public override string IsNotEditableReason(bool isloading) {
+        var f = base.IsNotEditableReason(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Maindata"; }

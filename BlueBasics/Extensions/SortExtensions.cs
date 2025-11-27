@@ -26,6 +26,11 @@ public static partial class Extensions {
 
     #region Methods
 
+    /// <summary>
+    /// Sortiert die Liste alphabetisch und gibt diese ohne doppelten Einträgen und ohne Leeren zurück.
+    /// </summary>
+    /// <param name="arr"></param>
+    /// <returns></returns>
     public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
         if (arr == null) { return []; }
 

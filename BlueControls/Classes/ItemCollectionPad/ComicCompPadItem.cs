@@ -79,7 +79,6 @@ public class ComicCompPadItem : AbstractPadItem {
 
     #region Properties
 
-    
     public static string ClassId => "COMIC";
 
     public Bitmap? Bitmap {
@@ -159,7 +158,7 @@ public class ComicCompPadItem : AbstractPadItem {
 
     public override List<string> ParseableItems() => [];
 
-    public override bool ParseThis(string tag, string value) {
+    public override bool ParseThis(string key, string value) {
         Develop.DebugPrint_NichtImplementiert(true);
         return true;
     }

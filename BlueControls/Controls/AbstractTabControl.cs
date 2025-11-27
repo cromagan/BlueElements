@@ -100,7 +100,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         }
     }
 
-    protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, BoundsSpecified specified) => tbounds;
+    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 
     // NIX TUN!!!!
     protected override void OnMouseLeave(System.EventArgs e) {

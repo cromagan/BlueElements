@@ -30,12 +30,12 @@ public sealed class ButtonActionList : DesignerActionList {
 
     public ButtonStyle ButtonStyle {
         get => _reverenceControl.ButtonStyle;
-        set => SetControlProperty("ButtonStyle", value);
+        set => SetControlProperty(nameof(ButtonStyle), value);
     }
 
     public bool Checked {
         get => _reverenceControl.Checked;
-        set => SetControlProperty("Checked", value);
+        set => SetControlProperty(nameof(Checked), value);
     }
 
     #endregion
@@ -46,10 +46,10 @@ public sealed class ButtonActionList : DesignerActionList {
         DesignerActionItemCollection items =
         [
             new DesignerActionHeaderItem("Allgemein"),
-            new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons.")
+            new DesignerActionPropertyItem(nameof(ButtonStyle), nameof(ButtonStyle), "Allgemein", "Das Verhalten des Buttons.")
         ];
         if ((int)_reverenceControl.ButtonStyle % 1000 is (int)ButtonStyle.Checkbox or (int)ButtonStyle.Yes_or_No or (int)ButtonStyle.Optionbox) {
-            items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
+            items.Add(new DesignerActionPropertyItem(nameof(Checked), nameof(Checked), "Allgemein", "Der Checked-Status."));
         }
         return items;
     }
@@ -59,4 +59,5 @@ public sealed class ButtonActionList : DesignerActionList {
     private void SetControlProperty(string propertyName, object value) => TypeDescriptor.GetProperties(_reverenceControl)[propertyName].SetValue(_reverenceControl, value);
 
     #endregion
+
 }

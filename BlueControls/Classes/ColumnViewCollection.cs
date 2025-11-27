@@ -39,9 +39,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Fields
 
-    public bool ShowHead = true;
     private readonly List<ColumnViewItem> _internal = [];
-    private readonly List<string> _permissionGroups_Show = [];
+    private readonly List<string> _permissionGroups_show = [];
     private int? _headSize;
 
     #endregion
@@ -88,13 +87,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
-        get => new(_permissionGroups_Show);
+        get => new(_permissionGroups_show);
         set {
             var l = value.SortedDistinctList();
 
-            if (l.IsDifferentTo(_permissionGroups_Show)) {
-                _permissionGroups_Show.Clear();
-                _permissionGroups_Show.AddRange(l);
+            if (l.IsDifferentTo(_permissionGroups_show)) {
+                _permissionGroups_show.Clear();
+                _permissionGroups_show.AddRange(l);
             }
         }
     }
@@ -110,6 +109,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             OnStyleChanged();
         }
     } = Win11;
+
+    public bool ShowHead { get; set; } = true;
 
     public Table? Table {
         get;
@@ -168,7 +169,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public static void Repair(ColumnViewCollection ca, int number) {
         if (ca.Table is not { IsDisposed: false } db) { return; }
 
-        #region Ungültige Spalten entfernen
+        #region UngÃ¼ltige Spalten entfernen
 
         for (var z = 0; z < ca.Count; z++) {
             if (ca[z]?.Column == null || !db.Column.Contains(ca[z]?.Column)) {
@@ -248,8 +249,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (disposing) {
             // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
         }
-        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
-        // TODO: große Felder auf Null setzen.
+        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten Ã¼berschreiben.
+        // TODO: groÃŸe Felder auf Null setzen.
         //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
         //PermissionGroups_Show.Clear();
         Table = null;
@@ -392,12 +393,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true;
 
             case "permissiongroup":
-                _permissionGroups_Show.Add(value);
+                _permissionGroups_show.Add(value);
                 return true;
 
             case "permissiongroups":
-                _permissionGroups_Show.Clear();
-                _permissionGroups_Show.AddRange(value.FromNonCritical().SplitByCr());
+                _permissionGroups_show.Clear();
+                _permissionGroups_show.AddRange(value.FromNonCritical().SplitByCr());
                 return true;
 
             case "showhead":
@@ -488,7 +489,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private void OnStyleChanged() {
         Invalidate_HeadSize();
-        Font_RowChapter = Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift);
+        Font_RowChapter = Skin.GetBlueFont(SheetStyle, PadStyles.Ãœberschrift);
         RowChapterHeight = (int)Font_RowChapter.CharHeight + 1;
         StyleChanged?.Invoke(this, System.EventArgs.Empty);
     }

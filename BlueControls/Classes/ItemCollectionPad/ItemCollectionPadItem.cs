@@ -754,7 +754,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLowerInvariant()) {
+        switch (key) {
             case "sheetsize":
                 var _sheetSizeInMm = value.SizeFParse();
                 Breite = _sheetSizeInMm.Width;
@@ -1211,7 +1211,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         if (IsDisposed) { return; }
-        OnPropertyChanged("Connections");
+        OnPropertyChanged(nameof(Connections));
     }
 
     private void CreateConnection(string toParse) {

@@ -30,7 +30,6 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.CellRenderer;
 
-
 public class Renderer_DateTime : Renderer_Abstract {
 
     #region Fields
@@ -119,7 +118,7 @@ public class Renderer_DateTime : Renderer_Abstract {
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLower()) {
+        switch (key) {
             case "format":
                 _format = value.FromNonCritical();
                 return true;
@@ -139,8 +138,8 @@ public class Renderer_DateTime : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) {
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
         var contentSize = this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
 
         if (ShowSymbol) {
@@ -150,7 +149,7 @@ public class Renderer_DateTime : Renderer_Abstract {
         return contentSize;
     }
 
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) {
         //if (string.IsNullOrWhiteSpace(_format) && !_utcToLocal) { return content; }
 
         if (!DateTimeTryParse(content, out var dt)) { return content; }
@@ -158,7 +157,7 @@ public class Renderer_DateTime : Renderer_Abstract {
         if (_utcToLocal) { dt = dt.ToLocalTime(); }
 
         if (string.IsNullOrWhiteSpace(_format)) {
-            if (translate == TranslationType.Datum && LanguageTool.Translation != null) { return dt.ToString1(); }
+            if (doOpticalTranslation == TranslationType.Datum && LanguageTool.Translation != null) { return dt.ToString1(); }
             return dt.ToString5();
         }
 

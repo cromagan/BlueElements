@@ -66,8 +66,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         get {
             var r = Row;
             if (r is not { IsDisposed: false }) { return string.Empty; }
-            if (_lastQuickInfo == r.QuickInfo) { return _tmpQuickInfo; }
-            _lastQuickInfo = r.QuickInfo;
+            var q = r.GetQuickInfo();
+            if (_lastQuickInfo == q) { return _tmpQuickInfo; }
+            _lastQuickInfo = q;
             _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + r.CellFirstString() + "]</b>");
             return _tmpQuickInfo;
         }

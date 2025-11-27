@@ -28,7 +28,6 @@ using System.Drawing;
 
 namespace BlueControls.CellRenderer;
 
-
 public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     #region Fields
@@ -84,16 +83,16 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stern);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) => new(48, 48);
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) => new(48, 48);
 
     /// <summary>
     /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
     /// </summary>
     /// <param name="content"></param>
     /// <param name="style"></param>
-    /// <param name="translate"></param>
+    /// <param name="doOpticalTranslation"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) => string.Empty;
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) => string.Empty;
 
     #endregion
 }

@@ -290,7 +290,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	RibbonBar_Back	Standard	Rechteck				5	Solide		FFFFFF			Ohne
 //	TabStrip_Back	Standard	Ohne					Ohne					Ohne
 //	Progressbar	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
-//	Progressbar_Füller	Standard	Rechteck					Solide		0072BC			Ohne
+//	Progressbar_FÃ¼ller	Standard	Rechteck					Solide		0072BC			Ohne
 //	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	ACACAC
 //	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	D8D8D8
 //	Table_Cursor	Standard	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	ACACAC
@@ -554,7 +554,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	RibbonBar_Back	Standard	Rechteck	0	0	0	5	Solide		ECE9D8			Ohne
 //	TabStrip_Back	Standard						Ohne					Ohne
 //	Progressbar	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
-//	Progressbar_Füller	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_Solide		FFFFFF	0000FF		Solide_1px	7F9DB9
+//	Progressbar_FÃ¼ller	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_Solide		FFFFFF	0000FF		Solide_1px	7F9DB9
 //	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	003C74
 //	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	C9C7BA
 //	Table_Cursor	Standard	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	C9C7BA
@@ -818,7 +818,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	RibbonBar_Back	Standard	Rechteck	0	0	0	8	Solide		D7E7EE
 //	TabStrip_Back	Standard	Ohne					Ohne					Ohne
 //	Progressbar	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
-//	Progressbar_Füller	Standard	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	498DAB
+//	Progressbar_FÃ¼ller	Standard	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	498DAB
 //	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	0046D5
 //	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	97AEE2
 //	Table_Cursor	Standard	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Ohne					Solide_3px	F8DFB1
@@ -842,8 +842,8 @@ public static class Skin {
     public static ColumnItem? StyleTb_Name;
     public static ColumnItem? StyleTb_Style;
     internal static Pen PenLinieDick = Pens.Red;
-    internal static Pen PenLinieDünn = Pens.Red;
-    internal static Pen PenLinieKräftig = Pens.Red;
+    internal static Pen PenLinieDÃ¼nn = Pens.Red;
+    internal static Pen PenLinieKrÃ¤ftig = Pens.Red;
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
 
@@ -853,7 +853,6 @@ public static class Skin {
 
     public static bool Inited { get; private set; }
 
-    
     public static Color RandomColor =>
         Color.FromArgb((byte)Constants.GlobalRnd.Next(0, 255),
             (byte)Constants.GlobalRnd.Next(0, 255),
@@ -912,7 +911,7 @@ public static class Skin {
             r.Y -= design.Y1;
             r.Width += design.X1 + design.X2;
             r.Height += design.Y1 + design.Y2;
-            if (r.Width < 1 || r.Height < 1) { return; }// Durchaus möglich, Creative-Pad, usereingabe
+            if (r.Width < 1 || r.Height < 1) { return; }// Durchaus mÃ¶glich, Creative-Pad, usereingabe
             switch (design.HintergrundArt) {
                 case HintergrundArt.Ohne:
                     break;
@@ -1033,7 +1032,7 @@ public static class Skin {
         }
         if (r.Width < 1 || r.Height < 1) { return; }
 
-        // PathX kann durch die ganzen Expand mal zu klein werden, dann wird nothing zurückgegeben
+        // PathX kann durch die ganzen Expand mal zu klein werden, dann wird nothing zurÃ¼ckgegeben
         try {
             Pen penX;
             GraphicsPath? pathX;
@@ -1090,7 +1089,7 @@ public static class Skin {
     }
 
     /// <summary>
-    /// Bild wird in dieser Routine nicht mehr gändert, aber in der nachfolgenden
+    /// Bild wird in dieser Routine nicht mehr gÃ¤ndert, aber in der nachfolgenden
     /// </summary>
     /// <param name="gr"></param>
     /// <param name="txt"></param>
@@ -1126,7 +1125,7 @@ public static class Skin {
     //    GR.SmoothingMode = x;
     //}
     /// <summary>
-    /// Status des Bildes (Disabled) wird geändert
+    /// Status des Bildes (Disabled) wird geÃ¤ndert
     /// </summary>
     /// <param name="gr"></param>
     /// <param name="txt"></param>
@@ -1215,7 +1214,7 @@ public static class Skin {
             StyleTb_Name is not { IsDisposed: false } cn ||
             StyleTb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
 
-        var f1 = new FilterItem(cn, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, style);
+        var f1 = new FilterItem(cn, BlueTable.Enums.FilterType.Istgleich_GroÃŸKleinEgal, style);
         var f2 = new FilterItem(cs, BlueTable.Enums.FilterType.Istgleich, ((int)format).ToString());
 
         var r = tb.Row[f1, f2];
@@ -1249,11 +1248,11 @@ public static class Skin {
     public static List<AbstractListItem> GetFonts(string sheetStyle) {
         List<AbstractListItem> rahms =
         [
-            ItemOf("Haupt-Überschrift", ((int)PadStyles.Überschrift).ToString(),
-                GetBlueFont(sheetStyle, PadStyles.Überschrift).SymbolForReadableText()),
-            ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Untertitel).ToString(),
+            ItemOf("Haupt-Ãœberschrift", ((int)PadStyles.Ãœberschrift).ToString(),
+                GetBlueFont(sheetStyle, PadStyles.Ãœberschrift).SymbolForReadableText()),
+            ItemOf("Untertitel fÃ¼r Haupt-Ãœberschrift", ((int)PadStyles.Untertitel).ToString(),
                 GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolForReadableText()),
-            ItemOf("Überschrift für Kapitel", ((int)PadStyles.Kapitel).ToString(),
+            ItemOf("Ãœberschrift fÃ¼r Kapitel", ((int)PadStyles.Kapitel).ToString(),
                 GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolForReadableText()),
             ItemOf("Standard", ((int)PadStyles.Standard).ToString(),
                 GetBlueFont(sheetStyle, PadStyles.Standard).SymbolForReadableText()),
@@ -1273,9 +1272,9 @@ public static class Skin {
         if (mitOhne) {
             rahms.Add(ItemOf("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz));
         }
-        rahms.Add(ItemOf("Haupt-Überschrift", ((int)PadStyles.Überschrift).ToString(), GetBlueFont(sheetStyle, PadStyles.Überschrift).SymbolOfLine()));
-        rahms.Add(ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Untertitel).ToString(), GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolOfLine()));
-        rahms.Add(ItemOf("Überschrift für Kapitel", ((int)PadStyles.Kapitel).ToString(), GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolOfLine()));
+        rahms.Add(ItemOf("Haupt-Ãœberschrift", ((int)PadStyles.Ãœberschrift).ToString(), GetBlueFont(sheetStyle, PadStyles.Ãœberschrift).SymbolOfLine()));
+        rahms.Add(ItemOf("Untertitel fÃ¼r Haupt-Ãœberschrift", ((int)PadStyles.Untertitel).ToString(), GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolOfLine()));
+        rahms.Add(ItemOf("Ãœberschrift fÃ¼r Kapitel", ((int)PadStyles.Kapitel).ToString(), GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolOfLine()));
         rahms.Add(ItemOf("Standard", ((int)PadStyles.Standard).ToString(), GetBlueFont(sheetStyle, PadStyles.Standard).SymbolOfLine()));
         rahms.Add(ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString(), GetBlueFont(sheetStyle, PadStyles.Hervorgehoben).SymbolOfLine()));
         rahms.Add(ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString(), GetBlueFont(sheetStyle, PadStyles.Alternativ).SymbolOfLine()));
@@ -1586,7 +1585,7 @@ public static class Skin {
         Design.Add(Enums.Design.RibbonBar_Back, States.Standard, string.Empty, Enums.Kontur.Rechteck, 0, 0, 0, 5, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.TabStrip_Back, States.Standard, string.Empty, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Progressbar, States.Standard, string.Empty, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty);
-        Design.Add(Enums.Design.Progressbar_Füller, States.Standard, string.Empty, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty);
+        Design.Add(Enums.Design.Progressbar_FÃ¼ller, States.Standard, string.Empty, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "0072BC", string.Empty, RahmenArt.Ohne, string.Empty, string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Lines_thick, States.Standard, string.Empty, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, "ACACAC", string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Lines_thin, States.Standard, string.Empty, Enums.Kontur.Ohne, 0, 0, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Ohne, "D8D8D8", string.Empty, string.Empty);
         Design.Add(Enums.Design.Table_Cursor, States.Standard, string.Empty, Enums.Kontur.Rechteck, -1, -1, -1, -1, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_3px, "ACACAC", string.Empty, string.Empty);
@@ -1595,8 +1594,8 @@ public static class Skin {
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;
 
-        PenLinieDünn = new Pen(Color_Border(Enums.Design.Table_Lines_thin, States.Standard));
-        PenLinieKräftig = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard));
+        PenLinieDÃ¼nn = new Pen(Color_Border(Enums.Design.Table_Lines_thin, States.Standard));
+        PenLinieKrÃ¤ftig = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard));
         PenLinieDick = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard), 3);
     }
 
@@ -1606,7 +1605,7 @@ public static class Skin {
                 return style;
 
             case 10001:
-                return PadStyles.Überschrift;
+                return PadStyles.Ãœberschrift;
 
             case 10002:
                 return PadStyles.Untertitel;
@@ -1661,10 +1660,10 @@ public static class Skin {
     //        case 1:
     //            switch (padStyle) {
     //                case PadStyles.Standard:
-    //                    return GetBlueFont(sheetStyle, PadStyles.Überschrift);
+    //                    return GetBlueFont(sheetStyle, PadStyles.Ãœberschrift);
 
     //                case PadStyles.Hervorgehoben:
-    //                    return GetBlueFont(sheetStyle, PadStyles.Überschrift);
+    //                    return GetBlueFont(sheetStyle, PadStyles.Ãœberschrift);
     //            }
     //            break;
 

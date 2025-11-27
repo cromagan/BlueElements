@@ -30,7 +30,6 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.CellRenderer;
 
-
 public class Renderer_Number : Renderer_Abstract {
 
     #region Fields
@@ -102,7 +101,7 @@ public class Renderer_Number : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType doOpticalTranslation, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var pix16 = (int)(16 * scale);
@@ -115,7 +114,7 @@ public class Renderer_Number : Renderer_Abstract {
 
             if (rect.Bottom > scaleddrawarea.Bottom) { break; }
 
-            var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, doOpticalTranslation);
+            var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, translate);
 
             Skin.Draw_FormatedText(gr, replacedText, null, align, rect, this.GetFont(scale), false);
 
@@ -146,7 +145,7 @@ public class Renderer_Number : Renderer_Abstract {
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLower()) {
+        switch (key) {
             case "prefix":
                 _präfix = value.FromNonCritical();
                 return true;
@@ -196,13 +195,13 @@ public class Renderer_Number : Renderer_Abstract {
     /// </summary>
     /// <param name="content"></param>
     /// <param name="style"></param>
-    /// <param name="translate"></param>
+    /// <param name="doOpticalTranslation"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) {
         var t_präfix = _präfix;
         var t_suffix = _suffix;
 
-        if (translate != TranslationType.Original_Anzeigen) {
+        if (doOpticalTranslation != TranslationType.Original_Anzeigen) {
             if (!string.IsNullOrEmpty(_präfix)) { t_präfix = LanguageTool.DoTranslate(_präfix, true); }
             if (!string.IsNullOrEmpty(_suffix)) { t_suffix = LanguageTool.DoTranslate(_suffix, true); }
         }

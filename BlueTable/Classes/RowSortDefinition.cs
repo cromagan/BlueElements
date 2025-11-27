@@ -20,18 +20,17 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BlueTable;
 
-public sealed class RowSortDefinition : IParseable {
+public sealed class RowSortDefinition : IEnumerable<ColumnItem>, IParseable {
 
     #region Fields
 
-    public List<ColumnItem> Columns = [];
-
-    public Table Table;
+    private readonly List<ColumnItem> _internal = [];
 
     #endregion
 
@@ -46,20 +45,16 @@ public sealed class RowSortDefinition : IParseable {
         Table = table;
         Reverse = reverse;
 
-        Columns.Clear();
-
-        if (colum is { IsDisposed: false }) { Columns.Add(colum); }
+        if (colum is { IsDisposed: false }) { _internal.Add(colum); }
     }
 
     public RowSortDefinition(Table table, List<ColumnItem?>? column, bool reverse) {
         Table = table;
         Reverse = reverse;
 
-        Columns.Clear();
-
         if (column != null) {
             foreach (var thisColumn in column) {
-                if (thisColumn is { IsDisposed: false } c) { Columns.Add(c); }
+                if (thisColumn is { IsDisposed: false } c) { _internal.Add(c); }
             }
         }
     }
@@ -70,14 +65,20 @@ public sealed class RowSortDefinition : IParseable {
 
     public bool Reverse { get; private set; }
 
+    public Table Table { get; }
+
     #endregion
 
     #region Methods
 
+    IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
+
+    public IEnumerator<ColumnItem> GetEnumerator() => _internal.GetEnumerator();
+
     public List<string> ParseableItems() {
         List<string> result = [];
         result.ParseableAdd("Reverse", Reverse);
-        result.ParseableAdd("Columns", Columns, true);
+        result.ParseableAdd("Columns", _internal, true);
         return result;
     }
 
@@ -99,13 +100,13 @@ public sealed class RowSortDefinition : IParseable {
 
             case "column":
             case "columnname": // ColumnName wichtig wegen CopyLayout
-                if (Table.Column[value] is { } c) { Columns.Add(c); }
+                if (Table.Column[value] is { } c) { _internal.Add(c); }
                 return true;
 
             case "columns":
                 var cols = value.FromNonCritical().SplitBy("|");
                 foreach (var thisc in cols) {
-                    if (Table.Column[thisc] is { } c2) { Columns.Add(c2); }
+                    if (Table.Column[thisc] is { } c2) { _internal.Add(c2); }
                 }
                 return true;
 
@@ -118,15 +119,15 @@ public sealed class RowSortDefinition : IParseable {
     }
 
     public void Repair() {
-        if (Columns.Count == 0) { return; }
+        if (_internal.Count == 0) { return; }
 
         if (Table is not { IsDisposed: false } tb) { return; }
 
         if (!tb.IsEditable(false)) { return; }
 
-        for (var i = 0; i < Columns.Count; i++) {
-            if (Columns[i] is not { IsDisposed: false }) {
-                Columns.RemoveAt(i);
+        for (var i = 0; i < _internal.Count; i++) {
+            if (_internal[i] is not { IsDisposed: false }) {
+                _internal.RemoveAt(i);
                 //OnPropertyChanged(string propertyname);
                 Repair();
                 return;
@@ -135,7 +136,7 @@ public sealed class RowSortDefinition : IParseable {
     }
 
     public List<RowItem> SortetdRows(IEnumerable<RowItem> rows) {
-        var sortedList = rows.OrderBy(item => item.CompareKey(Columns)).ToList();
+        var sortedList = rows.OrderBy(item => item.CompareKey(_internal)).ToList();
 
         if (Reverse) { sortedList.Reverse(); }
         return sortedList;
@@ -143,7 +144,9 @@ public sealed class RowSortDefinition : IParseable {
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    public bool UsedForRowSort(ColumnItem? column) => Columns.Count != 0 && Columns.Any(thisColumn => thisColumn == column);
+    public bool UsedForRowSort(ColumnItem? column) => _internal.Count != 0 && _internal.Any(thisColumn => thisColumn == column);
+
+    private IEnumerator IEnumerable_GetEnumerator() => _internal.GetEnumerator();
 
     #endregion
 }

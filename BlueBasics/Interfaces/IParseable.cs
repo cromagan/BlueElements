@@ -48,6 +48,12 @@ public interface IParseable : IStringable {
 
     void ParseFinished(string parsed);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key">Der Key in Kleinschreibung konvertiert</param>
+    /// <param name="value"></param>
+    /// <returns></returns>
     bool ParseThis(string key, string value);
 
     #endregion

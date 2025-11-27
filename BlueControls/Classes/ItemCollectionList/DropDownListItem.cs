@@ -79,22 +79,22 @@ public class DropDownListItem : AbstractListItem {
         return new Size(wi, he);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design design, States vState, bool drawBorderAndBack, bool translate) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
         //var tmpd = TempDesign(design);
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, Design.ComboBox_Textbox, vState, positionModified, null, false);
+            Skin.Draw_Back(gr, Design.ComboBox_Textbox, state, positionModified, null, false);
         }
 
         //Selected?.Draw(gr, positionModified.X, positionModified.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
 
         //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, Design.ComboBox_Textbox, vState, positionModified);
+            Skin.Draw_Border(gr, Design.ComboBox_Textbox, state, positionModified);
             var but = new Rectangle(positionModified.Right - 16, positionModified.Top, 16, 16);
 
             var qi = QuickImage.Get("Pfeil_Unten_Scrollbar|8|||||0");
 
-            Button.DrawButton(null, gr, Design.Button_ComboBox, vState, qi, Alignment.Horizontal_Vertical_Center, false, null, string.Empty, but, false);
+            Button.DrawButton(null, gr, Design.Button_ComboBox, state, qi, Alignment.Horizontal_Vertical_Center, false, null, string.Empty, but, false);
 
             //Skin.Draw_Back(gr, Design.Button_ComboBox, vState, but, null, false);
             //Skin.Draw_Border(gr, Design.Button_ComboBox, vState, but);

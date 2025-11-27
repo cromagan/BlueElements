@@ -60,7 +60,6 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
     #region Properties
 
-    
     public static string ClassId => "DynamicSymbol";
 
     public override string Description => string.Empty;

@@ -77,7 +77,7 @@ public class RowFormulaListItem : AbstractListItem {
             if (_row?.Table is not { IsDisposed: false } db) { return string.Empty; }
 
             return !string.IsNullOrEmpty(db.RowQuickInfo)
-                ? _row.QuickInfo.CreateHtmlCodes()
+                ? _row.GetQuickInfo().CreateHtmlCodes()
                 : _row.CellFirstString().CreateHtmlCodes();
         }
     }
@@ -116,13 +116,13 @@ public class RowFormulaListItem : AbstractListItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
         if (_tmpBmp == null) { GeneratePic(); }
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, itemdesign, vState, positionModified, null, false);
+            Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
         if (_tmpBmp != null) {
-            var scale = (float)Math.Min(positionModified.Width / (double)_tmpBmp.Width, positionModified.Height / (double)_tmpBmp.Height);
+            scale = (float)Math.Min(positionModified.Width / (double)_tmpBmp.Width, positionModified.Height / (double)_tmpBmp.Height);
             RectangleF r2 = new(
                 ((positionModified.Width - (_tmpBmp.Width * scale)) / 2) + positionModified.Left,
                 ((positionModified.Height - (_tmpBmp.Height * scale)) / 2) + positionModified.Top,
@@ -130,7 +130,7 @@ public class RowFormulaListItem : AbstractListItem {
             gr.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
         }
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, vState, positionModified);
+            Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }
     }
 
@@ -169,10 +169,8 @@ public class RowFormulaListItem : AbstractListItem {
     }
 
     private void RemovePic() {
-        if (_tmpBmp != null) {
-            _tmpBmp?.Dispose();
-            _tmpBmp = null;
-        }
+        _tmpBmp?.Dispose();
+        _tmpBmp = null;
     }
 
     #endregion

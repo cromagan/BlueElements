@@ -63,9 +63,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     #region Properties
 
-    /// <summary>Debouncing-Verzögerung für FileSystemWatcher-Events (ms)</summary>
-    public int DebounceDelayMs => 500;
-
     // Property anpassen:
     public bool IsDisposed => _isDisposedFlag == 1;
 
@@ -311,6 +308,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return normalizedChildPath.StartsWith(normalizedParentPath, StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool MatchesPattern(string fileName, string pattern) {
+        var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
+        return Regex.IsMatch(fileName.FileNameWithSuffix(), regexPattern, RegexOptions.IgnoreCase);
+    }
+
     private CachedFile AddToCache(string fileName) {
         var normalizedFileName = IO.NormalizeFile(fileName);
 
@@ -371,11 +373,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 _watcherLock.ExitWriteLock();
             } catch { }
         }
-    }
-
-    private bool MatchesPattern(string fileName, string pattern) {
-        var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
-        return Regex.IsMatch(fileName.FileNameWithSuffix(), regexPattern, RegexOptions.IgnoreCase);
     }
 
     private void OnFileChanged(object sender, FileSystemEventArgs e) {

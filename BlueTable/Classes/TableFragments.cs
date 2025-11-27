@@ -166,8 +166,8 @@ public class TableFragments : TableFile {
         return FileOperationResult.ValueStringEmpty;
     }
 
-    public override string IsNotEditableReason(bool isLoading) {
-        var aadc = base.IsNotEditableReason(isLoading);
+    public override string IsNotEditableReason(bool isloading) {
+        var aadc = base.IsNotEditableReason(isloading);
         if (!string.IsNullOrEmpty(aadc)) { return aadc; }
 
         if (string.IsNullOrEmpty(FragmengtsPath())) { return "Fragmentpfad nicht gesetzt."; }

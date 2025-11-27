@@ -38,7 +38,7 @@ using System.Windows.Forms;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-[DefaultEvent("TextChanged")]
+[DefaultEvent(nameof(TextChanged))]
 public partial class ComboBox : TextBox, ITranslateable {
 
     #region Fields
@@ -294,11 +294,11 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         if (!FloatingForm.IsShowing(this)) {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
-            var r = i.Position;
+            //var r = i.Position;
             var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height) / 2.0);
-            i.SetCoordinates(new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height));
-            i.Draw(gr, 0, 0, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert);
-            i.SetCoordinates(r);
+            //i.Position = new Rectangle(Skin.PaddingSmal, -ymod, Width - 30, i.SizeUntouchedForListBox(Design.Item_DropdownMenu).Height);
+            i.Draw(gr, i.Position, Skin.PaddingSmal, -ymod, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert, 1f);
+            //i.Position = r;
         }
         Skin.Draw_Border(gr, vType, state, DisplayRectangle);
         btnDropDown.Invalidate();

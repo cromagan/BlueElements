@@ -57,8 +57,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     #region Properties
 
-    public bool UndoDone { get; set; }
-
     public Table? Table {
         get;
         private set {
@@ -77,6 +75,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     public IEditable? ToEdit { set => Table = value as Table; }
+    public bool UndoDone { get; set; }
 
     #endregion
 
@@ -268,41 +267,41 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
 
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         PermissionGroups_NewRow.ItemClear();
-        PermissionGroups_NewRow.Check(db.PermissionGroupsNewRow);
+        PermissionGroups_NewRow.Check(tb.PermissionGroupsNewRow);
         PermissionGroups_NewRow.Suggestions.Clear();
         PermissionGroups_NewRow.ItemAddRange(TableView.Permission_AllUsed(false));
 
         lbxTableAdmin.ItemClear();
-        lbxTableAdmin.Check(db.TableAdmin);
+        lbxTableAdmin.Check(tb.TableAdmin);
 
-        txbKennwort.Text = db.GlobalShowPass;
+        txbKennwort.Text = tb.GlobalShowPass;
         lbxSortierSpalten.ItemClear();
 
-        if (db.SortDefinition != null) {
-            btnSortRichtung.Checked = db.SortDefinition.Reverse;
-            if (db.SortDefinition?.Columns != null) {
-                foreach (var thisColumn in db.SortDefinition.Columns) {
+        if (tb.SortDefinition != null) {
+            btnSortRichtung.Checked = tb.SortDefinition.Reverse;
+            if (tb.SortDefinition != null) {
+                foreach (var thisColumn in tb.SortDefinition) {
                     if (thisColumn is { IsDisposed: false }) {
                         lbxSortierSpalten.AddAndCheck(ItemOf(thisColumn));
                     }
                 }
             }
         }
-        txbTags.Text = db.Tags.JoinWithCr();
+        txbTags.Text = tb.Tags.JoinWithCr();
 
-        txbCaption.Text = db.Caption;
-        txbAdditionalFiles.Text = db.AdditionalFilesPath;
-        txbStandardFormulaFile.Text = db.StandardFormulaFile;
-        txbZeilenQuickInfo.Text = db.RowQuickInfo.Replace("<br>", "\r");
+        txbCaption.Text = tb.Caption;
+        txbAdditionalFiles.Text = tb.AdditionalFilesPath;
+        txbStandardFormulaFile.Text = tb.StandardFormulaFile;
+        txbZeilenQuickInfo.Text = tb.RowQuickInfo.Replace("<br>", "\r");
 
         lbxTableAdmin.Suggestions.Clear();
         lbxTableAdmin.ItemAddRange(TableView.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
-        lbxSortierSpalten.Suggestions.AddRange(ItemsOf(db.Column, true));
+        lbxSortierSpalten.Suggestions.AddRange(ItemsOf(tb.Column, true));
 
         variableEditor.ToEdit = Table?.Variables;
 

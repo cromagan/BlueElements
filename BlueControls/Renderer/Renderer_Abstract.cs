@@ -38,7 +38,6 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     #region Fields
 
-    public readonly bool ReadOnly;
     internal static readonly Renderer_Abstract Bool = new Renderer_ImageAndText("+|Häkchen\r\no|Kreis2\r\n-|Kreuz");
     internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
     private static readonly ConcurrentDictionary<string, string> Replaced = [];
@@ -50,7 +49,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     #region Constructors
 
-    public Renderer_Abstract() : this(false) { }
+    protected Renderer_Abstract() : this(false) { }
 
     protected Renderer_Abstract(bool readOnly) => ReadOnly = readOnly;
 
@@ -69,6 +68,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     public abstract string Description { get; }
     public BlueFont? Font { get; set; }
     public string QuickInfo => Description;
+    public bool ReadOnly { get; }
 
     public string SheetStyle {
         get => _sheetStyle;

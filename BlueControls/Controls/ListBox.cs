@@ -44,7 +44,7 @@ using Orientation = BlueBasics.Enums.Orientation;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-[DefaultEvent("ItemClicked")]
+[DefaultEvent(nameof(ItemClicked))]
 public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
     #region Fields
@@ -64,12 +64,6 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
     private AbstractListItem? _mouseOverItem;
-
-    /// <summary>
-    /// Einfaches Flag, dass die Buttons nur einblendet, wenn eine Mausbewegung stattgefunden hat.
-    /// Bei einem MouseWheel wird nichts eingeblendet
-    /// </summary>
-    private Point _mousepos = Point.Empty;
 
     private bool _sorted;
 
@@ -261,52 +255,6 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
     #region Methods
 
-    /// <summary>
-    ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-    /// </summary>
-    /// <returns></returns>
-    public static (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) ItemData(
-        List<AbstractListItem> item, Design itemDesign) {
-        try {
-            var w = 16;
-            var h = 0;
-            var hall = 0;
-            var sameh = -1;
-            var or = Orientation.Senkrecht;
-            PreComputeSize(item, itemDesign);
-
-            foreach (var thisItem in item) {
-                if (thisItem != null) {
-                    var s = thisItem.SizeUntouchedForListBox(itemDesign);
-                    w = Math.Max(w, s.Width);
-                    h = Math.Max(h, s.Height);
-                    hall += s.Height;
-                    if (sameh < 0) {
-                        sameh = thisItem.SizeUntouchedForListBox(itemDesign).Height;
-                    } else {
-                        if (sameh != thisItem.SizeUntouchedForListBox(itemDesign).Height) { or = Orientation.Waagerecht; }
-                        sameh = thisItem.SizeUntouchedForListBox(itemDesign).Height;
-                    }
-                    if (thisItem is not TextListItem) { or = Orientation.Waagerecht; }
-                }
-            }
-
-            return (w, h, hall, or);
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return ItemData(item, itemDesign);
-        }
-    }
-
-    public static void PreComputeSize(List<AbstractListItem> item, Design itemDesign) {
-        try {
-            Parallel.ForEach(item, thisItem => thisItem?.SizeUntouchedForListBox(itemDesign));
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            PreComputeSize(item, itemDesign);
-        }
-    }
-
     public AbstractListItem? Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
 
@@ -325,7 +273,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     }
 
     public Size CalculateColumnAndSize(Renderer_Abstract renderer) {
-        var (biggestItemX, _, heightAdded, orienation) = ItemData(_item, _itemDesign);
+        var (biggestItemX, _, heightAdded, orienation) = _item.ItemData(_itemDesign);
         if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation, 0, renderer); }
         BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orienation);
         return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation, 0, renderer);
@@ -570,7 +518,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
             }
 
             if (_itemDesign == Design.Undefiniert) { GetDesigns(); }
-            PreComputeSize(_item, _itemDesign);
+            _item.PreComputeSize(_itemDesign);
 
             if (BreakAfterItems < 1) { senkrechtAllowed = Orientation.Waagerecht; }
             var sliderWidth = 0;
@@ -623,7 +571,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
             DoItemOrder();
             foreach (var thisItem in _item) {
                 // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
-                if (thisItem != null) {
+                if (thisItem != null && thisItem.Visible) {
                     var cx = 0;
                     var cy = 0;
                     var wi = colWidth;
@@ -655,7 +603,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                             }
                         }
                     }
-                    thisItem.SetCoordinates(new Rectangle(cx, cy, wi, he));
+                    thisItem.Position = new Rectangle(cx, cy, wi, he);
                     maxX = Math.Max(thisItem.Position.Right, maxX);
                     maxy = Math.Max(thisItem.Position.Bottom, maxy);
                     previtem = thisItem;
@@ -746,8 +694,8 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     protected override void DrawControl(Graphics gr, States state) {
         var checkboxDesign = CheckboxDesign();
 
-        var tmpState = state;
-        tmpState &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
+        var controlState = state;
+        controlState &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
 
         var addy = 0;
 
@@ -759,7 +707,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
             addy = 0;
         }
 
-        var (biggestItemX, _, heightAdded, senkrechtAllowed) = ItemData(_item, _itemDesign);
+        var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.ItemData(_itemDesign);
         ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy, Renderer);
 
         var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
@@ -769,61 +717,38 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
         if (borderCoords.Height > 0) {
             gr.ScaleTransform(1, 1);
-            Skin.Draw_Back(gr, _controlDesign, tmpState, borderCoords, this, true);
+            Skin.Draw_Back(gr, _controlDesign, controlState, borderCoords, this, true);
         }
 
         //_mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
-        object locker = new();
+
         DoItemOrder();
 
-        Parallel.ForEach(_item, thisItem => {
-            var currentItem = thisItem;
-            if (currentItem.Position.IntersectsWith(visArea)) {
-                var itemState = tmpState;
-                if (_mouseOverItem == currentItem && Enabled) { itemState |= States.Standard_MouseOver; }
-
-                if (!currentItem.Enabled) { itemState = States.Standard_Disabled; }
-
-                if (CheckBehavior != CheckBehavior.AllSelected && IsChecked(currentItem)) { itemState |= States.Checked; }
-
-                lock (locker) {
-                    currentItem.Draw(gr, 0, (int)SliderY.Value, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign);
-                }
-            }
-        });
-
-        if (borderCoords.Height > 0 && _controlDesign == Design.ListBox) {
-            Skin.Draw_Border(gr, _controlDesign, tmpState, borderCoords);
+        if (CheckBehavior == CheckBehavior.AllSelected) {
+            _item.DrawItems(gr, visArea, _mouseOverItem, 0, (int)SliderY.Value, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, null);
+        } else {
+            _item.DrawItems(gr, visArea, _mouseOverItem, 0, (int)SliderY.Value, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, _checked);
         }
 
-        //if (tmpButtonLeisteHeight > 0) {
-        //    Skin.Draw_Back_Transparent(gr, new Rectangle(0, borderCoords.Bottom, Width, tmpButtonLeisteHeight), this);
-        //}
+        if (borderCoords.Height > 0 && _controlDesign == Design.ListBox) {
+            Skin.Draw_Border(gr, _controlDesign, controlState, borderCoords);
+        }
     }
 
-    //protected override void OnDoubleClick(System.EventArgs e) {
-    //    if (!Enabled) { return; }
-    //    var nd = MouseOverNode(MousePos().X, MousePos().Y);
-    //    if (nd == null) { return; }
-    //    OnItemDoubleClick(new AbstractListItemEventArgs(nd));
-    //}
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-
         DoMouseMovement();
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
-        if (e.X != _mousepos.X || e.Y != _mousepos.Y) { _mousemoved = true; }
-        _mousepos = new Point(e.X, e.Y);
         DoMouseMovement();
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (!Enabled) { return; }
-        var nd = MouseOverNode(e.X, e.Y);
+        var nd = _item.ElementAtPosition(e.X, e.Y, 0, (int)SliderY.Value);
         if (nd is { Enabled: false }) { return; }
         switch (e.Button) {
             case MouseButtons.Left:
@@ -848,7 +773,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 break;
 
             case MouseButtons.Right:
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, MouseOverNode(e.X, e.Y), e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, _item.ElementAtPosition(e.X, e.Y, 0, (int)SliderY.Value), e);
                 break;
         }
     }
@@ -1017,7 +942,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
         var isInForm = !(MousePos().X < 0 || MousePos().Y < 0 || MousePos().X > Width || MousePos().Y > Height);
 
-        var nd = MouseOverNode(MousePos().X, MousePos().Y);
+        var nd = _item.ElementAtPosition(MousePos().X, MousePos().Y, 0, (int)SliderY.Value);
         if (!Enabled || Parent is not { Enabled: true } || !Visible) {
             nd = null;
             isInForm = false;
@@ -1145,8 +1070,6 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     private bool IsChecked(string name) => _checked.Contains(name);
 
     private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
-
-    private AbstractListItem? MouseOverNode(int x, int y) => _item.FirstOrDefault(thisItem => thisItem?.Contains(x, y + (int)SliderY.Value) == true);
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 

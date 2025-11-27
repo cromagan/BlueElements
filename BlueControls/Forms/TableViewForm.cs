@@ -532,7 +532,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        Table.ImportBdb();
+        Table.ImportBtb();
     }
 
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();

@@ -36,7 +36,7 @@ using Form = BlueControls.Forms.Form;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-[DefaultEvent("Click")]
+[DefaultEvent(nameof(Click))]
 public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
     #region Fields

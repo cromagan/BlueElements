@@ -26,15 +26,6 @@ namespace BlueControls.ItemCollectionList;
 
 public class TextListItem : AbstractListItem {
 
-    public bool IsCaption {
-        get;
-        protected set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
     #region Constructors
 
     public TextListItem(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(keyName, enabled) {
@@ -47,6 +38,15 @@ public class TextListItem : AbstractListItem {
     #endregion
 
     #region Properties
+
+    public bool IsCaption {
+        get;
+        protected set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     public override string QuickInfo => Text.CreateHtmlCodes();
 
@@ -72,22 +72,22 @@ public class TextListItem : AbstractListItem {
 
     #region Methods
 
-    public override bool IsClickable() => !IsCaption && base.IsClickable();
-
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
+    public override bool IsClickable() => !IsCaption && base.IsClickable();
+
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Skin.GetBlueFont(TempDesign(itemdesign), States.Standard).FormatedText_NeededSize(Text, Symbol, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design design, States vState, bool drawBorderAndBack, bool translate) {
-        var tmpd = TempDesign(design);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+        var tmpd = TempDesign(itemdesign);
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, tmpd, vState, positionModified, null, false);
+            Skin.Draw_Back(gr, tmpd, state, positionModified, null, false);
         }
-        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionModified, tmpd, vState, null, false, translate);
+        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionModified, tmpd, state, null, false, translate);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, tmpd, vState, positionModified);
+            Skin.Draw_Border(gr, tmpd, state, positionModified);
         }
     }
 

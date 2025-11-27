@@ -31,7 +31,6 @@ using System.Linq;
 
 namespace BlueControls.CellRenderer;
 
-
 public class Renderer_Layout : Renderer_Abstract {
 
     #region Fields
@@ -135,7 +134,7 @@ public class Renderer_Layout : Renderer_Abstract {
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLower()) {
+        switch (key) {
             case "layoutfile":
                 _file = value.FromNonCritical();
                 return true;
@@ -147,7 +146,7 @@ public class Renderer_Layout : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Layout);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) {
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         using var l = new ItemCollectionPadItem(_file);
         l.ForPrinting = true;
 
@@ -163,9 +162,9 @@ public class Renderer_Layout : Renderer_Abstract {
     /// </summary>
     /// <param name="content"></param>
     /// <param name="style"></param>
-    /// <param name="translate"></param>
+    /// <param name="doOpticalTranslation"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) => LanguageTool.PrepaireText(content, style, string.Empty, string.Empty, translate, null);
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) => LanguageTool.PrepaireText(content, style, string.Empty, string.Empty, doOpticalTranslation, null);
 
     #endregion
 }

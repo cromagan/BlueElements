@@ -39,7 +39,7 @@ using Orientation = BlueBasics.Enums.Orientation;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-[DefaultEvent("ValueChanged")]
+[DefaultEvent(nameof(ValueChanged))]
 public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable {
 
     #region Fields

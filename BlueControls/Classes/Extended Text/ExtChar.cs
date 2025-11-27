@@ -43,7 +43,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     #region Constructors
 
-    public ExtChar(ExtText parent, PadStyles style, BlueFont font) : base() {
+    protected ExtChar(ExtText parent, PadStyles style, BlueFont font) : base() {
         _size = SizeF.Empty;
         _style = style;
         _parent = parent;
@@ -51,7 +51,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         _parent.StyleChanged += _parent_StyleChanged;
     }
 
-    public ExtChar(ExtText parent, int styleFromPos) : base() {
+    protected ExtChar(ExtText parent, int styleFromPos) : base() {
         styleFromPos = Math.Max(styleFromPos, 0);
         styleFromPos = Math.Min(styleFromPos, parent.Count - 1);
 

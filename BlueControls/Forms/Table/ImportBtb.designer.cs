@@ -10,7 +10,7 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.BlueTableDialogs
 {
-    public sealed partial class ImportBdb {
+    public sealed partial class ImportBtb {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing)

@@ -46,7 +46,7 @@ using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-[DefaultEvent("Click")]
+[DefaultEvent(nameof(Click))]
 public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged {
 
     #region Fields
@@ -590,14 +590,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
     private void _Items_ItemAdded(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        OnPropertyChanged("Items");
+        OnPropertyChanged(nameof(Items));
         if (!_items.Any() || Fitting) { ZoomFit(); }
         Invalidate();
     }
 
     private void _Items_ItemRemoved(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        OnPropertyChanged("Items");
+        OnPropertyChanged(nameof(Items));
         if (Fitting) { ZoomFit(); }
 
         Unselect();

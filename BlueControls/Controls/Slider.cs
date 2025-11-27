@@ -31,7 +31,7 @@ using Orientation = BlueBasics.Enums.Orientation;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-[DefaultEvent("ValueChanged")]
+[DefaultEvent(nameof(ValueChanged))]
 public partial class Slider : IBackgroundNone {
 
     #region Fields

@@ -345,7 +345,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     }
 
     public virtual bool ParseThis(string key, string value) {
-        switch (key.ToLowerInvariant()) {
+        switch (key) {
             case "type":
                 return true;
 

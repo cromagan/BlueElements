@@ -328,6 +328,46 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         ThumbGenerator.RunWorkerAsync();
     }
 
+    private void Contextmenu_Delete(object sender, ObjectEventArgs e) {
+        if (e.Data is not BitmapListItem it) { return; }
+        if (!AllowEdit) { return; }
+
+        var I = GetFileInfo(it.KeyName);
+        if (I == null) {
+            ReloadDirectory();
+            return;
+        }
+
+        var silent = !I.Attributes.HasFlag(System.IO.FileAttributes.ReadOnly);
+        if (FileDialogs.DeleteFile(I.FullName, !silent)) {
+            ReloadDirectory();
+        }
+    }
+
+    private void Contextmenu_OpenExplorer(object sender, ObjectEventArgs e) {
+        if (e.Data is not BitmapListItem it) { return; }
+        if (!AllowEdit) { return; }
+
+        ExecuteFile(it.KeyName);
+    }
+
+    private void Contextmenu_Rename(object sender, ObjectEventArgs e) {
+        if (e.Data is not BitmapListItem it) { return; }
+        if (!AllowEdit) { return; }
+
+        var n = it.KeyName;
+
+        var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder.Text);
+
+        if (n.FileNameWithoutSuffix() == n) { return; }
+
+        nn = n.FilePath() + nn + "." + n.FileSuffix();
+
+        MoveFile(it.KeyName, nn, true);
+
+        ReloadDirectory();
+    }
+
     private void CreateWatcher() {
         if (Disposing || IsDisposed) { return; }
 
@@ -377,46 +417,6 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         e.ContextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, e.HotItem, FileExists(it.KeyName)));
         e.ContextMenu.Add(Separator());
         e.ContextMenu.Add(ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, e.HotItem, true));
-    }
-
-    private void Contextmenu_Delete(object sender, ObjectEventArgs e) {
-        if (e.Data is not BitmapListItem it) { return; }
-        if (!AllowEdit) { return; }
-
-        var I = GetFileInfo(it.KeyName);
-        if (I == null) {
-            ReloadDirectory();
-            return;
-        }
-
-        var silent = !I.Attributes.HasFlag(System.IO.FileAttributes.ReadOnly);
-        if (FileDialogs.DeleteFile(I.FullName, !silent)) {
-            ReloadDirectory();
-        }
-    }
-
-    private void Contextmenu_OpenExplorer(object sender, ObjectEventArgs e) {
-        if (e.Data is not BitmapListItem it) { return; }
-        if (!AllowEdit) { return; }
-
-        ExecuteFile(it.KeyName);
-    }
-
-    private void Contextmenu_Rename(object sender, ObjectEventArgs e) {
-        if (e.Data is not BitmapListItem it) { return; }
-        if (!AllowEdit) { return; }
-
-        var n = it.KeyName;
-
-        var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder.Text);
-
-        if (n.FileNameWithoutSuffix() == n) { return; }
-
-        nn = n.FilePath() + nn + "." + n.FileSuffix();
-
-        MoveFile(it.KeyName, nn, true);
-
-        ReloadDirectory();
     }
 
     private void lsbFiles_DragDrop(object sender, DragEventArgs e) {

@@ -27,7 +27,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
+public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
 
     #region Fields
 
@@ -37,7 +37,7 @@ public sealed partial class ImportBdb : FormWithStatusBar, IHasTable {
 
     #region Constructors
 
-    public ImportBdb(Table? table) : base() {
+    public ImportBtb(Table? table) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

@@ -157,7 +157,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLowerInvariant()) {
+        switch (key) {
             case "size":
                 _size = value.SizeParse();
                 return true;

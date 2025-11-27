@@ -34,7 +34,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
     #region Constructors
 
-    public ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason) {
+    protected ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason) {
         if (string.IsNullOrEmpty(name)) {
             name = "New script";
         }

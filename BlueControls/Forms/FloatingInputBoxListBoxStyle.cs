@@ -97,7 +97,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, xpos, ypos, steuerWi, connectedControl, translate, controlDesign, itemDesign, autosort);
 
     public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) {
-        var (biggestItemX, _, heightAdded, _) = ListBox.ItemData(items, itemDesign);
+        var (biggestItemX, _, heightAdded, _) = items.ItemData(itemDesign);
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
         lstbx.Appearance = controlDesign;
         lstbx.Translate = translate;
@@ -152,9 +152,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
     }
 
-    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
-
     private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     private void timer1_Tick(object sender, System.EventArgs e) {
         var mouseIsDown = !string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton());

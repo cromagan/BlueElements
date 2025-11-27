@@ -121,9 +121,9 @@ public partial class VariableEditor : EditorEasy {
         tb.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }
 
-    protected override bool SetValuesToFormula(IEditable? variables) {
+    protected override bool SetValuesToFormula(IEditable? toEdit) {
         if (IsDisposed || tableVariablen?.Table is not { IsDisposed: false } db) { return false; }
-        if (variables is not VariableCollection vc) { return false; }
+        if (toEdit is not VariableCollection vc) { return false; }
 
         foreach (var thisv in vc) {
             var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");

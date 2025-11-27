@@ -244,7 +244,7 @@ public static class WindowsRemoteControl {
         var l = GetWindowTextLength(handle) + 1;
         var buffer = string.Empty.PadRight(l);
         GetWindowText(handle, buffer, l);
-        return buffer.Substring(0, buffer.Length);
+        return buffer.Substring(0);
     }
 
     [DllImport("user32", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]

@@ -28,7 +28,6 @@ using System.Drawing;
 
 namespace BlueControls.CellRenderer;
 
-
 public class Renderer_RichText : Renderer_Abstract {
 
     #region Properties
@@ -78,7 +77,7 @@ public class Renderer_RichText : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Sonne);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) {
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         using var _etxt = new ExtText(SheetStyle, Style) {
             HtmlText = content,
             Multiline = true
@@ -94,9 +93,9 @@ public class Renderer_RichText : Renderer_Abstract {
     /// </summary>
     /// <param name="content"></param>
     /// <param name="style"></param>
-    /// <param name="translate"></param>
+    /// <param name="doOpticalTranslation"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) => content;
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) => content;
 
     #endregion
 }

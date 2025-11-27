@@ -52,16 +52,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public RowItem(Table table, string key) {
         Table = table;
         KeyName = key;
-        QuickInfo = null;
     }
 
     #endregion
 
     #region Destructors
 
-    ~RowItem() {
-        Dispose(false);
-    }
+    ~RowItem() => Dispose(false);
 
     #endregion
 
@@ -89,16 +86,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public bool KeyIsCaseSensitive => true;
     public string KeyName { get; }
 
-    public string? QuickInfo {
-        get {
-            if (Table is not { IsDisposed: false }) { return string.Empty; }
-            field ??= ReplaceVariables(Table.RowQuickInfo, false, null);
-            return field;
-        }
-
-        private set;
-    }
-
     public Table? Table {
         get;
         private set {
@@ -107,13 +94,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (field != null) {
                 field.DisposingEvent -= _table_Disposing;
-                field.Cell.CellValueChanged -= Cell_CellValueChanged;
+                //field.Cell.CellValueChanged -= Cell_CellValueChanged;
             }
             field = value;
 
             if (field != null) {
                 field.DisposingEvent += _table_Disposing;
-                field.Cell.CellValueChanged += Cell_CellValueChanged;
+                //field.Cell.CellValueChanged += Cell_CellValueChanged;
             }
         }
     }
@@ -276,6 +263,41 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string CellGetString(string columnName) => CellGetString(Table?.Column[columnName]) ?? string.Empty;
 
+    public string CellGetString(ColumnItem? column) // Main Method
+                                                                                                {
+        try {
+            if (IsDisposed) {
+                Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Table.KeyName);
+                return string.Empty;
+            }
+
+            if (IsDisposed || Table is not { IsDisposed: false }) {
+                Table?.DevelopWarnung("Tabelle ungültig!");
+                Develop.DebugPrint(ErrorType.Error, "Tabelle ungültig!");
+                return string.Empty;
+            }
+
+            if (column is not { IsDisposed: false }) {
+                Table?.DevelopWarnung("Spalte ungültig!");
+                Develop.DebugPrint(ErrorType.Error, "Spalte ungültig!<br>" + Table?.KeyName);
+                return string.Empty;
+            }
+
+            if (column.RelationType == RelationType.CellValues) {
+                var (lcolumn, lrow, _, _) = LinkedCellData(column, false, false);
+                return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
+            }
+
+            return CellGetStringCore(column);
+        } catch {
+            // Manchmal verscwhindwet der vorhandene KeyName?!?
+            Develop.AbortAppIfStackOverflow();
+            return CellGetString(column);
+        }
+    }
+
+    public string CellGetStringCore(ColumnItem? column) => Table?.Cell[column, this]?.Value ?? string.Empty;
+
     public void CellSet(string columnName, bool value, string comment) => Set(Table?.Column[columnName], value.ToPlusMinus(), comment);
 
     public void CellSet(ColumnItem column, bool value, string comment) => Set(column, value.ToPlusMinus(), comment);
@@ -371,21 +393,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         var columns = new List<ColumnItem>();
-        if (tb.SortDefinition?.Columns is { } lc) { columns.AddRange(lc); }
+        if (tb.SortDefinition is { } lc) { columns.AddRange(lc); }
         if (tb.Column.SysChapter is { IsDisposed: false } csc) { columns.AddIfNotExists(csc); }
         if (tb.Column.First is { IsDisposed: false } cf) { columns.AddIfNotExists(cf); }
 
         return CompareKey(columns);
     }
-
-    //public int CompareTo(object obj) {
-    //    if (obj is RowItem tobj) {
-    //        return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
-    //    }
-
-    //    Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
-    //    return 0;
-    //}
 
     public void Dispose() {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -393,6 +406,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         GC.SuppressFinalize(this);
     }
 
+    //    Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
+    //    return 0;
+    //}
     public void DropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
         if (Table is not { IsDisposed: false } db) { return; }
@@ -401,6 +417,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         Develop.Message?.Invoke(type, this, db.Caption, ImageCode.Zeile, message, 0);
     }
 
+    //public int CompareTo(object obj) {
+    //    if (obj is RowItem tobj) {
+    //        return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
+    //    }
     /// <summary>
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initialwerte der Zellen.
     /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
@@ -434,40 +454,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         } while (true);
     }
 
-    public string CellGetString(ColumnItem? column) // Main Method
-                                                                                                {
-        try {
-            if (IsDisposed) {
-                Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Table.KeyName);
-                return string.Empty;
-            }
-
-            if (IsDisposed || Table is not { IsDisposed: false }) {
-                Table?.DevelopWarnung("Tabelle ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Tabelle ungültig!");
-                return string.Empty;
-            }
-
-            if (column is not { IsDisposed: false }) {
-                Table?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Spalte ungültig!<br>" + Table?.KeyName);
-                return string.Empty;
-            }
-
-            if (column.RelationType == RelationType.CellValues) {
-                var (lcolumn, lrow, _, _) = LinkedCellData(column, false, false);
-                return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
-            }
-
-            return CellGetStringCore(column);
-        } catch {
-            // Manchmal verscwhindwet der vorhandene KeyName?!?
-            Develop.AbortAppIfStackOverflow();
-            return CellGetString(column);
-        }
+    public string GetQuickInfo() {
+        if (Table is not { IsDisposed: false }) { return string.Empty; }
+        return ReplaceVariables(Table.RowQuickInfo, false, null);
     }
-
-    public string CellGetStringCore(ColumnItem? column) => Table?.Cell[column, this]?.Value ?? string.Empty;
 
     public void InvalidateCheckData() {
         RowCollection.FailedRows.TryRemove(this, out _);
@@ -1044,11 +1034,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    private void Cell_CellValueChanged(object sender, CellEventArgs e) {
-        if (e.Row != this) { return; }
-        QuickInfo = null;
-    }
-
     private string CellGetCompareKey(ColumnItem column) => Table?.Cell.CompareKey(column, this) ?? string.Empty;
 
     private string ChangeTextFromRowId(string completeRelationText) {
@@ -1111,7 +1096,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 Table = null;
             }
             // Nicht verwaltete Ressourcen (Bitmap, Tabellenverbindungen, ...)
-            QuickInfo = null;
             InvalidateCheckData();
 
             IsDisposed = true;

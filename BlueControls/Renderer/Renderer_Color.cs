@@ -29,7 +29,6 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.CellRenderer;
 
-
 public class Renderer_Color : Renderer_Abstract {
 
     #region Fields
@@ -118,7 +117,7 @@ public class Renderer_Color : Renderer_Abstract {
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLower()) {
+        switch (key) {
             case "showsymbol":
                 _showSymbol = value.FromPlusMinus();
                 return true;
@@ -138,8 +137,8 @@ public class Renderer_Color : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Farbrad);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) {
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
         var contentSize = this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
 
         if (ShowSymbol) {
@@ -149,7 +148,7 @@ public class Renderer_Color : Renderer_Abstract {
         return contentSize;
     }
 
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) {
         if (!_showHex && !_showName) { return string.Empty; }
 
         if (!ColorTryParse(content, out var col)) { return content; }

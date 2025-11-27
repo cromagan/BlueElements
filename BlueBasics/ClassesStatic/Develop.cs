@@ -197,7 +197,7 @@ public static class Develop {
                 Trace.WriteLine("<br>" + DateTime.UtcNow.ToString1() + " UTC<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
                 Trace.WriteLine("<th ALIGN=LEFT>");
                 for (var z = 0; z <= Math.Min(nr + 2, strace.FrameCount - 2); z++) {
-                    if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint")) {
+                    if (!strace.GetFrame(z).GetMethod().Name.Contains(nameof(DebugPrint))) {
                         if (first) { Trace.WriteLine("<font color =0000FF>"); }
                         Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
                         l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
@@ -271,7 +271,7 @@ public static class Develop {
             var context = SynchronizationContext.Current;
 
             // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
-            if (context != null && context.GetType().Name == "WindowsFormsSynchronizationContext") {
+            if (context != null && context.GetType().Name == nameof(WindowsFormsSynchronizationContext)) {
                 return propertyFunc();
             }
 
@@ -309,7 +309,7 @@ public static class Develop {
             var context = SynchronizationContext.Current;
 
             // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
-            if (context != null && context.GetType().Name == "WindowsFormsSynchronizationContext") {
+            if (context != null && context.GetType().Name == nameof(WindowsFormsSynchronizationContext)) {
                 action();
                 return;
             }

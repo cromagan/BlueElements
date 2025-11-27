@@ -43,8 +43,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     #region Fields
 
-    public string Page { get; set; } = string.Empty;
-
     /// <summary>
     /// Soll es gedruckt werden?
     /// </summary>
@@ -74,7 +72,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         _keyName = keyName;
         if (string.IsNullOrEmpty(_keyName)) { _keyName = GetUniqueKey(); }
 
-        JointMiddle = new PointM("JointMiddle", 0, 0);
+        JointMiddle = new PointM(nameof(JointMiddle), 0, 0);
         JointMiddle.Moved += JointMiddle_Moved;
 
         MovablePoint.CollectionChanged += Point_CollectionChanged;
@@ -153,8 +151,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     public ObservableCollection<PointM> MovablePoint { get; } = [];
 
     public virtual bool MoveXByMouse => true;
-
     public virtual bool MoveYByMouse => true;
+    public string Page { get; set; } = string.Empty;
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~AbstractPadItem()
@@ -224,6 +222,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             }
         }
     }
+
+    public static bool IsInDrawingArea(RectangleF drawingKoordinates, Rectangle visibleArea) => visibleArea.IsEmpty || drawingKoordinates.IntersectsWith(visibleArea);
 
     public virtual void AddedToCollection(ItemCollectionPadItem parent) {
         if (IsDisposed) { return; }
@@ -391,8 +391,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// <param name="width"></param>
     /// <param name="height"></param>
     public abstract void InitialPosition(int x, int y, int width, int height);
-
-    public static bool IsInDrawingArea(RectangleF drawingKoordinates, Rectangle visibleArea) => visibleArea.IsEmpty || drawingKoordinates.IntersectsWith(visibleArea);
 
     public void Move(float x, float y, bool isMouse) {
         if (x == 0 && y == 0) { return; }

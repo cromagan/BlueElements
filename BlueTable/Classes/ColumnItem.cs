@@ -1273,8 +1273,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return Contents(r2);
     }
 
-    public List<string> Contents(IEnumerable<RowItem>? rows) {
-        if (rows?.Any() != true) { return []; }
+    public List<string> Contents(ICollection<RowItem> rows) {
+        if (rows.Count == 0) { return []; }
 
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
@@ -1284,9 +1284,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 if (_multiLine) {
                     list.AddRange(thisRowItem.CellGetList(this));
                 } else {
-                    if (thisRowItem.CellGetString(this).Length > 0) {
+ 
                         list.Add(thisRowItem.CellGetString(this));
-                    }
+                    
                 }
             }
         }

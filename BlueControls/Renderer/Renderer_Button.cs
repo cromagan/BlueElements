@@ -29,7 +29,6 @@ using System.Drawing;
 
 namespace BlueControls.CellRenderer;
 
-
 public class Renderer_Button : Renderer_Abstract {
 
     #region Fields
@@ -123,7 +122,7 @@ public class Renderer_Button : Renderer_Abstract {
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLower()) {
+        switch (key) {
             case "showpic":
                 _bild_anzeigen = value.FromPlusMinus();
                 return true;
@@ -143,11 +142,11 @@ public class Renderer_Button : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Schaltfläche);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) {
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);
 
         //if (font == null) { return new Size(16, 32); }
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
 
         return this.GetFont().FormatedText_NeededSize(replacedText, QImage(content), 32);
     }
@@ -157,9 +156,9 @@ public class Renderer_Button : Renderer_Abstract {
     /// </summary>
     /// <param name="content"></param>
     /// <param name="style"></param>
-    /// <param name="translate"></param>
+    /// <param name="doOpticalTranslation"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) {
         if (!_text_anzeigen) { return string.Empty; }
 
         content = content.Replace("\r\n", "; ");
@@ -177,7 +176,7 @@ public class Renderer_Button : Renderer_Abstract {
             r = t[0];
         }
 
-        return LanguageTool.PrepaireText(r, style, string.Empty, string.Empty, translate, null);
+        return LanguageTool.PrepaireText(r, style, string.Empty, string.Empty, doOpticalTranslation, null);
     }
 
     private QuickImage? QImage(string content) {

@@ -36,7 +36,7 @@ using System.Windows.Forms;
 namespace BlueControls.Controls;
 
 [Designer(typeof(ButtonDesigner))]
-[DefaultEvent("Click")]
+[DefaultEvent(nameof(Click))]
 public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextMenu {
 
     #region Fields

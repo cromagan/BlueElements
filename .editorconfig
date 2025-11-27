@@ -269,3 +269,27 @@ dotnet_diagnostic.CA1707.severity = none
 
 # CA1031: Keine allgemeinen Ausnahmetypen abfangen
 dotnet_diagnostic.CA1031.severity = none
+
+# CA1012: Abstrakte Typen dürfen keine öffentlichen Konstruktoren enthalten
+dotnet_diagnostic.CA1012.severity = error
+
+# IDE0130: Der Namespace entspricht stimmt nicht der Ordnerstruktur.
+dotnet_diagnostic.IDE0130.severity = suggestion
+
+# CA1868: Unnötiger Aufruf von "Contains(item)"
+dotnet_diagnostic.CA1868.severity = error
+
+# CA5392: DefaultDllImportSearchPaths-Attribut für P/Invokes verwenden
+dotnet_diagnostic.CA5392.severity = none
+
+# CA2101: Marshalling für P/Invoke-Zeichenfolgenargumente angeben
+dotnet_diagnostic.CA2101.severity = none
+
+# CA1852: Der Typ kann versiegelt werden
+dotnet_diagnostic.CA1852.severity = none
+
+# CA1008: Enumerationen müssen einen Wert von null aufweisen.
+dotnet_diagnostic.CA1008.severity = none
+
+# CA5401: CreateEncryptor nicht mit Nicht-Standard-Initialisierungsvektoren verwenden
+dotnet_diagnostic.CA5401.severity = none

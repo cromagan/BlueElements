@@ -226,7 +226,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLowerInvariant()) {
+        switch (key) {
             case "notallowedchilds":
                 _notAllowedChilds.Clear();
                 _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCr());

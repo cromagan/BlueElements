@@ -31,7 +31,7 @@ using static BlueBasics.IO;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-[DefaultEvent("ItemClicked")]
+[DefaultEvent(nameof(ItemClicked))]
 public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     #region Constructors

@@ -39,7 +39,7 @@ using Orientation = BlueBasics.Enums.Orientation;
 namespace BlueControls.Controls;
 
 [Designer(typeof(TextBoxDesigner))]
-[DefaultEvent("TextChanged")]
+[DefaultEvent(nameof(TextChanged))]
 public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Fields
@@ -47,11 +47,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private const string ExtCharFormat = "BlueElements.ExtChar";
     private readonly ExtText _eTxt;
     private int _blinkCount;
-    private int _markStart = -1;
     private bool _cursorVisible;
     private string _lastCheckedText = string.Empty;
     private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
     private int _markEnd = -1;
+    private int _markStart = -1;
     private int _mouseValue;
     private bool _mustCheck = true;
     private int _raiseChangeDelay;
@@ -234,21 +234,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Methods
 
-    private int Char_DelBereich(int von, int bis, bool raiseEvent) {
-        _cursorVisible = true;
-        if (von < 0 && bis <= 0) { return 0; }
-        if (von < 0 || bis < 0 || von == bis) { return von; }
-
-        _eTxt.Delete(von, bis);
-
-        if (raiseEvent) {
-            RaiseEventIfTextChanged(false);
-            Invalidate();
-        }
-
-        return Math.Min(von, bis);
-    }
-
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         AbortSpellChecking();
 
@@ -301,23 +286,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
 
         OnContextMenuInit(e);
-    }
-
-    private int Insert(int pos, string? nt, bool raiseEvent) {
-        if (nt == null) { return pos; }
-        nt = nt.RemoveChars(Constants.Char_NotFromClip);
-        if (!MultiLine) { nt = nt.RemoveChars("\r\n"); }
-
-        foreach (var t in nt) {
-            pos = Insert(pos, t, false);
-        }
-
-        if (raiseEvent) {
-            RaiseEventIfTextChanged(false);
-            Invalidate();
-        }
-
-        return pos;
     }
 
     public void Mark(MarkState markstate, int first, int last) => _eTxt.Mark(markstate, first, last);
@@ -390,203 +358,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 }
                 break;
         }
-    }
-
-    private int Insert(int pos, Char c, bool raiseEvent) {
-        if (c < 13) { return pos; }
-        return Insert(pos, new ExtCharAscii(_eTxt, pos, c), raiseEvent);
-    }
-
-    private int Insert(int pos, AsciiKey keyAscii, bool raiseEvent) => Insert(pos, (char)keyAscii, raiseEvent);
-
-    private int Insert(int pos, ExtChar chr, bool raiseEvent) {
-        if (_eTxt.Insert(pos, chr)) {
-            if (raiseEvent) { RaiseEventIfTextChanged(false); }
-            return pos + 1;
-        }
-        if (raiseEvent) { RaiseEventIfTextChanged(false); }
-        return pos;
-    }
-
-    private int InsertClipboard(int pos, bool linkAllowed) {
-        if (TextFormatingAllowed) {
-            if (linkAllowed && Clipboard.ContainsData(TableView.CellDataFormat)) {
-                if (Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
-                    var t = sd.SplitByCr();
-                    var c = new ExtCharCellLink(_eTxt, pos, t[0], t[1], t[2]);
-                    pos = Insert(pos, c, true);
-                    return pos;
-                }
-            }
-
-            if (Clipboard.ContainsData(ExtCharFormat)) {
-                if (Clipboard.GetData(ExtCharFormat) is not string sd || string.IsNullOrEmpty(sd)) { return pos; }
-
-                foreach (var thiss in sd.SplitByCr()) {
-                    if (_eTxt.Count < MaxTextLength) {
-                        var extChar = ParseableItem.NewByParsing<ExtChar>(thiss, _eTxt, pos);
-
-                        if (extChar != null) {
-                            pos = Insert(pos, extChar, false);
-                        }
-                    }
-                }
-
-                RaiseEventIfTextChanged(false);
-                return pos;
-            }
-        }
-
-        if (Clipboard.ContainsText()) {
-            return Insert(pos, Clipboard.GetText(), true);
-        }
-
-        // Eine vorherige Aktion kann Text löschen und kein Event auslösen. Also hier müssen wir!
-        RaiseEventIfTextChanged(false);
-        Invalidate();
-
-        return pos;
-    }
-
-    private void Contextmenu_SpellAdd(object sender, ObjectEventArgs e) {
-        if (e.Data is not string word) { return; }
-
-        if (string.IsNullOrEmpty(word)) { return; }
-
-        Dictionary.WordAdd(word);
-        _mustCheck = true;
-        Invalidate();
-    }
-
-    private void Contextmenu_SpellChecking(object sender, ObjectEventArgs e) {
-        FloatingForm.Close(this);
-        if (SpellCheckingEnabled) {
-            _mustCheck = false;
-            Dictionary.SpellCheckingAll(_eTxt, false);
-            _mustCheck = true;
-            Invalidate();
-        }
-    }
-
-    private void Contextmenu_SpellAddAll(object sender, ObjectEventArgs e) {
-        FloatingForm.Close(this);
-        if (SpellCheckingEnabled) {
-            _mustCheck = false;
-            Dictionary.SpellCheckingAll(_eTxt, true);
-            _mustCheck = true;
-            Invalidate();
-        }
-    }
-
-    private void Contextmenu_Cut(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
-        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
-
-        Clipboard_Copy(start, end);
-        if (!Enabled) { return; }
-
-        _markStart = Char_DelBereich(start, end, true);
-        _markEnd = -1;
-    }
-
-    private void Contextmenu_Copy(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
-        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
-
-        Clipboard_Copy(start, end);
-    }
-
-    private void Contextmenu_Paste(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
-        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
-        var linkallowed = (bool)(data.GetType().GetProperty("Link")?.GetValue(data) ?? false);
-        _markStart = Char_DelBereich(start, end, false);
-        _markEnd = -1;
-
-        _markStart = InsertClipboard(_markStart, linkallowed);
-    }
-
-    private void Contextmenu_Caption(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
-        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
-
-        if (start < 0 || end < 0) { return; }
-
-        //_markStart = start;
-        //_markEnd = end;
-        Selection_Repair(true);
-        _eTxt.ChangeStyle(start, end - 1, PadStyles.Überschrift);
-        Invalidate();
-        RaiseEventIfTextChanged(false);
-    }
-
-    private void Contextmenu_NoCaption(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
-        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
-
-        if (start < 0 || end < 0) { return; }
-
-        _markStart = start;
-        _markEnd = end;
-        Selection_Repair(true);
-        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Standard);
-        Invalidate();
-        RaiseEventIfTextChanged(false);
-    }
-
-    private void Contextmenu_Bold(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
-        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
-
-        if (start < 0 || end < 0) { return; }
-
-        _markStart = start;
-        _markEnd = end;
-        Selection_Repair(true);
-        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
-        Invalidate();
-        RaiseEventIfTextChanged(false);
-    }
-
-    private void Contextmenu_Sonderzeichen(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
-        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
-
-        List<AbstractListItem> i =
-        [
-            ItemOf("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)),
-        ItemOf("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)),
-        ItemOf("Information", "Information", QuickImage.Get(ImageCode.Information, 20)),
-        ItemOf("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)),
-        ItemOf("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20))
-        ];
-
-        var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None);
-
-        if (r is not { Count: 1 }) { return; }
-
-        _markStart = Char_DelBereich(start, end, false);
-        _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0])), true);
-    }
-
-    private void Contextmenu_ChangeTo(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var newWord = data.GetType().GetProperty("NewWord")?.GetValue(data)?.ToString() ?? string.Empty;
-        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
-        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
-
-        if (string.IsNullOrEmpty(newWord) || start < 0 || end < 0) { return; }
-
-        _markStart = Char_DelBereich(start, end, false);
-        _markEnd = -1;
-        _markStart = Insert(_markStart, newWord, true);
     }
 
     internal bool WordStarts(string word, int position) {
@@ -925,6 +696,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
+    private int Char_DelBereich(int von, int bis, bool raiseEvent) {
+        _cursorVisible = true;
+        if (von < 0 && bis <= 0) { return 0; }
+        if (von < 0 || bis < 0 || von == bis) { return von; }
+
+        _eTxt.Delete(von, bis);
+
+        if (raiseEvent) {
+            RaiseEventIfTextChanged(false);
+            Invalidate();
+        }
+
+        return Math.Min(von, bis);
+    }
+
     private void Clipboard_Copy(int markStart, int markEnd) {
         if (markStart < 0 || markEnd < 0) { return; }
         Selection_Repair(true);
@@ -940,6 +726,147 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         dataObject.SetData(ExtCharFormat, l.JoinWithCr());// 1. Als ExtChar-Format (für interne Verwendung)
         dataObject.SetText(_eTxt.ConvertCharToPlainText(markStart, markEnd - 1));// 2. Als Plain Text (für externe Anwendungen)
         Clipboard.SetDataObject(dataObject, true);
+    }
+
+    private void Contextmenu_Bold(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+
+        if (start < 0 || end < 0) { return; }
+
+        _markStart = start;
+        _markEnd = end;
+        Selection_Repair(true);
+        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
+        Invalidate();
+        RaiseEventIfTextChanged(false);
+    }
+
+    private void Contextmenu_Caption(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+
+        if (start < 0 || end < 0) { return; }
+
+        //_markStart = start;
+        //_markEnd = end;
+        Selection_Repair(true);
+        _eTxt.ChangeStyle(start, end - 1, PadStyles.Überschrift);
+        Invalidate();
+        RaiseEventIfTextChanged(false);
+    }
+
+    private void Contextmenu_ChangeTo(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var newWord = data.GetType().GetProperty("NewWord")?.GetValue(data)?.ToString() ?? string.Empty;
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+
+        if (string.IsNullOrEmpty(newWord) || start < 0 || end < 0) { return; }
+
+        _markStart = Char_DelBereich(start, end, false);
+        _markEnd = -1;
+        _markStart = Insert(_markStart, newWord, true);
+    }
+
+    private void Contextmenu_Copy(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+
+        Clipboard_Copy(start, end);
+    }
+
+    private void Contextmenu_Cut(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+
+        Clipboard_Copy(start, end);
+        if (!Enabled) { return; }
+
+        _markStart = Char_DelBereich(start, end, true);
+        _markEnd = -1;
+    }
+
+    private void Contextmenu_NoCaption(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+
+        if (start < 0 || end < 0) { return; }
+
+        _markStart = start;
+        _markEnd = end;
+        Selection_Repair(true);
+        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Standard);
+        Invalidate();
+        RaiseEventIfTextChanged(false);
+    }
+
+    private void Contextmenu_Paste(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+        var linkallowed = (bool)(data.GetType().GetProperty("Link")?.GetValue(data) ?? false);
+        _markStart = Char_DelBereich(start, end, false);
+        _markEnd = -1;
+
+        _markStart = InsertClipboard(_markStart, linkallowed);
+    }
+
+    private void Contextmenu_Sonderzeichen(object sender, ObjectEventArgs e) {
+        if (e.Data is not { } data) { return; }
+        var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
+        var end = (int)(data.GetType().GetProperty("End")?.GetValue(data) ?? -1);
+
+        List<AbstractListItem> i =
+        [
+            ItemOf("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)),
+        ItemOf("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)),
+        ItemOf("Information", "Information", QuickImage.Get(ImageCode.Information, 20)),
+        ItemOf("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)),
+        ItemOf("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20))
+        ];
+
+        var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None);
+
+        if (r is not { Count: 1 }) { return; }
+
+        _markStart = Char_DelBereich(start, end, false);
+        _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0])), true);
+    }
+
+    private void Contextmenu_SpellAdd(object sender, ObjectEventArgs e) {
+        if (e.Data is not string word) { return; }
+
+        if (string.IsNullOrEmpty(word)) { return; }
+
+        Dictionary.WordAdd(word);
+        _mustCheck = true;
+        Invalidate();
+    }
+
+    private void Contextmenu_SpellAddAll(object sender, ObjectEventArgs e) {
+        FloatingForm.Close(this);
+        if (SpellCheckingEnabled) {
+            _mustCheck = false;
+            Dictionary.SpellCheckingAll(_eTxt, true);
+            _mustCheck = true;
+            Invalidate();
+        }
+    }
+
+    private void Contextmenu_SpellChecking(object sender, ObjectEventArgs e) {
+        FloatingForm.Close(this);
+        if (SpellCheckingEnabled) {
+            _mustCheck = false;
+            Dictionary.SpellCheckingAll(_eTxt, false);
+            _mustCheck = true;
+            Invalidate();
+        }
     }
 
     /// <summary>
@@ -1057,6 +984,79 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private int HotPosition() => _markStart > -1 ? _markStart
         : _markStart > -1 && _markEnd < 0 ? _markEnd : _markStart > -1 && _markEnd > -1 ? _markEnd : -1;
+
+    private int Insert(int pos, string? nt, bool raiseEvent) {
+        if (nt == null) { return pos; }
+        nt = nt.RemoveChars(Constants.Char_NotFromClip);
+        if (!MultiLine) { nt = nt.RemoveChars("\r\n"); }
+
+        foreach (var t in nt) {
+            pos = Insert(pos, t, false);
+        }
+
+        if (raiseEvent) {
+            RaiseEventIfTextChanged(false);
+            Invalidate();
+        }
+
+        return pos;
+    }
+
+    private int Insert(int pos, Char c, bool raiseEvent) {
+        if (c < 13) { return pos; }
+        return Insert(pos, new ExtCharAscii(_eTxt, pos, c), raiseEvent);
+    }
+
+    private int Insert(int pos, AsciiKey keyAscii, bool raiseEvent) => Insert(pos, (char)keyAscii, raiseEvent);
+
+    private int Insert(int pos, ExtChar chr, bool raiseEvent) {
+        if (_eTxt.Insert(pos, chr)) {
+            if (raiseEvent) { RaiseEventIfTextChanged(false); }
+            return pos + 1;
+        }
+        if (raiseEvent) { RaiseEventIfTextChanged(false); }
+        return pos;
+    }
+
+    private int InsertClipboard(int pos, bool linkAllowed) {
+        if (TextFormatingAllowed) {
+            if (linkAllowed && Clipboard.ContainsData(TableView.CellDataFormat)) {
+                if (Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
+                    var t = sd.SplitByCr();
+                    var c = new ExtCharCellLink(_eTxt, pos, t[0], t[1], t[2]);
+                    pos = Insert(pos, c, true);
+                    return pos;
+                }
+            }
+
+            if (Clipboard.ContainsData(ExtCharFormat)) {
+                if (Clipboard.GetData(ExtCharFormat) is not string sd || string.IsNullOrEmpty(sd)) { return pos; }
+
+                foreach (var thiss in sd.SplitByCr()) {
+                    if (_eTxt.Count < MaxTextLength) {
+                        var extChar = ParseableItem.NewByParsing<ExtChar>(thiss, _eTxt, pos);
+
+                        if (extChar != null) {
+                            pos = Insert(pos, extChar, false);
+                        }
+                    }
+                }
+
+                RaiseEventIfTextChanged(false);
+                return pos;
+            }
+        }
+
+        if (Clipboard.ContainsText()) {
+            return Insert(pos, Clipboard.GetText(), true);
+        }
+
+        // Eine vorherige Aktion kann Text löschen und kein Event auslösen. Also hier müssen wir!
+        RaiseEventIfTextChanged(false);
+        Invalidate();
+
+        return pos;
+    }
 
     private void MarkAll() {
         if (_eTxt.Count > 0) {

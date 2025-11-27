@@ -30,7 +30,6 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.CellRenderer;
 
-
 public class Renderer_TextOneLine : Renderer_Abstract {
 
     #region Fields
@@ -117,7 +116,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     }
 
     public override bool ParseThis(string key, string value) {
-        switch (key.ToLower()) {
+        switch (key) {
             case "prefix":
                 _präfix = value.FromNonCritical();
                 return true;
@@ -133,8 +132,8 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld2);
 
-    protected override Size CalculateContentSize(string content, TranslationType translate) {
-        var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
+    protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
+        var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
         return this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
     }
 
@@ -143,10 +142,10 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     /// </summary>
     /// <param name="content"></param>
     /// <param name="style"></param>
-    /// <param name="translate"></param>
+    /// <param name="doOpticalTranslation"></param>
     /// <returns></returns>
-    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType translate) {
-        content = LanguageTool.PrepaireText(content, style, _präfix, _suffix, translate, null);
+    protected override string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation) {
+        content = LanguageTool.PrepaireText(content, style, _präfix, _suffix, doOpticalTranslation, null);
 
         if (content.IndexOf('\r') == -1) { return content; }
 
