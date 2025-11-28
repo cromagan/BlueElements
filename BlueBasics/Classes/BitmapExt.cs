@@ -29,7 +29,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using System.Windows.Media.Imaging;
 using static BlueBasics.Extensions;
 
 namespace BlueBasics;
@@ -205,20 +204,13 @@ public class BitmapExt : IDisposableExtended {
         return pa;
     }
 
-    public static Bitmap GetBitmap(BitmapSource sourceBmp, int maxSize) {
-        Generic.CollectGarbage();
-        Generic.Pause(0.1, true);
-        Bitmap? bmp;
-        using (var outStream = new System.IO.MemoryStream()) {
-            BitmapEncoder enc = new BmpBitmapEncoder();
-            enc.Frames.Add(BitmapFrame.Create(sourceBmp));
-            enc.Save(outStream);
-            bmp = new Bitmap(outStream);
-        }
+    public static Bitmap GetBitmap(Bitmap sourceBmp, int maxSize) {
         if (maxSize > 0) {
-            bmp = bmp.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+            return sourceBmp.Resize(maxSize, maxSize,
+                SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern,
+                InterpolationMode.HighQualityBicubic, true);
         }
-        return bmp;
+        return sourceBmp;
     }
 
     public static Color GetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y) {
@@ -369,10 +361,33 @@ public class BitmapExt : IDisposableExtended {
         List<Bitmap> l = [];
         var frames = 1;
         try {
-            TiffBitmapDecoder decoder = new(imageStreamSource,
-                BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-            frames = decoder.Frames.Count;
-            l.AddRange(decoder.Frames.Select(frame => GetBitmap(frame, maxSize)));
+            //TiffBitmapDecoder decoder = new(imageStreamSource,
+            //    BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+            //frames = decoder.Frames.Count;
+            //l.AddRange(decoder.Frames.Select(frame => GetBitmap(frame, maxSize)));
+
+            using var tiffImage = Image.FromStream(imageStreamSource);
+            // Anzahl der Frames ermitteln
+            frames = tiffImage.FrameDimensionsList.Length > 0
+                ? tiffImage.GetFrameCount(FrameDimension.Page)
+                : 1;
+
+            // Alle Frames durchgehen
+            for (int i = 0; i < frames; i++) {
+                tiffImage.SelectActiveFrame(FrameDimension.Page, i);
+
+                // Frame als Bitmap kopieren
+                var frameBitmap = new Bitmap(tiffImage);
+
+                // Optional: Größe anpassen
+                if (maxSize > 0) {
+                    frameBitmap = frameBitmap.Resize(maxSize, maxSize,
+                        SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern,
+                        InterpolationMode.HighQualityBicubic, true);
+                }
+
+                l.Add(frameBitmap);
+            }
         } catch {
             try {
                 l.Clear();

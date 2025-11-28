@@ -483,7 +483,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         result.ParseableAdd("WindowState", WindowState);
         result.ParseableAdd("SplitterX", SplitContainer1.SplitterDistance);
         result.ParseableAdd("MainTab", ribMain.SelectedIndex);
-        result.ParseableAdd("TableView", Table.ViewToString());
+        result.ParseableAdd("TableView", Table.ViewToString().FinishParseable());
 
         return result.FinishParseable();
     }

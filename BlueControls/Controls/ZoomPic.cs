@@ -77,6 +77,8 @@ public partial class ZoomPic : ZoomPad {
     }
 
     public override bool ControlMustPressed => false;
+    protected override bool AutoCenter => true;
+    protected override float SliderZoomOutAddition => 0.1f;
 
     #endregion
 

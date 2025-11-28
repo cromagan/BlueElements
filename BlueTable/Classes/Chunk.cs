@@ -76,7 +76,7 @@ public class Chunk : IHasKeyName {
 
     public string KeyName {
         get;
-        private set => field = value.ToLower();
+        private set => field = value.ToLowerInvariant();
     } = string.Empty;
 
     public string LastEditApp { get; private set; } = string.Empty;
@@ -301,12 +301,12 @@ public class Chunk : IHasKeyName {
         SaveToByteList(TableDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
         SaveToByteList(TableDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
         SaveToByteList(TableDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.AfterEditRound, c.AfterEditRound.ToString(), name);
-        SaveToByteList(TableDataType.MaxCellLength, c.MaxCellLength.ToString(), name);
-        SaveToByteList(TableDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
+        SaveToByteList(TableDataType.AfterEditRound, c.AfterEditRound.ToStringInt1(), name);
+        SaveToByteList(TableDataType.MaxCellLength, c.MaxCellLength.ToStringInt1(), name);
+        SaveToByteList(TableDataType.FixedColumnWidth, c.FixedColumnWidth.ToStringInt1(), name);
         SaveToByteList(TableDataType.AfterEditAutoRemoveChar, c.AfterEditAutoRemoveChar, name);
         SaveToByteList(TableDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);
+        SaveToByteList(TableDataType.FilterOptions, ((int)c.FilterOptions).ToStringInt1(), name);
         SaveToByteList(TableDataType.AutoFilterJoker, c.AutoFilterJoker, name);
         SaveToByteList(TableDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
         SaveToByteList(TableDataType.EditableWithTextInput, c.EditableWithTextInput.ToPlusMinus(), name);
@@ -314,12 +314,12 @@ public class Chunk : IHasKeyName {
         SaveToByteList(TableDataType.Relationship_to_First, c.Relationship_to_First.ToPlusMinus(), name);
         //SaveToByteList(TableDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
         SaveToByteList(TableDataType.TextFormatingAllowed, c.TextFormatingAllowed.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.ForeColor, c.ForeColor.ToArgb().ToString(), name);
-        SaveToByteList(TableDataType.BackColor, c.BackColor.ToArgb().ToString(), name);
-        SaveToByteList(TableDataType.LineStyleLeft, ((int)c.LineStyleLeft).ToString(), name);
-        SaveToByteList(TableDataType.LineStyleRight, ((int)c.LineStyleRight).ToString(), name);
-        SaveToByteList(TableDataType.RelationType, ((int)c.RelationType).ToString(), name);
-        SaveToByteList(TableDataType.Value_for_Chunk, ((int)c.Value_for_Chunk).ToString(), name);
+        SaveToByteList(TableDataType.ForeColor, c.ForeColor.ToArgb().ToStringInt1(), name);
+        SaveToByteList(TableDataType.BackColor, c.BackColor.ToArgb().ToStringInt1(), name);
+        SaveToByteList(TableDataType.LineStyleLeft, ((int)c.LineStyleLeft).ToStringInt1(), name);
+        SaveToByteList(TableDataType.LineStyleRight, ((int)c.LineStyleRight).ToStringInt1(), name);
+        SaveToByteList(TableDataType.RelationType, ((int)c.RelationType).ToStringInt1(), name);
+        SaveToByteList(TableDataType.Value_for_Chunk, ((int)c.Value_for_Chunk).ToStringInt1(), name);
         SaveToByteList(TableDataType.EditableWithDropdown, c.EditableWithDropdown.ToPlusMinus(), name);
         SaveToByteList(TableDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
         SaveToByteList(TableDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
@@ -334,21 +334,21 @@ public class Chunk : IHasKeyName {
         //SaveToByteList(l, TableDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
         SaveToByteList(TableDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
         SaveToByteList(TableDataType.AllowedChars, c.AllowedChars, name);
-        SaveToByteList(TableDataType.MaxTextLength, c.MaxTextLength.ToString(), name);
+        SaveToByteList(TableDataType.MaxTextLength, c.MaxTextLength.ToStringInt1(), name);
         SaveToByteList(TableDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
         SaveToByteList(TableDataType.ColumnTags, c.ColumnTags.JoinWithCr(), name);
         SaveToByteList(TableDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
         SaveToByteList(TableDataType.LinkedTableTableName, c.LinkedTableTableName, name);
         //SaveToByteList(l, TableDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, name);
         //SaveToByteList(l, TableDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), name);
-        SaveToByteList(TableDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), name);
-        SaveToByteList(TableDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), name);
+        SaveToByteList(TableDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToStringInt1(), name);
+        SaveToByteList(TableDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToStringInt1(), name);
         SaveToByteList(TableDataType.ScriptType, ((int)c.ScriptType).ToString(), name);
         //SaveToByteList(l, TableDataType.KeyColumnKey, column.KeyColumnKey.ToString(false), key);
         SaveToByteList(TableDataType.ColumnNameOfLinkedTable, c.ColumnNameOfLinkedTable, name);
         //SaveToByteList(l, TableDataType.MakeSuggestionFromSameKeyColumn, column.VorschlagsColumn.ToString(false), key);
-        SaveToByteList(TableDataType.ColumnAlign, ((int)c.Align).ToString(), name);
-        SaveToByteList(TableDataType.SortType, ((int)c.SortType).ToString(), name);
+        SaveToByteList(TableDataType.ColumnAlign, ((int)c.Align).ToStringInt1(), name);
+        SaveToByteList(TableDataType.SortType, ((int)c.SortType).ToStringInt1(), name);
         //SaveToByteList(l, TableDataType.ColumnTimeCode, column.TimeCode, key);
     }
 
@@ -516,6 +516,43 @@ public class Chunk : IHasKeyName {
 
     internal void SaveToByteListEOF() => SaveToByteList(TableDataType.EOF, "END");
 
+    /// <summary>
+    /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position
+    /// </summary>
+    /// <param name="bytes">Die zu verarbeitenden Bytes</param>
+    /// <returns>Eine Liste von Bytes ohne Header-Daten oder null bei Fehlern</returns>
+    private static List<byte>? RemoveHeaderDataTypes(byte[]? bytes) {
+        if (bytes == null) { return null; }
+        if (bytes.Length == 0) { return []; }
+
+        var result = new List<byte>(bytes.Length);
+        var pointer = 0;
+        //var filename = ChunkFileName;
+
+        // Durch alle Datensätze gehen
+        while (pointer < bytes.Length) {
+            var startPointer = pointer;
+            var (newPointer, type, _, _, _) = Table.Parse(bytes, pointer);
+
+            // Wenn Parse keine Fortschritte macht, abbrechen um Endlosschleife zu vermeiden
+            if (newPointer <= startPointer) {
+                return null;
+            }
+
+            // Nur Nicht-Header-Datensätze zum Ergebnis hinzufügen
+            if (!type.IsHeaderType() && !type.IsObsolete()) {
+                // Kompletten Datensatz hinzufügen
+                for (var i = startPointer; i < newPointer; i++) {
+                    result.Add(bytes[i]);
+                }
+            }
+
+            pointer = newPointer;
+        }
+
+        return result;
+    }
+
     private List<byte> GetHeadAndSetEditor() {
         if (LoadFailed) { return []; }
 
@@ -575,43 +612,6 @@ public class Chunk : IHasKeyName {
                     //    return;
             }
         }
-    }
-
-    /// <summary>
-    /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position
-    /// </summary>
-    /// <param name="bytes">Die zu verarbeitenden Bytes</param>
-    /// <returns>Eine Liste von Bytes ohne Header-Daten oder null bei Fehlern</returns>
-    private static List<byte>? RemoveHeaderDataTypes(byte[]? bytes) {
-        if (bytes == null) { return null; }
-        if (bytes.Length == 0) { return []; }
-
-        var result = new List<byte>(bytes.Length);
-        var pointer = 0;
-        //var filename = ChunkFileName;
-
-        // Durch alle Datensätze gehen
-        while (pointer < bytes.Length) {
-            var startPointer = pointer;
-            var (newPointer, type, _, _, _) = Table.Parse(bytes, pointer);
-
-            // Wenn Parse keine Fortschritte macht, abbrechen um Endlosschleife zu vermeiden
-            if (newPointer <= startPointer) {
-                return null;
-            }
-
-            // Nur Nicht-Header-Datensätze zum Ergebnis hinzufügen
-            if (!type.IsHeaderType() && !type.IsObsolete()) {
-                // Kompletten Datensatz hinzufügen
-                for (var i = startPointer; i < newPointer; i++) {
-                    result.Add(bytes[i]);
-                }
-            }
-
-            pointer = newPointer;
-        }
-
-        return result;
     }
 
     #endregion

@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.CellRenderer;
 using BlueControls.Enums;
@@ -71,15 +72,17 @@ public sealed class RowDataListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public override void DrawColumn(Graphics gr, Renderer_Abstract renderer, ColumnItem column, Rectangle positionModified, float scale, TranslationType translate, Alignment align) {
-        base.DrawColumn(gr, renderer, column, positionModified, scale, translate, align);
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionModified, float scale, TranslationType translate, float shiftX, float shiftY) {
+        base.DrawColumn(gr, viewItem, positionModified, scale, translate, shiftX, shiftY);
 
-        if (!column.SaveContent) {
+        if (viewItem.Column == null) { return; }
+
+        if (!viewItem.Column.SaveContent) {
             Row.CheckRow();
         }
 
-        var toDrawd = Row.CellGetString(column);
-        renderer.Draw(gr, toDrawd, Row, positionModified, translate, align, scale);
+        var toDrawd = Row.CellGetString(viewItem.Column);
+        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionModified.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
     }
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;

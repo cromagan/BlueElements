@@ -144,8 +144,8 @@ public class BitmapListItem : AbstractListItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
-        if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false); }
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+        if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionModified.ToRect(), null, false); }
 
         var drawingCoordinates = positionModified;
         drawingCoordinates.Inflate(-Padding, -Padding);
@@ -203,11 +203,10 @@ public class BitmapListItem : AbstractListItem {
             foreach (var thisCap in _captiontmp) {
                 c--;
                 var s = bFont.FormatedText_NeededSize(thisCap, null, 16);
-                Rectangle r =
-                    new((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)),
-                        drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
-                r.X -= trp.X;
-                r.Y -= trp.Y;
+                var r = new Rectangle((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)),
+                       (int)drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                r.X -= (int)trp.X;
+                r.Y -= (int)trp.Y;
                 r.Y = r.Y - (ConstMy * c) + ausgl;
                 //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                 //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
@@ -218,7 +217,7 @@ public class BitmapListItem : AbstractListItem {
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionModified);
+            Skin.Draw_Border(gr, itemdesign, state, positionModified.ToRect());
         }
     }
 

@@ -7,7 +7,9 @@
     <Nullable>enable</Nullable>
     <StartupObject>BeCreative.Program</StartupObject>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    <AnalysisMode>All</AnalysisMode>
+    <AnalysisMode>Recommended</AnalysisMode>
+	<EnableHotReload>true</EnableHotReload>
+	<Deterministic>false</Deterministic>
     
     <!-- Assembly-Metadaten -->
     <AssemblyTitle>BeCreative</AssemblyTitle>
@@ -30,6 +32,8 @@
     <Platforms>AnyCPU;x86</Platforms>
     <Prefer32Bit>false</Prefer32Bit>
     <UseWindowsForms>true</UseWindowsForms>
+    <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   
   <ItemGroup>
@@ -43,7 +47,6 @@
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
 
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />

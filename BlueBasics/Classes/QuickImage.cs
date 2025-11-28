@@ -39,6 +39,11 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     #region Fields
 
+    /// <summary>
+    /// QuickImages werden immer in den Speicher für spätere Zugriffe aufgenommen!
+    /// </summary>
+    private static readonly object _picsLock = new object();
+
     private static readonly ConcurrentDictionary<string, QuickImage> Pics = [];
     private readonly Bitmap _bitmap;
 
@@ -74,9 +79,6 @@ public sealed class QuickImage : IReadableText, IEditable {
         Pics.TryAdd(Code, this);
     }
 
-    /// <summary>
-    /// QuickImages werden immer in den Speicher für spätere Zugriffe aufgenommen!
-    /// </summary>
     public QuickImage(string name, Bitmap bmp) {
         if (string.IsNullOrEmpty(name)) {
             _bitmap = GenerateErrorImage(5, 5);
@@ -84,19 +86,22 @@ public sealed class QuickImage : IReadableText, IEditable {
             return;
         }
 
-        if (Exists(name)) { Develop.DebugPrint(ErrorType.Warning, "Doppeltes Bild:" + name); }
-        if (name.Contains("|")) { Develop.DebugPrint(ErrorType.Warning, "Fehlerhafter Name:" + name); }
+        if (Exists(name)) {
+            Develop.DebugPrint(ErrorType.Warning, "Doppeltes Bild:" + name);
+        }
+        if (name.Contains("|")) {
+            Develop.DebugPrint(ErrorType.Warning, "Fehlerhafter Name:" + name);
+        }
 
         Name = name;
         Code = Name;
 
         CorrectSize(-1, -1, bmp);
 
-        if (Pics.IsEmpty) {
-            BindingOperations.EnableCollectionSynchronization(Pics, new object());
+        // Thread-sicheres Hinzufügen zur Collection
+        lock (_picsLock) {
+            Pics.TryAdd(Code, this);
         }
-
-        Pics.TryAdd(Code, this);
 
         _bitmap = bmp.CloneFromBitmap();
     }
@@ -303,6 +308,16 @@ public sealed class QuickImage : IReadableText, IEditable {
     /// <returns></returns>
     public override string ToString() => Code;
 
+    private static Bitmap GenerateErrorImage(int width, int height) {
+        var bmp = new Bitmap(width, height);
+
+        using var gr = Graphics.FromImage(bmp);
+        gr.Clear(Color.Black);
+        gr.DrawLine(new Pen(Color.Red, 3), 0, 0, width - 1, height - 1);
+        gr.DrawLine(new Pen(Color.Red, 3), width - 1, 0, 0, height - 1);
+        return bmp;
+    }
+
     private void CorrectSize(int width, int height, Image? bmp) {
         if (width > 0 && height > 0) {
             Width = width;
@@ -467,16 +482,6 @@ public sealed class QuickImage : IReadableText, IEditable {
         var bmp = bmpTmp.CloneOfBitmap()?.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
 
         return bmp == null ? (new Bitmap(Width, Height), true) : (bmp, false);
-    }
-
-    private static Bitmap GenerateErrorImage(int width, int height) {
-        var bmp = new Bitmap(width, height);
-
-        using var gr = Graphics.FromImage(bmp);
-        gr.Clear(Color.Black);
-        gr.DrawLine(new Pen(Color.Red, 3), 0, 0, width - 1, height - 1);
-        gr.DrawLine(new Pen(Color.Red, 3), width - 1, 0, 0, height - 1);
-        return bmp;
     }
 
     #endregion

@@ -267,7 +267,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
 
-    public string ViewToString() => TableInternal.ViewToString().FinishParseable();
+    public List<string> ViewToString() => TableInternal.ViewToString();
 
     internal void CursorPos_Set(ColumnViewItem? columnViewItem, RowDataListItem? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
 

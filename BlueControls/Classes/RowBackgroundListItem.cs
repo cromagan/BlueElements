@@ -29,6 +29,7 @@ using BlueControls.CellRenderer;
 using BlueTable.Enums;
 using System.Drawing.Drawing2D;
 using BlueControls;
+using BlueControls.Controls;
 
 namespace BlueTable;
 
@@ -128,7 +129,51 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
     //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionModified, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
 
-    public virtual void DrawColumn(Graphics gr, Renderer_Abstract renderer, ColumnItem column, Rectangle positionModified, float scale, TranslationType translate, Alignment align) {
+    public virtual void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) {
+        DrawLine(gr, lin, xPos, xPos, top, bottom);
+    }
+
+    public virtual void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) {
+        DrawLine(gr, lin, left, right, bottom, bottom);
+    }
+
+    public virtual void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionModified, float scale, TranslationType translate, float shiftX, float shiftY) {
+    }
+
+    public void DrawLine(Graphics gr, ColumnLineStyle lin, float left, float right, float top, float bottom) {
+        if (IsDisposed) { return; }
+
+        try {
+            switch (lin) {
+                case ColumnLineStyle.Ohne:
+                    break;
+
+                case ColumnLineStyle.Dünn:
+                    gr.DrawLine(Skin.PenLinieDünn, left, top, right, bottom);
+                    break;
+
+                case ColumnLineStyle.Kräftig:
+                    gr.DrawLine(Skin.PenLinieKräftig, left, top, right, bottom);
+                    break;
+
+                case ColumnLineStyle.Dick:
+                    gr.DrawLine(Skin.PenLinieDick, left, top, right, bottom);
+                    break;
+
+                case ColumnLineStyle.ShadowRight:
+                    var c = Skin.Color_Border(Design.Table_Lines_thick, States.Standard);
+                    gr.DrawLine(Skin.PenLinieKräftig, left, top, right, bottom);
+                    gr.DrawLine(new Pen(Color.FromArgb(80, c.R, c.G, c.B)), left + 1, top, right + 1, bottom);
+                    gr.DrawLine(new Pen(Color.FromArgb(60, c.R, c.G, c.B)), left + 2, top, right + 2, bottom);
+                    gr.DrawLine(new Pen(Color.FromArgb(40, c.R, c.G, c.B)), left + 3, top, right + 3, bottom);
+                    gr.DrawLine(new Pen(Color.FromArgb(20, c.R, c.G, c.B)), left + 4, top, right + 4, bottom);
+                    break;
+
+                default:
+                    Develop.DebugPrint(lin);
+                    break;
+            }
+        } catch { }
     }
 
     protected virtual void Dispose(bool disposing) {
@@ -145,7 +190,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
         if (Arrangement == null) { return; }
 
         for (var du = 0; du < 2; du++) {
@@ -158,9 +203,9 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 if (left > visibleArea.Width) { continue; }
                 if (left + positionModified.Width < 0) { continue; }
 
-                var area = new Rectangle((int)(left ?? 0), positionModified.Top, viewItem.DrawWidth(), positionModified.Height);
+                var area = new Rectangle((int)(left ?? 0), (int)positionModified.Top, ZoomPad.GetPix(viewItem.DrawWidth(), scale), (int)positionModified.Height);
 
-                if (Arrangement.Count == 1) { area = positionModified; }
+                if (Arrangement.Count == 1) { area = positionModified.ToRect(); }
 
                 gr.SmoothingMode = SmoothingMode.None;
                 gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnCell), area);
@@ -168,48 +213,15 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 var t = viewItem.Column.DoOpticalTranslation;
                 if (!translate) { t = TranslationType.Original_Anzeigen; }
 
-                DrawColumn(gr, viewItem.GetRenderer(SheetStyle), viewItem.Column, area, scale, t, (Alignment)viewItem.Column.Align);
+                DrawColumn(gr, viewItem, area, scale, t, shiftX, shiftY);
                 Draw_Border(gr, viewItem.LineLeft, area.Left, area.Top, area.Bottom);
                 Draw_Border(gr, viewItem.LineRight, area.Right, area.Top, area.Bottom);
+                Draw_LowerLine(gr, ColumnLineStyle.Dünn, area.Left, area.Right, area.Bottom - 1);
             }
         }
     }
 
     protected override string GetCompareKey() => KeyName;
-
-    private void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) {
-        if (IsDisposed) { return; }
-
-        switch (lin) {
-            case ColumnLineStyle.Ohne:
-                break;
-
-            case ColumnLineStyle.Dünn:
-                gr.DrawLine(Skin.PenLinieDünn, xPos, top, xPos, bottom);
-                break;
-
-            case ColumnLineStyle.Kräftig:
-                gr.DrawLine(Skin.PenLinieKräftig, xPos, top, xPos, bottom);
-                break;
-
-            case ColumnLineStyle.Dick:
-                gr.DrawLine(Skin.PenLinieDick, xPos, top, xPos, bottom);
-                break;
-
-            case ColumnLineStyle.ShadowRight:
-                var c = Skin.Color_Border(Design.Table_Lines_thick, States.Standard);
-                gr.DrawLine(Skin.PenLinieKräftig, xPos, top, xPos, bottom);
-                gr.DrawLine(new Pen(Color.FromArgb(80, c.R, c.G, c.B)), xPos + 1, top, xPos + 1, bottom);
-                gr.DrawLine(new Pen(Color.FromArgb(60, c.R, c.G, c.B)), xPos + 2, top, xPos + 2, bottom);
-                gr.DrawLine(new Pen(Color.FromArgb(40, c.R, c.G, c.B)), xPos + 3, top, xPos + 3, bottom);
-                gr.DrawLine(new Pen(Color.FromArgb(20, c.R, c.G, c.B)), xPos + 4, top, xPos + 4, bottom);
-                break;
-
-            default:
-                Develop.DebugPrint(lin);
-                break;
-        }
-    }
 
     #endregion
 }

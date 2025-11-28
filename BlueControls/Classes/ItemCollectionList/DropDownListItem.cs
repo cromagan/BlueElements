@@ -79,18 +79,18 @@ public class DropDownListItem : AbstractListItem {
         return new Size(wi, he);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
         //var tmpd = TempDesign(design);
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, Design.ComboBox_Textbox, state, positionModified, null, false);
+            Skin.Draw_Back(gr, Design.ComboBox_Textbox, state, positionModified.ToRect(), null, false);
         }
 
         //Selected?.Draw(gr, positionModified.X, positionModified.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
 
         //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, Design.ComboBox_Textbox, state, positionModified);
-            var but = new Rectangle(positionModified.Right - 16, positionModified.Top, 16, 16);
+            Skin.Draw_Border(gr, Design.ComboBox_Textbox, state, positionModified.ToRect());
+            var but = new Rectangle((int)positionModified.Right - 16, (int)positionModified.Top, 16, 16);
 
             var qi = QuickImage.Get("Pfeil_Unten_Scrollbar|8|||||0");
 

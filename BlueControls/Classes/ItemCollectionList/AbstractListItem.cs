@@ -55,7 +55,7 @@ public static class AbstractListItemExtension {
         edit.Edit();
     }
 
-    public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visArea, AbstractListItem? _mouseOverItem, int shiftX, int shiftY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked) {
+    public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visArea, AbstractListItem? _mouseOverItem, int shiftX, int shiftY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float scale) {
         try {
             object locker = new();
             Parallel.ForEach(list, thisItem => {
@@ -68,7 +68,7 @@ public static class AbstractListItemExtension {
                     if (_checked?.Contains(thisItem.KeyName) ?? false) { itemState |= States.Checked; }
 
                     lock (locker) {
-                        thisItem.Draw(gr, visArea, shiftX, shiftY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, 1f);
+                        thisItem.Draw(gr, visArea, shiftX, shiftY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, scale);
                     }
                 }
             });
@@ -572,22 +572,23 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     public void Draw(Graphics gr, Rectangle visibleArea, float shiftX, float shiftY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float scale) {
         if (itemdesign == Design.Undefiniert) { return; }
-        var positionModified = Position with { X = (int)(Position.X - shiftX + (Indent * 20)), Y = (int)(Position.Y - shiftY), Width = (int)(Position.Width - (Indent * 20)) };
+        var positionModifiedi = Position with { X = (int)(Position.X + (Indent * 20)), Y = (int)(Position.Y), Width = (int)(Position.Width - (Indent * 20)) };
+        var positionModifiedf = positionModifiedi.ZoomAndMoveRect(scale, shiftX, shiftY, false);
 
         if (checkboxDesign != Design.Undefiniert) {
             var design = Skin.DesignOf(checkboxDesign, state);
-            gr.DrawImage(QuickImage.Get(design.Image, Controls.ZoomPad.GetPix(12, scale)), positionModified.X + Controls.ZoomPad.GetPix(4, scale), positionModified.Y + Controls.ZoomPad.GetPix(3, scale));
-            positionModified.X += Controls.ZoomPad.GetPix(20, scale);
-            positionModified.Width -= Controls.ZoomPad.GetPix(20, scale);
+            gr.DrawImage(QuickImage.Get(design.Image, Controls.ZoomPad.GetPix(12, scale)), positionModifiedf.X + Controls.ZoomPad.GetPix(4, scale), positionModifiedf.Y + Controls.ZoomPad.GetPix(3, scale));
+            positionModifiedf.X += Controls.ZoomPad.GetPix(20, scale);
+            positionModifiedf.Width -= Controls.ZoomPad.GetPix(20, scale);
             if (state.HasFlag(States.Checked)) { state ^= States.Checked; }
         }
 
-        DrawExplicit(gr, visibleArea, positionModified, itemdesign, state, drawBorderAndBack, translate, shiftX, shiftY, scale);
+        DrawExplicit(gr, visibleArea, positionModifiedf, itemdesign, state, drawBorderAndBack, translate, shiftX, shiftY, scale);
         if (drawBorderAndBack) {
             if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
                 var c1 = Skin.Color_Back(controldesign, States.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
                 c1 = c1.SetAlpha(160);
-                gr.FillRectangle(new SolidBrush(c1), positionModified);
+                gr.FillRectangle(new SolidBrush(c1), positionModifiedf);
             }
         }
     }
@@ -613,7 +614,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     protected abstract Size ComputeSizeUntouchedForListBox(Design itemdesign);
 
-    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale);
+    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale);
 
     protected abstract string GetCompareKey();
 

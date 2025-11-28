@@ -51,7 +51,6 @@ using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 
-
 namespace BlueControls.ItemCollectionPad;
 
 public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables, IStyleable {
@@ -63,6 +62,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public bool AutoZoomFit = true;
 
     private readonly ObservableCollection<AbstractPadItem> _internal = [];
+    private readonly object _itemLock = new();
     private string _caption = string.Empty;
 
     private bool _endless;
@@ -81,8 +81,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     #region Constructors
 
     public ItemCollectionPadItem() : base(string.Empty) {
-        BindingOperations.EnableCollectionSynchronization(_internal, new object());
-
         Breite = 10;
         Höhe = 10;
         _endless = false;
@@ -553,8 +551,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (this[item.KeyName] != null) { Develop.DebugPrint(ErrorType.Warning, "Name bereits vorhanden: " + item.KeyName); return; }
 
         if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(ErrorType.Error, "Item ohne Namen!"); return; }
-
-        _internal.Add(item);
+        lock (_itemLock) {
+            _internal.Add(item);
+        }
         item.AddedToCollection(this);
 
         IsSaved = false;
@@ -568,8 +567,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void BringToFront(AbstractPadItem thisItem) {
         if (_internal.IndexOf(thisItem) == _internal.Count - 1) { return; }
-        _internal.Remove(thisItem);
-        _internal.Add(thisItem);
+        lock (_itemLock) {
+            _internal.Remove(thisItem);
+            _internal.Add(thisItem);
+        }
     }
 
     public void Clear() {
@@ -579,7 +580,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             Remove(thisit);
         }
 
-        _internal.Clear();
+        lock (_itemLock) {
+            _internal.Clear();
+        }
     }
 
     public bool Contains(AbstractPadItem item) => _internal.Contains(item);
@@ -833,7 +836,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (IsDisposed) { return; }
         if (item == null || !_internal.Contains(item)) { return; }
         item.PropertyChanged -= Item_PropertyChanged;
-        _internal.Remove(item);
+        lock (_itemLock) {
+            _internal.Remove(item);
+        }
         item.Parent = null;
         OnItemRemoved();
         OnPropertyChanged("Items");
@@ -909,14 +914,18 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void SendToBack(AbstractPadItem thisItem) {
         if (_internal.IndexOf(thisItem) == 0) { return; }
-        _internal.Remove(thisItem);
-        _internal.Insert(0, thisItem);
+        lock (_itemLock) {
+            _internal.Remove(thisItem);
+            _internal.Insert(0, thisItem);
+        }
     }
 
     public void Swap(int index1, int index2) {
         if (IsDisposed) { return; }
         if (index1 == index2) { return; }
-        (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
+        lock (_itemLock) {
+            (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
+        }
         OnPropertyChanged("Items");
     }
 

@@ -52,7 +52,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     #region Fields
 
     private readonly List<IMoveable> _itemsToMove = [];
-
     private ItemCollectionPadItem? _items = [];
     private bool _repairPrinterDataPrepaired;
 
@@ -167,6 +166,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             OnPropertyChanged();
         }
     }
+
+    protected override bool AutoCenter => true;
+    protected override float SliderZoomOutAddition => 0.6f;
 
     #endregion
 

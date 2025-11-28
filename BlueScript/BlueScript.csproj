@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <AnalysisMode>Recommended</AnalysisMode>
+	<EnableHotReload>true</EnableHotReload>
+	<Deterministic>false</Deterministic>
     
     <!-- Assembly-Metadaten -->
     <RootNamespace>BlueScript</RootNamespace>
@@ -27,8 +29,10 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
     <!-- Plattformen -->
-    <Platforms>AnyCPU</Platforms>
+	  <Platforms>AnyCPU</Platforms>
     <Prefer32Bit>false</Prefer32Bit>
+    <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,7 +43,6 @@
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
 
     <!-- System-Referenzen -->
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

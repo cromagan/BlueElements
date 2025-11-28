@@ -319,6 +319,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// </summary>
     internal FilterCollection Filter { get; } = new("DefaultTableFilter");
 
+    protected override bool AutoCenter => false;
+    protected override float SliderZoomOutAddition => 0f;
+
     #endregion
 
     #region Methods
@@ -1596,8 +1599,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         // Haupt-Aufbau-Routine ------------------------------------
         var t = sortedRowData.ItemData(Design.Item_Listbox);
-
-        sortedRowData.DrawItems(gr, AvailablePaintArea(), null, (int)ShiftX, (int)ShiftY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null);
+        sortedRowData.DrawItems(gr, AvailablePaintArea(), null, (int)ShiftX, (int)ShiftY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
 
         // Rahmen um die gesamte Tabelle zeichnen
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
@@ -1858,11 +1860,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     return;
                 }
 
-                if (IsInRedcueButton(_mouseOverColumn, e)) {
-                    _mouseOverColumn.Reduced = !_mouseOverColumn.Reduced;
-                    Invalidate();
-                    return;
-                }
+                //if (IsInRedcueButton(_mouseOverColumn, e)) {
+                //    _mouseOverColumn.Reduced = !_mouseOverColumn.Reduced;
+                //    Invalidate();
+                //    return;
+                //}
 
                 if (_mouseOverRow?.Row is { IsDisposed: false } r) {
                     OnCellClicked(new CellEventArgs(column, r));
@@ -2273,7 +2275,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void CalculateSortedRows(List<AbstractListItem>? items) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || items == null) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb || items == null || SortUsed() is not { } sortused) {
             VisibleRowCount = 0;
             items?.Clear();
             return;
@@ -2284,7 +2286,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         List<RowItem> pinnedRows = [.. PinnedRows];
         List<RowItem> filteredRows = [.. RowsFiltered];
-        var sortused = SortUsed();
         var arrangement = CurrentArrangement;
 
         foreach (var thisItem in items) {
@@ -2416,19 +2417,98 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #endregion
 
-        var y = 0;
         lock (lockMe) {
+
+            #region Visible richtig setzen
+
             foreach (var thisItem in items) {
+                if (thisItem is RowDataListItem rdli) {
+                    rdli.Visible = !_collapsed.Contains(rdli.AlignsToCaption);
+                }
+                if (thisItem is RowCaptionListItem rcli) {
+                    rcli.Visible = !_collapsed.Contains(rcli.RowChapter.PathParent());
+                }
+                if (thisItem is ColumnsHeadListItem chli) {
+                    chli.Visible = true;
+                }
+            }
+
+            #endregion
+
+            #region UserDefCompareKey für RowDataListItem setzen
+
+            foreach (var thisItem in items) {
+                if (thisItem is RowDataListItem rdli && rdli.Visible) {
+                    rdli.UserDefCompareKey = sortused.Reverse
+                        ? "~" + rdli.Row.CompareKey(sortused)
+                        : rdli.Row.CompareKey(sortused);
+                }
+            }
+
+            // Sortieren
+            items.Sort();
+
+            #endregion
+
+            #region Sortierte Reihenfolge der sichtbaren RowDataListItems ermitteln
+
+            var sortedDataItems = items
+                .OfType<RowDataListItem>()
+                .Where(x => x.Visible)
+                .ToList();
+
+            #endregion
+
+            #region captionOrder erstellen
+
+            // Caption "Angepinnt" (falls vorhanden) an zweiter Stelle, dann alle anderen Captions
+            var captionOrder = new List<string>();
+
+            // "Angepinnt" zuerst (falls vorhanden)
+            var pinnedCaption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.RowChapter == "Angepinnt");
+            if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.RowChapter); }
+
+            // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
+            foreach (var dataItem in sortedDataItems) {
+                captionOrder.AddIfNotExists(dataItem.AlignsToCaption);
+            }
+
+            #endregion
+
+            // Neue sortierte Liste erstellen
+            var sortedItems = new List<AbstractListItem>();
+
+            #region ColumnsHeadListItem an erster Stelle
+
+            var columnHead = items.OfType<ColumnsHeadListItem>().FirstOrDefault();
+            if (columnHead != null && columnHead.Visible) { sortedItems.Add(columnHead); }
+
+            #endregion
+
+            // Captions und ihre RowDataListItems in der ermittelten Reihenfolge hinzufügen
+            foreach (var captionKey in captionOrder) {
+                // Caption hinzufügen
+                var caption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.RowChapter.ToUpperInvariant() == captionKey.ToUpperInvariant());
+
+                if (caption != null) { sortedItems.Add(caption); }
+
+                // Alle RowDataListItems dieser Caption hinzufügen
+                var captionDataItems = sortedDataItems
+                    .Where(x => x.AlignsToCaption == captionKey)
+                    .ToList();
+                sortedItems.AddRange(captionDataItems);
+            }
+
+            // ══════════════════════════════════════════════════════════════
+            // Teil 3: Position (y) setzen
+            // ══════════════════════════════════════════════════════════════
+            var y = 0;
+            foreach (var thisItem in sortedItems) {
                 if (!thisItem.Visible) { continue; }
 
-                if (thisItem is RowDataListItem rdli) { rdli.Visible = !_collapsed.Contains(rdli.AlignsToCaption); }
-
-                if (thisItem is RowCaptionListItem rcli) { rcli.Visible = !_collapsed.Contains(rcli.RowChapter.PathParent()); }
-                if (thisItem is ColumnsHeadListItem chli) { chli.Visible = true; }
-
-                if (!thisItem.Visible) { continue; }
-
-                if (thisItem is RowBackgroundListItem it) { it.Arrangement = arrangement; }
+                if (thisItem is RowBackgroundListItem it) {
+                    it.Arrangement = arrangement;
+                }
 
                 thisItem.Position = new Rectangle(0, y, displayR.Width, thisItem.HeightForListBox(ListBoxAppearance.Listbox, displayR.Width, Design.Item_Listbox));
                 y = thisItem.Position.Bottom;
@@ -2952,8 +3032,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         mustResort = true;
         Invalidate();
     }
-
-    private bool IsInRedcueButton(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.ReduceButtonLocation(Zoom, ShiftX, 0).Contains(e.Location);
 
     private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, ShiftX, 0).Contains(e.Location);
 

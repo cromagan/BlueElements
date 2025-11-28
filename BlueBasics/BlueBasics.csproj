@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <AnalysisMode>Recommended</AnalysisMode>
+	<EnableHotReload>true</EnableHotReload>
+    <Deterministic>false</Deterministic>
 
     <!-- Assembly-Metadaten -->
     <AssemblyName>BlueBasics</AssemblyName>
@@ -28,9 +30,11 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
      <!-- Plattformen -->
-    <Platforms>AnyCPU;x86;x64</Platforms>
+	 <Platforms>AnyCPU;x86;x64</Platforms>
     <Prefer32Bit>false</Prefer32Bit>
     <UseWindowsForms>true</UseWindowsForms>
+    <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,8 +47,6 @@
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
 
     <!-- NuGet-Pakete -->
     <PackageReference Include="System.Memory" Version="4.5.5" />

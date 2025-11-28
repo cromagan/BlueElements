@@ -73,8 +73,6 @@ namespace BlueControls.Forms {
             // Pad
             // 
             this.Pad.Location = new System.Drawing.Point(0, 136);
-            this.Pad.ShiftX = -137.5F;
-            this.Pad.ShiftY = -132F;
             this.Pad.Size = new System.Drawing.Size(412, 401);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             // 

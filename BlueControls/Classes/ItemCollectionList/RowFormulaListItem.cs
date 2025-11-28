@@ -116,10 +116,10 @@ public class RowFormulaListItem : AbstractListItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
         if (_tmpBmp == null) { GeneratePic(); }
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
+            Skin.Draw_Back(gr, itemdesign, state, positionModified.ToRect(), null, false);
         }
         if (_tmpBmp != null) {
             scale = (float)Math.Min(positionModified.Width / (double)_tmpBmp.Width, positionModified.Height / (double)_tmpBmp.Height);
@@ -130,7 +130,7 @@ public class RowFormulaListItem : AbstractListItem {
             gr.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
         }
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionModified);
+            Skin.Draw_Border(gr, itemdesign, state, positionModified.ToRect());
         }
     }
 

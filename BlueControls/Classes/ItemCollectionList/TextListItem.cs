@@ -80,14 +80,14 @@ public class TextListItem : AbstractListItem {
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Skin.GetBlueFont(TempDesign(itemdesign), States.Standard).FormatedText_NeededSize(Text, Symbol, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
         var tmpd = TempDesign(itemdesign);
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, tmpd, state, positionModified, null, false);
+            Skin.Draw_Back(gr, tmpd, state, positionModified.ToRect(), null, false);
         }
-        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionModified, tmpd, state, null, false, translate);
+        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionModified.ToRect(), tmpd, state, null, false, translate);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, tmpd, state, positionModified);
+            Skin.Draw_Border(gr, tmpd, state, positionModified.ToRect());
         }
     }
 

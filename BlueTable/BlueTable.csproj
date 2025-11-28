@@ -7,7 +7,9 @@
     <Nullable>enable</Nullable>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <AnalysisMode>Recommended</AnalysisMode>
-
+	<EnableHotReload>true</EnableHotReload>
+	<Deterministic>false</Deterministic>
+	
     <!-- Assembly-Metadaten -->
     <RootNamespace>BlueTable</RootNamespace>
     <AssemblyName>BlueTable</AssemblyName>
@@ -30,6 +32,8 @@
     <Platforms>AnyCPU;x86</Platforms>
     <Prefer32Bit>false</Prefer32Bit>
     <UseWindowsForms>true</UseWindowsForms>
+    <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

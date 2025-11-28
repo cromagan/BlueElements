@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <AnalysisMode>Recommended</AnalysisMode>
+	<EnableHotReload>true</EnableHotReload>
+	<Deterministic>false</Deterministic>
 
     <!-- Assembly-Metadaten -->
     <RootNamespace>BlueControls</RootNamespace>
@@ -26,9 +28,11 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
     <!-- Plattformen -->
-    <Platforms>AnyCPU;x86;x64</Platforms>
+	  <Platforms>AnyCPU;x86;x64</Platforms>
     <Prefer32Bit>false</Prefer32Bit>
     <UseWindowsForms>true</UseWindowsForms>
+    <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   
   <ItemGroup>
@@ -46,8 +50,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
 
     <!-- .NET Framework Referenzen -->
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
@@ -65,10 +67,5 @@
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Controls\TableViewWithFilters.cs">
-      <SubType>Component</SubType>
-    </Compile>
-  </ItemGroup>
 
 </Project>

@@ -30,7 +30,6 @@ using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
-
 namespace BluePaint;
 
 public partial class MainWindow : BlueControls.Forms.Form {
@@ -157,7 +156,7 @@ public partial class MainWindow : BlueControls.Forms.Form {
 
     private void btnEinfügen_Click(object sender, System.EventArgs e) {
         if (!IsSaved()) { return; }
-        if (!System.Windows.Clipboard.ContainsImage()) {
+        if (!Clipboard.ContainsImage()) {
             Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", ImageCode.Information);
             return;
         }
@@ -192,7 +191,7 @@ public partial class MainWindow : BlueControls.Forms.Form {
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
         if (FileExists(SaveTab.FileName)) {
-            if(BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", ImageCode.Frage, "Ja", "Nein") != 0) { return; }
+            if (BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", ImageCode.Frage, "Ja", "Nein") != 0) { return; }
         }
         _filename = SaveTab.FileName;
         _isSaved = false;
@@ -264,7 +263,7 @@ public partial class MainWindow : BlueControls.Forms.Form {
                 return true;
             }
 
-            switch(BlueControls.Forms.MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
+            switch (BlueControls.Forms.MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
                 case 0:
                     Speichern();
                     break;

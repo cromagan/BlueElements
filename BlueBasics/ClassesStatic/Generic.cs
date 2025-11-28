@@ -32,7 +32,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using static BlueBasics.IO;
-using Clipboard = System.Windows.Clipboard;
 using Point = System.Drawing.Point;
 
 namespace BlueBasics;
@@ -112,7 +111,7 @@ public static class Generic {
     /// <param name="saveTo"></param>
     /// <param name="linkUrl"></param>
     /// <returns></returns>
-    
+
     public static bool CreateInternetLink(string saveTo, string linkUrl) {
         var title = "unbekannt";
         // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -135,7 +134,7 @@ public static class Generic {
     /// Erstellt eine Datei-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
     /// </summary>
     /// <returns></returns>
-    
+
     public static bool CreateShortCut(string saveTo, string linkName) {
         try {
             var app = Assembly.GetExecutingAssembly().Location;

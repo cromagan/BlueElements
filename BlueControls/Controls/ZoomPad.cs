@@ -130,6 +130,13 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     }
 
+    protected abstract bool AutoCenter { get; }
+
+    /// <summary>
+    /// So viel darf zusätzlich hinausgezoomt werden.
+    /// </summary>
+    protected abstract float SliderZoomOutAddition { get; }
+
     private bool ControlPressing { get; set; }
 
     #endregion
@@ -281,11 +288,17 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         if (maxBounds.Width == 0) { return; }
         var p = ItemCollectionPadItem.CenterPos(maxBounds, AvailablePaintArea().Size, _zoom);
-        var sliderv = ItemCollectionPadItem.SliderValues(maxBounds, _zoom, p);
+        PointF sliderv;
+        if (AutoCenter) {
+            sliderv = ItemCollectionPadItem.SliderValues(maxBounds, _zoom, p);
+        } else {
+            sliderv = new PointF(0, 0);
+        }
+
         if (p.X < 0) {
             SliderX.Enabled = true;
-            SliderX.Minimum = (float)((maxBounds.Left * _zoom) - (Width * 0.6d));
-            SliderX.Maximum = (float)((maxBounds.Right * _zoom) - Width + (Width * 0.6d));
+            SliderX.Minimum = (float)((maxBounds.Left * _zoom) - (Width * SliderZoomOutAddition));
+            SliderX.Maximum = (float)((maxBounds.Right * _zoom) - Width + (Width * SliderZoomOutAddition));
             SliderX.Value = ShiftX;
         } else {
             SliderX.Enabled = false;
@@ -298,8 +311,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         if (p.Y < 0) {
             SliderY.Enabled = true;
-            SliderY.Minimum = (float)((maxBounds.Top * _zoom) - (Height * 0.6d));
-            SliderY.Maximum = (float)((maxBounds.Bottom * _zoom) - Height + (Height * 0.6d));
+            SliderY.Minimum = (float)((maxBounds.Top * _zoom) - (Height * SliderZoomOutAddition));
+            SliderY.Maximum = (float)((maxBounds.Bottom * _zoom) - Height + (Height * SliderZoomOutAddition));
             SliderY.Value = ShiftY;
         } else {
             SliderY.Enabled = false;
@@ -415,7 +428,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         //SliderY.Value = (m.Y * _zoom) - (Height / 2) - SliderX.Height
     }
 
-    protected virtual void OnShiftChanged() { Invalidate(); }
+    protected virtual void OnShiftChanged() {
+        Invalidate();
+    }
 
     protected override void OnSizeChanged(System.EventArgs e) {
         if (ScreenshotMode) {
@@ -425,7 +440,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     }
 
-    protected virtual void OnZoomChanged() { Invalidate(); }
+    protected virtual void OnZoomChanged() {
+        Invalidate();
+    }
 
     private void SliderX_ValueChanged(object sender, System.EventArgs e) => ShiftX = SliderX.Value;
 

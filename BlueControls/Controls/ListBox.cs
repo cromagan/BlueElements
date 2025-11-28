@@ -49,6 +49,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     #region Fields
 
     private readonly List<AbstractListItem> _item = [];
+    private readonly object _itemLock = new();
     private ListBoxAppearance _appearance;
     private CheckBehavior _checkBehavior = CheckBehavior.SingleSelection;
 
@@ -74,8 +75,6 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-
-        BindingOperations.EnableCollectionSynchronization(_item, new object());
 
         _maxNeededItemSize = Size.Empty;
         _appearance = ListBoxAppearance.Listbox;
@@ -409,8 +408,9 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         }
 
         _checked.Clear();
-
-        _item.Clear();
+        lock (_itemLock) {
+            _item.Clear();
+        }
         InvalidateItemOrder();
         ValidateCheckStates(null, string.Empty);
     }
@@ -454,7 +454,9 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         if (index1 == index2) { return; }
         if (AutoSort) { return; }
 
-        (_item[index1], _item[index2]) = (_item[index2], _item[index1]);
+        lock (_itemLock) {
+            (_item[index1], _item[index2]) = (_item[index2], _item[index1]);
+        }
 
         InvalidateItemOrder();
         DoItemOrder();
@@ -723,9 +725,9 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         DoItemOrder();
 
         if (CheckBehavior == CheckBehavior.AllSelected) {
-            _item.DrawItems(gr, visArea, _mouseOverItem, 0, (int)SliderY.Value, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, null);
+            _item.DrawItems(gr, visArea, _mouseOverItem, 0, (int)SliderY.Value, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, null, 1f);
         } else {
-            _item.DrawItems(gr, visArea, _mouseOverItem, 0, (int)SliderY.Value, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, _checked);
+            _item.DrawItems(gr, visArea, _mouseOverItem, 0, (int)SliderY.Value, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, _checked, 1f);
         }
 
         if (borderCoords.Height > 0 && _controlDesign == Design.ListBox) {
@@ -795,7 +797,8 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     }
 
     private void AddAndRegister(AbstractListItem item) {
-        _item.Add(item);
+        lock (_itemLock) { _item.Add(item); }
+
         item.CompareKeyChanged += Item_CompareKeyChangedChanged;
         item.PropertyChanged += Item_PropertyChanged;
     }
@@ -931,7 +934,9 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
     private void DoItemOrder() {
         if (!AutoSort || _sorted) { return; }
-        _item.Sort();
+        lock (_itemLock) {
+            _item.Sort();
+        }
         _sorted = true;
     }
 
@@ -1082,7 +1087,9 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     private void RemoveAndUnRegister(AbstractListItem item) {
         item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
         item.PropertyChanged -= Item_PropertyChanged;
-        _item.Remove(item);
+        lock (_itemLock) {
+            _item.Remove(item);
+        }
         _checked.Remove(item.KeyName);
         InvalidateItemOrder();
     }

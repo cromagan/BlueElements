@@ -26,7 +26,7 @@ using System.Linq;
 
 namespace BlueTable;
 
-public sealed class RowSortDefinition : IEnumerable<ColumnItem>, IParseable {
+public sealed class RowSortDefinition : List<ColumnItem>, IParseable {
 
     #region Fields
 
@@ -70,10 +70,6 @@ public sealed class RowSortDefinition : IEnumerable<ColumnItem>, IParseable {
     #endregion
 
     #region Methods
-
-    IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
-
-    public IEnumerator<ColumnItem> GetEnumerator() => _internal.GetEnumerator();
 
     public List<string> ParseableItems() {
         List<string> result = [];
@@ -145,8 +141,6 @@ public sealed class RowSortDefinition : IEnumerable<ColumnItem>, IParseable {
     public override string ToString() => ParseableItems().FinishParseable();
 
     public bool UsedForRowSort(ColumnItem? column) => _internal.Count != 0 && _internal.Any(thisColumn => thisColumn == column);
-
-    private IEnumerator IEnumerable_GetEnumerator() => _internal.GetEnumerator();
 
     #endregion
 }

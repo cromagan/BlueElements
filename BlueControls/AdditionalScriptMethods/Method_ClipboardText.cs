@@ -21,10 +21,9 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Windows;
+using System.Windows.Forms;
 
 namespace BlueScript.Methods;
-
 
 internal class Method_ClipboardText : Method {
 

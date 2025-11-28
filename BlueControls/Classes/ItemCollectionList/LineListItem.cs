@@ -47,7 +47,7 @@ public class LineListItem : AbstractListItem {
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Position is { X: 0, Y: 0 } and { Width: 0, Height: 0 } ? new Size(4, 4) : Position.Size;
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionModified.Left, (int)(positionModified.Top + (positionModified.Height / 2.0)), positionModified.Right, (int)(positionModified.Top + (positionModified.Height / 2.0)));
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionModified.Left, (int)(positionModified.Top + (positionModified.Height / 2.0)), positionModified.Right, (int)(positionModified.Top + (positionModified.Height / 2.0)));
 
     protected override string GetCompareKey() => Position.ToString();
 

@@ -24,6 +24,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Extended_Text;
 using BlueControls.Controls;
+using BlueTable.Enums;
 
 namespace BlueTable;
 
@@ -54,11 +55,16 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => 18;
+    public override void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) {
+    }
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => new(18, 18);
+    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Dick, left, right, bottom);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
+
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => new(40, 40);
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
         base.DrawExplicit(gr, visibleArea, positionModified, itemdesign, state, drawBorderAndBack, translate, shiftX, shiftY, scale);
 
         if (Arrangement == null) { return; }
@@ -73,19 +79,19 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
         var si = chpF.MeasureString(tmp);
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionModified);
-        var CaptionPos = new Rectangle(1, (int)(positionModified.Bottom - si.Height), (int)si.Width + p23 + p5, (int)si.Height);
+        var CaptionPos = new Rectangle(1, (int)(positionModified.Bottom - si.Height - p5), (int)si.Width + p23 + p14, (int)si.Height + p5);
 
         if (!Expanded) {
             var x = new ExtText(Design.Button_CheckBox, States.Checked);
             Button.DrawButton(null, gr, Design.Button_CheckBox, States.Checked, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, CaptionPos, false);
-            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, CaptionPos.Top);
+            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, CaptionPos.Top + p5);
         } else {
             var x = new ExtText(Design.Button_CheckBox, States.Standard);
             Button.DrawButton(null, gr, Design.Button_CheckBox, States.Standard, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, CaptionPos, false);
-            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, CaptionPos.Top);
+            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, CaptionPos.Top + p5);
         }
         chpF.DrawString(gr, tmp, p23, CaptionPos.Top);
-        gr.DrawLine(Skin.PenLinieDick, 0, positionModified.Y, positionModified.Width, positionModified.Y);
+        //gr.DrawLine(Skin.PenLinieDick, 0, positionModified.Y, positionModified.Width, positionModified.Y);
     }
 
     protected override string GetCompareKey() => RowChapter;

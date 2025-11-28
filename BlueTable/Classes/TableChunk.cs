@@ -223,36 +223,36 @@ public class TableChunk : TableFile {
         if (db is not { IsDisposed: false }) { return string.Empty; }
 
         if (type is TableDataType.Command_RemoveColumn
-                or TableDataType.Command_AddColumnByName) { return Chunk_MainData.ToLower(); }
+                or TableDataType.Command_AddColumnByName) { return Chunk_MainData.ToLowerInvariant(); }
 
         if (type == TableDataType.Command_NewStart) { return string.Empty; }
 
         if (type.IsObsolete()) { return string.Empty; }
-        if (type == TableDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases.ToLower(); }
-        if (type == TableDataType.TableVariables) { return Chunk_Variables.ToLower(); }
-        if (type is TableDataType.TemporaryTableMasterUser or TableDataType.TemporaryTableMasterTimeUTC) { return Chunk_Master.ToLower(); }
+        if (type == TableDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases.ToLowerInvariant(); }
+        if (type == TableDataType.TableVariables) { return Chunk_Variables.ToLowerInvariant(); }
+        if (type is TableDataType.TemporaryTableMasterUser or TableDataType.TemporaryTableMasterTimeUTC) { return Chunk_Master.ToLowerInvariant(); }
 
         if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
             switch (db.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None) {
                 case ChunkType.ByHash_1Char:
-                    return chunkvalue.ToLower().GetHashString().Right(1).ToLower();
+                    return chunkvalue.ToLowerInvariant().GetHashString().Right(1).ToLowerInvariant();
 
                 case ChunkType.ByHash_2Chars:
-                    return chunkvalue.ToLower().GetHashString().Right(2).ToLower();
+                    return chunkvalue.ToLowerInvariant().GetHashString().Right(2).ToLowerInvariant();
 
                 case ChunkType.ByHash_3Chars:
-                    return chunkvalue.ToLower().GetHashString().Right(3).ToLower();
+                    return chunkvalue.ToLowerInvariant().GetHashString().Right(3).ToLowerInvariant();
 
                 case ChunkType.ByName:
                     var t = ColumnItem.MakeValidColumnName(chunkvalue);
-                    return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLower();
+                    return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
 
                 default:
-                    return Chunk_UnknownData.ToLower();
+                    return Chunk_UnknownData.ToLowerInvariant();
             }
         }
 
-        return Chunk_MainData.ToLower();
+        return Chunk_MainData.ToLowerInvariant();
     }
 
     public override bool AmITemporaryMaster(int ranges, int rangee) {
@@ -330,7 +330,7 @@ public class TableChunk : TableFile {
     }
 
     public string ChunkFolder() {
-        if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chunk)) {
+        if (!_chunks.TryGetValue(Chunk_MainData.ToLowerInvariant(), out var chunk)) {
             return string.Empty;
         } else {
             return chunk.ChunkFolder();
@@ -360,11 +360,11 @@ public class TableChunk : TableFile {
         var f = base.IsNotEditableReason(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (!_chunks.TryGetValue(Chunk_MainData.ToLower(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Maindata"; }
-        if (!_chunks.TryGetValue(Chunk_Master.ToLower(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Master"; }
-        if (!_chunks.TryGetValue(Chunk_Variables.ToLower(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Variablen"; }
-        if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLower(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Uses"; }
-        if (!_chunks.TryGetValue(Chunk_UnknownData.ToLower(), out var chkukn) || chkukn.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-UnknownData"; }
+        if (!_chunks.TryGetValue(Chunk_MainData.ToLowerInvariant(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Maindata"; }
+        if (!_chunks.TryGetValue(Chunk_Master.ToLowerInvariant(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Master"; }
+        if (!_chunks.TryGetValue(Chunk_Variables.ToLowerInvariant(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Variablen"; }
+        if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLowerInvariant(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Uses"; }
+        if (!_chunks.TryGetValue(Chunk_UnknownData.ToLowerInvariant(), out var chkukn) || chkukn.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-UnknownData"; }
 
         return string.Empty;
     }
@@ -378,7 +378,7 @@ public class TableChunk : TableFile {
     /// <returns>Ob ein Load stattgefunden hat</returns>
     public bool LoadChunkWithChunkId(string chunkId, bool isFirst) {
         if (string.IsNullOrEmpty(chunkId)) { return false; }
-        chunkId = chunkId.ToLower();
+        chunkId = chunkId.ToLowerInvariant();
 
         while (chunksBeingSaved.Count > 10) {
             DropMessage(ErrorType.Info, $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
@@ -460,7 +460,7 @@ public class TableChunk : TableFile {
 
             foreach (var file in chunkFiles) {
                 DeleteFile(file, false);
-                var key = file.FileNameWithoutSuffix().ToLower();
+                var key = file.FileNameWithoutSuffix().ToLowerInvariant();
                 _chunks.TryRemove(key, out _);
             }
         }
@@ -611,8 +611,8 @@ public class TableChunk : TableFile {
     }
 
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        newChunkId = newChunkId.ToLower();
-        oldChunkId = oldChunkId.ToLower();
+        newChunkId = newChunkId.ToLowerInvariant();
+        oldChunkId = oldChunkId.ToLowerInvariant();
 
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }

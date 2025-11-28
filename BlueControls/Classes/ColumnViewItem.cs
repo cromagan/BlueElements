@@ -449,7 +449,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public void ParseFinished(string parsed) {
+    }
 
     public bool ParseThis(string key, string value) {
         if (Parent?.Table is not { IsDisposed: false } db) {
@@ -521,21 +522,21 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return new Rectangle((int)(((int)X * scale) - sliderx), 0, (int)(DrawWidth() * scale), (int)(Parent.HeadSize() * scale));
     }
 
-    public Rectangle ReduceButtonLocation(float scale, float sliderx, int moveDown) {
-        var r = RealHead(scale, sliderx);
-        var size = (int)(18 * scale);
-        var pcch = (int)(ColumnCaptionSizeY * scale);
+    //public Rectangle ReduceButtonLocation(float scale, float sliderx) {
+    //    var r = RealHead(scale, sliderx);
+    //    var size = (int)(18 * scale);
+    //    var pcch = (int)(ColumnCaptionSizeY * scale);
 
-        if (!string.IsNullOrEmpty(CaptionGroup3)) {
-            moveDown += pcch * 3;
-        } else if (!string.IsNullOrEmpty(CaptionGroup2)) {
-            moveDown += pcch * 2;
-        } else if (!string.IsNullOrEmpty(CaptionGroup1)) {
-            moveDown += pcch;
-        }
+    //    //if (!string.IsNullOrEmpty(CaptionGroup3)) {
+    //    //    moveDown += pcch * 3;
+    //    //} else if (!string.IsNullOrEmpty(CaptionGroup2)) {
+    //    //    moveDown += pcch * 2;
+    //    //} else if (!string.IsNullOrEmpty(CaptionGroup1)) {
+    //    //    moveDown += pcch;
+    //    //}
 
-        return new Rectangle(r.Right - size, r.Top + moveDown, size, size);
-    }
+    //    return new Rectangle(r.Right - size, r.Top, size, size);
+    //}
 
     public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();
 
@@ -580,5 +581,4 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     #endregion
-
 }

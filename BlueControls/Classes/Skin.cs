@@ -836,7 +836,7 @@ public static class Skin {
 
     public const int Padding = 9;
     public const int PaddingSmal = 3;
-    public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2, MidpointRounding.AwayFromZero);
+    public static readonly float Scale = (float)Math.Round(GetDpiScale(), 2, MidpointRounding.AwayFromZero);
     public static Table? StyleTb;
     public static ColumnItem? StyleTb_Font;
     public static ColumnItem? StyleTb_Name;
@@ -1631,6 +1631,11 @@ public static class Skin {
     }
 
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;
+
+    private static double GetDpiScale() {
+        using var g = Graphics.FromHwnd(IntPtr.Zero);
+        return g.DpiX / 96.0; // 96 DPI = 100% Skalierung
+    }
 
     //internal static BlueFont? GetBlueFont(PadStyles padStyle, string sheetStyle, int stufe) {
     //    switch (stufe) {
