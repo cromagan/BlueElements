@@ -21,7 +21,7 @@ namespace BlueControls.BlueTableDialogs
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.tblUndo = new TableView();
+            this.tblUndo = new TableViewWithFilters();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,6 +53,6 @@ namespace BlueControls.BlueTableDialogs
             this.ResumeLayout(false);
 
         }
-        private TableView tblUndo;
+        private TableViewWithFilters tblUndo;
     }
 }

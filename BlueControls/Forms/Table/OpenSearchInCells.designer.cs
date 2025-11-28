@@ -10,7 +10,7 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs
     {
-    public sealed partial class Search 
+    public sealed partial class OpenSearchInCells 
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]

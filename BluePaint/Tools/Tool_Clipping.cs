@@ -24,7 +24,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.Generic;
-using MessageBox = BlueControls.Forms.MessageBox;
+
 
 namespace BluePaint;
 
@@ -38,7 +38,7 @@ public partial class Tool_Clipping {
         CheckMinMax();
         btnAutoZ_Click(null, null);
         ZuschnittOK_Click(null, null);
-        MessageBox.Show("Automatisch zugeschnitten.");
+        BlueControls.Forms.MessageBox.Show("Automatisch zugeschnitten.");
     }
 
     #endregion
@@ -121,7 +121,7 @@ public partial class Tool_Clipping {
 
     private void WollenSieDenZuschnittÜbernehmen() {
         if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
-        if (MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
+        if(BlueControls.Forms.MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
         ZuschnittOK_Click(null, System.EventArgs.Empty);
     }
 

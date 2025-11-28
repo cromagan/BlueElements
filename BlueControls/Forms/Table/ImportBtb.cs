@@ -139,7 +139,7 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
         //    TR = aTXT.Text;
         //}
         //if (string.IsNullOrEmpty(TR)) {
-        //    MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
+        //    BlueControls.Forms.MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
         //    return;
         //}
 

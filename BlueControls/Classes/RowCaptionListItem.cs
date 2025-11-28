@@ -19,51 +19,10 @@
 
 using BlueControls;
 using BlueControls.Enums;
-using System;
 using System.Drawing;
-using static BlueTable.RowBackgroundListItemListItemExtensions;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
-using BlueControls.BlueTableDialogs;
-using BlueControls.CellRenderer;
-using BlueControls.Designer_Support;
-
-using BlueControls.Enums;
-
-using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueTable;
-using BlueTable.Enums;
-using BlueTable.EventArgs;
-using BlueTable.Interfaces;
-
-using System;
-
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-
-using System.Drawing;
-
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static BlueTable.Table;
 using BlueControls.Controls;
 
 namespace BlueTable;
@@ -108,9 +67,9 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
         var tmp = RowChapter.Trim('\\');
 
-        var p14 = TableView.GetPix(14, scale);
-        var p5 = TableView.GetPix(5, scale);
-        var p23 = TableView.GetPix(23, scale);
+        var p14 = ZoomPad.GetPix(14, scale);
+        var p5 = ZoomPad.GetPix(5, scale);
+        var p23 = ZoomPad.GetPix(23, scale);
 
         var si = chpF.MeasureString(tmp);
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionModified);

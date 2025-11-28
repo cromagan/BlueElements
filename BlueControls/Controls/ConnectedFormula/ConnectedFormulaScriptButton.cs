@@ -25,7 +25,6 @@ using BlueScript.Variables;
 using BlueTable.Enums;
 using System.ComponentModel;
 using System.Windows.Forms;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -172,12 +171,12 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
             #endregion
         } else {
             Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Fehler: " + t.Protocol, 0);
-            MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{errorreason}", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+            Forms.MessageBox.Show($"Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n{errorreason}", BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
-
-        #endregion
 
         mainButton.Enabled = true;
         mainButton.Refresh();
     }
+
+    #endregion
 }

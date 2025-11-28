@@ -83,6 +83,8 @@ public partial class Slider : IBackgroundNone {
 
     #region Properties
 
+    public new bool Focused => base.Focused || But1.Focused || But2.Focused;
+
     [DefaultValue(10f)]
     public float LargeChange { get; set; } = 10;
 
@@ -158,14 +160,14 @@ public partial class Slider : IBackgroundNone {
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
-  
+
         set => base.TabIndex = 0;
     }
 
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
-  
+
         set => base.TabStop = false;
     }
 
@@ -201,8 +203,6 @@ public partial class Slider : IBackgroundNone {
     #endregion
 
     #region Methods
-
-    public new bool Focused() => base.Focused || But1.Focused || But2.Focused;
 
     internal void DoMouseWheel(MouseEventArgs e) => OnMouseWheel(e);
 

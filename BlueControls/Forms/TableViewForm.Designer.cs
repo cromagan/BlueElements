@@ -50,7 +50,6 @@ namespace BlueControls.Forms {
             this.btnZoomFit = new BlueControls.Controls.Button();
             this.btnZoomOut = new BlueControls.Controls.Button();
             this.btnZoomIn = new BlueControls.Controls.Button();
-            this.btnUnterschiede = new BlueControls.Controls.Button();
             this.btnAlleSchließen = new BlueControls.Controls.Button();
             this.btnAlleErweitern = new BlueControls.Controls.Button();
             this.capSpaltenanordnung = new BlueControls.Controls.Caption();
@@ -88,7 +87,7 @@ namespace BlueControls.Forms {
             this.btnClipboardImport = new BlueControls.Controls.Button();
             this.pnlTableSelect = new System.Windows.Forms.Panel();
             this.tbcTableSelector = new BlueControls.Controls.TabControl();
-            this.Table = new BlueControls.Controls.TableView();
+            this.Table = new BlueControls.Controls.TableViewWithFilters();
             this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tbcSidebar = new BlueControls.Controls.TabControl();
             this.tabFormula = new System.Windows.Forms.TabPage();
@@ -313,7 +312,6 @@ namespace BlueControls.Forms {
             this.grpAnsicht.Controls.Add(this.btnZoomFit);
             this.grpAnsicht.Controls.Add(this.btnZoomOut);
             this.grpAnsicht.Controls.Add(this.btnZoomIn);
-            this.grpAnsicht.Controls.Add(this.btnUnterschiede);
             this.grpAnsicht.Controls.Add(this.btnAlleSchließen);
             this.grpAnsicht.Controls.Add(this.btnAlleErweitern);
             this.grpAnsicht.Controls.Add(this.capSpaltenanordnung);
@@ -360,17 +358,6 @@ namespace BlueControls.Forms {
             this.btnZoomIn.Size = new System.Drawing.Size(24, 22);
             this.btnZoomIn.TabIndex = 15;
             this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
-            // 
-            // btnUnterschiede
-            // 
-            this.btnUnterschiede.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
-            this.btnUnterschiede.Location = new System.Drawing.Point(216, 46);
-            this.btnUnterschiede.Name = "btnUnterschiede";
-            this.btnUnterschiede.QuickInfo = "Zeigt Unterschiede zur gewählten Zeile an";
-            this.btnUnterschiede.Size = new System.Drawing.Size(104, 22);
-            this.btnUnterschiede.TabIndex = 14;
-            this.btnUnterschiede.Text = "Unterschiede";
-            this.btnUnterschiede.CheckedChanged += new System.EventHandler(this.btnUnterschiede_CheckedChanged);
             // 
             // btnAlleSchließen
             // 
@@ -836,7 +823,6 @@ namespace BlueControls.Forms {
             this.Table.SheetStyle = "Windows 11";
             this.Table.Size = new System.Drawing.Size(972, 571);
             this.Table.TabIndex = 0;
-            this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
             this.Table.TableChanged += new System.EventHandler(this.Table_TableChanged);
             this.Table.SelectedCellChanged += new System.EventHandler<BlueControls.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
             this.Table.SelectedRowChanged += new System.EventHandler<BlueTable.EventArgs.RowNullableEventArgs>(this.Table_SelectedRowChanged);
@@ -977,7 +963,7 @@ namespace BlueControls.Forms {
         protected RibbonBar ribMain;
         protected Panel pnlTableSelect;
         protected TabControl tbcTableSelector;
-        protected Controls.TableView Table;
+        protected Controls.TableViewWithFilters Table;
         protected SplitContainer SplitContainer1;
         protected TabPage tabAdmin;
         private Button btnZeileLöschen;
@@ -993,7 +979,6 @@ namespace BlueControls.Forms {
         protected TabControl tbcSidebar;
         private Caption capZeilen2;
         protected TabPage tabAllgemein;
-        protected Button btnUnterschiede;
         private Caption capSpaltenanordnung;
         private Caption capZeilen1;
         private ComboBox cbxColumnArr;

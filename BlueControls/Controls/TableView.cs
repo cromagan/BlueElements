@@ -42,10 +42,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
@@ -54,7 +52,6 @@ using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 using static BlueTable.Table;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -62,50 +59,37 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(SelectedRowChanged))]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class TableView : GenericControlReciverSender, IContextMenu, ITranslateable, IHasTable, IOpenScriptEditor, IStyleable {
+public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTable, IOpenScriptEditor, IStyleable {
 
     #region Fields
 
     public const string CellDataFormat = "BlueElements.CellLink";
 
-    /// <summary>
-    ///  Abstand zwischen den Zeilen
-    /// </summary>
-    private const int RowSpacing = 4;
-
     private readonly List<string> _collapsed = [];
     private readonly object _lockUserAction = new();
 
-    private ColumnViewCollection? _ähnliche;
     private string _arrangement = string.Empty;
     private AutoFilter? _autoFilter;
-    private bool _controlPressing;
-    private bool _isFilling;
+
     private bool _isinDoubleClick;
     private bool _isinKeyDown;
     private bool _isinMouseDown;
     private bool _isinMouseMove;
-    private bool _isinMouseWheel;
     private bool _isinSizeChanged;
-    private bool _isinVisibleChanged;
     private string _lastLooked = string.Empty;
     private string _newRowsAllowed = string.Empty;
     private Progressbar? _pg;
-    private SearchAndReplaceInCells? _searchAndReplaceInCells;
-    private SearchAndReplaceInTbScripts? _searchAndReplaceInTbScripts;
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
     private DateTime? _tableDrawError;
     private Rectangle _tmpCursorRect = Rectangle.Empty;
-    private RowItem? _unterschiede;
-    private float _zoom = 1f;
     private bool mustResort = true;
 
     #endregion
 
     #region Constructors
 
-    public TableView() : base(true, false, false) {
+    public TableView() : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -113,6 +97,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Filter.PropertyChanged += Filter_PropertyChanged;
         FilterCombined.RowsChanged += FilterCombined_RowsChanged;
         FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
+        FilterFix.PropertyChanged += FilterFix_PropertyChanged;
     }
 
     #endregion
@@ -145,19 +130,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     #region Properties
 
-    /// <summary>
-    /// Wenn "Ähnliche" als Schaltfläche vorhanden sein soll, muss hier der Name einer Spaltenanordnung stehen
-    /// </summary>
-    [DefaultValue("")]
-    public string ÄhnlicheAnsichtName {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            GetÄhnlich();
-        }
-    } = string.Empty;
-
     [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
     public string Arrangement {
@@ -180,6 +152,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// </summary>
     public bool ContextMenuDefault { get; set; } = true;
 
+    public override bool ControlMustPressed => true;
+
     public ColumnViewCollection? CurrentArrangement {
         get {
             if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
@@ -194,11 +168,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
             if (field is { } cu) {
                 cu.SheetStyle = SheetStyle;
-                cu.ClientWidth = (int)(DisplayRectangleWithoutSlider().Width / _zoom);
+                cu.ClientWidth = (int)AvailablePaintAreaScaled().Width;
                 cu.ComputeAllColumnPositions();
             }
-
-            UpdateFilterleisteVisibility();
 
             return field;
         }
@@ -226,19 +198,15 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    public FilterCollection Filter { get; } = new("DefaultTableFilter");
+    public FilterCollection FilterCombined { get; } = new("TableFilterCombined");
 
     /// <summary>
-    /// Welche Knöpfe angezeigt werden sollen. Muss der Name einer Spaltenanordnung sein.
+    /// Filter, die fest an das Element übergeben werden und nicht verändert werden können.
+    /// Werden bei FilterCombined ausgegeben.
     /// </summary>
-    [DefaultValue("")]
-    public string FilterAnsichtName { get; set; } = string.Empty;
+    public FilterCollection FilterFix { get; } = new("FilterFix");
 
-    public FilterCollection FilterCombined { get; } = new("TableFilterCombined");
-    public int FilterleisteZeilen => CurrentArrangement?.FilterRows ?? 1;
-
-    [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
-    public FilterTypesToShow FilterTypesToShow { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
+    public new bool Focused => base.Focused || BTB.Focused || BCB.Focused;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -343,44 +311,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowItem? Unterschiede {
-        get => _unterschiede;
-        set {
-            //if (_Unterschiede != null && value != null && _sortDefinitionTemporary.ToString(false) == value.ToString(false)) { return; }
-            if (_unterschiede == value) { return; }
-            _unterschiede = value;
-            Invalidate();
-        }
-    }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public long VisibleRowCount { get; private set; }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public float Zoom {
-        get => _zoom;
-        set {
-            if (Math.Abs(_zoom - value) < DefaultTolerance) { return; }
-
-            _zoom = value;
-            Invalidate();
-        }
-    }
-
     /// <summary>
-    /// Berechnet die Höhe der Filterleiste in Pixeln.
+    /// Interne Filter, die im Controll erstellt wurden und auch geändert werden dürfen.
+    /// Werden bei FilterCombined ausgegeben.
     /// </summary>
-    private int FilterleisteHeight {
-        get {
-            if (FilterleisteZeilen < 1) { return 0; }
-
-            return (btnAlleFilterAus.Top * 2) + (FilterleisteZeilen * btnAlleFilterAus.Height) + ((FilterleisteZeilen - 1) * RowSpacing);
-        }
-    }
+    internal FilterCollection Filter { get; } = new("DefaultTableFilter");
 
     #endregion
 
@@ -438,14 +375,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (e.Data is Func<List<RowItem>> fRows) { rows.AddRange(fRows()); }
 
         if (rows.Count == 0) {
-            MessageBox.Show("Keine Zeilen zum Prüfen vorhanden.", ImageCode.Kreuz, "OK");
+            Forms.MessageBox.Show("Keine Zeilen zum Prüfen vorhanden.", ImageCode.Kreuz, "OK");
             return;
         }
 
         foreach (var thisR in rows) {
             if (thisR.Table is { IsDisposed: false } tb) {
                 if (!tb.CanDoValueChangedScript(true)) {
-                    MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
+                    Forms.MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
                     RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
                     return;
                 }
@@ -456,9 +393,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         if (rows.Count == 1) {
-            MessageBox.Show("Datenüberprüfung:\r\n" + rows[0].CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
+            Forms.MessageBox.Show("Datenüberprüfung:\r\n" + rows[0].CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
         } else {
-            MessageBox.Show($"Alle {rows.Count} Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
+            Forms.MessageBox.Show($"Alle {rows.Count} Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
         }
     }
 
@@ -468,16 +405,16 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
 
         if (rows.Count == 0) {
-            MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
+            Forms.MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
             return;
         }
 
         if (rows[0].Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
 
         if (rows.Count == 1) {
-            if (MessageBox.Show($"Zeile wirklich löschen? (<b>{rows[0].CellFirstString()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+            if (Forms.MessageBox.Show($"Zeile wirklich löschen? (<b>{rows[0].CellFirstString()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
         } else {
-            if (MessageBox.Show($"{rows.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+            if (Forms.MessageBox.Show($"{rows.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
         }
         RowCollection.Remove(rows, "Benutzer: löschen Befehl");
     }
@@ -518,7 +455,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var bearbColumn = column;
         if (columnLinked != null) {
             columnLinked.Repair();
-            if (MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
+            if (Forms.MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
                 bearbColumn = columnLinked;
             }
         } else {
@@ -561,7 +498,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
 
             if (rows.Count > 0) {
-                if (MessageBox.Show($"Skript für {rows.Count} Zeile(n) ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
+                if (Forms.MessageBox.Show($"Skript für {rows.Count} Zeile(n) ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
                     m = tb.Row.ExecuteScript(null, sc.KeyName, rows);
                 } else {
                     m = "Durch Benutzer abgebrochen";
@@ -575,9 +512,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         if (string.IsNullOrEmpty(m)) {
-            MessageBox.Show("Skript erfolgreich ausgeführt.", ImageCode.Häkchen, "Ok");
+            Forms.MessageBox.Show("Skript erfolgreich ausgeführt.", ImageCode.Häkchen, "Ok");
         } else {
-            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
+            Forms.MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
         }
     }
 
@@ -619,7 +556,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         var cellKey = CellCollection.KeyOfCell(column, row);
         var i = UndoItems(column.Table, cellKey);
         if (i.Count < 1) {
-            MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
             return;
         }
         var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, CheckBehavior.SingleSelection, ["Cancel"], AddType.None);
@@ -693,8 +630,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
         return sb.ToString().TrimEnd("\r\n");
     }
-
-    public static int GetPix(int pix, float scale) => (int)((pix * scale) + 0.5);
 
     public static void ImportBtb(Table table) {
         using var x = new ImportBtb(table);
@@ -782,7 +717,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     public static void SearchNextText(string searchTxt, TableView tableView, ColumnViewItem? column, RowDataListItem? row, out ColumnViewItem? foundColumn, out RowDataListItem? foundRow, bool vereinfachteSuche) {
         if (tableView.Table is not { IsDisposed: false } tb) {
-            MessageBox.Show("Tabellen-Fehler.", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Tabellen-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
             return;
@@ -790,7 +725,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         searchTxt = searchTxt.Trim();
         if (tableView.CurrentArrangement is not { IsDisposed: false } ca) {
-            MessageBox.Show("Tabellen-Ansichts-Fehler.", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Tabellen-Ansichts-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
             return;
@@ -800,7 +735,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         column ??= ca.Last();
         var rowsChecked = 0;
         if (string.IsNullOrEmpty(searchTxt)) {
-            MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
             foundColumn = null;
             foundRow = null;
             return;
@@ -992,8 +927,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (did) { Invalidate_SortedRowData(); }
     }
 
-    public void CursorPos_Reset() => CursorPos_Set(null, null, false);
-
     public void CursorPos_Set(ColumnViewItem? column, AbstractListItem? row, bool ensureVisible) {
         if (IsDisposed || Table is not { IsDisposed: false } || row == null || column == null ||
             CurrentArrangement is not { IsDisposed: false } ca2 || !ca2.Contains(column) ||
@@ -1022,22 +955,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (!sameRow) {
             OnSelectedRowChanged(new RowNullableEventArgs(CursorPosRow?.Row));
-            DoFilterOutput();
         }
-    }
-
-    public void DoZoom(bool zoomIn) {
-        var nz = _zoom;
-
-        if (zoomIn) {
-            nz *= 1.05f;
-        } else {
-            nz *= 1f / 1.05f;
-        }
-
-        nz = Math.Max(nz, 0.5f);
-        nz = Math.Min(nz, 4);
-        Zoom = nz;
     }
 
     public bool EnsureVisible(ColumnViewCollection ca, ColumnViewItem? viewItem, AbstractListItem? row) => EnsureVisible(viewItem) && EnsureVisible(ca, row);
@@ -1129,11 +1047,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     /// </summary>
     /// <returns></returns>
     public new void Focus() {
-        if (Focused()) { return; }
+        if (Focused) { return; }
         base.Focus();
     }
-
-    public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (ContextMenuDefault && Table is { IsDisposed: false } tb) {
@@ -1272,7 +1188,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 return "Zelle konnte nicht angezeigt werden.";
             }
 
-            var realHead = cellInThisTableColumn.RealHead(_zoom, SliderX.Value);
+            var realHead = cellInThisTableColumn.RealHead(Zoom, ShiftX);
             if (realHead.Right < 0 || realHead.Left > DisplayRectangle.Width) {
                 return "Spalte konnte nicht angezeigt werden.";
             }
@@ -1292,9 +1208,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OpenScriptEditor() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        var se = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
+        var se = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
         se.Row = CursorPosRow?.Row;
     }
 
@@ -1303,19 +1219,81 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (!Table.IsAdministrator()) { return; }
 
-        if (_searchAndReplaceInCells is not { IsDisposed: false } || !_searchAndReplaceInCells.Visible) {
-            _searchAndReplaceInCells = new SearchAndReplaceInCells(this);
-            _searchAndReplaceInCells.Show();
-        }
+        IUniqueWindowExtension.ShowOrCreate<SearchAndReplaceInCells>(this);
     }
 
     public void OpenSearchAndReplaceInTbScripts() {
+        if (TableViewForm.EditabelErrorMessage(Table) || Table == null) { return; }
         if (!IsAdministrator()) { return; }
 
-        if (_searchAndReplaceInTbScripts is not { IsDisposed: false } || !_searchAndReplaceInTbScripts.Visible) {
-            _searchAndReplaceInTbScripts = new SearchAndReplaceInTbScripts();
-            _searchAndReplaceInTbScripts.Show();
+        IUniqueWindowExtension.ShowOrCreate<SearchAndReplaceInTbScripts>(null);
+    }
+
+    public void OpenSearchInCells() => IUniqueWindowExtension.ShowOrCreate<OpenSearchInCells>(this);
+
+    public override void ParseView(string toParse) {
+        ResetView();
+
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
+            foreach (var pair in x) {
+                switch (pair.Key) {
+                    case "arrangement":
+                        Arrangement = pair.Value.FromNonCritical();
+                        break;
+
+                    case "arrangementnr":
+                        break;
+
+                    case "filters":
+                        Filter.PropertyChanged -= Filter_PropertyChanged;
+                        Filter.Table = Table;
+                        var code = pair.Value.FromNonCritical();
+                        Filter.Clear();
+                        Filter.Parse(code);
+                        Filter.ParseFinished(code);
+                        Filter.PropertyChanged += Filter_PropertyChanged;
+                        DoFilterCombined();
+                        break;
+
+                    case "cursorpos":
+                        tb.Cell.DataOfCellKey(pair.Value.FromNonCritical(), out var column, out var row);
+                        CursorPos_Set(CurrentArrangement?[column], RowsFilteredAndPinned?.Get(row), false);
+                        break;
+
+                    case "tempsort":
+                        _sortDefinitionTemporary = new RowSortDefinition(Table, pair.Value.FromNonCritical());
+                        break;
+
+                    case "pin":
+                        foreach (var thisk in pair.Value.FromNonCritical().SplitBy("|")) {
+                            var r = tb.Row.GetByKey(thisk);
+                            if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
+                        }
+
+                        break;
+
+                    case "collapsed":
+                        var t = pair.Value.FromNonCritical().SplitAndCutBy("|");
+                        CollapseThis(t);
+                        break;
+
+                    case "reduced":
+                        var cols = pair.Value.FromNonCritical().SplitBy("|");
+                        CurrentArrangement?.Reduce(cols);
+                        break;
+
+                    case "zoom":
+                        Zoom = FloatParse(pair.Value.FromNonCritical());
+                        break;
+                }
+            }
         }
+
+        base.ParseView(toParse);
+
+        CheckView();
     }
 
     public void Pin(List<RowItem>? rows) {
@@ -1359,8 +1337,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         CursorPosColumn = null;
         CursorPosRow = null;
         _arrangement = string.Empty;
-        _unterschiede = null;
-        _zoom = 1f;
+        Zoom = 1f;
 
         OnViewChanged();
     }
@@ -1424,7 +1401,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         //InitializeSkin(); // Neue Schriftgrößen
         if (Table is { IsDisposed: false } db2) {
             RepairColumnArrangements(db2);
-            FilterOutput.Table = db2;
 
             db2.Cell.CellValueChanged += _Table_CellValueChanged;
             db2.Loaded += _Table_TableLoaded;
@@ -1444,14 +1420,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         ParseView(viewCode);
 
         ShowWaitScreen = false;
-
-        // Nach dem vorhandenen Code, vor ShowWaitScreen = false:
-        if (FilterleisteZeilen > 0) {
-            GetÄhnlich();
-            FillFilters();
-            UpdateFilterleisteVisibility();
-            RepositionControls();
-        }
 
         // Aktualisiere den Status der Steuerelemente
         OnEnabledChanged(System.EventArgs.Empty);
@@ -1487,19 +1455,17 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return sr.Last<RowDataListItem>();
     }
 
-    public string ViewToString() {
+    public override List<string> ViewToString() {
         List<string> result = [];
         result.ParseableAdd("Arrangement", _arrangement);
-        result.ParseableAdd("Zoom", _zoom);
         result.ParseableAdd("Filters", (IStringable?)Filter);
-        result.ParseableAdd("SliderX", SliderX.Value);
-        result.ParseableAdd("SliderY", SliderY.Value);
         result.ParseableAdd("Pin", PinnedRows, false);
         result.ParseableAdd("Collapsed", _collapsed, false);
         result.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns(), false);
         result.ParseableAdd("TempSort", _sortDefinitionTemporary);
         result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn?.Column, CursorPosRow?.Row));
-        return result.FinishParseable();
+        result.AddRange(base.ViewToString());
+        return result;
     }
 
     internal static Renderer_Abstract RendererOf(ColumnViewItem columnViewItem, string style) {
@@ -1545,163 +1511,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return false;
     }
 
-    internal void FillFilters() {
-        if (IsDisposed || FilterleisteZeilen <= 0) { return; }
-
-        if (InvokeRequired) {
-            Invoke(new Action(FillFilters));
-            return;
-        }
-
-        if (_isFilling) { return; }
-        _isFilling = true;
-
-        btnPinZurück.Enabled = Table is not null && PinnedRows.Count > 0;
-
-        #region ZeilenFilter befüllen
-
-        txbZeilenFilter.Text = Table != null && Filter.IsRowFilterActiv()
-                                ? Filter.RowFilterText
-                                : string.Empty;
-
-        #endregion
-
-        var consthe = btnAlleFilterAus.Height;
-
-        #region Variablen für Waagerecht / Senkrecht bestimmen
-
-        // Verfügbare Zeilen berechnen
-        var availableRows = FilterleisteZeilen;
-
-        // Startposition für die erste Zeile
-        var toppos = btnAlleFilterAus.Top;
-        var beginnx = btnPinZurück.Right + (Skin.Padding * 3);
-        var leftpos = beginnx;
-        var constwi = (int)(txbZeilenFilter.Width * 1.5);
-        var right = constwi + Skin.PaddingSmal;
-        const AnchorStyles anchor = AnchorStyles.Top | AnchorStyles.Left;
-
-        #endregion
-
-        List<FlexiFilterControl> flexsToDelete = [];
-
-        #region Vorhandene Flexis ermitteln
-
-        foreach (var thisControl in Controls) {
-            if (thisControl is FlexiFilterControl flx) { flexsToDelete.Add(flx); }
-        }
-
-        #endregion
-
-        var cu = CurrentArrangement;
-
-        #region Neue Flexis erstellen / updaten
-
-        if (Table is { IsDisposed: false } db) {
-            var tcvc = ColumnViewCollection.ParseAll(db);
-            List<ColumnItem> columSort = [];
-            var orderArrangement = tcvc.GetByKey(FilterAnsichtName);
-
-            #region Reihenfolge der Spalten bestimmen
-
-            if (orderArrangement != null) {
-                foreach (var thisclsVitem in orderArrangement) {
-                    if (thisclsVitem?.Column is { IsDisposed: false } ci) { columSort.AddIfNotExists(ci); }
-                }
-            }
-
-            if (cu != null) {
-                foreach (var thisclsVitem in cu) {
-                    if (thisclsVitem?.Column is { IsDisposed: false } ci) { columSort.AddIfNotExists(ci); }
-                }
-            }
-
-            foreach (var thisColumn in Table.Column) {
-                columSort.AddIfNotExists(thisColumn);
-            }
-
-            #endregion
-
-            var currentRow = 1; // Die erste Zeile ist bereits belegt mit den Hauptsteuerelementen
-                                // var count = 0;
-            var itemsInCurrentRow = 0;
-
-            foreach (var thisColumn in columSort) {
-                var showMe = false;
-                if (thisColumn.Table is { IsDisposed: false }) {
-                    var viewItemOrder = orderArrangement?[thisColumn];
-                    var viewItemCurrent = cu?[thisColumn];
-                    var filterItem = FilterCombined[thisColumn];
-
-                    #region Sichtbarkeit des Filterelements bestimmen
-
-                    if (thisColumn.AutoFilterSymbolPossible()) {
-                        if (viewItemOrder != null && FilterTypesToShow.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
-                        if (viewItemCurrent != null && FilterTypesToShow.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter) && filterItem != null) { showMe = true; }
-
-                        if (FilterInput?[thisColumn] is { }) { showMe = true; }
-                    }
-
-                    #endregion
-
-                    if (showMe && currentRow <= availableRows) {
-                        var flx = FlexiItemOf(thisColumn);
-                        if (flx != null) {
-                            // Sehr Gut, Flex vorhanden, wird später nicht mehr gelöscht
-                            flexsToDelete.Remove(flx);
-                        } else {
-                            // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil, true, false);
-                            flx.FilterOutput.Table = thisColumn.Table;
-                            //flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-                            //flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
-                            ChildIsBorn(flx);
-                            flx.FilterOutputPropertyChanged += FlexSingeFilter_FilterOutputPropertyChanged;
-                            Controls.Add(flx);
-                        }
-
-                        // Prüfen, ob wir in eine neue Zeile wechseln müssen
-                        if (leftpos + constwi > Width && itemsInCurrentRow > 0) {
-                            leftpos = beginnx;
-                            toppos = btnAlleFilterAus.Top + (currentRow * (consthe + RowSpacing));
-                            currentRow++;
-                            itemsInCurrentRow = 0;
-
-                            // Prüfen, ob wir noch in den verfügbaren Zeilen sind
-                            if (currentRow >= availableRows) {
-                                flexsToDelete.AddIfNotExists(flx);
-                                break;
-                            }
-                        }
-
-                        flx.Top = toppos;
-                        flx.Left = leftpos;
-                        flx.Width = constwi;
-                        flx.Height = consthe;
-                        flx.Anchor = anchor;
-                        leftpos += right;
-                        itemsInCurrentRow++;
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region Unnötige Flexis löschen
-
-        foreach (var thisFlexi in flexsToDelete) {
-            thisFlexi.FilterOutputPropertyChanged -= FlexSingeFilter_FilterOutputPropertyChanged;
-            thisFlexi.Visible = false;
-            Controls.Remove(thisFlexi);
-            thisFlexi.Dispose();
-        }
-
-        #endregion
-
-        _isFilling = false;
-    }
-
     internal void RowCleanUp() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         var l = new RowCleanUp(this);
@@ -1717,10 +1526,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
                 FilterCombined.RowsChanged -= FilterCombined_RowsChanged;
                 TableSet(null, string.Empty); // Wichtig (nicht _Table) um Events zu lösen
-                _ähnliche?.Dispose();
                 _pg?.Dispose();
-                _searchAndReplaceInCells?.Dispose();
-                _searchAndReplaceInTbScripts?.Dispose();
             }
         } finally {
             base.Dispose(disposing);
@@ -1743,7 +1549,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (_tableDrawError is { } dt) {
             if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 60) {
-                DrawWaitScreen(gr, string.Empty, null);
+                DrawWaitScreen(gr, string.Empty);
                 return;
             }
             _tableDrawError = null;
@@ -1755,91 +1561,46 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         if (Table is not { IsDisposed: false } db) {
-            DrawWaitScreen(gr, "Keine Tabelle geladen.", null);
+            DrawWaitScreen(gr, "Keine Tabelle geladen.");
             return;
         }
 
         db.LastUsedDate = DateTime.UtcNow;
 
         if (DesignMode || ShowWaitScreen) {
-            DrawWaitScreen(gr, string.Empty, null);
+            DrawWaitScreen(gr, string.Empty);
             return;
         }
 
         if (CurrentArrangement is not { IsDisposed: false } ca || ca.Count < 1) {
-            DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft", null);
+            DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft");
             return;
         }
 
         if (!FilterCombined.IsOk()) {
-            DrawWaitScreen(gr, FilterCombined.ErrorReason(), ca);
+            DrawWaitScreen(gr, FilterCombined.ErrorReason());
             return;
         }
 
         if (FilterCombined.Table != null && Table != FilterCombined.Table) {
-            DrawWaitScreen(gr, "Filter fremder Tabelle: " + FilterCombined.Table.Caption, ca);
+            DrawWaitScreen(gr, "Filter fremder Tabelle: " + FilterCombined.Table.Caption);
             return;
         }
 
         if (RowsFilteredAndPinned is not { } sortedRowData) {
-            DrawWaitScreen(gr, "Fehler der angezeigten Zeilen", ca);
+            DrawWaitScreen(gr, "Fehler der angezeigten Zeilen");
             return;
         }
 
         if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
-        var displayRectangleWoSlider = DisplayRectangleWithoutSlider();
-
         // Haupt-Aufbau-Routine ------------------------------------
         var t = sortedRowData.ItemData(Design.Item_Listbox);
 
-        #region Slider
-
-        SliderY.Minimum = 0;
-        SliderY.Maximum = Math.Max(GetPix(t.HeightAdded, _zoom), 0);
-        SliderY.LargeChange = 0; //        etPix(displayRectangleWoSlider.Height - ca.HeadSize() - FilterleisteHeight);
-        SliderY.Enabled = SliderY.Maximum > 0;
-
-        var maxX = 0;
-        //if (ca.Count > 1) {
-        //    // Count größer 1! Weil wenns nur eine ist, diese als ganze breite angezeigt wird
-        //    maxX = realHead.Right;
-        //}
-
-        SliderX.Minimum = 0;
-        SliderX.Maximum = maxX - displayRectangleWoSlider.Width + 1;
-        SliderX.LargeChange = displayRectangleWoSlider.Width;
-        SliderX.Enabled = SliderX.Maximum > 0;
-
-        #endregion
-
-        sortedRowData.DrawItems(gr, displayRectangleWoSlider, null, (int)SliderX.Value, (int)SliderY.Value, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null);
-
-        //Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement);
-
-        // Filterleiste zeichnen, wenn aktiviert
-        if (FilterleisteZeilen > 0) {
-            // Bereich für die Filterleiste
-            var filterRect = new Rectangle(0, 0, Width, FilterleisteHeight);
-
-            // Hintergrund der Filterleiste zeichnen (falls nötig)
-            Skin.Draw_Back(gr, Design.GroupBox, state, filterRect, this, true);
-        }
+        sortedRowData.DrawItems(gr, AvailablePaintArea(), null, (int)ShiftX, (int)ShiftY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null);
 
         // Rahmen um die gesamte Tabelle zeichnen
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
-    }
-
-    protected override void HandleChangesNow() {
-        base.HandleChangesNow();
-        if (IsDisposed) { return; }
-        if (FilterInputChangedHandled) { return; }
-
-        if (Table is not { IsDisposed: false }) { return; }
-
-        DoInputFilter(FilterOutput.Table, false);
-
-        DoFilterCombined();
     }
 
     protected override bool IsInputKey(Keys keyData) {
@@ -1852,6 +1613,21 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             default:
                 return false;
         }
+    }
+
+    protected override RectangleF MaxBounds() {
+        var x = AvailablePaintArea().Width;
+        var y = AvailablePaintArea().Height;
+
+        if (CurrentArrangement is { } ca) {
+            x = ca.ColumnsWidth;
+        }
+
+        if (RowsFilteredAndPinned is { } sortedRowData) {
+            (_, y, _, _) = sortedRowData.ItemData(Design.Item_Listbox);
+        }
+
+        return new RectangleF(0, 0, x, y);
     }
 
     protected override void OnDoubleClick(System.EventArgs e) {
@@ -1883,40 +1659,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    protected override void OnEnabledChanged(System.EventArgs e) {
-        base.OnEnabledChanged(e);
-
-        // Status der Steuerelemente aktualisieren
-        var hasDb = Table != null;
-        var tableEnabled = Enabled;
-
-        txbZeilenFilter.Enabled = hasDb && LanguageTool.Translation == null && Enabled && tableEnabled;
-        btnAlleFilterAus.Enabled = hasDb && Enabled && tableEnabled;
-        btnPin.Enabled = hasDb && Enabled && tableEnabled;
-        btnPinZurück.Enabled = hasDb && PinnedRows.Count > 0 && Enabled && tableEnabled;
-
-        // Filterleisten-Initialisierung
-        btnTextLöschen.Enabled = false;
-        btnÄhnliche.Visible = false;
-    }
-
-    protected override void OnHandleCreated(System.EventArgs e) {
-        base.OnHandleCreated(e);
-
-        DoFilterOutput();
-
-        // Anfängliche Positionierung der Steuerelemente
-        UpdateFilterleisteVisibility();
-        RepositionControls();
-
-        GetÄhnlich();
-        FillFilters();
-    }
-
     protected override void OnKeyDown(KeyEventArgs e) {
         base.OnKeyDown(e);
-
-        _controlPressing = e.Modifiers == Keys.Control;
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (CursorPosColumn?.Column is not { IsDisposed: false } c) { return; }
@@ -1976,31 +1720,19 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                     break;
 
                 case Keys.PageDown:
-                    if (SliderY.Enabled) {
-                        CursorPos_Reset();
-                        SliderY.Value += SliderY.LargeChange;
-                    }
+                    CursorPos_Reset();
                     break;
 
                 case Keys.PageUp: //Bildab
-                    if (SliderY.Enabled) {
-                        CursorPos_Reset();
-                        SliderY.Value -= SliderY.LargeChange;
-                    }
+                    CursorPos_Reset();
                     break;
 
                 case Keys.Home:
-                    if (SliderY.Enabled) {
-                        CursorPos_Reset();
-                        SliderY.Value = SliderY.Minimum;
-                    }
+                    CursorPos_Reset();
                     break;
 
                 case Keys.End:
-                    if (SliderY.Enabled) {
-                        CursorPos_Reset();
-                        SliderY.Value = SliderY.Maximum;
-                    }
+                    CursorPos_Reset();
                     break;
 
                 case Keys.C:
@@ -2011,8 +1743,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                 case Keys.F:
                     if (e.Modifiers == Keys.Control) {
-                        Search x = new(this);
-                        x.Show();
+                        OpenSearchInCells();
                     }
                     break;
 
@@ -2028,11 +1759,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
             _isinKeyDown = false;
         }
-    }
-
-    protected override void OnKeyUp(KeyEventArgs e) {
-        base.OnKeyUp(e);
-        _controlPressing = false;
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {
@@ -2064,11 +1790,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             Develop.SetUserDidSomething();
             _isinMouseDown = false;
         }
-    }
-
-    protected override void OnMouseLeave(System.EventArgs e) {
-        base.OnMouseLeave(e);
-        _controlPressing = false;
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
@@ -2155,27 +1876,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    protected override void OnMouseWheel(MouseEventArgs e) {
-        base.OnMouseWheel(e);
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-
-        lock (_lockUserAction) {
-            if (_isinMouseWheel) { return; }
-            _isinMouseWheel = true;
-
-            if (_controlPressing) {
-                DoZoom(e.Delta > 0);
-                _isinMouseWheel = false;
-                return;
-            }
-
-            if (!SliderY.Visible) {
-                _isinMouseWheel = false;
-                return;
-            }
-            SliderY.DoMouseWheel(e);
-            _isinMouseWheel = false;
-        }
+    protected override void OnShiftChanged() {
+        base.OnShiftChanged();
+        CloseAllComponents();
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
@@ -2188,22 +1891,8 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             Invalidate_CurrentArrangement();
             Invalidate_SortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
                                         //CurrentArrangement?.Invalidate_DrawWithOfAllItems();
-            RepositionControls();
-
-            FillFilters();
 
             _isinSizeChanged = false;
-        }
-    }
-
-    protected override void OnVisibleChanged(System.EventArgs e) {
-        base.OnVisibleChanged(e);
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        lock (_lockUserAction) {
-            if (_isinVisibleChanged) { return; }
-            _isinVisibleChanged = true;
-            //Table?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-            _isinVisibleChanged = false;
         }
     }
 
@@ -2229,7 +1918,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         if (formatWarnung && !string.IsNullOrEmpty(newValue)) {
             if (!newValue.IsFormat(contentHolderCellColumn)) {
-                if (MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
+                if (Forms.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
                     return "Abbruch, da das erwartete Format nicht eingehalten wurde.";
                 }
             }
@@ -2260,7 +1949,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
             var l = table.RowsFiltered;
             if (newrow != null && !l.Contains(newrow)) {
-                if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
+                if (Forms.MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
                     table.PinAdd(newrow);
                 }
             }
@@ -2346,7 +2035,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void _Table_StoreView(object sender, System.EventArgs e) =>
                 //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
-                _storedView = ViewToString();
+                _storedView = ViewToString().FinishParseable();
 
     private void _Table_TableLoaded(object sender, FirstEventArgs e) {
         if (IsDisposed) { return; }
@@ -2363,16 +2052,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
                 ResetView();
             }
 
-            Invalidate_FilterInput();
-            Invalidate_RowsInput();
             Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
             Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
             CheckView();
-
-            GetÄhnlich();
-            FillFilters();
-            UpdateFilterleisteVisibility();
-            RepositionControls();
         } else {
             _storedView = string.Empty;
             if (CurrentArrangement is { } ca) {
@@ -2388,8 +2070,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (IsDisposed) { return; }
         Invalidate_CurrentArrangement();
         CursorPos_Set(CursorPosColumn, CursorPosRow, true);
-
-        FillFilters();
     }
 
     private void AutoFilter_Close() {
@@ -2509,17 +2189,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (!columnviewitem.AutoFilterSymbolPossible) { return; }
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        if (!FilterInputChangedHandled) { HandleChangesNow(); }
-
         if (FilterCombined.HasAlwaysFalse()) {
-            MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Ein Filter, der nie ein Ergebnis zurückgibt,\r\nverhindert aktuell Filterungen.", ImageCode.Information, "OK");
             return;
         }
-
-        //if (FilterInput?[columnviewitem.Column] is { }) {
-        //    MessageBox.Show("Ein Filter der eingeht,\r\nverhindert weitere Filterungen.", ImageCode.Information, "OK");
-        //    return;
-        //}
 
         var t = string.Empty;
         foreach (var thisFilter in Filter) {
@@ -2529,14 +2202,14 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         if (!string.IsNullOrEmpty(t)) {
-            MessageBox.Show("<b>Dieser Filter wurde automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
+            Forms.MessageBox.Show("<b>Dieser Filter wurde automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
             return;
         }
 
-        var realHead = columnviewitem.RealHead(_zoom, SliderX.Value);
+        var realHead = columnviewitem.RealHead(Zoom, ShiftX);
 
         _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.DrawWidth(), columnviewitem.GetRenderer(SheetStyle));
-        _autoFilter.Position_LocateToPosition(new Point(screenx + realHead.Left, screeny + realHead.Bottom + FilterleisteHeight));
+        _autoFilter.Position_LocateToPosition(new Point(screenx + realHead.Left, screeny + realHead.Bottom));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
         //Develop.Debugprint_BackgroundThread();
@@ -2587,44 +2260,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
 
-    private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-
-        if (db.Column.First is not { IsDisposed: false } co) { return; }
-
-        var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
-
-        using var fc = new FilterCollection(fl, "ähnliche");
-
-        var r = fc.Rows;
-        if (r.Count != 1 || _ähnliche is not { Count: not 0 }) {
-            MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
-            return;
-        }
-
-        btnAlleFilterAus_Click(null, System.EventArgs.Empty);
-        foreach (var thiscolumnitem in _ähnliche) {
-            if (thiscolumnitem?.Column != null && FilterCombined != null) {
-                if (thiscolumnitem.AutoFilterSymbolPossible) {
-                    if (string.IsNullOrEmpty(r[0].CellGetString(thiscolumnitem.Column))) {
-                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
-                        Filter.Add(fi);
-                    } else if (thiscolumnitem.Column.MultiLine) {
-                        var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
-                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                        Filter.Add(fi);
-                    } else {
-                        var l = r[0].CellGetString(thiscolumnitem.Column);
-                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                        Filter.Add(fi);
-                    }
-                }
-            }
-        }
-
-        btnÄhnliche.Enabled = false;
-    }
-
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
         _lastLooked = string.Empty;
         if (Table != null) {
@@ -2637,15 +2272,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         db.Edit(typeof(TableHeadEditor));
     }
 
-    private void btnPin_Click(object sender, System.EventArgs e) => Pin(RowsVisibleUnique());
-
-    private void btnPinZurück_Click(object sender, System.EventArgs e) {
-        _lastLooked = string.Empty;
-        Pin(null);
-    }
-
-    private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
-
     private void CalculateSortedRows(List<AbstractListItem>? items) {
         if (IsDisposed || Table is not { IsDisposed: false } tb || items == null) {
             VisibleRowCount = 0;
@@ -2653,7 +2279,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             return;
         }
 
-        var displayR = DisplayRectangleWithoutSlider();
+        var displayR = AvailablePaintArea();
         _newRowsAllowed = UserEdit_NewRowAllowed();
 
         List<RowItem> pinnedRows = [.. PinnedRows];
@@ -2790,7 +2416,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         #endregion
 
-        var d = DisplayRectangleWithoutSlider();
         var y = 0;
         lock (lockMe) {
             foreach (var thisItem in items) {
@@ -2805,7 +2430,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
                 if (thisItem is RowBackgroundListItem it) { it.Arrangement = arrangement; }
 
-                thisItem.Position = new Rectangle(0, y, d.Width, thisItem.HeightForListBox(ListBoxAppearance.Listbox, d.Width, Design.Item_Listbox));
+                thisItem.Position = new Rectangle(0, y, displayR.Width, thisItem.HeightForListBox(ListBoxAppearance.Listbox, displayR.Width, Design.Item_Listbox));
                 y = thisItem.Position.Bottom;
             }
         }
@@ -2978,7 +2603,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             }
         }
 
-        var realHead = viewItem.RealHead(_zoom, SliderX.Value);
+        var realHead = viewItem.RealHead(Zoom, ShiftX);
 
         box.GetStyleFrom(contentHolderCellColumn);
 
@@ -2986,13 +2611,13 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
             var h = cellInThisTableRow.Position.Height;
             if (isHeight > 0) { h = isHeight; }
             box.Location = new Point(realHead.X, cellInThisTableRow.Position.Y);
-            box.Size = new Size(realHead.Width + addWith, GetPix(h, _zoom));
+            box.Size = new Size(realHead.Width + addWith, GetPix(h, Zoom));
 
             box.Text = contentHolderCellRow?.CellGetString(contentHolderCellColumn) ?? string.Empty;
         } else {
             // Neue Zeile...
-            box.Location = new Point(realHead.X, realHead.Bottom + FilterleisteHeight);
-            box.Size = new Size(realHead.Width + addWith, GetPix(18, _zoom));
+            box.Location = new Point(realHead.X, realHead.Bottom);
+            box.Size = new Size(realHead.Width + addWith, GetPix(18, Zoom));
             box.Text = string.Empty;
         }
 
@@ -3012,7 +2637,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         return true;
     }
 
-    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection ca, int xpos, int ypos) => (ColumnOnCoordinate(ca, xpos), RowsFilteredAndPinned.ElementAtPosition(1, ypos, SliderX.Value, SliderY.Value));
+    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection ca, int xpos, int ypos) => (ColumnOnCoordinate(ca, xpos), RowsFilteredAndPinned.ElementAtPosition(1, ypos, ShiftX, ShiftY));
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -3051,7 +2676,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (ca.IsDisposed) { return null; }
 
         foreach (var thisViewItem in ca) {
-            var headPos = thisViewItem.RealHead(_zoom, SliderX.Value);
+            var headPos = thisViewItem.RealHead(Zoom, ShiftX);
             if (xpos >= headPos.Left && xpos <= headPos.Right) { return thisViewItem; }
         }
 
@@ -3134,7 +2759,7 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var split = false;
         if (column.MultiLine) {
-            split = MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
+            split = Forms.MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
         }
         column.Statistik(RowsVisibleUnique(), !split);
     }
@@ -3143,9 +2768,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var summe = column.Summe(FilterCombined);
         if (!summe.HasValue) {
-            MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
+            Forms.MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
         } else {
-            MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
+            Forms.MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
         }
     }
 
@@ -3166,45 +2791,10 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
 
-    private Rectangle DisplayRectangleWithoutSlider() => new(DisplayRectangle.Left, DisplayRectangle.Top + FilterleisteHeight, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height - FilterleisteHeight);
-
-    private void DoÄhnlich() {
-        if (IsDisposed || Table is not { IsDisposed: false } db || db.Column.Count == 0) { return; }
-
-        var col = db.Column.First;
-
-        if (col == null) { return; } // Neue Tabelle?
-
-        var fi = new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
-        using var fc = new FilterCollection(fi, "doähnliche");
-
-        var r = fc.Rows;
-        if (_ähnliche != null) {
-            btnÄhnliche.Visible = true;
-            btnÄhnliche.Enabled = r.Count == 1;
-        } else {
-            btnÄhnliche.Visible = false;
-        }
-
-        if (AutoPin && r.Count == 1) {
-            if (_lastLooked != r[0].CellFirstString()) {
-                if (RowsFilteredAndPinned?.Get(r[0]) == null) {
-                    if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
-                        PinAdd(r[0]);
-                    }
-                    _lastLooked = r[0].CellFirstString();
-                }
-            }
-        }
-    }
+    private void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
     private void DoFilterCombined() {
-        if (!FilterInputChangedHandled) {
-            HandleChangesNow();
-            return;
-        }
-
-        if (Filter.Count == 0 && (FilterInput is not { IsDisposed: false } fi || fi.Count == 0)) {
+        if (Filter.Count == 0 && (FilterFix is not { IsDisposed: false } fi || fi.Count == 0)) {
             FilterCombined.Clear();
             return;
         }
@@ -3213,46 +2803,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
         nfc.Table = Filter.Table;
         nfc.RemoveOtherAndAdd(Filter, null);
-        nfc.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
+        nfc.RemoveOtherAndAdd(FilterFix, "Filter aus übergeordneten Element");
 
         FilterCombined.ChangeTo(nfc);
-    }
-
-    private void DoFilterOutput() {
-        if (!FilterInputChangedHandled) {
-            HandleChangesNow();
-            return;
-        }
-
-        if (CursorPosRow?.Row is { IsDisposed: false } setedrow) {
-            using var nfc = new FilterCollection(setedrow, "Temp TableOutput");
-            nfc.RemoveOtherAndAdd(FilterCombined, null);
-
-            if (!FilterOutput.IsDifferentTo(nfc)) { return; }
-
-            FilterOutput.ChangeTo(nfc);
-        } else {
-            if (!FilterOutput.IsDifferentTo(FilterCombined)) { return; }
-            FilterOutput.ChangeTo(FilterCombined);
-        }
-
-        FillFilters();
-    }
-
-    private void DrawWaitScreen(Graphics gr, string info, ColumnViewCollection? ca) {
-        SliderX?.Enabled = false;
-        SliderY?.Enabled = false;
-
-        Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
-
-        var i = QuickImage.Get(ImageCode.Uhr, 64);
-        gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
-
-        var fa = ca?.Font_RowChapter ?? BlueFont.DefaultFont;
-
-        fa.DrawString(gr, info, 12, 50);
-
-        Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }
 
     /// <summary>
@@ -3306,72 +2859,51 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
 
     private bool EnsureVisible(ColumnViewCollection ca, AbstractListItem? rowdata) {
         if (rowdata is not { }) { return false; }
-        var dispR = DisplayRectangleWithoutSlider();
+        //var dispR = DisplayRectangleWithoutSlider();
 
-        // Stellen sicher, dass die Zeile im sichtbaren Bereich ist
-        // Berücksichtigen der Filterleistenhöhe
-        var rowY = rowdata.Position.Top - SliderY.Value;
+        //// Stellen sicher, dass die Zeile im sichtbaren Bereich ist
+        //// Berücksichtigen der Filterleistenhöhe
+        //var rowY = rowdata.Position.Top - ShiftY;
 
-        // Wenn die Zeile über dem sichtbaren Bereich liegt
-        if (rowY < GetPix(ca.HeadSize() + FilterleisteHeight, _zoom)) {
-            SliderY.Value = SliderY.Value + rowY - GetPix(ca.HeadSize(), _zoom) - FilterleisteHeight;
-        }
-        // Wenn die Zeile unter dem sichtbaren Bereich liegt
-        else if (rowY + rowdata.Position.Height > dispR.Height + FilterleisteHeight) {
-            SliderY.Value = SliderY.Value + rowY + GetPix(rowdata.Position.Height, _zoom) - (dispR.Height + FilterleisteHeight);
-        }
+        //// Wenn die Zeile über dem sichtbaren Bereich liegt
+        //if (rowY < GetPix(ca.HeadSize() + FilterleisteHeight, Zoom)) {
+        //    ShiftY = ShiftY + rowY - GetPix(ca.HeadSize(), Zoom) - FilterleisteHeight;
+        //}
+        //// Wenn die Zeile unter dem sichtbaren Bereich liegt
+        //else if (rowY + rowdata.Position.Height > dispR.Height + FilterleisteHeight) {
+        //    ShiftY = ShiftY + rowY + GetPix(rowdata.Position.Height, Zoom) - (dispR.Height + FilterleisteHeight);
+        //}
 
+        EnsureVisibleY(rowdata.Position); // TODO: Kopdhöhe berücksichtigen
         return true;
     }
 
     private bool EnsureVisible(ColumnViewItem? viewItem) {
         if (IsDisposed) { return false; }
         if (viewItem?.Column is not { IsDisposed: false }) { return false; }
-        var dispR = DisplayRectangleWithoutSlider();
+        //var dispR = DisplayRectangleWithoutSlider();
 
-        if (CurrentArrangement is not { IsDisposed: false } ca) { return false; }
+        //if (CurrentArrangement is not { IsDisposed: false } ca) { return false; }
 
-        var realhead = viewItem.RealHead(_zoom, SliderX.Value); // Filterleiste kann ignoriert werden, da nur X-Koordinaten berechnet werden.
+        //var realhead = viewItem.RealHead(Zoom, ShiftX); // Filterleiste kann ignoriert werden, da nur X-Koordinaten berechnet werden.
 
-        if (viewItem.ViewType == ViewType.PermanentColumn) {
-            return realhead.Right <= dispR.Width;
-        }
+        //if (viewItem.ViewType == ViewType.PermanentColumn) {
+        //    return realhead.Right <= dispR.Width;
+        //}
 
-        if (realhead.Left < GetPix(ca.WiederHolungsSpaltenWidth, _zoom)) {
-            SliderX.Value = SliderX.Value + realhead.X - GetPix(ca.WiederHolungsSpaltenWidth, _zoom);
-        } else if (realhead.Right > dispR.Width) {
-            SliderX.Value = SliderX.Value + realhead.Right - dispR.Width;
-        }
+        //if (realhead.Left < GetPix(ca.WiederHolungsSpaltenWidth, Zoom)) {
+        //    ShiftX = ShiftX + realhead.X - GetPix(ca.WiederHolungsSpaltenWidth, Zoom);
+        //} else if (realhead.Right > dispR.Width) {
+        //    ShiftX = ShiftX + realhead.Right - dispR.Width;
+        //}
+        EnsureVisibleX(viewItem.RealHead(Zoom, ShiftX));
+
         return true;
     }
 
     private void Filter_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
-    private void Filter_ZeilenFilterSetzen() {
-        if (IsDisposed || (Table?.IsDisposed ?? true)) {
-            DoÄhnlich();
-            return;
-        }
-
-        var currentFilter = Filter.RowFilterText;
-        var newFilter = txbZeilenFilter.Text;
-
-        if (string.Equals(currentFilter, newFilter, StringComparison.OrdinalIgnoreCase)) { return; }
-
-        if (string.IsNullOrEmpty(newFilter)) {
-            Filter.Remove_RowFilter();
-            DoÄhnlich();
-            return;
-        }
-
-        Filter.RowFilterText = newFilter;
-        DoÄhnlich();
-    }
-
-    private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-        OnFilterCombinedChanged();
-        DoFilterOutput();
-    }
+    private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnFilterCombinedChanged();
 
     private void FilterCombined_RowsChanged(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
@@ -3382,9 +2914,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
 
         Invalidate_SortedRowData();
-        //OnFilterCombinedChanged();
-        //DoFilterOutput();
     }
+
+    private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
     private FlexiFilterControl? FlexiItemOf(ColumnItem column) {
         foreach (var thisControl in Controls) {
@@ -3411,16 +2943,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         //DoFilterOutput();
     }
 
-    private void GetÄhnlich() {
-        if (IsDisposed || FilterleisteZeilen <= 0) { return; }
-        if (Table is not { IsDisposed: false } db) { return; }
-
-        var tcvc = ColumnViewCollection.ParseAll(db);
-
-        _ähnliche = tcvc.GetByKey(ÄhnlicheAnsichtName);
-        DoÄhnlich();
-    }
-
     private void Invalidate_CurrentArrangement() {
         CurrentArrangement = null;
         Invalidate();
@@ -3431,9 +2953,9 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         Invalidate();
     }
 
-    private bool IsInRedcueButton(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.ReduceButtonLocation(_zoom, SliderX.Value, FilterleisteHeight).Contains(e.Location);
+    private bool IsInRedcueButton(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.ReduceButtonLocation(Zoom, ShiftX, 0).Contains(e.Location);
 
-    private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(_zoom, SliderX.Value, FilterleisteHeight).Contains(e.Location);
+    private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, ShiftX, 0).Contains(e.Location);
 
     private void Neighbour(ColumnViewItem? column, RowDataListItem? row, Direction direction, out ColumnViewItem? newColumn, out RowDataListItem? newRow) {
         if (CurrentArrangement is not { IsDisposed: false } ca) {
@@ -3479,12 +3001,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     private void OnPinnedChanged() {
         // Bestehenden Code belassen
         PinnedChanged?.Invoke(this, System.EventArgs.Empty);
-
-        // Filterleiste aktualisieren, wenn sie sichtbar ist
-        if (FilterleisteZeilen > 0) {
-            btnPinZurück.Enabled = Table is not null && PinnedRows.Count > 0;
-            FillFilters();
-        }
     }
 
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
@@ -3500,79 +3016,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
     }
 
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
-
-    private void ParseView(string toParse) {
-        ResetView();
-
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
-            foreach (var pair in x) {
-                switch (pair.Key) {
-                    case "arrangement":
-                        Arrangement = pair.Value.FromNonCritical();
-                        break;
-
-                    case "arrangementnr":
-                        break;
-
-                    case "filters":
-                        Filter.PropertyChanged -= Filter_PropertyChanged;
-                        Filter.Table = Table;
-                        var code = pair.Value.FromNonCritical();
-                        Filter.Clear();
-                        Filter.Parse(code);
-                        Filter.ParseFinished(code);
-                        Filter.PropertyChanged += Filter_PropertyChanged;
-                        DoFilterCombined();
-                        break;
-
-                    case "sliderx":
-                        SliderX.Maximum = Math.Max(SliderX.Maximum, IntParse(pair.Value));
-                        SliderX.Value = IntParse(pair.Value);
-                        break;
-
-                    case "slidery":
-                        SliderY.Maximum = Math.Max(SliderY.Maximum, IntParse(pair.Value));
-                        SliderY.Value = IntParse(pair.Value);
-                        break;
-
-                    case "cursorpos":
-                        tb.Cell.DataOfCellKey(pair.Value.FromNonCritical(), out var column, out var row);
-                        CursorPos_Set(CurrentArrangement?[column], RowsFilteredAndPinned?.Get(row), false);
-                        break;
-
-                    case "tempsort":
-                        _sortDefinitionTemporary = new RowSortDefinition(Table, pair.Value.FromNonCritical());
-                        break;
-
-                    case "pin":
-                        foreach (var thisk in pair.Value.FromNonCritical().SplitBy("|")) {
-                            var r = tb.Row.GetByKey(thisk);
-                            if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
-                        }
-
-                        break;
-
-                    case "collapsed":
-                        var t = pair.Value.FromNonCritical().SplitAndCutBy("|");
-                        CollapseThis(t);
-                        break;
-
-                    case "reduced":
-                        var cols = pair.Value.FromNonCritical().SplitBy("|");
-                        CurrentArrangement?.Reduce(cols);
-                        break;
-
-                    case "zoom":
-                        Zoom = FloatParse(pair.Value.FromNonCritical());
-                        break;
-                }
-            }
-        }
-
-        CheckView();
-    }
 
     private void PasteToCursor() {
         if (CursorPosColumn?.Column is not { } column || CursorPosRow?.Row is not { } row) {
@@ -3593,52 +3036,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
     }
 
-    /// <summary>
-    /// Positioniert die Steuerelemente in der Table neu, um Platz für die Filterleiste zu schaffen.
-    /// </summary>
-    private void RepositionControls() {
-        if (InvokeRequired) {
-            Invoke(new Action(RepositionControls));
-            return;
-        }
-
-        // Filterleistenelemente positionieren
-        if (FilterleisteZeilen > 0) {
-            var firstRowY = 8; // Standard Y-Position für erste Zeile
-
-            // Hauptelemente (erste Zeile)
-            txbZeilenFilter.Top = firstRowY;
-            btnTextLöschen.Top = firstRowY;
-            btnAlleFilterAus.Top = firstRowY;
-            btnPin.Top = firstRowY;
-            btnPinZurück.Top = firstRowY;
-
-            // Elemente der zweiten Zeile wenn nötig
-            if (FilterleisteZeilen > 1) {
-                btnÄhnliche.Top = firstRowY + 32; // 32 = Höhe der ersten Reihe + Abstand
-            }
-        }
-
-        // Sliders anpassen
-        if (SliderY != null) {
-            // Slider Y beginnt am Ende der Filterleiste und geht bis zum unteren Rand minus SliderX-Höhe
-            SliderY.Location = new Point(Width - SliderY.Width, FilterleisteHeight);
-            SliderY.Height = Height - SliderX.Height - FilterleisteHeight;
-        }
-
-        if (SliderX != null) {
-            // SliderX bleibt am unteren Rand, aber seine Breite muss angepasst werden
-            SliderX.Location = new Point(0, Height - SliderX.Height);
-            SliderX.Width = Width - SliderY.Width;
-        }
-
-        // Bei kompletter Neupositionierung auch die FlexiFilterControls anpassen
-        FillFilters();
-
-        // Neu zeichnen anfordern
-        Invalidate();
-    }
-
     private void Row_RowRemoved(object sender, RowEventArgs e) => Invalidate_CurrentArrangement();
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
@@ -3650,36 +3047,11 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         }
     }
 
-    private void SliderX_ValueChanged(object sender, System.EventArgs e) {
-        CloseAllComponents();
-        Invalidate();
-    }
-
-    private void SliderY_ValueChanged(object sender, System.EventArgs e) {
-        CloseAllComponents();
-        Invalidate();
-    }
-
     private RowSortDefinition? SortUsed() => _sortDefinitionTemporary ?? Table?.SortDefinition;
 
     private void Table_InvalidateView(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         Invalidate();
-    }
-
-    private void txbZeilenFilter_Enter(object sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
-
-    private void txbZeilenFilter_TextChanged(object sender, System.EventArgs e) {
-        var neuerT = txbZeilenFilter.Text.TrimStart();
-        btnTextLöschen.Enabled = !string.IsNullOrEmpty(neuerT);
-        if (_isFilling) { return; }
-
-        if (neuerT != txbZeilenFilter.Text) {
-            txbZeilenFilter.Text = neuerT;
-            return;
-        }
-        Filter_ZeilenFilterSetzen();
-        DoÄhnlich();
     }
 
     private void TXTBox_Close(TextBox? textbox) {
@@ -3702,54 +3074,6 @@ public partial class TableView : GenericControlReciverSender, IContextMenu, ITra
         NotEditableInfo(UserEdited(this, w, column, row, true));
 
         Focus();
-    }
-
-    private void UpdateFilterleisteVisibility() {
-        if (InvokeRequired) {
-            Invoke(new Action(UpdateFilterleisteVisibility));
-            return;
-        }
-
-        var visible = FilterleisteZeilen > 0;
-
-        // Hauptsteuerelemente der Filterleiste
-        btnTextLöschen.Visible = visible;
-        txbZeilenFilter.Visible = visible;
-        btnAlleFilterAus.Visible = visible;
-        btnPin.Visible = visible;
-        btnPinZurück.Visible = visible;
-
-        if (visible) {
-            // Status der Steuerelemente aktualisieren
-            btnPinZurück.Enabled = Table is not null && PinnedRows.Count > 0;
-            txbZeilenFilter.Enabled = Table != null && LanguageTool.Translation == null && Enabled;
-            btnAlleFilterAus.Enabled = Table != null && Enabled;
-            btnPin.Enabled = Table != null && Enabled;
-
-            // Text im ZeilenFilter aktualisieren
-            if (Table != null && Filter.IsRowFilterActiv()) {
-                txbZeilenFilter.Text = Filter.RowFilterText;
-            } else {
-                txbZeilenFilter.Text = string.Empty;
-            }
-
-            // Status des Löschen-Buttons aktualisieren
-            btnTextLöschen.Enabled = !string.IsNullOrEmpty(txbZeilenFilter.Text);
-        }
-
-        // btnÄhnliche wird separat gesteuert über GetÄhnlich()
-        if (!visible) {
-            btnÄhnliche.Visible = false;
-        } else {
-            GetÄhnlich(); // Status von btnÄhnliche aktualisieren
-        }
-
-        // Alle FlexiFilterControls ein-/ausblenden
-        foreach (var control in Controls) {
-            if (control is FlexiFilterControl flx) {
-                flx.Visible = visible;
-            }
-        }
     }
 
     private string UserEdit_NewRowAllowed() {

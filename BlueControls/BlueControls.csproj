@@ -66,7 +66,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Controls\Table_Legacy.cs">
+    <Compile Update="Controls\TableViewWithFilters.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>

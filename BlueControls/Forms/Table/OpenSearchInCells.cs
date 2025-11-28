@@ -21,33 +21,58 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueTable;
+using BlueTable.Interfaces;
 using System.Windows.Forms;
 using Form = BlueControls.Forms.Form;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class Search : Form {
+public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
 
     #region Fields
 
-    private readonly TableView _tableView;
     private ColumnViewItem? _col;
     private RowDataListItem? _row;
+    private TableView? _tableView;
 
     #endregion
 
     #region Constructors
 
-    public Search(TableView table) {
+    public OpenSearchInCells() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        _tableView = table;
-        _tableView.SelectedCellChanged += SelectedCellChanged;
-        SelectedCellChanged(_tableView, new CellExtEventArgs(_tableView.CursorPosColumn, _tableView.CursorPosRow));
     }
+
+    #endregion
+
+    #region Properties
+
+    public object? Object {
+        get => _tableView;
+
+        set {
+            var newt = value as TableView;
+
+            if (_tableView != null) {
+                _tableView.SelectedCellChanged -= SelectedCellChanged;
+                _tableView.TableChanged -= TableChanged;
+            }
+
+            _tableView = newt;
+
+            if (_tableView != null) {
+                _tableView.SelectedCellChanged += SelectedCellChanged;
+                _tableView.TableChanged += TableChanged;
+                SelectedCellChanged(_tableView, new CellExtEventArgs(_tableView.CursorPosColumn, _tableView.CursorPosRow));
+            }
+        }
+    }
+
+    public Table? Table => _tableView?.Table;
 
     #endregion
 
@@ -55,7 +80,7 @@ public sealed partial class Search : Form {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        _tableView.SelectedCellChanged -= SelectedCellChanged;
+        Object = null;
     }
 
     private void btnSuchInCell_Click(object? sender, System.EventArgs e) {
@@ -63,7 +88,7 @@ public sealed partial class Search : Form {
         if (string.IsNullOrEmpty(suchtT)) { return; }
         TableView.SearchNextText(suchtT, _tableView, _col, _tableView.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);
         if (found == null) {
-            MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
             return;
         }
         _tableView.CursorPos_Set(found, gefRow, true);
@@ -72,7 +97,7 @@ public sealed partial class Search : Form {
 
     private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
         //if (_table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-        //    MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
+        //    BlueControls.Forms.MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
         //    return;
         //}
         var searchT = SuchText();
@@ -80,7 +105,7 @@ public sealed partial class Search : Form {
         var found = _col;
 
         if (_tableView.CurrentArrangement is not { IsDisposed: false } ca) {
-            MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
             return;
         }
 
@@ -91,7 +116,7 @@ public sealed partial class Search : Form {
             found = ca.NextVisible(found) ?? ca.First();
 
             if (found?.Column is not { IsDisposed: false } c) {
-                MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
+                Forms.MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
                 return;
             }
 
@@ -113,7 +138,7 @@ public sealed partial class Search : Form {
             }
         } while (true);
         if (found == null) {
-            MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
             return;
         }
         _tableView.CursorPos_Set(found, _row, true);
@@ -130,11 +155,13 @@ public sealed partial class Search : Form {
     private string SuchText() {
         var suchtT = txbSuchText.Text.Trim();
         if (string.IsNullOrEmpty(suchtT)) {
-            MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
             return string.Empty;
         }
         return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLowerInvariant();
     }
+
+    private void TableChanged(object sender, System.EventArgs e) => Close();
 
     private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);
 

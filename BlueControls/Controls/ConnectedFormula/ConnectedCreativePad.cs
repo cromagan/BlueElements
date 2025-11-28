@@ -29,7 +29,7 @@ using BlueTable;
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using MessageBox = BlueControls.Forms.MessageBox;
+
 
 namespace BlueControls.Controls;
 
@@ -192,7 +192,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             Clipboard.SetImage(i);
             Notification.Show("Kopiert!", ImageCode.Smiley);
         } catch {
-            MessageBox.Show("Fehler beim Kopieren!");
+            Forms.MessageBox.Show("Fehler beim Kopieren!");
         }
     }
 

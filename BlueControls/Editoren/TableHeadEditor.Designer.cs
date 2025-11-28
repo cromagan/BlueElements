@@ -66,9 +66,8 @@ namespace BlueControls.BlueTableDialogs {
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
             this.tabUndo = new System.Windows.Forms.TabPage();
-            this.tblUndo = new BlueControls.Controls.TableView();
+            this.tblUndo = new BlueControls.Controls.TableViewWithFilters();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
-            this.btnClipboard = new BlueControls.Controls.Button();
             this.btnLoadAll = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
@@ -562,7 +561,6 @@ namespace BlueControls.BlueTableDialogs {
             // grpUndoActions
             // 
             this.grpUndoActions.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpUndoActions.Controls.Add(this.btnClipboard);
             this.grpUndoActions.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.grpUndoActions.Location = new System.Drawing.Point(0, 608);
             this.grpUndoActions.Name = "grpUndoActions";
@@ -570,17 +568,6 @@ namespace BlueControls.BlueTableDialogs {
             this.grpUndoActions.TabIndex = 4;
             this.grpUndoActions.TabStop = false;
             this.grpUndoActions.Text = "Aktionen";
-            // 
-            // btnClipboard
-            // 
-            this.btnClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClipboard.ImageCode = "Clipboard|24";
-            this.btnClipboard.Location = new System.Drawing.Point(16, 24);
-            this.btnClipboard.Name = "btnClipboard";
-            this.btnClipboard.Size = new System.Drawing.Size(176, 40);
-            this.btnClipboard.TabIndex = 3;
-            this.btnClipboard.Text = "In die Zwischenablage";
-            this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
             // btnLoadAll
             // 
@@ -642,14 +629,13 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabUndo;
         private Caption capKennwort;
         private Button btnSpaltenuebersicht;
-        private TableView tblUndo;
+        private TableViewWithFilters tblUndo;
         private Caption capNeueZeilenInfo;
         private TabControl GlobalTab;
         private TextBox txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;
         private TextBox txbAdditionalFiles;
         private Caption capAdditional;
-        private Button btnClipboard;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
         private Button btnOptimize;

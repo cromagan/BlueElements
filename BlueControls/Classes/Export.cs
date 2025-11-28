@@ -119,11 +119,11 @@ public static class Export {
 
     //Shared Sub SaveAsBitmap(Row As RowItem)
     //    If Row Is Nothing Then
-    //        MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK")
+    //        BlueControls.Forms.MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK")
     //        Exit Sub
     //    End If
     //    If Row.Table.Layouts.Count = 0 Then
-    //        MessageBox.Show("Kein Layouts vorhanden.", ImageCode.Information, "OK")
+    //        BlueControls.Forms.MessageBox.Show("Kein Layouts vorhanden.", ImageCode.Information, "OK")
     //        Exit Sub
     //    End If
     //    'Dim x As String = Row.Cell(Row.Table.Column.SysLastUsedLayout).String

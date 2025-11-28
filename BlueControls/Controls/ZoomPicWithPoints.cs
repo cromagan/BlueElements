@@ -206,7 +206,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             Tags.WriteAllText(pathtxt, Win1252, false);
         } catch {
             Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
-            MessageBox.Show("Fehler beim Speichern");
+            Forms.MessageBox.Show("Fehler beim Speichern");
         }
     }
 

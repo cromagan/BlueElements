@@ -29,7 +29,7 @@ namespace BlueControls {
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.tableVariablen = new TableView();
+            this.tableVariablen = new TableViewWithFilters();
             this.SuspendLayout();
             // 
             // tableVariablen
@@ -53,6 +53,6 @@ namespace BlueControls {
         }
 
         #endregion
-        private TableView tableVariablen;
+        private TableViewWithFilters tableVariablen;
     }
 }

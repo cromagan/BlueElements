@@ -38,7 +38,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -400,7 +399,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
             IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
         } else {
-            MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
+            Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }
         Invalidate_FilterInput();
     }

@@ -20,7 +20,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueScript.Variables;
 

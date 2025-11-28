@@ -212,7 +212,7 @@ public sealed partial class ExportDialog : IHasTable {
     private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();
 
     private void btnEinstellung_Click(object sender, System.EventArgs e) {
-        switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "A4 Printer", "Abbrechen")) {
+        switch(MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "A4 Printer", "Abbrechen")) {
             case 0:
                 flxBreite.ValueSet("210", true);
                 flxHöhe.ValueSet("297", true);

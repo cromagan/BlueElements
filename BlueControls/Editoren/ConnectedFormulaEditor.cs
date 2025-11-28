@@ -91,6 +91,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             if (field != null) {
                 field.Editing -= _cFormula_Editing;
+
                 field.UnlockEditing();
             }
 

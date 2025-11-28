@@ -32,7 +32,7 @@ using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using MessageBox = BlueControls.Forms.MessageBox;
+
 
 namespace BlueControls.Controls;
 
@@ -119,7 +119,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         if (string.IsNullOrEmpty(FileName)) { return true; }
         if (!FileExists(FileName)) { return true; }
 
-        if (MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
+        if(Forms.MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
 
         if (DeleteFile(FileName, false)) {
             _bitmap = null;

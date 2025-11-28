@@ -346,8 +346,8 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         if (IsClosed) { return; }
         if (txbEingabe.Focused) { return; }
         if (Focused) { return; }
-        if (lsbFilterItems.Focused()) { return; }
-        if (lsbStandardFilter.Focused()) { return; }
+        if (lsbFilterItems.Focused) { return; }
+        if (lsbStandardFilter.Focused) { return; }
         if (butFertig.Focused) { return; }
         CloseAndDispose(string.Empty, null);
     }

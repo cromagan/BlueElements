@@ -50,7 +50,7 @@ using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
-using MessageBox = BlueControls.Forms.MessageBox;
+
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -519,7 +519,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         foreach (var thisc in padData._internal) {
             if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
-                AbstractPadItem.IsInDrawingArea(thisc.UsedArea, padData.UsedArea.ToRect())) {
+                IsInDrawingArea(thisc.UsedArea, padData.UsedArea.ToRect())) {
                 its.Add(aas);
             }
         }
@@ -902,7 +902,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 break;
 
             default:
-                MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpperInvariant(), ImageCode.Warnung, "OK");
+                Forms.MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpperInvariant(), ImageCode.Warnung, "OK");
                 return;
         }
     }

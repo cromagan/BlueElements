@@ -38,7 +38,7 @@ using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using MessageBox = BlueControls.Forms.MessageBox;
+
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -220,7 +220,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
 
         if (!testmode) {
-            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
+            if(Forms.MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
                 return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein");
             }
         }
@@ -370,14 +370,14 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private bool EnableScript() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return false; }
 
-        var s = MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
+        var s = Forms.MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
 
         if (s == 1) { return false; }
 
         Table.EnableScript();
 
         if (!Table.IsRowScriptPossible()) {
-            MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
+            Forms.MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
             return false;
         }
         return true;

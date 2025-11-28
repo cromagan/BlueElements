@@ -23,12 +23,18 @@ namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Wird verwendet, wenn ein einzigartiges Fenster eines Objektes angezeigt werden soll.
-/// Typischerweiße bei einem Editor
+/// Typischerweiße bei einem Editor.
+/// Wichtig! Die Form muss einen Parameterlosen Konstruktor haben.
+/// Wenn Object Null ist, ist Systemweit nur ein Fenster möglich.
+/// Aufrufbeispiel: IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
 /// </summary>
 public interface IUniqueWindow : IDisposableExtended {
 
     #region Properties
 
+    /// <summary>
+    /// Wenn Object Null ist, ist Systemweit nur ein Fenster möglich.
+    /// </summary>
     object? Object { get; set; }
 
     #endregion

@@ -35,9 +35,9 @@ public partial class GlobalMonitor : Form {
 
     #region Methods
 
-    public static void GenerateLogTable(Controls.TableView tblLog) {
+    public static void GenerateLogTable(Controls.TableViewWithFilters tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
-        var tb =  Table.Get();
+        var tb = Table.Get();
         var dbi = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         dbi.IsFirst = true;
         tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);

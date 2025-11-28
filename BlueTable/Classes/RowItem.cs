@@ -535,7 +535,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                     if (oldvalue != newvalue) {
                         var chunkValue = ChunkValue;
-                        var editableError = Table.GrantWriteAccess(inputColumn, this, chunkValue, 2, true);
+                        var editableError = GrantWriteAccess(inputColumn, this, chunkValue, 2, true);
 
                         if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
                         //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
@@ -765,7 +765,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!tb.CanDoValueChangedScript(true)) { return new ScriptEndedFeedback("Skripte fehlerhaft!", false, true, "Allgemein"); }
 
-        Table.WaitScriptsDone();
+        WaitScriptsDone();
 
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) {
             return new ScriptEndedFeedback([], RepairAllLinks());

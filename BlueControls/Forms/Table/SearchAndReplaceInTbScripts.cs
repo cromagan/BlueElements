@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueTable;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.BlueTableDialogs;
 
-internal sealed partial class SearchAndReplaceInTbScripts : Form {
+internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow {
 
     #region Fields
 
@@ -42,6 +43,12 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form {
     public SearchAndReplaceInTbScripts() =>
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
+
+    #endregion
+
+    #region Properties
+
+    public object? Object { get; set; }
 
     #endregion
 

@@ -35,7 +35,6 @@ using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -69,7 +68,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     #region Properties
 
-    
     public static string ClassId => "IMAGE";
 
     public SizeModes Bild_Modus {
@@ -122,14 +120,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     public void Bildschirmbereich_wählen() {
         if (Bitmap != null) {
-            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         Bitmap = ScreenShot.GrabArea(null).Area;
     }
 
     public void Datei_laden() {
         if (Bitmap != null) {
-            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         OpenFileDialog e = new() {
             CheckFileExists = true,

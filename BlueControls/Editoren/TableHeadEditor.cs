@@ -81,7 +81,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     #region Methods
 
-    public static void AddUndosToTable(TableView tblUndo, Table? table, float maxAgeInDays) {
+    public static void AddUndosToTable(TableViewWithFilters tblUndo, Table? table, float maxAgeInDays) {
         if (table is { IsDisposed: false } tb) {
             Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{tb.Caption}'", 0);
 
@@ -93,7 +93,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    public static void AddUndoToTable(TableView tblUndo, UndoItem work, Table db, float maxAgeInDays) {
+    public static void AddUndoToTable(TableViewWithFilters tblUndo, UndoItem work, Table db, float maxAgeInDays) {
         if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
         var r = tblUndo.Table?.Row.GenerateAndAdd(work.ParseableItems().FinishParseable(), "New Undo Item");
         if (r == null) { return; }
@@ -194,7 +194,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         r.CellSet("Wertneu", neu, string.Empty);
     }
 
-    public static void GenerateUndoTabelle(TableView tblUndo) {
+    public static void GenerateUndoTabelle(TableViewWithFilters tblUndo) {
         var tb = Table.Get();
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         var f = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
@@ -314,8 +314,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table = null;
         Close();
     }
-
-    private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));
 
     private void btnLoadAll_Click(object sender, System.EventArgs e) {
         if (Table is not { IsDisposed: false }) { return; }

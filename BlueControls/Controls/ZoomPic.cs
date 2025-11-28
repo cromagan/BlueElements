@@ -76,6 +76,8 @@ public partial class ZoomPic : ZoomPad {
         }
     }
 
+    public override bool ControlMustPressed => false;
+
     #endregion
 
     #region Methods

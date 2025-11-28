@@ -34,11 +34,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using MessageBox = BlueControls.Forms.MessageBox;
+
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
@@ -176,6 +175,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         }
     } = string.Empty;
 
+    public new bool Focused => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused || SliderY.Focused;
     public int ItemCount => _item.Count;
 
     [DefaultValue(false)]
@@ -263,7 +263,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
 
     public AbstractListItem? Add_TextBySuggestion() {
         if (Suggestions.Count == 0) {
-            MessageBox.Show("Keine (weiteren) Werte vorhanden.", ImageCode.Information, "OK");
+            Forms.MessageBox.Show("Keine (weiteren) Werte vorhanden.", ImageCode.Information, "OK");
             return null;
         }
 
@@ -313,11 +313,9 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     }
 
     public new void Focus() {
-        if (Focused()) { return; }
+        if (Focused) { return; }
         base.Focus();
     }
-
-    public new bool Focused() => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused || SliderY.Focused();
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 

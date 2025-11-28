@@ -35,7 +35,7 @@ public sealed class RowDataListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public RowDataListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(RowBackgroundListItem.Key(row, alignsToCaption), arrangement) {
+    public RowDataListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Key(row, alignsToCaption), arrangement) {
         Row = row;
         MarkYellow = false;
         AlignsToCaption = alignsToCaption;

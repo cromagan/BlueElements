@@ -181,6 +181,11 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         return null;
     }
 
+    internal void ContextMenu_EnableRowScript(object sender, System.EventArgs e) {
+        Table.Table?.EnableScript();
+        CheckButtons();
+    }
+
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Tabelle laden zu können - lädt die Tabelle aber selbst nicht.
     /// HIer wird auch die Standard-Ansicht als Tag Injiziert
@@ -237,8 +242,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
 
-    protected virtual void ContextMenu_OpenScriptEditor(object sender, System.EventArgs e) => OpenScriptEditor(Table.Table);
-
     protected void ChangeTableInTab(string tablename, TabPage? tabpage, string settings) {
         if (tabpage == null) { return; }
 
@@ -253,6 +256,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         s[1] = settings;
         tabpage.Tag = s;
     }
+
+    protected virtual void ContextMenu_OpenScriptEditor(object sender, System.EventArgs e) => OpenScriptEditor(Table.Table);
 
     protected virtual void FillFormula(RowItem? r) {
         if (CFO is null) { return; }
@@ -372,9 +377,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// <returns></returns>
     protected bool SwitchTabToTable(Table? table) => table?.IsDisposed == false && SwitchTabToTable(table.KeyName);
 
-    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-    }
-
     protected virtual void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
             Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
@@ -383,6 +385,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (ckbZeilenclickInsClipboard.Checked) {
             TableView.CopyToClipboard(e.ColumnView?.Column, e.RowData?.Row, false);
+
             Table.Focus();
         }
     }
@@ -392,8 +395,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
             return;
         }
-
-        btnUnterschiede_CheckedChanged(this, System.EventArgs.Empty);
 
         FillFormula(e.Row);
     }
@@ -611,10 +612,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInCells();
 
-    private void btnSuchFenster_Click(object sender, System.EventArgs e) {
-        var x = new Search(Table);
-        x.Show();
-    }
+    private void btnSuchFenster_Click(object sender, System.EventArgs e) => Table.OpenSearchInCells();
 
     private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInTbScripts();
 
@@ -637,9 +635,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         MultiUserFile.SaveAll(false);
         ExecuteFile(System.IO.Path.GetTempPath());
     }
-
-    private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) =>
-        Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow?.Row : null;
 
     private void btnUserInfo_Click(object sender, System.EventArgs e) {
         var t = new UserInfo();
@@ -845,11 +840,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         lstAufgaben.Enabled = lstAufgaben.ItemCount > 0;
-    }
-
-    internal void ContextMenu_EnableRowScript(object sender, System.EventArgs e) {
-        Table.Table?.EnableScript();
-        CheckButtons();
     }
 
     #endregion

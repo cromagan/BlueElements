@@ -28,7 +28,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms;
 

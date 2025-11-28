@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Windows.Forms;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using Timer = System.Threading.Timer;
@@ -388,7 +387,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     public bool SaveAs(string filename) => ProcessFile(TrySave, [filename], false, 120) is true;
 
     public void UnlockEditing() {
-        if (!AmIBlocker(false)) { return; }
+        if (!AmIBlocker()) { return ; }
 
         Save(true);
 
@@ -399,7 +398,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         UnlockAllHard();
     }
 
-    internal bool AmIBlocker(bool silent) {
+    internal bool AmIBlocker() {
         if (AgeOfBlockDatei() is < 0 or > 3600) { return false; }
 
         string inhalt;
@@ -407,17 +406,10 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         try {
             inhalt = ReadAllText(Blockdateiname(), Constants.Win1252);
         } catch {
-            if (!silent) { MessageBox.Show("Dateisystem Fehler"); }
             return false;
         }
 
-        if (_inhaltBlockdatei == inhalt) { return true; }
-
-        if (!silent) {
-            MessageBox.Show("<b>Bearbeiten nicht möglich.</b>\r\n" + inhalt);
-        }
-
-        return false;
+        return _inhaltBlockdatei == inhalt;
     }
 
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);

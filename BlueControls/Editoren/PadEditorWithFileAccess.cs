@@ -190,7 +190,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
         Pad.Items.IsSaved = true;
 
-        if (MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
+        if(MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
 
         var t = Pad.Items.ParseableItems().FinishParseable();
         WriteAllText(_lastFileName, t, Constants.Win1252, false);

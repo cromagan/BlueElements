@@ -34,7 +34,7 @@ public static class FileDialogs {
     //    if (!DirectoryExists(Pfad)) { return; }
     //    if (Meldungen)
     //    {
-    //        ButtonNumber = MessageBox.Show("Soll der Ordner \"" + Pfad + "\"<br>und dessen Inhalt wirklich <b>gelöscht</b> werden?\"", ImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
+    //        ButtonNumber = BlueControls.Forms.MessageBox.Show("Soll der Ordner \"" + Pfad + "\"<br>und dessen Inhalt wirklich <b>gelöscht</b> werden?\"", ImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
     //    }
     //    else
     //    {
@@ -50,7 +50,7 @@ public static class FileDialogs {
     //        {
     //            if (Meldungen)
     //            {
-    //                MessageBox.Show("Ordner konnte <b>nicht</b> gelöscht werden:<br>" + ex.Message, ImageCode.Kritisch, "OK");
+    //                BlueControls.Forms.MessageBox.Show("Ordner konnte <b>nicht</b> gelöscht werden:<br>" + ex.Message, ImageCode.Kritisch, "OK");
     //            }
     //            Develop.DebugPrint("Ordner " + Pfad + " konnte nicht gelöscht werden.<br>" + ex.Message);
     //        }
@@ -59,7 +59,7 @@ public static class FileDialogs {
     //    {
     //        if (Meldungen)
     //        {
-    //            MessageBox.Show("Ordner <b>nicht</b> gelöscht!", ImageCode.Information, "OK");
+    //            BlueControls.Forms.MessageBox.Show("Ordner <b>nicht</b> gelöscht!", ImageCode.Information, "OK");
     //        }
     //    }
     //}

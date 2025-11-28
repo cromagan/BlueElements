@@ -30,12 +30,11 @@ using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ZoomPad : GenericControl, IBackgroundNone {
+public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Fields
 
@@ -64,13 +63,17 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    public ZoomPad() : base(true, true, false) => InitializeComponent();
+    protected ZoomPad() : base(true, true, false) => InitializeComponent();
 
     #endregion
 
     #region Properties
 
+    public abstract bool ControlMustPressed { get; }
+
     public bool Fitting { get; private set; } = true;
+
+    public new bool Focused => base.Focused || SliderX.Focused || SliderY.Focused;
 
     [DefaultValue(false)]
     public bool ScreenshotMode {
@@ -98,7 +101,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
             if (ScreenshotMode) { return; }
             if (Math.Abs(value - _shiftX) < DefaultTolerance) { return; }
             _shiftX = value;
-            Invalidate();
+            OnShiftChanged();
         }
     }
 
@@ -109,7 +112,7 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
             if (ScreenshotMode) { return; }
             if (Math.Abs(value - _shiftY) < DefaultTolerance) { return; }
             _shiftY = value;
-            Invalidate();
+            OnShiftChanged();
         }
     }
 
@@ -123,9 +126,11 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
             if (Math.Abs(value - _zoom) < DefaultTolerance) { return; }
             _zoom = value;
-            Invalidate();
+            OnZoomChanged();
         }
     }
+
+    private bool ControlPressing { get; set; }
 
     #endregion
 
@@ -143,9 +148,11 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     new((int)Math.Round(((e.X + shiftX) / scale) - 0.5d, 0, MidpointRounding.AwayFromZero),
         (int)Math.Round(((e.Y + shiftY) / scale) - 0.5d, 0, MidpointRounding.AwayFromZero));
 
+    public static int GetPix(int pix, float scale) => (int)((pix * scale) + 0.5);
+
     public static bool ScaleWarnung() {
         if (Skin.Scale is > 0.98f and < 1.02f) { return false; }
-        MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
+        Forms.MessageBox.Show("Diese Funktion kann mit ihrer aktuellen Schriftgrößeneinstellung<br>leider nicht möglich.", ImageCode.Warnung, "OK");
         return true;
     }
 
@@ -177,7 +184,23 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         return _lastPaintArea;
     }
 
-    public void ParseView(string toParse) {
+    public RectangleF AvailablePaintAreaScaled() => AvailablePaintArea().ZoomAndMoveRect(Zoom, 0, 0, true);
+
+    public void DoZoom(bool zoomIn) {
+        var nz = _zoom;
+
+        if (zoomIn) {
+            nz *= 1.05f;
+        } else {
+            nz *= 1f / 1.05f;
+        }
+
+        nz = Math.Max(nz, 0.5f);
+        nz = Math.Min(nz, 4);
+        Zoom = nz;
+    }
+
+    public virtual void ParseView(string toParse) {
         if (IsDisposed) { return; }
 
         if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
@@ -203,12 +226,12 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         Fitting = false;
     }
 
-    public string ViewToString() {
+    public virtual List<string> ViewToString() {
         List<string> result = [];
         result.ParseableAdd("Zoom", _zoom);
         result.ParseableAdd("SliderX", SliderX.Value);
         result.ParseableAdd("SliderY", SliderY.Value);
-        return result.FinishParseable();
+        return result;
     }
 
     public void ZoomFit() {
@@ -229,6 +252,26 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     public void ZoomOut(MouseEventArgs e) {
         MouseEventArgs x = new(e.Button, e.Clicks, e.X, e.Y, -1);
         OnMouseWheel(x);
+    }
+
+    internal void EnsureVisibleX(Rectangle position) {
+        var pa = AvailablePaintArea();
+
+        if (position.Left < pa.Left) {
+            ShiftX = ShiftX + position.Left - pa.Width;
+        } else if (position.Right > pa.Width) {
+            ShiftX = ShiftX + position.Right - pa.Width;
+        }
+    }
+
+    internal void EnsureVisibleY(Rectangle position) {
+        var pa = AvailablePaintArea();
+
+        if (position.Top < pa.Top) {
+            ShiftY = ShiftY + position.Top - pa.Height;
+        } else if (position.Right > pa.Width) {
+            ShiftY = ShiftY + position.Bottom - pa.Height;
+        }
     }
 
     protected override void DrawControl(Graphics gr, States state) {
@@ -268,9 +311,58 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     }
 
-    protected virtual RectangleF MaxBounds() {
-        Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
-        return default;
+    protected void DrawWaitScreen(Graphics gr, string info) {
+        Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
+
+        var i = QuickImage.Get(ImageCode.Uhr, 64);
+        gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
+
+        var fa = BlueFont.DefaultFont;
+
+        fa.DrawString(gr, info, 12, 50);
+
+        Skin.Draw_Border(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
+    }
+
+    protected abstract RectangleF MaxBounds();
+
+    protected override void OnKeyDown(KeyEventArgs e) {
+        base.OnKeyDown(e);
+
+        if (IsDisposed) { return; }
+
+        ControlPressing = e.Modifiers == Keys.Control;
+
+        switch (e.KeyCode) {
+            case Keys.PageDown:
+                if (SliderY.Enabled) {
+                    ShiftY += SliderY.LargeChange;
+                }
+                break;
+
+            case Keys.PageUp: //Bildab
+                if (SliderY.Enabled) {
+                    ShiftY -= SliderY.LargeChange;
+                }
+                break;
+
+            case Keys.Home:
+                if (SliderY.Enabled) {
+                    ShiftY = SliderY.Minimum;
+                }
+                break;
+
+            case Keys.End:
+                if (SliderY.Enabled) {
+                    ShiftY = SliderY.Maximum;
+                }
+                break;
+        }
+    }
+
+    protected override void OnKeyUp(KeyEventArgs e) {
+        base.OnKeyUp(e);
+        ControlPressing = false;
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {
@@ -280,8 +372,9 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
-        MousePos11 = Point.Empty;
         base.OnMouseLeave(e);
+        ControlPressing = false;
+        MousePos11 = Point.Empty;
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
@@ -297,6 +390,9 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
+
+        if (ControlMustPressed && !ControlPressing) { return; }
+
         Fitting = false;
         var m = CoordinatesUnscaled(e, _zoom, _shiftX, _shiftY);
         if (e.Delta > 0) {
@@ -319,6 +415,8 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
         //SliderY.Value = (m.Y * _zoom) - (Height / 2) - SliderX.Height
     }
 
+    protected virtual void OnShiftChanged() { Invalidate(); }
+
     protected override void OnSizeChanged(System.EventArgs e) {
         if (ScreenshotMode) {
             UpdateScreenshotLayout();
@@ -326,6 +424,8 @@ public partial class ZoomPad : GenericControl, IBackgroundNone {
             base.OnSizeChanged(e);
         }
     }
+
+    protected virtual void OnZoomChanged() { Invalidate(); }
 
     private void SliderX_ValueChanged(object sender, System.EventArgs e) => ShiftX = SliderX.Value;
 

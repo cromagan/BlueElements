@@ -24,60 +24,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-
-using BlueBasics;
-
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-
-using BlueBasics.Interfaces;
-
-using BlueBasics.MultiUserFile;
-using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
-using BlueControls.Designer_Support;
-
-using BlueControls.Enums;
-
-using BlueControls.EventArgs;
-using BlueControls.Extended_Text;
-using BlueControls.Forms;
-
-using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-
-using BlueTable;
 using BlueTable.Enums;
-using BlueTable.EventArgs;
-using BlueTable.Interfaces;
-
-using System;
-
-using System.Collections.Concurrent;
-
-using System.Collections.Generic;
-
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-
-using System.Drawing;
-
 using System.Drawing.Drawing2D;
-
-using System.Linq;
-
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static BlueTable.Table;
-using System.Runtime.Versioning;
 using BlueControls;
 
 namespace BlueTable;

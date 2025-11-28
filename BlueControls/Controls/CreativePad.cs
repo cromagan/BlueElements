@@ -105,6 +105,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     [DefaultValue(true)]
     public bool ContextMenuAllowed { get; set; } = true;
 
+    public override bool ControlMustPressed => false;
+
     [DefaultValue(true)]
     public bool EditAllowed { get; set; } = true;
 
@@ -214,104 +216,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         OnContextMenuInit(e);
     }
 
-    private void ContextMenu_Vordergrund(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
-        if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
-        icpi.BringToFront(item);
-    }
-
-    private void ContextMenu_Hintergrund(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
-        if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
-        icpi.SendToBack(item);
-    }
-
-    private void ContextMenu_Vorne(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
-        if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
-        icpi.EineEbeneNachVorne(item);
-    }
-
-    private void ContextMenu_Hinten(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
-        if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
-        icpi.EineEbeneNachHinten(item);
-    }
-
-    private void ContextMenu_Duplicate(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
-        var cloned = item.Clone();
-        if (cloned is AbstractPadItem clonedapi) {
-            clonedapi.GetNewIdsForEverything();
-            _items?.Add(clonedapi);
-        }
-    }
-
-    //private void ContextMenu_Page(object sender, ObjectEventArgs e) {
-    //    if (e.Data is not AbstractPadItem item) { return; }
-    //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatHolder.SystemName);
-    //    Unselect();
-    //}
-
-    private void ContextMenu_Connect(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
-        foreach (var pt in item.JointPoints) {
-            var p = Items?.GetJointPoint(pt.KeyName, item);
-            if (p != null) {
-                item.ConnectJointPoint(pt, p);
-                return;
-            }
-        }
-    }
-
-    private void ContextMenu_Export(object sender, ObjectEventArgs e) {
-        if (e.Data is not IStringable ps) { return; }
-        using SaveFileDialog f = new();
-        f.CheckFileExists = false;
-        f.CheckPathExists = true;
-        if (!string.IsNullOrEmpty(IO.LastFilePath)) { f.InitialDirectory = IO.LastFilePath; }
-        f.AddExtension = true;
-        f.DefaultExt = "bcs";
-        f.Title = "Speichern:";
-        f.ShowDialog();
-        if (string.IsNullOrEmpty(f.FileName)) { return; }
-        IO.WriteAllText(f.FileName, ps.ParseableItems().FinishParseable(), Constants.Win1252, false);
-        IO.LastFilePath = f.FileName.FilePath();
-    }
-
-    private void ContextMenu_Löschen(object sender, ObjectEventArgs e) {
-        if (e.Data is not PointM pm) { return; }
-        if (pm.Parent is AbstractPadItem api) {
-            api.JointPoints.Remove(pm);
-        }
-    }
-
-    private void ContextMenu_Umbenennen(object sender, ObjectEventArgs e) {
-        if (e.Data is not PointM pm) { return; }
-        var t = InputBox.Show("Neuer Name:", pm.KeyName, FormatHolder.SystemName);
-        if (!string.IsNullOrEmpty(t)) {
-            pm.KeyName = t;
-        }
-    }
-
-    private void ContextMenu_Verschieben(object sender, ObjectEventArgs e) {
-        if (e.Data is not PointM pm) { return; }
-        var tn = InputBox.Show("Zu welchem Punkt:", pm.KeyName, FormatHolder.SystemName);
-        if (!string.IsNullOrEmpty(tn)) {
-            if (pm.Parent is AbstractPadItem api2) {
-                var p = Items?.GetJointPoint(tn, api2);
-                if (p != null) {
-                    pm.SetTo(p.X, p.Y, true);
-                }
-            }
-        }
-    }
-
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnItemRemoved() => ItemRemoved?.Invoke(this, System.EventArgs.Empty);
-
-    //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
 
     public void OpenSaveDialog(string title) {
         title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
@@ -319,6 +226,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         PicsSave.ShowDialog();
     }
 
+    //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
     public void Print() {
         DruckerDokument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
         if (PrintDialog1.ShowDialog() == DialogResult.OK) {
@@ -610,6 +518,98 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         OnPropertyChanged(e.PropertyName);
         if (!_items.Any() || Fitting) { ZoomFit(); }
         Invalidate();
+    }
+
+    private void ContextMenu_Connect(object sender, ObjectEventArgs e) {
+        if (e.Data is not AbstractPadItem item) { return; }
+        foreach (var pt in item.JointPoints) {
+            var p = Items?.GetJointPoint(pt.KeyName, item);
+            if (p != null) {
+                item.ConnectJointPoint(pt, p);
+                return;
+            }
+        }
+    }
+
+    private void ContextMenu_Duplicate(object sender, ObjectEventArgs e) {
+        if (e.Data is not AbstractPadItem item) { return; }
+        var cloned = item.Clone();
+        if (cloned is AbstractPadItem clonedapi) {
+            clonedapi.GetNewIdsForEverything();
+            _items?.Add(clonedapi);
+        }
+    }
+
+    //private void ContextMenu_Page(object sender, ObjectEventArgs e) {
+    //    if (e.Data is not AbstractPadItem item) { return; }
+    //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatHolder.SystemName);
+    //    Unselect();
+    //}
+    private void ContextMenu_Export(object sender, ObjectEventArgs e) {
+        if (e.Data is not IStringable ps) { return; }
+        using SaveFileDialog f = new();
+        f.CheckFileExists = false;
+        f.CheckPathExists = true;
+        if (!string.IsNullOrEmpty(IO.LastFilePath)) { f.InitialDirectory = IO.LastFilePath; }
+        f.AddExtension = true;
+        f.DefaultExt = "bcs";
+        f.Title = "Speichern:";
+        f.ShowDialog();
+        if (string.IsNullOrEmpty(f.FileName)) { return; }
+        IO.WriteAllText(f.FileName, ps.ParseableItems().FinishParseable(), Constants.Win1252, false);
+        IO.LastFilePath = f.FileName.FilePath();
+    }
+
+    private void ContextMenu_Hinten(object sender, ObjectEventArgs e) {
+        if (e.Data is not AbstractPadItem item) { return; }
+        if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
+        icpi.EineEbeneNachHinten(item);
+    }
+
+    private void ContextMenu_Hintergrund(object sender, ObjectEventArgs e) {
+        if (e.Data is not AbstractPadItem item) { return; }
+        if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
+        icpi.SendToBack(item);
+    }
+
+    private void ContextMenu_Löschen(object sender, ObjectEventArgs e) {
+        if (e.Data is not PointM pm) { return; }
+        if (pm.Parent is AbstractPadItem api) {
+            api.JointPoints.Remove(pm);
+        }
+    }
+
+    private void ContextMenu_Umbenennen(object sender, ObjectEventArgs e) {
+        if (e.Data is not PointM pm) { return; }
+        var t = InputBox.Show("Neuer Name:", pm.KeyName, FormatHolder.SystemName);
+        if (!string.IsNullOrEmpty(t)) {
+            pm.KeyName = t;
+        }
+    }
+
+    private void ContextMenu_Verschieben(object sender, ObjectEventArgs e) {
+        if (e.Data is not PointM pm) { return; }
+        var tn = InputBox.Show("Zu welchem Punkt:", pm.KeyName, FormatHolder.SystemName);
+        if (!string.IsNullOrEmpty(tn)) {
+            if (pm.Parent is AbstractPadItem api2) {
+                var p = Items?.GetJointPoint(tn, api2);
+                if (p != null) {
+                    pm.SetTo(p.X, p.Y, true);
+                }
+            }
+        }
+    }
+
+    private void ContextMenu_Vordergrund(object sender, ObjectEventArgs e) {
+        if (e.Data is not AbstractPadItem item) { return; }
+        if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
+        icpi.BringToFront(item);
+    }
+
+    private void ContextMenu_Vorne(object sender, ObjectEventArgs e) {
+        if (e.Data is not AbstractPadItem item) { return; }
+        if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
+        icpi.EineEbeneNachVorne(item);
     }
 
     private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) => OnBeginnPrint(e);

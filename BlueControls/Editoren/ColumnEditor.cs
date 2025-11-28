@@ -30,12 +30,10 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -85,6 +83,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     #region Properties
 
+    public Table? Table => _column?.Table;
+
     public IEditable? ToEdit {
         set {
             if (value == _column) { return; }
@@ -96,8 +96,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             Column_DatenAuslesen();
         }
     }
-
-    public Table? Table => _column?.Table;
 
     #endregion
 
@@ -130,7 +128,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (!string.IsNullOrEmpty(feh)) {
-            MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + feh, ImageCode.Warnung, "Ok");
+            Forms.MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + feh, ImageCode.Warnung, "Ok");
             return false;
         }
 
@@ -255,7 +253,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(TableView.ColumnUsage(_column));
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(TableView.ColumnUsage(_column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
@@ -596,7 +594,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             t.TagSet("Filename", linkedTb.KeyName);
             tb.Tags = t.AsReadOnly();
 
-            tblFilterliste?.Filter.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
+            tblFilterliste?.FilterFix.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
         }
 
         linkedTb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt

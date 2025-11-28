@@ -78,6 +78,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     } = 16;
 
     public string ColumnQuickInfo => string.Empty;
+    public int ColumnsPermanentWidth { get; private set; }
+    public int ColumnsWidth { get; private set; }
     public int Count => _internal.Count;
     public Type? Editor { get; set; }
     public int FilterRows { get; internal set; } = 1;
@@ -128,8 +130,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             }
         }
     }
-
-    public int WiederHolungsSpaltenWidth { get; private set; }
 
     #endregion
 
@@ -223,7 +223,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         if (IsDisposed) { return; }
 
-        WiederHolungsSpaltenWidth = 0;
+        ColumnsPermanentWidth = 0;
+        ColumnsWidth = 0;
 
         var wdh = true;
         var maxX = 0;
@@ -236,8 +237,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
                 maxX += thisViewItem.DrawWidth();
                 if (wdh) {
-                    WiederHolungsSpaltenWidth = Math.Max(maxX, WiederHolungsSpaltenWidth);
+                    ColumnsPermanentWidth = Math.Max(maxX, ColumnsPermanentWidth);
                 }
+
+                ColumnsWidth = Math.Max(maxX, ColumnsWidth);
             }
         }
     }

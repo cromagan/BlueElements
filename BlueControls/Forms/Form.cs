@@ -63,14 +63,14 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     public new DialogResult ShowDialog() {
-        BlueControls.FormManager.RegisterForm(this);
+        FormManager.RegisterForm(this);
         var t = base.ShowDialog();
 
         return t;
     }
 
     public new void Show() {
-        BlueControls.FormManager.RegisterForm(this);
+        FormManager.RegisterForm(this);
         base.Show();
     }
 

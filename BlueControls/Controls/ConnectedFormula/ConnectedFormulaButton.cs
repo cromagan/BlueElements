@@ -32,7 +32,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -225,7 +224,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         Enabled = enabled;
     }
 
-    private void ButtonError(string message) => MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
+    private static void ButtonError(string message) => Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
 
     private void mainButton_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (TableInput is { IsDisposed: false } db) {
@@ -306,7 +305,7 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
         if (!string.IsNullOrEmpty(f)) {
             Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Fehler: " + f, 0);
-            MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+            Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         } else {
             Develop.Message?.Invoke(ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Häkchen, "Knopfdruck ausgeführt", 0);
         }
