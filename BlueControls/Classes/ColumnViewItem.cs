@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using System;
@@ -284,7 +285,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 : Math.Min(Contentwidth, (int)(Parent.ClientWidth * 0.6));
         }
 
-        _drawWidth = Math.Max((int)_drawWidth, ColumnsFilterListItem.AutoFilterSize); // Mindestens so groß wie der Autofilter;
+        _drawWidth = Math.Max((int)_drawWidth, FilterBarListItem.AutoFilterSize); // Mindestens so groß wie der Autofilter;
         return (int)_drawWidth;
     }
 

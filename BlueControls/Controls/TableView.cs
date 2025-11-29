@@ -190,7 +190,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowDataListItem? CursorPosRow { get; private set; }
+    public RowListItem? CursorPosRow { get; private set; }
 
     [DefaultValue(false)]
     public bool EditButton {
@@ -722,7 +722,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return renderer;
     }
 
-    public static void SearchNextText(string searchTxt, TableView tableView, ColumnViewItem? column, RowDataListItem? row, out ColumnViewItem? foundColumn, out RowDataListItem? foundRow, bool vereinfachteSuche) {
+    public static void SearchNextText(string searchTxt, TableView tableView, ColumnViewItem? column, RowListItem? row, out ColumnViewItem? foundColumn, out RowListItem? foundRow, bool vereinfachteSuche) {
         if (tableView.Table is not { IsDisposed: false } tb) {
             Forms.MessageBox.Show("Tabellen-Fehler.", ImageCode.Information, "OK");
             foundColumn = null;
@@ -947,7 +947,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (CursorPosColumn == column && CursorPosRow == row) { return; }
         QuickInfo = string.Empty;
         CursorPosColumn = column;
-        CursorPosRow = row as RowDataListItem;
+        CursorPosRow = row as RowListItem;
 
         //if (CursorPosColumn != column) { return; }
 
@@ -1022,7 +1022,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (RowsFilteredAndPinned is { } rw) {
             foreach (var thisRow in rw) {
-                if (thisRow is RowDataListItem { IsDisposed: false } rdli) {
+                if (thisRow is RowListItem { IsDisposed: false } rdli) {
                     da.RowBeginn();
                     foreach (var thisColumn in ca) {
                         if (thisColumn.Column != null) {
@@ -1147,7 +1147,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         OnContextMenuInit(e);
     }
 
-    public string GrantWriteAccess(ColumnViewItem? cellInThisTableColumn, RowDataListItem? cellInThisTableRow, string newChunkVal) {
+    public string GrantWriteAccess(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string newChunkVal) {
         var f = IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
@@ -1178,7 +1178,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         ImportCsv(db, csvtxt);
     }
 
-    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowDataListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
+    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
         var f = CellCollection.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
@@ -1436,30 +1436,30 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public ColumnViewItem? View_ColumnFirst() => IsDisposed || Table is not { IsDisposed: false } ? null : CurrentArrangement is { Count: not 0 } ca ? ca[0] : null;
 
-    public RowDataListItem? View_NextRow(RowDataListItem? row) {
+    public RowListItem? View_NextRow(RowListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
         if (RowsFilteredAndPinned is not { } sr) { return null; }
-        return sr.Next<RowDataListItem>(row);
+        return sr.Next<RowListItem>(row);
     }
 
-    public RowDataListItem? View_PreviousRow(RowDataListItem? row) {
+    public RowListItem? View_PreviousRow(RowListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
         if (RowsFilteredAndPinned is not { } sr) { return null; }
-        return sr.Previous<RowDataListItem>(row);
+        return sr.Previous<RowListItem>(row);
     }
 
-    public RowDataListItem? View_RowFirst() {
+    public RowListItem? View_RowFirst() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (RowsFilteredAndPinned is not { } sr) { return null; }
-        return sr.First<RowDataListItem>();
+        return sr.First<RowListItem>();
     }
 
-    public RowDataListItem? View_RowLast() {
+    public RowListItem? View_RowLast() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (RowsFilteredAndPinned is not { } sr) { return null; }
-        return sr.Last<RowDataListItem>();
+        return sr.Last<RowListItem>();
     }
 
     public override List<string> ViewToString() {
@@ -1646,11 +1646,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
             var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(ca, MousePos().X, MousePos().Y);
-            var _mouseOverRow = _mouseOverRowItem as RowDataListItem;
+            var _mouseOverRow = _mouseOverRowItem as RowListItem;
             var ea = new CellExtEventArgs(_mouseOverColumn, _mouseOverRow);
             DoubleClick?.Invoke(this, ea);
 
-            if (_mouseOverRow is RowDataListItem rdi) {
+            if (_mouseOverRow is RowListItem rdi) {
                 if (rdi.Row is { } r) {
                     Cell_Edit(ca, _mouseOverColumn, _mouseOverRow, true, r.ChunkValue);
                 } else {
@@ -1816,7 +1816,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (e.Button == MouseButtons.None) {
                 if (_mouseOverRowItem is ColumnsHeadListItem) {
                     QuickInfo = QuickInfoText(column, string.Empty);
-                } else if (_mouseOverRowItem is RowDataListItem rdli && rdli.Row is { } mor) {
+                } else if (_mouseOverRowItem is RowListItem rdli && rdli.Row is { } mor) {
                     if (column.RelationType == RelationType.CellValues) {
                         if (column.LinkedTable != null) {
                             var (lcolumn, _, info, _) = mor.LinkedCellData(column, true, false);
@@ -1848,7 +1848,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(ca, e.X, e.Y);
-            var _mouseOverRow = _mouseOverRowItem as RowDataListItem;
+            var _mouseOverRow = _mouseOverRowItem as RowListItem;
 
             // TXTBox_Close() NICHT! Weil sonst nach dem Öffnen sofort wieder gschlossen wird
             // AutoFilter_Close() NICHT! Weil sonst nach dem Öffnen sofort wieder geschlossen wird
@@ -1857,7 +1857,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_mouseOverColumn?.Column is not { IsDisposed: false } column) { return; }
 
             if (e.Button == MouseButtons.Left) {
-                if (_mouseOverRowItem is ColumnsFilterListItem cfli) {
+                if (_mouseOverRowItem is FilterBarListItem cfli) {
                     var screenX = Cursor.Position.X - e.X;
                     var screenY = Cursor.Position.Y - e.Y;
                     AutoFilter_Show(ca, _mouseOverColumn, screenX, screenY, cfli.Position.Bottom);
@@ -1907,7 +1907,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
     }
 
-    private static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowDataListItem? cellInThisTableRow, bool formatWarnung) {
+    private static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, bool formatWarnung) {
         if (cellInThisTableColumn?.Column is not { IsDisposed: false } contentHolderCellColumn) { return "Spalte nicht vorhanden"; } // Dummy prüfung
 
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
@@ -2310,9 +2310,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #region Sort-Anzeige erstellen
 
-        var sortAnzeige = items.First<SortListItem>();
+        var sortAnzeige = items.First<SortBarListItem>();
         if (sortAnzeige == null) {
-            sortAnzeige = new SortListItem(arrangement);
+            sortAnzeige = new SortBarListItem(arrangement);
             items.Add(sortAnzeige);
         }
 
@@ -2320,9 +2320,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #region Filter erstellen
 
-        var columnFilter = items.First<ColumnsFilterListItem>();
+        var columnFilter = items.First<FilterBarListItem>();
         if (columnFilter == null) {
-            columnFilter = new ColumnsFilterListItem(arrangement);
+            columnFilter = new FilterBarListItem(arrangement);
             items.Add(columnFilter);
         }
 
@@ -2389,13 +2389,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (markYellow) { caps.Add("Angepinnt"); }
 
             foreach (var thisCap in caps) {
-                RowDataListItem? it;
+                RowListItem? it;
                 lock (lockMe) {
-                    it = items.Get(thisRow, thisCap) as RowDataListItem;
+                    it = items.Get(thisRow, thisCap) as RowListItem;
                 }
 
                 if (it is null) {
-                    it = new RowDataListItem(thisRow, thisCap, arrangement);
+                    it = new RowListItem(thisRow, thisCap, arrangement);
                     lock (lockMe) {
                         items.Add(it);
                     }
@@ -2437,7 +2437,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         lock (lockMe) {
             foreach (var thisItem in items) {
-                if (thisItem is RowDataListItem rdli) {
+                if (thisItem is RowListItem rdli) {
                     rdli.UserDefCompareKey = sortused.Reverse
                     ? "~" + rdli.Row.CompareKey(sortused)
                     : rdli.Row.CompareKey(sortused);
@@ -2456,14 +2456,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (thisItem is ColumnsHeadListItem chli) {
                     chli.Visible = arrangement.ShowHead;
                 }
-                if (thisItem is ColumnsFilterListItem cfli) {
+                if (thisItem is FilterBarListItem cfli) {
                     cfli.Visible = arrangement.ShowHead;
                     cfli.ShowNumber = ShowNumber;
                     cfli.FilterCombined = FilterCombined;
                     cfli.RowsFilteredCount = filteredRows.Count;
                 }
 
-                if (thisItem is SortListItem sli) {
+                if (thisItem is SortBarListItem sli) {
                     sli.Visible = arrangement.ShowHead;
                     sli.FilterCombined = FilterCombined;
                     sli.Sort = SortUsed();
@@ -2479,7 +2479,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             #region Sortierte Reihenfolge der sichtbaren RowDataListItems ermitteln
 
-            var sortedDataItems = items.OfType<RowDataListItem>().ToList();
+            var sortedDataItems = items.OfType<RowListItem>().ToList();
 
             #endregion
 
@@ -2540,7 +2540,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         VisibleRowCount = allrows.Count;
     }
 
-    private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowDataListItem? cellInThisTableRow, bool preverDropDown, string? chunkval) {
+    private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowListItem? cellInThisTableRow, bool preverDropDown, string? chunkval) {
         var f = IsCellEditable(viewItem, cellInThisTableRow, chunkval, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
@@ -2616,7 +2616,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private void Cell_Edit_Color(ColumnViewItem viewItem, RowDataListItem? cellInThisTableRow) {
+    private void Cell_Edit_Color(ColumnViewItem viewItem, RowListItem? cellInThisTableRow) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
 
         var colDia = new ColorDialog();
@@ -2641,7 +2641,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToStringInt1(), viewItem, cellInThisTableRow, false));
     }
 
-    private void Cell_Edit_Dropdown(ColumnViewCollection ca, ColumnViewItem viewItem, RowDataListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
+    private void Cell_Edit_Dropdown(ColumnViewCollection ca, ColumnViewItem viewItem, RowListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
         if (viewItem.Column != contentHolderCellColumn) {
             if (contentHolderCellRow == null) {
                 NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
@@ -2713,7 +2713,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         box.GetStyleFrom(viewItem.Column);
         RowItem? contentHolderCellRow = null;
-        if (cellInThisTableRow is RowDataListItem rli) {
+        if (cellInThisTableRow is RowListItem rli) {
             box.Location = new Point(headX, cellInThisTableRow.Position.Y);
             box.Size = new Size(headWith + addWith, GetPix(cellInThisTableRow.Position.Height, Zoom));
             box.Text = rli.Row.CellGetString(viewItem.Column);
@@ -3064,7 +3064,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     //private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, ShiftX, 0).Contains(e.Location);
 
-    private void Neighbour(ColumnViewItem? column, RowDataListItem? row, Direction direction, out ColumnViewItem? newColumn, out RowDataListItem? newRow) {
+    private void Neighbour(ColumnViewItem? column, RowListItem? row, Direction direction, out ColumnViewItem? newColumn, out RowListItem? newRow) {
         if (CurrentArrangement is not { IsDisposed: false } ca) {
             newColumn = null;
             newRow = null;
@@ -3171,10 +3171,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var w = textbox.Text;
 
         ColumnViewItem? column = null;
-        RowDataListItem? row = null;
+        RowListItem? row = null;
 
         if (tags[0] is ColumnViewItem c) { column = c; }
-        if (tags[1] is RowDataListItem r) { row = r; }
+        if (tags[1] is RowListItem r) { row = r; }
 
         textbox.Tag = null;
         textbox.Visible = false;

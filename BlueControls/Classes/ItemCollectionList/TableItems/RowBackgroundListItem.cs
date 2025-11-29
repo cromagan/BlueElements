@@ -28,14 +28,15 @@ using BlueTable.Enums;
 using System.Drawing.Drawing2D;
 using BlueControls;
 using BlueControls.Controls;
+using BlueTable;
 
-namespace BlueTable;
+namespace BlueControls.ItemCollectionList;
 
 public static class RowBackgroundListItemListItemExtensions {
 
     #region Methods
 
-    public static RowDataListItem? Get(this List<AbstractListItem>? l, RowItem? row) => row == null ? null : l?.FirstOrDefault(thisr => thisr is RowDataListItem r && r.Row == row) as RowDataListItem;
+    public static RowListItem? Get(this List<AbstractListItem>? l, RowItem? row) => row == null ? null : l?.FirstOrDefault(thisr => thisr is RowListItem r && r.Row == row) as RowListItem;
 
     public static RowBackgroundListItem? Get(this List<AbstractListItem>? l, RowItem? row, string caption) {
         if (l == null) { return null; }
@@ -207,10 +208,10 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
         for (var du = 0; du < 2; du++) {
             foreach (var viewItem in Arrangement) {
-                if ((viewItem.Permanent && du == 0) || (!viewItem.Permanent && du == 1)) { continue; }
+                if (viewItem.Permanent && du == 0 || !viewItem.Permanent && du == 1) { continue; }
                 if (viewItem.Column == null) { continue; }
 
-                var left = viewItem.Permanent ? viewItem.X * scale : (viewItem.X * scale) - shiftX;
+                var left = viewItem.Permanent ? viewItem.X * scale : viewItem.X * scale - shiftX;
 
                 if (left > visibleArea.Width) { continue; }
                 if (left + positionModified.Width < 0) { continue; }

@@ -25,6 +25,7 @@ using BlueBasics.Enums;
 using BlueControls.Extended_Text;
 using BlueControls.Controls;
 using BlueTable.Enums;
+using BlueControls.ItemCollectionList;
 
 namespace BlueTable;
 
@@ -80,7 +81,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
         var si = Font_RowChapter_Scaled.MeasureString(tmp);
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionModified);
-        var buttonPos = new Rectangle(1, (int)(positionModified.Bottom - si.Height - p5 -2), (int)si.Width + p23 + p14, (int)si.Height + p5);
+        var buttonPos = new Rectangle(1, (int)(positionModified.Bottom - si.Height - p5 - 2), (int)si.Width + p23 + p14, (int)si.Height + p5);
 
         if (!Expanded) {
             var x = new ExtText(Design.Button_CheckBox, States.Checked);

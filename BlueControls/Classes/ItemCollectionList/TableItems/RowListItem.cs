@@ -20,22 +20,23 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
+using BlueTable;
 using BlueTable.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueTable;
+namespace BlueControls.ItemCollectionList;
 
 /// <summary>
 /// Enthält Daten, wie eine Zeile angezeigt werden soll.
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public sealed class RowDataListItem : RowBackgroundListItem {
+public sealed class RowListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public RowDataListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Key(row, alignsToCaption), arrangement, alignsToCaption) {
+    public RowListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Key(row, alignsToCaption), arrangement, alignsToCaption) {
         Row = row;
         MarkYellow = false;
     }

@@ -21,10 +21,11 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueTable;
 using BlueTable.Enums;
 using System.Drawing;
 
-namespace BlueTable;
+namespace BlueControls.ItemCollectionList;
 
 /// <summary>
 /// Enthält Daten, wie eine Zeile angezeigt werden soll.

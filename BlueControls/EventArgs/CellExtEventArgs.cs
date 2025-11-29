@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueControls.ItemCollectionList;
 using BlueTable;
 
 namespace BlueControls.EventArgs;
@@ -25,7 +26,7 @@ public class CellExtEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public CellExtEventArgs(ColumnViewItem? column, RowDataListItem? row) {
+    public CellExtEventArgs(ColumnViewItem? column, RowListItem? row) {
         ColumnView = column;
         RowData = row;
     }
@@ -35,7 +36,7 @@ public class CellExtEventArgs : System.EventArgs {
     #region Properties
 
     public ColumnViewItem? ColumnView { get; }
-    public RowDataListItem? RowData { get; }
+    public RowListItem? RowData { get; }
 
     #endregion
 }

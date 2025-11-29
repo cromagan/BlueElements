@@ -21,11 +21,12 @@ using BlueBasics;
 using BlueControls;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueTable;
 using BlueTable.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueTable;
+namespace BlueControls.ItemCollectionList;
 
 /// <summary>
 /// Kümmert sich um die Anzeige des Spaltenkopfes

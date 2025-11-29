@@ -18,15 +18,15 @@
 #nullable enable
 
 using BlueBasics;
-using BlueControls;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueTable;
 using BlueTable.Enums;
 using System.Drawing;
 
-namespace BlueTable;
+namespace BlueControls.ItemCollectionList;
 
-public sealed class ColumnsFilterListItem : RowBackgroundListItem {
+public sealed class FilterBarListItem : RowBackgroundListItem {
 
     #region Fields
 
@@ -36,7 +36,7 @@ public sealed class ColumnsFilterListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public ColumnsFilterListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
+    public FilterBarListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
     }
 
     #endregion

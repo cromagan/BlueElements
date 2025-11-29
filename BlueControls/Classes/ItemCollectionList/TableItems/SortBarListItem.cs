@@ -21,16 +21,17 @@ using BlueBasics;
 using BlueControls;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueTable;
 using BlueTable.Enums;
 using System.Drawing;
 
-namespace BlueTable;
+namespace BlueControls.ItemCollectionList;
 
-public sealed class SortListItem : RowBackgroundListItem {
+public sealed class SortBarListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public SortListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
+    public SortBarListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
     }
 
     #endregion

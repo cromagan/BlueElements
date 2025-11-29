@@ -141,7 +141,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowDataListItem? CursorPosRow {
+    public RowListItem? CursorPosRow {
         get => TableInternal.CursorPosRow;
     }
 
@@ -269,7 +269,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public List<string> ViewToString() => TableInternal.ViewToString();
 
-    internal void CursorPos_Set(ColumnViewItem? columnViewItem, RowDataListItem? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
+    internal void CursorPos_Set(ColumnViewItem? columnViewItem, RowListItem? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
 
     internal void DoZoom(bool zoomin) => TableInternal.DoZoom(zoomin);
 
@@ -438,7 +438,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     internal void RowCleanUp() => TableInternal.RowCleanUp();
 
-    internal RowDataListItem? View_RowFirst() => TableInternal.View_RowFirst();
+    internal RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
 
     //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     [DebuggerNonUserCode]

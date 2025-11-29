@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueTable;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
@@ -34,7 +35,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
     #region Fields
 
     private ColumnViewItem? _col;
-    private RowDataListItem? _row;
+    private RowListItem? _row;
     private TableView? _tableView;
 
     #endregion
