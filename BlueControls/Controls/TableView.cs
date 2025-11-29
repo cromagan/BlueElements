@@ -928,7 +928,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (RowsFilteredAndPinned is not { } _rowsFilteredAndPinned) { return; }
 
         foreach (var thisR in _rowsFilteredAndPinned) {
-            if (thisR is RowCaptionListItem { IsDisposed: false, Visible: true, Expanded: true } rcli) { rcli.Expanded = false; did = true; }
+            if (thisR is RowCaptionListItem { IsDisposed: false, Expanded: true } rcli) { rcli.Expanded = false; did = true; }
         }
 
         if (did) { Invalidate_SortedRowData(); }
@@ -973,7 +973,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (RowsFilteredAndPinned is not { } _rowsFilteredAndPinned) { return; }
 
         foreach (var thisR in _rowsFilteredAndPinned) {
-            if (thisR is RowCaptionListItem { IsDisposed: false, Visible: true, Expanded: false } rcli) { rcli.Expanded = true; did = true; }
+            if (thisR is RowCaptionListItem { IsDisposed: false, Expanded: false } rcli) { rcli.Expanded = true; did = true; }
         }
 
         if (did) {
@@ -2308,6 +2308,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #endregion
 
+        #region Sort-Anzeige erstellen
+
+        var sortAnzeige = items.First<SortListItem>();
+        if (sortAnzeige == null) {
+            sortAnzeige = new SortListItem(arrangement);
+            items.Add(sortAnzeige);
+        }
+
+        #endregion
+
         #region Filter erstellen
 
         var columnFilter = items.First<ColumnsFilterListItem>();
@@ -2405,14 +2415,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         foreach (var thisR in items) {
             lock (lockMe) {
                 if (thisR is RowCaptionListItem { IsDisposed: false, Expanded: false } rcli) {
-                    l.Add(rcli.RowChapter.ToUpperInvariant());
+                    l.Add(rcli.ChapterText.ToUpperInvariant());
 
                     // Alle Untereinträge hinzufügen
-                    var prefix = rcli.RowChapter.ToUpperInvariant() + "\\";
+                    var prefix = rcli.ChapterText.ToUpperInvariant() + "\\";
                     foreach (var otherR in items) {
                         if (otherR is RowCaptionListItem { IsDisposed: false } otherRcli) {
-                            if (otherRcli.RowChapter.ToUpperInvariant().StartsWith(prefix)) {
-                                l.Add(otherRcli.RowChapter);
+                            if (otherRcli.ChapterText.ToUpperInvariant().StartsWith(prefix)) {
+                                l.Add(otherRcli.ChapterText);
                             }
                         }
                     }
@@ -2426,21 +2436,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         #endregion
 
         lock (lockMe) {
-
-            #region Attribute und Visible ALLER Items setzen
-
             foreach (var thisItem in items) {
                 if (thisItem is RowDataListItem rdli) {
                     rdli.UserDefCompareKey = sortused.Reverse
                     ? "~" + rdli.Row.CompareKey(sortused)
                     : rdli.Row.CompareKey(sortused);
-                    //rdli.Visible = !_collapsed.Contains(rdli.AlignsToCaption);
                     thisItem.Visible = false;
                 }
                 if (thisItem is RowCaptionListItem rcli) {
                     thisItem.Visible = false;
                     //rcli.Visible = !_collapsed.Contains(rcli.RowChapter.PathParent());
                 }
+
+                if (thisItem is RowBackgroundListItem rbli) {
+                    rbli.Arrangement = arrangement;
+                    rbli.Visible = !_collapsed.Contains(rbli.AlignsToChapter);
+                }
+
                 if (thisItem is ColumnsHeadListItem chli) {
                     chli.Visible = arrangement.ShowHead;
                 }
@@ -2448,21 +2460,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     cfli.Visible = arrangement.ShowHead;
                     cfli.ShowNumber = ShowNumber;
                     cfli.FilterCombined = FilterCombined;
-                    cfli.Sort = SortUsed();
                     cfli.RowsFilteredCount = filteredRows.Count;
+                }
+
+                if (thisItem is SortListItem sli) {
+                    sli.Visible = arrangement.ShowHead;
+                    sli.FilterCombined = FilterCombined;
+                    sli.Sort = SortUsed();
                 }
 
                 if (thisItem is NewRowListItem nrli) {
                     nrli.Visible = string.IsNullOrEmpty(_newRowsAllowed);
                     nrli.FilterCombined = FilterCombined;
                 }
-
-                if (thisItem is RowBackgroundListItem rbli) {
-                    rbli.Arrangement = arrangement;
-                }
             }
-
-            #endregion
 
             items.Sort();
 
@@ -2478,22 +2489,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var captionOrder = new List<string>();
 
             // "Angepinnt" zuerst (falls vorhanden)
-            var pinnedCaption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.RowChapter == "Angepinnt");
-            if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.RowChapter.ToUpperInvariant()); }
+            var pinnedCaption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.ChapterText == "Angepinnt");
+            if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.ChapterText.ToUpperInvariant()); }
 
             // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
             foreach (var dataItem in sortedDataItems) {
-                captionOrder.AddIfNotExists(dataItem.AlignsToCaption);
+                captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
             }
 
             #endregion
 
-            // Neue sortierte Liste erstellen
+            #region Neue sortierte Liste erstellen
+
             var sortedItems = new List<AbstractListItem>();
 
-            #region Den Kopf oben erstellen an erster Stelle
-
             if (columnHead?.Visible == true) { sortedItems.Add(columnHead); }
+            if (sortAnzeige?.Visible == true) { sortedItems.Add(sortAnzeige); }
             if (columnFilter?.Visible == true) { sortedItems.Add(columnFilter); }
             if (newRow?.Visible == true) { sortedItems.Add(newRow); }
 
@@ -2502,14 +2513,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // Captions und ihre RowDataListItems in der ermittelten Reihenfolge hinzufügen
             foreach (var captionKey in captionOrder) {
                 // Caption hinzufügen
-                var caption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.RowChapter.Equals(captionKey, StringComparison.OrdinalIgnoreCase));
+                var caption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.ChapterText.Equals(captionKey, StringComparison.OrdinalIgnoreCase));
 
                 if (caption != null) { sortedItems.Add(caption); }
 
                 if (!_collapsed.Contains(captionKey)) {
                     // Alle RowDataListItems dieser Caption hinzufügen
                     var captionDataItems = sortedDataItems
-                        .Where(x => x.AlignsToCaption == captionKey)
+                        .Where(x => x.AlignsToChapter == captionKey)
                         .ToList();
                     sortedItems.AddRange(captionDataItems);
                 }
@@ -2750,8 +2761,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var did = false;
 
         foreach (var thisR in r) {
-            if (thisR is RowCaptionListItem { IsDisposed: false, Visible: true } rcli) {
-                if (rcli.Expanded != t.Contains(rcli.RowChapter)) {
+            if (thisR is RowCaptionListItem { IsDisposed: false } rcli) {
+                if (rcli.Expanded == t.Contains(rcli.ChapterText)) {
                     rcli.Expanded = !rcli.Expanded;
                     did = true;
                 }

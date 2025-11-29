@@ -35,28 +35,14 @@ public sealed class RowDataListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public RowDataListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Key(row, alignsToCaption), arrangement) {
+    public RowDataListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Key(row, alignsToCaption), arrangement, alignsToCaption) {
         Row = row;
         MarkYellow = false;
-        AlignsToCaption = alignsToCaption;
     }
 
     #endregion
 
     #region Properties
-
-    /// <summary>
-    /// Großschreibung
-    /// </summary>
-    public string AlignsToCaption {
-        get;
-        set {
-            value = value.ToUpperInvariant();
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
 
     public bool MarkYellow {
         get;

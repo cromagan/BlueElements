@@ -37,8 +37,8 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public RowCaptionListItem(string chapter, ColumnViewCollection arrangement) : base(Key(null, chapter), arrangement) {
-        RowChapter = chapter;
+    public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Key(null, chapterText), arrangement, chapterText.Trim('\\').PathParent()) {
+        ChapterText = chapterText;
         Expanded = true;
     }
 
@@ -46,11 +46,11 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     #region Properties
 
+    public string ChapterText { get; }
     public bool Expanded { get; set; }
 
     public BlueFont Font_RowChapter => Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift);
     public override string QuickInfo => string.Empty;
-    public string RowChapter { get; }
 
     #endregion
 
@@ -72,7 +72,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
         var Font_RowChapter_Scaled = Font_RowChapter.Scale(scale);
 
-        var tmp = RowChapter.Trim('\\');
+        var tmp = ChapterText.Trim('\\');
 
         var p14 = ZoomPad.GetPix(14, scale);
         var p5 = ZoomPad.GetPix(5, scale);
@@ -80,22 +80,22 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
         var si = Font_RowChapter_Scaled.MeasureString(tmp);
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionModified);
-        var CaptionPos = new Rectangle(1, (int)(positionModified.Bottom - si.Height - p5), (int)si.Width + p23 + p14, (int)si.Height + p5);
+        var buttonPos = new Rectangle(1, (int)(positionModified.Bottom - si.Height - p5 -2), (int)si.Width + p23 + p14, (int)si.Height + p5);
 
         if (!Expanded) {
             var x = new ExtText(Design.Button_CheckBox, States.Checked);
-            Button.DrawButton(null, gr, Design.Button_CheckBox, States.Checked, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, CaptionPos, false);
-            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, CaptionPos.Top + p5);
+            Button.DrawButton(null, gr, Design.Button_CheckBox, States.Checked, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, buttonPos, false);
+            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, buttonPos.Top + p5);
         } else {
             var x = new ExtText(Design.Button_CheckBox, States.Standard);
-            Button.DrawButton(null, gr, Design.Button_CheckBox, States.Standard, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, CaptionPos, false);
-            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, CaptionPos.Top + p5);
+            Button.DrawButton(null, gr, Design.Button_CheckBox, States.Standard, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, buttonPos, false);
+            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, buttonPos.Top + p5);
         }
-        Font_RowChapter_Scaled.DrawString(gr, tmp, p23, CaptionPos.Top);
+        Font_RowChapter_Scaled.DrawString(gr, tmp, p23, buttonPos.Top);
         //gr.DrawLine(Skin.PenLinieDick, 0, positionModified.Y, positionModified.Width, positionModified.Y);
     }
 
-    protected override string GetCompareKey() => RowChapter;
+    protected override string GetCompareKey() => ChapterText;
 
     #endregion
 }

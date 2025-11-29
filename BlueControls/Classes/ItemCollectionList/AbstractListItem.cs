@@ -75,7 +75,7 @@ public static class AbstractListItemExtension {
         } catch { }
     }
 
-    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int x, int y, float shiftX, float shiftY) => list.FirstOrDefault(thisItem => thisItem?.Contains((int)(x + shiftX), (int)(y + shiftY)) == true);
+    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int x, int y, float shiftX, float shiftY) => list.FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem?.Contains((int)(x + shiftX), (int)(y + shiftY)) == true);
 
     /// <summary>
     /// Gibt das erste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.

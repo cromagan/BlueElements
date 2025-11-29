@@ -35,7 +35,7 @@ public sealed class NewRowListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public NewRowListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement) {
+    public NewRowListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
     }
 
     #endregion

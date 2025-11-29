@@ -59,13 +59,27 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
     #region Constructors
 
-    protected RowBackgroundListItem(string keyname, ColumnViewCollection? arrangement) : base(keyname, true) {
+    protected RowBackgroundListItem(string keyname, ColumnViewCollection? arrangement, string alignsToCaption) : base(keyname, true) {
         Arrangement = arrangement;
+        AlignsToChapter = alignsToCaption;
     }
 
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Großschreibung
+    /// </summary>
+    public string AlignsToChapter {
+        get;
+        private set {
+            value = value.ToUpperInvariant();
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     public ColumnViewCollection? Arrangement {
         get;

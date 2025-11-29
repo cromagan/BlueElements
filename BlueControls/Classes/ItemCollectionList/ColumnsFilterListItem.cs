@@ -36,7 +36,7 @@ public sealed class ColumnsFilterListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public ColumnsFilterListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement) {
+    public ColumnsFilterListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
     }
 
     #endregion
@@ -62,7 +62,6 @@ public sealed class ColumnsFilterListItem : RowBackgroundListItem {
     public override string QuickInfo => string.Empty;
     public int RowsFilteredCount { get; set; }
     public bool ShowNumber { get; set; }
-    public RowSortDefinition? Sort { get; set; }
 
     #endregion
 
@@ -98,7 +97,7 @@ public sealed class ColumnsFilterListItem : RowBackgroundListItem {
 
         var paf = positionModified.Height;
 
-        var pts = positionModified.Height * 0.8;
+        var pts = (int)(positionModified.Height * 0.8);
 
         if (FilterCombined != null) {
             if (FilterCombined.HasAlwaysFalse() && viewItem.AutoFilterSymbolPossible) {
@@ -137,19 +136,6 @@ public sealed class ColumnsFilterListItem : RowBackgroundListItem {
 
         if (ShowNumber && Arrangement != null) {
             Font_Numbers.Scale(scale).DrawString(gr, "#" + Arrangement.IndexOf(viewItem), positionModified.X, positionModified.Top);
-        }
-
-        #endregion
-
-        #region Sortierrichtung Zeichnen
-
-        if (Sort != null && Sort.UsedForRowSort(viewItem.Column)) {
-            var p5 = ZoomPad.GetPix(5, scale);
-            var p11 = ZoomPad.GetPix(11, scale);
-            var p6 = ZoomPad.GetPix(6, scale);
-            gr.DrawImage(Sort.Reverse ? QuickImage.Get("ZA|" + p11 + "|" + p5 + "||||50") : QuickImage.Get("AZ|" + p11 + "|" + p5 + "||||50"),
-                (float)(positionModified.X + (positionModified.Width / 2.0) - p6),
-                positionModified.Bottom - p6 - paf);
         }
 
         #endregion

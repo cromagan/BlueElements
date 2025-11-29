@@ -34,7 +34,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public ColumnsHeadListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement) {
+    public ColumnsHeadListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
     }
 
     #endregion
