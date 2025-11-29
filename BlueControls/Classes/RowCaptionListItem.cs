@@ -48,6 +48,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     public bool Expanded { get; set; }
 
+    public BlueFont Font_RowChapter => Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift);
     public override string QuickInfo => string.Empty;
     public string RowChapter { get; }
 
@@ -69,7 +70,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
         if (Arrangement == null) { return; }
 
-        var chpF = Arrangement.Font_RowChapter.Scale(scale);
+        var Font_RowChapter_Scaled = Font_RowChapter.Scale(scale);
 
         var tmp = RowChapter.Trim('\\');
 
@@ -77,7 +78,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
         var p5 = ZoomPad.GetPix(5, scale);
         var p23 = ZoomPad.GetPix(23, scale);
 
-        var si = chpF.MeasureString(tmp);
+        var si = Font_RowChapter_Scaled.MeasureString(tmp);
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionModified);
         var CaptionPos = new Rectangle(1, (int)(positionModified.Bottom - si.Height - p5), (int)si.Width + p23 + p14, (int)si.Height + p5);
 
@@ -90,7 +91,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
             Button.DrawButton(null, gr, Design.Button_CheckBox, States.Standard, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, CaptionPos, false);
             gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, CaptionPos.Top + p5);
         }
-        chpF.DrawString(gr, tmp, p23, CaptionPos.Top);
+        Font_RowChapter_Scaled.DrawString(gr, tmp, p23, CaptionPos.Top);
         //gr.DrawLine(Skin.PenLinieDick, 0, positionModified.Y, positionModified.Width, positionModified.Y);
     }
 

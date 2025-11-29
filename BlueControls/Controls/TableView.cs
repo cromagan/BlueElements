@@ -65,7 +65,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public const string CellDataFormat = "BlueElements.CellLink";
 
+    /// <summary>
+    /// Großschreibung
+    /// </summary>
     private readonly List<string> _collapsed = [];
+
     private readonly object _lockUserAction = new();
 
     private string _arrangement = string.Empty;
@@ -961,7 +965,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    public bool EnsureVisible(ColumnViewCollection ca, ColumnViewItem? viewItem, AbstractListItem? row) => EnsureVisible(viewItem) && EnsureVisible(ca, row);
+    public bool EnsureVisible(ColumnViewCollection ca, ColumnViewItem? viewItem, AbstractListItem? row) => EnsureVisible(viewItem) && EnsureVisible(row);
 
     public void ExpandAll() {
         var did = false;
@@ -1191,10 +1195,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 return "Zelle konnte nicht angezeigt werden.";
             }
 
-            var realHead = cellInThisTableColumn.RealHead(Zoom, ShiftX);
-            if (realHead.Right < 0 || realHead.Left > DisplayRectangle.Width) {
-                return "Spalte konnte nicht angezeigt werden.";
-            }
+            //var realHead = cellInThisTableColumn.RealHead(Zoom, ShiftX);
+            //if (realHead.Right < 0 || realHead.Left > DisplayRectangle.Width) {
+            //    return "Spalte konnte nicht angezeigt werden.";
+            //}
 
             if (!cellInThisTableRow.IsVisible(DisplayRectangle)) {
                 return "Die Zeile wird nicht angezeigt.";
@@ -1853,18 +1857,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_mouseOverColumn?.Column is not { IsDisposed: false } column) { return; }
 
             if (e.Button == MouseButtons.Left) {
-                if (Mouse_IsInAutofilter(_mouseOverColumn, e)) {
+                if (_mouseOverRowItem is ColumnsFilterListItem cfli) {
                     var screenX = Cursor.Position.X - e.X;
                     var screenY = Cursor.Position.Y - e.Y;
-                    AutoFilter_Show(ca, _mouseOverColumn, screenX, screenY);
+                    AutoFilter_Show(ca, _mouseOverColumn, screenX, screenY, cfli.Position.Bottom);
                     return;
                 }
 
-                //if (IsInRedcueButton(_mouseOverColumn, e)) {
-                //    _mouseOverColumn.Reduced = !_mouseOverColumn.Reduced;
-                //    Invalidate();
-                //    return;
-                //}
+                if (_mouseOverRowItem is ColumnsHeadListItem) {
+                    _mouseOverColumn.Reduced = !_mouseOverColumn.Reduced;
+                    Invalidate();
+                    return;
+                }
 
                 if (_mouseOverRow?.Row is { IsDisposed: false } r) {
                     OnCellClicked(new CellEventArgs(column, r));
@@ -2060,7 +2064,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         } else {
             _storedView = string.Empty;
             if (CurrentArrangement is { } ca) {
-                ca.Invalidate_HeadSize();
                 ca.Invalidate_ContentWidthOfAllItems();
                 ca.Invalidate_XOfAllItems();
             }
@@ -2185,7 +2188,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         OnAutoFilterClicked(new FilterEventArgs(e.Filter));
     }
 
-    private void AutoFilter_Show(ColumnViewCollection ca, ColumnViewItem columnviewitem, int screenx, int screeny) {
+    private void AutoFilter_Show(ColumnViewCollection ca, ColumnViewItem columnviewitem, int screenx, int screeny, int bottom) {
         if (columnviewitem.Column == null) { return; }
         if (!ca.ShowHead) { return; }
         if (!columnviewitem.AutoFilterSymbolPossible) { return; }
@@ -2208,10 +2211,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        var realHead = columnviewitem.RealHead(Zoom, ShiftX);
+        var headX = ZoomPad.GetPix((columnviewitem.X ?? 0), Zoom) - ShiftX;
+
+        //var headWith =  ZoomPad.GetPix(columnviewitem.DrawWidth() , Zoom);
 
         _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.DrawWidth(), columnviewitem.GetRenderer(SheetStyle));
-        _autoFilter.Position_LocateToPosition(new Point(screenx + realHead.Left, screeny + realHead.Bottom));
+        _autoFilter.Position_LocateToPosition(new Point((int)(screenx + headX), screeny + bottom));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
         //Develop.Debugprint_BackgroundThread();
@@ -2288,10 +2293,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         List<RowItem> filteredRows = [.. RowsFiltered];
         var arrangement = CurrentArrangement;
 
-        foreach (var thisItem in items) {
-            thisItem.Visible = false;
-        }
-
         if (arrangement == null) { return; }
 
         var nullcap = string.Empty;
@@ -2299,12 +2300,31 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #region Spaltenkopf erstellen
 
-        var head = items.First<ColumnsHeadListItem>();
-        if (head == null) {
-            head = new ColumnsHeadListItem(arrangement);
-            items.Add(head);
+        var columnHead = items.First<ColumnsHeadListItem>();
+        if (columnHead == null) {
+            columnHead = new ColumnsHeadListItem(arrangement);
+            items.Add(columnHead);
         }
-        head.Visible = true;
+
+        #endregion
+
+        #region Filter erstellen
+
+        var columnFilter = items.First<ColumnsFilterListItem>();
+        if (columnFilter == null) {
+            columnFilter = new ColumnsFilterListItem(arrangement);
+            items.Add(columnFilter);
+        }
+
+        #endregion
+
+        #region NeueZeileItem erstellen
+
+        var newRow = items.First<NewRowListItem>();
+        if (newRow == null) {
+            newRow = new NewRowListItem(arrangement);
+            items.Add(newRow);
+        }
 
         #endregion
 
@@ -2338,49 +2358,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     capi = new RowCaptionListItem(thisCap, arrangement);
                     items.Add(capi);
                 }
-                capi.Visible = true;
+                //capi.Visible = true;
             }
         }
-
-        #endregion
-
-        //#region Collapsed ermitteln
-
-        //var l = new List<string>();
-
-        //foreach (var thisR in _items) {
-        //    if (thisR is RowCaptionListItem { IsDisposed: false, Visible: true, Expanded: false } rcli) { l.Add(rcli.RowChapter); }
-        //}
-
-        //_collapsed.Clear();
-        //_collapsed.AddRange(l.SortedDistinctList());
-
-        //#endregion
-
-        #region Collapsed ermitteln
-
-        var l = new List<string>();
-
-        foreach (var thisR in items) {
-            lock (lockMe) {
-                if (thisR is RowCaptionListItem { IsDisposed: false, Visible: true, Expanded: false } rcli) {
-                    l.Add(rcli.RowChapter);
-
-                    // Alle Untereinträge hinzufügen
-                    var prefix = rcli.RowChapter + "\\";
-                    foreach (var otherR in items) {
-                        if (otherR is RowCaptionListItem { IsDisposed: false } otherRcli) {
-                            if (otherRcli.RowChapter.StartsWith(prefix)) {
-                                l.Add(otherRcli.RowChapter);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        _collapsed.Clear();
-        _collapsed.AddRange(l.SortedDistinctList());
 
         #endregion
 
@@ -2411,51 +2391,84 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     }
                 }
                 it.MarkYellow = markYellow;
-                it.Visible = true;
             }
         });
 
         #endregion
 
+        // ---------------------------------------------------------------------------
+
+        #region Collapsed ermitteln
+
+        var l = new List<string>();
+
+        foreach (var thisR in items) {
+            lock (lockMe) {
+                if (thisR is RowCaptionListItem { IsDisposed: false, Expanded: false } rcli) {
+                    l.Add(rcli.RowChapter.ToUpperInvariant());
+
+                    // Alle Untereinträge hinzufügen
+                    var prefix = rcli.RowChapter.ToUpperInvariant() + "\\";
+                    foreach (var otherR in items) {
+                        if (otherR is RowCaptionListItem { IsDisposed: false } otherRcli) {
+                            if (otherRcli.RowChapter.ToUpperInvariant().StartsWith(prefix)) {
+                                l.Add(otherRcli.RowChapter);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        _collapsed.Clear();
+        _collapsed.AddRange(l.SortedDistinctList());
+
+        #endregion
+
         lock (lockMe) {
 
-            #region Visible richtig setzen
+            #region Attribute und Visible ALLER Items setzen
 
             foreach (var thisItem in items) {
                 if (thisItem is RowDataListItem rdli) {
-                    rdli.Visible = !_collapsed.Contains(rdli.AlignsToCaption);
+                    rdli.UserDefCompareKey = sortused.Reverse
+                    ? "~" + rdli.Row.CompareKey(sortused)
+                    : rdli.Row.CompareKey(sortused);
+                    //rdli.Visible = !_collapsed.Contains(rdli.AlignsToCaption);
+                    thisItem.Visible = false;
                 }
                 if (thisItem is RowCaptionListItem rcli) {
-                    rcli.Visible = !_collapsed.Contains(rcli.RowChapter.PathParent());
+                    thisItem.Visible = false;
+                    //rcli.Visible = !_collapsed.Contains(rcli.RowChapter.PathParent());
                 }
                 if (thisItem is ColumnsHeadListItem chli) {
-                    chli.Visible = true;
+                    chli.Visible = arrangement.ShowHead;
+                }
+                if (thisItem is ColumnsFilterListItem cfli) {
+                    cfli.Visible = arrangement.ShowHead;
+                    cfli.ShowNumber = ShowNumber;
+                    cfli.FilterCombined = FilterCombined;
+                    cfli.Sort = SortUsed();
+                    cfli.RowsFilteredCount = filteredRows.Count;
+                }
+
+                if (thisItem is NewRowListItem nrli) {
+                    nrli.Visible = string.IsNullOrEmpty(_newRowsAllowed);
+                    nrli.FilterCombined = FilterCombined;
+                }
+
+                if (thisItem is RowBackgroundListItem rbli) {
+                    rbli.Arrangement = arrangement;
                 }
             }
 
             #endregion
 
-            #region UserDefCompareKey für RowDataListItem setzen
-
-            foreach (var thisItem in items) {
-                if (thisItem is RowDataListItem rdli && rdli.Visible) {
-                    rdli.UserDefCompareKey = sortused.Reverse
-                        ? "~" + rdli.Row.CompareKey(sortused)
-                        : rdli.Row.CompareKey(sortused);
-                }
-            }
-
-            // Sortieren
             items.Sort();
-
-            #endregion
 
             #region Sortierte Reihenfolge der sichtbaren RowDataListItems ermitteln
 
-            var sortedDataItems = items
-                .OfType<RowDataListItem>()
-                .Where(x => x.Visible)
-                .ToList();
+            var sortedDataItems = items.OfType<RowDataListItem>().ToList();
 
             #endregion
 
@@ -2466,7 +2479,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             // "Angepinnt" zuerst (falls vorhanden)
             var pinnedCaption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.RowChapter == "Angepinnt");
-            if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.RowChapter); }
+            if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.RowChapter.ToUpperInvariant()); }
 
             // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
             foreach (var dataItem in sortedDataItems) {
@@ -2478,25 +2491,28 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // Neue sortierte Liste erstellen
             var sortedItems = new List<AbstractListItem>();
 
-            #region ColumnsHeadListItem an erster Stelle
+            #region Den Kopf oben erstellen an erster Stelle
 
-            var columnHead = items.OfType<ColumnsHeadListItem>().FirstOrDefault();
-            if (columnHead != null && columnHead.Visible) { sortedItems.Add(columnHead); }
+            if (columnHead?.Visible == true) { sortedItems.Add(columnHead); }
+            if (columnFilter?.Visible == true) { sortedItems.Add(columnFilter); }
+            if (newRow?.Visible == true) { sortedItems.Add(newRow); }
 
             #endregion
 
             // Captions und ihre RowDataListItems in der ermittelten Reihenfolge hinzufügen
             foreach (var captionKey in captionOrder) {
                 // Caption hinzufügen
-                var caption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.RowChapter.ToUpperInvariant() == captionKey.ToUpperInvariant());
+                var caption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.RowChapter.Equals(captionKey, StringComparison.OrdinalIgnoreCase));
 
                 if (caption != null) { sortedItems.Add(caption); }
 
-                // Alle RowDataListItems dieser Caption hinzufügen
-                var captionDataItems = sortedDataItems
-                    .Where(x => x.AlignsToCaption == captionKey)
-                    .ToList();
-                sortedItems.AddRange(captionDataItems);
+                if (!_collapsed.Contains(captionKey)) {
+                    // Alle RowDataListItems dieser Caption hinzufügen
+                    var captionDataItems = sortedDataItems
+                        .Where(x => x.AlignsToCaption == captionKey)
+                        .ToList();
+                    sortedItems.AddRange(captionDataItems);
+                }
             }
 
             // ══════════════════════════════════════════════════════════════
@@ -2504,12 +2520,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // ══════════════════════════════════════════════════════════════
             var y = 0;
             foreach (var thisItem in sortedItems) {
-                if (!thisItem.Visible) { continue; }
-
-                if (thisItem is RowBackgroundListItem it) {
-                    it.Arrangement = arrangement;
-                }
-
+                thisItem.Visible = true;
                 thisItem.Position = new Rectangle(0, y, displayR.Width, thisItem.HeightForListBox(ListBoxAppearance.Listbox, displayR.Width, Design.Item_Listbox));
                 y = thisItem.Position.Bottom;
             }
@@ -2547,12 +2558,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         switch (dia) {
             case EditTypeTable.Textfeld:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
+                Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, BTB, 0);
                 break;
 
             case EditTypeTable.Textfeld_mit_Auswahlknopf:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow, BCB, 20, 18);
+                Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, BCB, 20);
                 break;
 
             case EditTypeTable.Dropdown_Single:
@@ -2669,35 +2680,37 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Develop.Debugprint_BackgroundThread();
     }
 
-    private bool Cell_Edit_TextBox(ColumnViewCollection ca, ColumnViewItem viewItem, RowDataListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow, TextBox box, int addWith, int isHeight) {
+    private bool Cell_Edit_TextBox(ColumnViewCollection ca, ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow, TextBox box, int addWith) {
         if (IsDisposed) { return false; }
 
-        if (contentHolderCellColumn != viewItem.Column) {
-            if (contentHolderCellRow == null) {
-                NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
-                return false;
-            }
-            if (cellInThisTableRow == null) {
-                NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
-                return false;
-            }
-        }
+        if (viewItem.Column == null) { return false; }
 
-        var realHead = viewItem.RealHead(Zoom, ShiftX);
+        //if (contentHolderCellColumn != viewItem.Column) {
+        //    if (contentHolderCellRow == null) {
+        //        NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
+        //        return false;
+        //    }
+        //    if (cellInThisTableRow == null) {
+        //        NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
+        //        return false;
+        //    }
+        //}
 
-        box.GetStyleFrom(contentHolderCellColumn);
+        var headX = (int)(ZoomPad.GetPix((viewItem.X ?? 0), Zoom) - ShiftX);
 
-        if (cellInThisTableRow != null) {
-            var h = cellInThisTableRow.Position.Height;
-            if (isHeight > 0) { h = isHeight; }
-            box.Location = new Point(realHead.X, cellInThisTableRow.Position.Y);
-            box.Size = new Size(realHead.Width + addWith, GetPix(h, Zoom));
+        var headWith = ZoomPad.GetPix(viewItem.DrawWidth(), Zoom);
 
-            box.Text = contentHolderCellRow?.CellGetString(contentHolderCellColumn) ?? string.Empty;
-        } else {
+        box.GetStyleFrom(viewItem.Column);
+        RowItem? contentHolderCellRow = null;
+        if (cellInThisTableRow is RowDataListItem rli) {
+            box.Location = new Point(headX, cellInThisTableRow.Position.Y);
+            box.Size = new Size(headWith + addWith, GetPix(cellInThisTableRow.Position.Height, Zoom));
+            box.Text = rli.Row.CellGetString(viewItem.Column);
+            contentHolderCellRow = rli.Row;
+        } else if (cellInThisTableRow is NewRowListItem nrli) {
             // Neue Zeile...
-            box.Location = new Point(realHead.X, realHead.Bottom);
-            box.Size = new Size(realHead.Width + addWith, GetPix(18, Zoom));
+            box.Location = new Point(headX, cellInThisTableRow.Position.Y);
+            box.Size = new Size(headWith + addWith, GetPix(cellInThisTableRow.Position.Height, Zoom));
             box.Text = string.Empty;
         }
 
@@ -2705,9 +2718,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (box is ComboBox cbox) {
             cbox.ItemClear();
-            cbox.ItemAddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, viewItem.GetRenderer(SheetStyle), null));
+            cbox.ItemAddRange(ItemsOf(viewItem.Column, contentHolderCellRow, 1000, viewItem.GetRenderer(SheetStyle), null));
             if (cbox.ItemCount == 0) {
-                return Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
+                return Cell_Edit_TextBox(ca, viewItem, cellInThisTableRow, BTB, 0);
             }
         }
 
@@ -2756,8 +2769,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (ca.IsDisposed) { return null; }
 
         foreach (var thisViewItem in ca) {
-            var headPos = thisViewItem.RealHead(Zoom, ShiftX);
-            if (xpos >= headPos.Left && xpos <= headPos.Right) { return thisViewItem; }
+            if (xpos >= thisViewItem.X && xpos <= thisViewItem.X + thisViewItem.DrawWidth()) { return thisViewItem; }
         }
 
         return null;
@@ -2937,7 +2949,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private bool EnsureVisible(ColumnViewCollection ca, AbstractListItem? rowdata) {
+    private bool EnsureVisible(AbstractListItem? rowdata) {
         if (rowdata is not { }) { return false; }
         //var dispR = DisplayRectangleWithoutSlider();
 
@@ -2954,7 +2966,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //    ShiftY = ShiftY + rowY + GetPix(rowdata.Position.Height, Zoom) - (dispR.Height + FilterleisteHeight);
         //}
 
-        EnsureVisibleY(rowdata.Position); // TODO: Kopdhöhe berücksichtigen
+        EnsureVisibleY(rowdata.Position.Bottom);
+        EnsureVisibleY(rowdata.Position.Top);
         return true;
     }
 
@@ -2976,7 +2989,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //} else if (realhead.Right > dispR.Width) {
         //    ShiftX = ShiftX + realhead.Right - dispR.Width;
         //}
-        EnsureVisibleX(viewItem.RealHead(Zoom, ShiftX));
+
+        var headX = (int)(ZoomPad.GetPix((viewItem.X ?? 0), Zoom) - ShiftX);
+        var headWith = ZoomPad.GetPix(viewItem.DrawWidth(), Zoom);
+
+        EnsureVisibleX(headX + headWith);
+        EnsureVisibleX(headX);
 
         return true;
     }
@@ -3033,7 +3051,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate();
     }
 
-    private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, ShiftX, 0).Contains(e.Location);
+    //private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, ShiftX, 0).Contains(e.Location);
 
     private void Neighbour(ColumnViewItem? column, RowDataListItem? row, Direction direction, out ColumnViewItem? newColumn, out RowDataListItem? newRow) {
         if (CurrentArrangement is not { IsDisposed: false } ca) {

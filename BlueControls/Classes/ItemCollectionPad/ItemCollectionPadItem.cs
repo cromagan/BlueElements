@@ -45,7 +45,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows.Data;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;

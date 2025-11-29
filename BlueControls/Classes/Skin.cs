@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
-using System.Windows;
 using System.Windows.Forms;
 using static BlueBasics.Polygons;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;

@@ -20,10 +20,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
@@ -41,7 +39,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Fields
 
-    public static readonly int AutoFilterSize = 22;
     private Color _backColor_ColumnCell = Color.Transparent;
     private Color _backColor_ColumnHead = Color.Transparent;
     private ColumnItem? _column;
@@ -50,8 +47,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private Color _fontColor_Caption = Color.Transparent;
     private bool _horizontal;
     private Renderer_Abstract? _renderer;
-
-    private SizeF _tmpCaptionTextSize = SizeF.Empty;
 
     #endregion
 
@@ -113,18 +108,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string Caption => Column?.Caption ?? "[Spalte]";
 
-    public QuickImage? CaptionBitmap {
-        get {
-            if (string.IsNullOrEmpty(Column?.CaptionBitmapCode)) { return null; }
-            if (field != null) { return field; }
-
-            field = QuickImage.Get(Column.CaptionBitmapCode + "|100");
-            return field;
-        }
-
-        private set;
-    }
-
     public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
 
     public string CaptionGroup2 => Column?.CaptionGroup2 ?? string.Empty;
@@ -138,7 +121,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             UnRegisterEvents();
             _column = value;
-            Invalidate_Fonts();
+            Invalidate_ContentWidth();
             RegisterEvents();
         }
     }
@@ -152,59 +135,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public BlueFont Font_Head_Colored {
-        get {
-            if (IsDisposed) { return BlueFont.DefaultFont; }
-
-            if (field == null) {
-                if (_column != null) {
-                    var baseFont = Font_Head_Default;
-                    field = BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, FontColor_Caption, Color.Transparent, Color.Transparent);
-                } else {
-                    field = Font_Head_Default;
-                }
-            }
-            return field;
-        }
-
-        private set;
-    }
-
-    public BlueFont Font_Head_Default { get => IsDisposed ? BlueFont.DefaultFont : field ??= Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben); private set; }
-
-    public BlueFont Font_Numbers {
-        get {
-            if (IsDisposed) { return BlueFont.DefaultFont; }
-
-            if (field == null) {
-                var baseFont = Font_Head_Default;
-                field = BlueFont.Get(baseFont.FontName, baseFont.Size, false, false, false, false, Color.Black, Color.White, Color.Transparent);
-            }
-            return field;
-        }
-
-        private set;
-    }
-
-    public BlueFont Font_TextInFilter {
-        get {
-            if (IsDisposed) { return BlueFont.DefaultFont; }
-            if (field == null) {
-                var baseFont = Font_Head_Default;
-                field = BlueFont.Get(baseFont.FontName, baseFont.Size - 2, true, false, false, false, Color.White, Color.Red, Color.Transparent);
-            }
-            return field;
-        }
-
-        private set;
-    }
-
     public Color FontColor_Caption {
         get => Column != null && _fontColor_Caption.IsMagentaOrTransparent() ? Column.ForeColor : _fontColor_Caption;
         set {
             if (_fontColor_Caption.ToArgb() == value.ToArgb()) { return; }
             _fontColor_Caption = value;
-            Invalidate_Fonts();
             OnPropertyChanged();
         }
     }
@@ -264,7 +199,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public string Renderer { get; set; }
 
     public string RendererSettings { get; set; }
-
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : Win11;
 
     public int? TmpIfFilterRemoved { get; set; }
@@ -310,46 +244,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return newContentWidth;
     }
 
-    public Rectangle AutoFilterLocation(float scale, float sliderx, int add) {
-        // Manchmal sind filter da, auch ohne Autofilter-Button
-        //if (!AutoFilterSymbolPossible) { return Rectangle.Empty; }
-
-        var realHead = RealHead(scale, sliderx);
-        var size = (int)(AutoFilterSize * scale);
-
-        return new Rectangle(realHead.Right - size, realHead.Bottom - size + add, size, size);
-    }
-
-    public SizeF ColumnCaptionText_Size() {
-        if (Column is not { IsDisposed: false } c) { return new SizeF(16, 16); }
-
-        if (!_tmpCaptionTextSize.IsEmpty) { return _tmpCaptionTextSize; }
-
-        _tmpCaptionTextSize = Font_Head_Default.MeasureString(c.Caption.Replace("\r", "\r\n"));
-        return _tmpCaptionTextSize;
-    }
-
-    public SizeF ColumnHead_Size() {
-        if (Column is not { IsDisposed: false } c) { return new SizeF(16, 16); }
-
-        var ccts = ColumnCaptionText_Size();
-
-        var wi = ccts.Height + 4;
-        var he = ccts.Width + 3;
-
-        if (!IsDisposed) {
-            if (!string.IsNullOrEmpty(c.CaptionGroup3)) {
-                he += ColumnCaptionSizeY * 3;
-            } else if (!string.IsNullOrEmpty(c.CaptionGroup2)) {
-                he += ColumnCaptionSizeY * 2;
-            } else if (!string.IsNullOrEmpty(c.CaptionGroup1)) {
-                he += ColumnCaptionSizeY;
-            }
-        }
-
-        return new SizeF(wi, he);
-    }
-
     public void Dispose() =>
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);//GC.SuppressFinalize(this);
@@ -360,7 +254,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 UnRegisterEvents();
                 Parent = null;
                 _column = null;
-                Invalidate_Fonts();
             }
             IsDisposed = true;
         }
@@ -391,7 +284,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 : Math.Min(Contentwidth, (int)(Parent.ClientWidth * 0.6));
         }
 
-        _drawWidth = Math.Max((int)_drawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
+        _drawWidth = Math.Max((int)_drawWidth, ColumnsFilterListItem.AutoFilterSize); // Mindestens so groß wie der Autofilter;
         return (int)_drawWidth;
     }
 
@@ -413,11 +306,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         _drawWidth = null;
 
         Parent?.Invalidate_XOfAllItems();
-    }
-
-    public void Invalidate_Head() {
-        _tmpCaptionTextSize = SizeF.Empty;
-        CaptionBitmap = null;
     }
 
     public void Invalidate_X() => X = null;
@@ -508,20 +396,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string ReadableText() => _column?.ReadableText() ?? "?";
 
-    public Rectangle RealHead(float scale, float sliderx) {
-        if (Parent is null) { return Rectangle.Empty; }
-
-        if (!Parent.ShowHead) { return Rectangle.Empty; }
-
-        if (X == null) { Parent.ComputeAllColumnPositions(); }
-
-        if (X == null) { return Rectangle.Empty; }
-
-        if (ViewType == ViewType.PermanentColumn) { sliderx = 0; }
-
-        return new Rectangle((int)(((int)X * scale) - sliderx), 0, (int)(DrawWidth() * scale), (int)(Parent.HeadSize() * scale));
-    }
-
     //public Rectangle ReduceButtonLocation(float scale, float sliderx) {
     //    var r = RealHead(scale, sliderx);
     //    var size = (int)(18 * scale);
@@ -542,21 +416,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _column_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate_Fonts();
+    private void _column_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate_ContentWidth();
 
-    private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_Fonts();
+    private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_ContentWidth();
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Column == _column) { Invalidate_ContentWidth(); }
-    }
-
-    private void Invalidate_Fonts() {
-        Font_Head_Default = null;
-        Font_Head_Colored = null;
-        Font_Numbers = null;
-        Font_TextInFilter = null;
-        Invalidate_Head();
-        Invalidate_ContentWidth();
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -19,9 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls;
 using BlueControls.BlueTableDialogs;
-using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
@@ -41,7 +39,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<string> _permissionGroups_show = [];
-    private int? _headSize;
 
     #endregion
 
@@ -83,7 +80,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public int Count => _internal.Count;
     public Type? Editor { get; set; }
     public int FilterRows { get; internal set; } = 1;
-    public BlueFont Font_RowChapter { get; internal set; } = BlueFont.DefaultFont;
+
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
@@ -99,8 +96,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             }
         }
     }
-
-    public int RowChapterHeight { get; internal set; } = 20;
 
     public string SheetStyle {
         get;
@@ -267,33 +262,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
-    public int HeadSize() {
-        if (_headSize != null) { return (int)_headSize; }
-
-        if (!ShowHead || Count - 1 < 0) {
-            _headSize = 0;
-            return 0;
-        }
-        var tmpheadSize = 16;
-
-        foreach (var thisViewItem in this) {
-            if (thisViewItem?.Column != null) {
-                tmpheadSize = Math.Max(tmpheadSize, (int)thisViewItem.ColumnHead_Size().Height);
-            }
-        }
-
-        tmpheadSize += 8;
-        tmpheadSize += ColumnViewItem.AutoFilterSize;
-
-        _headSize = tmpheadSize;
-
-        return tmpheadSize;
-    }
-
     public void HideSystemColumns() {
         foreach (var thisViewItem in this) {
             if (thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn())) {
-                Remove(thisViewItem);
+                _internal.Remove(thisViewItem);
                 HideSystemColumns();
                 return;
             }
@@ -305,14 +277,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Invalidate_ContentWidthOfAllItems() {
         foreach (var thisViewItem in _internal) {
             thisViewItem?.Invalidate_ContentWidth();
-        }
-    }
-
-    public void Invalidate_HeadSize() {
-        _headSize = null;
-
-        foreach (var thisViewItem in this) {
-            thisViewItem.Invalidate_Head();
         }
     }
 
@@ -491,16 +455,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void OnStyleChanged() {
-        Invalidate_HeadSize();
-        Font_RowChapter = Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift);
-        RowChapterHeight = (int)Font_RowChapter.CharHeight + 1;
         StyleChanged?.Invoke(this, System.EventArgs.Empty);
-    }
-
-    private void Remove(ColumnViewItem columnViewItem) {
-        if (_internal.Remove(columnViewItem)) {
-            //columnViewItem.Changed -= ColumnViewItem_Changed;
-        }
     }
 
     #endregion

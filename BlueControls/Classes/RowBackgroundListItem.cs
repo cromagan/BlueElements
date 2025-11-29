@@ -24,8 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using BlueBasics.Enums;
-using BlueControls.CellRenderer;
 using BlueTable.Enums;
 using System.Drawing.Drawing2D;
 using BlueControls;

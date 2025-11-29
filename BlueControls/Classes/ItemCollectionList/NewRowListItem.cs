@@ -19,9 +19,9 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueTable.Enums;
-using System;
 using System.Drawing;
 
 namespace BlueTable;
@@ -31,44 +31,19 @@ namespace BlueTable;
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public sealed class RowDataListItem : RowBackgroundListItem {
+public sealed class NewRowListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public RowDataListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Key(row, alignsToCaption), arrangement) {
-        Row = row;
-        MarkYellow = false;
-        AlignsToCaption = alignsToCaption;
+    public NewRowListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement) {
     }
 
     #endregion
 
     #region Properties
 
-    /// <summary>
-    /// Großschreibung
-    /// </summary>
-    public string AlignsToCaption {
-        get;
-        set {
-            value = value.ToUpperInvariant();
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public bool MarkYellow {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public override string QuickInfo => Row.GetQuickInfo();
-    public RowItem Row { get; }
+    public FilterCollection? FilterCombined { get; set; }
+    public override string QuickInfo => string.Empty;
 
     #endregion
 
@@ -79,32 +54,31 @@ public sealed class RowDataListItem : RowBackgroundListItem {
 
         if (viewItem.Column == null) { return; }
 
-        if (!viewItem.Column.SaveContent) {
-            Row.CheckRow();
+        var p14 = ZoomPad.GetPix(14, scale);
+        var p1 = ZoomPad.GetPix(1, scale);
+
+        string toDrawd;
+        var plus = 0;
+        QuickImage? qi;
+        if (viewItem.Column.IsFirst) {
+            toDrawd = "[Neue Zeile]";
+            plus = ZoomPad.GetPix(16, scale);
+            qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
+        } else {
+            toDrawd = FilterCollection.InitValue(viewItem.Column, false, false, [.. FilterCombined]) ?? string.Empty;
+            qi = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
         }
 
-        var toDrawd = Row.CellGetString(viewItem.Column);
-        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionModified.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+        if (!string.IsNullOrEmpty(toDrawd)) {
+            gr.DrawImage(qi, new Point((int)positionModified.Left + p1, (int)positionModified.Top + p1));
+            viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, null, positionModified.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+        }
     }
 
     public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
-        if (IsDisposed || Row.IsDisposed || Arrangement is null) { return new(16, 16); }
-
-        var drawHeight = 18;
-
-        foreach (var thisViewItem in Arrangement) {
-            if (thisViewItem.Column is { IsDisposed: false } tmpc) {
-                var renderer = thisViewItem.GetRenderer(SheetStyle);
-                drawHeight = Math.Max(drawHeight, renderer.ContentSize(Row.CellGetString(tmpc), tmpc.DoOpticalTranslation).Height);
-            }
-        }
-
-        drawHeight = Math.Min(drawHeight, 200);
-        drawHeight = Math.Max(drawHeight, 18);
-
-        return new(100, drawHeight);
+        return new(18, 18);
     }
 
     #endregion

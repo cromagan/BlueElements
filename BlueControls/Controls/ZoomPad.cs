@@ -261,23 +261,23 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         OnMouseWheel(x);
     }
 
-    internal void EnsureVisibleX(Rectangle position) {
+    internal void EnsureVisibleX(int x) {
         var pa = AvailablePaintArea();
 
-        if (position.Left < pa.Left) {
-            ShiftX = ShiftX + position.Left - pa.Width;
-        } else if (position.Right > pa.Width) {
-            ShiftX = ShiftX + position.Right - pa.Width;
+        if (x < pa.Left) {
+            ShiftX = ShiftX + x - pa.Width;
+        } else if (x > pa.Width) {
+            ShiftX = ShiftX + x - pa.Width;
         }
     }
 
-    internal void EnsureVisibleY(Rectangle position) {
+    internal void EnsureVisibleY(int y) {
         var pa = AvailablePaintArea();
 
-        if (position.Top < pa.Top) {
-            ShiftY = ShiftY + position.Top - pa.Height;
-        } else if (position.Right > pa.Width) {
-            ShiftY = ShiftY + position.Bottom - pa.Height;
+        if (y < pa.Top) {
+            ShiftY = ShiftY + y - pa.Height;
+        } else if (y > pa.Width) {
+            ShiftY = ShiftY + y - pa.Height;
         }
     }
 

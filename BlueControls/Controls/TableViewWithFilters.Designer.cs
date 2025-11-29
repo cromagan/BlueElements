@@ -101,6 +101,7 @@ namespace BlueControls.Controls {
             this.Controls.Add(this.btnTextLöschen);
             this.Controls.Add(this.txbZeilenFilter);
             this.Controls.Add(this.btnAlleFilterAus);
+            this.Controls.Add(this.TableInternal);
             this.Name = "TableViewWithFilters";
             this.Size = new Size(599, 388);
             this.ResumeLayout(false);

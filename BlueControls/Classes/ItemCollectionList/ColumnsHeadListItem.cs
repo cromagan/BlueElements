@@ -18,11 +18,11 @@
 #nullable enable
 
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.CellRenderer;
+using BlueControls;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueTable.Enums;
+using System;
 using System.Drawing;
 
 namespace BlueTable;
@@ -41,14 +41,22 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     #region Properties
 
+    public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
     public override string QuickInfo => string.Empty;
 
     #endregion
 
     #region Methods
 
+    public static QuickImage? CaptionBitmap(ColumnItem column) {
+        if (string.IsNullOrEmpty(column.CaptionBitmapCode)) { return null; }
+
+        return QuickImage.Get(column.CaptionBitmapCode + "|100");
+    }
+
     public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionModified, float scale, TranslationType translate, float shiftX, float shiftY) {
         base.DrawColumn(gr, viewItem, positionModified, scale, translate, shiftX, shiftY);
+        if (viewItem.Column is not { IsDisposed: false } column) { return; }
 
         #region Recude-Button zeichnen
 
@@ -71,7 +79,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         #region Roten Rand für Split-Spalten
 
-        if (viewItem.Column is { IsDisposed: false } c && c == viewItem.Column?.Table?.Column.ChunkValueColumn) {
+        if (column == column.Table?.Column.ChunkValueColumn) {
             var t = positionModified;
             t.Inflate(-3, -3);
             gr.DrawRectangle(new Pen(Color.Red, 6), t);
@@ -79,19 +87,18 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         #endregion
 
-        var tx = viewItem.Caption;
-        tx = LanguageTool.DoTranslate(tx, true).Replace("\r", "\r\n");
-        var fs = viewItem.Font_Head_Default.Scale(scale).MeasureString(tx);
+        var capTranslated = CaptionTranslated(column);
+        var Font_Head_Default_Scaled = Font_Head_Default.Scale(scale).MeasureString(capTranslated);
 
-        if (viewItem.CaptionBitmap is { IsError: false } cb) {
+        if (CaptionBitmap(column) is { IsError: false } cb) {
 
             #region Spalte mit Bild zeichnen
 
-            var pos = new Point((int)positionModified.X + (int)((positionModified.Width - fs.Width) / 2.0), 3);
-            gr.DrawImageInRectAspectRatio(cb, (int)positionModified.X + 2, (int)(pos.Y + fs.Height), (int)positionModified.Width - 4, (int)positionModified.Bottom - (int)(pos.Y + fs.Height) - 6 - 18);
+            var pos = new Point((int)positionModified.X + (int)((positionModified.Width - Font_Head_Default_Scaled.Width) / 2.0), 3);
+            gr.DrawImageInRectAspectRatio(cb, (int)positionModified.X + 2, (int)(pos.Y + Font_Head_Default_Scaled.Height), (int)positionModified.Width - 4, (int)positionModified.Bottom - (int)(pos.Y + Font_Head_Default_Scaled.Height) - 6 - 18);
             // Dann der Text
             gr.TranslateTransform(pos.X, pos.Y);
-            viewItem.Font_Head_Colored.Scale(scale).DrawString(gr, tx, 0, 0);
+            Font_Head_Colored(viewItem).Scale(scale).DrawString(gr, capTranslated, 0, 0);
             gr.TranslateTransform(-pos.X, -pos.Y);
 
             #endregion
@@ -100,14 +107,23 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             #region Spalte ohne Bild zeichnen
 
             var p4 = ZoomPad.GetPix(4, scale);
-            var pos = new Point((int)positionModified.X + (int)((positionModified.Width - fs.Height) / 2.0), (int)positionModified.Bottom - p4);
+            var pos = new Point((int)positionModified.X + (int)((positionModified.Width - Font_Head_Default_Scaled.Height) / 2.0), (int)positionModified.Bottom - p4);
             gr.TranslateTransform(pos.X, pos.Y);
             gr.RotateTransform(-90);
-            viewItem.Font_Head_Colored.Scale(scale).DrawString(gr, tx, 0, 0);
+            Font_Head_Colored(viewItem).Scale(scale).DrawString(gr, capTranslated, 0, 0);
             gr.TranslateTransform(-pos.X, -pos.Y);
             gr.ResetTransform();
 
             #endregion
+        }
+    }
+
+    public BlueFont Font_Head_Colored(ColumnViewItem column) {
+        if (column != null) {
+            var baseFont = Font_Head_Default;
+            return BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, column.FontColor_Caption, Color.Transparent, Color.Transparent);
+        } else {
+            return Font_Head_Default;
         }
     }
 
@@ -116,8 +132,25 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
         if (IsDisposed || Arrangement is null) { return new(16, 16); }
 
-        return new(100, Arrangement.HeadSize());
+        if (!Arrangement.ShowHead) { return new(0, 0); }
+
+        var minH = 16;
+
+        var f = Font_Head_Default;
+
+        foreach (var thisC in Arrangement) {
+            if (thisC.Column is { IsDisposed: false } column) {
+                var capTranslated = CaptionTranslated(column);
+                var s = f.MeasureString(capTranslated);
+
+                minH = Math.Max(minH, (int)s.Width);
+            }
+        }
+
+        return new(100, minH + 3);
     }
+
+    private static string CaptionTranslated(ColumnItem column) => LanguageTool.DoTranslate(column.Caption, true).Replace("\r", "\r\n");
 
     #endregion
 }
