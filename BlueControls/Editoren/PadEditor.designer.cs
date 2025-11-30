@@ -114,8 +114,8 @@ namespace BlueControls.Forms {
             this.Pad.Dock = DockStyle.Fill;
             this.Pad.Location = new Point(0, 110);
             this.Pad.Name = "Pad";
-            this.Pad.ShiftX = 0F;
-            this.Pad.ShiftY = 0F;
+            this.Pad.OffsetX = 0F;
+            this.Pad.OffsetY = 0F;
             this.Pad.Size = new Size(512, 227);
             this.Pad.TabIndex = 0;
             this.Pad.Zoom = 1F;

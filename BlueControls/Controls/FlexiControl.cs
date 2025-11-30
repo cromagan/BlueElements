@@ -686,7 +686,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //        var tmpstate = state;
         //        if (tmpstate != enStates.Checked_Disabled) { tmpstate = enStates.Standard; }
         //        var R = new Rectangle {
-        //            X = Main.Left - 1,
+        //            ControlX = Main.Left - 1,
         //            Y = Main.Top - 1,
         //            Width = Main.Width + 2,
         //            Height = Height - Main.Top - 1
@@ -978,7 +978,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     /// <summary>
     /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
-    /// Kümmert sich dann um die Position des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
+    /// Kümmert sich dann um die CanvasPosition des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
     /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
     /// </summary>
     /// <param name="control"></param>

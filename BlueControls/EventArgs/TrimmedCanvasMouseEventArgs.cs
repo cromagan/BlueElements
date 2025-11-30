@@ -17,18 +17,16 @@
 
 #nullable enable
 
-using System.Windows.Forms;
-
 namespace BlueControls.EventArgs;
 
-public sealed class MouseEventArgs1_1 : MouseEventArgs {
+public sealed class TrimmedCanvasMouseEventArgs : CanvasMouseEventArgs {
 
     #region Constructors
 
-    public MouseEventArgs1_1(MouseButtons button, int clicks, int x, int y, int delta, int trimmedX, int trimmedy, bool isinPic) : base(button, clicks, x, y, delta) {
+    public TrimmedCanvasMouseEventArgs(CanvasMouseEventArgs e, int trimmedCanvasX, int trimmedCanvasY, bool isinPic) : base(e) {
         IsInPic = isinPic;
-        TrimmedX = trimmedX;
-        TrimmedY = trimmedy;
+        TrimmedCanvasX = trimmedCanvasX;
+        TrimmedCanvasY = trimmedCanvasY;
     }
 
     #endregion
@@ -36,8 +34,8 @@ public sealed class MouseEventArgs1_1 : MouseEventArgs {
     #region Properties
 
     public bool IsInPic { get; }
-    public int TrimmedX { get; }
-    public int TrimmedY { get; }
+    public int TrimmedCanvasX { get; }
+    public int TrimmedCanvasY { get; }
 
     #endregion
 }

@@ -145,7 +145,7 @@ public class Renderer_Button : Renderer_Abstract {
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);
 
-        //if (font == null) { return new Size(16, 32); }
+        //if (font == null) { return new CanvasSize(16, 32); }
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
 
         return this.GetFont().FormatedText_NeededSize(replacedText, QImage(content), 32);

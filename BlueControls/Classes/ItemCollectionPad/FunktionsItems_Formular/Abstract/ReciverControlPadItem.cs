@@ -236,7 +236,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
 
         if (MustBeInDrawingArea) {
-            if (!IsInDrawingArea(UsedArea, icpi.UsedArea.ToRect())) {
+            if (!IsInDrawingArea(CanvasUsedArea, icpi.CanvasUsedArea.ToRect())) {
                 return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
             }
 
@@ -431,7 +431,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         var anzahlSpaltenImFormular = (int)_xPosition / 100;
         var aufXPosition = (int)(_xPosition - (anzahlSpaltenImFormular * 100));
 
-        var wi = (icpi.UsedArea.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+        var wi = (icpi.CanvasUsedArea.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
         var xpos = (wi * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));
 
         _pLo.X = xpos;
@@ -449,8 +449,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     //    SetCoordinates(x, true);
     //    OnPropertyChanged(string propertyname);
     //}
-    protected static void DrawArrow(Graphics gr, RectangleF positionModified, float scale, int colorId, Alignment al, float valueArrow, float xmod) {
-        var p = positionModified.PointOf(al);
+    protected static void DrawArrow(Graphics gr, RectangleF positionInControl, float scale, int colorId, Alignment al, float valueArrow, float xmod) {
+        var p = positionInControl.PointOf(al);
         var width = (int)(scale * 25);
         var height = (int)(scale * 12);
         var pa = Poly_Arrow(new Rectangle(0, -(width / 2), height, width));
@@ -476,12 +476,12 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         //var x = QuickImage.GenerateCode("Pfeil_Unten", (int)(10 * zoom), (int)(10 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, symbol);
 
         //var sy2 = QuickImage.Get(x);
-        //gr.DrawImage(sy2, p.X - (sy2.Width / 2) + xmod, p.Y - valueSymbol);
+        //gr.DrawImage(sy2, p.ControlX - (sy2.Width / 2) + xmod, p.Y - valueSymbol);
 
         //if (!string.IsNullOrEmpty(symbol)) {
         //    var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
         //    var sy = QuickImage.Get(co);
-        //    gr.DrawImage(sy, p.X - (sy.Width / 2) + xmod, p.Y - valueSymbol);
+        //    gr.DrawImage(sy, p.ControlX - (sy.Width / 2) + xmod, p.Y - valueSymbol);
         //}
     }
 
@@ -489,7 +489,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     //    var he1 = MmToPixel(1, ItemCollectionPadItem.Dpi);
     //    x.Height = (int)(x.Height / he) * he;
     //    x.Height = (int)((x.Height / he1) + 0.99) * he1;
-    protected void DrawArrorInput(Graphics gr, RectangleF positionModified, float scale, bool forPrinting, List<int>? colorId) {
+    protected void DrawArrorInput(Graphics gr, RectangleF positionInControl, float scale, bool forPrinting, List<int>? colorId) {
         if (forPrinting) { return; }
 
         var arrowY = (int)(scale * 12) * 0.35f;
@@ -503,17 +503,17 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         var start = -((colorId.Count - 1) * width / 2);
 
         foreach (var thisColorId in colorId) {
-            DrawArrow(gr, positionModified, scale, thisColorId, Alignment.Top_HorizontalCenter, arrowY, start);
+            DrawArrow(gr, positionInControl, scale, thisColorId, Alignment.Top_HorizontalCenter, arrowY, start);
             start += width;
         }
     }
 
     //public void Standardhöhe_setzen() {
-    //    var x = UsedArea;
-    protected void DrawArrowOutput(Graphics gr, RectangleF positionModified, float scale, bool forPrinting, int colorId) {
+    //    var x = CanvasUsedArea;
+    protected void DrawArrowOutput(Graphics gr, RectangleF positionInControl, float scale, bool forPrinting, int colorId) {
         if (forPrinting) { return; }
         var arrowY = (int)(scale * 12) * 0.45f;
-        DrawArrow(gr, positionModified, scale, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);
+        DrawArrow(gr, positionInControl, scale, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);
     }
 
     protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float scale, List<int>? id, bool drawSymbol, bool drawText, bool transparent) {
@@ -554,11 +554,11 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) => CalculateColorIds();
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) => CalculateColorIds();
 
-    protected void DrawFakeControl(Graphics gr, RectangleF positionModified, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
+    protected void DrawFakeControl(Graphics gr, RectangleF positionInControl, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
         Point cap;
-        var uc = positionModified.ToRect();
+        var uc = positionInControl.ToRect();
 
         switch (captionPosition) {
             case CaptionPosition.ohne:
@@ -580,7 +580,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
 
         if (cap.X >= 0) {
-            var e = new RectangleF(positionModified.Left + (cap.X * scale), positionModified.Top + (cap.Y * scale), positionModified.Width, 16 * scale);
+            var e = new RectangleF(positionInControl.Left + (cap.X * scale), positionInControl.Top + (cap.Y * scale), positionInControl.Width, 16 * scale);
             Skin.Draw_FormatedText(gr, captiontxt, null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(scale), true);
         }
 

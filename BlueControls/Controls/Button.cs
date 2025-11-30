@@ -273,7 +273,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         } catch { }
     }
 
-    //internal static Size StandardSize(string text, QuickImage? qi) {
+    //internal static CanvasSize StandardSize(string text, QuickImage? qi) {
     //    var s = ((Font)Skin.GetBlueFont(Design.Button_CheckBox, States.Standard)).FormatedText_NeededSize(text, qi, 16);
     //    s.Width += 10;
     //    s.Height += 4;

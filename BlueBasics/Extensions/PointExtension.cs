@@ -26,6 +26,8 @@ public static partial class Extensions {
 
     #region Methods
 
+    public static PointF ControlToCanvas(this Point p, float zoom, float offsetX, float offsetY) => new(p.X.ControlToCanvas(zoom, offsetX), p.Y.ControlToCanvas(zoom, offsetY));
+
     public static Point PointParse(this string? toParse) {
         if (toParse == null) { return Point.Empty; }
 

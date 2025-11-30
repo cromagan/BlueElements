@@ -263,7 +263,7 @@ public class BitmapExt : IDisposableExtended {
         return false;
     }
 
-    public static void Magnify(Bitmap sourceBmp, Point point, Graphics gr, bool swapX) {
+    public static void Magnify(Bitmap sourceBmp, PointF point, Graphics gr, bool swapX) {
         const int w1 = 200; // Größe des Rechteckes
         const int w5 = 10; // Pixel zum vergrößerm
         int x;
@@ -286,7 +286,7 @@ public class BitmapExt : IDisposableExtended {
         r.Inflate(-5, -5);
         gr.InterpolationMode = InterpolationMode.NearestNeighbor;
         gr.PixelOffsetMode = PixelOffsetMode.Half;
-        gr.DrawImage(sourceBmp, r, new Rectangle(point.X - w5, point.Y - w5, (w5 * 2) + 1, (w5 * 2) + 1), GraphicsUnit.Pixel);
+        gr.DrawImage(sourceBmp, r, new Rectangle((int)point.X - w5, (int)point.Y - w5, (w5 * 2) + 1, (w5 * 2) + 1), GraphicsUnit.Pixel);
         gr.DrawRectangle(Pens.Black, r);
         var mitte = r.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);

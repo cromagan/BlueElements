@@ -425,10 +425,10 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         }
 
         if (e.Item is DropDownListItem dli) {
-            var x = Cursor.Position.X - MousePos().X + dli.Position.X + (dli.Indent * 20);
-            var y = Cursor.Position.Y - MousePos().Y + dli.Position.Bottom; //Identisch
+            var x = Cursor.Position.X - MousePos().X + dli.CanvasPosition.X + (dli.Indent * 20);
+            var y = Cursor.Position.Y - MousePos().Y + dli.CanvasPosition.Bottom; //Identisch
 
-            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DropDownItems, CheckBehavior.SingleSelection, null, x, y, dli.Position.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
+            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DropDownItems, CheckBehavior.SingleSelection, null, x, y, dli.CanvasPosition.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
             dropDownMenu.Cancel += DropDownMenu_Cancel;
             dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         }

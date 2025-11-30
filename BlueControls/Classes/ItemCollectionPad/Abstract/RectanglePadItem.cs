@@ -83,7 +83,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
 
     [Description("Die Breite des Objekts in mm.")]
     public virtual float Breite {
-        get => (float)Math.Round(PixelToMm(UsedArea.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round(PixelToMm(CanvasUsedArea.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
             if (Math.Abs(Breite - value) < Constants.DefaultTolerance) { return; }
@@ -103,7 +103,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
 
     [Description("Die Höhe des Objekts in mm.")]
     public virtual float Höhe {
-        get => (float)Math.Round(PixelToMm(UsedArea.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round(PixelToMm(CanvasUsedArea.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
             if (Math.Abs(Höhe - value) < Constants.DefaultTolerance) { return; }
@@ -225,7 +225,7 @@ public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
         _pRu.SetTo(r.PointOf(Alignment.Bottom_Right), false);
     }
 
-    protected override RectangleF CalculateUsedArea() => new(Math.Min(_pLo.X, _pRu.X),
+    protected override RectangleF CalculateCanvasUsedArea() => new(Math.Min(_pLo.X, _pRu.X),
                                                                Math.Min(_pLo.Y, _pRu.Y),
                                                                Math.Abs(_pRu.X - _pLo.X),
                                                                Math.Abs(_pRu.Y - _pLo.Y));

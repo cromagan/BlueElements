@@ -50,12 +50,48 @@ public static class AbstractListItemExtension {
         return ld2;
     }
 
+    /// <summary>
+    ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+    /// </summary>
+    /// <returns></returns>
+    public static (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) CanvasItemData(this List<AbstractListItem> item, Design itemDesign) {
+        try {
+            var w = 16;
+            var h = 0;
+            var hall = 0;
+            var sameh = -1;
+            var or = Orientation.Senkrecht;
+            PreComputeSize(item, itemDesign);
+
+            foreach (var thisItem in item) {
+                if (thisItem != null && thisItem.Visible) {
+                    var s = thisItem.UntrimmedCanvasSize(itemDesign);
+                    w = Math.Max(w, s.Width);
+                    h = Math.Max(h, s.Height);
+                    hall += s.Height;
+                    if (sameh < 0) {
+                        sameh = thisItem.UntrimmedCanvasSize(itemDesign).Height;
+                    } else {
+                        if (sameh != thisItem.UntrimmedCanvasSize(itemDesign).Height) { or = Orientation.Waagerecht; }
+                        sameh = thisItem.UntrimmedCanvasSize(itemDesign).Height;
+                    }
+                    if (thisItem is not TextListItem) { or = Orientation.Waagerecht; }
+                }
+            }
+
+            return (w, h, hall, or);
+        } catch {
+            Develop.AbortAppIfStackOverflow();
+            return CanvasItemData(item, itemDesign);
+        }
+    }
+
     public static void Conextmenu_OpenEditor(object sender, ObjectEventArgs e) {
         if (e.Data is not IEditable edit) { return; }
         edit.Edit();
     }
 
-    public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visArea, AbstractListItem? _mouseOverItem, int shiftX, int shiftY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float scale) {
+    public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float scale) {
         try {
             object locker = new();
             Parallel.ForEach(list, thisItem => {
@@ -68,14 +104,14 @@ public static class AbstractListItemExtension {
                     if (_checked?.Contains(thisItem.KeyName) ?? false) { itemState |= States.Checked; }
 
                     lock (locker) {
-                        thisItem.Draw(gr, visArea, shiftX, shiftY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, scale);
+                        thisItem.Draw(gr, visArea, offsetX, offsetY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, scale);
                     }
                 }
             });
         } catch { }
     }
 
-    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int x, int y, float shiftX, float shiftY) => list.FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem?.Contains((int)(x + shiftX), (int)(y + shiftY)) == true);
+    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int x, int y, float offsetX, float offsetY) => list.FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem?.Contains((int)(x + offsetX), (int)(y + offsetY)) == true);
 
     /// <summary>
     /// Gibt das erste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
@@ -102,42 +138,6 @@ public static class AbstractListItemExtension {
         }
 
         return null;
-    }
-
-    /// <summary>
-    ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-    /// </summary>
-    /// <returns></returns>
-    public static (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) ItemData(this List<AbstractListItem> item, Design itemDesign) {
-        try {
-            var w = 16;
-            var h = 0;
-            var hall = 0;
-            var sameh = -1;
-            var or = Orientation.Senkrecht;
-            PreComputeSize(item, itemDesign);
-
-            foreach (var thisItem in item) {
-                if (thisItem != null && thisItem.Visible) {
-                    var s = thisItem.SizeUntouchedForListBox(itemDesign);
-                    w = Math.Max(w, s.Width);
-                    h = Math.Max(h, s.Height);
-                    hall += s.Height;
-                    if (sameh < 0) {
-                        sameh = thisItem.SizeUntouchedForListBox(itemDesign).Height;
-                    } else {
-                        if (sameh != thisItem.SizeUntouchedForListBox(itemDesign).Height) { or = Orientation.Waagerecht; }
-                        sameh = thisItem.SizeUntouchedForListBox(itemDesign).Height;
-                    }
-                    if (thisItem is not TextListItem) { or = Orientation.Waagerecht; }
-                }
-            }
-
-            return (w, h, hall, or);
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return ItemData(item, itemDesign);
-        }
     }
 
     public static TextListItem ItemOf(IEditable edit) => ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, Conextmenu_OpenEditor, edit, true);
@@ -396,7 +396,7 @@ public static class AbstractListItemExtension {
 
     public static void PreComputeSize(this List<AbstractListItem> item, Design itemDesign) {
         try {
-            Parallel.ForEach(item, thisItem => thisItem?.SizeUntouchedForListBox(itemDesign));
+            Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
         } catch {
             Develop.AbortAppIfStackOverflow();
             PreComputeSize(item, itemDesign);
@@ -455,7 +455,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         KeyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
         if (string.IsNullOrEmpty(KeyName)) { Develop.DebugPrint(ErrorType.Error, "Interner Name nicht vergeben."); }
         Enabled = enabled;
-        Position = Rectangle.Empty;
+        CanvasPosition = Rectangle.Empty;
         UserDefCompareKey = string.Empty;
     }
 
@@ -472,6 +472,15 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     #endregion
 
     #region Properties
+
+    public Rectangle CanvasPosition {
+        get;
+        set {
+            if (field.Equals(value)) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool Enabled {
         get;
@@ -497,15 +506,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         get;
         set {
             if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public Rectangle Position {
-        get;
-        set {
-            if (field.Equals(value)) { return; }
             field = value;
             OnPropertyChanged();
         }
@@ -568,53 +568,53 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         return 0;
     }
 
-    public bool Contains(int x, int y) => Position.Contains(x, y);
+    public bool Contains(int x, int y) => CanvasPosition.Contains(x, y);
 
-    public void Draw(Graphics gr, Rectangle visibleArea, float shiftX, float shiftY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float scale) {
+    public void Draw(Graphics gr, Rectangle visibleArea, float offsetX, float offsetY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float scale) {
         if (itemdesign == Design.Undefiniert) { return; }
-        var positionModifiedi = Position with { X = (int)(Position.X + (Indent * 20)), Y = (int)(Position.Y), Width = (int)(Position.Width - (Indent * 20)) };
-        var positionModifiedf = positionModifiedi.ZoomAndMoveRect(scale, shiftX, shiftY, false);
+        var canvasIndeted = CanvasPosition with { X = CanvasPosition.X + (Indent * 20), Y = CanvasPosition.Y, Width = CanvasPosition.Width - (Indent * 20) };
+        var controlIndented = canvasIndeted.CanvasToControl(scale, offsetX, offsetY, false);
 
         if (checkboxDesign != Design.Undefiniert) {
             var design = Skin.DesignOf(checkboxDesign, state);
-            gr.DrawImage(QuickImage.Get(design.Image, Controls.ZoomPad.GetPix(12, scale)), positionModifiedf.X + Controls.ZoomPad.GetPix(4, scale), positionModifiedf.Y + Controls.ZoomPad.GetPix(3, scale));
-            positionModifiedf.X += Controls.ZoomPad.GetPix(20, scale);
-            positionModifiedf.Width -= Controls.ZoomPad.GetPix(20, scale);
+            gr.DrawImage(QuickImage.Get(design.Image, 12.CanvasToControl(scale)), controlIndented.X + 4.CanvasToControl(scale), controlIndented.Y + 3.CanvasToControl(scale));
+            controlIndented.X += 20.CanvasToControl(scale);
+            controlIndented.Width -= 20.CanvasToControl(scale);
             if (state.HasFlag(States.Checked)) { state ^= States.Checked; }
         }
 
-        DrawExplicit(gr, visibleArea, positionModifiedf, itemdesign, state, drawBorderAndBack, translate, shiftX, shiftY, scale);
+        DrawExplicit(gr, visibleArea, controlIndented, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
         if (drawBorderAndBack) {
             if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
                 var c1 = Skin.Color_Back(controldesign, States.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
                 c1 = c1.SetAlpha(160);
-                gr.FillRectangle(new SolidBrush(c1), positionModifiedf);
+                gr.FillRectangle(new SolidBrush(c1), controlIndented);
             }
         }
     }
 
     public virtual bool FilterMatch(string filterText) => KeyName.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
-    public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign);
+    public abstract int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign);
 
     public virtual bool IsClickable() => true;
 
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public Size SizeUntouchedForListBox(Design itemdesign) {
+    public Size UntrimmedCanvasSize(Design itemdesign) {
         if (_sizeUntouchedForListBox.IsEmpty) {
-            _sizeUntouchedForListBox = ComputeSizeUntouchedForListBox(itemdesign);
+            _sizeUntouchedForListBox = ComputeUntrimmedCanvasSize(itemdesign);
         }
         return _sizeUntouchedForListBox;
     }
 
-    internal bool IsVisible(Rectangle visArea) => Visible && Position.IntersectsWith(visArea);
+    internal bool IsVisible(Rectangle visArea) => Visible && CanvasPosition.IntersectsWith(visArea);
 
     internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new ObjectEventArgs(Tag));
 
-    protected abstract Size ComputeSizeUntouchedForListBox(Design itemdesign);
+    protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 
-    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale);
+    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale);
 
     protected abstract string GetCompareKey();
 

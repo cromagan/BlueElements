@@ -535,7 +535,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                         }
                         // HTML-Code verarbeiten
                         DoHtmlCode(cactext, pos, ref zeichen, ref font, ref style);
-                        // Position zum Ende des HTML-Tags bewegen
+                        // CanvasPosition zum Ende des HTML-Tags bewegen
                         var endTag = cactext.IndexOf('>', pos + 1);
                         pos = endTag != -1 ? endTag : cactext.Length;
                         break;
@@ -664,9 +664,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 break;
 
             case "HR":
-            //    Position++;
+            //    CanvasPosition++;
             //    this.GenerateAndAdd(new ExtChar(13, _Design, _State, PF, Stufe, MarkState));
-            //    Position++;
+            //    CanvasPosition++;
             //    this.GenerateAndAdd(new ExtChar((int)enEtxtCodes.HorizontalLine, _Design, _State, PF, Stufe, MarkState));
             //    break;
             case "BR":

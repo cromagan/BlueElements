@@ -100,7 +100,7 @@ public sealed partial class ScreenShot : Form {
             // Hole das Rectangle aller Screens
             var r = Generic.RectangleOfAllScreens();
 
-            // Setze die Form-Position und Größe VOR dem Screen-Grab
+            // Setze die Form-CanvasPosition und Größe VOR dem Screen-Grab
             StartPosition = FormStartPosition.Manual;
             Left = r.Left;
             Top = r.Top;

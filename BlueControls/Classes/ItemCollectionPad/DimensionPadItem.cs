@@ -111,7 +111,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     #region Properties
 
-    
     public static string ClassId => "DIMENSION";
 
     public override string Description => string.Empty;
@@ -315,7 +314,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
 
-    protected override RectangleF CalculateUsedArea() {
+    protected override RectangleF CalculateCanvasUsedArea() {
         if (_style == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
         var f2 = this.GetFont(_textScale);
 
@@ -337,7 +336,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         UnRegisterEvents();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         if (_style != PadStyles.Undefiniert) {
             var geszoom = _textScale * scale;
 
@@ -345,18 +344,18 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
             var pfeilG = f.Size * 0.8f;
             var pen2 = f.Pen(1f);
 
-            //DrawOutline(gr, zoom, shiftX, shiftY, Color.Red);
-            //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Right).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
-            //gr.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(zoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Left).ZoomAndMove(zoom, shiftX, shiftY)); // Bezugslinie 1
+            //DrawOutline(gr, zoom, offsetX, offsetY, Color.Red);
+            //gr.DrawLine(pen2, CanvasUsedArea().PointOf(enAlignment.Top_Left).CanvasToControl(zoom, offsetX, offsetY), CanvasUsedArea().PointOf(enAlignment.Bottom_Right).CanvasToControl(zoom, offsetX, offsetY)); // Bezugslinie 1
+            //gr.DrawLine(pen2, CanvasUsedArea().PointOf(enAlignment.Top_Left).CanvasToControl(zoom, offsetX, offsetY), CanvasUsedArea().PointOf(enAlignment.Bottom_Left).CanvasToControl(zoom, offsetX, offsetY)); // Bezugslinie 1
 
-            gr.DrawLine(pen2, _point1.ZoomAndMove(scale, shiftX, shiftY), _bezugslinie1.ZoomAndMove(scale, shiftX, shiftY)); // Bezugslinie 1
-            gr.DrawLine(pen2, _point2.ZoomAndMove(scale, shiftX, shiftY), _bezugslinie2.ZoomAndMove(scale, shiftX, shiftY)); // Bezugslinie 2
-            gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY), _schnittPunkt2.ZoomAndMove(scale, shiftX, shiftY)); // Maßhilfslinie
-            gr.DrawLine(pen2, _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY), _textPoint.ZoomAndMove(scale, shiftX, shiftY)); // Maßhilfslinie
+            gr.DrawLine(pen2, _point1.CanvasToControl(scale, offsetX, offsetY), _bezugslinie1.CanvasToControl(scale, offsetX, offsetY)); // Bezugslinie 1
+            gr.DrawLine(pen2, _point2.CanvasToControl(scale, offsetX, offsetY), _bezugslinie2.CanvasToControl(scale, offsetX, offsetY)); // Bezugslinie 2
+            gr.DrawLine(pen2, _schnittPunkt1.CanvasToControl(scale, offsetX, offsetY), _schnittPunkt2.CanvasToControl(scale, offsetX, offsetY)); // Maßhilfslinie
+            gr.DrawLine(pen2, _schnittPunkt1.CanvasToControl(scale, offsetX, offsetY), _textPoint.CanvasToControl(scale, offsetX, offsetY)); // Maßhilfslinie
             var sz1 = f.MeasureString(Angezeigter_Text_Oben());
             var sz2 = f.MeasureString(Text_Unten);
-            var p1 = _schnittPunkt1.ZoomAndMove(scale, shiftX, shiftY);
-            var p2 = _schnittPunkt2.ZoomAndMove(scale, shiftX, shiftY);
+            var p1 = _schnittPunkt1.CanvasToControl(scale, offsetX, offsetY);
+            var p2 = _schnittPunkt2.CanvasToControl(scale, offsetX, offsetY);
             if (sz1.Width + (pfeilG * 2f) < GetLength(p1, p2)) {
                 DrawArrow(gr, p1, _winkel, f.ColorMain, pfeilG);
                 DrawArrow(gr, p2, _winkel + 180, f.ColorMain, pfeilG);
@@ -364,7 +363,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
                 DrawArrow(gr, p1, _winkel + 180, f.ColorMain, pfeilG);
                 DrawArrow(gr, p2, _winkel, f.ColorMain, pfeilG);
             }
-            var mitte = _textPoint.ZoomAndMove(scale, shiftX, shiftY);
+            var mitte = _textPoint.CanvasToControl(scale, offsetX, offsetY);
             var textWinkel = _winkel % 360;
             if (textWinkel is > 90 and <= 270) { textWinkel = _winkel - 180; }
 

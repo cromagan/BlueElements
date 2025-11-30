@@ -95,7 +95,7 @@ public class RowFormulaListItem : AbstractListItem {
 
     #region Methods
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (_tmpBmp == null) { GeneratePic(); }
         return _tmpBmp?.Height ?? 200;
 
@@ -106,31 +106,31 @@ public class RowFormulaListItem : AbstractListItem {
         //return (int)(sc * columnWidth);
     }
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         try {
             if (_tmpBmp == null) { GeneratePic(); }
             return _tmpBmp?.Size ?? new Size(200, 200);
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return ComputeSizeUntouchedForListBox(itemdesign);
+            return ComputeUntrimmedCanvasSize(itemdesign);
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
         if (_tmpBmp == null) { GeneratePic(); }
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, itemdesign, state, positionModified.ToRect(), null, false);
+            Skin.Draw_Back(gr, itemdesign, state, positionInControl.ToRect(), null, false);
         }
         if (_tmpBmp != null) {
-            scale = (float)Math.Min(positionModified.Width / (double)_tmpBmp.Width, positionModified.Height / (double)_tmpBmp.Height);
+            scale = (float)Math.Min(positionInControl.Width / (double)_tmpBmp.Width, positionInControl.Height / (double)_tmpBmp.Height);
             RectangleF r2 = new(
-                ((positionModified.Width - (_tmpBmp.Width * scale)) / 2) + positionModified.Left,
-                ((positionModified.Height - (_tmpBmp.Height * scale)) / 2) + positionModified.Top,
+                ((positionInControl.Width - (_tmpBmp.Width * scale)) / 2) + positionInControl.Left,
+                ((positionInControl.Height - (_tmpBmp.Height * scale)) / 2) + positionInControl.Top,
                 _tmpBmp.Width * scale, _tmpBmp.Height * scale);
             gr.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
         }
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionModified.ToRect());
+            Skin.Draw_Border(gr, itemdesign, state, positionInControl.ToRect());
         }
     }
 
@@ -149,20 +149,20 @@ public class RowFormulaListItem : AbstractListItem {
             return;
         }
 
-        var mb = pad.UsedArea.ToRect();
+        var canvasUsedArea = pad.CanvasUsedArea.ToRect();
         if (_tmpBmp != null) {
-            if (_tmpBmp.Width != mb.Width || _tmpBmp.Height != mb.Height) {
+            if (_tmpBmp.Width != canvasUsedArea.Width || _tmpBmp.Height != canvasUsedArea.Height) {
                 RemovePic();
             }
         }
 
-        var internalZoom = Math.Min(500 / mb.Width, 500 / mb.Height);
+        var internalZoom = Math.Min(500 / canvasUsedArea.Width, 500 / canvasUsedArea.Height);
         internalZoom = Math.Min(1, internalZoom);
 
-        _tmpBmp ??= new Bitmap(mb.Width * internalZoom, mb.Height * internalZoom);
-        var zoomv = ItemCollectionPadItem.ZoomFitValue(mb, _tmpBmp.Size);
-        var centerpos = ItemCollectionPadItem.CenterPos(mb, _tmpBmp.Size, zoomv);
-        var slidervalues = ItemCollectionPadItem.SliderValues(mb, zoomv, centerpos);
+        _tmpBmp ??= new Bitmap(canvasUsedArea.Width * internalZoom, canvasUsedArea.Height * internalZoom);
+        var zoomv = ItemCollectionPadItem.ZoomFitValue(canvasUsedArea, _tmpBmp.Size);
+        var centerpos = ItemCollectionPadItem.CenterPos(canvasUsedArea, _tmpBmp.Size, zoomv);
+        var slidervalues = ItemCollectionPadItem.SliderValues(canvasUsedArea, zoomv, centerpos);
         //pad.ShowInPrintMode = true;
         //pad.Unselect();
         pad.DrawToBitmap(_tmpBmp, zoomv, slidervalues.X, slidervalues.Y);

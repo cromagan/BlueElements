@@ -183,9 +183,10 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 
-    public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Design type, States state) {
-        var t = ZoomAndMove(zoom, shiftX, shiftY);
-        Rectangle r = new((int)(t.X - 4), (int)(t.Y - 4), 9, 9);
+    public void Draw(Graphics gr, float zoom, float offsetX, float offsetY, Design type, States state) {
+        var contX = _x.CanvasToControl(zoom, offsetX);
+        var contY = _y.CanvasToControl(zoom, offsetY);
+        var r = new Rectangle(contX - 4, contY - 4, 9, 9);
         Skin.Draw_Back(gr, type, state, r, null, false);
         Skin.Draw_Border(gr, type, state, r);
     }
@@ -307,10 +308,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
-
-    public PointF ZoomAndMove(float zoom, float shiftX, float shiftY) =>
-        new((_x * zoom) - shiftX + (zoom / 2), (_y * zoom) - shiftY + (zoom / 2));
+    internal PointF CanvasToControl(float zoom, float offsetX, float offsetY) => new PointF(_x.CanvasToControl(zoom, offsetX), _y.CanvasToControl(zoom, offsetY));
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

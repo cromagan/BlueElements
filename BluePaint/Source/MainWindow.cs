@@ -298,23 +298,23 @@ public partial class MainWindow : BlueControls.Forms.Form {
         Close();
     }
 
-    private void P_DoAdditionalDrawing(object sender, AdditionalDrawing e) => _currentTool?.DoAdditionalDrawing(e, P.Bmp);
+    private void P_DoAdditionalDrawing(object sender, AdditionalDrawingEventArgs e) => _currentTool?.DoAdditionalDrawing(e, P.Bmp);
 
-    private void P_ImageMouseDown(object sender, MouseEventArgs1_1 e) => _currentTool?.MouseDown(e, P.Bmp);
+    private void P_ImageMouseDown(object sender, TrimmedCanvasMouseEventArgs e) => _currentTool?.MouseDown(e, P.Bmp);
 
-    private void P_ImageMouseMove(object sender, MouseEventArgs1_1DownAndCurrent e) {
+    private void P_ImageMouseMove(object sender, TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e) {
         _currentTool?.MouseMove(e, P.Bmp);
-        if (e.Current.IsInPic && P.Bmp is { } bmp && bmp.IsValid()) {
-            var c = bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
-            InfoText.Text = "X: " + e.Current.TrimmedX +
-                            "<br>Y: " + e.Current.TrimmedY +
+        if (e.MouseCurrent.IsInPic && P.Bmp is { } bmp && bmp.IsValid()) {
+            var c = bmp.GetPixel(e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY);
+            InfoText.Text = "X: " + e.MouseCurrent.TrimmedCanvasX +
+                            "<br>Y: " + e.MouseCurrent.TrimmedCanvasY +
                             "<br>Farbe: " + c.ToHtmlCode().ToUpperInvariant();
         } else {
             InfoText.Text = string.Empty;
         }
     }
 
-    private void P_ImageMouseUp(object sender, MouseEventArgs1_1DownAndCurrent e) => _currentTool?.MouseUp(e, P.Bmp);
+    private void P_ImageMouseUp(object sender, TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e) => _currentTool?.MouseUp(e, P.Bmp);
 
     private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = string.Empty;
 

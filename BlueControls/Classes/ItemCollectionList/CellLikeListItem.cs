@@ -64,18 +64,18 @@ public class CellLikeListItem : AbstractListItem {
         return txt.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
     }
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) =>
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) =>
         _cellRenderer.ContentSize(KeyName, _translate);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, itemdesign, state, positionModified.ToRect(), null, false);
+            Skin.Draw_Back(gr, itemdesign, state, positionInControl.ToRect(), null, false);
         }
-        _cellRenderer.Draw(gr, KeyName, null, positionModified.ToRect(), _translate, _align, 1f);
+        _cellRenderer.Draw(gr, KeyName, null, positionInControl.ToRect(), _translate, _align, 1f);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionModified.ToRect());
+            Skin.Draw_Border(gr, itemdesign, state, positionInControl.ToRect());
         }
     }
 

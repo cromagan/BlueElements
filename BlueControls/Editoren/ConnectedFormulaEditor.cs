@@ -190,13 +190,13 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnArbeitsbereich_Click(object sender, System.EventArgs e) {
         if (Pad?.Items is not { IsDisposed: false } pi) { return; }
 
-        var oldw = pi.UsedArea.Width / AutosizableExtension.GridSize;
+        var oldw = pi.CanvasUsedArea.Width / AutosizableExtension.GridSize;
 
         var wi = InputBox.Show("Breite in Kästchen:", oldw.ToStringFloat1(), FormatHolder.LongPositive);
 
         if (string.IsNullOrEmpty(wi)) { return; }
 
-        var oldh = pi.UsedArea.Height / AutosizableExtension.GridSize;
+        var oldh = pi.CanvasUsedArea.Height / AutosizableExtension.GridSize;
 
         var he = InputBox.Show("Höhe in Kästchen:", oldh.ToStringFloat1(), FormatHolder.LongPositive);
 

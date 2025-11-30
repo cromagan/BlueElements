@@ -410,7 +410,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         foreach (var thisIt in ic) {
             if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
                 if (fi.CVI?.Column?.Table == db) {
-                    if (found == null || fi.UsedArea.X < found.UsedArea.X) {
+                    if (found == null || fi.CanvasUsedArea.X < found.CanvasUsedArea.X) {
                         found = fi;
                     }
                 }
@@ -448,7 +448,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                 var it = new ColumnPadItem(thisColumnViewItem, thisColumnViewItem.GetRenderer(Constants.Win11));
                 Pad.Items.Add(it);
                 it.SetLeftTopPoint(x, 0);
-                x = it.UsedArea.Right;
+                x = it.CanvasUsedArea.Right;
                 anyitem = it;
             }
         }
@@ -485,14 +485,14 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                                 databItem = new TextPadItem(toCheckCombi, nam);
                                 Pad.Items.Add(databItem);
                                 if (it != null) {
-                                    var r = new RectangleF(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width),
+                                    var r = new RectangleF(Math.Max(kx, it.CanvasUsedArea.Left - databItem.CanvasUsedArea.Width),
                                                             600,
-                                                           (int)(anyitem.UsedArea.Height / 2),
-                                                           (int)anyitem.UsedArea.Height);
+                                                           (int)(anyitem.CanvasUsedArea.Height / 2),
+                                                           (int)anyitem.CanvasUsedArea.Height);
 
                                     databItem.SetCoordinates(r);
                                 }
-                                kx = databItem.UsedArea.Right;
+                                kx = databItem.CanvasUsedArea.Right;
                             }
 
                             foreach (var thisitem in c.LinkedCellFilter) {
@@ -520,7 +520,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                                 if (it != null) {
                                     Pad.Items.Connections.Add(new ItemConnection(it2, ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
                                 }
-                                kx = it2.UsedArea.Right;
+                                kx = it2.CanvasUsedArea.Right;
 
                                 // und noch die Tabelle auf die Spalte zeigen lassem
                                 Pad.Items.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
@@ -547,7 +547,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             if (x == null) { break; }
             done.Add(x);
             x.SetLeftTopPoint(left, 0);
-            left = x.UsedArea.Right;
+            left = x.CanvasUsedArea.Right;
         } while (true);
     }
 

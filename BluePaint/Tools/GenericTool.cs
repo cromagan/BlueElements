@@ -67,27 +67,27 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
     /// <param name="originalPic"></param>
-    public virtual void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) { }
+    public virtual void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) { }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
     /// <param name="originalPic"></param>
-    public new virtual void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) { }
+    public new virtual void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) { }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
     /// <param name="originalPic"></param>
-    public new virtual void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
+    public new virtual void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) { }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-    public new virtual void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
+    public new virtual void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) { }
 
     /// <summary>
     ///

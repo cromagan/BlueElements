@@ -43,16 +43,16 @@ public class Renderer_RichText : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        //gr.SetClip(positionModified);
-        //var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
-        //gr.TranslateTransform(trp.X, trp.Y);
+        //gr.SetClip(positionInControl);
+        //var trp = positionInControl.PointOf(Alignment.Horizontal_Vertical_Center);
+        //gr.TranslateTransform(trp.ControlX, trp.Y);
         //gr.RotateTransform(-Drehwinkel);
 
         using var _txt = new ExtText(SheetStyle, Style) {
             HtmlText = content,
             //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
-            //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / SheetStyleScale), -1);
+            //etxt.DrawingArea = new Rectangle((int)CanvasUsedArea().Left, (int)CanvasUsedArea().Top, (int)(CanvasUsedArea().Width / AdditionalScale / SheetStyleScale), -1);
             //etxt.LineBreakWidth = etxt.DrawingArea.Width;
             TextDimensions = new Size(scaleddrawarea.Width, -1),
             Ausrichtung = align,

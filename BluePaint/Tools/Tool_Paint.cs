@@ -34,20 +34,20 @@ public partial class Tool_Paint {
 
     #region Methods
 
-    public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
+    public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
         var c = Color.FromArgb(50, 255, 0, 0);
-        e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
+        e.FillCircle(c, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
     }
 
-    public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) {
+    public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) {
         OnForceUndoSaving();
-        MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), originalPic);
+        MouseMove(new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(e, e), originalPic);
     }
 
-    public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
-        if (e.Current.Button == MouseButtons.Left) {
+    public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
+        if (e.MouseCurrent.Button == MouseButtons.Left) {
             var pic = OnNeedCurrentPic();
-            FillCircle(pic, Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);
+            FillCircle(pic, Color.Black, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
             OnDoInvalidate();
         } else {
             OnDoInvalidate();

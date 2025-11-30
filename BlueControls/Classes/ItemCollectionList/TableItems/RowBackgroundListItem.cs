@@ -19,15 +19,12 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using BlueTable.Enums;
 using System.Drawing.Drawing2D;
-using BlueControls;
-using BlueControls.Controls;
 using BlueTable;
 
 namespace BlueControls.ItemCollectionList;
@@ -140,7 +137,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         GC.SuppressFinalize(this);
     }
 
-    //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionModified, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
+    //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionInControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
 
     public virtual void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) {
         DrawLine(gr, lin, xPos, xPos, top, bottom);
@@ -150,7 +147,11 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         DrawLine(gr, lin, left, right, bottom, bottom);
     }
 
-    public virtual void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionModified, float scale, TranslationType translate, float shiftX, float shiftY) {
+    public virtual void Draw_UpperLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) {
+        DrawLine(gr, lin, left, right, bottom, bottom);
+    }
+
+    public virtual void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
     }
 
     public void DrawLine(Graphics gr, ColumnLineStyle lin, float left, float right, float top, float bottom) {
@@ -203,22 +204,22 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
         if (Arrangement == null) { return; }
 
         for (var du = 0; du < 2; du++) {
             foreach (var viewItem in Arrangement) {
-                if (viewItem.Permanent && du == 0 || !viewItem.Permanent && du == 1) { continue; }
+                if ((viewItem.Permanent && du == 0) || (!viewItem.Permanent && du == 1)) { continue; }
                 if (viewItem.Column == null) { continue; }
 
-                var left = viewItem.Permanent ? viewItem.X * scale : viewItem.X * scale - shiftX;
+                var left = viewItem.ControlColumnLeft((int)offsetX);
 
                 if (left > visibleArea.Width) { continue; }
-                if (left + positionModified.Width < 0) { continue; }
+                if (left + positionInControl.Width < 0) { continue; }
 
-                var area = new Rectangle((int)(left ?? 0), (int)positionModified.Top, ZoomPad.GetPix(viewItem.DrawWidth(), scale), (int)positionModified.Height);
+                var area = new Rectangle(left, (int)positionInControl.Top, viewItem.ControlColumnWidth ?? 0, (int)positionInControl.Height);
 
-                if (Arrangement.Count == 1) { area = positionModified.ToRect(); }
+                if (Arrangement.Count == 1) { area = positionInControl.ToRect(); }
 
                 gr.SmoothingMode = SmoothingMode.None;
                 gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnCell), area);
@@ -226,10 +227,11 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 var t = viewItem.Column.DoOpticalTranslation;
                 if (!translate) { t = TranslationType.Original_Anzeigen; }
 
-                DrawColumn(gr, viewItem, area, scale, t, shiftX, shiftY);
+                DrawColumn(gr, viewItem, area, scale, t, offsetX, offsetY, state);
                 Draw_Border(gr, viewItem.LineLeft, area.Left, area.Top, area.Bottom);
                 Draw_Border(gr, viewItem.LineRight, area.Right, area.Top, area.Bottom);
-                Draw_LowerLine(gr, ColumnLineStyle.Dünn, area.Left, area.Right, area.Bottom - 1);
+                Draw_UpperLine(gr, ColumnLineStyle.Ohne, area.Right, area.Left, area.Top);
+                Draw_LowerLine(gr, ColumnLineStyle.Dünn, area.Right, area.Left, area.Bottom - 1);
             }
         }
     }

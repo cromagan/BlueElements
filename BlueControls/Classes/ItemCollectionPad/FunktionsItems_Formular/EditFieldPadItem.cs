@@ -69,14 +69,14 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public bool AutoSizeableHeight {
         get {
             if (_bearbeitung == EditTypeFormula.nur_als_Text_anzeigen) {
-                return (int)UsedArea.Height > AutosizableExtension.MinHeigthCaption;
+                return (int)CanvasUsedArea.Height > AutosizableExtension.MinHeigthCaption;
             }
 
             if (_captionPosition is CaptionPosition.Links_neben_dem_Feld or CaptionPosition.ohne) {
-                return (int)UsedArea.Height > AutosizableExtension.MinHeigthTextBox;
+                return (int)CanvasUsedArea.Height > AutosizableExtension.MinHeigthTextBox;
             }
 
-            return (int)UsedArea.Height > AutosizableExtension.MinHeigthCapAndBox;
+            return (int)CanvasUsedArea.Height > AutosizableExtension.MinHeigthCapAndBox;
         }
     }
 
@@ -255,24 +255,24 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stift, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, false);
+            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, false);
         }
 
         //if (Column  ==null || Column .IsDisposed) {
-        //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
+        //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionInControl.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
-        DrawFakeControl(gr, positionModified, scale, CaptionPosition, Column?.ReadableText() + ":", EditType);
+        DrawFakeControl(gr, positionInControl, scale, CaptionPosition, Column?.ReadableText() + ":", EditType);
         //}
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
+        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
 
-        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

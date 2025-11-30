@@ -62,12 +62,14 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Dick, left, right, bottom);
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
+    public override void Draw_UpperLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_UpperLine(gr, ColumnLineStyle.Dick, left, right, bottom);
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => new(40, 40);
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
-        base.DrawExplicit(gr, visibleArea, positionModified, itemdesign, state, drawBorderAndBack, translate, shiftX, shiftY, scale);
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+        base.DrawExplicit(gr, visibleArea, positionInControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
 
         if (Arrangement == null) { return; }
 
@@ -75,13 +77,13 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
         var tmp = ChapterText.Trim('\\');
 
-        var p14 = ZoomPad.GetPix(14, scale);
-        var p5 = ZoomPad.GetPix(5, scale);
-        var p23 = ZoomPad.GetPix(23, scale);
+        var p14 = 14.CanvasToControl(scale);
+        var p5 = 5.CanvasToControl(scale);
+        var p23 = 23.CanvasToControl(scale);
 
         var si = Font_RowChapter_Scaled.MeasureString(tmp);
-        gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionModified);
-        var buttonPos = new Rectangle(1, (int)(positionModified.Bottom - si.Height - p5 - 2), (int)si.Width + p23 + p14, (int)si.Height + p5);
+        gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionInControl);
+        var buttonPos = new Rectangle(1, (int)(positionInControl.Bottom - si.Height - p5 - 2), (int)si.Width + p23 + p14, (int)si.Height + p5);
 
         if (!Expanded) {
             var x = new ExtText(Design.Button_CheckBox, States.Checked);
@@ -93,7 +95,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
             gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, buttonPos.Top + p5);
         }
         Font_RowChapter_Scaled.DrawString(gr, tmp, p23, buttonPos.Top);
-        //gr.DrawLine(Skin.PenLinieDick, 0, positionModified.Y, positionModified.Width, positionModified.Y);
+        //gr.DrawLine(Skin.PenLinieDick, 0, positionInControl.Y, positionInControl.Width, positionInControl.Y);
     }
 
     protected override string GetCompareKey() => ChapterText;

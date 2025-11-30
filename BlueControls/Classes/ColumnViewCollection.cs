@@ -64,25 +64,28 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public string CaptionForEditor => "Spaltenanordnung";
 
-    public int ClientWidth {
-        get;
-        set {
-            if (field == value) { return; }
-
-            field = value;
-            OnStyleChanged();
-        }
-    } = 16;
-
     public string ColumnQuickInfo => string.Empty;
-    public int ColumnsPermanentWidth { get; private set; }
-    public int ColumnsWidth { get; private set; }
+
+    /// <summary>
+    /// Controll gibt an, dass es sich um Koordinten auf Controll ebene handel (nicht Canvas)
+    /// </summary>
+    public int ControlColumnsPermanentWidth { get; private set; }
+
+    /// <summary>
+    /// Controll gibt an, dass es sich um Koordinten auf Controll ebene handel (nicht Canvas)
+    /// </summary>
+    public int ControlColumnsWidth { get; private set; }
+
     public int Count => _internal.Count;
+
     public Type? Editor { get; set; }
+
     public int FilterRows { get; internal set; } = 1;
 
     public bool IsDisposed { get; private set; }
+
     public bool KeyIsCaseSensitive => false;
+
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
@@ -211,32 +214,27 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
 
-    public void ComputeAllColumnPositions() {
+    public void ComputeAllColumnPositions(int tableviewWith, float zoom) {
         foreach (var thisViewItem in this) {
-            thisViewItem.X = null;
+            thisViewItem.Invalidate_ControlColumnWidth();
+            thisViewItem.Invalidate_ControlColumnLeft();
         }
-
+        ControlColumnsPermanentWidth = 0;
+        ControlColumnsWidth = 0;
         if (IsDisposed) { return; }
 
-        ColumnsPermanentWidth = 0;
-        ColumnsWidth = 0;
-
-        var wdh = true;
         var maxX = 0;
 
         foreach (var thisViewItem in this) {
-            if (thisViewItem?.Column != null) {
-                if (thisViewItem.ViewType != ViewType.PermanentColumn) { wdh = false; }
+            thisViewItem.ComputeLocation(maxX, tableviewWith, zoom);
 
-                thisViewItem.X = maxX;
+            maxX = thisViewItem.ControlColumnRight(0);
 
-                maxX += thisViewItem.DrawWidth();
-                if (wdh) {
-                    ColumnsPermanentWidth = Math.Max(maxX, ColumnsPermanentWidth);
-                }
-
-                ColumnsWidth = Math.Max(maxX, ColumnsWidth);
+            if (thisViewItem.Permanent) {
+                ControlColumnsPermanentWidth = Math.Max(maxX, ControlColumnsPermanentWidth);
             }
+
+            ControlColumnsWidth = Math.Max(maxX, ControlColumnsWidth);
         }
     }
 
@@ -276,13 +274,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public void Invalidate_ContentWidthOfAllItems() {
         foreach (var thisViewItem in _internal) {
-            thisViewItem?.Invalidate_ContentWidth();
+            thisViewItem?.Invalidate_CanvasContentWidth();
         }
     }
 
     public void Invalidate_XOfAllItems() {
         foreach (var thisViewItem in _internal) {
-            thisViewItem?.Invalidate_X();
+            thisViewItem?.Invalidate_ControlColumnLeft();
         }
     }
 

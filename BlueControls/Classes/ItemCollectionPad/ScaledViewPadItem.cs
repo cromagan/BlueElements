@@ -82,7 +82,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         set {
             if (!field.IsDifferentTo(value)) { return; }
             field = value;
-            CalculateSize();
+            CalculateCanvasSize();
             OnPropertyChanged();
         }
     } = new([]);
@@ -94,7 +94,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             value = Math.Min(value, 100f);
             if (Math.Abs(value - field) < Constants.DefaultTolerance) { return; }
             field = value;
-            CalculateSize();
+            CalculateCanvasSize();
             OnPropertyChanged();
         }
     } = 1f;
@@ -130,7 +130,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
     public override void AddedToCollection(ItemCollectionPadItem parent) {
         base.AddedToCollection(parent);
-        CalculateSize();
+        CalculateCanvasSize();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -212,20 +212,20 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     }
 
     //}
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
 
-        var newarea = positionModified.ToRect();
-        var (childScale, childShiftX, childShiftY) = ItemCollectionPadItem.AlterView(positionModified, scale, shiftX, shiftY, true, CalculateShowingArea());
+        var newarea = positionInControl.ToRect();
+        var (childScale, childOffsetX, childOffsetY) = ItemCollectionPadItem.AlterView(positionInControl, scale, offsetX, offsetY, true, CalculateCanvasShowingArea());
 
         foreach (var thisItem in icpi) {
             if (thisItem is not ScaledViewPadItem) {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
-                var childpos = thisItem.UsedArea.ZoomAndMoveRect(childScale, childShiftX, childShiftY, false);
+                var childpos = thisItem.CanvasUsedArea.CanvasToControl(childScale, childOffsetX, childOffsetY, false);
                 if (IsInDrawingArea(childpos, newarea)) {
                     // IsInDrawingArea extra abfragen, weil ShowAlways dazwischenfunkt
                     gr.SetClip(newarea);
-                    thisItem.Draw(gr, newarea, childScale, childShiftX, childShiftY);
+                    thisItem.Draw(gr, newarea, childScale, childOffsetX, childOffsetY);
                     gr.ResetClip();
                 }
             }
@@ -242,15 +242,15 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         var textSize = bFont.MeasureString(Caption);
 
         // Umrandung der Detailansicht
-        gr.DrawRectangle(whitePen, positionModified);
-        gr.DrawRectangle(colorPen, positionModified);
+        gr.DrawRectangle(whitePen, positionInControl);
+        gr.DrawRectangle(colorPen, positionInControl);
         if (_ausrichtung != (Alignment)(-1)) {
-            gr.FillRectangle(Brushes.White, new RectangleF(positionModified.Left, positionModified.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
-            bFont.DrawString(gr, Caption, positionModified.Left, positionModified.Top - textSize.Height - (9f * scale));
+            gr.FillRectangle(Brushes.White, new RectangleF(positionInControl.Left, positionInControl.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
+            bFont.DrawString(gr, Caption, positionInControl.Left, positionInControl.Top - textSize.Height - (9f * scale));
         }
 
         //Markierung in der Zeichnung
-        var f = CalculateShowingArea().ZoomAndMoveRect(scale, shiftX, shiftY, false);
+        var f = CalculateCanvasShowingArea().CanvasToControl(scale, offsetX, offsetY, false);
         gr.DrawRectangle(whitePen, f);
         gr.DrawRectangle(colorPen, f);
         if (_ausrichtung != (Alignment)(-1)) {
@@ -258,10 +258,10 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             bFont.DrawString(gr, Caption, f.Left, f.Top - textSize.Height - (9f * scale));
         }
 
-        //base.DrawExplicit(gr,visibleArea,positionModified,scale, shiftX, shiftY);
+        //base.DrawExplicit(gr,visibleArea,positionInControl,scale, offsetX, offsetY);
     }
 
-    private RectangleF CalculateShowingArea() {
+    private RectangleF CalculateCanvasShowingArea() {
         var points = new List<PointM>();
 
         if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
@@ -289,10 +289,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         return area;
     }
 
-    private void CalculateSize() {
-        var r = CalculateShowingArea();
-        Size = new SizeF(r.Width * Scale, r.Height * Scale);
-    }
+    private void CalculateCanvasSize() => CanvasSize = CalculateCanvasShowingArea().Size;
 
     #endregion
 }

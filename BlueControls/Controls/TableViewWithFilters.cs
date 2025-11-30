@@ -168,8 +168,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.PowerEdit = value;
     }
 
-    public List<AbstractListItem>? RowsFilteredAndPinned {
-        get => TableInternal.RowsFilteredAndPinned;
+    public List<AbstractListItem>? RowViewItems {
+        get => TableInternal.RowViewItems;
     }
 
     public string SheetStyle {
@@ -616,7 +616,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         if (AutoPin && r.Count == 1) {
             if (_lastLooked != r[0].CellFirstString()) {
-                if (RowsFilteredAndPinned?.Get(r[0]) == null) {
+                if (RowViewItems?.Get(r[0]) == null) {
                     if (Forms.MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
                         PinAdd(r[0]);
                     }
@@ -749,7 +749,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         // Filterleistenelemente positionieren
         if (FilterleisteZeilen > 0) {
-            var firstRowY = 8; // Standard Y-Position für erste Zeile
+            var firstRowY = 8; // Standard Y-CanvasPosition für erste Zeile
 
             // Hauptelemente (erste Zeile)
             txbZeilenFilter.Top = firstRowY;

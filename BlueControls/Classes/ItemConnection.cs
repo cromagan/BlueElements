@@ -83,20 +83,20 @@ public class ItemConnection : IStringable, INotifyPropertyChanged {
     public static PointF GetConnectionPoint(AbstractPadItem item, ConnectionType itemc, AbstractPadItem otherItem) {
         switch (itemc) {
             case ConnectionType.Top:
-                return item.UsedArea.PointOf(Alignment.Top_HorizontalCenter);
+                return item.CanvasUsedArea.PointOf(Alignment.Top_HorizontalCenter);
 
             case ConnectionType.Bottom:
-                return item.UsedArea.PointOf(Alignment.Bottom_HorizontalCenter);
+                return item.CanvasUsedArea.PointOf(Alignment.Bottom_HorizontalCenter);
 
             case ConnectionType.Left:
-                return item.UsedArea.PointOf(Alignment.VerticalCenter_Left);
+                return item.CanvasUsedArea.PointOf(Alignment.VerticalCenter_Left);
 
             case ConnectionType.Right:
-                return item.UsedArea.PointOf(Alignment.VerticalCenter_Right);
+                return item.CanvasUsedArea.PointOf(Alignment.VerticalCenter_Right);
 
             default:
-                var m1 = otherItem.UsedArea.PointOf(Alignment.Horizontal_Vertical_Center);
-                return item.UsedArea.NearestLineMiddle(m1);
+                var m1 = otherItem.CanvasUsedArea.PointOf(Alignment.Horizontal_Vertical_Center);
+                return item.CanvasUsedArea.NearestLineMiddle(m1);
         }
     }
 

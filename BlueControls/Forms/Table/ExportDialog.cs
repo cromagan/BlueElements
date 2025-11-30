@@ -136,14 +136,14 @@ public sealed partial class ExportDialog : IHasTable {
         if (scx.Failed) { return -1; }
         tmp.ForPrinting = true;
 
-        var oneItem = tmp.UsedArea;
+        var oneItem = tmp.CanvasUsedArea;
         pad.Items.SheetStyle = tmp.SheetStyle;
         pad.ShowInPrintMode = true;
         pad.Items.GridShow = -1;
         pad.Items.BackColor = Color.LightGray;
         tmp.Dispose();
 
-        var druckB = pad.Items.UsedArea;
+        var druckB = pad.Items.CanvasUsedArea;
         var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPadItem.Dpi), MidpointRounding.AwayFromZero);
 
         var maxX = Math.Max(1, (int)Math.Floor(druckB.Width / (oneItem.Width + abstand + 0.01)));

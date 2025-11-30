@@ -40,7 +40,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     /// <summary>
     /// Die fixe Größe in Pixel
     /// </summary>
-    protected SizeF _size = SizeF.Empty;
+    protected SizeF _canvassize = SizeF.Empty;
 
     private readonly PointM _pl;
 
@@ -92,34 +92,34 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     [Description("Die Breite des Objekts in mm.")]
     public float Breite {
-        get => (float)Math.Round(PixelToMm(_size.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        get => (float)Math.Round(PixelToMm(_canvassize.Width, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
         set {
             if (IsDisposed) { return; }
             if (Math.Abs(Breite - value) < Constants.DefaultTolerance) { return; }
-            Size = _size with { Width = MmToPixel(value, ItemCollectionPadItem.Dpi) };
-        }
-    }
-
-    [Description("Die Höhe des Objekts in mm.")]
-    public float Höhe {
-        get => (float)Math.Round(PixelToMm(_size.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
-        set {
-            if (IsDisposed) { return; }
-            if (Math.Abs(Höhe - value) < Constants.DefaultTolerance) { return; }
-            Size = _size with { Height = MmToPixel(value, ItemCollectionPadItem.Dpi) };
+            CanvasSize = _canvassize with { Width = MmToPixel(value, ItemCollectionPadItem.Dpi) };
         }
     }
 
     /// <summary>
     /// Die fixe Größe in Pixel
     /// </summary>
-    public SizeF Size {
-        get => _size;
+    public SizeF CanvasSize {
+        get => _canvassize;
         set {
-            if (Math.Abs(_size.Width - value.Width) < Constants.DefaultTolerance && Math.Abs(_size.Height - value.Height) < Constants.DefaultTolerance) { return; }
-            _size = value;
+            if (Math.Abs(_canvassize.Width - value.Width) < Constants.DefaultTolerance && Math.Abs(_canvassize.Height - value.Height) < Constants.DefaultTolerance) { return; }
+            _canvassize = value;
             PointMoved(_pLo, new MoveEventArgs(false));
             OnPropertyChanged();
+        }
+    }
+
+    [Description("Die Höhe des Objekts in mm.")]
+    public float Höhe {
+        get => (float)Math.Round(PixelToMm(_canvassize.Height, ItemCollectionPadItem.Dpi), 2, MidpointRounding.AwayFromZero);
+        set {
+            if (IsDisposed) { return; }
+            if (Math.Abs(Höhe - value) < Constants.DefaultTolerance) { return; }
+            CanvasSize = _canvassize with { Height = MmToPixel(value, ItemCollectionPadItem.Dpi) };
         }
     }
 
@@ -139,14 +139,14 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {
-        var ua = UsedArea;
+        var ua = CanvasUsedArea;
         SetLeftTopPoint(x - (ua.Width / 2f) + (width / 2f), y - (ua.Height / 2f) + (height / 2f));
     }
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Size", _size);
+        result.ParseableAdd("Size", _canvassize);
 
         return result;
     }
@@ -159,7 +159,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "size":
-                _size = value.SizeParse();
+                _canvassize = value.SizeParse();
                 return true;
         }
 
@@ -178,18 +178,18 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         var y = point.Y;
 
         if (point == _pLo) {
-            _pRu.Y = y + _size.Height;
+            _pRu.Y = y + _canvassize.Height;
             _po.Y = y;
 
-            _pRu.X = x + _size.Width;
+            _pRu.X = x + _canvassize.Width;
             _pl.X = x;
         }
 
         if (point == _pRu) {
-            _pLo.X = x - _size.Width;
+            _pLo.X = x - _canvassize.Width;
             _pr.X = x;
 
-            _pLo.Y = y - _size.Height;
+            _pLo.Y = y - _canvassize.Height;
             _pu.Y = y;
         }
 
@@ -238,7 +238,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         CalculateJointMiddle(_pl, _pr);
     }
 
-    protected override RectangleF CalculateUsedArea() => new(_pLo.X, _pLo.Y, Size.Width, Size.Height);
+    protected override RectangleF CalculateCanvasUsedArea() => new(_pLo.X, _pLo.Y, CanvasSize.Width, CanvasSize.Height);
 
     #endregion
 }

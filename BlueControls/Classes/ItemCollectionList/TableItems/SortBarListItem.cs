@@ -18,8 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueControls;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueTable;
 using BlueTable.Enums;
@@ -55,23 +53,25 @@ public sealed class SortBarListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionModified, float scale, TranslationType translate, float shiftX, float shiftY) {
-        base.DrawColumn(gr, viewItem, positionModified, scale, translate, shiftX, shiftY);
+    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Ohne, left, right, bottom);
+
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.DrawColumn(gr, viewItem, positionInControl, scale, translate, offsetX, offsetY, state);
 
         if (Sort != null && Sort.UsedForRowSort(viewItem.Column)) {
-            var p6 = ZoomPad.GetPix(6, scale);
-            var p12 = ZoomPad.GetPix(12, scale);
+            var p6 = 6.CanvasToControl(scale);
+            var p12 = 12.CanvasToControl(scale);
             var im = Sort.Reverse ? QuickImage.Get("ZA|" + p12 + "|" + p6 + "||||50") : QuickImage.Get("AZ|" + p12 + "|" + p6 + "||||50");
 
             gr.DrawImage(im,
-                positionModified.X + (positionModified.Width - im.Width) / 2f,
-                positionModified.Y + (positionModified.Height - im.Height) / 2f);
+                positionInControl.X + (positionInControl.Width - im.Width) / 2f,
+                positionInControl.Y + (positionInControl.Height - im.Height) / 2f);
         }
     }
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => new(14, 14);
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(14, 14);
 
     #endregion
 }

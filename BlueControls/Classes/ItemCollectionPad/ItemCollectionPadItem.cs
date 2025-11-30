@@ -277,15 +277,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     #region Methods
 
-    public static (float scale, float shiftX, float shiftY) AlterView(RectangleF positionModified, float scale, float shiftX, float shiftY, bool autoZoomFit, RectangleF usedArea) {
-        var newX = shiftX;
-        var newY = shiftY;
+    public static (float scale, float offsetX, float offsetY) AlterView(RectangleF positionInControl, float scale, float offsetX, float offsetY, bool autoZoomFit, RectangleF usedArea) {
+        var newX = offsetX;
+        var newY = offsetY;
         var newS = scale;
 
         if (autoZoomFit) {
-            newS = ZoomFitValue(usedArea, positionModified.ToRect().Size);
-            newX = -positionModified.X - (positionModified.Width / 2f);
-            newY = -positionModified.Y - (positionModified.Height / 2f);
+            newS = ZoomFitValue(usedArea, positionInControl.ToRect().Size);
+            newX = -positionInControl.X - (positionInControl.Width / 2f);
+            newY = -positionInControl.Y - (positionInControl.Height / 2f);
             newX += (usedArea.Left + (usedArea.Width / 2f)) * newS;
             newY += (usedArea.Top + (usedArea.Height / 2f)) * newS;
         }
@@ -296,14 +296,14 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// <summary>
     /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
     /// </summary>
-    /// <param name="maxBounds"></param>
-    /// <param name="sizeOfPaintArea"></param>
-    /// <param name="zoomToUse"></param>
+    /// <param name="maxCanvasBounds"></param>
+    /// <param name="controlArea"></param>
+    /// <param name="zoom"></param>
     /// <returns></returns>
-    public static Point CenterPos(RectangleF maxBounds, Size sizeOfPaintArea, float zoomToUse) {
-        var w = sizeOfPaintArea.Width - (maxBounds.Width * zoomToUse);
-        var h = sizeOfPaintArea.Height - (maxBounds.Height * zoomToUse);
-        return new Point((int)w, (int)h);
+    public static Point CenterPos(RectangleF maxCanvasBounds, Size controlArea, float zoom) {
+        var w = controlArea.Width - maxCanvasBounds.Width.CanvasToControl(zoom);
+        var h = controlArea.Height - maxCanvasBounds.Height.CanvasToControl(zoom);
+        return new Point(w, h);
     }
 
     public static List<RectangleF> ResizeControls(List<IAutosizable> its, float newWidth, float newHeight, float currentWidth, float currentHeight) {
@@ -320,26 +320,26 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             #region  newY
 
-            newY.Add(thisIt.UsedArea.Y * scaleY);
+            newY.Add(thisIt.CanvasUsedArea.Y * scaleY);
 
             #endregion
 
             #region  newX
 
-            newX.Add(thisIt.UsedArea.X * scaleX);
+            newX.Add(thisIt.CanvasUsedArea.X * scaleX);
 
             #endregion
 
             #region  newH
 
-            var nh = thisIt.UsedArea.Height * scaleY;
+            var nh = thisIt.CanvasUsedArea.Height * scaleY;
 
             if (thisIt.AutoSizeableHeight) {
                 if (!thisIt.CanChangeHeightTo(nh)) {
                     nh = AutosizableExtension.MinHeigthCapAndBox;
                 }
             } else {
-                nh = thisIt.UsedArea.Height;
+                nh = thisIt.CanvasUsedArea.Height;
             }
 
             newH.Add(nh);
@@ -348,7 +348,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             #region  newW
 
-            newW.Add(thisIt.UsedArea.Width * scaleX);
+            newW.Add(thisIt.CanvasUsedArea.Width * scaleX);
 
             #endregion
         }
@@ -425,8 +425,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     for (var coll = tocheck + 1; coll < its.Count; coll++) {
                         //var poscoll = PositioOf(coll);
 
-                        if (its[coll].UsedArea.Y >= its[tocheck].UsedArea.Bottom && its[coll].UsedArea.IntersectsVericalyWith(its[tocheck].UsedArea)) {
-                            newY[coll] = newY[tocheck] + newH[tocheck] + its[coll].UsedArea.Top - its[tocheck].UsedArea.Bottom;
+                        if (its[coll].CanvasUsedArea.Y >= its[tocheck].CanvasUsedArea.Bottom && its[coll].CanvasUsedArea.IntersectsVericalyWith(its[tocheck].CanvasUsedArea)) {
+                            newY[coll] = newY[tocheck] + newH[tocheck] + its[coll].CanvasUsedArea.Top - its[tocheck].CanvasUsedArea.Bottom;
                             //pos = PositioOf(tocheck);
                         }
                     }
@@ -516,16 +516,16 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         foreach (var thisc in padData._internal) {
             if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
-                IsInDrawingArea(thisc.UsedArea, padData.UsedArea.ToRect())) {
+                IsInDrawingArea(thisc.CanvasUsedArea, padData.CanvasUsedArea.ToRect())) {
                 its.Add(aas);
             }
         }
 
-        its.Sort((it1, it2) => it1.UsedArea.Y.CompareTo(it2.UsedArea.Y));
+        its.Sort((it1, it2) => it1.CanvasUsedArea.Y.CompareTo(it2.CanvasUsedArea.Y));
 
         #endregion
 
-        var p = ResizeControls(its, newWidthPixel, newhHeightPixel, padData.UsedArea.Width, padData.UsedArea.Height);
+        var p = ResizeControls(its, newWidthPixel, newhHeightPixel, padData.CanvasUsedArea.Width, padData.CanvasUsedArea.Height);
 
         var erg = new List<(IAutosizable item, RectangleF newpos)>();
 
@@ -536,13 +536,14 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return erg;
     }
 
-    public static PointF SliderValues(RectangleF bounds, float zoomToUse, Point topLeftPos) => new((float)((bounds.Left * zoomToUse) - (topLeftPos.X / 2d)),
-            (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
+    public static PointF SliderValues(RectangleF canvasBounds, float zoom, Point topLeftPos)
+        => new(canvasBounds.Left.CanvasToControl(zoom) - (topLeftPos.X / 2f),
+               canvasBounds.Top.CanvasToControl(zoom) - (topLeftPos.Y / 2f));
 
-    public static float ZoomFitValue(RectangleF maxBounds, Size sizeOfPaintArea) => maxBounds.IsEmpty
+    public static float ZoomFitValue(RectangleF canvasBounds, Size controlSize) => canvasBounds.IsEmpty
             ? 1f
-            : Math.Min(sizeOfPaintArea.Width / maxBounds.Width,
-            sizeOfPaintArea.Height / maxBounds.Height);
+            : Math.Min(controlSize.Width / canvasBounds.Width,
+            controlSize.Height / canvasBounds.Height);
 
     public void Add(AbstractPadItem? item) {
         if (item == null) { Develop.DebugPrint(ErrorType.Error, "Item ist null"); return; }
@@ -635,19 +636,19 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return null;
     }
 
-    public AbstractPadItem? HotItem(Point point, bool topLevel, float scale, float shiftX, float shiftY) {
+    public AbstractPadItem? HotItem(Point controlPoint, bool topLevel, float scale, float offsetX, float offsetY) {
         // Berechne die unscaled Koordinaten für dieses Item
 
-        var unscaledPoint = ZoomPad.CoordinatesUnscaled(point, scale, shiftX, shiftY);
+        var canvasPoint = controlPoint.ControlToCanvas(scale, offsetX, offsetY);
 
-        //CreativePad.MouseCoords = unscaledPoint.ToString();
+        //CreativePad.MouseCoords = canvasPoint.ToString();
 
         //// Prüfe die Grenzen nur, wenn nicht endlos
-        //if (!_endless && !UsedArea.Contains(unscaledPoint)) { return null; }
+        //if (!_endless && !CanvasUsedArea.Contains(canvasPoint)) { return null; }
 
         // Finde alle Items, die den Punkt enthalten
-        var hotItems = _internal.Where(item => item?.Contains(unscaledPoint, scale) == true)
-                                        .OrderBy(item => item.UsedArea.Width * item.UsedArea.Height)
+        var hotItems = _internal.Where(item => item?.Contains(canvasPoint, scale) == true)
+                                        .OrderBy(item => item.CanvasUsedArea.Width * item.CanvasUsedArea.Height)
                                         .ToList();
 
         // Wenn kein Item gefunden wurde, return null
@@ -664,35 +665,34 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
         if (smallestHotItem is ItemCollectionPadItem { IsDisposed: false } icpi) {
-            var positionModified = icpi.UsedArea.ZoomAndMoveRect(scale, shiftX, shiftY, false);
-            var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
+            var alteredUsedArea = icpi.CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
+            var (childScale, childOffsetX, childOffsetY) = AlterView(alteredUsedArea, scale, offsetX, offsetY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
 
             ////Berechne den neuen Punkt für das Kind - Item
             //var childPoint = new Point(
-            //    (int)(-(point.X - positionModified.X)),
-            //    (int)(-(point.Y - positionModified.Y))
+            //    (int)(-(controlPoint.ControlX - alteredUsedArea.ControlX)),
+            //    (int)(-(controlPoint.Y - alteredUsedArea.Y))
             //);
 
             //var childPoint = new Point(
-            //    (int)positionModified.X + (int)( point.X- positionModified.X),
-            //    (int)positionModified.Y + (int)(point.Y - positionModified.Y));
+            //    (int)alteredUsedArea.ControlX + (int)( controlPoint.ControlX- alteredUsedArea.ControlX),
+            //    (int)alteredUsedArea.Y + (int)(controlPoint.Y - alteredUsedArea.Y));
 
-            //var pn = new Point(point.X - (int) positionModified.X, unscaledPoint.Y);
+            //var pn = new Point(controlPoint.ControlX - (int) alteredUsedArea.ControlX, canvasPoint.Y);
             // Berechnung des childPoint
-            //var childPoint = ZoomPad.CoordinatesUnscaled(point, childScale, childShiftX, childShiftY);
+            //var childPoint = ZoomPad.CoordinatesUnscaled(controlPoint, childScale, childOffsetX, childOffsetY);
 
-            //var childPoint = ZoomPad.CoordinatesUnscaled(pn, childScale, childShiftX, childShiftY);
+            //var childPoint = ZoomPad.CoordinatesUnscaled(pn, childScale, childOffsetX, childOffsetY);
 
             // Rekursiver Aufruf mit den angepassten Koordinaten
-            var childHotItem = icpi.HotItem(point, false, childScale, childShiftX, childShiftY);
-            //CreativePad.XXX = CreativePad.XXX  + ";" + childShiftX.ToString();
+            var childHotItem = icpi.HotItem(controlPoint, false, childScale, childOffsetX, childOffsetY);
+            //CreativePad.XXX = CreativePad.XXX  + ";" + childOffsetX.ToString();
             // Wenn ein Kind-Item gefunden wurde, geben wir dieses zurück
             if (childHotItem != null) {
                 //CreativePad.Highlight = childHotItem;
                 return childHotItem;
             }
         }
-
         // Wenn kein Kind-Item gefunden wurde oder es kein ItemCollection war,
         // geben wir das ursprünglich gefundene Item zurück
         //CreativePad.Highlight = smallestHotItem;
@@ -1096,8 +1096,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Höhe = PixelToMm(newhHeightPixel, Dpi);
     }
 
-    protected override RectangleF CalculateUsedArea() {
-        if (!Endless) { return base.CalculateUsedArea(); }
+    protected override RectangleF CalculateCanvasUsedArea() {
+        if (!Endless) { return base.CalculateCanvasUsedArea(); }
 
         var f = UsedAreaOfItems();
         return f with { X = f.X + _pLo.X, Y = f.Y + _pLo.Y };
@@ -1116,11 +1116,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Connections.RemoveAll();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         gr.PixelOffsetMode = PixelOffsetMode.None;
 
-        var d = !Endless ? UsedArea.ToRect().ZoomAndMoveRect(scale, shiftX, shiftY, false) : visibleArea;
-        var ds = !Endless ? positionModified : visibleArea;
+        var d = !Endless ? CanvasUsedArea.ToRect().CanvasToControl(scale, offsetX, offsetY, false) : visibleArea;
+        var ds = !Endless ? positionInControl : visibleArea;
 
         if (BackColor.A > 0) {
             gr.FillRectangle(new SolidBrush(BackColor), d);
@@ -1136,7 +1136,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             var p = new Pen(Color.FromArgb(10, 0, 0, 0));
             float ex = 0;
 
-            var po = new PointM(0, 0).ZoomAndMove(scale, shiftX, shiftY);
+            var po = new PointM(0, 0).CanvasToControl(scale, offsetX, offsetY);
             float dxp, dyp, dxm, dym;
 
             do {
@@ -1167,11 +1167,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         #region Items selbst
 
-        var (childScale, childShiftX, childShiftY) = AlterView(positionModified, scale, shiftX, shiftY, AutoZoomFit, UsedAreaOfItems());
+        var (childScale, childOffsetX, childOffsetY) = AlterView(positionInControl, scale, offsetX, offsetY, AutoZoomFit, UsedAreaOfItems());
 
         foreach (var thisItem in _internal) {
             gr.PixelOffsetMode = PixelOffsetMode.None;
-            thisItem.Draw(gr, positionModified.ToRect(), childScale, childShiftX, childShiftY);
+            thisItem.Draw(gr, positionInControl.ToRect(), childScale, childOffsetX, childOffsetY);
         }
 
         #endregion
@@ -1361,7 +1361,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         var done = false;
         foreach (var thisItem in _internal) {
             if (thisItem != null) {
-                var ua = thisItem.UsedArea;
+                var ua = thisItem.CanvasUsedArea;
                 x1 = Math.Min(x1, ua.Left);
                 y1 = Math.Min(y1, ua.Top);
                 x2 = Math.Max(x2, ua.Right);

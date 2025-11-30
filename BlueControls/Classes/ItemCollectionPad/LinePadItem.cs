@@ -197,7 +197,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Linie, 16);
 
-    protected override RectangleF CalculateUsedArea() {
+    protected override RectangleF CalculateCanvasUsedArea() {
         if (_point1.X == 0d && _point2.X == 0d && _point1.Y == 0d && _point2.Y == 0d) { return RectangleF.Empty; }
         if (_tempPoints is not { Count: not 0 }) { CalcTempPoints(); }
         if (_tempPoints is not { Count: not 0 }) { return RectangleF.Empty; }
@@ -212,7 +212,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
             y2 = Math.Max(thisPoint.Y, y2);
         }
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
-        //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
+        //Return New Rectangle(CInt(Math.Min(Point1.ControlX, Point2.ControlX)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.ControlX - Point1.ControlX)), CInt(Math.Abs(Point2.Y - Point1.Y)))
     }
 
     protected override void Dispose(bool disposing) {
@@ -220,13 +220,13 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         UnRegisterEvents();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         if (_style != PadStyles.Undefiniert) {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
 
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-                gr.DrawLine(this.GetFont().Pen(scale), _tempPoints[z].ZoomAndMove(scale, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(scale, shiftX, shiftY));
+                gr.DrawLine(this.GetFont().Pen(scale), _tempPoints[z].CanvasToControl(scale, offsetX, offsetY), _tempPoints[z + 1].CanvasToControl(scale, offsetX, offsetY));
             }
         }
     }
@@ -247,7 +247,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     private static bool SchneidetDas(AbstractPadItem? thisBasicItem, PointM p1, PointM p2) {
         if (thisBasicItem == null) { return false; }
         if (thisBasicItem is not LinePadItem) {
-            var a = thisBasicItem.UsedArea;
+            var a = thisBasicItem.CanvasUsedArea;
             if (a is { Width: > 0, Height: > 0 }) {
                 a.Inflate(2, 2);
 
@@ -347,7 +347,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
         foreach (var thisBasicItem in icpi) {
             if (thisBasicItem is { IsDisposed: false } and not LinePadItem) {
-                var a = thisBasicItem.UsedArea;
+                var a = thisBasicItem.CanvasUsedArea;
                 if (a is { Width: > 0, Height: > 0 }) {
                     a.Inflate(2, 2);
                     if (a.Contains(x, y)) { return true; }
@@ -360,8 +360,8 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     private bool LöscheVerdeckte(int p1) {
         if (_tempPoints?[p1] is not { } p) { return false; }
 
-        //if (Math.Abs(p.X - _point1.X) < DefaultTolerance && Math.Abs(p.Y - _point1.Y) < DefaultTolerance) { return false; }
-        //if (Math.Abs(p.X - _point2.X) < DefaultTolerance && Math.Abs(p.Y - _point2.Y) < DefaultTolerance) { return false; }
+        //if (Math.Abs(p.ControlX - _point1.ControlX) < DefaultTolerance && Math.Abs(p.Y - _point1.Y) < DefaultTolerance) { return false; }
+        //if (Math.Abs(p.ControlX - _point2.ControlX) < DefaultTolerance && Math.Abs(p.Y - _point2.Y) < DefaultTolerance) { return false; }
 
         if (IsVerdeckt(p.X, p.Y)) {
             _tempPoints.RemoveAt(p1);
@@ -444,7 +444,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
             if (thisItemBasic is { IsDisposed: false } and not LinePadItem)
             //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
             {
-                var a = thisItemBasic.UsedArea;
+                var a = thisItemBasic.CanvasUsedArea;
                 if (a is { Width: > 0, Height: > 0 }) {
                     a.Inflate(2, 2);
                     var lo = a.PointOf(Alignment.Top_Left);

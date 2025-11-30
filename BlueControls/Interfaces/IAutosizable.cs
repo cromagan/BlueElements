@@ -26,7 +26,7 @@ public interface IAutosizable {
     #region Properties
 
     bool AutoSizeableHeight { get; }
-    RectangleF UsedArea { get; }
+    RectangleF CanvasUsedArea { get; }
 
     #endregion
 
@@ -55,7 +55,7 @@ public static class AutosizableExtension {
 
     public static bool CanChangeHeightTo(this IAutosizable item, float heightinPixel) => item.AutoSizeableHeight && heightinPixel > MinHeigthCapAndBox;
 
-    public static bool CanScaleHeightTo(this IAutosizable item, float scale) => CanChangeHeightTo(item, item.UsedArea.Height * scale);
+    public static bool CanScaleHeightTo(this IAutosizable item, float scale) => CanChangeHeightTo(item, item.CanvasUsedArea.Height * scale);
 
     #endregion
 }

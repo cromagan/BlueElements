@@ -159,8 +159,8 @@ namespace BlueControls.Forms {
             this.padVorschau.EditAllowed = false;
             this.padVorschau.Location = new Point(232, 80);
             this.padVorschau.Name = "padVorschau";
-            this.padVorschau.ShiftX = 0F;
-            this.padVorschau.ShiftY = 0F;
+            this.padVorschau.OffsetX = 0F;
+            this.padVorschau.OffsetY = 0F;
             this.padVorschau.ShowInPrintMode = true;
             this.padVorschau.Size = new Size(623, 480);
             this.padVorschau.TabIndex = 1;
@@ -335,8 +335,8 @@ namespace BlueControls.Forms {
             this.padPrint.EditAllowed = false;
             this.padPrint.Location = new Point(5, 60);
             this.padPrint.Name = "padPrint";
-            this.padPrint.ShiftX = 0F;
-            this.padPrint.ShiftY = 0F;
+            this.padPrint.OffsetX = 0F;
+            this.padPrint.OffsetY = 0F;
             this.padPrint.ShowInPrintMode = true;
             this.padPrint.Size = new Size(849, 568);
             this.padPrint.TabIndex = 2;
@@ -435,8 +435,8 @@ namespace BlueControls.Forms {
             this.padSchachteln.EditAllowed = false;
             this.padSchachteln.Location = new Point(8, 40);
             this.padSchachteln.Name = "padSchachteln";
-            this.padSchachteln.ShiftX = 0F;
-            this.padSchachteln.ShiftY = 0F;
+            this.padSchachteln.OffsetX = 0F;
+            this.padSchachteln.OffsetY = 0F;
             this.padSchachteln.ShowInPrintMode = true;
             this.padSchachteln.Size = new Size(849, 584);
             this.padSchachteln.TabIndex = 3;

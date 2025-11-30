@@ -106,18 +106,18 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText, IHasF
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         // Die Eigangszeile ist immer vom übergeordenetem Formular und wird einfach weitergegeben.
         // Deswegen ist InputColorID nur Fake
 
         if (!ForPrinting) {
-            DrawArrowOutput(gr, positionModified, scale, ForPrinting, OutputColorId);
-            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, false);
+            DrawArrowOutput(gr, positionInControl, scale, ForPrinting, OutputColorId);
+            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, false);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
+        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
 
-        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

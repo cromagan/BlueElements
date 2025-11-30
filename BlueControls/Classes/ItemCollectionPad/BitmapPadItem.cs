@@ -292,39 +292,39 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        //positionModified.Inflate(-_padding, -_padding);
-        //RectangleF r1 = new(positionModified.Left , positionModified.Top , positionModified.Width , positionModified.Height );
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+        //positionInControl.Inflate(-_padding, -_padding);
+        //RectangleF r1 = new(positionInControl.Left , positionInControl.Top , positionInControl.Width , positionInControl.Height );
         RectangleF r2 = new();
         RectangleF r3 = new();
         if (Bitmap != null) {
             r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
             switch (Bild_Modus) {
                 case SizeModes.Verzerren: {
-                        r2 = positionModified;
+                        r2 = positionInControl;
                         break;
                     }
 
                 case SizeModes.BildAbschneiden: {
-                        var scale2 = Math.Max(positionModified.Width / Bitmap.Width, positionModified.Height / Bitmap.Height);
-                        var tmpw = positionModified.Width / scale2;
-                        var tmph = positionModified.Height / scale2;
+                        var scale2 = Math.Max(positionInControl.Width / Bitmap.Width, positionInControl.Height / Bitmap.Height);
+                        var tmpw = positionInControl.Width / scale2;
+                        var tmph = positionInControl.Height / scale2;
                         r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
-                        r2 = positionModified;
+                        r2 = positionInControl;
                         break;
                     }
                 default: // Is = enSizeModes.WeißerRand
                 {
-                        var scale2 = Math.Min(positionModified.Width / Bitmap.Width, positionModified.Height / Bitmap.Height);
-                        r2 = new RectangleF(((positionModified.Width - (Bitmap.Width * scale2)) / 2) + positionModified.Left, ((positionModified.Height - (Bitmap.Height * scale2)) / 2) + positionModified.Top, Bitmap.Width * scale2, Bitmap.Height * scale2);
+                        var scale2 = Math.Min(positionInControl.Width / Bitmap.Width, positionInControl.Height / Bitmap.Height);
+                        r2 = new RectangleF(((positionInControl.Width - (Bitmap.Width * scale2)) / 2) + positionInControl.Left, ((positionInControl.Height - (Bitmap.Height * scale2)) / 2) + positionInControl.Top, Bitmap.Width * scale2, Bitmap.Height * scale2);
                         break;
                     }
             }
         }
-        var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
+        var trp = positionInControl.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);
-        var r1 = positionModified with { X = positionModified.Left - trp.X, Y = positionModified.Top - trp.Y };
+        var r1 = positionInControl with { X = positionInControl.Left - trp.X, Y = positionInControl.Top - trp.Y };
         r2 = r2 with { X = r2.Left - trp.X, Y = r2.Top - trp.Y };
         if (Hintergrund_Weiß_Füllen) {
             gr.FillRectangle(Brushes.White, r1);
@@ -352,7 +352,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         if (!ForPrinting) {
             if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
                 Font f = new("Arial", 8);
-                BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionModified.Left, positionModified.Top);
+                BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionInControl.Left, positionInControl.Top);
             }
         }
     }

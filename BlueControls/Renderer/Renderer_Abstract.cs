@@ -95,7 +95,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     #region Methods
 
     public Size ContentSize(string content, TranslationType translate) {
-        //if (string.IsNullOrEmpty(content)) { return Size.Empty; }
+        //if (string.IsNullOrEmpty(content)) { return CanvasSize.Empty; }
 
         var key = TextSizeKey(_lastCode, content);
 

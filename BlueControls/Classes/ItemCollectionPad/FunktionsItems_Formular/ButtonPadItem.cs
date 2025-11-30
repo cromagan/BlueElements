@@ -474,17 +474,17 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stop, 16, Color.Transparent, Skin.IdColor(InputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         _eTxt ??= new ExtText(Design.Button, States.Standard);
-        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _beschriftung, positionModified.ToRect(), false);
+        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _beschriftung, positionInControl.ToRect(), false);
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionModified, scale, InputColorId, false, false, true);
+            DrawColorScheme(gr, positionInControl, scale, InputColorId, false, false, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
+        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
 
-        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

@@ -23,7 +23,7 @@ public class PositionEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public PositionEventArgs(int x, int y) {
+    public PositionEventArgs(float x, float y) {
         X = x;
         Y = y;
     }
@@ -32,9 +32,9 @@ public class PositionEventArgs : System.EventArgs {
 
     #region Properties
 
-    public int X { get; set; }
+    public float X { get; set; }
 
-    public int Y { get; set; }
+    public float Y { get; set; }
 
     #endregion
 }

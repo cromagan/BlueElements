@@ -134,7 +134,7 @@ public partial class Notification : FloatingForm {
             if (ms < SpeedIn) {
                 // Kommt von Rechts reingeflogen
                 Opacity = ms / SpeedIn;
-                //Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
+                //Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.CanvasSize.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
                 newTop = Math.Min(newTop, _lowestY);
             } else if (Top >= Screen.PrimaryScreen.Bounds.Size.Height || Opacity < 0.01) {
                 //Lebensdauer überschritten
@@ -291,7 +291,7 @@ public partial class Notification : FloatingForm {
     //        }
     //        if (this.Design == enDesign.Form_DesktopBenachrichtigung)
     //        {
-    //            Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - Width - Skin.Padding * 2;
+    //            Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.CanvasSize.Width - Width - Skin.Padding * 2;
     //            Region = new Region(new Rectangle(0, 0, Width, (int)(Math.Truncate(Height * _Proz))));
     //            Top = (int)(Math.Truncate(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height * _Proz));
     //            Opacity = _Proz;

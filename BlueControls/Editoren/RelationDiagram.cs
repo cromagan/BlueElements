@@ -83,7 +83,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     #region Methods
 
     //private bool RelationsValid;
-    //   Dim ItS As New Size(60, 80)
+    //   Dim ItS As New CanvasSize(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
         if (IsDisposed || Table is not { IsDisposed: false } db) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
@@ -165,19 +165,19 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         //            case clsRelation.enRelationStatus.Identisch:
         //                if (Welche == -1 || Welche == 0)
         //                {
-        //                    AddOne(Rel.Sec, (int)(I.UsedArea().X + I.UsedArea().Width * (Plus + 0.5m)), (int)I.UsedArea().Y);
+        //                    AddOne(Rel.Sec, (int)(I.CanvasUsedArea().ControlX + I.CanvasUsedArea().Width * (Plus + 0.5m)), (int)I.CanvasUsedArea().Y);
         //                }
         //                break;
         //            case clsRelation.enRelationStatus.Uber:
         //                if (Welche == -1 || Welche == 1)
         //                {
-        //                    AddOne(Rel.Sec, (int)(I.UsedArea().X + I.UsedArea().Width * (Plus + 0.5m)), (int)(I.UsedArea().Y - I.UsedArea().Height * 1.5m));
+        //                    AddOne(Rel.Sec, (int)(I.CanvasUsedArea().ControlX + I.CanvasUsedArea().Width * (Plus + 0.5m)), (int)(I.CanvasUsedArea().Y - I.CanvasUsedArea().Height * 1.5m));
         //                }
         //                break;
         //            case clsRelation.enRelationStatus.Unter:
         //                if (Welche == -1 || Welche == 2)
         //                {
-        //                    AddOne(Rel.Sec, (int)(I.UsedArea().X + I.UsedArea().Width * (Plus + 0.5m)), (int)(I.UsedArea().Y + I.UsedArea().Height * 1.5m));
+        //                    AddOne(Rel.Sec, (int)(I.CanvasUsedArea().ControlX + I.CanvasUsedArea().Width * (Plus + 0.5m)), (int)(I.CanvasUsedArea().Y + I.CanvasUsedArea().Height * 1.5m));
         //                }
         //                break;
         //            default:
@@ -387,7 +387,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     //        If Pad.Item(P1) IsNot Nothing AndAlso TypeOf Pad.Item(P1).Object Is clsExtTxt Then
     //            For P2 As Integer = Skin.P1 + 1 To Pad.Item.Lastx
     //                If Pad.Item(2) IsNot Nothing AndAlso TypeOf Pad.Item(2).Object Is clsExtTxt Then
-    //                    If Pad.Item(P1).UsedArea.IntersectsWith(Pad.Item(2).UsedArea) Then
+    //                    If Pad.Item(P1).CanvasUsedArea.IntersectsWith(Pad.Item(2).CanvasUsedArea) Then
     //                        Entwirren(Pad.Item(P1), Pad.Item(2))
     //                        Entwirren()
     //                        Exit Sub
@@ -399,21 +399,21 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     //    '   If Wirr Then Entwirren()
     //End Sub
     //Private Sub Entwirren(I1 As BasicItem, I2 As BasicItem)
-    //    If I1.UsedArea.Left >= I2.UsedArea.Left Then
-    //        I1.UsedArea = New Rectangle(I1.Coordinates.Left + Pad.Raster.Width,
+    //    If I1.CanvasUsedArea.Left >= I2.CanvasUsedArea.Left Then
+    //        I1.CanvasUsedArea = New Rectangle(I1.Coordinates.Left + Pad.Raster.Width,
     //                                      I1.Coordinates.Top,
     //                                      I1.Coordinates.Width,
     //                                      I1.Coordinates.Height)
-    //        I2.UsedArea = New Rectangle(I2.Coordinates.Left - Pad.Raster.Width,
+    //        I2.CanvasUsedArea = New Rectangle(I2.Coordinates.Left - Pad.Raster.Width,
     //                          I2.Coordinates.Top,
     //                          I2.Coordinates.Width,
     //                          I2.Coordinates.Height)
     //    Else
-    //        I1.UsedArea = New Rectangle(I1.Coordinates.Left - Pad.Raster.Width,
+    //        I1.CanvasUsedArea = New Rectangle(I1.Coordinates.Left - Pad.Raster.Width,
     //                                      I1.Coordinates.Top,
     //                                      I1.Coordinates.Width,
     //                                      I1.Coordinates.Height)
-    //        I2.UsedArea = New Rectangle(I2.Coordinates.Left + Pad.Raster.Width,
+    //        I2.CanvasUsedArea = New Rectangle(I2.Coordinates.Left + Pad.Raster.Width,
     //                          I2.Coordinates.Top,
     //                          I2.Coordinates.Width,
     //                          I2.Coordinates.Height)
@@ -442,7 +442,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     //    'Dim l As New List(Of String)
     //    'For z As Integer = 0 To Pad.Item.Lastx
     //    '    If Pad.Item(z) IsNot Nothing AndAlso TypeOf Pad.Item(z).Object Is clsExtTxt Then
-    //    '        l.GenerateAndAdd(Pad.Item(z).Internal & "|" & Pad.Item(z).UsedArea.Left & "|" & Pad.Item(z).UsedArea.Top)
+    //    '        l.GenerateAndAdd(Pad.Item(z).Internal & "|" & Pad.Item(z).CanvasUsedArea.Left & "|" & Pad.Item(z).CanvasUsedArea.Top)
     //    '    End If
     //    'Next
     //    'SaveToDiskx(SaveFileDialog1.FileName, l.JoinWithCr(), False)

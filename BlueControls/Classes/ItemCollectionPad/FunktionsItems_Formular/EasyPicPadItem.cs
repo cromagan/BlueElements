@@ -142,17 +142,17 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         //var id = GetRowFrom?.OutputColorId ?? - 1;
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionModified, scale, InputColorId, true, true, false);
+            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, false);
         }
 
-        DrawFakeControl(gr, positionModified, scale, CaptionPosition.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
+        DrawFakeControl(gr, positionInControl, scale, CaptionPosition.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
 
-        base.DrawExplicit(gr, visibleArea, positionModified, scale, shiftX, shiftY);
-        DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
+        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

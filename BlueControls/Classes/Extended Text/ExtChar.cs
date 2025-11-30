@@ -117,7 +117,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         GC.SuppressFinalize(this);
     }
 
-    public abstract void Draw(Graphics gr, Point posModificator, float scale);
+    public abstract void Draw(Graphics gr, Point offset, float zoom);
 
     public abstract string HtmlText();
 
@@ -127,15 +127,15 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     public abstract bool IsSpace();
 
-    public bool IsVisible(float zoom, Point drawingPos, Rectangle area) {
-        if (area.Width < 1 || area.Height < 1) { return true; }
+    public bool IsVisible(float zoom, Point offset, Rectangle controlArea) {
+        if (controlArea.Width < 1 || controlArea.Height < 1) { return true; }
 
-        var px = (Pos.X * zoom) + drawingPos.X;
-        if (px > area.Right) { return false; }
+        var px = Pos.X.CanvasToControl(zoom, offset.X);
+        if (px > controlArea.Right) { return false; }
 
-        var py = (Pos.Y * zoom) + drawingPos.Y;
-        return py <= area.Bottom && px + (Size.Width * zoom) >= area.Left &&
-               py + (Size.Height * zoom) >= area.Top;
+        var py = Pos.Y.CanvasToControl(zoom, offset.Y);
+        return py <= controlArea.Bottom && px + (Size.Width * zoom) >= controlArea.Left &&
+               py + Size.Height.CanvasToControl(zoom) >= controlArea.Top;
     }
 
     public abstract bool IsWordSeparator();
@@ -171,13 +171,13 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
     /////
     ///// </summary>
     ///// <param name="zoom"></param>
-    ///// <param name="drawingPos">Muss bereits Skaliert sein</param>
+    ///// <param name="offset">Muss bereits Skaliert sein</param>
     ///// <returns></returns>
-    //public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) => drawingArea is { Width: < 1, Height: < 1 } ||
-    //    ((drawingArea.Width <= 0 || (Pos.X * zoom) + drawingPos.X <= drawingArea.Right)
-    //     && (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
-    //     && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
-    //     && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
+    //public bool IsVisible(float zoom, Point offset, Rectangle drawingArea) => drawingArea is { Width: < 1, Height: < 1 } ||
+    //    ((drawingArea.Width <= 0 || (Pos.X * zoom) + offset.X <= drawingArea.Right)
+    //     && (drawingArea.Height <= 0 || (Pos.Y * zoom) + offset.Y <= drawingArea.Bottom)
+    //     && ((Pos.X + Size.Width) * zoom) + offset.X >= drawingArea.Left
+    //     && ((Pos.Y + Size.Height) * zoom) + offset.Y >= drawingArea.Top);
     public abstract string PlainText();
 
     protected abstract SizeF CalculateSize();

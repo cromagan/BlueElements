@@ -154,7 +154,7 @@ public class Renderer_Layout : Renderer_Abstract {
             return new Size(16, 16);
         }
 
-        return new Size((int)l.UsedArea.Width, (int)l.UsedArea.Height);
+        return new Size((int)l.CanvasUsedArea.Width, (int)l.CanvasUsedArea.Height);
     }
 
     /// <summary>

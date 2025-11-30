@@ -18,8 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueControls;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueTable;
 using BlueTable.Enums;
@@ -55,18 +53,20 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         return QuickImage.Get(column.CaptionBitmapCode + "|100");
     }
 
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionModified, float scale, TranslationType translate, float shiftX, float shiftY) {
-        base.DrawColumn(gr, viewItem, positionModified, scale, translate, shiftX, shiftY);
+    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Ohne, left, right, bottom);
+
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.DrawColumn(gr, viewItem, positionInControl, scale, translate, offsetX, offsetY, state);
         if (viewItem.Column is not { IsDisposed: false } column) { return; }
 
         #region Recude-Button zeichnen
 
-        if (positionModified.Width > 70 || viewItem.Reduced) {
-            // Anpassen der Reduce-Button-Position
+        if (positionInControl.Width > 70 || viewItem.Reduced) {
+            // Anpassen der Reduce-Button-CanvasPosition
 
-            var p14 = ZoomPad.GetPix(14, scale);
+            var p14 = 14.CanvasToControl(scale);
 
-            var origReduceButtonLocation = new Rectangle((int)positionModified.Right - p14, (int)positionModified.Top, p14, p14);
+            var origReduceButtonLocation = new Rectangle((int)positionInControl.Right - p14, (int)positionInControl.Top, p14, p14);
 
             gr.DrawImage(
                 viewItem.Reduced ? QuickImage.Get("Pfeil_Rechts|" + origReduceButtonLocation.Width + "|||FF0000|||||20")
@@ -81,7 +81,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         #region Roten Rand für Split-Spalten
 
         if (column == column.Table?.Column.ChunkValueColumn) {
-            var t = positionModified;
+            var t = positionInControl;
             t.Inflate(-3, -3);
             gr.DrawRectangle(new Pen(Color.Red, 6), t);
         }
@@ -95,8 +95,8 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
             #region Spalte mit Bild zeichnen
 
-            var pos = new Point((int)positionModified.X + (int)((positionModified.Width - Font_Head_Default_Scaled.Width) / 2.0), 3);
-            gr.DrawImageInRectAspectRatio(cb, (int)positionModified.X + 2, (int)(pos.Y + Font_Head_Default_Scaled.Height), (int)positionModified.Width - 4, (int)positionModified.Bottom - (int)(pos.Y + Font_Head_Default_Scaled.Height) - 6 - 18);
+            var pos = new Point((int)positionInControl.X + (int)((positionInControl.Width - Font_Head_Default_Scaled.Width) / 2.0), 3);
+            gr.DrawImageInRectAspectRatio(cb, (int)positionInControl.X + 2, (int)(pos.Y + Font_Head_Default_Scaled.Height), (int)positionInControl.Width - 4, (int)positionInControl.Bottom - (int)(pos.Y + Font_Head_Default_Scaled.Height) - 6 - 18);
             // Dann der Text
             gr.TranslateTransform(pos.X, pos.Y);
             Font_Head_Colored(viewItem).Scale(scale).DrawString(gr, capTranslated, 0, 0);
@@ -107,8 +107,8 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
             #region Spalte ohne Bild zeichnen
 
-            var p4 = ZoomPad.GetPix(4, scale);
-            var pos = new Point((int)positionModified.X + (int)((positionModified.Width - Font_Head_Default_Scaled.Height) / 2.0), (int)positionModified.Bottom - p4);
+            var p4 = 4.CanvasToControl(scale);
+            var pos = new Point((int)positionInControl.X + (int)((positionInControl.Width - Font_Head_Default_Scaled.Height) / 2.0), (int)positionInControl.Bottom - p4);
             gr.TranslateTransform(pos.X, pos.Y);
             gr.RotateTransform(-90);
             Font_Head_Colored(viewItem).Scale(scale).DrawString(gr, capTranslated, 0, 0);
@@ -128,9 +128,9 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         }
     }
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         if (IsDisposed || Arrangement is null) { return new(16, 16); }
 
         if (!Arrangement.ShowHead) { return new(0, 0); }

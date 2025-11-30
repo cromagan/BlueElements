@@ -164,7 +164,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
 
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) {
         // Komplett keine Skalierung durchführen - Tab-Größen bleiben unverändert
-        // Nur die Position kann sich ändern, aber nicht die Größe der Tabs
+        // Nur die CanvasPosition kann sich ändern, aber nicht die Größe der Tabs
     }
 
     protected override void ScaleCore(float dx, float dy) {

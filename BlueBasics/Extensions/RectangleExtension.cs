@@ -27,6 +27,33 @@ public static partial class Extensions {
 
     #region Methods
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <param name="scale"></param>
+    /// <param name="offsetX"></param>
+    /// <param name="offsetY"></param>
+    /// <param name="outerLine">true = die Punkte komplett umschlossen (für Fills), false = Mitte der Punkte</param>
+    /// <returns></returns>
+    public static Rectangle CanvasToControl(this Rectangle rect, float scale, float offsetX, float offsetY, bool outerLine) {
+        if (outerLine) {
+            // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+            //               0 und 25 rauskommen
+            return new Rectangle(rect.X.CanvasToControl(scale) - (int)offsetX,
+                                  rect.Y.CanvasToControl(scale) - (int)offsetY,
+                                  rect.Width.CanvasToControl(scale),
+                                  rect.Height.CanvasToControl(scale));
+        }
+
+        // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+        //               2,5 und 27,5 rauskommen
+        return new Rectangle(rect.X.CanvasToControl(scale, offsetX),
+                              rect.Y.CanvasToControl(scale, offsetY),
+                              rect.Width.CanvasToControl(scale),
+                              rect.Height.CanvasToControl(scale));
+    }
+
     public static PointF NearestCornerOf(this Rectangle r, Point p) {
         //TODO: Unused
         List<Point> pl =
@@ -88,34 +115,6 @@ public static partial class Extensions {
                 Develop.DebugPrint(p);
                 return Point.Empty;
         }
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="rect"></param>
-    /// <param name="scale"></param>
-    /// <param name="shiftX"></param>
-    /// <param name="shiftY"></param>
-    /// <param name="outerLine">true = die Punkte komplett umschlossen (für Fills), false = Mitte der Punkte</param>
-    /// <returns></returns>
-    public static RectangleF ZoomAndMoveRect(this RectangleF rect, float scale, float shiftX, float shiftY, bool outerLine) {
-        if (outerLine) {
-            // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
-            //               0 und 25 rauskommen
-            return new RectangleF((rect.X * scale) - shiftX,
-                (rect.Y * scale) - shiftY,
-                rect.Width * scale,
-                rect.Height * scale);
-        }
-
-        // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
-        //               2,5 und 27,5 rauskommen
-        var add = scale / 2;
-        return new RectangleF((rect.X * scale) - shiftX + add,
-            (rect.Y * scale) - shiftY + add,
-            rect.Width * scale,
-            rect.Height * scale);
     }
 
     #endregion

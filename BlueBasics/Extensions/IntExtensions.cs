@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Globalization;
 
 namespace BlueBasics;
@@ -24,6 +25,14 @@ namespace BlueBasics;
 public static partial class Extensions {
 
     #region Methods
+
+    public static int CanvasToControl(this int value, float zoom, float offset) => (int)Math.Round(value * zoom + offset, 0, MidpointRounding.AwayFromZero);
+
+    public static int CanvasToControl(this int value, float zoom) => (int)Math.Round(value * zoom, 0, MidpointRounding.AwayFromZero);
+
+    public static float ControlToCanvas(this int value, float zoom, float offset) => (value - offset) / zoom;
+
+    public static float ControlToCanvas(this int value, float zoom) => value / zoom;
 
     public static string ToStringInt1(this int value) => value.ToString("0", CultureInfo.InvariantCulture);
 

@@ -41,15 +41,15 @@ public class LineListItem : AbstractListItem {
 
     #region Methods
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => 4;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 4;
 
     public override bool IsClickable() => false;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Position is { X: 0, Y: 0 } and { Width: 0, Height: 0 } ? new Size(4, 4) : Position.Size;
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => CanvasPosition is { X: 0, Y: 0 } and { Width: 0, Height: 0 } ? new Size(4, 4) : CanvasPosition.Size;
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionModified.Left, (int)(positionModified.Top + (positionModified.Height / 2.0)), positionModified.Right, (int)(positionModified.Top + (positionModified.Height / 2.0)));
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionInControl.Left, (int)(positionInControl.Top + (positionInControl.Height / 2.0)), positionInControl.Right, (int)(positionInControl.Top + (positionInControl.Height / 2.0)));
 
-    protected override string GetCompareKey() => Position.ToString();
+    protected override string GetCompareKey() => CanvasPosition.ToString();
 
     #endregion
 }

@@ -25,7 +25,6 @@ using System.Windows.Forms;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.Generic;
 
-
 namespace BluePaint;
 
 public partial class Tool_Clipping {
@@ -45,29 +44,29 @@ public partial class Tool_Clipping {
 
     #region Methods
 
-    public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
-        if (originalPic == null) { return; }
+    public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
+        if (originalPic == null || e.MouseCurrent == null) { return; }
         Pen penBlau = new(Color.FromArgb(150, 0, 0, 255));
         DrawZusatz(e, originalPic);
-        e.DrawLine(penBlau, e.Current.TrimmedX, -1, e.Current.TrimmedX, originalPic.Height);
-        e.DrawLine(penBlau, -1, e.Current.TrimmedY, originalPic.Width, e.Current.TrimmedY);
+        e.DrawLine(penBlau, e.MouseCurrent.TrimmedCanvasX, -1, e.MouseCurrent.TrimmedCanvasX, originalPic.Height);
+        e.DrawLine(penBlau, -1, e.MouseCurrent.TrimmedCanvasY, originalPic.Width, e.MouseCurrent.TrimmedCanvasY);
 
-        if (e.Current.Button == MouseButtons.Left) {
-            e.DrawLine(penBlau, e.MouseDown.X, -1, e.MouseDown.X, originalPic.Height);
-            e.DrawLine(penBlau, -1, e.MouseDown.Y, originalPic.Width, e.MouseDown.Y);
+        if (e.MouseCurrent.Button == MouseButtons.Left && e.MouseDown != null) {
+            e.DrawLine(penBlau, e.MouseDown.CanvasX, -1, e.MouseDown.CanvasX, originalPic.Height);
+            e.DrawLine(penBlau, -1, e.MouseDown.CanvasY, originalPic.Width, e.MouseDown.CanvasY);
         }
     }
 
-    public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) => OnDoInvalidate();
+    public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) => OnDoInvalidate();
 
-    public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) => OnDoInvalidate();
+    public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) => OnDoInvalidate();
 
-    public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
+    public override void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
         if (originalPic == null) { return; }
-        Links.Value = Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX) + 1;
-        Recht.Value = -(originalPic.Width - Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX));
-        Oben.Value = Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY) + 1;
-        Unten.Value = -(originalPic.Height - Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
+        Links.Value = Math.Min(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX) + 1;
+        Recht.Value = -(originalPic.Width - Math.Max(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX));
+        Oben.Value = Math.Min(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY) + 1;
+        Unten.Value = -(originalPic.Height - Math.Max(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY));
         ValueChangedByClicking(this, System.EventArgs.Empty);
     }
 
@@ -99,7 +98,7 @@ public partial class Tool_Clipping {
         Unten.Minimum = -pic.Height - 1;
     }
 
-    private void DrawZusatz(AdditionalDrawing e, Image? originalPic) {
+    private void DrawZusatz(AdditionalDrawingEventArgs e, Image? originalPic) {
         SolidBrush brushBlau = new(Color.FromArgb(120, 0, 0, 255));
         if (originalPic == null) { return; }
 
@@ -121,7 +120,7 @@ public partial class Tool_Clipping {
 
     private void WollenSieDenZuschnittÜbernehmen() {
         if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
-        if(BlueControls.Forms.MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
+        if (BlueControls.Forms.MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
         ZuschnittOK_Click(null, System.EventArgs.Empty);
     }
 

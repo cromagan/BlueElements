@@ -26,6 +26,10 @@ public static partial class Extensions {
 
     #region Methods
 
+    public static int CanvasToControl(this float value, float zoom, float offset) => (int)Math.Round(value * zoom + offset, 0, MidpointRounding.AwayFromZero);
+
+    public static int CanvasToControl(this float value, float zoom) => (int)Math.Round(value * zoom, 0, MidpointRounding.AwayFromZero);
+
     public static string ToStringFloat(this double value) => value.ToString(CultureInfo.InvariantCulture);
 
     public static string ToStringFloat1(this float value) => Math.Round(value, 1, MidpointRounding.AwayFromZero).ToString("0.#", CultureInfo.InvariantCulture);

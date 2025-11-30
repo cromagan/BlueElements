@@ -207,8 +207,8 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) =>
-        gr.DrawImage(SymbolForReadableText(), positionModified);//base.DrawExplicit(gr,visibleArea, positionModified, scale, shiftX, shiftY);//DrawArrorInput(gr, positionModified, scale, ForPrinting, InputColorId);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) =>
+        gr.DrawImage(SymbolForReadableText(), positionInControl);//base.DrawExplicit(gr,visibleArea, positionInControl, scale, offsetX, offsetY);//DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
 
     #endregion
 }

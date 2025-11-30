@@ -74,20 +74,20 @@ public class TextListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
     public override bool IsClickable() => !IsCaption && base.IsClickable();
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Skin.GetBlueFont(TempDesign(itemdesign), States.Standard).FormatedText_NeededSize(Text, Symbol, 16);
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => Skin.GetBlueFont(TempDesign(itemdesign), States.Standard).FormatedText_NeededSize(Text, Symbol, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
         var tmpd = TempDesign(itemdesign);
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, tmpd, state, positionModified.ToRect(), null, false);
+            Skin.Draw_Back(gr, tmpd, state, positionInControl.ToRect(), null, false);
         }
-        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionModified.ToRect(), tmpd, state, null, false, translate);
+        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionInControl.ToRect(), tmpd, state, null, false, translate);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, tmpd, state, positionModified.ToRect());
+            Skin.Draw_Border(gr, tmpd, state, positionInControl.ToRect());
         }
     }
 

@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueTable;
 using BlueTable.Enums;
@@ -60,15 +59,19 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
     }
 
     public override string QuickInfo => string.Empty;
+
     public int RowsFilteredCount { get; set; }
+
     public bool ShowNumber { get; set; }
 
     #endregion
 
     #region Methods
 
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionModified, float scale, TranslationType translate, float shiftX, float shiftY) {
-        base.DrawColumn(gr, viewItem, positionModified, scale, translate, shiftX, shiftY);
+    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Dick, left, right, bottom);
+
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.DrawColumn(gr, viewItem, positionInControl, scale, translate, offsetX, offsetY, state);
 
         #region Trichter-Text && trichterState
 
@@ -92,12 +95,14 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
         QuickImage? trichterIcon = null;
 
-        // Anpassen der Autofilter-Position
-        var origAutoFilterLocation = new RectangleF(positionModified.Right - positionModified.Height, positionModified.Top, positionModified.Height, positionModified.Height).ToRect();
+        var siz = (int)positionInControl.Height - 2;
 
-        var paf = positionModified.Height;
+        // Anpassen der Autofilter-CanvasPosition
+        var origAutoFilterLocation = new Rectangle((int)positionInControl.Right - siz, (int)positionInControl.Top, siz, siz);
 
-        var pts = (int)(positionModified.Height * 0.8);
+        var paf = positionInControl.Height;
+
+        var pts = (int)(positionInControl.Height * 0.8);
 
         if (FilterCombined != null) {
             if (FilterCombined.HasAlwaysFalse() && viewItem.AutoFilterSymbolPossible) {
@@ -117,7 +122,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
         }
 
         if (trichterIcon != null) {
-            var p2 = ZoomPad.GetPix(2, scale);
+            var p2 = 2.CanvasToControl(scale);
             gr.DrawImage(trichterIcon, origAutoFilterLocation.Left + p2, origAutoFilterLocation.Top + p2);
         }
 
@@ -135,15 +140,15 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
         #region LaufendeNummer
 
         if (ShowNumber && Arrangement != null) {
-            Font_Numbers.Scale(scale).DrawString(gr, "#" + Arrangement.IndexOf(viewItem), positionModified.X, positionModified.Top);
+            Font_Numbers.Scale(scale).DrawString(gr, "#" + Arrangement.IndexOf(viewItem), positionInControl.X, positionInControl.Top);
         }
 
         #endregion
     }
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => AutoFilterSize;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => AutoFilterSize + 2;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => new(AutoFilterSize, AutoFilterSize);
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(AutoFilterSize, AutoFilterSize + 2);
 
     private int Autofilter_Text(ColumnViewItem viewItem) {
         if (IsDisposed) { return 0; }

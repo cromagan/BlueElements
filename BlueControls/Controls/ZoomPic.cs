@@ -24,7 +24,6 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Windows.Forms;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.Controls;
@@ -34,8 +33,8 @@ public partial class ZoomPic : ZoomPad {
 
     #region Fields
 
-    private MouseEventArgs1_1? _mouseCurrent;
-    private MouseEventArgs1_1? _mouseDown;
+    private TrimmedCanvasMouseEventArgs? _mouseCurrent;
+    private TrimmedCanvasMouseEventArgs? _mouseDown;
 
     #endregion
 
@@ -49,13 +48,13 @@ public partial class ZoomPic : ZoomPad {
 
     #region Events
 
-    public event EventHandler<AdditionalDrawing>? DoAdditionalDrawing;
+    public event EventHandler<AdditionalDrawingEventArgs>? DoAdditionalDrawing;
 
-    public event EventHandler<MouseEventArgs1_1>? ImageMouseDown;
+    public event EventHandler<TrimmedCanvasMouseEventArgs>? ImageMouseDown;
 
-    public event EventHandler<MouseEventArgs1_1DownAndCurrent>? ImageMouseMove;
+    public event EventHandler<TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs>? ImageMouseMove;
 
-    public event EventHandler<MouseEventArgs1_1DownAndCurrent>? ImageMouseUp;
+    public event EventHandler<TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs>? ImageMouseUp;
 
     public event EventHandler<PositionEventArgs>? OverwriteMouseImageData;
 
@@ -84,20 +83,13 @@ public partial class ZoomPic : ZoomPad {
 
     #region Methods
 
-    public Point PointInsidePic(int x, int y) {
-        if (Bmp?.IsValid() != true) { return Point.Empty; }
-        x = Math.Max(0, x);
-        y = Math.Max(0, y);
-        x = Math.Min(Bmp.Width - 1, x);
-        y = Math.Min(Bmp.Height - 1, y);
-        return new Point(x, y);
-    }
+    protected override RectangleF CalculateCanvasMaxBounds() => Bmp?.IsValid() == true ? new RectangleF(0, 0, Bmp.Width, Bmp.Height) : new RectangleF(0, 0, 0, 0);
 
     protected override void DrawControl(Graphics gr, States state) {
         base.DrawControl(gr, state);
 
         // Get drawable area considering scrollbars
-        var drawArea = AvailablePaintArea();
+        var drawArea = AvailableControlPaintArea();
 
         // Create and draw gradient background
         using LinearGradientBrush lgb = new(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
@@ -105,8 +97,7 @@ public partial class ZoomPic : ZoomPad {
 
         if (Bmp?.IsValid() == true) {
             // Calculate image rectangle considering scrollbars
-            var imageRect = new RectangleF(0, 0, Bmp.Width, Bmp.Height)
-                .ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
+            var imageRect = new RectangleF(0, 0, Bmp.Width, Bmp.Height).CanvasToControl(Zoom, OffsetX, OffsetY, true);
 
             // Clip to available area
             gr.SetClip(drawArea);
@@ -124,29 +115,27 @@ public partial class ZoomPic : ZoomPad {
             gr.ResetClip();
         }
 
-        OnDoAdditionalDrawing(new AdditionalDrawing(gr, Zoom, ShiftX, ShiftY, _mouseDown, _mouseCurrent));
+        OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, drawArea);
     }
 
-    protected override RectangleF MaxBounds() => Bmp?.IsValid() == true ? new RectangleF(0, 0, Bmp.Width, Bmp.Height) : new RectangleF(0, 0, 0, 0);
-
-    protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e) => DoAdditionalDrawing?.Invoke(this, e);
+    protected virtual void OnDoAdditionalDrawing(AdditionalDrawingEventArgs e) => DoAdditionalDrawing?.Invoke(this, e);
 
     /// <summary>
     /// Zuerst ImageMouseUp, dann MouseUp
     /// </summary>
     /// <param name="e"></param>
-    protected virtual void OnImageMouseUp(MouseEventArgs1_1 e) => ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_mouseDown, e));
+    protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) => ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
 
-    protected override void OnMouseDown(MouseEventArgs e) {
+    protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);
         _mouseCurrent = GenerateNewMouseEventArgs(e);
         _mouseDown = _mouseCurrent;
         OnImageMouseDown(_mouseDown);
     }
 
-    protected override void OnMouseMove(MouseEventArgs e) {
+    protected override void OnMouseMove(CanvasMouseEventArgs e) {
         base.OnMouseMove(e);
         _mouseCurrent = GenerateNewMouseEventArgs(e);
         OnImageMouseMove(_mouseCurrent);
@@ -156,7 +145,7 @@ public partial class ZoomPic : ZoomPad {
     /// Zuerst ImageMouseUp, dann MouseUp
     /// </summary>
     /// <param name="e"></param>
-    protected override void OnMouseUp(MouseEventArgs e) {
+    protected override void OnMouseUp(CanvasMouseEventArgs e) {
         _mouseCurrent = GenerateNewMouseEventArgs(e);
         OnImageMouseUp(_mouseCurrent);
         base.OnMouseUp(e);
@@ -165,18 +154,27 @@ public partial class ZoomPic : ZoomPad {
 
     protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);
 
-    private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e) {
-        PositionEventArgs en = new(MousePos11.X, MousePos11.Y);
-        OnOverwriteMouseImageData(en);
-        var p = PointInsidePic(en.X, en.Y);
-        return new MouseEventArgs1_1(e.Button, e.Clicks, en.X, en.Y, e.Delta, p.X, p.Y, IsInBitmap(en.X, en.Y));
+    private TrimmedCanvasMouseEventArgs GenerateNewMouseEventArgs(CanvasMouseEventArgs e) {
+        var newCanvasCoords = new PositionEventArgs(e.CanvasX, e.CanvasY);
+
+        OnOverwriteMouseImageData(newCanvasCoords);
+
+        if (Bmp?.IsValid() != true) {
+            return new TrimmedCanvasMouseEventArgs(e, -1, -1, false);
+        }
+        var X = (int)Math.Max(0, newCanvasCoords.X);
+        var Y = (int)Math.Max(0, newCanvasCoords.Y);
+        X = Math.Min(Bmp.Width - 1, X);
+        Y = Math.Min(Bmp.Height - 1, Y);
+
+        var IsInBitmap = newCanvasCoords.X >= 0 && newCanvasCoords.Y >= 0 && newCanvasCoords.X <= Bmp.Width && newCanvasCoords.Y <= Bmp.Height;
+
+        return new TrimmedCanvasMouseEventArgs(e, X, Y, IsInBitmap);
     }
 
-    private bool IsInBitmap(int x, int y) => Bmp?.IsValid() == true && x >= 0 && y >= 0 && x <= Bmp.Width && y <= Bmp.Height;
+    private void OnImageMouseDown(TrimmedCanvasMouseEventArgs e) => ImageMouseDown?.Invoke(this, e);
 
-    private void OnImageMouseDown(MouseEventArgs1_1 e) => ImageMouseDown?.Invoke(this, e);
-
-    private void OnImageMouseMove(MouseEventArgs1_1 e) => ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_mouseDown, e));
+    private void OnImageMouseMove(TrimmedCanvasMouseEventArgs e) => ImageMouseMove?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
 
     #endregion
 }

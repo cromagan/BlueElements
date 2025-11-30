@@ -45,6 +45,8 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     #region Properties
 
+    public ColumnItem? Column { get; set; }
+
     public bool MarkYellow {
         get;
         set {
@@ -61,8 +63,8 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionModified, float scale, TranslationType translate, float shiftX, float shiftY) {
-        base.DrawColumn(gr, viewItem, positionModified, scale, translate, shiftX, shiftY);
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.DrawColumn(gr, viewItem, positionInControl, scale, translate, offsetX, offsetY, state);
 
         if (viewItem.Column == null) { return; }
 
@@ -70,13 +72,21 @@ public sealed class RowListItem : RowBackgroundListItem {
             Row.CheckRow();
         }
 
+        if (viewItem.Column == Column) {
+            var _tmpCursorRect = new Rectangle((int)positionInControl.X+1, (int)positionInControl.Y+1, (int)positionInControl.Width-2, (int)positionInControl.Height-2);
+            Skin.Draw_Back(gr, Design.Table_Cursor, state, _tmpCursorRect, null, false);
+            Skin.Draw_Border(gr, Design.Table_Cursor, state, _tmpCursorRect);
+        }
+
         var toDrawd = Row.CellGetString(viewItem.Column);
-        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionModified.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionInControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+
+
     }
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         if (IsDisposed || Row.IsDisposed || Arrangement is null) { return new(16, 16); }
 
         var drawHeight = 18;
@@ -92,6 +102,17 @@ public sealed class RowListItem : RowBackgroundListItem {
         drawHeight = Math.Max(drawHeight, 18);
 
         return new(100, drawHeight);
+    }
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+        base.DrawExplicit(gr, visibleArea, positionInControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
+        if (Column == null) { return; }
+
+        //var stat = States.Standard;
+        //if (Focused()) { stat = States.Standard_HasFocus; }
+        var _tmpCursorRect = positionInControl.ToRect();
+        Pen pen = new(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180));
+        gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1));
     }
 
     #endregion

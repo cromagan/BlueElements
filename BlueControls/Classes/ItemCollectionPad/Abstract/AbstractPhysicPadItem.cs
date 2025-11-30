@@ -66,8 +66,8 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
     // The cross product is a vector perpendicular to AB
     // and BC having length |AB| * |BC| * Sin(theta) and
     // with direction given by the right-hand rule.
-    // For two vectors in the X-Y plane, the result is a
-    // vector with X and Y components 0 so the Z component
+    // For two vectors in the ControlX-Y plane, the result is a
+    // vector with ControlX and Y components 0 so the Z component
     // gives the vector's length and direction.
     public static float CrossProductLength(float ax, float ay, float bx, float by, float cx, float cy) {
         // Get the vectors' coordinates.
@@ -377,7 +377,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
     // Return true if the polygon is oriented clockwise.
     public bool PolygonIsOrientedClockwise(List<PointF> points) => SignedPolygonArea(points) < 0;
 
-    protected override RectangleF CalculateUsedArea() {
+    protected override RectangleF CalculateCanvasUsedArea() {
         var minx = float.MaxValue;
         var miny = float.MaxValue;
         var maxx = float.MinValue;
@@ -391,11 +391,11 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         return new RectangleF(minx, miny, maxx - minx, maxy - miny);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         if (MovablePoint.Count > 0) {
             var lastP = MovablePoint[MovablePoint.Count - 1];
             foreach (var thisP in MovablePoint) {
-                gr.DrawLine(Pens.Black, lastP.ZoomAndMove(scale, shiftX, shiftY), thisP.ZoomAndMove(scale, shiftX, shiftY));
+                gr.DrawLine(Pens.Black, lastP.CanvasToControl(scale, offsetX, offsetY), thisP.CanvasToControl(scale, offsetX, offsetY));
                 lastP = thisP;
             }
         }

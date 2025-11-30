@@ -124,7 +124,7 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public Bitmap GetTransformedBitmap() {
-        var r = UsedArea;
+        var r = CanvasUsedArea;
         var bmp = new Bitmap((int)r.Width, (int)r.Height);
         var gr = Graphics.FromImage(bmp);
         gr.Clear(Color.White);
@@ -181,7 +181,7 @@ public class ComicCompPadItem : AbstractPadItem {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Verschieben, 16);
 
-    protected override RectangleF CalculateUsedArea() {
+    protected override RectangleF CalculateCanvasUsedArea() {
         //var wp12 = AngleOfMiddleLine();
         var angleOfMiddleLine = GetAngle(P1, JointMiddle);
 
@@ -211,11 +211,11 @@ public class ComicCompPadItem : AbstractPadItem {
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
-        var lOt = _ber_Lo.ZoomAndMove(scale, shiftX, shiftY);
-        var rOt = _ber_Ro.ZoomAndMove(scale, shiftX, shiftY);
-        var rUt = _ber_Ru.ZoomAndMove(scale, shiftX, shiftY);
-        var lUt = _ber_Lu.ZoomAndMove(scale, shiftX, shiftY);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+        var lOt = _ber_Lo.CanvasToControl(scale, offsetX, offsetY);
+        var rOt = _ber_Ro.CanvasToControl(scale, offsetX, offsetY);
+        var rUt = _ber_Ru.CanvasToControl(scale, offsetX, offsetY);
+        var lUt = _ber_Lu.CanvasToControl(scale, offsetX, offsetY);
         PointF[] destPara2 = [lOt, rOt, lUt];
         if (_bitmap != null) {
             gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
@@ -225,7 +225,7 @@ public class ComicCompPadItem : AbstractPadItem {
             gr.DrawLine(ZoomPad.PenGray, rOt, rUt);
             gr.DrawLine(ZoomPad.PenGray, rUt, lUt);
             gr.DrawLine(ZoomPad.PenGray, lUt, lOt);
-            gr.DrawLine(ZoomPad.PenGray, P1.ZoomAndMove(scale, shiftX, shiftY), P2.ZoomAndMove(scale, shiftX, shiftY));
+            gr.DrawLine(ZoomPad.PenGray, P1.CanvasToControl(scale, offsetX, offsetY), P2.CanvasToControl(scale, offsetX, offsetY));
         }
     }
 

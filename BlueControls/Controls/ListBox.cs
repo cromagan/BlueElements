@@ -271,7 +271,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
     }
 
     public Size CalculateColumnAndSize(Renderer_Abstract renderer) {
-        var (biggestItemX, _, heightAdded, orienation) = _item.ItemData(_itemDesign);
+        var (biggestItemX, _, heightAdded, orienation) = _item.CanvasItemData(_itemDesign);
         if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, biggestItemX, heightAdded, orienation, 0, renderer); }
         BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orienation);
         return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation, 0, renderer);
@@ -581,30 +581,30 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                     if (senkrechtAllowed == Orientation.Waagerecht) {
                         if (isCaption) { wi = controlDrawingArea.Width - sliderWidth; }
                     }
-                    var he = thisItem.HeightForListBox(_appearance, colHeight, _itemDesign);
+                    var he = thisItem.HeightInControl(_appearance, colHeight, _itemDesign);
 
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
-                            if (previtem.Position.Right + colWidth > controlDrawingArea.Width || isCaption) {
+                            if (previtem.CanvasPosition.Right + colWidth > controlDrawingArea.Width || isCaption) {
                                 cx = 0;
-                                cy = previtem.Position.Bottom;
+                                cy = previtem.CanvasPosition.Bottom;
                             } else {
-                                cx = previtem.Position.Right;
-                                cy = previtem.Position.Top;
+                                cx = previtem.CanvasPosition.Right;
+                                cy = previtem.CanvasPosition.Top;
                             }
                         } else {
                             if (itenc % BreakAfterItems == 0) {
-                                cx = previtem.Position.Right;
+                                cx = previtem.CanvasPosition.Right;
                                 cy = 0;
                             } else {
-                                cx = previtem.Position.Left;
-                                cy = previtem.Position.Bottom;
+                                cx = previtem.CanvasPosition.Left;
+                                cy = previtem.CanvasPosition.Bottom;
                             }
                         }
                     }
-                    thisItem.Position = new Rectangle(cx, cy, wi, he);
-                    maxX = Math.Max(thisItem.Position.Right, maxX);
-                    maxy = Math.Max(thisItem.Position.Bottom, maxy);
+                    thisItem.CanvasPosition = new Rectangle(cx, cy, wi, he);
+                    maxX = Math.Max(thisItem.CanvasPosition.Right, maxX);
+                    maxy = Math.Max(thisItem.CanvasPosition.Bottom, maxy);
                     previtem = thisItem;
                 }
             }
@@ -706,7 +706,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
             addy = 0;
         }
 
-        var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.ItemData(_itemDesign);
+        var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(_itemDesign);
         ComputeAllItemPositions(new Size(DisplayRectangle.Width, DisplayRectangle.Height), SliderY, biggestItemX, heightAdded, senkrechtAllowed, addy, Renderer);
 
         var tmpSliderWidth = SliderY.Visible ? SliderY.Width : 0;
@@ -719,7 +719,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
             Skin.Draw_Back(gr, _controlDesign, controlState, borderCoords, this, true);
         }
 
-        //_mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
+        //_mouseOverItem = MouseOverNode(MousePos().ControlX, MousePos().Y);
 
         DoItemOrder();
 
@@ -970,7 +970,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
         _mouseOverItem = nd;
 
         if (_mouseOverItem != null && _mousemoved) {
-            var pos = _mouseOverItem.Position.Right;
+            var pos = _mouseOverItem.CanvasPosition.Right;
 
             #region down-Button
 
@@ -981,7 +981,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 btnDown.Width = 16;
                 btnDown.Height = 16;
                 pos -= btnDown.Width;
-                btnDown.Top = _mouseOverItem.Position.Y - (int)SliderY.Value;
+                btnDown.Top = _mouseOverItem.CanvasPosition.Y - (int)SliderY.Value;
                 btnDown.Left = pos;
                 btnDown.Visible = true;
                 btnDown.Enabled = _item[_item.Count - 1] != _mouseOverItem;
@@ -997,7 +997,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 btnUp.Width = 16;
                 btnUp.Height = 16;
                 pos -= btnUp.Width;
-                btnUp.Top = _mouseOverItem.Position.Y - (int)SliderY.Value;
+                btnUp.Top = _mouseOverItem.CanvasPosition.Y - (int)SliderY.Value;
                 btnUp.Left = pos;
                 btnUp.Visible = true;
                 btnUp.Enabled = _item[0] != _mouseOverItem;
@@ -1018,7 +1018,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 btnMinus.Width = 16;
                 btnMinus.Height = 16;
                 pos -= btnMinus.Width;
-                btnMinus.Top = _mouseOverItem.Position.Y - (int)SliderY.Value;
+                btnMinus.Top = _mouseOverItem.CanvasPosition.Y - (int)SliderY.Value;
                 btnMinus.Left = pos;
                 btnMinus.Visible = true;
                 btnMinus.Enabled = true;
@@ -1041,7 +1041,7 @@ public sealed partial class ListBox : GenericControl, IContextMenu, IBackgroundN
                 btnEdit.Width = 16;
                 btnEdit.Height = 16;
                 pos -= btnEdit.Width;
-                btnEdit.Top = _mouseOverItem.Position.Y - (int)SliderY.Value;
+                btnEdit.Top = _mouseOverItem.CanvasPosition.Y - (int)SliderY.Value;
                 btnEdit.Left = pos;
                 btnEdit.Visible = true;
                 btnEdit.Enabled = true;

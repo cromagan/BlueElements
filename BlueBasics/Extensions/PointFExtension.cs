@@ -24,9 +24,10 @@ using System.Drawing;
 namespace BlueBasics;
 
 public static partial class Extensions {
-    //public static PointF ZoomAndMove(this PointF p, AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 
     #region Methods
+
+    public static Point CanvasToControl(this PointF p, float zoom, float offsetX, float offsetY) => new(p.X.CanvasToControl(zoom, offsetX), p.Y.CanvasToControl(zoom, offsetY));
 
     public static PointF NearestPoint(this PointF p, List<PointF> pl) {
         if (pl.Count == 0) { return PointF.Empty; }
@@ -49,9 +50,6 @@ public static partial class Extensions {
         r.Inflate(toleranz, toleranz);
         return r.Contains(p);
     }
-
-    public static PointF ZoomAndMove(this PointF p, float zoom, float shiftX, float shiftY) =>
-        new((p.X * zoom) - shiftX + (zoom / 2), (p.Y * zoom) - shiftY + (zoom / 2));
 
     #endregion
 }

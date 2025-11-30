@@ -63,7 +63,7 @@ namespace BluePaint
             this.Caption2.Size = new Size(40, 24);
             this.Caption2.Text = "Höhe:";
             // 
-            // X
+            // ControlX
             // 
             this.X.Cursor = Cursors.IBeam;
             this.X.Location = new Point(88, 56);

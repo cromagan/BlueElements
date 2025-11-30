@@ -19,7 +19,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using System;
@@ -47,33 +46,33 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
     #region Methods
 
-    public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
+    public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
         if (!_ausricht) { return; }
-        if (OnNeedCurrentPic() is not { } pic || e.Current == null || e.MouseDown == null) { return; }
+        if (OnNeedCurrentPic() is not { } pic || e.MouseCurrent == null || e.MouseDown == null) { return; }
 
-        e.DrawLine(PenRedTransp, -1, e.Current.TrimmedY, pic.Width, e.Current.TrimmedY);
-        e.DrawLine(PenRedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, pic.Height);
-        if (e.Current.Button != MouseButtons.Left) {
+        e.DrawLine(PenRedTransp, -1, e.MouseCurrent.TrimmedCanvasY, pic.Width, e.MouseCurrent.TrimmedCanvasY);
+        e.DrawLine(PenRedTransp, e.MouseCurrent.TrimmedCanvasX, -1, e.MouseCurrent.TrimmedCanvasX, pic.Height);
+        if (e.MouseCurrent.Button != MouseButtons.Left) {
             return;
         }
 
-        e.DrawLine(PenRedTransp, -1, e.MouseDown.TrimmedY, pic.Width, e.MouseDown.TrimmedY);
-        e.DrawLine(PenRedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, pic.Height);
-        e.DrawLine(PenLightWhite, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
-        e.DrawLine(PenRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
+        e.DrawLine(PenRedTransp, -1, e.MouseDown.TrimmedCanvasY, pic.Width, e.MouseDown.TrimmedCanvasY);
+        e.DrawLine(PenRedTransp, e.MouseDown.TrimmedCanvasX, -1, e.MouseDown.TrimmedCanvasX, pic.Height);
+        e.DrawLine(PenLightWhite, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasX, e.MouseDown.TrimmedCanvasY);
+        e.DrawLine(PenRedTransp, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasX, e.MouseDown.TrimmedCanvasY);
     }
 
-    public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) {
+    public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) {
         if (!_ausricht) { return; }
-        MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), originalPic);
+        MouseMove(new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(e, e), originalPic);
     }
 
-    public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
+    public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
         if (!_ausricht) { return; }
         OnDoInvalidate();
     }
 
-    public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
+    public override void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
         if (!_ausricht) { return; }
         _ausricht = false;
         CollectGarbage();
@@ -81,7 +80,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
         if (pic == null) { return; }
 
-        var wink = GetAngle(new PointM(e.MouseDown.X, e.MouseDown.Y), new PointM(e.Current.X, e.Current.Y));
+        var wink = GetAngle(e.MouseDown.CanvasPoint, e.MouseCurrent.CanvasPoint);
         // Make a Matrix to represent rotation by this angle.
         Matrix rotateAtOrigin = new();
         rotateAtOrigin.Rotate(wink);

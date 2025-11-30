@@ -54,7 +54,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             col.PropertyChanged += Column_PropertyChanged;
             CVI.PropertyChanged += Column_PropertyChanged;
 
-            Size = new SizeF(Math.Min(ColumnViewItem.CalculateContentWith(col, renderer), 300), 300);
+            CanvasSize = new SizeF(Math.Min(ColumnViewItem.CalculateCanvasContentWith(col, renderer), 300), 300);
         }
     }
 
@@ -141,9 +141,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             return;
         }
 
-        //var wi = 300;// Math.Max(Column.Contentwidth ?? 0, 24);
+        //var wi = 300;// Math.Max(Column.CanvasWidthx ?? 0, 24);
 
-        var bmp = new Bitmap((int)Size.Width, (int)Size.Height);
+        var bmp = new Bitmap((int)CanvasSize.Width, (int)CanvasSize.Height);
         var gr = Graphics.FromImage(bmp);
 
         gr.Clear(CVI.BackColor_ColumnHead);

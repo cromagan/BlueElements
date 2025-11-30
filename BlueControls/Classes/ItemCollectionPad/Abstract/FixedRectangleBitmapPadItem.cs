@@ -46,7 +46,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
         protected set {
             _generatedBitmap = value;
-            Size = _generatedBitmap?.Size ?? SizeF.Empty;
+            CanvasSize = _generatedBitmap?.Size ?? SizeF.Empty;
         }
     }
 
@@ -59,10 +59,10 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         SizeChanged();
     }
 
-    protected override RectangleF CalculateUsedArea() {
-        if (_generatedBitmap == null) { GeneratePic(); } // Um die Size zu erhalten
+    protected override RectangleF CalculateCanvasUsedArea() {
+        if (_generatedBitmap == null) { GeneratePic(); } // Um die CanvasSize zu erhalten
 
-        return base.CalculateUsedArea();
+        return base.CalculateCanvasUsedArea();
     }
 
     protected override void Dispose(bool disposing) {
@@ -79,7 +79,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         if (_generatedBitmap == null) { GeneratePic(); }
 
         #region Bild zeichnen
@@ -93,7 +93,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
                     gr.InterpolationMode = InterpolationMode.Low;
                     gr.PixelOffsetMode = PixelOffsetMode.Half;
                 }
-                gr.DrawImage(_generatedBitmap, positionModified);
+                gr.DrawImage(_generatedBitmap, positionInControl);
             }
         } catch { }
 

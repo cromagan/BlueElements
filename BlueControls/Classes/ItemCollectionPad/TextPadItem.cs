@@ -241,17 +241,17 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     //    base.CalculateSlavePoints();
     //    InvalidateText();
     //}
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, float scale, float shiftX, float shiftY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         if (_style != PadStyles.Undefiniert) {
-            gr.SetClip(positionModified);
-            var trp = positionModified.PointOf(Alignment.Horizontal_Vertical_Center);
+            gr.SetClip(positionInControl);
+            var trp = positionInControl.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
 
             if (_txt == null) { MakeNewETxt(); }
 
             if (_txt != null && Parent != null) {
-                _txt.DrawingPos = new Point((int)(positionModified.Left - trp.X), (int)(positionModified.Top - trp.Y));
+                _txt.DrawingPos = new Point((int)(positionInControl.Left - trp.X), (int)(positionInControl.Top - trp.Y));
                 _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !ForPrinting) {
                     _txt.Draw(gr, scale * _textScale);
@@ -295,9 +295,9 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}",
                 //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
                 //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
-                //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / SheetStyleScale), -1);
+                //etxt.DrawingArea = new Rectangle((int)CanvasUsedArea().Left, (int)CanvasUsedArea().Top, (int)(CanvasUsedArea().Width / AdditionalScale / SheetStyleScale), -1);
                 //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-                TextDimensions = new Size((int)(UsedArea.Width / _textScale), -1),
+                TextDimensions = new Size((int)(CanvasUsedArea.Width / _textScale), -1),
                 Ausrichtung = _ausrichtung
             };
         }

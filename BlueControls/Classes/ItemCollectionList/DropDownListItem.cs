@@ -55,23 +55,23 @@ public class DropDownListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => false;
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         var he = 16;
 
         foreach (var item in DropDownItems) {
-            var s = item.HeightForListBox(style, columnWidth, itemdesign);
+            var s = item.HeightInControl(style, columnWidth, itemdesign);
 
             he = Math.Max(he, s);
         }
         return he;
     }
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         var wi = 16 * 3;
         var he = 16;
 
         foreach (var item in DropDownItems) {
-            var s = item.SizeUntouchedForListBox(itemdesign);
+            var s = item.UntrimmedCanvasSize(itemdesign);
 
             wi = Math.Max(wi, s.Width);
             he = Math.Max(he, s.Height);
@@ -79,18 +79,18 @@ public class DropDownListItem : AbstractListItem {
         return new Size(wi, he);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
         //var tmpd = TempDesign(design);
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, Design.ComboBox_Textbox, state, positionModified.ToRect(), null, false);
+            Skin.Draw_Back(gr, Design.ComboBox_Textbox, state, positionInControl.ToRect(), null, false);
         }
 
-        //Selected?.Draw(gr, positionModified.X, positionModified.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
+        //Selected?.Draw(gr, positionInControl.ControlX, positionInControl.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
 
-        //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionModified, null, false, translate);
+        //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionInControl, null, false, translate);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, Design.ComboBox_Textbox, state, positionModified.ToRect());
-            var but = new Rectangle((int)positionModified.Right - 16, (int)positionModified.Top, 16, 16);
+            Skin.Draw_Border(gr, Design.ComboBox_Textbox, state, positionInControl.ToRect());
+            var but = new Rectangle((int)positionInControl.Right - 16, (int)positionInControl.Top, 16, 16);
 
             var qi = QuickImage.Get("Pfeil_Unten_Scrollbar|8|||||0");
 

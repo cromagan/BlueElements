@@ -302,11 +302,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     internal Point MiddleOfVisiblesScreen() {
-        var valx = ((float)Width / 2) + ShiftX;
-        var valy = ((float)Height / 2) + ShiftY;
+        var valx = ((float)Width / 2) + OffsetX;
+        var valy = ((float)Height / 2) + OffsetY;
 
         return new((int)(valx / Zoom), (int)(valy / Zoom));
     }
+
+    protected override RectangleF CalculateCanvasMaxBounds() => _items?.CanvasUsedArea ?? new RectangleF(0, 0, 0, 0);
 
     protected override void Dispose(bool disposing) {
         UnRegisterEvents();
@@ -327,22 +329,22 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             _items.ShowAlways = true;
             _items.AutoZoomFit = false;
 
-            _items.Draw(gr, ClientRectangle, Zoom, ShiftX, ShiftY);
+            _items.Draw(gr, ClientRectangle, Zoom, OffsetX, OffsetY);
 
             #region Dann die selektierten Punkte
 
             foreach (var thisItem in _itemsToMove) {
                 if (thisItem is AbstractPadItem bpi) {
-                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard, false);
-                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber, States.Standard, false);
+                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
                 }
 
                 if (thisItem is PointM p2) {
                     if (p2.Parent is AbstractPadItem bpi2) {
-                        AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard, false);
-                        AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard, false);
+                        AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber_Phantom, States.Standard, false);
+                        AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber_Phantom, States.Standard, false);
                     }
-                    p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
+                    p2.Draw(gr, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber, States.Standard);
                 }
             }
 
@@ -362,8 +364,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
         // Ganz wichtig diese Routine!
         keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
-
-    protected override RectangleF MaxBounds() => _items?.UsedArea ?? new RectangleF(0, 0, 0, 0);
 
     protected override void OnKeyUp(KeyEventArgs e) {
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
@@ -406,7 +406,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
     }
 
-    protected override void OnMouseDown(MouseEventArgs e) {
+    protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);
         if (!EditAllowed) { return; }
 
@@ -414,19 +414,19 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
         if (e.Button == MouseButtons.Left) {
             var hotitem = GetHotItem(e, true);
-            var p = CoordinatesUnscaled(e, Zoom, ShiftX, ShiftY);
+            //var p = CoordinatesUnscaled(e, Zoom, OffsetX, OffsetY);
             if (_itemsToMove.Count > 0) {
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
                         foreach (var thisPoint in bpi.JointPoints) {
-                            if (GetLength(thisPoint, p) < 5f / Zoom) {
+                            if (GetLength(thisPoint, e.CanvasPoint) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
                         }
 
                         foreach (var thisPoint in bpi.MovablePoint) {
-                            if (GetLength(thisPoint, p) < 5f / Zoom) {
+                            if (GetLength(thisPoint, e.CanvasPoint) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
@@ -445,7 +445,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
     }
 
-    protected override void OnMouseMove(MouseEventArgs e) {
+    protected override void OnMouseMove(CanvasMouseEventArgs e) {
         base.OnMouseMove(e);
         Invalidate();
 
@@ -461,12 +461,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
         if (e.Button == MouseButtons.Left) {
             QuickInfo = string.Empty;
-            MoveItemsWithMouse();
+
+            MoveItems(e.CanvasX - MouseDownCanvas.X, e.CanvasY - MouseDownCanvas.Y, true, true);
+
             Refresh(); // Ansonsten werden einige Redraws übersprungen
         }
     }
 
-    protected override void OnMouseUp(MouseEventArgs e) {
+    protected override void OnMouseUp(CanvasMouseEventArgs e) {
         base.OnMouseUp(e);
 
         switch (e.Button) {
@@ -487,7 +489,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
             case MouseButtons.Right:
                 if (!ContextMenuAllowed) { return; }
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, GetHotItem(e, false), e);
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, GetHotItem(e, false), e.ToMouseEventArgs());
                 break;
         }
         Invalidate();
@@ -624,22 +626,20 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
-    private IMoveable? GetHotItem(MouseEventArgs? e, bool topLevel) {
+    private IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel) {
         if (e == null || Items == null) { return null; }
 
-        var tmp = Items.HotItem(e.Location, topLevel, Zoom, ShiftX, ShiftY);
+        var tmp = Items.HotItem(e.ControlPoint, topLevel, Zoom, OffsetX, OffsetY);
         if (LastClickedItem is { IsDisposed: false } bpi) {
-            var p = CoordinatesUnscaled(e, Zoom, ShiftX, ShiftY);
-
             foreach (var thisPoint in bpi.JointPoints) {
-                if (GetLength(p, thisPoint) < 5f / Zoom) { return thisPoint; }
+                if (GetLength(e.CanvasPoint, thisPoint) < 5f / Zoom) { return thisPoint; }
             }
         }
 
         return tmp;
     }
 
-    private void MoveItems(float x, float y, bool doSnap, bool modifyMouseDown) {
+    private void MoveItems(float canvasX, float canvasY, bool doSnap, bool modifyMouseDown) {
         PointM? pointToMove = null;
         foreach (var thisIt in _itemsToMove) {
             if (thisIt is PointM p) { pointToMove = p; break; }
@@ -655,28 +655,26 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
 
         if (pointToMove != null) {
-            if (x != 0f) { x = SnapToGrid(true, pointToMove, x); }
-            if (y != 0f) { y = SnapToGrid(false, pointToMove, y); }
+            if (canvasX != 0f) { canvasX = SnapToGrid(true, pointToMove, canvasX); }
+            if (canvasY != 0f) { canvasY = SnapToGrid(false, pointToMove, canvasY); }
         }
 
         foreach (var thisIt in _itemsToMove) {
-            if (!thisIt.MoveXByMouse) { x = 0f; }
-            if (!thisIt.MoveYByMouse) { y = 0f; }
+            if (!thisIt.MoveXByMouse) { canvasX = 0f; }
+            if (!thisIt.MoveYByMouse) { canvasY = 0f; }
         }
 
-        if (x == 0f && y == 0f) { return; }
+        if (canvasX == 0f && canvasY == 0f) { return; }
 
         foreach (var thisIt in _itemsToMove) {
-            thisIt.Move(x, y, modifyMouseDown);
+            thisIt.Move(canvasX, canvasY, modifyMouseDown);
         }
 
         if (doSnap && modifyMouseDown) {
             // Maus-Daten modifizieren, da ja die tasächliche Bewegung wegen der SnapPoints abweichen kann.
-            MouseDownPos11 = new Point((int)(MouseDownPos11.X + x), (int)(MouseDownPos11.Y + y));
+            MouseDownCanvas = new PointF(MouseDownCanvas.X + canvasX, MouseDownCanvas.Y + canvasY);
         }
     }
-
-    private void MoveItemsWithMouse() => MoveItems(MousePos11.X - MouseDownPos11.X, MousePos11.Y - MouseDownPos11.Y, true, true);
 
     private void OnBeginnPrint(PrintEventArgs e) => BeginnPrint?.Invoke(this, e);
 

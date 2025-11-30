@@ -311,7 +311,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             //    return;
             //}
             if (BackColor) {
-                gr.FillRectangle(GetBackColorBrush(), x, y, size.Width * scale, size.Height * scale);
+                gr.FillRectangle(GetBackColorBrush(), x, y, size.Width.CanvasToControl(scale), size.Height.CanvasToControl(scale));
             }
         }
 
@@ -325,8 +325,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                         continue; // Überspringen der Mitte
                     }
 
-                    var dx = x + (px * scale);
-                    var dy = y + (py * scale);
+                    var dx = x + px.CanvasToControl(scale);
+                    var dy = y + py.CanvasToControl(scale);
                     DrawString(gr, text, font, outlineBrush, dx, dy);
                 }
             }
@@ -343,7 +343,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
             if (Underline) {
                 var underlineY = y + Oberlänge(scale) + lineWidth + scale + 0.5f;
-                gr.DrawLine(scaledPen, x, (int)underlineY, x + ((1 + size.Width) * scale), (int)underlineY);
+                gr.DrawLine(scaledPen, x, (int)underlineY, x + (1 + size.Width).CanvasToControl(scale), (int)underlineY);
             }
             if (StrikeOut) {
                 var strikeY = y + (size.Height * 0.55f);
@@ -352,12 +352,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         }
     }
 
-    //public Font Font(float scale) {
-    //    if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_font.Size)) {
+    //public Font Font(float zoom) {
+    //    if (Math.Abs(zoom - 1) < DefaultTolerance && SizeOk(_font.CanvasSize)) {
     //        return _font;
     //    }
 
-    //    var emSize = _fontOl.Size * scale / Skin.Scale;
+    //    var emSize = _fontOl.CanvasSize * zoom / Skin.Scale;
 
     //    return GetFont(
     //        FontName,
@@ -370,12 +370,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     //    );
     //}
 
-    public Font FontWithoutLines(float scale) {
-        if (Math.Abs(scale - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) {
+    public Font FontWithoutLines(float zoom) {
+        if (Math.Abs(zoom - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) {
             return _fontOl;
         }
 
-        var emSize = _fontOl.Size * scale / Skin.Scale;
+        var emSize = _fontOl.Size.CanvasToControl(zoom) / Skin.Scale;
 
         return GetFont(
             FontName,
@@ -605,12 +605,12 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return _sampleTextSym;
     }
 
-    public BlueFont Scale(float scale) {
-        if (Math.Abs(1 - scale) < DefaultTolerance) {
+    public BlueFont Scale(float zoom) {
+        if (Math.Abs(1 - zoom) < DefaultTolerance) {
             return this;
         }
 
-        return Get(FontName, Size * scale, Bold, Italic, Underline, StrikeOut, ColorMain,
+        return Get(FontName, Size.CanvasToControl(zoom), Bold, Italic, Underline, StrikeOut, ColorMain,
                    ColorOutline, ColorBack);
     }
 
@@ -669,7 +669,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
         return new SizeF(_fontOl.MeasureString($".{c}.").Width - _widthOf2Points, _zeilenabstand);
     });
 
-    internal float Oberlänge(float scale) => _oberlänge * scale;
+    internal float Oberlänge(float scale) => _oberlänge.CanvasToControl(scale);
 
     private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) {
         List<string> result = [];

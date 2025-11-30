@@ -112,7 +112,7 @@ public class BitmapListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpperInvariant().Contains(filterText.ToUpperInvariant()) || _imageFilename.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
 
-    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (style == ListBoxAppearance.FileSystem) {
             return 110 + (_captionlines * ConstMy);
         }
@@ -128,7 +128,7 @@ public class BitmapListItem : AbstractListItem {
 
     public bool ImageLoaded() => _bitmap != null;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) {
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         try {
             if (_bitmap == null) { return new Size(300, 300); }
 
@@ -140,14 +140,14 @@ public class BitmapListItem : AbstractListItem {
         } catch {
             //... wird an anderer Stelle verwendet...
             Develop.AbortAppIfStackOverflow();
-            return ComputeSizeUntouchedForListBox(itemdesign);
+            return ComputeUntrimmedCanvasSize(itemdesign);
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float shiftX, float shiftY, float scale) {
-        if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionModified.ToRect(), null, false); }
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+        if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionInControl.ToRect(), null, false); }
 
-        var drawingCoordinates = positionModified;
+        var drawingCoordinates = positionInControl;
         drawingCoordinates.Inflate(-Padding, -Padding);
         var scaledImagePosition = RectangleF.Empty;
         var areaOfWholeImage = RectangleF.Empty;
@@ -208,7 +208,7 @@ public class BitmapListItem : AbstractListItem {
                 r.X -= (int)trp.X;
                 r.Y -= (int)trp.Y;
                 r.Y = r.Y - (ConstMy * c) + ausgl;
-                //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
+                //r = new Rectangle(r.Left - trp.ControlX, r.Top - trp.Y, r.Width, r.Height);
                 //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                 //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
                 Skin.Draw_FormatedText(gr, thisCap, null, Alignment.Horizontal_Vertical_Center, r, Design.Item_Listbox, state, null, false, false);
@@ -217,7 +217,7 @@ public class BitmapListItem : AbstractListItem {
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionModified.ToRect());
+            Skin.Draw_Border(gr, itemdesign, state, positionInControl.ToRect());
         }
     }
 
