@@ -185,7 +185,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
                 break;
 
             case Symbol.Rechteck_gerundet:
-                p = Poly_RoundRec(d2.ToRect(), (int)(20 * scale));
+                p = Poly_RoundRec(d2.ToRect(), (int)20.CanvasToControl(scale));
                 break;
 
             default:
@@ -195,7 +195,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
         if (p != null && Parent != null) {
             gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
-            gr.DrawPath(new Pen(Randfarbe, Randdicke * scale), p);
+            gr.DrawPath(new Pen(Randfarbe, Randdicke.CanvasToControl(scale)), p);
         }
 
         gr.TranslateTransform(-trp.X, -trp.Y);

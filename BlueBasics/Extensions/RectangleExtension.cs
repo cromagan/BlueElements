@@ -40,8 +40,8 @@ public static partial class Extensions {
         if (outerLine) {
             // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
             //               0 und 25 rauskommen
-            return new Rectangle(rect.X.CanvasToControl(scale) - (int)offsetX,
-                                  rect.Y.CanvasToControl(scale) - (int)offsetY,
+            return new Rectangle(rect.X.CanvasToControl(scale) + (int)offsetX,
+                                  rect.Y.CanvasToControl(scale) + (int)offsetY,
                                   rect.Width.CanvasToControl(scale),
                                   rect.Height.CanvasToControl(scale));
         }

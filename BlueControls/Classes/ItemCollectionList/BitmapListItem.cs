@@ -166,10 +166,10 @@ public class BitmapListItem : AbstractListItem {
                         areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
                         scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
                             (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
-                        scaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
-                            ((drawingCoordinates.Height - (_bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2f),
-                            _bitmap.Width * scale,
-                            _bitmap.Height * scale);
+                        scaledImagePosition = new RectangleF(((drawingCoordinates.Width - _bitmap.Width.CanvasToControl(scale)) / 2) + drawingCoordinates.Left,
+                            ((drawingCoordinates.Height - _bitmap.Height.CanvasToControl(scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2f),
+                            _bitmap.Width.CanvasToControl(scale),
+                            _bitmap.Height.CanvasToControl(scale));
                     }
                 } catch {
                     ok = false;

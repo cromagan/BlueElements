@@ -49,6 +49,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// <remarks></remarks>
     private bool _beiExportSichtbar = true;
 
+    private RectangleF _canvasUsedArea;
+
     /// <summary>
     /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
     /// Aus _jointReference und _jointMiddle wird die Mitte des Objekts berechnet
@@ -62,7 +64,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     private PointM? _jointReferenceSecond;
 
     private string _keyName;
-    private RectangleF _canvasUsedArea;
 
     #endregion
 
@@ -103,6 +104,18 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
             OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// Gibt die aktuellen Koordinaten des Objektes zurück. Unabhängig von der aktuellen Ansicht.
+    /// Nicht berücksichtigt werden z.b. Verbindungslinien zu anderen Objekten
+    /// </summary>
+    /// <remarks></remarks>
+    public RectangleF CanvasUsedArea {
+        get {
+            if (_canvasUsedArea.IsEmpty) { _canvasUsedArea = CalculateCanvasUsedArea(); }
+            return _canvasUsedArea;
         }
     }
 
@@ -192,19 +205,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public List<string> Tags { get; } = [];
-
-    /// <summary>
-    /// Gibt die aktuellen Koordinaten des Objektes zurück. Unabhängig von der aktuellen Ansicht.
-    /// Nicht berücksichtigt werden z.b. Verbindungslinien zu anderen Objekten
-    /// </summary>
-    /// <remarks></remarks>
-    public RectangleF CanvasUsedArea {
-        get {
-            if (_canvasUsedArea.IsEmpty) { _canvasUsedArea = CalculateCanvasUsedArea(); }
-            return _canvasUsedArea;
-        }
-    }
-
     protected abstract int SaveOrder { get; }
 
     #endregion
@@ -520,24 +520,24 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         CollectGarbage();
 
         do {
-            if ((int)(r.Width * scale) > 15000) {
+            if ((int)r.Width.CanvasToControl(scale) > 15000) {
                 scale *= 0.8f;
-            } else if ((int)(r.Height * scale) > 15000) {
+            } else if ((int)r.Height.CanvasToControl(scale) > 15000) {
                 scale *= 0.8f;
-            } else if ((int)(r.Height * scale) * (int)(r.Height * scale) > 90000000) {
+            } else if ((int)r.Height.CanvasToControl(scale) * (int)r.Height.CanvasToControl(scale) > 90000000) {
                 scale *= 0.8f;
             } else {
                 break;
             }
         } while (true);
 
-        var bmp = new Bitmap((int)(r.Width * scale), (int)(r.Height * scale));
+        var bmp = new Bitmap((int)r.Width.CanvasToControl(scale), (int)r.Height.CanvasToControl(scale));
 
-        DrawToBitmap(bmp, scale, r.Left * scale, r.Top * scale);
+        DrawToBitmap(bmp, scale, r.Left.CanvasToControl(scale), r.Top.CanvasToControl(scale));
 
         //using var gr = Graphics.FromImage(I);
         //gr.Clear(BackColor);
-        //if (!DrawToBitmap(gr, r.Left * scale, r.Top * scale, I.CanvasSize, true, false, States.Standard)) {
+        //if (!DrawToBitmap(gr, r.Left.CanvasToControl(scale), r.Top.CanvasToControl(scale), I.CanvasSize, true, false, States.Standard)) {
         //    return ToBitmap(scale);
         //}
 
@@ -586,6 +586,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     internal void GetNewIdsForEverything() => KeyName = GetUniqueKey();
 
+    //foreach (var thispoint in JointPoints) {//    thispoint.KeyName = Generic.GetUniqueKey();//}//foreach (var thispoint in MovablePoint) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//foreach (var thispoint in PointsForSuccesfullyMove) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//_jointMiddle.KeyName = Generic.GetUniqueKey();//_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();//_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
+    protected abstract RectangleF CalculateCanvasUsedArea();
+
     protected void CalculateJointMiddle(PointM firstPoint, PointM secondPoint) {
         _jointReferenceFirst ??= firstPoint;
         _jointReferenceSecond ??= secondPoint;
@@ -602,9 +605,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         JointMiddle.SetTo((firstPoint.X + secondPoint.X) / 2, (firstPoint.Y + secondPoint.Y) / 2, false);
     }
-
-    //foreach (var thispoint in JointPoints) {//    thispoint.KeyName = Generic.GetUniqueKey();//}//foreach (var thispoint in MovablePoint) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//foreach (var thispoint in PointsForSuccesfullyMove) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//_jointMiddle.KeyName = Generic.GetUniqueKey();//_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();//_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
-    protected abstract RectangleF CalculateCanvasUsedArea();
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {

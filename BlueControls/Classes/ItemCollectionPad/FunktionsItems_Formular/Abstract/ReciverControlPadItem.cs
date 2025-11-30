@@ -468,7 +468,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         gr.RotateTransform(90);
 
         gr.FillPath(new SolidBrush(c), pa);
-        gr.DrawPath(new Pen(c2, 1 * scale), pa);
+        gr.DrawPath(new Pen(c2, 1.CanvasToControl(scale)), pa);
 
         gr.RotateTransform(-90);
         gr.TranslateTransform(-p.X - xmod, -p.Y + valueArrow);
@@ -568,19 +568,19 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
             case CaptionPosition.Links_neben_dem_Feld:
                 cap = new Point(0, 0);
-                uc.X += (int)(100 * scale);
-                uc.Width -= (int)(100 * scale);
+                uc.X += (int)100.CanvasToControl(scale);
+                uc.Width -= (int)100.CanvasToControl(scale);
                 break;
 
             default:
                 cap = new Point(0, 0);
-                uc.Y += (int)(19 * scale);
-                uc.Height -= (int)(19 * scale);
+                uc.Y += (int)19.CanvasToControl(scale);
+                uc.Height -= (int)19.CanvasToControl(scale);
                 break;
         }
 
         if (cap.X >= 0) {
-            var e = new RectangleF(positionInControl.Left + (cap.X * scale), positionInControl.Top + (cap.Y * scale), positionInControl.Width, 16 * scale);
+            var e = new RectangleF(positionInControl.Left + cap.X.CanvasToControl(scale), positionInControl.Top + cap.Y.CanvasToControl(scale), positionInControl.Width, 16.CanvasToControl(scale));
             Skin.Draw_FormatedText(gr, captiontxt, null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(scale), true);
         }
 

@@ -338,7 +338,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         if (_style != PadStyles.Undefiniert) {
-            var geszoom = _textScale * scale;
+            var geszoom = _textScale.CanvasToControl(scale);
 
             var f = this.GetFont(geszoom);
             var pfeilG = f.Size * 0.8f;

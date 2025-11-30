@@ -231,22 +231,21 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             }
         }
 
-        var bFont = this.GetFont(_textScale * scale);
+        var bFont = this.GetFont(_textScale.CanvasToControl(scale));
         //var font = bFont.Font(allScale);
 
         Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale)) {
             DashPattern = [5, 1, 1, 1]
         };
         Pen whitePen = new(Color.White, (float)(8.7d * scale) + 2f);
-
         var textSize = bFont.MeasureString(Caption);
 
         // Umrandung der Detailansicht
         gr.DrawRectangle(whitePen, positionInControl);
         gr.DrawRectangle(colorPen, positionInControl);
         if (_ausrichtung != (Alignment)(-1)) {
-            gr.FillRectangle(Brushes.White, new RectangleF(positionInControl.Left, positionInControl.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
-            bFont.DrawString(gr, Caption, positionInControl.Left, positionInControl.Top - textSize.Height - (9f * scale));
+            gr.FillRectangle(Brushes.White, new RectangleF(positionInControl.Left, positionInControl.Top - textSize.Height - 9.CanvasToControl(scale), textSize.Width, textSize.Height));
+            bFont.DrawString(gr, Caption, positionInControl.Left, positionInControl.Top - textSize.Height - 9.CanvasToControl(scale));
         }
 
         //Markierung in der Zeichnung
@@ -254,8 +253,8 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         gr.DrawRectangle(whitePen, f);
         gr.DrawRectangle(colorPen, f);
         if (_ausrichtung != (Alignment)(-1)) {
-            gr.FillRectangle(Brushes.White, new RectangleF(f.Left, f.Top - textSize.Height - (9f * scale), textSize.Width, textSize.Height));
-            bFont.DrawString(gr, Caption, f.Left, f.Top - textSize.Height - (9f * scale));
+            gr.FillRectangle(Brushes.White, new RectangleF(f.Left, f.Top - textSize.Height - 9f.CanvasToControl(scale), textSize.Width, textSize.Height));
+            bFont.DrawString(gr, Caption, f.Left, f.Top - textSize.Height - 9f.CanvasToControl(scale));
         }
 
         //base.DrawExplicit(gr,visibleArea,positionInControl,scale, offsetX, offsetY);

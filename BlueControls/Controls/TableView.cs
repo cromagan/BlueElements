@@ -1533,11 +1533,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var y = AvailableControlPaintArea().Height;
 
         if (CurrentArrangement is { } ca) {
-            x = ca.ControlColumnsPermanentWidth.CanvasToControl(Zoom);
+            x = (int)ca.ControlColumnsWidth.ControlToCanvas(Zoom);
         }
 
         if (RowViewItems is { } sortedRowData) {
-            (_, y, _, _) = sortedRowData.CanvasItemData(Design.Item_Listbox);
+            (_, _, y, _) = sortedRowData.CanvasItemData(Design.Item_Listbox);
         }
 
         return new RectangleF(0, 0, x, y);

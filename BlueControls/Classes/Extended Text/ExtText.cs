@@ -61,10 +61,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     #region Fields
 
-    private int? _height;
-
     private readonly List<ExtChar> _internal = [];
-
+    private int? _height;
     private string _sheetStyle = string.Empty;
 
     private Size _textDimensions;
@@ -800,18 +798,18 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private void DrawZone(Graphics gr, float scale, MarkState thisState, int markStart, int markEnd) {
-        var startX = (_internal[markStart].Pos.X * scale) + DrawingPos.X;
-        var startY = (_internal[markStart].Pos.Y * scale) + DrawingPos.Y;
-        var endX = (_internal[markEnd].Pos.X * scale) + DrawingPos.X + (_internal[markEnd].Size.Width * scale);
-        var endy = (_internal[markEnd].Pos.Y * scale) + DrawingPos.Y + (_internal[markEnd].Size.Height * scale);
+        var startX = _internal[markStart].Pos.X.CanvasToControl(scale, DrawingPos.X);
+        var startY = _internal[markStart].Pos.Y.CanvasToControl(scale, DrawingPos.Y);
+        var endX = _internal[markEnd].Pos.X.CanvasToControl(scale, DrawingPos.X) + _internal[markEnd].Size.Width.CanvasToControl(scale);
+        var endy = _internal[markEnd].Pos.Y.CanvasToControl(scale, DrawingPos.Y) + _internal[markEnd].Size.Height.CanvasToControl(scale);
 
         switch (thisState) {
             case MarkState.None:
                 break;
 
             case MarkState.Ringelchen:
-                using (var pen = new Pen(Color.Red, 3 * scale)) {
-                    gr.DrawLine(pen, startX, (int)(startY + (_internal[markStart].Size.Height * scale * 0.9)), endX, (int)(startY + (_internal[markStart].Size.Height * scale * 0.9)));
+                using (var pen = new Pen(Color.Red, 3.CanvasToControl(scale))) {
+                    gr.DrawLine(pen, startX, (int)(startY + (_internal[markStart].Size.Height.CanvasToControl(scale) * 0.9)), endX, (int)(startY + (_internal[markStart].Size.Height.CanvasToControl(scale) * 0.9)));
                 }
                 break;
 

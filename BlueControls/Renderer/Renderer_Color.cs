@@ -83,7 +83,7 @@ public class Renderer_Color : Renderer_Abstract {
         if (string.IsNullOrEmpty(content)) { return; }
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
         QuickImage? qi = null;
-        var pix = (int)(16 * scale);
+        var pix = (int)16.CanvasToControl(scale);
 
         var replacedText = content;
         if (ColorTryParse(content, out var col)) {

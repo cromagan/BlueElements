@@ -89,7 +89,7 @@ public class Renderer_DateTime : Renderer_Abstract {
         QuickImage? qi = null;
 
         if (_showSymbol) {
-            var pix = (int)(14 * scale);
+            var pix = (int)14.CanvasToControl(scale);
             if (_utcToLocal) {
                 qi = QuickImage.Get(ImageCode.Haus, pix);
             } else {

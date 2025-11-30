@@ -316,7 +316,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                 default: // Is = enSizeModes.WeißerRand
                 {
                         var scale2 = Math.Min(positionInControl.Width / Bitmap.Width, positionInControl.Height / Bitmap.Height);
-                        r2 = new RectangleF(((positionInControl.Width - (Bitmap.Width * scale2)) / 2) + positionInControl.Left, ((positionInControl.Height - (Bitmap.Height * scale2)) / 2) + positionInControl.Top, Bitmap.Width * scale2, Bitmap.Height * scale2);
+                        r2 = new RectangleF(((positionInControl.Width - Bitmap.Width.CanvasToControl(scale2)) / 2) + positionInControl.Left, ((positionInControl.Height - Bitmap.Height.CanvasToControl(scale2)) / 2) + positionInControl.Top, Bitmap.Width.CanvasToControl(scale2), Bitmap.Height.CanvasToControl(scale2));
                         break;
                     }
             }

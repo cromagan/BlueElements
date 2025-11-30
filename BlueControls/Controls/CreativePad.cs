@@ -124,7 +124,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             _items = value;
 
             RegisterEvents();
-
+            Invalidate_MaxBounds();
             ZoomFit();
             Invalidate();
             OnGotNewItemCollection();
@@ -278,6 +278,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
                                       (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Top, 100),
                                       (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Right, 100),
                                       (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Bottom, 100));
+
+        Invalidate_MaxBounds();
     }
 
     public void Unselect() {
@@ -520,6 +522,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     private void _Items_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(e.PropertyName);
+        Invalidate_MaxBounds();
         if (!_items.Any() || Fitting) { ZoomFit(); }
         Invalidate();
     }

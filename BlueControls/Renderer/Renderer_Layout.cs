@@ -113,7 +113,7 @@ public class Renderer_Layout : Renderer_Abstract {
             }
 
             var scale2 = Math.Min((float)scaleddrawarea.Width / cachedBmp.Width, (float)scaleddrawarea.Height / cachedBmp.Height);
-            gr.DrawImage(cachedBmp, new Rectangle(scaleddrawarea.X + ((scaleddrawarea.Width - (int)(cachedBmp.Width * scale2)) / 2), scaleddrawarea.Y + ((scaleddrawarea.Height - (int)(cachedBmp.Height * scale2)) / 2), (int)(cachedBmp.Width * scale2), (int)(cachedBmp.Height * scale2)));
+            gr.DrawImage(cachedBmp, new Rectangle(scaleddrawarea.X + ((scaleddrawarea.Width - (int)cachedBmp.Width.CanvasToControl(scale2)) / 2), scaleddrawarea.Y + ((scaleddrawarea.Height - (int)cachedBmp.Height.CanvasToControl(scale2)) / 2), (int)cachedBmp.Width.CanvasToControl(scale2), (int)cachedBmp.Height.CanvasToControl(scale2)));
         } catch {
             var replacedText = ValueReadable("Anzeige fehlgeschlagen.", ShortenStyle.Replaced, translate);
             Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);

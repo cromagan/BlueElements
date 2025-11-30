@@ -285,39 +285,39 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         var a = AvailableControlPaintArea();
 
-        var p = ItemCollectionPadItem.CenterPos(maxCanvasBounds, a.Size, _zoom);
+        var freiraumControl = ItemCollectionPadItem.FreiraumControl(maxCanvasBounds, a.Size, _zoom);
         PointF sliderv;
         if (AutoCenter) {
-            sliderv = ItemCollectionPadItem.SliderValues(maxCanvasBounds, _zoom, p);
+            sliderv = ItemCollectionPadItem.SliderValues(maxCanvasBounds, _zoom, freiraumControl);
         } else {
             sliderv = new PointF(0, 0);
         }
 
-        if (p.X < 0) {
+        if (freiraumControl.X < 0) {
             SliderX.Enabled = true;
             SliderX.Minimum = (float)(maxCanvasBounds.Left.CanvasToControl(_zoom) - (a.Width * SliderZoomOutAddition));
             SliderX.Maximum = (float)(maxCanvasBounds.Right.CanvasToControl(_zoom) - a.Width + (a.Width * SliderZoomOutAddition)) + 1;
-            SliderX.Value = OffsetX;
+            SliderX.Value = -OffsetX;
         } else {
             SliderX.Enabled = false;
             if (!MousePressing()) {
-                SliderX.Minimum = sliderv.X;
-                SliderX.Maximum = sliderv.X;
-                SliderX.Value = sliderv.X;
+                SliderX.Minimum = -sliderv.X;
+                SliderX.Maximum = -sliderv.X;
+                SliderX.Value = -sliderv.X;
             }
         }
 
-        if (p.Y < 0) {
+        if (freiraumControl.Y < 0) {
             SliderY.Enabled = true;
             SliderY.Minimum = (float)(maxCanvasBounds.Top.CanvasToControl(_zoom) - (a.Height * SliderZoomOutAddition));
             SliderY.Maximum = (float)(maxCanvasBounds.Bottom.CanvasToControl(_zoom) - a.Height + (a.Height * SliderZoomOutAddition)) + 1;
-            SliderY.Value = OffsetY;
+            SliderY.Value = -OffsetY;
         } else {
             SliderY.Enabled = false;
             if (!MousePressing()) {
-                SliderY.Minimum = sliderv.Y;
-                SliderY.Maximum = sliderv.Y;
-                SliderY.Value = sliderv.Y;
+                SliderY.Minimum = -sliderv.Y;
+                SliderY.Maximum = -sliderv.Y;
+                SliderY.Value = -sliderv.Y;
             }
         }
     }
@@ -455,9 +455,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Invalidate();
     }
 
-    private void SliderX_ValueChanged(object sender, System.EventArgs e) => OffsetX = SliderX.Value;
+    private void SliderX_ValueChanged(object sender, System.EventArgs e) => OffsetX = -SliderX.Value;
 
-    private void SliderY_ValueChanged(object sender, System.EventArgs e) => OffsetY = SliderY.Value;
+    private void SliderY_ValueChanged(object sender, System.EventArgs e) => OffsetY = -SliderY.Value;
 
     private void UpdateScreenshotLayout() {
         // Im Screenshot-Modus immer Zoom-Fit aktivieren
@@ -465,7 +465,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         _zoom = _zoomFit;
 
         // Bild zentrieren
-        var centerPos = ItemCollectionPadItem.CenterPos(CanvasMaxBounds(), AvailableControlPaintArea().Size, _zoom);
+        var centerPos = ItemCollectionPadItem.FreiraumControl(CanvasMaxBounds(), AvailableControlPaintArea().Size, _zoom);
         _offsetX = centerPos.X;
         _offsetY = centerPos.Y;
 

@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using System.Drawing;
 
 namespace BlueControls.Interfaces;
@@ -55,7 +56,7 @@ public static class AutosizableExtension {
 
     public static bool CanChangeHeightTo(this IAutosizable item, float heightinPixel) => item.AutoSizeableHeight && heightinPixel > MinHeigthCapAndBox;
 
-    public static bool CanScaleHeightTo(this IAutosizable item, float scale) => CanChangeHeightTo(item, item.CanvasUsedArea.Height * scale);
+    public static bool CanScaleHeightTo(this IAutosizable item, float scale) => CanChangeHeightTo(item, item.CanvasUsedArea.Height.CanvasToControl(scale));
 
     #endregion
 }

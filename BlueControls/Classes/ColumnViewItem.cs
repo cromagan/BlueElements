@@ -263,7 +263,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             return _controlColumnLeft ?? 0;
         }
 
-        return (_controlColumnLeft ?? 0) - (int)shiftX;
+        return (_controlColumnLeft ?? 0) + (int)shiftX;
     }
 
     public int ControlColumnRight(float shiftX) => ControlColumnLeft(shiftX) + ControlColumnWidth ?? 0;
@@ -417,8 +417,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     //public Rectangle ReduceButtonLocation(float scale, float sliderx) {
     //    var r = RealHead(scale, sliderx);
-    //    var size = (int)(18 * scale);
-    //    var pcch = (int)(ColumnCaptionSizeY * scale);
+    //    var size = (int)(18.CanvasToControl(scale));
+    //    var pcch = (int)(ColumnCaptionSizeY.CanvasToControl(scale));
     private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_CanvasContentWidth();
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {

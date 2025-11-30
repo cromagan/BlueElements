@@ -300,7 +300,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// <param name="controlArea"></param>
     /// <param name="zoom"></param>
     /// <returns></returns>
-    public static Point CenterPos(RectangleF maxCanvasBounds, Size controlArea, float zoom) {
+    public static Point FreiraumControl(RectangleF maxCanvasBounds, Size controlArea, float zoom) {
         var w = controlArea.Width - maxCanvasBounds.Width.CanvasToControl(zoom);
         var h = controlArea.Height - maxCanvasBounds.Height.CanvasToControl(zoom);
         return new Point(w, h);
@@ -320,26 +320,26 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             #region  newY
 
-            newY.Add(thisIt.CanvasUsedArea.Y * scaleY);
+            newY.Add(thisIt.CanvasUsedArea.Y.CanvasToControl(scaleY));
 
             #endregion
 
             #region  newX
 
-            newX.Add(thisIt.CanvasUsedArea.X * scaleX);
+            newX.Add(thisIt.CanvasUsedArea.X.CanvasToControl(scaleX));
 
             #endregion
 
             #region  newH
 
-            var nh = thisIt.CanvasUsedArea.Height * scaleY;
+            var nh = thisIt.CanvasUsedArea.Height.CanvasToControl(scaleY);
 
             if (thisIt.AutoSizeableHeight) {
                 if (!thisIt.CanChangeHeightTo(nh)) {
-                    nh = AutosizableExtension.MinHeigthCapAndBox;
+                    nh = (int)AutosizableExtension.MinHeigthCapAndBox;
                 }
             } else {
-                nh = thisIt.CanvasUsedArea.Height;
+                nh = (int)thisIt.CanvasUsedArea.Height;
             }
 
             newH.Add(nh);
@@ -348,7 +348,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             #region  newW
 
-            newW.Add(thisIt.CanvasUsedArea.Width * scaleX);
+            newW.Add(thisIt.CanvasUsedArea.Width.CanvasToControl(scaleX));
 
             #endregion
         }
@@ -536,9 +536,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return erg;
     }
 
-    public static PointF SliderValues(RectangleF canvasBounds, float zoom, Point topLeftPos)
-        => new(canvasBounds.Left.CanvasToControl(zoom) - (topLeftPos.X / 2f),
-               canvasBounds.Top.CanvasToControl(zoom) - (topLeftPos.Y / 2f));
+    public static PointF SliderValues(RectangleF canvasBounds, float zoom, Point freiraumControl)
+        => new(canvasBounds.Left.CanvasToControl(zoom) + (freiraumControl.X / 2f),
+               canvasBounds.Top.CanvasToControl(zoom) + (freiraumControl.Y / 2f));
 
     public static float ZoomFitValue(RectangleF canvasBounds, Size controlSize) => canvasBounds.IsEmpty
             ? 1f
@@ -1131,7 +1131,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (_gridShow > 0.1) {
             var tmpgrid = _gridShow;
 
-            while (MmToPixel(tmpgrid, Dpi) * scale < 5) { tmpgrid *= 2; }
+            while (MmToPixel(tmpgrid, Dpi).CanvasToControl(scale) < 5) { tmpgrid *= 2; }
 
             var p = new Pen(Color.FromArgb(10, 0, 0, 0));
             float ex = 0;
@@ -1140,7 +1140,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             float dxp, dyp, dxm, dym;
 
             do {
-                var mo = MmToPixel(ex * tmpgrid, Dpi) * scale;
+                var mo = MmToPixel(ex * tmpgrid, Dpi).CanvasToControl(scale);
 
                 dxp = po.X + mo;
                 dxm = po.X - mo;

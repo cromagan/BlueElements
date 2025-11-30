@@ -161,7 +161,7 @@ public class RowFormulaListItem : AbstractListItem {
 
         _tmpBmp ??= new Bitmap(canvasUsedArea.Width * internalZoom, canvasUsedArea.Height * internalZoom);
         var zoomv = ItemCollectionPadItem.ZoomFitValue(canvasUsedArea, _tmpBmp.Size);
-        var centerpos = ItemCollectionPadItem.CenterPos(canvasUsedArea, _tmpBmp.Size, zoomv);
+        var centerpos = ItemCollectionPadItem.FreiraumControl(canvasUsedArea, _tmpBmp.Size, zoomv);
         var slidervalues = ItemCollectionPadItem.SliderValues(canvasUsedArea, zoomv, centerpos);
         //pad.ShowInPrintMode = true;
         //pad.Unselect();

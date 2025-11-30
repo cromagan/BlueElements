@@ -250,8 +250,8 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
         DrawColorScheme(gr, positionInControl, scale, null, false, false, false);
-        var headh = 25 * scale;
-        var headb = 70 * scale;
+        var headh = 25.CanvasToControl(scale);
+        var headb = 70.CanvasToControl(scale);
 
         var body = positionInControl with { Y = positionInControl.Y + headh, Height = positionInControl.Height - headh };
         var c = -1;
