@@ -151,7 +151,7 @@ public static class AbstractListItemExtension {
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public static RowFormulaListItem ItemOf(RowItem row, string layoutId, string userDefCompareKey, object? tag) => new(row, layoutId, userDefCompareKey);
+    public static RowFormulaListItem ItemOf(RowItem row, string layoutId, string userDefCompareKey, object? tag) => new(row, layoutId, userDefCompareKey, tag);
 
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt

@@ -74,13 +74,20 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.ViewChanged += TableInternal_ViewChanged;
         TableInternal.SelectedCellChanged += TableInternal_SelectedCellChanged;
         TableInternal.TableChanged += TableInternal_TableChanged;
+        TableInternal.CellClicked += TableInternal_CellClicked;
+        TableInternal.DoubleClick += TableInternal_DoubleClick;
+        FilterFix.PropertyChanged += FilterFix_PropertyChanged;
     }
 
     #endregion
 
     #region Events
 
+    public event EventHandler<CellEventArgs>? CellClicked;
+
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
+
+    public new event EventHandler<CellExtEventArgs>? DoubleClick;
 
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
@@ -127,23 +134,17 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.ContextMenuDefault = value;
     }
 
-    public ColumnViewCollection? CurrentArrangement {
-        get => TableInternal.CurrentArrangement;
-    }
+    public ColumnViewCollection? CurrentArrangement => TableInternal.CurrentArrangement;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ColumnViewItem? CursorPosColumn {
-        get => TableInternal.CursorPosColumn;
-    }
+    public ColumnViewItem? CursorPosColumn => TableInternal.CursorPosColumn;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowListItem? CursorPosRow {
-        get => TableInternal.CursorPosRow;
-    }
+    public RowListItem? CursorPosRow => TableInternal.CursorPosRow;
 
     [DefaultValue(false)]
     public bool EditButton {
@@ -157,6 +158,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [DefaultValue("")]
     public string FilterAnsichtName { get; set; } = string.Empty;
 
+    public FilterCollection FilterCombined => TableInternal.FilterCombined;
+
+    public FilterCollection FilterFix { get; } = new("FilterFix");
+
     public int FilterleisteZeilen => CurrentArrangement?.FilterRows ?? 1;
 
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
@@ -164,13 +169,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public new bool Focused => base.Focused || TableInternal.Focused;
 
+    public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
+
     public bool PowerEdit {
         set => TableInternal.PowerEdit = value;
     }
 
-    public List<AbstractListItem>? RowViewItems {
-        get => TableInternal.RowViewItems;
-    }
+    public List<RowListItem> RowViewItems => TableInternal.RowViewItems;
 
     public string SheetStyle {
         get => TableInternal.SheetStyle;
@@ -199,9 +204,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Table? Table {
-        get => TableInternal.Table;
-    }
+    public Table? Table => TableInternal.Table;
 
     [DefaultValue(true)]
     public bool Translate {
@@ -239,45 +242,19 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void CollapesAll() => TableInternal.CollapesAll();
 
+    public void CursorPos_Set(ColumnViewItem? columnViewItem, RowListItem? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
+
+    public void DoZoom(bool zoomin) => TableInternal.DoZoom(zoomin);
+
     public void ExpandAll() => TableInternal.ExpandAll();
 
-    public void ImportClipboard() => TableInternal.ImportClipboard();
+    public string Export_CSV(FirstRow columnCaption) => TableInternal.Export_CSV(columnCaption);
 
-    public void ImportCsv(string csvtxt) => TableInternal.ImportCsv(csvtxt);
+    public void Export_HTML(string filename, bool execute) => TableInternal.Export_HTML(filename, execute);
 
-    public void OpenScriptEditor() => TableInternal.OpenScriptEditor();
+    public void Export_HTML() => TableInternal.Export_HTML();
 
-    public void OpenSearchAndReplaceInCells() => TableInternal.OpenSearchAndReplaceInCells();
-
-    public void OpenSearchAndReplaceInTbScripts() => TableInternal.OpenSearchAndReplaceInTbScripts();
-
-    public void OpenSearchInCells() => TableInternal.OpenSearchInCells();
-
-    public void ParseView(string toParse) => TableInternal.ParseView(toParse);
-
-    public void Pin(List<RowItem>? rows) => TableInternal.Pin(rows);
-
-    public void PinAdd(RowItem? row) => TableInternal.PinAdd(row);
-
-    public void PinRemove(RowItem? row) => TableInternal.PinRemove(row);
-
-    public List<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
-
-    public void TableSet(Table? tb, string viewCode) => TableInternal.TableSet(tb, viewCode);
-
-    public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
-
-    public List<string> ViewToString() => TableInternal.ViewToString();
-
-    internal void CursorPos_Set(ColumnViewItem? columnViewItem, RowListItem? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
-
-    internal void DoZoom(bool zoomin) => TableInternal.DoZoom(zoomin);
-
-    internal string Export_CSV(FirstRow columnCaption) => TableInternal.Export_CSV(columnCaption);
-
-    internal void Export_HTML() => TableInternal.Export_HTML();
-
-    internal void FillFilters() {
+    public void FillFilters() {
         if (IsDisposed || FilterleisteZeilen <= 0) { return; }
 
         if (InvokeRequired) {
@@ -434,11 +411,41 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         _isFilling = false;
     }
 
-    internal void ImportBtb() => TableInternal.ImportBtb();
+    public void ImportBtb() => TableInternal.ImportBtb();
 
-    internal void RowCleanUp() => TableInternal.RowCleanUp();
+    public void ImportClipboard() => TableInternal.ImportClipboard();
 
-    internal RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
+    public void ImportCsv(string csvtxt) => TableInternal.ImportCsv(csvtxt);
+
+    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) => TableInternal.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, maychangeview);
+
+    public void OpenScriptEditor() => TableInternal.OpenScriptEditor();
+
+    public void OpenSearchAndReplaceInCells() => TableInternal.OpenSearchAndReplaceInCells();
+
+    public void OpenSearchAndReplaceInTbScripts() => TableInternal.OpenSearchAndReplaceInTbScripts();
+
+    public void OpenSearchInCells() => TableInternal.OpenSearchInCells();
+
+    public void ParseView(string toParse) => TableInternal.ParseView(toParse);
+
+    public void Pin(List<RowItem>? rows) => TableInternal.Pin(rows);
+
+    public void PinAdd(RowItem? row) => TableInternal.PinAdd(row);
+
+    public void PinRemove(RowItem? row) => TableInternal.PinRemove(row);
+
+    public void RowCleanUp() => TableInternal.RowCleanUp();
+
+    public List<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
+
+    public void TableSet(Table? tb, string viewCode) => TableInternal.TableSet(tb, viewCode);
+
+    public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
+
+    public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
+
+    public List<string> ViewToString() => TableInternal.ViewToString();
 
     //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     [DebuggerNonUserCode]
@@ -486,7 +493,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         DoInputFilter(FilterOutput.Table, false);
 
-        TableInternal.FilterFix.ChangeTo(FilterInput);
+        using var nfc = new FilterCollection(FilterInput.Table, "TmpFilterCombined");
+        nfc.RemoveOtherAndAdd(FilterFix, "Filter aus übergeordneten Element");
+        nfc.RemoveOtherAndAdd(FilterInput, null);
+        TableInternal.FilterFix.ChangeTo(nfc);
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {
@@ -615,12 +625,12 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         }
 
         if (AutoPin && r.Count == 1) {
-            if (_lastLooked != r[0].CellFirstString()) {
-                if (RowViewItems?.Get(r[0]) == null) {
+            if (_lastLooked != r[0].KeyName) {
+                if (RowViewItems.GetByKey(r[0].KeyName) == null) {
                     if (Forms.MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
                         PinAdd(r[0]);
                     }
-                    _lastLooked = r[0].CellFirstString();
+                    _lastLooked = r[0].KeyName;
                 }
             }
         }
@@ -670,6 +680,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         DoFilterOutput();
     }
 
+    private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate_FilterInput();
+
     private FlexiFilterControl? FlexiItemOf(ColumnItem column) {
         foreach (var thisControl in Controls) {
             if (thisControl is FlexiFilterControl flx) {
@@ -705,7 +717,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         DoÄhnlich();
     }
 
+    private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
+
     private void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
+    private void OnDoubleClick(CellExtEventArgs e) => DoubleClick?.Invoke(this, e);
 
     private void OnPinnedChanged() {
         // Filterleiste aktualisieren, wenn sie sichtbar ist
@@ -774,9 +790,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         FillFilters();
     }
 
+    private void TableInternal_CellClicked(object sender, CellEventArgs e) => OnCellClicked(e);
+
     private void TableInternal_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         OnContextMenuInit(e);
     }
+
+    private void TableInternal_DoubleClick(object sender, CellExtEventArgs e) => OnDoubleClick(e);
 
     private void TableInternal_FilterCombinedChanged(object sender, System.EventArgs e) {
         DoFilterOutput();

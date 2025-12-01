@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
+using BlueControls.EventArgs;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
@@ -828,6 +829,7 @@ namespace BlueControls.Forms {
             this.Table.SelectedRowChanged += new System.EventHandler<BlueTable.EventArgs.RowNullableEventArgs>(this.Table_SelectedRowChanged);
             this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler(this.Table_VisibleRowsChanged);
+            this.Table.ContextMenuInit += new System.EventHandler<ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
             // 
             // SplitContainer1
             // 

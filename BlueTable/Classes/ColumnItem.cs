@@ -1284,9 +1284,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 if (_multiLine) {
                     list.AddRange(thisRowItem.CellGetList(this));
                 } else {
- 
-                        list.Add(thisRowItem.CellGetString(this));
-                    
+                    list.Add(thisRowItem.CellGetString(this));
                 }
             }
         }
@@ -2435,71 +2433,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return string.Empty;
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private void CheckIfIAmAKeyColumn() {
-        Am_A_Key_For_Other_Column = string.Empty;
-
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-
-        foreach (var c in db.Column) {
-            //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
-            //if (thisColumn.LinkedCell_RowKeyIsInColumn == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-            //if (ThisColumn.LinkedCell_ColumnValueFoundIn == _name) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-            if (c.RelationType == RelationType.CellValues) {
-                foreach (var thisitem in c.LinkedCellFilter) {
-                    var tmp = thisitem.SplitBy("|");
-
-                    if (tmp[2].ToLowerInvariant().Contains("~" + _keyName.ToLowerInvariant() + "~")) {
-                        Am_A_Key_For_Other_Column = "Spalte " + c.ReadableText() + " verweist auf diese Spalte";
-                    }
-                }
-            }
-        }
-        //if (_format == DataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
-    }
-
-    private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                OnDisposingEvent();
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-                Table = null;
-                Invalidate_LinkedTable();
-            }
-
-            _afterEditAutoReplace.Clear();
-            _dropDownItems.Clear();
-            LinkedCellFilter.Clear();
-            _permissionGroupsChangeCell.Clear();
-            ColumnTags.Clear();
-
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            IsDisposed = true;
-        }
-    }
-
-    private void Invalidate_LinkedTable() {
-        Table? tableToCleanup = null;
-
-        lock (_linkedTableLock) {
-            tableToCleanup = _linkedTable;
-            _linkedTable = null; // Sofort auf null setzen (fail-fast)
-        }
-
-        // Event-Abmeldung außerhalb des Locks um Deadlocks zu vermeiden
-        if (tableToCleanup != null) {
-            try {
-                tableToCleanup.Cell.CellValueChanged -= LinkedTable_CellValueChanged;
-            } catch { }
-
-            try {
-                tableToCleanup.DisposingEvent -= LinkedTable_Disposing;
-            } catch { }
-        }
-    }
-
     private static string KleineFehlerCorrect(string txt) {
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
         //if (TextFormatingAllowed) { txt = txt.HtmlSpecialToNormalChar(false); }
@@ -2569,6 +2502,71 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //    txt = txt.Replace("<br>", "\r");
         //}
         return txt;
+    }
+
+    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+
+    private void CheckIfIAmAKeyColumn() {
+        Am_A_Key_For_Other_Column = string.Empty;
+
+        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+
+        foreach (var c in db.Column) {
+            //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
+            //if (thisColumn.LinkedCell_RowKeyIsInColumn == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+            //if (ThisColumn.LinkedCell_ColumnValueFoundIn == _name) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+            if (c.RelationType == RelationType.CellValues) {
+                foreach (var thisitem in c.LinkedCellFilter) {
+                    var tmp = thisitem.SplitBy("|");
+
+                    if (tmp[2].ToLowerInvariant().Contains("~" + _keyName.ToLowerInvariant() + "~")) {
+                        Am_A_Key_For_Other_Column = "Spalte " + c.ReadableText() + " verweist auf diese Spalte";
+                    }
+                }
+            }
+        }
+        //if (_format == DataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
+    }
+
+    private void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
+                OnDisposingEvent();
+                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                Table = null;
+                Invalidate_LinkedTable();
+            }
+
+            _afterEditAutoReplace.Clear();
+            _dropDownItems.Clear();
+            LinkedCellFilter.Clear();
+            _permissionGroupsChangeCell.Clear();
+            ColumnTags.Clear();
+
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // TODO: Große Felder auf NULL setzen
+            IsDisposed = true;
+        }
+    }
+
+    private void Invalidate_LinkedTable() {
+        Table? tableToCleanup = null;
+
+        lock (_linkedTableLock) {
+            tableToCleanup = _linkedTable;
+            _linkedTable = null; // Sofort auf null setzen (fail-fast)
+        }
+
+        // Event-Abmeldung außerhalb des Locks um Deadlocks zu vermeiden
+        if (tableToCleanup != null) {
+            try {
+                tableToCleanup.Cell.CellValueChanged -= LinkedTable_CellValueChanged;
+            } catch { }
+
+            try {
+                tableToCleanup.DisposingEvent -= LinkedTable_Disposing;
+            } catch { }
+        }
     }
 
     private void LinkedTable_CellValueChanged(object sender, CellEventArgs e) {

@@ -170,7 +170,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "includedjointpoints":
-                //_includedjointPoints = value.FromNonCritical().SplitAndCutByCrToList();
+                //_includedjointPoints = value.FromNonCritical().SplitAndCutByCr();
                 return true;
 
             case "additionalscale":

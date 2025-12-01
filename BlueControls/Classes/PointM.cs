@@ -177,6 +177,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
 
+    public Point CanvasToControl(float zoom, float offsetX, float offsetY) => new Point(_x.CanvasToControl(zoom, offsetX), _y.CanvasToControl(zoom, offsetY));
+
     public float DistanzZuLinie(PointM p1, PointM p2) => DistanzZuLinie(p1.X, p1.Y, p2.X, p2.Y);
 
     public float DistanzZuLinie(float x1, float y1, float x2, float y2) => GetLength(this, PointOnLine(this, x1, y1, x2, y2));
@@ -308,9 +310,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    internal PointF CanvasToControl(float zoom, float offsetX, float offsetY) => new PointF(_x.CanvasToControl(zoom, offsetX), _y.CanvasToControl(zoom, offsetY));
-
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }
