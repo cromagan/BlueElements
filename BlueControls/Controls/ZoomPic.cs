@@ -75,13 +75,13 @@ public partial class ZoomPic : ZoomPad {
 
     public override bool ControlMustPressed => false;
     protected override bool AutoCenter => true;
-    protected override float SliderZoomOutAddition => 0.1f;
+    protected override bool ShowSliderX => true;
 
     #endregion
 
     #region Methods
 
-    protected override RectangleF CalculateCanvasMaxBounds() => Bmp?.IsValid() == true ? new RectangleF(0, 0, Bmp.Width, Bmp.Height) : new RectangleF(0, 0, 0, 0);
+    protected override RectangleF CalculateCanvasMaxBounds() => Bmp?.IsValid() == true ? new RectangleF(-20, -20, Bmp.Width + 40, Bmp.Height + 40) : new RectangleF(0, 0, 0, 0);
 
     protected override void DrawControl(Graphics gr, States state) {
         base.DrawControl(gr, state);

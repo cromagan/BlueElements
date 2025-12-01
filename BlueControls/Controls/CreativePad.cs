@@ -166,7 +166,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     protected override bool AutoCenter => true;
-    protected override float SliderZoomOutAddition => 0.6f;
+    protected override bool ShowSliderX => false;
 
     #endregion
 
@@ -308,7 +308,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         return new((int)(valx / Zoom), (int)(valy / Zoom));
     }
 
-    protected override RectangleF CalculateCanvasMaxBounds() => _items?.CanvasUsedArea ?? new RectangleF(0, 0, 0, 0);
+    protected override RectangleF CalculateCanvasMaxBounds() {
+        if (_items?.CanvasUsedArea is not { } a) { return new RectangleF(0, 0, 0, 0); }
+
+        var add = (float)Math.Max(a.Width * 0.5, a.Height * 0.5);
+
+        return new RectangleF(a.Left - add, a.Top - add, a.Right + add, a.Bottom + add);
+    }
 
     protected override void Dispose(bool disposing) {
         UnRegisterEvents();

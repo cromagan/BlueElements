@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
@@ -209,14 +208,14 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     protected override RectangleF CalculateCanvasMaxBounds() {
-        var r = base.CalculateCanvasMaxBounds();
+        var a = base.CalculateCanvasMaxBounds();
         foreach (var thisP in _points) {
-            r.X = Math.Min(r.X, thisP.X);
-            r.Y = Math.Min(r.Y, thisP.Y);
-            r.Width = Math.Max(r.Width, thisP.X - r.X);
-            r.Height = Math.Max(r.Height, thisP.Y - r.Y);
+            a.X = Math.Min(a.X, thisP.X);
+            a.Y = Math.Min(a.Y, thisP.Y);
+            a.Width = Math.Max(a.Width, thisP.X - a.X);
+            a.Height = Math.Max(a.Height, thisP.Y - a.Y);
         }
-        return r;
+        return a;
     }
 
     //protected override void DrawControl(Graphics gr, enStates state)

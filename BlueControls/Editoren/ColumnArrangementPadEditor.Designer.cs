@@ -62,8 +62,6 @@ namespace BlueControls.BlueTableDialogs {
             // Pad
             // 
             this.Pad.ContextMenuAllowed = false;
-            this.Pad.OffsetX = -237.5F;
-            this.Pad.OffsetY = -89.5F;
             this.Pad.Size = new System.Drawing.Size(612, 316);
             this.Pad.ItemRemoved += new System.EventHandler<System.EventArgs>(this.Item_ItemRemoved);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);

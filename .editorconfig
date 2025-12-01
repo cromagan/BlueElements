@@ -293,3 +293,6 @@ dotnet_diagnostic.CA1008.severity = none
 
 # CA5401: CreateEncryptor nicht mit Nicht-Standard-Initialisierungsvektoren verwenden
 dotnet_diagnostic.CA5401.severity = none
+
+# IDE0055: Formatierung korrigieren
+dotnet_diagnostic.IDE0055.severity = none

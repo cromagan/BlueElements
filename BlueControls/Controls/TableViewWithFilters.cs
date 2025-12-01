@@ -487,11 +487,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
 
-        if (Table is not { IsDisposed: false }) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
 
         DoInputFilter(FilterOutput.Table, false);
 
-        using var nfc = new FilterCollection(FilterInput.Table, "TmpFilterCombined");
+        using var nfc = new FilterCollection(tb, "TmpFilterCombined");
         nfc.RemoveOtherAndAdd(FilterFix, "Filter aus übergeordneten Element");
         nfc.RemoveOtherAndAdd(FilterInput, null);
         TableInternal.FilterFix.ChangeTo(nfc);

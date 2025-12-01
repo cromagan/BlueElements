@@ -15,25 +15,12 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.SliderY = new Slider();
             this.btnDown = new Button();
             this.btnEdit = new Button();
             this.btnUp = new Button();
             this.btnPlus = new Button();
             this.btnMinus = new Button();
             this.SuspendLayout();
-            // 
-            // SliderY
-            // 
-            this.SliderY.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                   | AnchorStyles.Right)));
-            this.SliderY.CausesValidation = false;
-            this.SliderY.Location = new Point(159, 0);
-            this.SliderY.Name = "SliderY";
-            this.SliderY.Orientation = Orientation.Senkrecht;
-            this.SliderY.Size = new Size(18, 144);
-            this.SliderY.Visible = false;
-            this.SliderY.ValueChanged += new EventHandler(this.SliderY_ValueChange);
             // 
             // btnDown
             // 
@@ -100,7 +87,6 @@ namespace BlueControls.Controls
             this.Controls.Add(this.btnEdit);
             this.Controls.Add(this.btnDown);
             this.Controls.Add(this.btnUp);
-            this.Controls.Add(this.SliderY);
             this.Size = new Size(177, 168);
             this.ResumeLayout(false);
 
@@ -111,6 +97,5 @@ namespace BlueControls.Controls
         private Button btnUp;
         private Button btnPlus;
         private Button btnMinus;
-        private Slider SliderY;
     }
 }

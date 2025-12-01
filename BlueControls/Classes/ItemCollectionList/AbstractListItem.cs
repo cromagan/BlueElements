@@ -109,7 +109,7 @@ public static class AbstractListItemExtension {
         } catch { }
     }
 
-    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int x, int y, float offsetX, float offsetY) => list.FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem?.Contains((int)(x + offsetX), (int)(y + offsetY)) == true);
+    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, float canvasX, float canvasY) => list.FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem?.CanvasPosition.Contains((int)canvasX, (int)canvasY) == true);
 
     /// <summary>
     /// Gibt das erste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
@@ -565,8 +565,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
         return 0;
     }
-
-    public bool Contains(int x, int y) => CanvasPosition.Contains(x, y);
 
     public void Draw(Graphics gr, Rectangle visibleArea, float offsetX, float offsetY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float scale) {
         if (itemdesign == Design.Undefiniert) { return; }

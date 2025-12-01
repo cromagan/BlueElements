@@ -215,7 +215,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
             if (showName) {
                 var t = p.CanvasToControl(zoom, offsetX, offsetY);
-                Rectangle r = new((int)(t.X + 5), (int)(t.Y + 0), 200, 200);
+                var r = new Rectangle(t.X + 5, t.Y + 0, 200, 200);
                 Skin.Draw_FormatedText(gr, p.KeyName, null, Alignment.Top_Left, r, design, state, null, false, false);
             }
         }
@@ -518,18 +518,18 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         CollectGarbage();
 
         do {
-            if ((int)r.Width.CanvasToControl(scale) > 15000) {
+            if (r.Width.CanvasToControl(scale) > 15000) {
                 scale *= 0.8f;
-            } else if ((int)r.Height.CanvasToControl(scale) > 15000) {
+            } else if (r.Height.CanvasToControl(scale) > 15000) {
                 scale *= 0.8f;
-            } else if ((int)r.Height.CanvasToControl(scale) * (int)r.Height.CanvasToControl(scale) > 90000000) {
+            } else if (r.Height.CanvasToControl(scale) * r.Height.CanvasToControl(scale) > 90000000) {
                 scale *= 0.8f;
             } else {
                 break;
             }
         } while (true);
 
-        var bmp = new Bitmap((int)r.Width.CanvasToControl(scale), (int)r.Height.CanvasToControl(scale));
+        var bmp = new Bitmap(r.Width.CanvasToControl(scale), r.Height.CanvasToControl(scale));
 
         DrawToBitmap(bmp, scale, r.Left.CanvasToControl(scale), r.Top.CanvasToControl(scale));
 

@@ -566,14 +566,14 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
             case CaptionPosition.Links_neben_dem_Feld:
                 cap = new Point(0, 0);
-                uc.X += (int)100.CanvasToControl(scale);
-                uc.Width -= (int)100.CanvasToControl(scale);
+                uc.X += 100.CanvasToControl(scale);
+                uc.Width -= 100.CanvasToControl(scale);
                 break;
 
             default:
                 cap = new Point(0, 0);
-                uc.Y += (int)19.CanvasToControl(scale);
-                uc.Height -= (int)19.CanvasToControl(scale);
+                uc.Y += 19.CanvasToControl(scale);
+                uc.Height -= 19.CanvasToControl(scale);
                 break;
         }
 

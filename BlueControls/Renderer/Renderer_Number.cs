@@ -102,7 +102,7 @@ public class Renderer_Number : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        var pix16 = (int)16.CanvasToControl(scale);
+        var pix16 = 16.CanvasToControl(scale);
 
         var splitedContent = content.SplitAndCutByCrAndBr();
 

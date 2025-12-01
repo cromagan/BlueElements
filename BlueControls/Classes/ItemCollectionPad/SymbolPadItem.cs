@@ -183,7 +183,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
                 break;
 
             case Symbol.Rechteck_gerundet:
-                p = Poly_RoundRec(d2.ToRect(), (int)20.CanvasToControl(scale));
+                p = Poly_RoundRec(d2.ToRect(), 20.CanvasToControl(scale));
                 break;
 
             default:

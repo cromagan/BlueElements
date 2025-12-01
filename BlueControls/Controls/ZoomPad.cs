@@ -46,8 +46,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     private bool _lastSliderXVisible;
 
     private bool _lastSliderYVisible;
-    private float _offsetX;
-    private float _offsetY;
+    private int _offsetX;
+    private int _offsetY;
     private float _zoom = 1;
 
     private float _zoomFit = 1;
@@ -68,16 +68,22 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public new bool Focused => base.Focused || SliderX.Focused || SliderY.Focused;
 
+    public bool IsMaxYOffset => Math.Abs(OffsetY - SliderY.Maximum) < IntTolerance;
+
     /// <summary>
     /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde. Zoom und Slider wurden eingerechnet, dass die Koordinaten Massstabsunabhängis sind.
     /// </summary>
     public PointF MouseDownCanvas { get; protected set; }
 
     [DefaultValue(0f)]
-    public float OffsetX {
-        get => _offsetX;
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int OffsetX {
+        get => ShowSliderX ? _offsetX : 0;
         set {
             if (ScreenshotMode) { return; }
+            if (!ShowSliderX) { value = 0; }
             if (Math.Abs(value - _offsetX) < DefaultTolerance) { return; }
             _offsetX = value;
             OnOffsetXChanged();
@@ -85,7 +91,10 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     [DefaultValue(0f)]
-    public float OffsetY {
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int OffsetY {
         get => _offsetY;
         set {
             if (ScreenshotMode) { return; }
@@ -96,6 +105,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool ScreenshotMode {
         get;
         set {
@@ -115,6 +127,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     [DefaultValue(1f)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public float Zoom {
         get => _zoom;
         set {
@@ -129,12 +144,14 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected abstract bool AutoCenter { get; }
+    protected abstract bool ShowSliderX { get; }
 
     /// <summary>
-    /// So viel darf zusätzlich hinausgezoomt werden.
+    /// True, wenn aktuell die STRG-Taste gedrückt wird.
     /// </summary>
-    protected abstract float SliderZoomOutAddition { get; }
-
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     private bool ControlPressing { get; set; }
 
     #endregion
@@ -245,7 +262,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         OnMouseWheel(x);
     }
 
-    internal void EnsureVisibleX(float controlX) {
+    internal void EnsureVisibleX(int controlX) {
+        if (!ShowSliderX) { return; }
         var pa = AvailableControlPaintArea();
 
         if (controlX < pa.Left) {
@@ -255,7 +273,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     }
 
-    internal void EnsureVisibleY(float controlY) {
+    internal void EnsureVisibleY(int controlY) {
         var pa = AvailableControlPaintArea();
 
         if (controlY < pa.Top) {
@@ -291,25 +309,34 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             sliderv = new PointF(0, 0);
         }
 
-        if (freiraumControl.X < 0) {
-            SliderX.Enabled = true;
-            SliderX.Minimum = (float)(maxCanvasBounds.Left.CanvasToControl(_zoom) - (a.Width * SliderZoomOutAddition));
-            SliderX.Maximum = (float)(maxCanvasBounds.Right.CanvasToControl(_zoom) - a.Width + (a.Width * SliderZoomOutAddition)) + 1;
-            SliderX.Value = -OffsetX;
+        if (ShowSliderX) {
+            SliderX.Visible = true;
+            if (freiraumControl.X < 0) {
+                SliderX.Enabled = true;
+                SliderX.Minimum = maxCanvasBounds.Left.CanvasToControl(_zoom) - a.Width;
+                SliderX.Maximum = (float)maxCanvasBounds.Right.CanvasToControl(_zoom) + 1;
+                SliderX.Value = -OffsetX;
+                SliderX.LargeChange = a.Width;
+            } else {
+                SliderX.Enabled = false;
+                if (!MousePressing()) {
+                    SliderX.Minimum = -sliderv.X;
+                    SliderX.Maximum = -sliderv.X;
+                    SliderX.Value = -sliderv.X;
+                }
+            }
         } else {
             SliderX.Enabled = false;
-            if (!MousePressing()) {
-                SliderX.Minimum = -sliderv.X;
-                SliderX.Maximum = -sliderv.X;
-                SliderX.Value = -sliderv.X;
-            }
+            SliderX.Visible = false;
+            SliderX.Value = 0;
         }
 
         if (freiraumControl.Y < 0) {
             SliderY.Enabled = true;
-            SliderY.Minimum = (float)(maxCanvasBounds.Top.CanvasToControl(_zoom) - (a.Height * SliderZoomOutAddition));
-            SliderY.Maximum = (float)(maxCanvasBounds.Bottom.CanvasToControl(_zoom) - a.Height + (a.Height * SliderZoomOutAddition)) + 1;
+            SliderY.Minimum = maxCanvasBounds.Top.CanvasToControl(_zoom) - a.Height;
+            SliderY.Maximum = (float)maxCanvasBounds.Bottom.CanvasToControl(_zoom) + 1;
             SliderY.Value = -OffsetY;
+            SliderY.LargeChange = a.Height;
         } else {
             SliderY.Enabled = false;
             if (!MousePressing()) {
@@ -348,25 +375,25 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         switch (e.KeyCode) {
             case Keys.PageDown:
                 if (SliderY.Enabled) {
-                    OffsetY += SliderY.LargeChange;
+                    OffsetY += (int)SliderY.LargeChange;
                 }
                 break;
 
             case Keys.PageUp: //Bildab
                 if (SliderY.Enabled) {
-                    OffsetY -= SliderY.LargeChange;
+                    OffsetY -= (int)SliderY.LargeChange;
                 }
                 break;
 
             case Keys.Home:
                 if (SliderY.Enabled) {
-                    OffsetY = SliderY.Minimum;
+                    OffsetY = (int)SliderY.Minimum;
                 }
                 break;
 
             case Keys.End:
                 if (SliderY.Enabled) {
-                    OffsetY = SliderY.Maximum;
+                    OffsetY = (int)SliderY.Maximum;
                 }
                 break;
         }
@@ -377,7 +404,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         ControlPressing = false;
     }
 
-    protected sealed override void OnMouseDown(MouseEventArgs e) {
+    protected override sealed void OnMouseDown(MouseEventArgs e) {
         var cme = new CanvasMouseEventArgs(e, _zoom, _offsetX, _offsetY);
         MouseDownCanvas = cme.CanvasPoint;
         base.OnMouseDown(e);
@@ -391,14 +418,14 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         ControlPressing = false;
     }
 
-    protected sealed override void OnMouseMove(MouseEventArgs e) {
+    protected override sealed void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         OnMouseMove(new CanvasMouseEventArgs(e, _zoom, _offsetX, _offsetY));
     }
 
     protected virtual void OnMouseMove(CanvasMouseEventArgs e) { }
 
-    protected sealed override void OnMouseUp(MouseEventArgs e) {
+    protected override sealed void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         MouseDownCanvas = Point.Empty;
         OnMouseUp(new CanvasMouseEventArgs(e, _zoom, _offsetX, _offsetY));
@@ -406,7 +433,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected virtual void OnMouseUp(CanvasMouseEventArgs e) { }
 
-    protected sealed override void OnMouseWheel(MouseEventArgs controle) {
+    protected override sealed void OnMouseWheel(MouseEventArgs controle) {
         base.OnMouseWheel(controle);
 
         if (ControlMustPressed && !ControlPressing) { return; }
@@ -449,13 +476,11 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     }
 
-    protected virtual void OnZoomChanged() {
-        Invalidate();
-    }
+    protected virtual void OnZoomChanged() => Invalidate();
 
-    private void SliderX_ValueChanged(object sender, System.EventArgs e) => OffsetX = -SliderX.Value;
+    private void SliderX_ValueChanged(object sender, System.EventArgs e) => OffsetX = -(int)SliderX.Value;
 
-    private void SliderY_ValueChanged(object sender, System.EventArgs e) => OffsetY = -SliderY.Value;
+    private void SliderY_ValueChanged(object sender, System.EventArgs e) => OffsetY = -(int)SliderY.Value;
 
     private void UpdateScreenshotLayout() {
         // Im Screenshot-Modus immer Zoom-Fit aktivieren

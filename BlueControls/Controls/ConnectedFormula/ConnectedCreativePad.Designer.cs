@@ -35,11 +35,8 @@ namespace BlueControls.Controls {
             this.pad.Dock = DockStyle.Fill;
             this.pad.Location = new Point(0, 0);
             this.pad.Name = "pad";
-            this.pad.OffsetX = 0F;
-            this.pad.OffsetY = 0F;
             this.pad.Size = new Size(500, 500);
             this.pad.TabIndex = 0;
-            this.pad.Zoom = 1F;
             this.pad.MouseEnter += new EventHandler(this.pad_MouseEnter);
             this.pad.MouseLeave += new EventHandler(this.pad_MouseLeave);
             this.pad.MouseMove += new MouseEventHandler(this.pad_MouseMove);

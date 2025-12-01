@@ -36,7 +36,6 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -309,7 +308,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     protected override bool AutoCenter => false;
 
-    protected override float SliderZoomOutAddition => 0f;
+    protected override bool ShowSliderX => true;
 
     private List<AbstractListItem>? AllViewItems {
         get {
@@ -1619,7 +1618,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         // Haupt-Aufbau-Routine ------------------------------------
         var t = sortedRowData.CanvasItemData(Design.Item_Listbox);
-        sortedRowData.DrawItems(gr, AvailableControlPaintArea(), null, (int)OffsetX, (int)OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
+        sortedRowData.DrawItems(gr, AvailableControlPaintArea(), null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
 
         // Rahmen um die gesamte Tabelle zeichnen
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
@@ -2234,7 +2233,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
 
         _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth, columnviewitem.GetRenderer(SheetStyle));
-        _autoFilter.Position_LocateToPosition(new Point((int)(screenx + headX), screeny + bottom));
+        _autoFilter.Position_LocateToPosition(new Point(screenx + headX, screeny + bottom));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
     }
@@ -2737,7 +2736,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return true;
     }
 
-    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), AllViewItems.ElementAtPosition(1, (int)e.CanvasY, 0, 0));
+    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), AllViewItems.ElementAtPosition(1, (int)e.CanvasY));
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -3005,8 +3004,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //    OffsetX = OffsetX + realhead.Right - dispR.Width;
         //}
 
-        EnsureVisibleX(viewItem.ControlColumnRight((int)OffsetX));
-        EnsureVisibleX(viewItem.ControlColumnLeft((int)OffsetX));
+        EnsureVisibleX(viewItem.ControlColumnRight(OffsetX));
+        EnsureVisibleX(viewItem.ControlColumnLeft(OffsetX));
 
         return true;
     }
