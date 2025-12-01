@@ -62,18 +62,6 @@ public partial class Form : System.Windows.Forms.Form {
         BackColor = Skin.Color_Back(Design, States.Standard);
     }
 
-    public new DialogResult ShowDialog() {
-        FormManager.RegisterForm(this);
-        var t = base.ShowDialog();
-
-        return t;
-    }
-
-    public new void Show() {
-        FormManager.RegisterForm(this);
-        base.Show();
-    }
-
     #endregion
 
     #region Properties
@@ -85,7 +73,7 @@ public partial class Form : System.Windows.Forms.Form {
         set => base.AutoSize = false;
     }
 
-    public sealed override Color BackColor {
+    public override sealed Color BackColor {
         get => base.BackColor;
 
         set => base.BackColor = value;
@@ -98,6 +86,7 @@ public partial class Form : System.Windows.Forms.Form {
     public Design Design { get; }
 
     public bool IsClosed { get; private set; }
+
     public bool IsClosing { get; private set; }
 
     protected override CreateParams CreateParams {
@@ -118,14 +107,28 @@ public partial class Form : System.Windows.Forms.Form {
 
     public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
 
-    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-
     public new void PerformAutoScale() {
         // NIX TUN!!!!
     }
 
+    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
     public void Scale() {
         // NIX TUN!!!!
+    }
+
+    public new void Show() {
+        if (FormManager.Running) {
+            FormManager.RegisterForm(this);
+        }
+        base.Show();
+    }
+
+    public new DialogResult ShowDialog() {
+        if (FormManager.Running) {
+            FormManager.RegisterForm(this);
+        }
+        var t = base.ShowDialog();
+        return t;
     }
 
     //MyBase.ScaleChildren
