@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -133,7 +131,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {
-            tags = ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCr().ToList();
+            tags = [.. ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCr()];
         }
         tags.TagSet("ImageFile", pathOfPicture);
         return tags;

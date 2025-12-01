@@ -20,8 +20,6 @@ using System.Text;
 using System.Threading;
 using static BlueBasics.IO;
 
-#nullable enable
-
 namespace BlueBasics.FileSystemCaching;
 
 /// <summary>

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -131,7 +129,7 @@ public static class AbstractListItemExtension {
     public static T? First<T>(this List<AbstractListItem>? list) where T : AbstractListItem? {
         if (list == null) { return null; }
 
-        for (int i = 0; i < list.Count; i++) {
+        for (var i = 0; i < list.Count; i++) {
             if (list[i] is T typedItem && list[i].Visible) {
                 return typedItem;
             }
@@ -354,7 +352,7 @@ public static class AbstractListItemExtension {
     public static T? Last<T>(this List<AbstractListItem>? list) where T : AbstractListItem? {
         if (list == null) { return null; }
 
-        for (int i = list.Count - 1; i >= 0; i--) {
+        for (var i = list.Count - 1; i >= 0; i--) {
             if (list[i] is T typedItem && list[i].Visible) {
                 return typedItem;
             }
@@ -382,10 +380,10 @@ public static class AbstractListItemExtension {
     public static T? Next<T>(this List<AbstractListItem>? list, AbstractListItem? currentItem) where T : AbstractListItem? {
         if (list == null || currentItem == null) { return null; }
 
-        int currentIndex = list.IndexOf(currentItem);
+        var currentIndex = list.IndexOf(currentItem);
         if (currentIndex < 0) { return null; }
 
-        for (int i = currentIndex + 1; i < list.Count; i++) {
+        for (var i = currentIndex + 1; i < list.Count; i++) {
             if (list[i] is T typedItem && list[i].Visible) {
                 return typedItem;
             }
@@ -422,10 +420,10 @@ public static class AbstractListItemExtension {
     public static T? Previous<T>(this List<AbstractListItem>? list, AbstractListItem? currentItem) where T : AbstractListItem? {
         if (list == null || currentItem == null) { return null; }
 
-        int currentIndex = list.IndexOf(currentItem);
+        var currentIndex = list.IndexOf(currentItem);
         if (currentIndex < 0) { return null; }
 
-        for (int i = currentIndex - 1; i >= 0; i--) {
+        for (var i = currentIndex - 1; i >= 0; i--) {
             if (list[i] is T typedItem && list[i].Visible) {
                 return typedItem;
             }

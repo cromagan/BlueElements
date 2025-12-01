@@ -23,8 +23,6 @@ using System;
 using System.Reflection;
 using static BlueBasics.Converter;
 
-#nullable enable
-
 namespace BlueControls.Forms;
 
 public partial class Start : FormWithStatusBar, IUniqueWindow {

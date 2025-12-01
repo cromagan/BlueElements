@@ -7,8 +7,6 @@ using System;
 using System.Threading;
 using static BlueBasics.Extensions;
 
-#nullable enable
-
 namespace BlueControls;
 
 public partial class GlobalMonitor : Form {

@@ -23,8 +23,6 @@ using BlueTable;
 using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
-#nullable enable
-
 namespace BlueControls;
 
 public partial class Befehlsreferenz : Form {

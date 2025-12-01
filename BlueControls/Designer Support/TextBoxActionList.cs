@@ -6,8 +6,6 @@ using System.ComponentModel.Design;
 
 namespace BlueControls.Designer_Support;
 
-#nullable enable
-
 public sealed class TextBoxActionList : DesignerActionList {
 
     #region Fields

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -963,8 +961,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         DoCursorPos();
 
-        if (ensureVisible && CurrentArrangement is { IsDisposed: false } ca) {
-            EnsureVisible(ca, CursorPosColumn, CursorPosRow);
+        if (ensureVisible) {
+            EnsureVisible(CursorPosColumn, CursorPosRow);
         }
         Invalidate();
 
@@ -975,7 +973,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    public bool EnsureVisible(ColumnViewCollection ca, ColumnViewItem? viewItem, AbstractListItem? row) => EnsureVisible(viewItem) && EnsureVisible(row);
+    public bool EnsureVisible(ColumnViewItem? viewItem, AbstractListItem? row) => EnsureVisible(viewItem) && EnsureVisible(row);
 
     public void ExpandAll() {
         var did = false;
@@ -1159,12 +1157,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public string GrantWriteAccess(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string newChunkVal) {
         var f = IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
-        if (!string.IsNullOrWhiteSpace(f)) { return f; }
-
-        var f2 = Table.GrantWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
-        if (!string.IsNullOrWhiteSpace(f)) { return f2; }
-
-        return string.Empty;
+        return !string.IsNullOrWhiteSpace(f)
+            ? f
+            : Table.GrantWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
     }
 
     public void ImportBtb() {
@@ -1201,7 +1196,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         if (cellInThisTableRow != null) {
-            if (maychangeview && !EnsureVisible(ca, cellInThisTableColumn, cellInThisTableRow)) {
+            if (maychangeview && !EnsureVisible(cellInThisTableColumn, cellInThisTableRow)) {
                 return "Zelle konnte nicht angezeigt werden.";
             }
 
@@ -1449,27 +1444,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public RowListItem? View_NextRow(RowListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
-        if (AllViewItems is not { } sr) { return null; }
-        return sr.Next<RowListItem>(row);
+        return AllViewItems is not { } sr ? null : sr.Next<RowListItem>(row);
     }
 
     public RowListItem? View_PreviousRow(RowListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
-        if (AllViewItems is not { } sr) { return null; }
-        return sr.Previous<RowListItem>(row);
+        return AllViewItems is not { } sr ? null : sr.Previous<RowListItem>(row);
     }
 
     public RowListItem? View_RowFirst() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-        if (AllViewItems is not { } sr) { return null; }
-        return sr.First<RowListItem>();
+        return AllViewItems is not { } sr ? null : sr.First<RowListItem>();
     }
 
     public RowListItem? View_RowLast() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-        if (AllViewItems is not { } sr) { return null; }
-        return sr.Last<RowListItem>();
+        return AllViewItems is not { } sr ? null : sr.Last<RowListItem>();
     }
 
     public override List<string> ViewToString() {
@@ -1805,7 +1796,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 Invalidate_SortedRowData(false);
             }
-            EnsureVisible(ca, _mouseOverColumn, _mouseOverRow);
+            EnsureVisible(_mouseOverColumn, _mouseOverRow);
             CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
             Develop.SetUserDidSomething();
             _isinMouseDown = false;
@@ -2351,7 +2342,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 var parts = capValue.Trim('\\').Split('\\');
                 var currentPath = parts[0];
                 expandedCaps.Add(parts[0]);
-                for (int i = 1; i < parts.Length; i++) {
+                for (var i = 1; i < parts.Length; i++) {
                     currentPath += "\\" + parts[i];
                     expandedCaps.Add(currentPath);
                 }
@@ -2382,7 +2373,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         #region Gefiltere Zeilen erstellen (_rowData)
 
         List<RowItem> allrows = [.. pinnedRows, .. filteredRows];
-        allrows = allrows.Distinct().ToList();
+        allrows = [.. allrows.Distinct()];
 
         Parallel.ForEach(allrows, thisRow => {
             var markYellow = pinnedRows.Contains(thisRow);

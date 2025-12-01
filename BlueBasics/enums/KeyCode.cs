@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace BlueBasics.Enums;
 
 public enum KeyCode : byte {

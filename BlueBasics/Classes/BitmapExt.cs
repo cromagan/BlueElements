@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
@@ -308,16 +306,16 @@ public class BitmapExt : IDisposableExtended {
             sourceData = sourceBmp.LockBits(new Rectangle(0, 0, sourceBmp.Width, sourceBmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             targetData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
-            int bytes = Math.Abs(sourceData.Stride) * sourceBmp.Height;
-            byte[] sourceBuffer = new byte[bytes];
-            byte[] targetBuffer = new byte[bytes];
+            var bytes = Math.Abs(sourceData.Stride) * sourceBmp.Height;
+            var sourceBuffer = new byte[bytes];
+            var targetBuffer = new byte[bytes];
 
             Marshal.Copy(sourceData.Scan0, sourceBuffer, 0, bytes);
 
             for (var y = 0; y < sourceBmp.Height; ++y) {
-                int rowOffset = y * sourceData.Stride;
+                var rowOffset = y * sourceData.Stride;
                 for (var x = 0; x < sourceBmp.Width; ++x) {
-                    int pixelOffset = rowOffset + (x * pixelSize);
+                    var pixelOffset = rowOffset + (x * pixelSize);
                     var b = sourceBuffer[pixelOffset + 0];
                     var g = sourceBuffer[pixelOffset + 1];
                     var r = sourceBuffer[pixelOffset + 2];
@@ -372,7 +370,7 @@ public class BitmapExt : IDisposableExtended {
                 : 1;
 
             // Alle Frames durchgehen
-            for (int i = 0; i < frames; i++) {
+            for (var i = 0; i < frames; i++) {
                 tiffImage.SelectActiveFrame(FrameDimension.Page, i);
 
                 // Frame als Bitmap kopieren

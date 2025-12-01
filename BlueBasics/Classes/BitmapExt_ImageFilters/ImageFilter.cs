@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics.Interfaces;
 using System.Drawing.Imaging;
 
@@ -27,7 +25,6 @@ public abstract class ImageFilter : IHasKeyName {
     #region Properties
 
     public bool KeyIsCaseSensitive => false;
-
     public abstract string KeyName { get; }
 
     #endregion
