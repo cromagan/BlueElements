@@ -121,9 +121,9 @@ public class RowFormulaListItem : AbstractListItem {
         }
         if (_tmpBmp != null) {
             zoom = (float)Math.Min(positionControl.Width / (double)_tmpBmp.Width, positionControl.Height / (double)_tmpBmp.Height);
-            RectangleF r2 = new(
-                (positionControl.Width - _tmpBmp.Width.CanvasToControl(zoom) / 2 + positionControl.Left,
-                (positionControl.Height - _tmpBmp.Height.CanvasToControl(zoom) / 2 + positionControl.Top,
+            var r2 = new RectangleF(
+                ((positionControl.Width - _tmpBmp.Width.CanvasToControl(zoom)) / 2) + positionControl.Left,
+                ((positionControl.Height - _tmpBmp.Height.CanvasToControl(zoom)) / 2) + positionControl.Top,
                 _tmpBmp.Width.CanvasToControl(zoom), _tmpBmp.Height.CanvasToControl(zoom));
             gr.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
         }

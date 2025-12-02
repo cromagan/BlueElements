@@ -492,7 +492,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
         var arrowY = 12.CanvasToControl(zoom) * 0.35f;
 
-        var width = (25.CanvasToControl(zoom);
+        var width = 25.CanvasToControl(zoom);
 
         colorId ??= [];
 
@@ -514,14 +514,14 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         DrawArrow(gr, positionControl, zoom, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);
     }
 
-    protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float scale, List<int>? id, bool drawSymbol, bool drawText, bool transparent) {
+    protected void DrawColorScheme(Graphics gr, RectangleF positionControl, float zoom, List<int>? id, bool drawSymbol, bool drawText, bool transparent) {
         if (!transparent) {
-            gr.FillRectangle(Brushes.White, drawingCoordinates);
+            gr.FillRectangle(Brushes.White, positionControl);
         }
 
-        var w = scale * 3;
+        var w = 3.CanvasToControl(zoom);
 
-        var tmp = drawingCoordinates;
+        var tmp = positionControl;
         tmp.Inflate(-w, -w);
 
         var c = Skin.IdColor(id);
@@ -537,18 +537,18 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
                 gr.DrawRectangle(new Pen(c.Brighten(0.9).MakeTransparent(128), w * 2), tmp);
             }
 
-            gr.DrawRectangle(new Pen(c2.Brighten(0.6).MakeTransparent(128), scale), drawingCoordinates);
+            gr.DrawRectangle(new Pen(c2.Brighten(0.6).MakeTransparent(128), zoom), positionControl);
         } else {
             gr.DrawRectangle(new Pen(c.Brighten(0.9), w * 2), tmp);
-            gr.DrawRectangle(new Pen(c2.Brighten(0.6), scale), drawingCoordinates);
+            gr.DrawRectangle(new Pen(c2.Brighten(0.6), zoom), positionControl);
         }
 
         if (drawSymbol && drawText) {
-            Skin.Draw_FormatedText(gr, ReadableText(), SymbolForReadableText()?.Scale(scale), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(scale), false);
+            Skin.Draw_FormatedText(gr, ReadableText(), SymbolForReadableText()?.Scale(zoom), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         } else if (drawSymbol) {
-            Skin.Draw_FormatedText(gr, string.Empty, SymbolForReadableText()?.Scale(scale), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(scale), false);
+            Skin.Draw_FormatedText(gr, string.Empty, SymbolForReadableText()?.Scale(zoom), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         } else if (drawText) {
-            Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(scale), false);
+            Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         }
     }
 

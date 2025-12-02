@@ -104,8 +104,9 @@ public class ComicCompPadItem : AbstractPadItem {
 
     #region Methods
 
-    public override bool Contains(PointF value, float zoomfactor) {
-        var ne = 5 / zoomfactor;
+    public override bool CanvasContains(PointF value, float zoom) {
+        var ne = 6.ControlToCanvas(zoom) + 1;
+
         if (value.DistanzZuStrecke(P1, P2) < ne) { return true; }
         foreach (var thispoint in PointsForSuccesfullyMove) {
             if (GetLength(value, (PointF)thispoint) < ne) { return true; }

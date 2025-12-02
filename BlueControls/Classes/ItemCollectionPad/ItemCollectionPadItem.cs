@@ -269,8 +269,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public AbstractPadItem? this[int nr] => _internal[nr];
 
-    public List<AbstractPadItem> this[Point p] => [.. _internal.Where(thisItem => thisItem?.Contains(p, 1) == true)];
-
     #endregion
 
     #region Methods
@@ -630,18 +628,18 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return null;
     }
 
-    public AbstractPadItem? HotItem(Point controlPoint, bool topLevel, float scale, float offsetX, float offsetY) {
+    public AbstractPadItem? HotItem(Point controlPoint, bool topLevel, float zoom, float offsetX, float offsetY) {
         // Berechne die unscaled Koordinaten für dieses Item
 
-        var canvasPoint = controlPoint.ControlToCanvas(scale, offsetX, offsetY);
+        var canvasPoint = controlPoint.ControlToCanvas(zoom, offsetX, offsetY);
 
         //CreativePad.MouseCoords = canvasPoint.ToString();
 
         //// Prüfe die Grenzen nur, wenn nicht endlos
-        //if (!_endless && !CanvasUsedArea.Contains(canvasPoint)) { return null; }
+        //if (!_endless && !CanvasUsedArea.CanvasContainsx(canvasPoint)) { return null; }
 
         // Finde alle Items, die den Punkt enthalten
-        var hotItems = _internal.Where(item => item?.Contains(canvasPoint, scale) == true)
+        var hotItems = _internal.Where(item => item?.CanvasContains(canvasPoint, zoom) == true)
                                         .OrderBy(item => item.CanvasUsedArea.Width * item.CanvasUsedArea.Height)
                                         .ToList();
 
@@ -659,8 +657,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
         if (smallestHotItem is ItemCollectionPadItem { IsDisposed: false } icpi) {
-            var alteredUsedArea = icpi.CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
-            var (childScale, childOffsetX, childOffsetY) = AlterView(alteredUsedArea, scale, offsetX, offsetY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
+            var alteredUsedArea = icpi.CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false);
+            var (childScale, childOffsetX, childOffsetY) = AlterView(alteredUsedArea, zoom, offsetX, offsetY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
 
             ////Berechne den neuen Punkt für das Kind - Item
             //var childPoint = new Point(

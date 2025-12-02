@@ -166,7 +166,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     protected override bool AutoCenter => true;
-    protected override bool ShowSliderX => false;
+    protected override bool ShowSliderX => true;
     protected override int SmallChangeY => 5;
 
     #endregion
@@ -312,7 +312,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     protected override RectangleF CalculateCanvasMaxBounds() {
         if (_items?.CanvasUsedArea is not { } a) { return new RectangleF(0, 0, 0, 0); }
 
-        var add = (float)Math.Max(a.Width * 0.5, a.Height * 0.5);
+        var add = (float)Math.Max(a.Width * 0.1, a.Height * 0.1);
 
         return new RectangleF(a.Left - add, a.Top - add, a.Right + add, a.Bottom + add);
     }
@@ -331,7 +331,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         var controla = AvailableControlPaintArea();
 
         LinearGradientBrush lgb = new(controla, Color.White, Color.LightGray, LinearGradientMode.Vertical);
-        gr.FillRectangle(lgb, ClientRectangle);
+        gr.FillRectangle(lgb, controla);
+
         if (_items != null) {
             _items.ShowJointPoints = ShowJointPoint;
             _items.ForPrinting = ShowInPrintMode;
@@ -428,14 +429,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
                         foreach (var thisPoint in bpi.JointPoints) {
-                            if (GetLength(thisPoint, e.CanvasPoint) < 5f / Zoom) {
+                            if (GetLength(thisPoint, e.CanvasPoint).CanvasToControl(Zoom) < 5f) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
                         }
 
                         foreach (var thisPoint in bpi.MovablePoint) {
-                            if (GetLength(thisPoint, e.CanvasPoint) < 5f / Zoom) {
+                            if (GetLength(thisPoint, e.CanvasPoint).CanvasToControl(Zoom) < 5f) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
@@ -642,7 +643,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         var tmp = Items.HotItem(e.ControlPoint, topLevel, Zoom, OffsetX, OffsetY);
         if (LastClickedItem is { IsDisposed: false } bpi) {
             foreach (var thisPoint in bpi.JointPoints) {
-                if (GetLength(e.CanvasPoint, thisPoint) < 5f / Zoom) { return thisPoint; }
+                if (GetLength(e.CanvasPoint, thisPoint).CanvasToControl(Zoom) < 5f) { return thisPoint; }
             }
         }
 

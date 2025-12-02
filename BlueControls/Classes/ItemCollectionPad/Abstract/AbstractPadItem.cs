@@ -238,6 +238,19 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         JointPoints.Add(p);
     }
 
+    /// <summary>
+    /// Prüft, ob die angegebenen Koordinaten das Element berühren.
+    /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
+    /// </summary>
+    /// <remarks></remarks>
+    public virtual bool CanvasContains(PointF value, float zoom) {
+        var tmp = CanvasUsedArea; // Umwandlung, um den Bezug zur Klasse zu zerstören
+
+        var ne = 6.ControlToCanvas(zoom) + 1;
+        tmp.Inflate(ne, ne);
+        return tmp.Contains(value);
+    }
+
     public int CompareTo(object obj) {
         if (obj is AbstractPadItem v) {
             return SaveOrder.CompareTo(v.SaveOrder);
@@ -245,19 +258,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
         return 0;
-    }
-
-    /// <summary>
-    /// Prüft, ob die angegebenen Koordinaten das Element berühren.
-    /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
-    /// </summary>
-    /// <remarks></remarks>
-    public virtual bool Contains(PointF value, float zoomfactor) {
-        var tmp = CanvasUsedArea; // Umwandlung, um den Bezug zur Klasse zu zerstören
-
-        var ne = (6 / zoomfactor) + 1;
-        tmp.Inflate(ne, ne);
-        return tmp.Contains(value);
     }
 
     public void Dispose() {

@@ -101,8 +101,9 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     #region Methods
 
-    public override bool Contains(PointF value, float zoomfactor) {
-        var ne = 5 / zoomfactor;
+    public override bool CanvasContains(PointF value, float zoom) {
+        var ne = 6.ControlToCanvas(zoom) + 1;
+
         if (_point1.X == 0d && _point2.X == 0d && _point1.Y == 0d && _point2.Y == 0d) { return false; }
         if (_tempPoints is { Count: 0 }) { CalcTempPoints(); }
         if (_tempPoints is { Count: 0 }) { return false; }
@@ -453,7 +454,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
                     var tUnten = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lu, ru, true);
                     var tLinks = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, lu, true);
                     var trechts = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], ro, ru, true);
-                    //    If DirectCast(Object2, RowFormulaItem).Row.CellFirst().String.Contains("Lilo") AndAlso DirectCast(Object1, RowFormulaItem).Row.CellFirst().String.Contains("Karl") Then Stop
+                    //    If DirectCast(Object2, RowFormulaItem).Row.CellFirst().String.CanvasContainsx("Lilo") AndAlso DirectCast(Object1, RowFormulaItem).Row.CellFirst().String.CanvasContainsx("Karl") Then Stop
                     if (!tOben.IsEmpty || !tUnten.IsEmpty || !tLinks.IsEmpty || !trechts.IsEmpty) {
                         a.Inflate(-50, -50);
                         lo = a.PointOf(Alignment.Top_Left);

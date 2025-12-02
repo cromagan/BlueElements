@@ -191,8 +191,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         return Präfix + s + Suffix;
     }
 
-    public override bool Contains(PointF value, float zoomfactor) {
-        var ne = 5 / zoomfactor;
+    public override bool CanvasContains(PointF value, float zoom) {
+        var ne = 6.ControlToCanvas(zoom) + 1;
         return value.DistanzZuStrecke(_point1, _bezugslinie1) < ne
                || value.DistanzZuStrecke(_point2, _bezugslinie2) < ne
                || value.DistanzZuStrecke(_schnittPunkt1, _schnittPunkt2) < ne

@@ -318,7 +318,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             SliderX.Enabled = false;
             if (!MousePressing()) {
                 var val = 0;
-                if (AutoCenter) { val = freiraumControl.X / 2; }
+                if (AutoCenter) { val = (freiraumControl.X- tmpCanvasMaxBounds.Left.CanvasToControl(_zoom))/2; }
                 SliderX.Minimum = -val;
                 SliderX.Maximum = -val;
                 SliderX.Value = -val;
@@ -336,7 +336,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             SliderY.Enabled = false;
             if (!MousePressing()) {
                 var val = 0;
-                if (AutoCenter) { val = tmpCanvasMaxBounds.Top.CanvasToControl(_zoom) + (freiraumControl.Y / 2); }
+                if (AutoCenter) { val = (freiraumControl.Y - tmpCanvasMaxBounds.Top.CanvasToControl(_zoom)) / 2; }
                 SliderY.Minimum = -val;
                 SliderY.Maximum = -val;
                 SliderY.Value = -val;
@@ -480,11 +480,10 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected override void OnSizeChanged(System.EventArgs e) {
         Invalidate_MaxBounds(); // Slider
-        if (ScreenshotMode) {
+        if (ScreenshotMode || Fitting) {
             ZoomFit();
-        } else {
-            base.OnSizeChanged(e);
-        }
+        } 
+        base.OnSizeChanged(e);
     }
 
     protected virtual void OnZoomChanged() {
