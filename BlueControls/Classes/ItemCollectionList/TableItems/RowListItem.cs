@@ -61,8 +61,8 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
-        base.DrawColumn(gr, viewItem, positionInControl, scale, translate, offsetX, offsetY, state);
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
         if (viewItem.Column == null) { return; }
 
@@ -71,15 +71,13 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         if (viewItem.Column == Column) {
-            var _tmpCursorRect = new Rectangle((int)positionInControl.X+1, (int)positionInControl.Y+1, (int)positionInControl.Width-2, (int)positionInControl.Height-2);
+            var _tmpCursorRect = new Rectangle((int)positionControl.X + 1, (int)positionControl.Y + 1, (int)positionControl.Width - 2, (int)positionControl.Height - 2);
             Skin.Draw_Back(gr, Design.Table_Cursor, state, _tmpCursorRect, null, false);
             Skin.Draw_Border(gr, Design.Table_Cursor, state, _tmpCursorRect);
         }
 
         var toDrawd = Row.CellGetString(viewItem.Column);
-        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionInControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
-
-
+        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
@@ -102,13 +100,13 @@ public sealed class RowListItem : RowBackgroundListItem {
         return new(100, drawHeight);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
-        base.DrawExplicit(gr, visibleArea, positionInControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
         if (Column == null) { return; }
 
         //var stat = States.Standard;
         //if (Focused()) { stat = States.Standard_HasFocus; }
-        var _tmpCursorRect = positionInControl.ToRect();
+        var _tmpCursorRect = positionControl.ToRect();
         Pen pen = new(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180));
         gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1));
     }

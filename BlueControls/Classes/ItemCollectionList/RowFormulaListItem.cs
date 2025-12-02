@@ -114,21 +114,21 @@ public class RowFormulaListItem : AbstractListItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         if (_tmpBmp == null) { GeneratePic(); }
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, itemdesign, state, positionInControl.ToRect(), null, false);
+            Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false);
         }
         if (_tmpBmp != null) {
-            scale = (float)Math.Min(positionInControl.Width / (double)_tmpBmp.Width, positionInControl.Height / (double)_tmpBmp.Height);
+            zoom = (float)Math.Min(positionControl.Width / (double)_tmpBmp.Width, positionControl.Height / (double)_tmpBmp.Height);
             RectangleF r2 = new(
-                ((positionInControl.Width - (_tmpBmp.Width * scale)) / 2) + positionInControl.Left,
-                ((positionInControl.Height - (_tmpBmp.Height * scale)) / 2) + positionInControl.Top,
-                _tmpBmp.Width * scale, _tmpBmp.Height * scale);
+                (positionControl.Width - _tmpBmp.Width.CanvasToControl(zoom) / 2 + positionControl.Left,
+                (positionControl.Height - _tmpBmp.Height.CanvasToControl(zoom) / 2 + positionControl.Top,
+                _tmpBmp.Width.CanvasToControl(zoom), _tmpBmp.Height.CanvasToControl(zoom));
             gr.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
         }
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionInControl.ToRect());
+            Skin.Draw_Border(gr, itemdesign, state, positionControl.ToRect());
         }
     }
 

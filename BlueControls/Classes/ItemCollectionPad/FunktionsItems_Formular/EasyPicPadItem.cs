@@ -48,7 +48,6 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     #region Properties
 
-    
     public static string ClassId => "FI-EasyPic";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
@@ -140,17 +139,17 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         //var id = GetRowFrom?.OutputColorId ?? - 1;
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, false);
+            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, false);
         }
 
-        DrawFakeControl(gr, positionInControl, scale, CaptionPosition.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
+        DrawFakeControl(gr, positionControl, scale, CaptionPosition.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
 
-        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
-        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
+        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

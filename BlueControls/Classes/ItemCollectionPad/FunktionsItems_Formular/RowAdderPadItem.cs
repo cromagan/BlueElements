@@ -317,26 +317,26 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
-        DrawArrowOutput(gr, positionInControl, scale, ForPrinting, OutputColorId);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+        DrawArrowOutput(gr, positionControl, scale, ForPrinting, OutputColorId);
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, false);
+            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, false);
         }
 
         //if (Column  ==null || Column .IsDisposed) {
-        //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionInControl.ToRect(), CaptionFnt.Scale(zoom), true);
+        //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
-        //DrawFakeControl(gr, positionInControl, scale, CaptionPosition, Column?.ReadableText() + ":", EditType);
+        //DrawFakeControl(gr, positionControl, scale, CaptionPosition, Column?.ReadableText() + ":", EditType);
         //}
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
 
-        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

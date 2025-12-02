@@ -390,27 +390,27 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         base.DrawControl(gr, state);
 
         var effectWidth = Width;
-        var sliderVisible = MultiLine ? _eTxt.Height > Height - 16 : _eTxt.Height > Height;
+        var sliderVisible = MultiLine ? _eTxt.HeightControl > Height - 16 : _eTxt.HeightControl > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
 
         switch (Verhalten) {
             case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
                 _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
-                _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
+                _eTxt.DrawingAreaControl = new Rectangle(0, 0, effectWidth, Height);
                 break;
 
             case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
                 var hp = HotPosition();
                 _eTxt.TextDimensions = Size.Empty;
-                _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
-                var pos = _eTxt.DrawingPos;
+                _eTxt.DrawingAreaControl = new Rectangle(0, 0, effectWidth, Height);
+                var pos = _eTxt.DrawingPosControl;
 
                 if (hp < 0) {
                     // Mach nix
                 } else if (hp == 0) {
                     pos.X = Skin.PaddingSmal;
                 } else if (hp > _eTxt.Count - 1) {
-                    pos.X = _eTxt.Width > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.Width - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
+                    pos.X = _eTxt.WidthControl > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.WidthControl - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
                 } else {
                     var r = _eTxt.CursorPixelPosX(hp);
                     if (r.X > Width - (Skin.PaddingSmal * 4) - pos.X) {
@@ -421,23 +421,23 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 }
                 if (pos.X > Skin.PaddingSmal) { pos.X = Skin.PaddingSmal; }
 
-                _eTxt.DrawingPos = pos;
+                _eTxt.DrawingPosControl = pos;
                 break;
 
             case SteuerelementVerhalten.Steuerelement_Anpassen:
                 sliderVisible = false;
                 _eTxt.TextDimensions = Size.Empty;
                 Width = this is ComboBox
-                    ? Math.Max(_eTxt.Width + (Skin.PaddingSmal * 3) + 20, Width)
-                    : Math.Max(_eTxt.Width + (Skin.PaddingSmal * 3), Width);
-                Height = Math.Max(_eTxt.Height + (Skin.PaddingSmal * 2), Height);
-                _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
+                    ? Math.Max(_eTxt.WidthControl + (Skin.PaddingSmal * 3) + 20, Width)
+                    : Math.Max(_eTxt.WidthControl + (Skin.PaddingSmal * 3), Width);
+                Height = Math.Max(_eTxt.HeightControl + (Skin.PaddingSmal * 2), Height);
+                _eTxt.DrawingAreaControl = new Rectangle(0, 0, Width, Height);
                 break;
 
             case SteuerelementVerhalten.Text_Abschneiden:
                 sliderVisible = false;
                 _eTxt.TextDimensions = Size.Empty;
-                _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
+                _eTxt.DrawingAreaControl = new Rectangle(0, 0, Width, Height);
                 break;
 
             default:
@@ -453,15 +453,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _sliderY.Height = Height;
                 _sliderY.Left = Width - _sliderY.Width;
                 _sliderY.Top = 0;
-                _eTxt.DrawingPos = _eTxt.DrawingPos with { Y = (int)-_sliderY.Value };
-                _sliderY.Maximum = _eTxt.Height + 16 - DisplayRectangle.Height;
+                _eTxt.DrawingPosControl = _eTxt.DrawingPosControl with { Y = (int)-_sliderY.Value };
+                _sliderY.Maximum = _eTxt.HeightControl + 16 - DisplayRectangle.Height;
             }
         } else {
             if (_sliderY != null) {
                 _sliderY.Visible = false;
                 _sliderY.Value = 0;
             }
-            _eTxt.DrawingPos = _eTxt.DrawingPos with { Y = Skin.PaddingSmal };
+            _eTxt.DrawingPosControl = _eTxt.DrawingPosControl with { Y = Skin.PaddingSmal };
         }
 
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
@@ -471,7 +471,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         MarkAndGenerateZone(gr, state);
 
         if (!string.IsNullOrEmpty(Suffix)) {
-            Rectangle r = new(_eTxt.Width + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
+            Rectangle r = new(_eTxt.WidthControl + _eTxt.DrawingPosControl.X, _eTxt.DrawingPosControl.Y, 1000, 1000);
             if (_eTxt.Count > 0) {
                 r.X += 2;
                 Skin.Draw_FormatedText(gr, Suffix, null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, false);
@@ -877,14 +877,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// <remarks></remarks>
     private int Cursor_PosAt(double pixX, double pixY) {
         // Das geht am Einfachsten....
-        if (pixX < _eTxt.DrawingPos.X && pixY < _eTxt.DrawingPos.Y) { return 0; }
-        pixX = Math.Max(pixX, _eTxt.DrawingPos.X);
-        pixY = Math.Max(pixY, _eTxt.DrawingPos.Y);
-        pixX = Math.Min(pixX, _eTxt.DrawingPos.X + _eTxt.Width);
-        pixY = Math.Min(pixY, _eTxt.DrawingPos.Y + _eTxt.Height);
+        if (pixX < _eTxt.DrawingPosControl.X && pixY < _eTxt.DrawingPosControl.Y) { return 0; }
+        pixX = Math.Max(pixX, _eTxt.DrawingPosControl.X);
+        pixY = Math.Max(pixY, _eTxt.DrawingPosControl.Y);
+        pixX = Math.Min(pixX, _eTxt.DrawingPosControl.X + _eTxt.WidthControl);
+        pixY = Math.Min(pixY, _eTxt.DrawingPosControl.Y + _eTxt.HeightControl);
         var c = _eTxt.Char_Search(pixX, pixY);
         if (c < 0) { c = 0; }
-        return c < _eTxt.Count && pixX > _eTxt.DrawingPos.X + _eTxt[c].Pos.X + (_eTxt[c].Size.Width / 2.0) ? c + 1 : c;
+        return c < _eTxt.Count && pixX > _eTxt.DrawingPosControl.X + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
     }
 
     private void Cursor_Richtung(short x, short y) {
@@ -907,13 +907,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (y > 0) {
                 _markStart = _markStart >= _eTxt.Count
                     ? _eTxt.Count
-                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) + _eTxt[_markStart].Size.Height + _eTxt.DrawingPos.Y);
+                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPosControl.X, ri.Top + (ri.Height / 2.0) + _eTxt[_markStart].SizeCanvas.Height + _eTxt.DrawingPosControl.Y);
             } else if (y < 0) {
                 _markStart = _markStart >= _eTxt.Count
                     ? _eTxt.Count > 0
-                        ? Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt[_markStart - 1].Size.Height + _eTxt.DrawingPos.Y)
+                        ? Cursor_PosAt(ri.Left + _eTxt.DrawingPosControl.X, ri.Top + (ri.Height / 2.0) - _eTxt[_markStart - 1].SizeCanvas.Height + _eTxt.DrawingPosControl.Y)
                         : 0
-                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt[_markStart].Size.Height + _eTxt.DrawingPos.Y);
+                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPosControl.X, ri.Top + (ri.Height / 2.0) - _eTxt[_markStart].SizeCanvas.Height + _eTxt.DrawingPosControl.Y);
             }
         }
 
@@ -926,7 +926,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (!_cursorVisible) { return; }
         if (_markStart < 0 || _markEnd > -1) { return; }
         var r = _eTxt.CursorPixelPosX(_markStart);
-        gr.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
+        gr.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPosControl.X, r.Top + _eTxt.DrawingPosControl.Y, r.Left + _eTxt.DrawingPosControl.X, r.Bottom + _eTxt.DrawingPosControl.Y);
     }
 
     /// <summary>
@@ -954,8 +954,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _sliderY.Visible = false;
                 _sliderY.Value = 0;
             }
-            _eTxt.DrawingPos = new Point(Skin.PaddingSmal, Skin.PaddingSmal);
-            _eTxt.DrawingArea = new Rectangle(0, 0, -1, -1);
+            _eTxt.DrawingPosControl = new Point(Skin.PaddingSmal, Skin.PaddingSmal);
+            _eTxt.DrawingAreaControl = new Rectangle(0, 0, -1, -1);
             _eTxt.TextDimensions = Size.Empty;
         }
     }
@@ -1082,10 +1082,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var sr = state | States.Checked;
 
         for (var cc = mas; cc < mae; cc++) {
-            if (_eTxt[cc].IsVisible(1f, _eTxt.DrawingPos, _eTxt.DrawingArea)) {
+            if (_eTxt[cc].IsVisible(1f, _eTxt.DrawingPosControl, _eTxt.DrawingAreaControl)) {
                 var f = _eTxt[cc].Font;
                 _eTxt[cc].Font = Skin.GetBlueFont(Design.TextBox, sr);
-                _eTxt[cc].Draw(gr, _eTxt.DrawingPos, 1f);
+                _eTxt[cc].Draw(gr, _eTxt.DrawingPosControl, 1f);
                 _eTxt[cc].Font = f;
             }
         }

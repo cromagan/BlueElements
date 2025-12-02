@@ -47,8 +47,8 @@ public sealed class NewRowListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
-        base.DrawColumn(gr, viewItem, positionInControl, scale, translate, offsetX, offsetY, state);
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
         if (viewItem.Column == null) { return; }
 
@@ -68,8 +68,8 @@ public sealed class NewRowListItem : RowBackgroundListItem {
         }
 
         if (!string.IsNullOrEmpty(toDrawd)) {
-            gr.DrawImage(qi, new Point((int)positionInControl.Left + p1, (int)positionInControl.Top + p1));
-            viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, null, positionInControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+            gr.DrawImage(qi, new Point((int)positionControl.Left + p1, (int)positionControl.Top + p1));
+            viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, null, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
         }
     }
 

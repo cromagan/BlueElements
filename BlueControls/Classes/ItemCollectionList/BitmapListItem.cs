@@ -142,10 +142,10 @@ public class BitmapListItem : AbstractListItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
-        if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionInControl.ToRect(), null, false); }
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+        if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false); }
 
-        var drawingCoordinates = positionInControl;
+        var drawingCoordinates = positionControl;
         drawingCoordinates.Inflate(-Padding, -Padding);
         var scaledImagePosition = RectangleF.Empty;
         var areaOfWholeImage = RectangleF.Empty;
@@ -215,7 +215,7 @@ public class BitmapListItem : AbstractListItem {
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionInControl.ToRect());
+            Skin.Draw_Border(gr, itemdesign, state, positionControl.ToRect());
         }
     }
 

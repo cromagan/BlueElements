@@ -34,7 +34,6 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-
 public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpenScriptEditor {
 
     #region Fields
@@ -55,7 +54,6 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
 
     #region Properties
 
-    
     public static string ClassId => "FI-Timer";
 
     public bool AutoSizeableHeight => false;
@@ -205,8 +203,10 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) =>
-        gr.DrawImage(SymbolForReadableText(), positionInControl);//base.DrawExplicit(gr,visibleArea, positionInControl, scale, offsetX, offsetY);//DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) =>
+        gr.DrawImage(SymbolForReadableText(), positionControl);
 
     #endregion
+
+    //base.DrawExplicit(gr,visibleArea, positionControl, scale, offsetX, offsetY);//DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
 }

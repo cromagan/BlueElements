@@ -389,7 +389,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         return new RectangleF(minx, miny, maxx - minx, maxy - miny);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         if (MovablePoint.Count > 0) {
             var lastP = MovablePoint[MovablePoint.Count - 1];
             foreach (var thisP in MovablePoint) {

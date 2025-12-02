@@ -52,7 +52,7 @@ internal class ExtCharTopCode : ExtChar {
 
     public override string PlainText() => string.Empty;
 
-    protected override SizeF CalculateSize() => SizeF.Empty;
+    protected override SizeF CalculateSizeCanvas() => SizeF.Empty;
 
     #endregion
 }

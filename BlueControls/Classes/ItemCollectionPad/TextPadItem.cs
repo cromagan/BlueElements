@@ -239,20 +239,20 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     //    base.CalculateSlavePoints();
     //    InvalidateText();
     //}
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         if (_style != PadStyles.Undefiniert) {
-            gr.SetClip(positionInControl);
-            var trp = positionInControl.PointOf(Alignment.Horizontal_Vertical_Center);
+            gr.SetClip(positionControl);
+            var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
 
             if (_txt == null) { MakeNewETxt(); }
 
             if (_txt != null && Parent != null) {
-                _txt.DrawingPos = new Point((int)(positionInControl.Left - trp.X), (int)(positionInControl.Top - trp.Y));
-                _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
+                _txt.DrawingPosControl = new Point((int)(positionControl.Left - trp.X), (int)(positionControl.Top - trp.Y));
+                _txt.DrawingAreaControl = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !ForPrinting) {
-                    _txt.Draw(gr, scale * _textScale);
+                    _txt.Draw(gr, zoom * _textScale);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);

@@ -137,7 +137,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         GC.SuppressFinalize(this);
     }
 
-    //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionInControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
+    //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
 
     public virtual void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) {
         DrawLine(gr, lin, xPos, xPos, top, bottom);
@@ -151,7 +151,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         DrawLine(gr, lin, left, right, bottom, bottom);
     }
 
-    public virtual void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+    public virtual void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
     }
 
     public void DrawLine(Graphics gr, ColumnLineStyle lin, float left, float right, float top, float bottom) {
@@ -204,7 +204,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
         if (Arrangement == null) { return; }
 
         for (var du = 0; du < 2; du++) {
@@ -214,12 +214,12 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
                 var left = viewItem.ControlColumnLeft((int)offsetX);
 
-                if (left > visibleArea.Width) { continue; }
-                if (left + positionInControl.Width < 0) { continue; }
+                if (left > visibleAreaControl.Width) { continue; }
+                if (left + positionControl.Width < 0) { continue; }
 
-                var area = new Rectangle(left, (int)positionInControl.Top, viewItem.ControlColumnWidth ?? 0, (int)positionInControl.Height);
+                var area = new Rectangle(left, (int)positionControl.Top, viewItem.ControlColumnWidth ?? 0, (int)positionControl.Height);
 
-                if (Arrangement.Count == 1) { area = positionInControl.ToRect(); }
+                if (Arrangement.Count == 1) { area = positionControl.ToRect(); }
 
                 gr.SmoothingMode = SmoothingMode.None;
                 gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnCell), area);

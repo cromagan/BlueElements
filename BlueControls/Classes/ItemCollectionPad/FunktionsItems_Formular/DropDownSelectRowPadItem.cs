@@ -56,7 +56,6 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     #region Properties
 
-    
     public static string ClassId => "FI-SelectRowWithDropDownMenu";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
@@ -177,17 +176,17 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         if (!ForPrinting) {
-            DrawArrowOutput(gr, positionInControl, scale, ForPrinting, OutputColorId);
-            DrawFakeControl(gr, positionInControl, scale, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
-            DrawColorScheme(gr, positionInControl, scale, null, true, true, true);
+            DrawArrowOutput(gr, positionControl, scale, ForPrinting, OutputColorId);
+            DrawFakeControl(gr, positionControl, scale, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawColorScheme(gr, positionControl, scale, null, true, true, true);
         } else {
-            DrawFakeControl(gr, positionInControl, scale, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionControl, scale, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
-        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
+        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

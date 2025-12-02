@@ -172,7 +172,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                 etxt.SheetStyle = sh.SheetStyle;
                 //etxt.ChangeStyle(sh.Stil);
                 etxt.Zeilenabstand = 0.65f;
-                etxt.DrawingPos = new Point(0, 43);
+                etxt.DrawingPosControl = new Point(0, 43);
                 etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
                 etxt.Ausrichtung = Alignment.Horizontal_Vertical_Center;
                 etxt.HtmlText = tt;

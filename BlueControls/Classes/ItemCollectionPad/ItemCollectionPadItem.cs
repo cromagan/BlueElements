@@ -275,15 +275,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     #region Methods
 
-    public static (float scale, float offsetX, float offsetY) AlterView(RectangleF positionInControl, float scale, float offsetX, float offsetY, bool autoZoomFit, RectangleF usedArea) {
+    public static (float scale, float offsetX, float offsetY) AlterView(RectangleF positionControl, float scale, float offsetX, float offsetY, bool autoZoomFit, RectangleF usedArea) {
         var newX = offsetX;
         var newY = offsetY;
         var newS = scale;
 
         if (autoZoomFit) {
-            newS = ZoomFitValue(usedArea, positionInControl.ToRect().Size);
-            newX = -positionInControl.X - (positionInControl.Width / 2f);
-            newY = -positionInControl.Y - (positionInControl.Height / 2f);
+            newS = ZoomFitValue(usedArea, positionControl.ToRect().Size);
+            newX = -positionControl.X - (positionControl.Width / 2f);
+            newY = -positionControl.Y - (positionControl.Height / 2f);
             newX += (usedArea.Left + (usedArea.Width / 2f)) * newS;
             newY += (usedArea.Top + (usedArea.Height / 2f)) * newS;
         }
@@ -1110,11 +1110,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Connections.RemoveAll();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         gr.PixelOffsetMode = PixelOffsetMode.None;
 
-        var d = !Endless ? CanvasUsedArea.ToRect().CanvasToControl(scale, offsetX, offsetY, false) : visibleArea;
-        var ds = !Endless ? positionInControl : visibleArea;
+        var d = !Endless ? CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false) : visibleAreaControl;
+        var ds = !Endless ? positionControl : visibleAreaControl;
 
         if (BackColor.A > 0) {
             gr.FillRectangle(new SolidBrush(BackColor), d);
@@ -1161,11 +1161,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         #region Items selbst
 
-        var (childScale, childOffsetX, childOffsetY) = AlterView(positionInControl, scale, offsetX, offsetY, AutoZoomFit, UsedAreaOfItems());
+        var (childScale, childOffsetX, childOffsetY) = AlterView(positionControl, scale, offsetX, offsetY, AutoZoomFit, UsedAreaOfItems());
 
         foreach (var thisItem in _internal) {
             gr.PixelOffsetMode = PixelOffsetMode.None;
-            thisItem.Draw(gr, positionInControl.ToRect(), childScale, childOffsetX, childOffsetY);
+            thisItem.Draw(gr, positionControl.ToRect(), childScale, childOffsetX, childOffsetY);
         }
 
         #endregion

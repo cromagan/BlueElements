@@ -69,7 +69,7 @@ public class ExtCharCellLink : ExtChar {
     public override void Draw(Graphics gr, Point offset, float zoom) {
         if (string.IsNullOrEmpty(_displayText)) { return; }
 
-        var controlP = Pos.CanvasToControl(zoom, offset.X, offset.Y);
+        var controlP = PosCanvas.CanvasToControl(zoom, offset.X, offset.Y);
 
         try {
             var f = this.GetFont();
@@ -122,7 +122,7 @@ public class ExtCharCellLink : ExtChar {
 
     public override string PlainText() => _displayText;
 
-    protected override SizeF CalculateSize() {
+    protected override SizeF CalculateSizeCanvas() {
         if (Font == null) { return new SizeF(0, 16); }
         if (string.IsNullOrEmpty(_displayText)) { return Font.CharSize(0f); }
 

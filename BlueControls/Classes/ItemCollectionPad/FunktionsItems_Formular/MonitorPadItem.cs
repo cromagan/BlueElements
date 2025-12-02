@@ -27,7 +27,6 @@ using System.Windows.Forms;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-
 public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
     #region Constructors
@@ -79,21 +78,21 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Monitor, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         //var id = GetRowFrom?.OutputColorId ?? -1;
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, false);
+            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, false);
         }
 
-        //DrawFakeControl(gr, positionInControl, scale, CaptionPosition.Über_dem_Feld, "Monitor", EditTypeFormula.Listbox);
+        //DrawFakeControl(gr, positionControl, scale, CaptionPosition.Über_dem_Feld, "Monitor", EditTypeFormula.Listbox);
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
-        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
+        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

@@ -31,7 +31,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     #region Fields
 
-    public PointF Pos = PointF.Empty;
+    public PointF PosCanvas = PointF.Empty;
     private BlueFont? _font;
     private ExtText? _parent;
     private SizeF _size;
@@ -89,9 +89,9 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     public string SheetStyle => _parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
-    public SizeF Size {
+    public SizeF SizeCanvas {
         get {
-            if (_size.IsEmpty) { _size = CalculateSize(); }
+            if (_size.IsEmpty) { _size = CalculateSizeCanvas(); }
             return _size;
         }
     }
@@ -128,12 +128,12 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
     public bool IsVisible(float zoom, Point offset, Rectangle controlArea) {
         if (controlArea.Width < 1 || controlArea.Height < 1) { return true; }
 
-        var px = Pos.X.CanvasToControl(zoom, offset.X);
+        var px = PosCanvas.X.CanvasToControl(zoom, offset.X);
         if (px > controlArea.Right) { return false; }
 
-        var py = Pos.Y.CanvasToControl(zoom, offset.Y);
-        return py <= controlArea.Bottom && px + (Size.Width * zoom) >= controlArea.Left &&
-               py + Size.Height.CanvasToControl(zoom) >= controlArea.Top;
+        var py = PosCanvas.Y.CanvasToControl(zoom, offset.Y);
+        return py <= controlArea.Bottom && px + SizeCanvas.Width.CanvasToControl(zoom) >= controlArea.Left &&
+               py + SizeCanvas.Height.CanvasToControl(zoom) >= controlArea.Top;
     }
 
     public abstract bool IsWordSeparator();
@@ -178,7 +178,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
     //     && ((Pos.Y + Size.Height) * zoom) + offset.Y >= drawingArea.Top);
     public abstract string PlainText();
 
-    protected abstract SizeF CalculateSize();
+    protected abstract SizeF CalculateSizeCanvas();
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {

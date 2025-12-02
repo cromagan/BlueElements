@@ -41,8 +41,8 @@ public class Renderer_RichText : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        //gr.SetClip(positionInControl);
-        //var trp = positionInControl.PointOf(Alignment.Horizontal_Vertical_Center);
+        //gr.SetClip(positionControl);
+        //var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
         //gr.TranslateTransform(trp.ControlX, trp.Y);
         //gr.RotateTransform(-Drehwinkel);
 
@@ -54,8 +54,8 @@ public class Renderer_RichText : Renderer_Abstract {
             //etxt.LineBreakWidth = etxt.DrawingArea.Width;
             TextDimensions = new Size(scaleddrawarea.Width, -1),
             Ausrichtung = align,
-            DrawingArea = scaleddrawarea,
-            DrawingPos = scaleddrawarea.PointOf(Alignment.Top_Left)
+            DrawingAreaControl = scaleddrawarea,
+            DrawingPosControl = scaleddrawarea.PointOf(Alignment.Top_Left)
         };
 
         _txt.Draw(gr, scale);

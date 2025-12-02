@@ -246,19 +246,19 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
-        DrawColorScheme(gr, positionInControl, scale, null, false, false, false);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+        DrawColorScheme(gr, positionControl, scale, null, false, false, false);
         var headh = 25.CanvasToControl(scale);
         var headb = 70.CanvasToControl(scale);
 
-        var body = positionInControl with { Y = positionInControl.Y + headh, Height = positionInControl.Height - headh };
+        var body = positionControl with { Y = positionControl.Y + headh, Height = positionControl.Height - headh };
         var c = -1;
 
         var lc = ListOfChildsPages();
 
         foreach (var thisC in lc) {
             c++;
-            var it = new RectangleF(positionInControl.X + (c * headb), positionInControl.Y, headb, headh);
+            var it = new RectangleF(positionControl.X + (c * headb), positionControl.Y, headb, headh);
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 
@@ -269,16 +269,16 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
         gr.DrawRectangle(new Pen(Color.Black, scale), body);
 
-        //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionInControl.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
+        //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
         //Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionInControl, scale, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
 
-        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
     }
 
     private ListBox Childs() {

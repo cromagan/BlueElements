@@ -210,11 +210,11 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     }
 
     //}
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
 
-        var newarea = positionInControl.ToRect();
-        var (childScale, childOffsetX, childOffsetY) = ItemCollectionPadItem.AlterView(positionInControl, scale, offsetX, offsetY, true, CalculateCanvasShowingArea());
+        var newarea = positionControl.ToRect();
+        var (childScale, childOffsetX, childOffsetY) = ItemCollectionPadItem.AlterView(positionControl, scale, offsetX, offsetY, true, CalculateCanvasShowingArea());
 
         foreach (var thisItem in icpi) {
             if (thisItem is not ScaledViewPadItem) {
@@ -239,11 +239,11 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         var textSize = bFont.MeasureString(Caption);
 
         // Umrandung der Detailansicht
-        gr.DrawRectangle(whitePen, positionInControl);
-        gr.DrawRectangle(colorPen, positionInControl);
+        gr.DrawRectangle(whitePen, positionControl);
+        gr.DrawRectangle(colorPen, positionControl);
         if (_ausrichtung != (Alignment)(-1)) {
-            gr.FillRectangle(Brushes.White, new RectangleF(positionInControl.Left, positionInControl.Top - textSize.Height - 9.CanvasToControl(scale), textSize.Width, textSize.Height));
-            bFont.DrawString(gr, Caption, positionInControl.Left, positionInControl.Top - textSize.Height - 9.CanvasToControl(scale));
+            gr.FillRectangle(Brushes.White, new RectangleF(positionControl.Left, positionControl.Top - textSize.Height - 9.CanvasToControl(scale), textSize.Width, textSize.Height));
+            bFont.DrawString(gr, Caption, positionControl.Left, positionControl.Top - textSize.Height - 9.CanvasToControl(scale));
         }
 
         //Markierung in der Zeichnung
@@ -255,7 +255,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             bFont.DrawString(gr, Caption, f.Left, f.Top - textSize.Height - 9f.CanvasToControl(scale));
         }
 
-        //base.DrawExplicit(gr,visibleArea,positionInControl,scale, offsetX, offsetY);
+        //base.DrawExplicit(gr,visibleArea,positionControl,scale, offsetX, offsetY);
     }
 
     private RectangleF CalculateCanvasShowingArea() {

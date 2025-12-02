@@ -328,7 +328,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
         base.DrawControl(gr, state);
 
-        LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+        var controla = AvailableControlPaintArea();
+
+        LinearGradientBrush lgb = new(controla, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
         if (_items != null) {
             _items.ShowJointPoints = ShowJointPoint;
@@ -336,7 +338,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             _items.ShowAlways = true;
             _items.AutoZoomFit = false;
 
-            _items.Draw(gr, ClientRectangle, Zoom, OffsetX, OffsetY);
+            _items.Draw(gr, controla, Zoom, OffsetX, OffsetY);
 
             #region Dann die selektierten Punkte
 

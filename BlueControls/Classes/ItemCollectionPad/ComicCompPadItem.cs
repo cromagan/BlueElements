@@ -209,7 +209,7 @@ public class ComicCompPadItem : AbstractPadItem {
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         var lOt = _ber_Lo.CanvasToControl(scale, offsetX, offsetY);
         var rOt = _ber_Ro.CanvasToControl(scale, offsetX, offsetY);
         var rUt = _ber_Ru.CanvasToControl(scale, offsetX, offsetY);

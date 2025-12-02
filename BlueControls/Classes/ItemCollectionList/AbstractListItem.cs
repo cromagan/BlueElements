@@ -613,7 +613,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 
-    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale);
+    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale);
 
     protected abstract string GetCompareKey();
 

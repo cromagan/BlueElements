@@ -68,8 +68,8 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Dick, left, right, bottom);
 
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
-        base.DrawColumn(gr, viewItem, positionInControl, scale, translate, offsetX, offsetY, state);
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
         #region Trichter-Text && trichterState
 
@@ -93,14 +93,14 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
         QuickImage? trichterIcon = null;
 
-        var siz = (int)positionInControl.Height - 2;
+        var siz = (int)positionControl.Height - 2;
 
         // Anpassen der Autofilter-CanvasPosition
-        var origAutoFilterLocation = new Rectangle((int)positionInControl.Right - siz, (int)positionInControl.Top, siz, siz);
+        var origAutoFilterLocation = new Rectangle((int)positionControl.Right - siz, (int)positionControl.Top, siz, siz);
 
-        var paf = positionInControl.Height;
+        var paf = positionControl.Height;
 
-        var pts = (int)(positionInControl.Height * 0.8);
+        var pts = (int)(positionControl.Height * 0.8);
 
         if (FilterCombined != null) {
             if (FilterCombined.HasAlwaysFalse() && viewItem.AutoFilterSymbolPossible) {
@@ -138,7 +138,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
         #region LaufendeNummer
 
         if (ShowNumber && Arrangement != null) {
-            Font_Numbers.Scale(scale).DrawString(gr, "#" + Arrangement.IndexOf(viewItem), positionInControl.X, positionInControl.Top);
+            Font_Numbers.Scale(scale).DrawString(gr, "#" + Arrangement.IndexOf(viewItem), positionControl.X, positionControl.Top);
         }
 
         #endregion

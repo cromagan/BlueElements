@@ -275,29 +275,29 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    public void Draw(Graphics gr, Rectangle visibleArea, float scale, float offsetX, float offsetY) {
+    public void Draw(Graphics gr, Rectangle visibleAreaControl, float zoom, float offsetX, float offsetY) {
         if (ForPrinting && !_beiExportSichtbar && !ShowAlways) { return; }
 
-        var positionInControl = CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
+        var positionControl = CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false);
 
-        if (ShowAlways || IsInDrawingArea(positionInControl, visibleArea)) {
-            DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
+        if (ShowAlways || IsInDrawingArea(positionControl, visibleAreaControl)) {
+            DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
 
             if (!ForPrinting) {
                 if (ShowJointPoints) {
-                    DrawPoints(gr, JointPoints, scale, offsetX, offsetY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+                    DrawPoints(gr, JointPoints, zoom, offsetX, offsetY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
                 }
 
-                gr.DrawRectangle(scale > 1 ? new Pen(Color.Gray, scale) : ZoomPad.PenGray, positionInControl);
+                gr.DrawRectangle(zoom > 1 ? new Pen(Color.Gray, zoom) : ZoomPad.PenGray, positionControl);
 
-                if (positionInControl is { Width: < 1, Height: < 1 }) {
-                    gr.DrawEllipse(new Pen(Color.Gray, 3), positionInControl.Left - 5, positionInControl.Top + 5, 10, 10);
-                    gr.DrawLine(ZoomPad.PenGray, positionInControl.PointOf(Alignment.Top_Left), positionInControl.PointOf(Alignment.Bottom_Right));
+                if (positionControl is { Width: < 1, Height: < 1 }) {
+                    gr.DrawEllipse(new Pen(Color.Gray, 3), positionControl.Left - 5, positionControl.Top + 5, 10, 10);
+                    gr.DrawLine(ZoomPad.PenGray, positionControl.PointOf(Alignment.Top_Left), positionControl.PointOf(Alignment.Bottom_Right));
                 }
 
                 if (!_beiExportSichtbar) {
                     var q = QuickImage.Get("Drucker|16||1");
-                    gr.DrawImage(q, positionInControl.X, positionInControl.Y);
+                    gr.DrawImage(q, positionControl.X, positionControl.Y);
                 }
 
                 if (this is IErrorCheckable iec) {
@@ -305,12 +305,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
                     if (!string.IsNullOrEmpty(r)) {
                         using var brush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
-                        gr.FillRectangle(brush, positionInControl);
+                        gr.FillRectangle(brush, positionControl);
                         var q = QuickImage.Get("Kritisch|32||1");
-                        gr.DrawImage(q, positionInControl.X, positionInControl.Y);
+                        gr.DrawImage(q, positionControl.X, positionControl.Y);
                     }
                 }
-                //if (CreativePad.Highlight == this) { gr.DrawRectangle(new Pen(Color.Red, 5), positionInControl); }
+                //if (CreativePad.Highlight == this) { gr.DrawRectangle(new Pen(Color.Red, 5), positionControl); }
             }
         }
 
@@ -318,21 +318,21 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         if (!ForPrinting) {
             var line = 1f;
-            if (scale > 1) { line = scale; }
+            if (zoom > 1) { line = zoom; }
 
             if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
                 foreach (var thisV in icpi.Connections) {
                     if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
                         if (icpi.Contains(thisV.Item2) && thisV.Item2 != this) {
                             if (thisV.Item2.Bei_Export_sichtbar) {
-                                var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).CanvasToControl(scale, offsetX, offsetY);
-                                var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).CanvasToControl(scale, offsetX, offsetY);
+                                var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).CanvasToControl(zoom, offsetX, offsetY);
+                                var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).CanvasToControl(zoom, offsetX, offsetY);
 
                                 if (GetLength(t1, t2) > 1) {
                                     gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
                                     var wi = GetAngle(t1, t2);
-                                    if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, scale * 20); }
-                                    if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, scale * 20); }
+                                    if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, 20.CanvasToControl(zoom)); }
+                                    if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, 20.CanvasToControl(zoom)); }
                                 }
                             }
                         }
@@ -347,8 +347,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     public void DrawToBitmap(Bitmap? bmp, float scale, float offsetX, float offsetY) {
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
-        var positionInControl = CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
-        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionInControl, scale, offsetX, offsetY);
+        var positionControl = CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
+        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionControl, scale, offsetX, offsetY);
         gr.Dispose();
     }
 
@@ -621,7 +621,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY);
+    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY);
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 

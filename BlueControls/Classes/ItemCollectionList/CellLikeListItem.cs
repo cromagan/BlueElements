@@ -67,13 +67,13 @@ public class CellLikeListItem : AbstractListItem {
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) =>
         _cellRenderer.ContentSize(KeyName, _translate);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, itemdesign, state, positionInControl.ToRect(), null, false);
+            Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false);
         }
-        _cellRenderer.Draw(gr, KeyName, null, positionInControl.ToRect(), _translate, _align, 1f);
+        _cellRenderer.Draw(gr, KeyName, null, positionControl.ToRect(), _translate, _align, 1f);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionInControl.ToRect());
+            Skin.Draw_Border(gr, itemdesign, state, positionControl.ToRect());
         }
     }
 

@@ -447,10 +447,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     //    SetCoordinates(x, true);
     //    OnPropertyChanged(string propertyname);
     //}
-    protected static void DrawArrow(Graphics gr, RectangleF positionInControl, float scale, int colorId, Alignment al, float valueArrow, float xmod) {
-        var p = positionInControl.PointOf(al);
-        var width = (int)(scale * 25);
-        var height = (int)(scale * 12);
+    protected static void DrawArrow(Graphics gr, RectangleF positionControl, float zoom, int colorId, Alignment al, float valueArrow, float xmod) {
+        var p = positionControl.PointOf(al);
+        var width = 25.CanvasToControl(zoom);
+        var height = 12.CanvasToControl(zoom);
         var pa = Poly_Arrow(new Rectangle(0, -(width / 2), height, width));
 
         var c = Skin.IdColor(colorId);
@@ -466,7 +466,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         gr.RotateTransform(90);
 
         gr.FillPath(new SolidBrush(c), pa);
-        gr.DrawPath(new Pen(c2, 1.CanvasToControl(scale)), pa);
+        gr.DrawPath(new Pen(c2, 1.CanvasToControl(zoom)), pa);
 
         gr.RotateTransform(-90);
         gr.TranslateTransform(-p.X - xmod, -p.Y + valueArrow);
@@ -487,12 +487,12 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     //    var he1 = MmToPixel(1, ItemCollectionPadItem.Dpi);
     //    x.Height = (int)(x.Height / he) * he;
     //    x.Height = (int)((x.Height / he1) + 0.99) * he1;
-    protected void DrawArrorInput(Graphics gr, RectangleF positionInControl, float scale, bool forPrinting, List<int>? colorId) {
+    protected void DrawArrorInput(Graphics gr, RectangleF positionControl, float zoom, bool forPrinting, List<int>? colorId) {
         if (forPrinting) { return; }
 
-        var arrowY = (int)(scale * 12) * 0.35f;
+        var arrowY = 12.CanvasToControl(zoom) * 0.35f;
 
-        var width = (int)(scale * 25);
+        var width = (25.CanvasToControl(zoom);
 
         colorId ??= [];
 
@@ -501,17 +501,17 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         var start = -((colorId.Count - 1) * width / 2);
 
         foreach (var thisColorId in colorId) {
-            DrawArrow(gr, positionInControl, scale, thisColorId, Alignment.Top_HorizontalCenter, arrowY, start);
+            DrawArrow(gr, positionControl, zoom, thisColorId, Alignment.Top_HorizontalCenter, arrowY, start);
             start += width;
         }
     }
 
     //public void Standardhöhe_setzen() {
     //    var x = CanvasUsedArea;
-    protected void DrawArrowOutput(Graphics gr, RectangleF positionInControl, float scale, bool forPrinting, int colorId) {
+    protected void DrawArrowOutput(Graphics gr, RectangleF positionControl, float zoom, bool forPrinting, int colorId) {
         if (forPrinting) { return; }
-        var arrowY = (int)(scale * 12) * 0.45f;
-        DrawArrow(gr, positionInControl, scale, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);
+        var arrowY = 12.CanvasToControl(zoom) * 0.45f;
+        DrawArrow(gr, positionControl, zoom, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);
     }
 
     protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float scale, List<int>? id, bool drawSymbol, bool drawText, bool transparent) {
@@ -552,11 +552,11 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) => CalculateColorIds();
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) => CalculateColorIds();
 
-    protected void DrawFakeControl(Graphics gr, RectangleF positionInControl, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
+    protected void DrawFakeControl(Graphics gr, RectangleF positionControl, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
         Point cap;
-        var uc = positionInControl.ToRect();
+        var uc = positionControl.ToRect();
 
         switch (captionPosition) {
             case CaptionPosition.ohne:
@@ -578,7 +578,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
 
         if (cap.X >= 0) {
-            var e = new RectangleF(positionInControl.Left + cap.X.CanvasToControl(scale), positionInControl.Top + cap.Y.CanvasToControl(scale), positionInControl.Width, 16.CanvasToControl(scale));
+            var e = new RectangleF(positionControl.Left + cap.X.CanvasToControl(scale), positionControl.Top + cap.Y.CanvasToControl(scale), positionControl.Width, 16.CanvasToControl(scale));
             Skin.Draw_FormatedText(gr, captiontxt, null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(scale), true);
         }
 

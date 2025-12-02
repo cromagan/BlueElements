@@ -60,7 +60,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     #region Fields
 
     private readonly List<ExtChar> _internal = [];
-    private int? _height;
+    private int? _heightControl;
     private string _sheetStyle = string.Empty;
 
     private Size _textDimensions;
@@ -69,7 +69,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private string? _tmpPlainText;
 
-    private int? _width;
+    private int? _widthControl;
 
     private float _zeilenabstand;
 
@@ -78,15 +78,15 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     #region Constructors
 
     public ExtText() : base() {
-        DrawingPos = new Point(0, 0);
+        DrawingPosControl = new Point(0, 0);
         Ausrichtung = Alignment.Top_Left;
         MaxTextLength = 4000;
         Multiline = true;
         AllowedChars = string.Empty;
-        DrawingArea = new Rectangle(0, 0, -1, -1);
+        DrawingAreaControl = new Rectangle(0, 0, -1, -1);
         _textDimensions = Size.Empty;
-        _width = null;
-        _height = null;
+        _widthControl = null;
+        _heightControl = null;
         _zeilenabstand = 1;
         _tmpHtmlText = null;
         _tmpPlainText = null;
@@ -125,17 +125,17 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     /// <summary>
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
     /// </summary>
-    public Rectangle DrawingArea { get; set; }
+    public Rectangle DrawingAreaControl { get; set; }
 
     /// <summary>
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
     /// </summary>
-    public Point DrawingPos { get; set; }
+    public Point DrawingPosControl { get; set; }
 
-    public int Height {
+    public int HeightControl {
         get {
             EnsurePositions();
-            return _height ?? -1;
+            return _heightControl ?? -1;
         }
     }
 
@@ -199,10 +199,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    public int Width {
+    public int WidthControl {
         get {
             EnsurePositions();
-            return _width ?? 0;
+            return _widthControl ?? 0;
         }
     }
 
@@ -257,21 +257,21 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         do {
             cZ++;
             if (cZ > _internal.Count - 1) { break; }// Das Ende des Textes
-            if (_internal[cZ].Size.Width > 0) {
-                var matchX = pixX >= DrawingPos.X + _internal[cZ].Pos.X && pixX <= DrawingPos.X + _internal[cZ].Pos.X + _internal[cZ].Size.Width;
-                var matchY = pixY >= DrawingPos.Y + _internal[cZ].Pos.Y && pixY <= DrawingPos.Y + _internal[cZ].Pos.Y + _internal[cZ].Size.Height;
+            if (_internal[cZ].SizeCanvas.Width > 0) {
+                var matchX = pixX >= DrawingPosControl.X + _internal[cZ].PosCanvas.X && pixX <= DrawingPosControl.X + _internal[cZ].PosCanvas.X + _internal[cZ].SizeCanvas.Width;
+                var matchY = pixY >= DrawingPosControl.Y + _internal[cZ].PosCanvas.Y && pixY <= DrawingPosControl.Y + _internal[cZ].PosCanvas.Y + _internal[cZ].SizeCanvas.Height;
 
                 if (matchX && matchY) { return cZ; }
 
                 double tmpDi;
                 if (!matchX && matchY) {
-                    tmpDi = Math.Abs(pixX - (DrawingPos.X + _internal[cZ].Pos.X + (_internal[cZ].Size.Width / 2.0)));
+                    tmpDi = Math.Abs(pixX - (DrawingPosControl.X + _internal[cZ].PosCanvas.X + (_internal[cZ].SizeCanvas.Width / 2.0)));
                     if (tmpDi < xDi) {
                         xNr = cZ;
                         xDi = tmpDi;
                     }
                 } else if (matchX && !matchY) {
-                    tmpDi = Math.Abs(pixY - (DrawingPos.Y + _internal[cZ].Pos.Y + (_internal[cZ].Size.Height / 2.0)));
+                    tmpDi = Math.Abs(pixY - (DrawingPosControl.Y + _internal[cZ].PosCanvas.Y + (_internal[cZ].SizeCanvas.Height / 2.0)));
                     if (tmpDi < yDi) {
                         yNr = cZ;
                         yDi = tmpDi;
@@ -298,18 +298,18 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             // Kein Text vorhanden
         } else if (charPos < _internal.Count) {
             // Cursor vor einem Zeichen
-            x = _internal[charPos].Pos.X;
-            y = _internal[charPos].Pos.Y;
-            he = _internal[charPos].Size.Height;
+            x = _internal[charPos].PosCanvas.X;
+            y = _internal[charPos].PosCanvas.Y;
+            he = _internal[charPos].SizeCanvas.Height;
         } else if (charPos > 0 && charPos < _internal.Count + 1 && _internal[charPos - 1].IsLineBreak()) {
             // Vorzeichen = Zeilenumbruch
-            y = _internal[charPos - 1].Pos.Y + _internal[charPos - 1].Size.Height;
-            he = _internal[charPos - 1].Size.Height;
+            y = _internal[charPos - 1].PosCanvas.Y + _internal[charPos - 1].SizeCanvas.Height;
+            he = _internal[charPos - 1].SizeCanvas.Height;
         } else if (charPos > 0 && charPos < _internal.Count + 1) {
             // Vorzeichen = Echtes Char
-            x = _internal[charPos - 1].Pos.X + _internal[charPos - 1].Size.Width;
-            y = _internal[charPos - 1].Pos.Y;
-            he = _internal[charPos - 1].Size.Height;
+            x = _internal[charPos - 1].PosCanvas.X + _internal[charPos - 1].SizeCanvas.Width;
+            y = _internal[charPos - 1].PosCanvas.Y;
+            he = _internal[charPos - 1].SizeCanvas.Height;
         }
         return new Rectangle((int)x, (int)(y - 1), 0, (int)(he + 2));
     }
@@ -331,8 +331,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         DrawStates(gr, zoom);
 
         foreach (var t in _internal) {
-            if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
-                t.Draw(gr, DrawingPos, zoom);
+            if (t.IsVisible(zoom, DrawingPosControl, DrawingAreaControl)) {
+                t.Draw(gr, DrawingPosControl, zoom);
             }
         }
     }
@@ -348,7 +348,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public Size LastSize() {
         EnsurePositions();
-        return _height == null || _width < 5 || _height < 5 ? new Size(32, 16) : new Size((int)_width + 1, (int)_height + 1);
+        return _heightControl == null || _widthControl < 5 || _heightControl < 5 ? new Size(32, 16) : new Size((int)_widthControl + 1, (int)_heightControl + 1);
     }
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
@@ -796,10 +796,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private void DrawZone(Graphics gr, float scale, MarkState thisState, int markStart, int markEnd) {
-        var startX = _internal[markStart].Pos.X.CanvasToControl(scale, DrawingPos.X);
-        var startY = _internal[markStart].Pos.Y.CanvasToControl(scale, DrawingPos.Y);
-        var endX = _internal[markEnd].Pos.X.CanvasToControl(scale, DrawingPos.X) + _internal[markEnd].Size.Width.CanvasToControl(scale);
-        var endy = _internal[markEnd].Pos.Y.CanvasToControl(scale, DrawingPos.Y) + _internal[markEnd].Size.Height.CanvasToControl(scale);
+        var startX = _internal[markStart].PosCanvas.X.CanvasToControl(scale, DrawingPosControl.X);
+        var startY = _internal[markStart].PosCanvas.Y.CanvasToControl(scale, DrawingPosControl.Y);
+        var endX = _internal[markEnd].PosCanvas.X.CanvasToControl(scale, DrawingPosControl.X) + _internal[markEnd].SizeCanvas.Width.CanvasToControl(scale);
+        var endy = _internal[markEnd].PosCanvas.Y.CanvasToControl(scale, DrawingPosControl.Y) + _internal[markEnd].SizeCanvas.Height.CanvasToControl(scale);
 
         switch (thisState) {
             case MarkState.None:
@@ -807,7 +807,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             case MarkState.Ringelchen:
                 using (var pen = new Pen(Color.Red, 3.CanvasToControl(scale))) {
-                    gr.DrawLine(pen, startX, (int)(startY + (_internal[markStart].Size.Height.CanvasToControl(scale) * 0.9)), endX, (int)(startY + (_internal[markStart].Size.Height.CanvasToControl(scale) * 0.9)));
+                    gr.DrawLine(pen, startX, (int)(startY + (_internal[markStart].SizeCanvas.Height.CanvasToControl(scale) * 0.9)), endX, (int)(startY + (_internal[markStart].SizeCanvas.Height.CanvasToControl(scale) * 0.9)));
                 }
                 break;
 
@@ -836,7 +836,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private void EnsurePositions() {
-        if (_width == null) {
+        if (_widthControl == null) {
             ReBreak();
         }
     }
@@ -849,8 +849,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     /// </summary>
     /// <remarks></remarks>
     private void ReBreak() {
-        _width = 0;
-        _height = 0;
+        _widthControl = 0;
+        _heightControl = 0;
         if (_internal.Count == 0) { return; }
 
         var estimatedRows = _internal.Count / 50; // Geschätzte Zeilenanzahl
@@ -877,7 +877,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             if (!_internal[akt].IsSpace()) {
                 if (akt > zbChar && _textDimensions.Width > 0) {
-                    if (isX + _internal[akt].Size.Width + 0.5 > _textDimensions.Width) {
+                    if (isX + _internal[akt].SizeCanvas.Width + 0.5 > _textDimensions.Width) {
                         akt = WordBreaker(akt, zbChar);
                         isX = vZbxPixel;
                         isY += Row_SetOnLine(zbChar, akt - 1) * _zeilenabstand;
@@ -885,16 +885,16 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                         zbChar = akt;
                     }
                 }
-                _width = Math.Max((int)_width, (int)(isX + _internal[akt].Size.Width + 0.5));
-                _height = Math.Max((int)_height, (int)(isY + _internal[akt].Size.Height + 0.5));
+                _widthControl = Math.Max((int)_widthControl, (int)(isX + _internal[akt].SizeCanvas.Width + 0.5));
+                _heightControl = Math.Max((int)_heightControl, (int)(isY + _internal[akt].SizeCanvas.Height + 0.5));
             }
 
-            _internal[akt].Pos.X = isX;
-            _internal[akt].Pos.Y = isY;
+            _internal[akt].PosCanvas.X = isX;
+            _internal[akt].PosCanvas.Y = isY;
 
             // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
             //isX = (float)(isX + Math.Truncate(_internal[akt].Size.Width + 0.5));
-            isX += _internal[akt].Size.Width;
+            isX += _internal[akt].SizeCanvas.Width;
 
             if (_internal[akt].IsLineBreak()) {
                 isX = vZbxPixel;
@@ -913,18 +913,18 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         if (Ausrichtung != Alignment.Top_Left) {
             var ky = 0f;
-            if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { ky = (float)((_textDimensions.Height - (int)_height) / 2.0); }
-            if (Ausrichtung.HasFlag(Alignment.Bottom)) { ky = _textDimensions.Height - (int)_height; }
+            if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { ky = (float)((_textDimensions.Height - (int)_heightControl) / 2.0); }
+            if (Ausrichtung.HasFlag(Alignment.Bottom)) { ky = _textDimensions.Height - (int)_heightControl; }
             foreach (var t in ri) {
                 var o = t.SplitAndCutBy(";");
                 var z1 = IntParse(o[0]);
                 var z2 = IntParse(o[1]);
                 float kx = 0;
-                if (Ausrichtung.HasFlag(Alignment.Right)) { kx = _textDimensions.Width - _internal[z2].Pos.X - _internal[z2].Size.Width; }
-                if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) { kx = (_textDimensions.Width - _internal[z2].Pos.X - _internal[z2].Size.Width) / 2; }
+                if (Ausrichtung.HasFlag(Alignment.Right)) { kx = _textDimensions.Width - _internal[z2].PosCanvas.X - _internal[z2].SizeCanvas.Width; }
+                if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) { kx = (_textDimensions.Width - _internal[z2].PosCanvas.X - _internal[z2].SizeCanvas.Width) / 2; }
                 for (var z3 = z1; z3 <= z2; z3++) {
-                    _internal[z3].Pos.X += kx;
-                    _internal[z3].Pos.Y += ky;
+                    _internal[z3].PosCanvas.X += kx;
+                    _internal[z3].PosCanvas.Y += ky;
                 }
             }
         }
@@ -934,8 +934,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private void ResetPosition(bool andTmpText) {
         if (IsDisposed) { return; }
-        _width = null;
-        _height = null;
+        _widthControl = null;
+        _heightControl = null;
 
         if (andTmpText) {
             _tmpHtmlText = null;
@@ -947,11 +947,11 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private float Row_SetOnLine(int first, int last) {
         float abstand = 0;
         for (var z = first; z <= last; z++) {
-            abstand = Math.Max(abstand, _internal[z].Size.Height);
+            abstand = Math.Max(abstand, _internal[z].SizeCanvas.Height);
         }
         for (var z = first; z <= last; z++) {
             if (_internal[z] is ExtCharTopCode) {
-                _internal[z].Pos.Y = _internal[z].Pos.Y + abstand - _internal[z].Size.Height;
+                _internal[z].PosCanvas.Y = _internal[z].PosCanvas.Y + abstand - _internal[z].SizeCanvas.Height;
             }
         }
         return abstand;

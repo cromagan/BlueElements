@@ -78,14 +78,14 @@ public class TextListItem : AbstractListItem {
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => Skin.GetBlueFont(TempDesign(itemdesign), States.Standard).FormatedText_NeededSize(Text, Symbol, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
         var tmpd = TempDesign(itemdesign);
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, tmpd, state, positionInControl.ToRect(), null, false);
+            Skin.Draw_Back(gr, tmpd, state, positionControl.ToRect(), null, false);
         }
-        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionInControl.ToRect(), tmpd, state, null, false, translate);
+        Skin.Draw_FormatedText(gr, Text, Symbol, Alignment.VerticalCenter_Left, positionControl.ToRect(), tmpd, state, null, false, translate);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, tmpd, state, positionInControl.ToRect());
+            Skin.Draw_Border(gr, tmpd, state, positionControl.ToRect());
         }
     }
 

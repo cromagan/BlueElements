@@ -155,16 +155,16 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         UnRegisterEvents();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
-        var trp = positionInControl.PointOf(Alignment.Horizontal_Vertical_Center);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+        var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);
         GraphicsPath? p = null;
 
         // Wegen der Nullpunktverschiebung wird ein temporäres Rechteck benötigt
-        var d2 = positionInControl;
-        d2.X = -positionInControl.Width / 2;
-        d2.Y = -positionInControl.Height / 2;
+        var d2 = positionControl;
+        d2.X = -positionControl.Width / 2;
+        d2.Y = -positionControl.Height / 2;
 
         switch (Symbol) {
             case Symbol.Ohne:

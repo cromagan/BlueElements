@@ -53,8 +53,8 @@ public sealed class SortBarListItem : RowBackgroundListItem {
 
     public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Ohne, left, right, bottom);
 
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionInControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
-        base.DrawColumn(gr, viewItem, positionInControl, scale, translate, offsetX, offsetY, state);
+    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
         if (Sort != null && Sort.UsedForRowSort(viewItem.Column)) {
             var p6 = 6.CanvasToControl(scale);
@@ -62,8 +62,8 @@ public sealed class SortBarListItem : RowBackgroundListItem {
             var im = Sort.Reverse ? QuickImage.Get("ZA|" + p12 + "|" + p6 + "||||50") : QuickImage.Get("AZ|" + p12 + "|" + p6 + "||||50");
 
             gr.DrawImage(im,
-                positionInControl.X + (positionInControl.Width - im.Width) / 2f,
-                positionInControl.Y + (positionInControl.Height - im.Height) / 2f);
+                positionControl.X + (positionControl.Width - im.Width) / 2f,
+                positionControl.Y + (positionControl.Height - im.Height) / 2f);
         }
     }
 

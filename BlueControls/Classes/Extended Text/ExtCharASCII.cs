@@ -66,7 +66,7 @@ public class ExtCharAscii : ExtChar {
     public override void Draw(Graphics gr, Point offset, float zoom) {
         if (_charInt < 20) { return; }
 
-        var controlP = Pos.CanvasToControl(zoom, offset.X, offset.Y);
+        var controlP = PosCanvas.CanvasToControl(zoom, offset.X, offset.Y);
 
         try {
             this.GetFont().DrawString(gr, _charString, controlP.X, controlP.Y, zoom);
@@ -115,7 +115,7 @@ public class ExtCharAscii : ExtChar {
 
     public override string PlainText() => _charString;
 
-    protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
+    protected override SizeF CalculateSizeCanvas() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
 
     private void InitVales() {
         _charInt = _char;

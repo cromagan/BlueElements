@@ -45,7 +45,7 @@ public class LineListItem : AbstractListItem {
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => CanvasPosition is { X: 0, Y: 0 } and { Width: 0, Height: 0 } ? new Size(4, 4) : CanvasPosition.Size;
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionInControl.Left, (int)(positionInControl.Top + (positionInControl.Height / 2.0)), positionInControl.Right, (int)(positionInControl.Top + (positionInControl.Height / 2.0)));
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) => gr.DrawLine(Skin.GetBlueFont(itemdesign, States.Standard).Pen(1f), positionControl.Left, (int)(positionControl.Top + (positionControl.Height / 2.0)), positionControl.Right, (int)(positionControl.Top + (positionControl.Height / 2.0)));
 
     protected override string GetCompareKey() => CanvasPosition.ToString();
 

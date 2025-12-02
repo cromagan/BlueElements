@@ -71,7 +71,6 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     #region Properties
 
-    
     public static string ClassId => "FI-FilterButton";
 
     [Description("Welches Skript ausgeführt werden soll")]
@@ -472,17 +471,17 @@ public class ButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stop, 16, Color.Transparent, Skin.IdColor(InputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         _eTxt ??= new ExtText(Design.Button, States.Standard);
-        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _beschriftung, positionInControl.ToRect(), false);
+        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _beschriftung, positionControl.ToRect(), false);
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionInControl, scale, InputColorId, false, false, true);
+            DrawColorScheme(gr, positionControl, scale, InputColorId, false, false, true);
         }
 
-        base.DrawExplicit(gr, visibleArea, positionInControl, scale, offsetX, offsetY);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
 
-        DrawArrorInput(gr, positionInControl, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
     }
 
     #endregion

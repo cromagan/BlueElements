@@ -166,7 +166,7 @@ public partial class MessageBox : Form {
                         b.ImageCode = string.Empty;
                         break;
                 }
-                b.Size = new Size(erT.Width + (Skin.Padding * w), erT.Height + (Skin.Padding * 2));
+                b.Size = new Size(erT.WidthControl + (Skin.Padding * w), erT.HeightControl + (Skin.Padding * 2));
                 b.Location = new Point(myX - b.Width, Height - BorderHeight - Skin.Padding - b.Height);
                 myX = b.Location.X - Skin.Padding;
                 b.ButtonStyle = ButtonStyle.Button;

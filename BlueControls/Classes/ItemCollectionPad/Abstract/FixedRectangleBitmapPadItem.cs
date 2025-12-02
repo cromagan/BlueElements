@@ -77,7 +77,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         if (_generatedBitmap == null) { GeneratePic(); }
 
         #region Bild zeichnen
@@ -91,7 +91,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
                     gr.InterpolationMode = InterpolationMode.Low;
                     gr.PixelOffsetMode = PixelOffsetMode.Half;
                 }
-                gr.DrawImage(_generatedBitmap, positionInControl);
+                gr.DrawImage(_generatedBitmap, positionControl);
             }
         } catch { }
 

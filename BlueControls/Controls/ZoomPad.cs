@@ -310,15 +310,15 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         SliderX.Visible = ShowSliderX && !ScreenshotMode;
         if (freiraumControl.X < 0 && SliderX.Visible) {
             SliderX.Enabled = true;
-            SliderX.Minimum =  tmpCanvasMaxBounds.Right.CanvasToControl(_zoom)- controlArea.Right;
-            SliderX.Maximum =  tmpCanvasMaxBounds.Left.CanvasToControl(_zoom) - controlArea.Left;
+            SliderX.Minimum = tmpCanvasMaxBounds.Right.CanvasToControl(_zoom) - controlArea.Right - tmpCanvasMaxBounds.Left.CanvasToControl(_zoom);
+            SliderX.Maximum = tmpCanvasMaxBounds.Left.CanvasToControl(_zoom) - controlArea.Left;
             SliderX.LargeChange = controlArea.Width;
             SliderX.Value = -OffsetX;
         } else {
             SliderX.Enabled = false;
             if (!MousePressing()) {
                 var val = 0;
-                if (AutoCenter) { val = tmpCanvasMaxBounds.Left.CanvasToControl(_zoom) + (freiraumControl.X / 2); }
+                if (AutoCenter) { val = freiraumControl.X / 2; }
                 SliderX.Minimum = -val;
                 SliderX.Maximum = -val;
                 SliderX.Value = -val;
@@ -328,7 +328,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         SliderY.Visible = !ScreenshotMode;
         if (freiraumControl.Y < 0 && SliderY.Visible) {
             SliderY.Enabled = true;
-            SliderY.Maximum = tmpCanvasMaxBounds.Bottom.CanvasToControl(_zoom) - controlArea.Bottom;
+            SliderY.Maximum = tmpCanvasMaxBounds.Bottom.CanvasToControl(_zoom) - controlArea.Bottom - tmpCanvasMaxBounds.Top.CanvasToControl(_zoom);
             SliderY.Minimum = tmpCanvasMaxBounds.Top.CanvasToControl(_zoom) - controlArea.Top;
             SliderY.LargeChange = controlArea.Height;
             SliderY.Value = -OffsetY;

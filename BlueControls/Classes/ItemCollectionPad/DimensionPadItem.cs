@@ -334,7 +334,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableO
         UnRegisterEvents();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleArea, RectangleF positionInControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
         if (_style != PadStyles.Undefiniert) {
             var geszoom = _textScale.CanvasToControl(scale);
 
