@@ -41,7 +41,7 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasTable {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
         var ein = _originalImportText.SplitAndCutByCr().ToList();
-        capEinträge.Text = ein.Count + " zum Importieren bereit.";
+        capEinträge.Text = $"{ein.Count-1} zum Importieren bereit.";
         Table = table;
     }
 

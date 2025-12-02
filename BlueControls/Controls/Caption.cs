@@ -181,7 +181,10 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    protected override void DrawControl(Graphics? gr, States state) {
+    protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
+
         try {
             if (_design == Design.Undefiniert) {
                 GetDesign();

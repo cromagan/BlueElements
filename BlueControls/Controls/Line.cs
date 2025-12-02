@@ -56,14 +56,14 @@ public class Line : GenericControl, IBackgroundNone {
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
-  
+
         set => base.TabIndex = 0;
     }
 
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
-  
+
         set => base.TabStop = false;
     }
 
@@ -82,6 +82,8 @@ public class Line : GenericControl, IBackgroundNone {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
         CheckSize();
         Pen dp = new(SystemColors.ControlDark);
         Pen lp = new(SystemColors.ControlLight);

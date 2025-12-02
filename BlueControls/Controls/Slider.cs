@@ -205,6 +205,9 @@ public partial class Slider : IBackgroundNone {
     internal void DoMouseWheel(MouseEventArgs e) => OnMouseWheel(e);
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
+
         var vStateBack = state;
         var vStateSlider = state;
 

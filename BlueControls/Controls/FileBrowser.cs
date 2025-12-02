@@ -34,7 +34,6 @@ using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
-
 namespace BlueControls.Controls;
 
 public sealed partial class FileBrowser : GenericControlReciver   //UserControl //
@@ -199,7 +198,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        HandleChangesNow();
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
     }
 

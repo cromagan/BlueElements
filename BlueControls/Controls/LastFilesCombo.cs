@@ -96,6 +96,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
         SetLastFilesStyle();
         base.DrawControl(gr, state);
     }

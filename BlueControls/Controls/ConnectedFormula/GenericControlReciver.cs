@@ -35,6 +35,7 @@ using System.Drawing;
 namespace BlueControls.Controls;
 
 public class GenericControlReciver : GenericControl, IBackgroundNone {
+
     #region Fields
 
     public readonly List<GenericControlReciverSender> Parents = [];
@@ -303,6 +304,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
         HandleChangesNow();
     }
 

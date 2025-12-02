@@ -49,9 +49,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
     private readonly object _itemLock = new();
     private ListBoxAppearance _appearance;
     private CheckBehavior _checkBehavior = CheckBehavior.SingleSelection;
-
     private List<string> _checked = [];
-
     private Design _controlDesign;
     private Design _itemDesign;
     private SizeF _lastCheckedMaxSize = Size.Empty;
@@ -158,7 +156,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
     }
 
     public ReadOnlyCollection<string> Checked => _checked.AsReadOnly();
-
     public override bool ControlMustPressed => true;
 
     [DefaultValue("")]
@@ -222,8 +219,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
     public bool Translate { get; set; } = true;
 
     protected override bool AutoCenter => false;
-
     protected override bool ShowSliderX => false;
+    protected override int SmallChangeY => 10;
 
     #endregion
 
@@ -374,6 +371,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
         AddAndRegister(item);
         InvalidateItemOrder();
         ValidateCheckStates(_checked, item.KeyName);
+        Invalidate_MaxBounds();
     }
 
     public void ItemAddRange(List<AbstractListItem>? items) {
@@ -660,29 +658,30 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
     }
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
         base.DrawControl(gr, state);
         var checkboxDesign = CheckboxDesign();
 
         var controlState = state;
         controlState &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
 
-        var area = AvailableControlPaintArea();
+        var visControPaintArea = AvailableControlPaintArea();
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(_itemDesign);
-        ComputeAllItemPositions(new Size(area.Width, area.Height), biggestItemX, heightAdded, senkrechtAllowed, Renderer);
+        ComputeAllItemPositions(new Size(visControPaintArea.Width, visControPaintArea.Height), biggestItemX, heightAdded, senkrechtAllowed, Renderer);
 
         gr.ScaleTransform(1, 1);
-        Skin.Draw_Back(gr, _controlDesign, controlState, area, this, true);
+        Skin.Draw_Back(gr, _controlDesign, controlState, visControPaintArea, this, true);
 
         DoItemOrder();
 
         if (CheckBehavior == CheckBehavior.AllSelected) {
-            _item.DrawItems(gr, area, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, null, Zoom);
+            _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, null, Zoom);
         } else {
-            _item.DrawItems(gr, area, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, _checked, Zoom);
+            _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, _checked, Zoom);
         }
 
         if (_controlDesign == Design.ListBox) {
-            Skin.Draw_Border(gr, _controlDesign, controlState, area);
+            Skin.Draw_Border(gr, _controlDesign, controlState, visControPaintArea);
         }
     }
 

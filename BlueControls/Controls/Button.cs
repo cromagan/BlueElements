@@ -192,6 +192,8 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
         try {
             QuickImage? qi;
             if ((ButtonStyle)((int)_buttonStyle % 1000) == ButtonStyle.Yes_or_No) {

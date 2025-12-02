@@ -89,11 +89,14 @@ public static class AbstractListItemExtension {
         edit.Edit();
     }
 
-    public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float scale) {
+    public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visControlArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
         try {
             object locker = new();
+
+            var visCanvasArea = visControlArea.ControlToCanvas(zoom, offsetX, offsetY);
+
             Parallel.ForEach(list, thisItem => {
-                if (thisItem.IsVisible(visArea)) {
+                if (thisItem.IsVisible(visCanvasArea.ToRect())) {
                     var itemState = controlState;
                     if (_mouseOverItem == thisItem && !controlState.HasFlag(States.Checked_Disabled)) { itemState |= States.Standard_MouseOver; }
 
@@ -102,7 +105,7 @@ public static class AbstractListItemExtension {
                     if (_checked?.Contains(thisItem.KeyName) ?? false) { itemState |= States.Checked; }
 
                     lock (locker) {
-                        thisItem.Draw(gr, visArea, offsetX, offsetY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, scale);
+                        thisItem.Draw(gr, visControlArea, offsetX, offsetY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, zoom);
                     }
                 }
             });
@@ -604,7 +607,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         return _sizeUntouchedForListBox;
     }
 
-    internal bool IsVisible(Rectangle visArea) => Visible && CanvasPosition.IntersectsWith(visArea);
+    internal bool IsVisible(Rectangle visCanvasArea) => Visible && CanvasPosition.IntersectsWith(visCanvasArea);
 
     internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new ObjectEventArgs(Tag));
 

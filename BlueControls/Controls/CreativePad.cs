@@ -167,6 +167,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
     protected override bool AutoCenter => true;
     protected override bool ShowSliderX => false;
+    protected override int SmallChangeY => 5;
 
     #endregion
 

@@ -534,10 +534,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return erg;
     }
 
-    public static PointF SliderValues(RectangleF canvasBounds, float zoom, Point freiraumControl)
-        => new(canvasBounds.Left.CanvasToControl(zoom) + (freiraumControl.X / 2f),
-               canvasBounds.Top.CanvasToControl(zoom) + (freiraumControl.Y / 2f));
-
     public static float ZoomFitValue(RectangleF canvasBounds, Size controlSize) => canvasBounds.IsEmpty
             ? 1f
             : Math.Min(controlSize.Width / canvasBounds.Width,

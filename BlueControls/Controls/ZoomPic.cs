@@ -76,6 +76,7 @@ public partial class ZoomPic : ZoomPad {
     public override bool ControlMustPressed => false;
     protected override bool AutoCenter => true;
     protected override bool ShowSliderX => true;
+    protected override int SmallChangeY => 5;
 
     #endregion
 
@@ -84,6 +85,7 @@ public partial class ZoomPic : ZoomPad {
     protected override RectangleF CalculateCanvasMaxBounds() => Bmp?.IsValid() == true ? new RectangleF(-20, -20, Bmp.Width + 40, Bmp.Height + 40) : new RectangleF(0, 0, 0, 0);
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
         base.DrawControl(gr, state);
 
         // Get drawable area considering scrollbars

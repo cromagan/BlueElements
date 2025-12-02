@@ -237,6 +237,8 @@ public partial class ComboBox : TextBox, ITranslateable {
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+
         if (_dropDownStyle == ComboBoxStyle.DropDownList) {
             if (_items.Count == 0) {
                 state = States.Standard_Disabled;
@@ -294,7 +296,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
             var r = i.CanvasPosition;
             var ymod = (int)((DisplayRectangle.Height - r.Height) / 2.0);
-            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal - r.Left, ymod - r.Top , Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert, 1f);
+            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal - r.Left, ymod - r.Top, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert, 1f);
         }
         Skin.Draw_Border(gr, vType, state, DisplayRectangle);
         btnDropDown.Invalidate();

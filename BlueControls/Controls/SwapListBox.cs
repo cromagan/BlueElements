@@ -98,6 +98,8 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
     }
 
     protected bool MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove, bool fireEvent = true) {

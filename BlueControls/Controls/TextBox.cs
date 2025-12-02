@@ -386,6 +386,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
+
         var effectWidth = Width;
         var sliderVisible = MultiLine ? _eTxt.Height > Height - 16 : _eTxt.Height > Height;
         if (sliderVisible) { effectWidth = Width - 18; }

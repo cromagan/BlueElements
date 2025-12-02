@@ -159,11 +159,10 @@ public class RowFormulaListItem : AbstractListItem {
 
         _tmpBmp ??= new Bitmap(canvasUsedArea.Width * internalZoom, canvasUsedArea.Height * internalZoom);
         var zoomv = ItemCollectionPadItem.ZoomFitValue(canvasUsedArea, _tmpBmp.Size);
-        var centerpos = ItemCollectionPadItem.FreiraumControl(canvasUsedArea, _tmpBmp.Size, zoomv);
-        var slidervalues = ItemCollectionPadItem.SliderValues(canvasUsedArea, zoomv, centerpos);
-        //pad.ShowInPrintMode = true;
-        //pad.Unselect();
-        pad.DrawToBitmap(_tmpBmp, zoomv, slidervalues.X, slidervalues.Y);
+        var freiraumControl = ItemCollectionPadItem.FreiraumControl(canvasUsedArea, _tmpBmp.Size, zoomv);
+        var sliderX = canvasUsedArea.Left.CanvasToControl(zoomv) + (freiraumControl.X / 2f);
+        var sliderY = canvasUsedArea.Top.CanvasToControl(zoomv) + (freiraumControl.Y / 2f);
+        pad.DrawToBitmap(_tmpBmp, zoomv, sliderX, sliderY);
     }
 
     private void RemovePic() {

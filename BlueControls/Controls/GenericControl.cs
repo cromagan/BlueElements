@@ -86,7 +86,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     [DefaultValue(false)]
     public override bool AutoSize {
         get => false; //MyBase.AutoSize
-  
+
         set => base.AutoSize = false;
     }
 
@@ -307,7 +307,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         }
     }
 
-    protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+    protected virtual void DrawControl(Graphics gr, States state) { }
 
     protected ParentType GetParentType() {
         if (Parent == null) { return ParentType.Unbekannt; }

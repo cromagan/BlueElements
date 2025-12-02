@@ -69,37 +69,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private readonly List<string> _collapsed = [];
 
     private readonly object _lockUserAction = new();
-
     private readonly List<AbstractListItem> _rowViewItems = [];
-
     private string _arrangement = string.Empty;
-
     private AutoFilter? _autoFilter;
-
     private bool _isinDoubleClick;
-
     private bool _isinKeyDown;
-
     private bool _isinMouseDown;
-
     private bool _isinMouseMove;
-
     private bool _isinSizeChanged;
-
     private string _lastLooked = string.Empty;
-
     private string _newRowsAllowed = string.Empty;
-
     private Progressbar? _pg;
-
     private RowSortDefinition? _sortDefinitionTemporary;
-
     private string _storedView = string.Empty;
-
     private DateTime? _tableDrawError;
-
     private Rectangle _tmpCursorRect = Rectangle.Empty;
-
     private bool mustResort = true;
 
     #endregion
@@ -307,8 +291,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     internal FilterCollection Filter { get; } = new("DefaultTableFilter");
 
     protected override bool AutoCenter => false;
-
     protected override bool ShowSliderX => true;
+    protected override int SmallChangeY => 10;
 
     private List<AbstractListItem>? AllViewItems {
         get {
@@ -321,7 +305,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 OnVisibleRowsChanged();
 
-                return field;
+                return _rowViewItems;
             } catch {
                 // Komisch, manchmal wird die Variable _sortedRowData verworfen.
                 Develop.AbortAppIfStackOverflow();
@@ -329,7 +313,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 return AllViewItems;
             }
         }
-    } = [];
+    }
 
     #endregion
 
@@ -1194,6 +1178,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return "Keine Spalte angekommen.";
         }
 
+        var visCanvasArea = AvailableControlPaintArea().ControlToCanvas(Zoom, OffsetX, OffsetY).ToRect();
+
         if (cellInThisTableRow != null) {
             if (maychangeview && !EnsureVisible(cellInThisTableColumn, cellInThisTableRow)) {
                 return "Zelle konnte nicht angezeigt werden.";
@@ -1204,7 +1190,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             //    return "Spalte konnte nicht angezeigt werden.";
             //}
 
-            if (!cellInThisTableRow.IsVisible(DisplayRectangle)) {
+            if (!cellInThisTableRow.IsVisible(visCanvasArea)) {
                 return "Die Zeile wird nicht angezeigt.";
             }
         } else {
@@ -1536,7 +1522,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             (_, _, y, _) = sortedRowData.CanvasItemData(Design.Item_Listbox);
         }
 
-        return new RectangleF(0, 0, x, y);
+        return new RectangleF(0, 0, x + 8, y + 8);
     }
 
     //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.

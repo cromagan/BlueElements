@@ -76,7 +76,11 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
         Script = string.Empty;
     }
 
-    protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);//Intiall();
+    protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
+        Skin.Draw_Back_Transparent(gr, ClientRectangle, this);//Intiall();
+    }
 
     private void main_Tick(object sender, System.EventArgs e) {
         if (!_wasok) { return; }

@@ -328,6 +328,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
+
         var s = States.Standard;
 
         if (!Enabled) { s = States.Standard_Disabled; }
