@@ -163,12 +163,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <param name="ca"></param>
     /// <param name="number"></param>
     public static void Repair(ColumnViewCollection ca, int number) {
-        if (ca.Table is not { IsDisposed: false } db) { return; }
+        if (ca.Table is not { IsDisposed: false } tb) { return; }
 
         #region Ungültige Spalten entfernen
 
         for (var z = 0; z < ca.Count; z++) {
-            if (ca[z]?.Column == null || !db.Column.Contains(ca[z]?.Column)) {
+            if (ca[z]?.Column == null || !tb.Column.Contains(ca[z]?.Column)) {
                 ca.RemoveAt(z);
                 z--;
             }
@@ -283,9 +283,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public string IsNowEditable() {
-        if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        return db.GrantWriteAccess(TableDataType.ColumnArrangement, TableChunk.Chunk_Master).StringValue;
+        return tb.GrantWriteAccess(TableDataType.ColumnArrangement, TableChunk.Chunk_Master).StringValue;
     }
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
@@ -409,15 +409,15 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void RemoveAt(int z) => _internal.RemoveAt(z);
 
     public void ShowAllColumns() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var thisColumn in db.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
                 Add(new ColumnViewItem(thisColumn, this));
             }
         }
 
-        foreach (var thisColumn in db.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
                 Add(new ColumnViewItem(thisColumn, this));
             }

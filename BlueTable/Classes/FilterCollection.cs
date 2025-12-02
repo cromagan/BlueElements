@@ -137,8 +137,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public event EventHandler? PropertyChanging;
-
     public event EventHandler? RowsChanged;
 
     #endregion
@@ -202,7 +200,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
             lock (_internal) {
                 if (IsDisposed) { return; }
-                OnChanging();
                 UnRegisterTableEvents();
 
                 _table = value;
@@ -235,7 +232,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         set {
             if (IsDisposed) { return; }
 
-            OnChanging();
             Clear();
 
             if (!string.IsNullOrWhiteSpace(value) && Table is { IsDisposed: false }) {
@@ -248,13 +244,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
             OnPropertyChanged();
         }
-    }
-
-    public bool HasFilterToLinkedCell() {
-        foreach (var filter in _internal) {
-            if (filter.Column is { } c && c.RelationType == RelationType.CellValues) { return true; }
-        }
-        return false;
     }
 
     #endregion
@@ -271,12 +260,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Methods
 
-    public static List<RowItem> CalculateFilteredRows(Table? db, params FilterItem[] filter) {
-        if (db?.IsDisposed != false) { return []; }
+    public static List<RowItem> CalculateFilteredRows(Table? tb, params FilterItem[] filter) {
+        if (tb?.IsDisposed != false) { return []; }
 
-        if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
+        if(filter.Length == 0) { return [..tb.Row]; }
+        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, true, filter) is { } i) {
-                var ok = db.BeSureRowIsLoaded(i);
+                var ok = tb.BeSureRowIsLoaded(i);
                 if (!ok) { return []; }
             }
         }
@@ -286,7 +276,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var hasError = false;
 
         try {
-            Parallel.ForEach(db.Row, (thisRowItem, state) => {
+            Parallel.ForEach(tb.Row, (thisRowItem, state) => {
                 try {
                     if (hasError) {
                         state.Break();
@@ -311,7 +301,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (hasError) {
             Develop.AbortAppIfStackOverflow();
-            return CalculateFilteredRows(db, filter);
+            return CalculateFilteredRows(tb, filter);
         }
 
         return tmpVisibleRows;
@@ -365,7 +355,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void Add(FilterItem fi) {
         if (IsDisposed) { return; }
 
-        OnChanging();
         AddInternal(fi);
         Invalidate_FilteredRows();
         OnPropertyChanged("FilterItems");
@@ -382,7 +371,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var newItems = filterItems.Where(item => !Exists(item)).ToList();
 
         if (newItems.Count != 0) {
-            OnChanging();
             AddInternal(newItems);
             Invalidate_FilteredRows();
             OnPropertyChanged("FilterItems");
@@ -392,8 +380,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void ChangeTo(FilterItem? fi) {
         if (fi != null && fi.Table == _table && _internal.Count == 1 && Exists(fi)) { return; }
         if (fi == null && _table == null && _internal.Count == 0) { return; }
-
-        OnChanging();
 
         if (_table != fi?.Table) {
             UnRegisterTableEvents();
@@ -417,8 +403,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <param name="fc"></param>
     public void ChangeTo(FilterCollection? fc) {
         if (!IsDifferentTo(fc)) { return; }
-
-        OnChanging();
 
         // Tabellewechsel nur bei Unterschieden durchführen
         if (_table != fc?.Table) {
@@ -453,7 +437,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return; }
         if (_internal.Count == 0) { return; }
 
-        OnChanging();
         _internal.Clear();
         Invalidate_FilteredRows();
         OnPropertyChanged("FilterItems");
@@ -514,6 +497,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public bool HasAlwaysFalse() {
         foreach (var thisFi in this) {
             if (thisFi.FilterType == FilterType.AlwaysFalse) { return true; }
+        }
+        return false;
+    }
+
+    public bool HasFilterToLinkedCell() {
+        foreach (var filter in _internal) {
+            if (filter.Column is { } c && c.RelationType == RelationType.CellValues) { return true; }
         }
         return false;
     }
@@ -628,7 +618,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Equals(filter)).ToList();
 
         if (existingColumnFilter.Count != 0) {
-            OnChanging();
             foreach (var thisItem in existingColumnFilter) {
                 _internal.Remove(thisItem);
             }
@@ -668,7 +657,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             if (Exists(fi)) { return; }
         }
 
-        OnChanging();
         foreach (var thisItem in existingColumnFilter) {
             _internal.Remove(thisItem);
         }
@@ -710,8 +698,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (!needChanges) { return; }
 
-        OnChanging();
-
         // Entferne die identifizierten Filter
         foreach (var filter in toRemove) {
             _internal.Remove(filter);
@@ -734,10 +720,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var did = false;
         foreach (var thisItem in fi) {
             if (Exists(thisItem)) {
-                if (!did) {
-                    OnChanging();
-                    did = true;
-                }
+                did = true;
                 _internal.Remove(thisItem);
             }
         }
@@ -916,11 +899,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             _internal.Clear();
             IsDisposed = true;
         }
-    }
-
-    private void OnChanging() {
-        if (IsDisposed) { return; }
-        PropertyChanging?.Invoke(this, System.EventArgs.Empty);
     }
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);

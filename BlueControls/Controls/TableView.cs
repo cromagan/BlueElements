@@ -77,13 +77,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private bool _isinMouseDown;
     private bool _isinMouseMove;
     private bool _isinSizeChanged;
-    private string _lastLooked = string.Empty;
     private string _newRowsAllowed = string.Empty;
     private Progressbar? _pg;
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
     private DateTime? _tableDrawError;
-    private Rectangle _tmpCursorRect = Rectangle.Empty;
     private bool mustResort = true;
 
     #endregion
@@ -95,8 +93,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
+        Filter.RowsChanged += FilterAny_RowsChanged;
         Filter.PropertyChanged += Filter_PropertyChanged;
-        FilterCombined.RowsChanged += FilterCombined_RowsChanged;
+        FilterCombined.RowsChanged += FilterAny_RowsChanged;
         FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
         FilterFix.PropertyChanged += FilterFix_PropertyChanged;
     }
@@ -291,7 +290,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     internal FilterCollection Filter { get; } = new("DefaultTableFilter");
 
     protected override bool AutoCenter => false;
+
     protected override bool ShowSliderX => true;
+
     protected override int SmallChangeY => 10;
 
     private List<AbstractListItem>? AllViewItems {
@@ -320,14 +321,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     #region Methods
 
     public static string ColumnUsage(ColumnItem? column) {
-        if (column?.Table is not { IsDisposed: false } db) { return string.Empty; }
+        if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         var t = "<b><u>Verwendung von " + column.ReadableText() + "</b></u><br>";
         if (column.IsSystemColumn()) {
             t += " - Systemspalte<br>";
         }
 
-        if (db.SortDefinition?.Contains(column) ?? false) { t += " - Sortierung<br>"; }
+        if (tb.SortDefinition?.Contains(column) ?? false) { t += " - Sortierung<br>"; }
         //var view = false;
         //foreach (var thisView in OldFormulaViews) {
         //    if (thisView[column] != null) { view = true; }
@@ -336,14 +337,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var cola = false;
         var first = true;
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
         foreach (var thisView in tcvc) {
             if (!first && thisView[column] != null) { cola = true; }
             first = false;
         }
         if (cola) { t += " - Spalten-Anordnungen<br>"; }
         if (column.UsedInScript()) { t += " - Skripte<br>"; }
-        if (db.RowQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
+        if (tb.RowQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
         //if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Tabellen-Tags<br>"; }
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
@@ -807,7 +808,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     //    return renderer.GetSizeOfCellContent(column, row.CellGetString(column), Design.Table_Cell, States.Standard,
-    //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, db.GlobalScale, column.ConstantHeightOfImageCode);
+    //        column.BehaviorOfImageAndText, column.DoOpticalTranslation, column.OpticalReplace, tb.GlobalScale, column.ConstantHeightOfImageCode);
     //}
     public static void Table_AdditionalRepair(object sender, System.EventArgs e) {
         if (sender is not Table tbl) { return; }
@@ -880,11 +881,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnArrangementSelector.ItemClear();
         columnArrangementSelector.DropDownStyle = ComboBoxStyle.DropDownList;
 
-        if (table is { IsDisposed: false } db) {
-            var tcvc = ColumnViewCollection.ParseAll(db);
+        if (table is { IsDisposed: false } tb) {
+            var tcvc = ColumnViewCollection.ParseAll(tb);
 
             foreach (var thisArrangement in tcvc) {
-                if (db.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
+                if (tb.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
                     columnArrangementSelector.ItemAdd(ItemOf(thisArrangement as IReadableTextWithKey));
                 }
             }
@@ -983,7 +984,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void Export_HTML(string filename = "", bool execute = true) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
         if (string.IsNullOrEmpty(filename)) { filename = TempFile(string.Empty, string.Empty, "html"); }
@@ -992,8 +993,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             filename = TempFile(string.Empty, "Export", "html");
         }
 
-        Html da = new(db.KeyName.FileNameWithoutSuffix());
-        da.AddCaption(db.Caption);
+        var da = new Html(tb.KeyName.FileNameWithoutSuffix());
+        da.AddCaption(tb.Caption);
         da.TableBeginn();
 
         #region Spaltenköpfe
@@ -1146,8 +1147,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void ImportBtb() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-        ImportBtb(db);
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        ImportBtb(tb);
     }
 
     public void ImportClipboard() {
@@ -1162,8 +1163,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void ImportCsv(string csvtxt) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-        ImportCsv(db, csvtxt);
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        ImportCsv(tb, csvtxt);
     }
 
     public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
@@ -1368,21 +1369,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CloseAllComponents();
 
-        if (Table is { IsDisposed: false } db1) {
+        if (Table is { IsDisposed: false } tb1) {
             // auch Disposed Tabellen die Bezüge entfernen!
-            db1.Cell.CellValueChanged -= _Table_CellValueChanged;
-            db1.Loaded -= _Table_TableLoaded;
-            db1.Loading -= _Table_StoreView;
-            db1.ViewChanged -= _Table_ViewChanged;
-            db1.SortParameterChanged -= _Table_SortParameterChanged;
-            db1.Row.RowRemoving -= Row_RowRemoving;
-            db1.Row.RowRemoved -= Row_RowRemoved;
-            db1.Column.ColumnRemoving -= Column_ItemRemoving;
-            db1.Column.ColumnRemoved -= _Table_ViewChanged;
-            db1.Column.ColumnAdded -= _Table_ViewChanged;
-            db1.ProgressbarInfo -= _Table_ProgressbarInfo;
-            db1.DisposingEvent -= _table_Disposing;
-            db1.InvalidateView -= Table_InvalidateView;
+            tb1.Cell.CellValueChanged -= _Table_CellValueChanged;
+            tb1.Loaded -= _Table_TableLoaded;
+            tb1.Loading -= _Table_StoreView;
+            tb1.ViewChanged -= _Table_ViewChanged;
+            tb1.SortParameterChanged -= _Table_SortParameterChanged;
+            tb1.Row.RowRemoving -= Row_RowRemoving;
+            tb1.Row.RowRemoved -= Row_RowRemoved;
+            tb1.Column.ColumnRemoving -= Column_ItemRemoving;
+            tb1.Column.ColumnRemoved -= _Table_ViewChanged;
+            tb1.Column.ColumnAdded -= _Table_ViewChanged;
+            tb1.ProgressbarInfo -= _Table_ProgressbarInfo;
+            tb1.DisposingEvent -= _table_Disposing;
+            tb1.InvalidateView -= Table_InvalidateView;
             SaveAll(false);
             MultiUserFile.SaveAll(false);
         }
@@ -1396,22 +1397,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         _tableDrawError = null;
         //InitializeSkin(); // Neue Schriftgrößen
-        if (Table is { IsDisposed: false } db2) {
-            RepairColumnArrangements(db2);
+        if (Table is { IsDisposed: false } tb2) {
+            RepairColumnArrangements(tb2);
 
-            db2.Cell.CellValueChanged += _Table_CellValueChanged;
-            db2.Loaded += _Table_TableLoaded;
-            db2.Loading += _Table_StoreView;
-            db2.ViewChanged += _Table_ViewChanged;
-            db2.SortParameterChanged += _Table_SortParameterChanged;
-            db2.Row.RowRemoving += Row_RowRemoving;
-            db2.Row.RowRemoved += Row_RowRemoved;
-            db2.Column.ColumnAdded += _Table_ViewChanged;
-            db2.Column.ColumnRemoving += Column_ItemRemoving;
-            db2.Column.ColumnRemoved += _Table_ViewChanged;
-            db2.ProgressbarInfo += _Table_ProgressbarInfo;
-            db2.DisposingEvent += _table_Disposing;
-            db2.InvalidateView += Table_InvalidateView;
+            tb2.Cell.CellValueChanged += _Table_CellValueChanged;
+            tb2.Loaded += _Table_TableLoaded;
+            tb2.Loading += _Table_StoreView;
+            tb2.ViewChanged += _Table_ViewChanged;
+            tb2.SortParameterChanged += _Table_SortParameterChanged;
+            tb2.Row.RowRemoving += Row_RowRemoving;
+            tb2.Row.RowRemoved += Row_RowRemoved;
+            tb2.Column.ColumnAdded += _Table_ViewChanged;
+            tb2.Column.ColumnRemoving += Column_ItemRemoving;
+            tb2.Column.ColumnRemoved += _Table_ViewChanged;
+            tb2.ProgressbarInfo += _Table_ProgressbarInfo;
+            tb2.DisposingEvent += _table_Disposing;
+            tb2.InvalidateView += Table_InvalidateView;
         }
 
         ParseView(viewCode);
@@ -1484,14 +1485,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             ColumnViewCollection.Repair(tcvc[z], z);
         }
 
-        //var i = db.Column.IndexOf(tcvc[0][0].Column.KeyName);
+        //var i = tb.Column.IndexOf(tcvc[0][0].Column.KeyName);
 
         //if(i!= 0) {
         //    Develop.DebugPrint(ErrorType.Warning, "Spalte 0 nicht auf erster CanvasPosition!");
 
-        //    db.Column.RemoveAt
+        //    tb.Column.RemoveAt
 
-        //    Generic.Swap(db.Column[0], db.Column[i]);
+        //    Generic.Swap(tb.Column[0], tb.Column[i]);
         //}
 
         var n = tcvc.ToString(false);
@@ -1530,9 +1531,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
+                Filter.RowsChanged -= FilterAny_RowsChanged;
                 Filter.PropertyChanged -= Filter_PropertyChanged;
+                FilterCombined.RowsChanged -= FilterAny_RowsChanged;
                 FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
-                FilterCombined.RowsChanged -= FilterCombined_RowsChanged;
+                FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
                 TableSet(null, string.Empty); // Wichtig (nicht _Table) um Events zu lösen
                 _pg?.Dispose();
             }
@@ -1553,8 +1556,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Haupthintergrund der gesamten Tabelle zeichnen
         Skin.Draw_Back(gr, Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
 
-        _tmpCursorRect = Rectangle.Empty;
-
         if (_tableDrawError is { } dt) {
             if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 60) {
                 DrawWaitScreen(gr, string.Empty);
@@ -1568,12 +1569,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //    state ^= States.Standard_HasFocus;
         //}
 
-        if (Table is not { IsDisposed: false } db) {
+        if (Table is not { IsDisposed: false } tb) {
             DrawWaitScreen(gr, "Keine Tabelle geladen.");
             return;
         }
 
-        db.LastUsedDate = DateTime.UtcNow;
+        tb.LastUsedDate = DateTime.UtcNow;
 
         if (DesignMode || ShowWaitScreen) {
             DrawWaitScreen(gr, string.Empty);
@@ -2172,7 +2173,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     var clipTmp = Clipboard.GetText().RemoveChars(Char_NotFromClip).TrimEnd("\r\n");
                     Filter.Remove(e.Column);
 
-                    var searchValue = e.Column.Contents();//  db.Export_CSV(FirstRow.Without, e.Column, null).SplitAndCutByCr().SortedDistinctList();
+                    var searchValue = e.Column.Contents();//  tb.Export_CSV(FirstRow.Without, e.Column, null).SplitAndCutByCr().SortedDistinctList();
                     searchValue.RemoveString(clipTmp.SplitAndCutByCr().SortedDistinctList(), false);
 
                     if (searchValue.Count > 0) {
@@ -2248,16 +2249,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
 
-    private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
-        _lastLooked = string.Empty;
-        if (Table != null) {
-            Filter.Clear();
-        }
-    }
-
     private void btnEdit_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-        db.Edit(typeof(TableHeadEditor));
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        tb.Edit(typeof(TableHeadEditor));
     }
 
     private void CalculateSortedRows(List<AbstractListItem>? items) {
@@ -2359,6 +2353,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         List<RowItem> allrows = [.. pinnedRows, .. filteredRows];
         allrows = [.. allrows.Distinct()];
+        var vis = new List<RowListItem>();
 
         Parallel.ForEach(allrows, thisRow => {
             var markYellow = pinnedRows.Contains(thisRow);
@@ -2381,6 +2376,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         items.Add(it);
                     }
                 }
+
+                lock (lockMe) {
+                    vis.Add(it);
+                }
+
                 it.MarkYellow = markYellow;
             }
         });
@@ -2429,7 +2429,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 if (thisItem is RowBackgroundListItem rbli) {
                     rbli.Arrangement = arrangement;
-                    rbli.Visible = !_collapsed.Contains(rbli.AlignsToChapter);
+                    //rbli.Visible = !_collapsed.Contains(rbli.AlignsToChapter);
                 }
 
                 if (thisItem is ColumnsHeadListItem chli) {
@@ -2456,12 +2456,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             items.Sort();
 
-            #region Sortierte Reihenfolge der sichtbaren RowDataListItems ermitteln
-
-            var sortedDataItems = items.OfType<RowListItem>().ToList();
-
-            #endregion
-
             #region captionOrder erstellen
 
             // Caption "Angepinnt" (falls vorhanden) an zweiter Stelle, dann alle anderen Captions
@@ -2472,7 +2466,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.ChapterText.ToUpperInvariant()); }
 
             // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
-            foreach (var dataItem in sortedDataItems) {
+            foreach (var dataItem in vis) {
                 captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
             }
 
@@ -2498,7 +2492,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 if (!_collapsed.Contains(captionKey)) {
                     // Alle RowDataListItems dieser Caption hinzufügen
-                    var captionDataItems = sortedDataItems
+                    var captionDataItems = vis
                         .Where(x => x.AlignsToChapter == captionKey)
                         .ToList();
                     sortedItems.AddRange(captionDataItems);
@@ -2598,7 +2592,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void Cell_Edit_Color(ColumnViewItem viewItem, RowListItem? cellInThisTableRow) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         var colDia = new ColorDialog();
 
@@ -2607,7 +2601,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
         colDia.Tag = (List<object?>)[viewItem.Column, cellInThisTableRow];
         List<int> colList = [];
-        foreach (var thisRowItem in db.Row) {
+        foreach (var thisRowItem in tb.Row) {
             if (thisRowItem != null) {
                 if (thisRowItem.CellGetInteger(viewItem.Column) != 0) {
                     colList.Add(thisRowItem.CellGetColorBgr(viewItem.Column));
@@ -2825,7 +2819,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_SearchAndReplace(object sender, ObjectEventArgs e) {
-        if (Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        if (Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         OpenSearchAndReplaceInCells();
     }
 
@@ -2998,9 +2992,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void Filter_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
-    private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnFilterCombinedChanged();
-
-    private void FilterCombined_RowsChanged(object sender, System.EventArgs e) {
+    private void FilterAny_RowsChanged(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (CurrentArrangement is { IsDisposed: false } ca) {
             foreach (var thisColumn in ca) {
@@ -3010,6 +3002,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         Invalidate_SortedRowData(false);
     }
+
+    private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnFilterCombinedChanged();
 
     private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
 

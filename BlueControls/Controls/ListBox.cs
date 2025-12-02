@@ -504,13 +504,15 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
         Check(ali);
     }
 
-    internal Size ComputeAllItemPositions(Size drawArea, int biggestItemX, int heightAdded, Orientation senkrechtAllowed, Renderer_Abstract renderer) {
+    internal Size ComputeAllItemPositions(Size drawAreaControl, int biggestItemX, int heightAdded, Orientation senkrechtAllowed, Renderer_Abstract renderer) {
         try {
-            if (Math.Abs(_lastCheckedMaxSize.Width - drawArea.Width) > 0.1 || Math.Abs(_lastCheckedMaxSize.Height - drawArea.Height) > 0.1) {
-                _lastCheckedMaxSize = drawArea;
+            if (Math.Abs(_lastCheckedMaxSize.Width - drawAreaControl.Width) > 0.1 || Math.Abs(_lastCheckedMaxSize.Height - drawAreaControl.Height) > 0.1) {
+                _lastCheckedMaxSize = drawAreaControl;
                 _maxNeededItemSize = Size.Empty;
             }
+
             if (!_maxNeededItemSize.IsEmpty) { return _maxNeededItemSize; }
+
             if (_item.Count == 0) {
                 _maxNeededItemSize = Size.Empty;
                 return Size.Empty;
@@ -544,12 +546,12 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
                 default:
                     // u.a. Autofilter
                     if (BreakAfterItems < 1) {
-                        colWidth = drawArea.Width;
+                        colWidth = drawAreaControl.Width;
                     } else {
                         var colCount = _item.Count / BreakAfterItems;
                         var r = _item.Count % colCount;
                         if (r != 0) { colCount++; }
-                        colWidth = drawArea.Width < 5 ? biggestItemX : drawArea.Width / colCount;
+                        colWidth = drawAreaControl.Width < 5 ? biggestItemX : drawAreaControl.Width / colCount;
                     }
                     colHeight = colWidth;
                     break;
@@ -573,13 +575,13 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
                     var isCaption = thisItem is TextListItem { IsCaption: true };
 
                     if (senkrechtAllowed == Orientation.Waagerecht) {
-                        if (isCaption) { wi = drawArea.Width; }
+                        if (isCaption) { wi = drawAreaControl.Width; }
                     }
                     var he = thisItem.HeightInControl(_appearance, colHeight, _itemDesign);
 
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
-                            if (previtem.CanvasPosition.Right + colWidth > drawArea.Width || isCaption) {
+                            if (previtem.CanvasPosition.Right + colWidth > drawAreaControl.Width || isCaption) {
                                 cx = 0;
                                 cy = previtem.CanvasPosition.Bottom;
                             } else {
@@ -607,7 +609,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
             return _maxNeededItemSize;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return ComputeAllItemPositions(drawArea, biggestItemX, heightAdded, senkrechtAllowed, renderer);
+            return ComputeAllItemPositions(drawAreaControl, biggestItemX, heightAdded, senkrechtAllowed, renderer);
         }
     }
 
@@ -638,9 +640,9 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
     }
 
     protected override RectangleF CalculateCanvasMaxBounds() {
-        var area = AvailableControlPaintArea();
+        var areaControl = AvailableControlPaintArea();
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(_itemDesign);
-        var s = ComputeAllItemPositions(new Size(area.Width, area.Height), biggestItemX, heightAdded, senkrechtAllowed, Renderer);
+        var s = ComputeAllItemPositions(new Size(areaControl.Width, areaControl.Height), biggestItemX, heightAdded, senkrechtAllowed, Renderer);
 
         if (AddAllowed != AddType.None) { return new RectangleF(0, 0, s.Width, s.Height + 33); }
         return new RectangleF(0, 0, s.Width, s.Height);

@@ -65,7 +65,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public abstract bool ControlMustPressed { get; }
 
-    public bool Fitting { get; private set; } = true;
+    public bool Fitting { get; private set; } = false;
 
     public new bool Focused => base.Focused || SliderX.Focused || SliderY.Focused;
 
@@ -318,7 +318,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             SliderX.Enabled = false;
             if (!MousePressing()) {
                 var val = 0;
-                if (AutoCenter) { val = (freiraumControl.X- tmpCanvasMaxBounds.Left.CanvasToControl(_zoom))/2; }
+                if (AutoCenter) { val = (freiraumControl.X - tmpCanvasMaxBounds.Left.CanvasToControl(_zoom)) / 2; }
                 SliderX.Minimum = -val;
                 SliderX.Maximum = -val;
                 SliderX.Value = -val;
@@ -482,7 +482,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Invalidate_MaxBounds(); // Slider
         if (ScreenshotMode || Fitting) {
             ZoomFit();
-        } 
+        }
         base.OnSizeChanged(e);
     }
 

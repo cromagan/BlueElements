@@ -304,8 +304,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         #region Neue Flexis erstellen / updaten
 
-        if (Table is { IsDisposed: false } db) {
-            var tcvc = ColumnViewCollection.ParseAll(db);
+        if (Table is { IsDisposed: false } tb) {
+            var tcvc = ColumnViewCollection.ParseAll(tb);
             List<ColumnItem> columSort = [];
             var orderArrangement = tcvc.GetByKey(FilterAnsichtName);
 
@@ -553,9 +553,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        if (db.Column.First is not { IsDisposed: false } co) { return; }
+        if (tb.Column.First is not { IsDisposed: false } co) { return; }
 
         var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
 
@@ -605,13 +605,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void DoÄhnlich() {
-        if (IsDisposed || Table is not { IsDisposed: false } db || db.Column.Count == 0) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb || tb.Column.Count == 0) { return; }
 
-        var col = db.Column.First;
+        if (tb.Column.First is not { } colFirst) { return; } // Neue Tabelle?
 
-        if (col == null) { return; } // Neue Tabelle?
-
-        var fi = new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
+        var fi = new FilterItem(colFirst, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
         using var fc = new FilterCollection(fi, "doähnliche");
 
         var r = fc.Rows;

@@ -237,14 +237,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public static int CalculateCanvasContentWith(ColumnItem? column, Renderer_Abstract renderer) {
         if (column is not { IsDisposed: false }) { return 16; }
-        if (column.Table is not { IsDisposed: false } db) { return 16; }
+        if (column.Table is not { IsDisposed: false } tb) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
 
         var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
 
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
-            foreach (var thisRowItem in db.Row) {
+            foreach (var thisRowItem in tb.Row) {
                 var wx = renderer.ContentSize(thisRowItem.CellGetString(column), column.DoOpticalTranslation).Width;
                 newContentWidth = Math.Max(newContentWidth, wx);
             }
@@ -335,7 +335,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public bool ParseThis(string key, string value) {
-        if (Parent?.Table is not { IsDisposed: false } db) {
+        if (Parent?.Table is not { IsDisposed: false } tb) {
             Develop.DebugPrint(ErrorType.Error, "Tabelle unbekannt");
             return false;
         }
@@ -343,7 +343,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         switch (key) {
             case "column":
             case "columnname":// ColumnName wichtg, wegen CopyLayout
-                Column = db.Column[value];
+                Column = tb.Column[value];
                 return true;
 
             case "columnkey":

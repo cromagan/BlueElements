@@ -66,7 +66,7 @@ internal class AdderItem : IReadableTextWithKey {
     #region Methods
 
     public static void AddRowsToTable(ColumnItem? originIdColumn, List<string> keysAndInfo, string generatedEntityId, ColumnItem? additionalInfoColumn) {
-        if (originIdColumn?.Table is not { IsDisposed: false } db) { return; }
+        if (originIdColumn?.Table is not { IsDisposed: false } tb) { return; }
 
         foreach (var thisKeyAndInfo in keysAndInfo) {
             var key = OriginId(thisKeyAndInfo, originIdColumn, generatedEntityId);
@@ -74,7 +74,7 @@ internal class AdderItem : IReadableTextWithKey {
             var keyName = key.TrimStart(generatedEntityId + "\\");
 
             if (!string.IsNullOrEmpty(keyName)) {
-                var r = db.Row.GenerateAndAdd(key, "Zeilengenerator im Formular");
+                var r = tb.Row.GenerateAndAdd(key, "Zeilengenerator im Formular");
 
                 if (r != null) {
                     originIdColumn.MaxCellLength = Math.Max(originIdColumn.MaxCellLength, key.Length);
@@ -103,9 +103,9 @@ internal class AdderItem : IReadableTextWithKey {
     }
 
     public static void RemoveRowsFromTable(ColumnItem? originIdColumn, string generatedEntityId, string keyName) {
-        if (originIdColumn?.Table is not { IsDisposed: false } db) { return; }
+        if (originIdColumn?.Table is not { IsDisposed: false } tb) { return; }
 
-        var fi = new FilterCollection(db, "Zeilengenerator im Formular");
+        var fi = new FilterCollection(tb, "Zeilengenerator im Formular");
         var key = OriginId(keyName + "#", originIdColumn, generatedEntityId);
         fi.Add(new FilterItem(originIdColumn, FilterType.Istgleich_UND_GroßKleinEgal, key));
         RowCollection.Remove(fi, "Zeilengenerator im Formular");

@@ -522,7 +522,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void GeneratFilterListe() {
-        if (IsDisposed || _column?.Table is not { IsDisposed: false } db2) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false } tb2) { return; }
 
         _column.LinkedTableTableName = cbxLinkedTable.Text;
 
@@ -539,7 +539,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (tblFilterliste.Table == null) {
             var tb = Table.Get();
-            //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
+            //tb.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
             spn.IsFirst = true;
             var vis = tb.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
@@ -560,7 +560,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             var dd = b.DropDownItems.Clone();
             var or = new List<string>();
 
-            foreach (var thisColumn in db2.Column) {
+            foreach (var thisColumn in tb2.Column) {
                 if (thisColumn.CanBeCheckedByRules() && !thisColumn.MultiLine) {
                     dd.Add("~" + thisColumn.KeyName.ToUpperInvariant() + "~");
                     or.Add("~" + thisColumn.KeyName.ToUpperInvariant() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
@@ -623,11 +623,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     /// </summary>
 
     private void GetLinkedCellFilter() {
-        if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } tb) { return; }
         if (_column?.Table is not { IsDisposed: false }) { return; }
 
         var nf = new List<string>();
-        foreach (var thisr in db.Row) {
+        foreach (var thisr in tb.Row) {
             if (thisr.CellGetBoolean("visible") && !string.IsNullOrEmpty(thisr.CellGetString("such"))) {
                 nf.Add(thisr.CellGetString("spaltename") + "|=|" + thisr.CellGetString("Such").ToNonCritical());
             }
@@ -642,20 +642,20 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     /// </summary>
 
     private void SetLinkedCellFilter() {
-        if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } tb) { return; }
         if (_column is not { IsDisposed: false }) { return; }
 
-        foreach (var thisr in db.Row) {
+        foreach (var thisr in tb.Row) {
             thisr.CellSet("Such", string.Empty, string.Empty);
         }
 
-        if (db.Column["SpalteName"] is not { IsDisposed: false } c) { return; }
+        if (tb.Column["SpalteName"] is not { IsDisposed: false } c) { return; }
 
         foreach (var thisFi in _column.LinkedCellFilter) {
             var x = thisFi.SplitBy("|");
 
             if (x.Length == 3) {
-                var r = db.Row[new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, x[0])];
+                var r = tb.Row[new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, x[0])];
 
                 if (r?.CellGetBoolean("Visible") == true) {
                     r.CellSet("Such", x[2].FromNonCritical(), string.Empty);
@@ -665,13 +665,13 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || _column?.Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || _column?.Table is not { IsDisposed: false } tb) { return; }
 
         if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedTable.ItemCount == 0) {
             var l = Table.AllAvailableTables();
 
             foreach (var thisString in l) {
-                if (!string.Equals(thisString.FileNameWithoutSuffix(), db.KeyName, StringComparison.OrdinalIgnoreCase)) { cbxLinkedTable.ItemAdd(ItemOf(thisString.FileNameWithoutSuffix(), thisString)); }
+                if (!string.Equals(thisString.FileNameWithoutSuffix(), tb.KeyName, StringComparison.OrdinalIgnoreCase)) { cbxLinkedTable.ItemAdd(ItemOf(thisString.FileNameWithoutSuffix(), thisString)); }
             }
         }
     }
