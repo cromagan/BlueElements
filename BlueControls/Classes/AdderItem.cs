@@ -48,7 +48,7 @@ internal class AdderItem : IReadableTextWithKey {
     //public ColumnItem? OriginIDColumn { get; }
     public string ColumnQuickInfo => KeyName;
 
-    public bool KeyIsCaseSensitive => false;
+    public bool KeyIsCaseSensitive => true; // Es wird mit Zeilenschlüsseln gearbeitet
 
     //public ColumnItem? AdditionalInfoColumn { get; }
     //public string GeneratedEntityID { get; set; }

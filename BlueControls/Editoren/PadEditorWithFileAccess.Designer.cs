@@ -41,7 +41,6 @@ namespace BlueControls.Forms {
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.btnWeitereAllItem = new BlueControls.Controls.Button();
             this.btnAddDynamicSymbol = new BlueControls.Controls.Button();
-            this.btnAddPhsyik = new BlueControls.Controls.Button();
             this.btnAddSymbol = new BlueControls.Controls.Button();
             this.btnAddUnterStufe = new BlueControls.Controls.Button();
             this.btnAddText = new BlueControls.Controls.Button();
@@ -91,7 +90,6 @@ namespace BlueControls.Forms {
             this.grpKomponenteHinzufügen.Controls.Add(this.btnSymbolLaden);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnWeitereAllItem);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDynamicSymbol);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddPhsyik);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddText);
@@ -246,17 +244,6 @@ namespace BlueControls.Forms {
             this.btnAddDynamicSymbol.Text = "Dyn. Symbol";
             this.btnAddDynamicSymbol.Click += new System.EventHandler(this.btnAddDynamicSymbol_Click);
             // 
-            // btnAddPhsyik
-            // 
-            this.btnAddPhsyik.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddPhsyik.ImageCode = "Apfel|16";
-            this.btnAddPhsyik.Location = new System.Drawing.Point(192, 24);
-            this.btnAddPhsyik.Name = "btnAddPhsyik";
-            this.btnAddPhsyik.Size = new System.Drawing.Size(88, 22);
-            this.btnAddPhsyik.TabIndex = 10;
-            this.btnAddPhsyik.Text = "Physik";
-            this.btnAddPhsyik.Click += new System.EventHandler(this.btnAddPhsyik_Click);
-            // 
             // btnAddSymbol
             // 
             this.btnAddSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
@@ -376,7 +363,6 @@ namespace BlueControls.Forms {
         protected Button btnSpeichern;
         private Button btnWeitereAllItem;
         private Button btnAddDynamicSymbol;
-        private Button btnAddPhsyik;
         private Button btnAddSymbol;
         private Button btnAddUnterStufe;
         private Button btnAddText;

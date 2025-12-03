@@ -22,11 +22,9 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.Temporär;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-
 using System.Windows.Forms;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -93,23 +91,6 @@ public partial class PadEditorWithFileAccess : PadEditor {
         var p = Pad.MiddleOfVisiblesScreen();
         var w = (int)(300 / Pad.Zoom);
         LinePadItem b = new(PadStyles.Standard, p with { X = p.X - w }, p with { X = p.X + w });
-        Pad.AddCentered(b);
-    }
-
-    private void btnAddPhsyik_Click(object sender, System.EventArgs e) {
-        //var t1 = new TextPadItem(string.Empty, "-100,100 (500)");
-        //t1.SetCoordinates(new RectangleF(-100, 100, 500, 500));
-
-        //var t2 = new TextPadItem(string.Empty, "600,600 (300)");
-        //t2.SetCoordinates(new RectangleF(600, 600, 300, 300));
-
-        //ItemCollectionPadItem b = new();
-        //b.SetCoordinates(new RectangleF(100, 100, 500, 500));
-        //b.Endless = false;
-
-        //b.Add(t1);
-        //b.Add(t2);
-        PhysicPadItem b = new();
         Pad.AddCentered(b);
     }
 
@@ -188,7 +169,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
         Pad.Items.IsSaved = true;
 
-        if(MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
+        if (MessageBox.Show("Die Änderungen sind nicht gespeichert.\r\nJetzt speichern?", ImageCode.Diskette, "Speichern", "Verwerfen") != 0) { return; }
 
         var t = Pad.Items.ParseableItems().FinishParseable();
         WriteAllText(_lastFileName, t, Constants.Win1252, false);

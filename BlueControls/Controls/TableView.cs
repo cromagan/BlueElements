@@ -2420,7 +2420,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         lock (lockMe) {
             foreach (var thisItem in allItems) {
                 if (thisItem is RowListItem rdli) {
-                    rdli.UserDefCompareKey = sortused.Reverse ? "~" + rdli.Row.CompareKey(sortused) : rdli.Row.CompareKey(sortused);
+                    rdli.UserDefCompareKey = rdli.Row.CompareKey(sortused);
                     rdli.Visible = false;
                 }
                 if (thisItem is RowCaptionListItem rcli) {
@@ -2494,10 +2494,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 if (!_collapsed.Contains(captionKey)) {
                     // Alle RowDataListItems dieser Caption hinzufügen
-                    var captionDataItems = vis
-                        .Where(x => x.AlignsToChapter == captionKey)
-                        .ToList();
-                    sortedItems.AddRange(captionDataItems);
+
+                    if (sortused.Reverse) {
+                        var captionDataItems = vis.Where(x => x.AlignsToChapter == captionKey)
+                                                  .OrderBy(item => item.CompareKey());
+                        sortedItems.AddRange(captionDataItems);
+                    } else {
+                        var captionDataItems = vis.Where(x => x.AlignsToChapter == captionKey)
+                                                  .OrderByDescending(item => item.CompareKey());
+                        sortedItems.AddRange(captionDataItems);
+                    }
                 }
             }
 

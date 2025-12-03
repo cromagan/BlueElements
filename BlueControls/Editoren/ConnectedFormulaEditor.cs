@@ -49,7 +49,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         GenQuickInfo(btnFeldHinzu, new EditFieldPadItem());
 
-        GenQuickInfo(btnButton, new ButtonPadItem());
+        GenQuickInfo(btnButton, new ScriptButtonPadItem());
 
         GenQuickInfo(btnRegionAdd, new RegionFormulaPadItem());
 
@@ -218,7 +218,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnButton_Click(object sender, System.EventArgs e) {
-        var x = new ButtonPadItem();
+        var x = new ScriptButtonPadItem();
         AddCentered(x);
     }
 

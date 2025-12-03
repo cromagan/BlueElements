@@ -501,7 +501,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
-    public bool KeyIsCaseSensitive => false;
+    public bool KeyIsCaseSensitive => true; // Es wird mit Zeilenschlüsseln gearbeitet
 
     public string KeyName {
         get;
