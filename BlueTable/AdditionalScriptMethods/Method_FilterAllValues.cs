@@ -23,7 +23,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_FilterAllValues : Method_TableGeneric {
 
     #region Properties
@@ -48,7 +47,7 @@ public class Method_FilterAllValues : Method_TableGeneric {
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
-        if (allFi.Table is not { IsDisposed: false } db) {
+        if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
             return new DoItFeedback("Tabellefehler!", true, ld);
         }
@@ -56,9 +55,9 @@ public class Method_FilterAllValues : Method_TableGeneric {
         var r = allFi.Rows;
         allFi.Dispose();
 
-        var returncolumn = db.Column[attvar.ValueStringGet(0)];
+        var returncolumn = tb.Column[attvar.ValueStringGet(0)];
         if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
-        returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
+        returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
         List<string> list = [];
         foreach (var row in r) { list.AddRange(row.CellGetList(returncolumn)); }

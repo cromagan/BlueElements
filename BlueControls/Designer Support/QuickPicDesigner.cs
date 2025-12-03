@@ -20,7 +20,6 @@ using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Designer_Support;
@@ -56,7 +55,7 @@ public partial class QuickPicDesigner : Panel {
             lstNames.ItemAdd(ItemOf(thisIm, thisIm, QuickImage.Get(thisIm, 16)));
         }
 
-        QuickImage l = new(code);
+        var l = new QuickImage(code);
         txbName.Text = l.Name;
         txbFaerbung.Text = l.Färbung.ToHtmlCode();
         txbChangeGreen.Text = l.ChangeGreenTo.ToHtmlCode();
@@ -68,8 +67,8 @@ public partial class QuickPicDesigner : Panel {
         chkbDurchgestrichen.Checked = l.Effekt.HasFlag(ImageCodeEffect.Durchgestrichen);
         chkbMEDisabled.Checked = l.Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled);
         chkbXPDisabled.Checked = l.Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled);
-        txbWidth.Text = l.Width.ToString();
-        txbHeight.Text = l.Height.ToString();
+        txbWidth.Text = l.Width.ToStringInt1();
+        txbHeight.Text = l.Height.ToStringInt1();
         txbZweitsymbol.Text = l.Zweitsymbol;
     }
 

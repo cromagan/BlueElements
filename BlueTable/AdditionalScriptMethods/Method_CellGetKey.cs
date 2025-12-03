@@ -24,7 +24,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_CellGetKey : Method_TableGeneric {
 
     #region Properties
@@ -46,16 +45,16 @@ public class Method_CellGetKey : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false } db) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
-        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
+        //if (tb != myDb && !tb.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
-        if (db.Column.First is not { IsDisposed: false } cf) {
+        if (tb.Column.First is not { IsDisposed: false } cf) {
             return new DoItFeedback("Erste Spalte der Tabelle '" + attvar.ValueStringGet(0) + "' nicht gefunden", true, ld);
         }
 
-        var returncolumn = db.Column[attvar.ValueStringGet(2)];
+        var returncolumn = tb.Column[attvar.ValueStringGet(2)];
         if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(2), true, ld); }
-        returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
+        returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
         var r = RowCollection.MatchesTo(new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
 

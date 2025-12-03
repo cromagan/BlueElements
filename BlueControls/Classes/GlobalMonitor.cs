@@ -5,7 +5,6 @@ using BlueControls.Forms;
 using BlueTable;
 using System;
 using System.Threading;
-using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
@@ -136,10 +135,10 @@ public partial class GlobalMonitor : Form {
 
         //lstLog.Refresh();
 
-        var r = tblLog.Table?.Row.GenerateAndAdd(_n.ToString(), "New Undo Item");
+        var r = tblLog.Table?.Row.GenerateAndAdd(_n.ToStringInt1(), "New Undo Item");
         if (r == null) { return; }
 
-        r.CellSet("symbol", symbol.ToString() + "|16", string.Empty);
+        r.CellSet("symbol", symbol + "|16", string.Empty);
 
         r.CellSet("Zeit", DateTime.Now.ToString7(), string.Empty);
         r.CellSet("category", category, string.Empty);

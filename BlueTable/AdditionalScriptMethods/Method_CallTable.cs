@@ -26,7 +26,6 @@ using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_CallTable : Method_TableGeneric, IUseableForButton {
 
     #region Properties
@@ -84,9 +83,9 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
     }
 
     public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) {
-        var db = Table.Get(args[0], null, true);
-        var vdb = new VariableTable(db);
-        return vdb.ValueForReplace + "," + args[1] + "," + args[2];
+        var tb = Table.Get(args[0], null, true);
+        var vtb = new VariableTable(tb);
+        return vtb.ValueForReplace + "," + args[1] + "," + args[2];
     }
 
     #endregion

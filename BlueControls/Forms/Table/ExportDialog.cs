@@ -210,7 +210,7 @@ public sealed partial class ExportDialog : IHasTable {
     private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();
 
     private void btnEinstellung_Click(object sender, System.EventArgs e) {
-        switch(MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "A4 Printer", "Abbrechen")) {
+        switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "A4 Printer", "Abbrechen")) {
             case 0:
                 flxBreite.ValueSet("210", true);
                 flxHöhe.ValueSet("297", true);
@@ -278,8 +278,19 @@ public sealed partial class ExportDialog : IHasTable {
         }
     }
 
+    private void Contextmenu_CopyPath(object sender, ObjectEventArgs e) {
+        if (e.Data is not TextListItem tl) { return; }
+        var x = new StringCollection { tl.KeyName };
+        Clipboard.SetFileDropList(x);
+    }
+
+    private void Contextmenu_OpenPath(object sender, ObjectEventArgs e) {
+        if (e.Data is not TextListItem tl) { return; }
+        ExecuteFile(tl.KeyName.FilePath());
+    }
+
     private void EintragsText() => capAnzahlInfo.Text = _rowsForExport is not { Count: not 0 }
-        ? "Bitte wählen sie die Einträge für den Export."
+                ? "Bitte wählen sie die Einträge für den Export."
         : _rowsForExport.Count == 1
             ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
             : "Es sind <b>" + _rowsForExport.Count + "</b> Einträge gewählt.";
@@ -299,12 +310,12 @@ public sealed partial class ExportDialog : IHasTable {
     private void FrmDrucken_Drucken_Click(object sender, System.EventArgs e) => Close();
 
     private void LayoutEditor_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         Enabled = false;
         var n = cbxLayoutWahl.Text;
         cbxLayoutWahl.Text = string.Empty;
-        TableViewForm.OpenLayoutEditor(db, n);
+        TableViewForm.OpenLayoutEditor(tb, n);
         BefülleLayoutDropdowns();
         if (cbxLayoutWahl[n] != null) {
             cbxLayoutWahl.Text = n;
@@ -315,17 +326,6 @@ public sealed partial class ExportDialog : IHasTable {
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         e.ContextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, e.HotItem, true));
         e.ContextMenu.Add(ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, e.HotItem, true));
-    }
-
-    private void Contextmenu_OpenPath(object sender, ObjectEventArgs e) {
-        if (e.Data is not TextListItem tl) { return; }
-        ExecuteFile(tl.KeyName.FilePath());
-    }
-
-    private void Contextmenu_CopyPath(object sender, ObjectEventArgs e) {
-        if (e.Data is not TextListItem tl) { return; }
-        var x = new StringCollection { tl.KeyName };
-        Clipboard.SetFileDropList(x);
     }
 
     private void NurStartEnablen() {

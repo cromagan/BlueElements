@@ -26,7 +26,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -68,14 +67,14 @@ public class Chunk : IHasKeyName {
         }
     }
 
-    public long DataLength => Bytes?.Count ?? 0;
+    public long DataLength => Bytes.Count;
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
     public bool KeyIsCaseSensitive => false;
 
     public string KeyName {
         get;
         private set => field = value.ToLowerInvariant();
-    } = string.Empty;
+    }
 
     public string LastEditApp { get; private set; } = string.Empty;
 
@@ -232,7 +231,7 @@ public class Chunk : IHasKeyName {
 
     public void SaveToByteList(ColumnItem column, RowItem row) {
         if (LoadFailed) { return; }
-        if (column.Table is not { IsDisposed: false } tb) { return; }
+        if (column.Table is not { IsDisposed: false }) { return; }
 
         var cellContent = row.CellGetStringCore(column);
         if (string.IsNullOrEmpty(cellContent)) { return; }
@@ -503,9 +502,9 @@ public class Chunk : IHasKeyName {
 
     internal void SaveToByteList(RowItem thisRow) {
         if (LoadFailed) { return; }
-        if (thisRow.Table is not { IsDisposed: false } db) { return; }
+        if (thisRow.Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var thisColumn in db.Column) {
+        foreach (var thisColumn in tb.Column) {
             if (thisColumn.SaveContent) {
                 SaveToByteList(thisColumn, thisRow);
             }

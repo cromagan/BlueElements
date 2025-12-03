@@ -24,7 +24,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static BlueBasics.Constants;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 

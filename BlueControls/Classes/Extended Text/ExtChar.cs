@@ -23,7 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.Extended_Text;
 
@@ -147,8 +146,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         return result;
     }
 
-    public override void ParseFinished(string parsed) => base.ParseFinished(parsed);//if (_parent != null) {//    _parent.StyleChanged -= _parent_StyleChanged;//    _parent = null;//}//Pos = PointF.Empty;//_font = null;//_parent = null;//_size = new Size(0, 0);
-
+  
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "classid":

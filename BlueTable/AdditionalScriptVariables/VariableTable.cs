@@ -73,7 +73,7 @@ public class VariableTable : Variable {
 
     public override bool ToStringPossible => true;
     public override string ValueForCell => string.Empty;
-    public override string ValueForReplace => _table is not { IsDisposed: false } db ? "{TBL:?}" : "{TBL:" + db.KeyName + "}";
+    public override string ValueForReplace => _table is not { IsDisposed: false } tb ? "{TBL:?}" : "{TBL:" + tb.KeyName + "}";
 
     #endregion
 

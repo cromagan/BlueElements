@@ -25,7 +25,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_Filter : Method_TableGeneric {
 
     #region Properties
@@ -60,12 +59,12 @@ public class Method_Filter : Method_TableGeneric {
 
             if (fi.FilterItem is not { } fii) { return (null, $"Attribut {z + 1} enthält keinen Filter.", true); }
 
-            if (fii.Column?.Table is { IsDisposed: false } db) {
-                fii.Column.AddSystemInfo("Value Used in Script-Filter", sourcetable ?? db, user);
+            if (fii.Column?.Table is { IsDisposed: false } tb) {
+                fii.Column.AddSystemInfo("Value Used in Script-Filter", sourcetable ?? tb, user);
 
-                if (db.IsDisposed) { return (null, "Tabellefehler!", false); }
+                if (tb.IsDisposed) { return (null, "Tabellefehler!", false); }
 
-                //if (db != sourcetable && !db.AreScriptsExecutable()) { return (null, $"In der Tabelle '{db.Caption}' sind die Skripte defekt", false); }
+                //if (tb != sourcetable && !tb.AreScriptsExecutable()) { return (null, $"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false); }
             }
 
             if (!fii.IsOk()) { return (null, $"Der Filter des Attributes {z + 1} ist fehlerhaft.", true); }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
@@ -113,13 +112,13 @@ public class Method_Filter : Method_TableGeneric {
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (attvar.Attributes[0] is not VariableTable vdb || vdb.Table is not { IsDisposed: false } db) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
+        if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
 
-        //if (db != myDb && !db.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        //if (tb != myDb && !tb.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
         #region Spalte ermitteln
 
-        var filterColumn = db.Column[attvar.ValueStringGet(1)];
+        var filterColumn = tb.Column[attvar.ValueStringGet(1)];
         if (filterColumn == null) { return new DoItFeedback("Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Tabelle nicht gefunden", true, ld); }
 
         #endregion
@@ -140,7 +139,7 @@ public class Method_Filter : Method_TableGeneric {
             return new DoItFeedback("Filter konnte nicht erstellt werden: '" + fii.ErrorReason() + "'", true, ld);
         }
 
-        filterColumn.AddSystemInfo("Filter in Script", db, scp.ScriptName);
+        filterColumn.AddSystemInfo("Filter in Script", tb, scp.ScriptName);
 
         return new DoItFeedback(new VariableFilterItem(fii));
     }

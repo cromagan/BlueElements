@@ -45,7 +45,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -144,8 +143,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    [DefaultValue(false)]
-    public bool AutoPin { get; set; }
 
     /// <summary>
     /// Gibt an, ob das Standard-Kontextmenu der Tabellenansicht angezeitgt werden soll oder nicht
@@ -1604,7 +1601,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         // Haupt-Aufbau-Routine ------------------------------------
 
-        var t = sortedRowData.CanvasItemData(Design.Item_Listbox);
+        //var t = sortedRowData.CanvasItemData(Design.Item_Listbox);
         sortedRowData.DrawItems(gr, AvailableControlPaintArea(), null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
 
         // Rahmen um die gesamte Tabelle zeichnen
@@ -2260,7 +2257,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        var displayR = AvailableControlPaintArea();
+        //var displayR = AvailableControlPaintArea();
         _newRowsAllowed = UserEdit_NewRowAllowed();
 
         List<RowItem> pinnedRows = [.. PinnedRows];
@@ -2703,7 +2700,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             box.Size = new Size(controlWidth + addWith, controlPos.Height);
             box.Text = rli.Row.CellGetString(viewItem.Column);
             contentHolderCellRow = rli.Row;
-        } else if (cellInThisTableRow is NewRowListItem nrli) {
+        } else if (cellInThisTableRow is NewRowListItem) {
             // Neue Zeile...
             var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
             box.Location = new Point(controlX, controlPos.Y);
@@ -3018,21 +3015,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
-    private void FlexSingeFilter_FilterOutputPropertyChanged(object sender, System.EventArgs e) {
-        if (sender is not FlexiFilterControl ffc) { return; }
 
-        if (ffc.FilterOutput is not { } fc) { return; }
-
-        var fi = fc[ffc.FilterSingleColumn];
-
-        if (fi == null) {
-            Filter.Remove(ffc.FilterSingleColumn);
-        } else {
-            Filter.RemoveOtherAndAdd(fi);
-        }
-
-        //DoFilterOutput();
-    }
 
     private void Invalidate_AllViewItems(bool andclear) {
         mustDoAllViewItems = true;

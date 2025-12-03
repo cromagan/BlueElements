@@ -85,15 +85,15 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
         var txt = new List<string>();
 
         foreach (var thisTb in Table.AllFiles) {
-            if (thisTb is { IsDisposed: false } db) {
-                foreach (var thiss in db.EventScript) {
+            if (thisTb is { IsDisposed: false } tb) {
+                foreach (var thiss in tb.EventScript) {
                     // Prüfen, ob der Suchtext im Skript vorkommt
                     if (thiss.Script.Contains(txbAlt.Text)) {
                         // Tabellename -> Skriptname zur Liste hinzufügen
                         txt.Add(string.Empty);
                         txt.Add(string.Empty);
                         txt.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                        txt.Add($"{db.Caption} -> {thiss.KeyName}");
+                        txt.Add($"{tb.Caption} -> {thiss.KeyName}");
 
                         // Alle Zeilen durchgehen und die mit dem Suchtext zur Liste hinzufügen
                         var lines = thiss.Script.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);

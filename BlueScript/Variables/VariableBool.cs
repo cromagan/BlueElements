@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 

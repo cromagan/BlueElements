@@ -149,38 +149,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void Dispose() => Dispose(true);
 
-    //public ColumnItem? First() {
-    //    // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
-    //    if (IsDisposed || Table is not { IsDisposed: false } db) { return null; }
-
-    //    if (db.Column.Count == 0) { return null; }
-
-    //    foreach (var thisC in db.Column) {
-    //        if (thisC is { IsDisposed: false, IsFirst: true }) { return thisC; }
-    //    }
-
-    //    if (string.IsNullOrEmpty(db.ColumnArrangements)) { return null; }
-
-    //    var i = db.ColumnArrangements.IndexOf("ColumnName[J]", StringComparison.Ordinal);
-
-    //    if (i < 5) { return null; }
-
-    //    var en = db.ColumnArrangements.IndexOf("[", i + 12, StringComparison.Ordinal);
-
-    //    if (en <= i) { return null; }
-
-    //    var n = db.ColumnArrangements.Substring(i + 13, en - i - 13);
-
-    //    if (n.StartsWith("SYS_")) { return null; }
-
-    //    //var l = db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false } && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
-    //    //if (l != null) { return l; }
-
-    //    //return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column is { IsDisposed: false })?.Column;
-
-    //    return this[n];
-    //}
-
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat format) => GenerateAndAdd(keyName, caption, format, string.Empty);
 
     public ColumnItem? GenerateAndAdd(string keyName) => GenerateAndAdd(keyName, string.Empty, null, string.Empty);
@@ -194,12 +162,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-
-        //var item = GetByKey(key);
-        //if (item != null) {
-        //    Develop.DebugPrint(ErrorType.Error, "Schlüssel belegt!");
-        //    return null;
-        //}
 
         Table?.ChangeData(TableDataType.Command_AddColumnByName, null, string.Empty, keyName);
         var item = this[keyName];
@@ -240,10 +202,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public void GenerateOverView() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-        Html da = new(db.KeyName);
-        da.AddCaption("Spaltenliste von: " + db.Caption);
-        da.Add("  <Font face=\"Arial\" Size=\"4\">" + db.KeyName + "</h1><br>");
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        Html da = new(tb.KeyName);
+        da.AddCaption("Spaltenliste von: " + tb.Caption);
+        da.Add("  <Font face=\"Arial\" Size=\"4\">" + tb.KeyName + "</h1><br>");
         da.TableBeginn();
         da.RowBeginn();
         da.CellAdd("#");
@@ -465,7 +427,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     internal string ExecuteCommand(TableDataType type, string name, Reason reason) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return "Tabelle verworfen!"; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen!"; }
 
         if (type == TableDataType.Command_AddColumnByName) {
             var c = this[name];
@@ -475,7 +437,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             var f = Add(c);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
-            if (reason == Reason.SetCommand && db.LogUndo) {
+            if (reason == Reason.SetCommand && tb.LogUndo) {
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
 
@@ -525,7 +487,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     //public ColumnItem? this[int index] {
     //    get {
-    //        if (Table is not Table db || Table.IsDisposed) { return null; }
+    //        if (Table is not Table tb || Table.IsDisposed) { return null; }
 
     //        //var L = new List<string>();
 

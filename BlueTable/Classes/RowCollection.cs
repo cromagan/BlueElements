@@ -151,9 +151,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// </summary>
     /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
     public static void AddBackgroundWorker(RowItem row) {
-        if (row.IsDisposed || row.Table is not { IsDisposed: false } db) { return; }
-        if (!db.IsThisScriptBroken(ScriptEventTypes.value_changed_extra_thread, false)) { return; }
-        if (!db.IsRowScriptPossible()) { return; }
+        if (row.IsDisposed || row.Table is not { IsDisposed: false } tb) { return; }
+        if (!tb.IsThisScriptBroken(ScriptEventTypes.value_changed_extra_thread, false)) { return; }
+        if (!tb.IsRowScriptPossible()) { return; }
         var l = new BackgroundWorker {
             WorkerReportsProgress = true
         };
@@ -163,7 +163,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Pendingworker.Add(l);
         l.RunWorkerAsync(row);
 
-        Develop.Message?.Invoke(ErrorType.Info, db, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString(), 0);
+        Develop.Message?.Invoke(ErrorType.Info, tb, "Table", ImageCode.Blitz, "Hintergrund-Skript wird ausgeführt: " + row.CellFirstString(), 0);
     }
 
     public static void ExecuteValueChangedEvent() {
@@ -241,6 +241,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         unique = [.. unique.Except(notUnique)];
     }
 
+    public static bool HasPendingWorker() => Pendingworker.Count > 0;
+
     /// <summary>
     /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
     /// </summary>
@@ -262,11 +264,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             foreach (var thisTb in allfiles) {
-                if (thisTb is { IsDisposed: false } db) {
+                if (thisTb is { IsDisposed: false } tb) {
                     try {
-                        if (!db.CanDoValueChangedScript(false)) { continue; }
+                        if (!tb.CanDoValueChangedScript(false)) { continue; }
 
-                        var rowToCheck = db.Row?.NextRowToCheck(false);
+                        var rowToCheck = tb.Row?.NextRowToCheck(false);
                         if (rowToCheck != null) { return rowToCheck; }
                     } catch (ObjectDisposedException) {
                         // Table disposed während Verwendung - skip
@@ -409,17 +411,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public void Combine(ICollection<RowItem> rows) {
         if (rows.Count < 2) { return; }
 
-        if (Table is not { IsDisposed: false } db) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
 
         #region Leere Werte befüllen
 
-        foreach (var thisC in db.Column) {
+        foreach (var thisC in tb.Column) {
 
             #region neuen Wert zum Reinschreiben ermitteln (Wert)
 
             var wert = string.Empty;
             foreach (var thisR2 in rows) {
-                if (thisR2.Table != db) { return; }
+                if (thisR2.Table != tb) { return; }
 
                 if (string.IsNullOrEmpty(wert)) { wert = thisR2.CellGetString(thisC); }
             }
@@ -549,9 +551,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return null; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
 
-        if (db.Column.First is not { IsDisposed: false } cf) { return null; }
+        if (tb.Column.First is not { IsDisposed: false } cf) { return null; }
 
         return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).newrow;
     }
@@ -575,8 +577,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
-
-    public static bool HasPendingWorker() => Pendingworker.Count > 0;
 
     public void InvalidateAllCheckData() {
         foreach (var thisRow in this) {
@@ -657,7 +657,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="rows"></param>
     /// <param name="reduceToOne"></param>
     public void RemoveYoungest(ICollection<RowItem> rows, bool reduceToOne) {
-        if (Table is not { IsDisposed: false } db) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
 
         var l = rows.Distinct().ToList();
 
@@ -668,7 +668,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var toDel = l.First();
 
         foreach (var thisR2 in l) {
-            if (thisR2.CellGetDateTime(db.Column.SysRowCreateDate).Subtract(toDel.CellGetDateTime(db.Column.SysRowCreateDate)).TotalDays < 0) {
+            if (thisR2.CellGetDateTime(tb.Column.SysRowCreateDate).Subtract(toDel.CellGetDateTime(tb.Column.SysRowCreateDate)).TotalDays < 0) {
                 toDel = thisR2;
             }
         }
@@ -687,11 +687,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Used: Only BZL
         if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen", true); }
 
-        if (Table is not { IsDisposed: false } db) { return (null, "Tabelle verworfen", true); }
+        if (Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen", true); }
 
-        if (db.Column.First is not { IsDisposed: false } co) { return (null, "Spalte nicht vorhanden", true); }
+        if (tb.Column.First is not { IsDisposed: false } co) { return (null, "Spalte nicht vorhanden", true); }
 
-        using var fic = new FilterCollection(db, "UnqiueRow");
+        using var fic = new FilterCollection(tb, "UnqiueRow");
 
         var fi = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal, value);
 
@@ -703,30 +703,30 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     internal static List<RowItem> MatchesTo(FilterItem fi) {
         List<RowItem> l = [];
 
-        if (fi.Table is not { IsDisposed: false } db) { return l; }
+        if (fi.Table is not { IsDisposed: false } tb) { return l; }
 
-        l.AddRange(db.Row.Where(thisRow => thisRow.MatchesTo(fi)));
+        l.AddRange(tb.Row.Where(thisRow => thisRow.MatchesTo(fi)));
         return l;
     }
 
     internal string ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
         if (type == TableDataType.Command_AddRow) {
             var row = GetByKey(rowkey);
             if (row is { IsDisposed: false }) { return string.Empty; } // "Zeile " + rowkey+ " bereits vorhanden!";
 
-            row = new RowItem(db, rowkey);
+            row = new RowItem(tb, rowkey);
             var f = Add(row, reason);
 
             if (string.IsNullOrEmpty(f) && user != null && datetimeutc is { } dt) {
-                if (db.Column.SysRowCreator is { IsDisposed: false } src) { row.SetValueInternal(src, user, reason); }
-                if (db.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.SetValueInternal(scd, dt.ToString5(), reason); }
-                if (db.Column.SysLocked is { IsDisposed: false } sl) { row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
-                if (db.Column.SysCorrect is { IsDisposed: false } sc) { row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
+                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.SetValueInternal(src, user, reason); }
+                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.SetValueInternal(scd, dt.ToString5(), reason); }
+                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
+                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
             }
 
-            if (reason == Reason.SetCommand && db.LogUndo) {
+            if (reason == Reason.SetCommand && tb.LogUndo) {
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
             return f;
@@ -744,7 +744,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
             }
 
-            foreach (var thisColumn in db.Column) {
+            foreach (var thisColumn in tb.Column) {
                 if (thisColumn != null) {
                     row.SetValueInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
                 }
@@ -795,7 +795,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
     //}
 
-    //    var f = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
+    //    var f = tb.EditableErrorReason(EditableErrorReasonType.EditNormaly);
     //    if (!string.IsNullOrEmpty(f)) {
     //        Develop.DebugPrint(ErrorType.Error, "Neue Zeilen nicht möglich: " + f);
     //        throw new Exception();
@@ -808,7 +808,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     //internal void CloneFrom(Table sourceTable) {
-    //    if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+    //    if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
     private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);
 
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();

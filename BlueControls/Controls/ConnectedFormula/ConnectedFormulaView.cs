@@ -120,20 +120,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 }
             }
 
-            //if (FilterOutput.Table != table) {
-            //    if (FilterOutput.Table is { IsDisposed: false } db1) {
-            //        db1.DisposingEvent -= _table_Disposing;
-            //    }
-
-            //    FilterOutput.Table = table;
-
-            //    if (FilterOutput.Table is { IsDisposed: false } db2) {
-            //        db2.DisposingEvent += _table_Disposing;
-            //    }
-            //}
-
-            //InitFormula(null, null);
-
             updater.Enabled = true;
 
             InvalidateView();

@@ -36,12 +36,12 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasTable {
     #region Constructors
 
     public ImportCsv(Table? table, string importtext) : base() {
-        // Dieser Aufruf ist für den Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        // FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
         var ein = _originalImportText.SplitAndCutByCr().ToList();
-        capEinträge.Text = $"{ein.Count-1} zum Importieren bereit.";
+        capEintrÃ¤ge.Text = $"{ein.Count-1} zum Importieren bereit.";
         Table = table;
     }
 

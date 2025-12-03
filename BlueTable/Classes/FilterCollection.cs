@@ -61,18 +61,18 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     public FilterCollection(RowItem r, string coment) {
         Coment = coment;
-        if (r.Table is not { IsDisposed: false } db) {
+        if (r.Table is not { IsDisposed: false } tb) {
             Develop.DebugPrint(ErrorType.Error, "Fehler im Filter");
             return;
         }
 
-        Table = db;
+        Table = tb;
 
-        if (db.Column.ChunkValueColumn is { IsDisposed: false } spc) {
+        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             Add(new FilterItem(spc, FilterType.Istgleich, r.CellGetString(spc)));
         }
 
-        Add(new FilterItem(db, FilterType.RowKey, r.KeyName));
+        Add(new FilterItem(tb, FilterType.RowKey, r.KeyName));
     }
 
     public FilterCollection(FilterItem? fi, string coment) : this(fi?.Table, coment) {
@@ -263,7 +263,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static List<RowItem> CalculateFilteredRows(Table? tb, params FilterItem[] filter) {
         if (tb?.IsDisposed != false) { return []; }
 
-        if(filter.Length == 0) { return [..tb.Row]; }
+        if (filter.Length == 0) { return [.. tb.Row]; }
         if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, true, filter) is { } i) {
                 var ok = tb.BeSureRowIsLoaded(i);
@@ -318,17 +318,17 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static string? InitValue(ColumnItem column, bool firstToo, bool isForSerach, params FilterItem[] filter) {
         if (filter is not { Length: not 0 }) { return null; }
         if (column is not { IsDisposed: false }) { return null; }
-        if (column.Table is not { IsDisposed: false } db) { return null; }
+        if (column.Table is not { IsDisposed: false } tb) { return null; }
 
-        if (!firstToo && db.Column.First == column) { return null; }
+        if (!firstToo && tb.Column.First == column) { return null; }
 
-        if (column == db.Column.SysCorrect ||
-            column == db.Column.SysRowChangeDate ||
-            column == db.Column.SysRowChanger ||
-            column == db.Column.SysRowCreator ||
-            column == db.Column.SysRowCreateDate ||
-            column == db.Column.SysLocked ||
-            column == db.Column.SysRowState) { return null; }
+        if (column == tb.Column.SysCorrect ||
+            column == tb.Column.SysRowChangeDate ||
+            column == tb.Column.SysRowChanger ||
+            column == tb.Column.SysRowCreator ||
+            column == tb.Column.SysRowCreateDate ||
+            column == tb.Column.SysLocked ||
+            column == tb.Column.SysRowState) { return null; }
 
         var fi = filter.Where(thisFilterItem => thisFilterItem?.IsOk() == true)
                               .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
@@ -913,14 +913,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="whereClause">Die bereits normalisierte WHERE-Klausel</param>
     private void ParseSqlWhereClause(string whereClause) {
-        if (Table is not { IsDisposed: false } db) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
 
         try {
             // Aufteilen in einzelne Bedingungen (vereinfacht, ohne Klammern-Parsing)
             var conditions = SplitConditions(whereClause);
 
             foreach (var condition in conditions) {
-                var filterItem = new FilterItem(db, condition.Trim());
+                var filterItem = new FilterItem(tb, condition.Trim());
                 if (filterItem.IsOk()) {
                     AddInternal(filterItem);
                 }

@@ -209,14 +209,14 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
         BlueTable.Table.SaveAll(false);
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
 
         switch (e.Item.KeyName) {
             case "erweitert":
                 Visible = false;
                 var selectedRows = Table.RowsVisibleUnique();
 
-                using (var l = new ExportDialog(db, selectedRows)) {
+                using (var l = new ExportDialog(tb, selectedRows)) {
                     l.ShowDialog();
                 }
 
@@ -493,13 +493,13 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
 
     private void btnAufräumen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db || !db.IsAdministrator()) { return; }
+        if (IsDisposed || Table.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
 
         Table.RowCleanUp();
     }
 
     private void btnClipboardImport_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db || !db.IsAdministrator()) {
+        if (IsDisposed || Table.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
             return;
         }
 
@@ -508,11 +508,11 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db) {
+        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) {
             return;
         }
 
-        using var x = new ConnectedFormulaEditor(db.FormulaFileName(), null);
+        using var x = new ConnectedFormulaEditor(tb.FormulaFileName(), null);
 
         if (x.IsClosed || x.IsDisposed) { return; }
 
@@ -521,15 +521,15 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
 
-        OpenLayoutEditor(db, string.Empty);
+        OpenLayoutEditor(tb, string.Empty);
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) => SwitchTabToTable(e.Item.KeyName);
 
     private void btnMDBImport_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db || !db.IsAdministrator()) {
+        if (IsDisposed || Table.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
             return;
         }
 
@@ -601,11 +601,11 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc.GetByKey(cbxColumnArr.Text)?.Edit();
-        TableView.RepairColumnArrangements(db);
+        TableView.RepairColumnArrangements(tb);
     }
 
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Table?.Column.GenerateOverView();
@@ -774,8 +774,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         e.TabPage.Tag = s;
 
-        if (Table.Table is { IsDisposed: false } db) {
-            this.SetSetting("View_" + db.KeyName, ViewToString());
+        if (Table.Table is { IsDisposed: false } tb) {
+            this.SetSetting("View_" + tb.KeyName, ViewToString());
         }
     }
 

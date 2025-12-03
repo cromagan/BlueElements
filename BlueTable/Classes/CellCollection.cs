@@ -86,11 +86,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <returns></returns>
     public CellItem? this[ColumnItem? column, RowItem? row] {
         get {
-            if (IsDisposed || Table is not { IsDisposed: false } db) { return null; }
+            if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
             if (column is not { IsDisposed: false }) { return null; }
             if (row is not { IsDisposed: false }) { return null; }
 
-            if (column.Table != row.Table || column.Table != db) { return null; }
+            if (column.Table != row.Table || column.Table != tb) { return null; }
 
             var cellKey = KeyOfCell(column, row);
             return ContainsKey(cellKey) ? this[cellKey] : null;
@@ -155,19 +155,19 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public static (FilterCollection? fc, string info) GetFilterReverse(ColumnItem mycolumn, ColumnItem linkedcolumn, RowItem linkedrow) {
-        if (linkedcolumn.Table is not { IsDisposed: false } ldb || linkedcolumn.IsDisposed) { return (null, "Tabelle verworfen."); }
+        if (linkedcolumn.Table is not { IsDisposed: false } ltb || linkedcolumn.IsDisposed) { return (null, "Tabelle verworfen."); }
 
         if (mycolumn.RelationType != RelationType.CellValues) { return (null, "Falsches Format."); }
 
-        if (mycolumn.Table is not { IsDisposed: false } db) { return (null, "Tabelle verworfen."); }
+        if (mycolumn.Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen."); }
 
-        var fc = new FilterCollection(db, "cell get reverse filter");
+        var fc = new FilterCollection(tb, "cell get reverse filter");
 
         foreach (var thisFi in mycolumn.LinkedCellFilter) {
             if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
 
             var x = thisFi.SplitBy("|");
-            var c = ldb.Column[x[0]];
+            var c = ltb.Column[x[0]];
             if (c == null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
 
             if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
@@ -175,7 +175,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var value = x[2].FromNonCritical().ToUpperInvariant();
             if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
 
-            foreach (var thisColumn in db.Column) {
+            foreach (var thisColumn in tb.Column) {
                 if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
                     var l = linkedrow.CellGetList(c);
                     if (l.Count == 0) { l.Add(string.Empty); }
@@ -191,7 +191,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (fc.Count == 0) {
-            fc.Add(new FilterItem(db, "Reverse Filter"));
+            fc.Add(new FilterItem(tb, "Reverse Filter"));
         }
 
         return (fc, string.Empty);
@@ -204,14 +204,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //    var x = thisFi.SplitBy("|");
         //    var value = x[2].FromNonCritical().ToUpperInvariant();
 
-        //    foreach (var thisColumn in db.Column) {
+        //    foreach (var thisColumn in tb.Column) {
         //        if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
         //            columns.AddIfNotExists(thisColumn);
         //        }
         //    }
         //}
 
-        //var fc = new FilterCollection(db, "cell reverse get filter");
+        //var fc = new FilterCollection(tb, "cell reverse get filter");
 
         //foreach (var thisColumn in columns) {
         //    var fi = new FilterItem(row, thisColumn);
@@ -219,7 +219,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //}
 
         //if (fc.Count == 0) {
-        //    fc.Add(new FilterItem(db, "Reverse Filter"));
+        //    fc.Add(new FilterItem(tb, "Reverse Filter"));
         //}
 
         //return (fc, string.Empty);
@@ -283,9 +283,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
 
-            if (lcolumn?.Table is not { IsDisposed: false } db2) { return "Verknüpfte Tabelle verworfen."; }
+            if (lcolumn?.Table is not { IsDisposed: false } tb2) { return "Verknüpfte Tabelle verworfen."; }
 
-            db2.PowerEdit = tb.PowerEdit;
+            tb2.PowerEdit = tb.PowerEdit;
 
             if (lrow != null) {
                 var tmp = IsCellEditable(lcolumn, lrow, lrow.ChunkValue);
@@ -378,8 +378,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     internal string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
     internal void InvalidateAllSizes() {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-        foreach (var thisColumn in db.Column) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        foreach (var thisColumn in tb.Column) {
             thisColumn.Invalidate_ColumAndContent();
         }
     }

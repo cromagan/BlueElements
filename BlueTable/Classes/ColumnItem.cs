@@ -707,16 +707,16 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public List<string> LinkedCellFilter {
         get;
         set {
-            if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+            if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
             value = value.SortedDistinctList();
 
             if (!field.IsDifferentTo(value)) { return; }
 
-            db.ChangeData(TableDataType.LinkedCellFilter, this, field.JoinWithCr(), value.JoinWithCr());
+            tb.ChangeData(TableDataType.LinkedCellFilter, this, field.JoinWithCr(), value.JoinWithCr());
             OnPropertyChanged();
 
-            foreach (var thisColumn in db.Column) {
+            foreach (var thisColumn in tb.Column) {
                 thisColumn.CheckIfIAmAKeyColumn();
             }
         }
@@ -1329,9 +1329,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (string.IsNullOrEmpty(_defaultRenderer)) { return "Es ist kein Renderer angebeben"; }
 
         if (_relationType != RelationType.None) {
-            if (LinkedTable is not { IsDisposed: false } db2) { return "Verknüpfte Tabelle fehlt oder existiert nicht."; }
-            if (tb == db2) { return "Zirkelbezug mit verknüpfter Tabelle."; }
-            var c = db2.Column[_columnNameOfLinkedTable];
+            if (LinkedTable is not { IsDisposed: false } l_tb) { return "Verknüpfte Tabelle fehlt oder existiert nicht."; }
+            if (tb == l_tb) { return "Zirkelbezug mit verknüpfter Tabelle."; }
+            var c = l_tb.Column[_columnNameOfLinkedTable];
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
             if (LinkedCellFilter.Count == 0) {
                 if (_relationType != RelationType.DropDownValues) {
@@ -1344,7 +1344,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                     return "Spalten mit Verlinkungen zu anderen Tabellen können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
                 }
 
-                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, this, db2.Row.First(), null);
+                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(l_tb, this, l_tb.Row.First(), null);
                 if (!string.IsNullOrWhiteSpace(info)) { return $"Zell-Verlinkung fehlerhaft: {info}"; }
                 fc?.Dispose();
             }
@@ -1511,44 +1511,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     }
 
     public string IsNowEditable() {
-        if (Table is not { IsDisposed: false } db) { return "Tabelle verworfen"; }
-        return db.GrantWriteAccess(TableDataType.ColumnName, TableChunk.Chunk_Master).StringValue;
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
+        return tb.GrantWriteAccess(TableDataType.ColumnName, TableChunk.Chunk_Master).StringValue;
     }
-
-    //}
-    ///// <summary>
-    ///// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
-    ///// </summary>
-    ///// <param name="t">Beispiel: GetType(enDesign)</param>
-    ///// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
-    ///// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-    //public void GetValuesFromEnum(Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
-    //    List<string> NewReplacer = new();
-    //    List<string> NewAuswahl = new();
-    //    var items = Enum.GetValues(t);
-    //    foreach (var thisItem in items) {
-    //        var te = Enum.GetName(t, thisItem);
-    //        var th = (int)thisItem;
-    //        if (!string.IsNullOrEmpty(te)) {
-    //            NewReplacer.GenerateAndAdd(th + "|" + te);
-    //            if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis) {
-    //                NewAuswahl.GenerateAndAdd(th.ToString(false));
-    //            }
-    //        }
-    //    }
-    //    NewReplacer.Reverse();
-    //    if (OpticalReplace.IsDifferentTo(NewReplacer)) {
-    //        OpticalReplace.Clear();
-    //        OpticalReplace.AddRange(NewReplacer);
-    //    }
-    //    if (DropDownItems.IsDifferentTo(NewAuswahl)) {
-    //        DropDownItems.Clear();
-    //        DropDownItems.AddRange(NewAuswahl);
-    //    }
-    //}
-    /// <summary>
-    /// Der Invalidate, der am meisten invalidiert: Alle temporären Variablen und auch jede Zell-Größe der Spalte.
-    /// </summary>
 
     public bool IsSystemColumn() =>
         _keyName.ToUpperInvariant() is "SYS_CORRECT" or
@@ -2507,9 +2472,9 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private void CheckIfIAmAKeyColumn() {
         Am_A_Key_For_Other_Column = string.Empty;
 
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var c in db.Column) {
+        foreach (var c in tb.Column) {
             //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
             //if (thisColumn.LinkedCell_RowKeyIsInColumn == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
             //if (ThisColumn.LinkedCell_ColumnValueFoundIn == _name) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen

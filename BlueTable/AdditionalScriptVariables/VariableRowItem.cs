@@ -72,7 +72,7 @@ public class VariableRowItem : Variable {
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;
     public override string ValueForCell => string.Empty;
-    public override string ValueForReplace => _row?.Table is not { IsDisposed: false } db ? "{ROW:?}" : "{ROW:" + db.KeyName + ";" + _row.KeyName + "}";
+    public override string ValueForReplace => _row?.Table is not { IsDisposed: false } tb ? "{ROW:?}" : "{ROW:" + tb.KeyName + ";" + _row.KeyName + "}";
 
     #endregion
 

@@ -19,13 +19,13 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using BlueTable.Enums;
 using System.Drawing.Drawing2D;
-using BlueTable;
+using System.Linq;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -90,15 +90,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
-    public int FixY {
-        get;
-        set {
-            if (field == value) { return; }
-
-            field = value;
-            OnPropertyChanged();
-        }
-    }
 
     public bool IsDisposed {
         get;

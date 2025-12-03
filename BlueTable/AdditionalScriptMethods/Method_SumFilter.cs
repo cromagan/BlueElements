@@ -22,7 +22,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_SumFilter : Method_TableGeneric {
 
     #region Properties
@@ -49,7 +48,7 @@ public class Method_SumFilter : Method_TableGeneric {
         var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyTable(scp), scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
-        if (allFi.Table is not { IsDisposed: false } db) {
+        if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
             return new DoItFeedback("Tabellefehler!", true, ld);
         }
@@ -57,10 +56,10 @@ public class Method_SumFilter : Method_TableGeneric {
         var r = allFi.Rows;
         allFi.Dispose();
 
-        var returncolumn = db.Column[attvar.ReadableText(0)];
+        var returncolumn = tb.Column[attvar.ReadableText(0)];
         if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ReadableText(0), true, ld); }
 
-        returncolumn.AddSystemInfo("Value Used in Script", db, scp.ScriptName);
+        returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
         var x = returncolumn.Summe(r);
 

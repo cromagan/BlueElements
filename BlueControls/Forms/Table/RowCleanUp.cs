@@ -48,9 +48,9 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         //Eintr.Text = ein.Count + " zum Importieren bereit.";
         //Table = table;
 
-        if (Table is { IsDisposed: false } db) {
+        if (Table is { IsDisposed: false } tb) {
             //var lst =  List<AbstractListItem>();
-            lstColumns.ItemAddRange(ItemsOf(db.Column, false));
+            lstColumns.ItemAddRange(ItemsOf(tb.Column, false));
             //cbxColDateiname.Item = lst;
         }
 
@@ -158,20 +158,20 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
             return;
         }
 
-        if (Table is not { IsDisposed: false } db) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
         var columns = new List<ColumnItem>();
         foreach (var column in lstColumns.Checked) {
-            if (db.Column[column] is { IsDisposed: false } c) {
+            if (tb.Column[column] is { IsDisposed: false } c) {
                 columns.Add(c);
             }
         }
 
         foreach (var thisR in r) {
-            if (!thisR.IsDisposed && db.Row.Contains(thisR)) {
+            if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
 
                 #region Filtercol erstellen
 
-                var f = new FilterCollection(db, "Dupe Suche");
+                var f = new FilterCollection(tb, "Dupe Suche");
 
                 foreach (var thisc in columns) {
                     f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
@@ -187,9 +187,9 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
                 if (rows.Count > 1) {
                     if (optFülle.Checked) {
-                        db.Row.Combine(rows);
+                        tb.Row.Combine(rows);
                     } else if (optLöschen.Checked) {
-                        db.Row.RemoveYoungest(rows, false);
+                        tb.Row.RemoveYoungest(rows, false);
                     } else {
                         MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");
                         return;

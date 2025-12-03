@@ -106,10 +106,10 @@ public class InvalidatedRowsManager {
     /// <param name="rowItem">Das hinzuzufügende Row-Item</param>
     /// <returns>True wenn das Item hinzugefügt wurde, False wenn nicht</returns>
     public bool AddInvalidatedRow(RowItem? rowItem) {
-        if (rowItem?.Table is not { IsDisposed: false } db) { return false; }
+        if (rowItem?.Table is not { IsDisposed: false } tb) { return false; }
 
         // Ansosten ist Endloschleife mit Monitor
-        if (!db.CanDoValueChangedScript(false)) { return false; }
+        if (!tb.CanDoValueChangedScript(false)) { return false; }
 
         //// Prüfe, ob die Zeile bereits als verarbeitet markiert ist
         //if (_processedRowIds.ContainsKey(rowItem.KeyName)) {
@@ -121,7 +121,7 @@ public class InvalidatedRowsManager {
             return false;
         }
 
-        Develop.Message?.Invoke(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Tabelle {db.Caption}", 0);
+        Develop.Message?.Invoke(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Tabelle {tb.Caption}", 0);
 
         // Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
         return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);
@@ -233,19 +233,19 @@ public class InvalidatedRowsManager {
     /// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
     /// <param name="currentIndex">Aktueller Index für Statusmeldungen</param>
     private void ProcessSingleRow(RowItem row, RowItem? masterRow, bool extendedAllowed, int currentIndex) {
-        if (row.Table is not { IsDisposed: false } db) { return; }
+        if (row.Table is not { IsDisposed: false } tb) { return; }
 
         if (!extendedAllowed && row.NeedsRowInitialization()) {
-            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}  (Offen: {_invalidatedRows.Count + 1}): Zeile {db.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung");
+            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}  (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung");
             return;
         }
 
         if (!row.NeedsRowUpdate()) {
-            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Zeile {db.Caption} / {row.CellFirstString()} bereits aktuell");
+            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.CellFirstString()} bereits aktuell");
             return;
         }
 
-        masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {db.Caption} / {row.CellFirstString()}");
+        masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {tb.Caption} / {row.CellFirstString()}");
 
         DoUpdateRow?.Invoke(masterRow, row, extendedAllowed);
     }

@@ -18,20 +18,20 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.BlueTableDialogs;
+using BlueControls.CellRenderer;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueTable;
+using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Runtime.CompilerServices;
-using BlueControls.BlueTableDialogs;
-using BlueControls.CellRenderer;
-using BlueControls.Forms;
-using BlueTable;
-using BlueTable.Enums;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace BlueControls.ItemCollectionList;
 

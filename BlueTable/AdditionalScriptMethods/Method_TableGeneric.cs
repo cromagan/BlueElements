@@ -36,17 +36,6 @@ public abstract class Method_TableGeneric : Method {
 
     #region Methods
 
-    protected static RowItem? MyRow(ScriptProperties scp) {
-        if (scp.AdditionalInfo is RowItem r) { return r; }
-        return null;
-    }
-
-    protected static Table? MyTable(ScriptProperties scp) {
-        if (scp.AdditionalInfo is Table { IsDisposed: false } db) { return db; }
-        if (scp.AdditionalInfo is RowItem r) { return r.Table; }
-        return null;
-    }
-
     protected static ColumnItem? Column(ScriptProperties scp, SplittedAttributesFeedback attvar, int no) {
         var c = attvar.Attributes[no];
         if (c == null) { return null; }
@@ -56,6 +45,17 @@ public abstract class Method_TableGeneric : Method {
         }
 
         return MyTable(scp)?.Column[c.KeyName];
+    }
+
+    protected static RowItem? MyRow(ScriptProperties scp) {
+        if (scp.AdditionalInfo is RowItem r) { return r; }
+        return null;
+    }
+
+    protected static Table? MyTable(ScriptProperties scp) {
+        if (scp.AdditionalInfo is Table { IsDisposed: false } tb) { return tb; }
+        if (scp.AdditionalInfo is RowItem r) { return r.Table; }
+        return null;
     }
 
     #endregion

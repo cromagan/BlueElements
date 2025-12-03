@@ -82,16 +82,16 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void btnAusgehendeTabelle_Click(object sender, System.EventArgs e) {
         if (!Generic.IsAdministrator()) { return; }
-        if (_lastItem is ReciverSenderControlPadItem { TableOutput: { IsDisposed: false } db }) {
-            var c = new TableViewForm(db, false, true, true);
+        if (_lastItem is ReciverSenderControlPadItem { TableOutput: { IsDisposed: false } tb }) {
+            var c = new TableViewForm(tb, false, true, true);
             c.ShowDialog();
         }
     }
 
     private void btnEingehendeTabelle_Click(object sender, System.EventArgs e) {
         if (!Generic.IsAdministrator()) { return; }
-        if (_lastItem is ReciverControlPadItem { TableInput: { IsDisposed: false } db }) {
-            var c = new TableViewForm(db, false, true, true);
+        if (_lastItem is ReciverControlPadItem { TableInput: { IsDisposed: false } tb }) {
+            var c = new TableViewForm(tb, false, true, true);
             c.ShowDialog();
         }
     }

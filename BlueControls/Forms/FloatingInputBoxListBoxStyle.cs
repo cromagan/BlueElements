@@ -84,7 +84,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             thisContextMenu.Add(Separator());
             thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
             Develop.SetUserDidSomething();
-            var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, ce.HotItem, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
+            Show(thisContextMenu, CheckBehavior.NoSelection, null, ce.HotItem, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
         }
     }
 
