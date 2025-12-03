@@ -45,9 +45,9 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Table = table;
 
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var thisColumnItem in db.Column) {
+        foreach (var thisColumnItem in tb.Column) {
             if (thisColumnItem is { IsDisposed: false, Relationship_to_First: true }) {
                 _column = thisColumnItem;
                 break;
@@ -83,16 +83,16 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     //private bool RelationsValid;
     //   Dim ItS As New CanvasSize(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return null; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Items?[what] != null) { return null; }
-        var r = db.Row[what];
+        var r = tb.Row[what];
         if (r is not { IsDisposed: false }) {
             MessageBox.Show("<b>" + what + "</b> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }
         if (ItemOfRow(r) != null) { return null; }
-        RowFormulaPadItem i2 = new(db, r.KeyName, layoutId);
+        RowFormulaPadItem i2 = new(tb, r.KeyName, layoutId);
         Pad?.AddCentered(i2);
         //  Pad.Invalidate()
         i2.SetLeftTopPoint(xPos, ypos);
@@ -124,8 +124,8 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     }
 
     private void BezPlus(RowFormulaPadItem initialItem) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
-        if (_column == null || initialItem.Row == null || db.Column.First is not { IsDisposed: false } cf) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        if (_column == null || initialItem.Row == null || tb.Column.First is not { IsDisposed: false } cf) { return; }
 
         // Den Beziehungstext holen
         var t = initialItem.Row.CellGetString(_column).ToUpperInvariant();
@@ -142,7 +142,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         // Namen in der Übersicht hinzufügen
         var lastit = initialItem;
         foreach (var thisn in bez) {
-            var ro = db.Row[thisn];
+            var ro = tb.Row[thisn];
             if (ro != null) {
                 if (ItemOfRow(ro) is { IsDisposed: false } it &&
                     AddOne(thisn, 0, 0, lastit.Layout_Dateiname) is { } newit) {
@@ -355,6 +355,8 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         //RepairLinesAndFullProcessing();
     }
 
+    #endregion
+
     //private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
     //    //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
     //    if (e.HotItem is not RowFormulaPadItem) { return; }
@@ -375,8 +377,6 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     //    }
     //    //RepairLinesAndFullProcessing();
     //}
-
-    #endregion
 
     //Private Sub Entwirren()
     //    CheckStackForOverflow()

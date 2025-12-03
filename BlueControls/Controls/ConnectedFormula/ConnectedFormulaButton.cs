@@ -225,9 +225,9 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
     private static void ButtonError(string message) => Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
 
     private void mainButton_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (TableInput is { IsDisposed: false } db) {
-            db.Editor ??= typeof(TableHeadEditor);
-            e.ContextMenu.Add(ItemOf(db));
+        if (TableInput is { IsDisposed: false } tb) {
+            tb.Editor ??= typeof(TableHeadEditor);
+            e.ContextMenu.Add(ItemOf(tb));
         }
     }
 
@@ -255,8 +255,8 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
         object? ai = null;
         var row = RowSingleOrNull();
 
-        if (row?.Table is { IsDisposed: false } db) {
-            vars = db.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+        if (row?.Table is { IsDisposed: false } tb) {
+            vars = tb.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
         } else {
             vars = [];
         }

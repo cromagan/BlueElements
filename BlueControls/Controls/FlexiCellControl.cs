@@ -248,14 +248,11 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         f.InfoText = newT;
     }
 
-    private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (e.HotItem is TextListItem t) {
-            if (FileExists(t.KeyName)) {
-                e.ContextMenu.Add(ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, e.HotItem, true));
-            }
-        }
-        if (e.HotItem is BitmapListItem) {
-            e.ContextMenu.Add(ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, e.HotItem, true));
+    private static void Contextmenu_BildÖffnen(object sender, ObjectEventArgs e) {
+        if (e.Data is not BitmapListItem bi) { return; }
+        if (bi.ImageLoaded()) {
+            PictureView x = new(bi.Bitmap);
+            x.Show();
         }
     }
 
@@ -266,11 +263,14 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         }
     }
 
-    private static void Contextmenu_BildÖffnen(object sender, ObjectEventArgs e) {
-        if (e.Data is not BitmapListItem bi) { return; }
-        if (bi.ImageLoaded()) {
-            PictureView x = new(bi.Bitmap);
-            x.Show();
+    private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+        if (e.HotItem is TextListItem t) {
+            if (FileExists(t.KeyName)) {
+                e.ContextMenu.Add(ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, e.HotItem, true));
+            }
+        }
+        if (e.HotItem is BitmapListItem) {
+            e.ContextMenu.Add(ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, e.HotItem, true));
         }
     }
 
@@ -388,7 +388,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         });
 
     private async Task RunMarkerAsync(CancellationToken cancellationToken) {
-        if (IsDisposed || TableInput is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || TableInput is not { IsDisposed: false } tb) { return; }
 
         // Thread-sichere TextBox ermitteln
         var txb = f.GetControl<TextBox>();
@@ -403,7 +403,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
         if (_lastrow is not { IsDisposed: false } row) { return; }
 
-        var col = db.Column.First;
+        var col = tb.Column.First;
         if (col == null) { return; }
 
         // Background-Thread für schwere Berechnungen

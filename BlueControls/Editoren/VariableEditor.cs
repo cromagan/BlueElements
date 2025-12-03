@@ -47,9 +47,9 @@ public partial class VariableEditor : EditorEasy {
         }
         var list = new VariableCollection();
 
-        if (tableVariablen.Table is not { IsDisposed: false } db) { return list; }
+        if (tableVariablen.Table is not { IsDisposed: false } tb) { return list; }
 
-        foreach (var thisr in db.Row) {
+        foreach (var thisr in tb.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
             list.Add(v);
         }
@@ -57,9 +57,9 @@ public partial class VariableEditor : EditorEasy {
         return list;
     }
 
-    public RowItem? RowOfVariable(string variable) => tableVariablen?.Table is not { IsDisposed: false } db ? null : db.Row[variable];
+    public RowItem? RowOfVariable(string variable) => tableVariablen?.Table is not { IsDisposed: false } tb ? null : tb.Row[variable];
 
-    public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Table is not { IsDisposed: false } db ? null : db.Row[variable.KeyName];
+    public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Table is not { IsDisposed: false } tb ? null : tb.Row[variable.KeyName];
 
     protected override void InitializeComponentDefaultValues() {
         var tb = Table.Get();
@@ -120,11 +120,11 @@ public partial class VariableEditor : EditorEasy {
     }
 
     protected override bool SetValuesToFormula(IEditable? toEdit) {
-        if (IsDisposed || tableVariablen?.Table is not { IsDisposed: false } db) { return false; }
+        if (IsDisposed || tableVariablen?.Table is not { IsDisposed: false } tb) { return false; }
         if (toEdit is not VariableCollection vc) { return false; }
 
         foreach (var thisv in vc) {
-            var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
+            var ro = RowOfVariable(thisv) ?? tb.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
 
             if (ro != null) {
                 ro.CellSet("typ", thisv.MyClassId, string.Empty);

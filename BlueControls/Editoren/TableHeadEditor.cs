@@ -330,27 +330,27 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void btnOptimize_Click(object sender, System.EventArgs e) => Table?.Optimize();
 
     private void btnSkripte_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(db);
+        IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
         //var se = new_TableScriptEditor(db);
         //_ = se.ShowDialog();
     }
 
     private void btnSpaltenAnordnungen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc[1].Edit();
-        TableView.RepairColumnArrangements(db);
+        TableView.RepairColumnArrangements(tb);
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
 
     private void btnTabellenAnsicht_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        var c = new TableViewForm(db, false, true, true);
+        var c = new TableViewForm(tb, false, true, true);
         c.ShowDialog();
     }
 
@@ -363,9 +363,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        db.Column.GenerateAndAddSystem();
+        tb.Column.GenerateAndAddSystem();
     }
 
     private void GenerateInfoText() {

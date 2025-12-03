@@ -186,7 +186,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Zeile, 16);
 
     protected override void GeneratePic() {
-        if (IsDisposed || string.IsNullOrEmpty(_layoutFileName) || Table is not { IsDisposed: false } db) {
+        if (IsDisposed || string.IsNullOrEmpty(_layoutFileName) || Table is not { IsDisposed: false } tb) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
@@ -199,7 +199,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         }
 
         icp.ResetVariables();
-        icp.ReplaceVariables(db, _rowKey);
+        icp.ReplaceVariables(tb, _rowKey);
         GeneratedBitmap = icp.ToBitmap(1);
     }
 

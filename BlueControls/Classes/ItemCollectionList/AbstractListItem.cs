@@ -446,7 +446,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #region Fields
 
-    private Size _sizeUntouchedForListBox = Size.Empty;
+    private Size _untrimmedCanvasSize = Size.Empty;
 
     #endregion
 
@@ -601,10 +601,10 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
 
     public Size UntrimmedCanvasSize(Design itemdesign) {
-        if (_sizeUntouchedForListBox.IsEmpty) {
-            _sizeUntouchedForListBox = ComputeUntrimmedCanvasSize(itemdesign);
+        if (_untrimmedCanvasSize.IsEmpty) {
+            _untrimmedCanvasSize = ComputeUntrimmedCanvasSize(itemdesign);
         }
-        return _sizeUntouchedForListBox;
+        return _untrimmedCanvasSize;
     }
 
     internal bool IsVisible(Rectangle visCanvasArea) => Visible && CanvasPosition.IntersectsWith(visCanvasArea);
@@ -616,6 +616,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale);
 
     protected abstract string GetCompareKey();
+
+    protected void Invalidate_UntrimmedCanvasSize() => _untrimmedCanvasSize = Size.Empty;
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

@@ -409,10 +409,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     //}
     public void DropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
-        if (Table is not { IsDisposed: false } db) { return; }
-        if (!db.DropMessages) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (!tb.DropMessages) { return; }
 
-        Develop.Message?.Invoke(type, this, db.Caption, ImageCode.Zeile, message, 0);
+        Develop.Message?.Invoke(type, this, tb.Caption, ImageCode.Zeile, message, 0);
     }
 
     //public int CompareTo(object obj) {
@@ -430,7 +430,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
-        if (Table is not { IsDisposed: false } db) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
+        if (Table is not { IsDisposed: false } tb) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         var attempt = 0;
@@ -438,7 +438,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         do {
             attempt++;
-            var erg = db.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
+            var erg = tb.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
 
             if (!erg.Failed) { return erg; }
 
@@ -463,11 +463,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void InvalidateRowState(string comment) {
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        if (db.Column.SysRowState is not { IsDisposed: false } srs) { return; }
+        if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return; }
         //if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return; }
-        if (db.Column.SysRowChangeDate is not { IsDisposed: false } scd) { return; }
+        if (tb.Column.SysRowChangeDate is not { IsDisposed: false } scd) { return; }
 
         InvalidateCheckData();
         RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
@@ -893,13 +893,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     internal bool IsMyRow(double maxminutes, bool mastertoo) {
-        if (Table is not { IsDisposed: false } db) { return false; }
-        if (mastertoo && !db.MultiUserPossible) { return true; }
-        if (db.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
-        if (db.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        if (mastertoo && !tb.MultiUserPossible) { return true; }
+        if (tb.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
+        if (tb.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        if (mastertoo && db.AmITemporaryMaster(MasterTry, MasterUntil) && t.TotalMinutes > MyRowLost) { return true; }
+        if (mastertoo && tb.AmITemporaryMaster(MasterTry, MasterUntil) && t.TotalMinutes > MyRowLost) { return true; }
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 
@@ -940,7 +940,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         while (true) {
             tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures
 
-            if (IsDisposed || column.Table is not { IsDisposed: false } db) { return "Tabelle ungültig"; }
+            if (IsDisposed || column.Table is not { IsDisposed: false } tb) { return "Tabelle ungültig"; }
 
             // Timeout-Prüfung ODER tries-Limit - doppelte Sicherheit
             if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20 || tries > 100) {
@@ -949,10 +949,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             var cellKey = CellCollection.KeyOfCell(column, this);
 
-            if (db.Cell.TryGetValue(cellKey, out var c)) {
+            if (tb.Cell.TryGetValue(cellKey, out var c)) {
                 c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
                 if (string.IsNullOrEmpty(value)) {
-                    if (!db.Cell.TryRemove(cellKey, out _)) {
+                    if (!tb.Cell.TryRemove(cellKey, out _)) {
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
@@ -960,7 +960,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
             } else {
                 if (!string.IsNullOrEmpty(value)) {
-                    if (!db.Cell.TryAdd(cellKey, new CellItem(value))) {
+                    if (!tb.Cell.TryAdd(cellKey, new CellItem(value))) {
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
@@ -970,14 +970,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (reason == Reason.SetCommand) {
                 if (column.IsKeyColumn) {
-                    if (db.Column.SysRowState is { IsDisposed: false } srs) {
+                    if (tb.Column.SysRowState is { IsDisposed: false } srs) {
                         SetValueInternal(srs, string.Empty, reason);
                     }
                 }
 
                 //column.Invalidate_ContentWidth();
                 InvalidateCheckData();
-                db.Cell.OnCellValueChanged(new CellEventArgs(column, this));
+                tb.Cell.OnCellValueChanged(new CellEventArgs(column, this));
             }
 
             return string.Empty;
@@ -1103,20 +1103,20 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     private void DoSpecialFormats(ColumnItem column, string previewsValue, string currentValue) {
         if (currentValue == previewsValue) { return; }
 
-        if (column.Table is not { IsDisposed: false } db) { return; }
+        if (column.Table is not { IsDisposed: false } tb) { return; }
 
         if (column.Relationship_to_First) { RepairRelationText(column, previewsValue); }
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
-            foreach (var thisColumn in db.Column) {
+            foreach (var thisColumn in tb.Column) {
                 if (thisColumn.RelationType == RelationType.CellValues) {
                     LinkedCellData(thisColumn, true, false);
                 }
             }
         }
 
-        if (db.Column.First is { IsDisposed: false } c && c == column) {
-            foreach (var thisColumn in db.Column) {
+        if (tb.Column.First is { IsDisposed: false } c && c == column) {
+            foreach (var thisColumn in tb.Column) {
                 if (column.Relationship_to_First) {
                     RelationTextNameChanged(thisColumn, KeyName, previewsValue, currentValue);
                 }
@@ -1253,10 +1253,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private bool RowFilterMatch(string searchText) {
         if (string.IsNullOrEmpty(searchText)) { return true; }
-        if (IsDisposed || Table is not { IsDisposed: false } db) { return false; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return false; }
 
         searchText = searchText.ToUpperInvariant();
-        foreach (var thisColumnItem in db.Column) {
+        foreach (var thisColumnItem in tb.Column) {
             {
                 if (!thisColumnItem.IgnoreAtRowFilter) {
                     var txt = CellGetString(thisColumnItem);

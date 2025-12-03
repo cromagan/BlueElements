@@ -85,6 +85,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
             if (field == value) { return; }
 
             field = value;
+            Invalidate_UntrimmedCanvasSize();
             OnPropertyChanged();
         }
     }

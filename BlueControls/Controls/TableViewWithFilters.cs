@@ -705,9 +705,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void GetÄhnlich() {
         if (IsDisposed || FilterleisteZeilen <= 0) { return; }
-        if (Table is not { IsDisposed: false } db) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
 
-        var tcvc = ColumnViewCollection.ParseAll(db);
+        var tcvc = ColumnViewCollection.ParseAll(tb);
 
         _ähnliche = tcvc.GetByKey(ÄhnlicheAnsichtName);
         DoÄhnlich();

@@ -104,8 +104,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 field.ItemAdded -= _page_ItemAdded;
                 field.ItemRemoved -= _page_ItemRemoved;
 
-                if (field.GetRowEntryItem()?.TableOutput is { IsDisposed: false } db1) {
-                    db1.DisposingEvent -= _table_Disposing;
+                if (field.GetRowEntryItem()?.TableOutput is { IsDisposed: false } tb) {
+                    tb.DisposingEvent -= _table_Disposing;
                 }
             }
             field = value;
@@ -115,8 +115,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 field.PropertyChanged += _page_PropertyChanged;
                 field.ItemAdded += _page_ItemAdded;
                 field.ItemRemoved += _page_ItemRemoved;
-                if (field.GetRowEntryItem()?.TableOutput is { IsDisposed: false } db1) {
-                    db1.DisposingEvent += _table_Disposing;
+                if (field.GetRowEntryItem()?.TableOutput is { IsDisposed: false } tb) {
+                    tb.DisposingEvent += _table_Disposing;
                 }
             }
 

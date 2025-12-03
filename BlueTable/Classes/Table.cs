@@ -1013,15 +1013,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public static string UndoText(ColumnItem? column, RowItem? row) {
-        if (column?.Table is not { IsDisposed: false } db) { return string.Empty; }
+        if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
-        if (db.Undo.Count == 0) { return string.Empty; }
+        if (tb.Undo.Count == 0) { return string.Empty; }
 
         var cellKey = CellCollection.KeyOfCell(column, row);
         var t = string.Empty;
-        for (var z = db.Undo.Count - 1; z >= 0; z--) {
-            if (db.Undo[z] != null && db.Undo[z].CellKey == cellKey) {
-                t = t + db.Undo[z].UndoTextTableMouseOver() + "<br>";
+        for (var z = tb.Undo.Count - 1; z >= 0; z--) {
+            if (tb.Undo[z] != null && tb.Undo[z].CellKey == cellKey) {
+                t = t + tb.Undo[z].UndoTextTableMouseOver() + "<br>";
             }
         }
         t = t.Trim("<br>");
@@ -2265,7 +2265,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         //    LoadChunkWithChunkId(chunk, true, null);
         //}
         if (type.IsCellValue()) {
-            if (column?.Table is not { IsDisposed: false } db) { return string.Empty; }
+            if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
             if (row == null) { return string.Empty; }
             if (!column.SaveContent) { return string.Empty; }
 
@@ -2277,7 +2277,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (!string.IsNullOrEmpty(f)) { return f; }
 
             if (column.SaveContent) {
-                row.DoSystemColumns(db, column, user, datetimeutc, reason);
+                row.DoSystemColumns(tb, column, user, datetimeutc, reason);
             }
             return string.Empty;
         }
@@ -2597,9 +2597,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
                 if (!string.IsNullOrEmpty(info) && !canrepair) { return new(info, false, true); }
 
-                if (lcolumn?.Table is not { IsDisposed: false } db2) { return new("Verknüpfte Tabelle verworfen.", false, true); }
+                if (lcolumn?.Table is not { IsDisposed: false } tb2) { return new("Verknüpfte Tabelle verworfen.", false, true); }
 
-                db2.PowerEdit = tb.PowerEdit;
+                tb2.PowerEdit = tb.PowerEdit;
 
                 if (lrow != null) {
                     waitforseconds = Math.Max(1, waitforseconds / 2);
