@@ -31,8 +31,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public ColumnsHeadListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
-    }
+    public ColumnsHeadListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) => IgnoreYOffset = true;
 
     #endregion
 

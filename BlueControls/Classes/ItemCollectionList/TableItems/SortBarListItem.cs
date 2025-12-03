@@ -27,8 +27,7 @@ public sealed class SortBarListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public SortBarListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
-    }
+    public SortBarListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) => IgnoreYOffset = true;
 
     #endregion
 

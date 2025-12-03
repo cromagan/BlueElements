@@ -37,9 +37,7 @@ public class DropDownListItem : AbstractListItem {
 
     #region Constructors
 
-    public DropDownListItem(string keyName, bool enabled, string userDefCompareKey) : base(keyName, enabled) {
-        UserDefCompareKey = userDefCompareKey;
-    }
+    public DropDownListItem(string keyName, bool enabled, string userDefCompareKey) : base(keyName, enabled) => UserDefCompareKey = userDefCompareKey;
 
     #endregion
 

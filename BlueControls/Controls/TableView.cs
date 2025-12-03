@@ -43,9 +43,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static BlueBasics.Extensions;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
@@ -1190,7 +1190,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             //    return "Spalte konnte nicht angezeigt werden.";
             //}
 
-            if (!cellInThisTableRow.IsVisible(visCanvasArea)) {
+            if (!cellInThisTableRow.IsVisible(visCanvasArea, Zoom, OffsetX, OffsetY)) {
                 return "Die Zeile wird nicht angezeigt.";
             }
         } else {
@@ -1851,7 +1851,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (_mouseOverRowItem is FilterBarListItem cfli) {
                     var screenX = Cursor.Position.X - e.ControlX;
                     var screenY = Cursor.Position.Y - e.ControlY;
-                    AutoFilter_Show(ca, _mouseOverColumn, screenX, screenY, cfli.CanvasPosition.Bottom);
+                    AutoFilter_Show(ca, _mouseOverColumn, screenX, screenY, cfli.ControlPosition(Zoom, OffsetX, OffsetY).Bottom);
                     return;
                 }
 
@@ -2691,21 +2691,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //    }
         //}
 
-        var headX = viewItem.ControlColumnLeft(OffsetX);// (ControlToCanvasX(, Zoom) - OffsetX);
+        var controlX = viewItem.ControlColumnLeft(OffsetX);// (ControlToCanvasX(, Zoom) - OffsetX);
 
-        var headWidth = viewItem.ControlColumnWidth ?? 16;
+        var controlWidth = viewItem.ControlColumnWidth ?? 16;
 
         box.GetStyleFrom(viewItem.Column);
         RowItem? contentHolderCellRow = null;
         if (cellInThisTableRow is RowListItem rli) {
-            box.Location = new Point(headX, cellInThisTableRow.CanvasPosition.Y);
-            box.Size = new Size(headWidth + addWith, cellInThisTableRow.CanvasPosition.Height.CanvasToControl(Zoom));
+            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
+            box.Location = new Point(controlX, controlPos.Y);
+            box.Size = new Size(controlWidth + addWith, controlPos.Height);
             box.Text = rli.Row.CellGetString(viewItem.Column);
             contentHolderCellRow = rli.Row;
         } else if (cellInThisTableRow is NewRowListItem nrli) {
             // Neue Zeile...
-            box.Location = new Point(headX, cellInThisTableRow.CanvasPosition.Y);
-            box.Size = new Size(headWidth + addWith, cellInThisTableRow.CanvasPosition.Height.CanvasToControl(Zoom));
+            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
+            box.Location = new Point(controlX, controlPos.Y);
+            box.Size = new Size(controlWidth + addWith, controlPos.Height);
             box.Text = string.Empty;
         }
 
@@ -2725,7 +2727,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return true;
     }
 
-    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), AllViewItems.ElementAtPosition(1, (int)e.CanvasY));
+    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), AllViewItems.ElementAtPosition(1, e.ControlY, Zoom, OffsetX, OffsetY));
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -2953,7 +2955,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private bool EnsureVisible(AbstractListItem? rowdata) {
-        if (rowdata is not { }) { return false; }
+        if (rowdata is not RowListItem rli) { return false; }
         //var dispR = DisplayRectangleWithoutSlider();
 
         //// Stellen sicher, dass die Zeile im sichtbaren Bereich ist
@@ -2969,8 +2971,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //    OffsetY = OffsetY + rowY + ControlToCanvasX(rowdata.CanvasPosition.Height, Zoom) - (dispR.Height + FilterleisteHeight);
         //}
 
-        EnsureVisibleY(rowdata.CanvasPosition.Bottom.CanvasToControl(Zoom));
-        EnsureVisibleY(rowdata.CanvasPosition.Top.CanvasToControl(Zoom));
+        EnsureVisibleY(rli.CanvasPosition.Bottom.CanvasToControl(Zoom));
+        EnsureVisibleY(rli.CanvasPosition.Top.CanvasToControl(Zoom));
         return true;
     }
 

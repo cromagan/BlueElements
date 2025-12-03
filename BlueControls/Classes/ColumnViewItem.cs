@@ -411,7 +411,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 : Math.Min(CanvasContentWidth.CanvasToControl(zoom), (int)(tableviewWith * 0.6));
         }
 
-        _controlColumnWidth = Math.Max((int)_controlColumnWidth, FilterBarListItem.AutoFilterSize); // Mindestens so groß wie der Autofilter;
+        _controlColumnWidth = Math.Max(_controlColumnWidth, FilterBarListItem.AutoFilterSize); // Mindestens so groß wie der Autofilter;
         return _controlColumnWidth;
     }
 

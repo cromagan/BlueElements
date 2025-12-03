@@ -694,13 +694,13 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
 
     protected override void OnMouseMove(CanvasMouseEventArgs e) {
         base.OnMouseMove(e);
-        DoMouseMovement(e.CanvasX, e.CanvasY);
+        DoMouseMovement(e.ControlX, e.ControlY);
     }
 
     protected override void OnMouseUp(CanvasMouseEventArgs e) {
         base.OnMouseUp(e);
         if (!Enabled) { return; }
-        var nd = _item.ElementAtPosition(e.CanvasX, e.CanvasY);
+        var nd = _item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY);
         if (nd is { Enabled: false }) { return; }
         switch (e.Button) {
             case MouseButtons.Left:
@@ -725,7 +725,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
                 break;
 
             case MouseButtons.Right:
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, _item.ElementAtPosition(e.CanvasX, e.CanvasY), e.ToMouseEventArgs());
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, _item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY), e.ToMouseEventArgs());
                 break;
         }
     }
@@ -894,11 +894,11 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
         _sorted = true;
     }
 
-    private void DoMouseMovement(float canvasX, float canvasY) {
+    private void DoMouseMovement(int controlX, int controlY) {
         if (IsDisposed) { return; }
 
         var isInForm = true;
-        var nd = _item.ElementAtPosition(canvasX, canvasY);
+        var nd = _item.ElementAtPosition(controlX, controlY, Zoom, OffsetX, OffsetY);
         if (!Enabled || Parent is not { Enabled: true } || !Visible) {
             nd = null;
             isInForm = false;
@@ -920,7 +920,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
         _mouseOverItem = nd;
 
         if (_mouseOverItem != null) {
-            var cp = _mouseOverItem.CanvasPosition.CanvasToControl(Zoom, OffsetX, OffsetY, true);
+            var cp = _mouseOverItem.ControlPosition(Zoom, OffsetX, OffsetY);
             var right = cp.Right;
             var p16 = 16.CanvasToControl(Zoom);
 

@@ -33,8 +33,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public FilterBarListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) {
-    }
+    public FilterBarListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) => IgnoreYOffset = true;
 
     #endregion
 

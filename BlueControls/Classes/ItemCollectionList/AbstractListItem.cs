@@ -93,10 +93,12 @@ public static class AbstractListItemExtension {
         try {
             object locker = new();
 
-            var visCanvasArea = visControlArea.ControlToCanvas(zoom, offsetX, offsetY);
+            //var visCanvasArea = visControlArea.ControlToCanvas(zoom, offsetX, offsetY);
 
-            Parallel.ForEach(list, thisItem => {
-                if (thisItem.IsVisible(visCanvasArea.ToRect())) {
+            list = [.. list.OrderBy(item => item.DrawOrder())];
+
+            foreach (var thisItem in list) {
+                if (thisItem.IsVisible(visControlArea, zoom, offsetX, offsetY)) {
                     var itemState = controlState;
                     if (_mouseOverItem == thisItem && !controlState.HasFlag(States.Checked_Disabled)) { itemState |= States.Standard_MouseOver; }
 
@@ -108,11 +110,12 @@ public static class AbstractListItemExtension {
                         thisItem.Draw(gr, visControlArea, offsetX, offsetY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, zoom);
                     }
                 }
-            });
+            }
         } catch { }
     }
 
-    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, float canvasX, float canvasY) => list.FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem?.CanvasPosition.Contains((int)canvasX, (int)canvasY) == true);
+    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int controlX, int controlY, float zoom, float offsetX, float offsetY) =>
+        list.OrderByDescending(item => item.DrawOrder()).FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem?.ControlPosition(zoom, offsetX, offsetY).Contains(controlX, controlY) == true);
 
     /// <summary>
     /// Gibt das erste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
@@ -492,6 +495,24 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
+    public bool IgnoreXOffset {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IgnoreYOffset {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public int Indent {
         get;
         set {
@@ -569,20 +590,36 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         return 0;
     }
 
-    public void Draw(Graphics gr, Rectangle visibleArea, float offsetX, float offsetY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float scale) {
+    /// <summary>
+    /// Spezielle Berechnung, doe die Ignore-Werte berücksichtigt
+    /// </summary>
+    /// <param name="zoom"></param>
+    /// <param name="offsetX"></param>
+    /// <param name="offsetY"></param>
+    /// <returns></returns>
+    public Rectangle ControlPosition(float zoom, float offsetX, float offsetY) {
+        if (IgnoreYOffset) { offsetY = 0; }
+        if (IgnoreXOffset) { offsetX = 0; }
+
+        return CanvasPosition.CanvasToControl(zoom, offsetX, offsetY, true);
+    }
+
+    public void Draw(Graphics gr, Rectangle visibleArea, float offsetX, float offsetY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float zoom) {
         if (itemdesign == Design.Undefiniert) { return; }
-        var canvasIndeted = CanvasPosition with { X = CanvasPosition.X + (Indent * 20), Y = CanvasPosition.Y, Width = CanvasPosition.Width - (Indent * 20) };
-        var controlIndented = canvasIndeted.CanvasToControl(scale, offsetX, offsetY, false);
+
+        var controlPos = ControlPosition(zoom, offsetX, offsetY);
+        var p20 = 20.CanvasToControl(zoom) * Indent;
+        var controlIndented = new Rectangle(controlPos.X + p20, controlPos.Y, controlPos.Width - p20, controlPos.Height);
 
         if (checkboxDesign != Design.Undefiniert) {
             var design = Skin.DesignOf(checkboxDesign, state);
-            gr.DrawImage(QuickImage.Get(design.Image, 12.CanvasToControl(scale)), controlIndented.X + 4.CanvasToControl(scale), controlIndented.Y + 3.CanvasToControl(scale));
-            controlIndented.X += 20.CanvasToControl(scale);
-            controlIndented.Width -= 20.CanvasToControl(scale);
+            gr.DrawImage(QuickImage.Get(design.Image, 12.CanvasToControl(zoom)), controlIndented.X + 4.CanvasToControl(zoom), controlIndented.Y + 3.CanvasToControl(zoom));
+            controlIndented.X += 20.CanvasToControl(zoom);
+            controlIndented.Width -= 20.CanvasToControl(zoom);
             if (state.HasFlag(States.Checked)) { state ^= States.Checked; }
         }
 
-        DrawExplicit(gr, visibleArea, controlIndented, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
+        DrawExplicit(gr, visibleArea, controlIndented, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
         if (drawBorderAndBack) {
             if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
                 var c1 = Skin.Color_Back(controldesign, States.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
@@ -607,7 +644,9 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         return _untrimmedCanvasSize;
     }
 
-    internal bool IsVisible(Rectangle visCanvasArea) => Visible && CanvasPosition.IntersectsWith(visCanvasArea);
+    internal string DrawOrder() => $"{IgnoreXOffset}{IgnoreYOffset}{CanvasPosition.X}{CanvasPosition.Y}";
+
+    internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
     internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new ObjectEventArgs(Tag));
 
