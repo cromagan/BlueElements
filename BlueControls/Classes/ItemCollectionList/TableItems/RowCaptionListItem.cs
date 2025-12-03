@@ -38,7 +38,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Key(null, chapterText), arrangement, chapterText.Trim('\\').PathParent()) {
         ChapterText = chapterText;
-        Expanded = true;
+        IsExpanded = true;
     }
 
     #endregion
@@ -46,9 +46,8 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
     #region Properties
 
     public string ChapterText { get; }
-    public bool Expanded { get; set; }
-
     public BlueFont Font_RowChapter => Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift);
+    public bool IsExpanded { get; set; }
     public override string QuickInfo => string.Empty;
 
     #endregion
@@ -83,7 +82,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionControl);
         var buttonPos = new Rectangle(1, (int)(positionControl.Bottom - si.Height - p5 - 2), (int)si.Width + p23 + p14, (int)si.Height + p5);
 
-        if (!Expanded) {
+        if (!IsExpanded) {
             var x = new ExtText(Design.Button_CheckBox, States.Checked);
             Button.DrawButton(null, gr, Design.Button_CheckBox, States.Checked, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, buttonPos, false);
             gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, buttonPos.Top + p5);

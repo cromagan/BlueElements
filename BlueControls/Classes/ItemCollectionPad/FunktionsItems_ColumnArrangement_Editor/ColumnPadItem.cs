@@ -66,7 +66,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public override string Description => string.Empty;
     public Renderer_Abstract Renderer { get; }
-    public string Tabelle => IsDisposed || CVI?.Column?.Table is not { IsDisposed: false } db ? "?" : db.KeyName;
+    public string Tabelle => IsDisposed || CVI?.Column?.Table is not { IsDisposed: false } tb ? "?" : tb.KeyName;
 
     /// <summary>
     /// Wird von Flexoptions aufgerufen

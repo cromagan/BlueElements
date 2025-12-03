@@ -163,8 +163,8 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false } db) {
-            result.ParseableAdd("OutputTable", db.KeyName);
+        if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false } tb) {
+            result.ParseableAdd("OutputTable", tb.KeyName);
         } else {
             result.ParseableAdd("OutputTable", _tableOutputName);
         }

@@ -122,9 +122,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [];
 
-        if (Row?.Table is { IsDisposed: false } db) {
+        if (Row?.Table is { IsDisposed: false } tb) {
             var layouts = new List<AbstractListItem>();
-            foreach (var thisLayouts in db.GetAllLayoutsFileNames()) {
+            foreach (var thisLayouts in tb.GetAllLayoutsFileNames()) {
                 ItemCollectionPadItem p = new(thisLayouts);
                 layouts.Add(ItemOf(p.Caption, p.KeyName, ImageCode.Stern));
             }

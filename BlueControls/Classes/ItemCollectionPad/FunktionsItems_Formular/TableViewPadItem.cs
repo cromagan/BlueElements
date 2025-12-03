@@ -110,8 +110,8 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
             new FlexiControl("Einstellungen:", widthOfControl, true)
         ];
 
-        if (TableOutput is { IsDisposed: false } db) {
-            result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, AllAvailableColumArrangemengts(db)));
+        if (TableOutput is { IsDisposed: false } tb) {
+            result.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, AllAvailableColumArrangemengts(tb)));
         }
 
         //if (TableOutput is { IsDisposed: false }) {

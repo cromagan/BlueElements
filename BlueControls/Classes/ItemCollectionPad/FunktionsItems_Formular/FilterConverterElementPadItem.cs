@@ -175,9 +175,9 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         //}
 
         //var inr = GetFilterFromGet();
-        if (TableOutput is { IsDisposed: false } dbout) {
+        if (TableOutput is { IsDisposed: false } tb) {
             var ic = new List<AbstractListItem>();
-            ic.AddRange(ItemsOf(dbout.Column, true));
+            ic.AddRange(ItemsOf(tb.Column, true));
             result.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
 
             var ic2 = new List<AbstractListItem>();

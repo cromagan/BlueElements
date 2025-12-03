@@ -175,9 +175,9 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
             new FlexiControl("Einstellungen:", widthOfControl, true)
         ];
 
-        if (TableOutput is { IsDisposed: false } db) {
+        if (TableOutput is { IsDisposed: false } tb) {
             var lst = new List<AbstractListItem>();
-            lst.AddRange(ItemsOf(db.Column, true));
+            lst.AddRange(ItemsOf(tb.Column, true));
 
             result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
         }

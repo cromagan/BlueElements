@@ -229,8 +229,8 @@ public partial class GlobalMonitor : Form {
     }
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
-        if (tblLog.Table is { IsDisposed: false } db) {
-            db.Row.Clear("Monitoring-Log geleert");
+        if (tblLog.Table is { IsDisposed: false } tb) {
+            tb.Row.Clear("Monitoring-Log geleert");
         }
 
         Develop.Message?.Invoke(ErrorType.Info, this, "Global", ImageCode.Information, "Monitoring-Log geleert", 0);

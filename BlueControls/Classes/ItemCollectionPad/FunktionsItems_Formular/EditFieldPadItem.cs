@@ -176,12 +176,12 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        if (TableInput is not { IsDisposed: false } db) { return result; }
+        if (TableInput is not { IsDisposed: false } tb) { return result; }
 
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
 
         var lst = new List<AbstractListItem>();
-        lst.AddRange(ItemsOf(db.Column, true));
+        lst.AddRange(ItemsOf(tb.Column, true));
 
         result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 

@@ -79,9 +79,9 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public ColumnItem? AdditionalInfoColumn {
         get {
-            if (TableOutput is not { IsDisposed: false } dbout) { return null; }
+            if (TableOutput is not { IsDisposed: false } tb) { return null; }
 
-            var c = dbout.Column[_additinalInfoColumnName];
+            var c = tb.Column[_additinalInfoColumnName];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
@@ -132,9 +132,9 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// </summary>
     public ColumnItem? OriginIDColumn {
         get {
-            if (TableOutput is not { IsDisposed: false } dbout) { return null; }
+            if (TableOutput is not { IsDisposed: false } tb) { return null; }
 
-            var c = dbout.Column[_originIdColumnName];
+            var c = tb.Column[_originIdColumnName];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
@@ -248,9 +248,9 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
             result.Add(new FlexiDelegateControl(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
         }
 
-        if (TableOutput is { IsDisposed: false } dbout) {
+        if (TableOutput is { IsDisposed: false } tb) {
             var lst = new List<AbstractListItem>();
-            lst.AddRange(ItemsOf(dbout.Column, true));
+            lst.AddRange(ItemsOf(tb.Column, true));
 
             result.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
             result.Add(new FlexiControlForProperty<string>(() => AdditionalInfoColumnName, lst));

@@ -202,12 +202,12 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var layouts = new List<AbstractListItem>();
 
-        if (TableInput is { IsDisposed: false } db) {
+        if (TableInput is { IsDisposed: false } tb) {
 
             #region Verfügbare Layouts ermitteln
 
-            if (DirectoryExists(db.AdditionalFilesPathWhole())) {
-                var f = GetFiles(db.AdditionalFilesPathWhole(), "*.bcr", System.IO.SearchOption.TopDirectoryOnly);
+            if (DirectoryExists(tb.AdditionalFilesPathWhole())) {
+                var f = GetFiles(tb.AdditionalFilesPathWhole(), "*.bcr", System.IO.SearchOption.TopDirectoryOnly);
 
                 layouts.AddRange(ItemsOf(f));
             }

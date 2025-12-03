@@ -72,9 +72,9 @@ public class RowFormulaListItem : AbstractListItem {
 
     public override string QuickInfo {
         get {
-            if (_row?.Table is not { IsDisposed: false } db) { return string.Empty; }
+            if (_row?.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
-            return !string.IsNullOrEmpty(db.RowQuickInfo)
+            return !string.IsNullOrEmpty(tb.RowQuickInfo)
                 ? _row.GetQuickInfo().CreateHtmlCodes()
                 : _row.CellFirstString().CreateHtmlCodes();
         }

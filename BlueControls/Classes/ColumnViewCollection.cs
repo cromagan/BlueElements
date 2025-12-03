@@ -68,11 +68,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     /// <summary>
     /// Controll gibt an, dass es sich um Koordinten auf Controll ebene handel (nicht Canvas)
+    /// Es muss mit Control-Koordinaten gearbeitet werden, da verschiedene Zoom-Stufen anderen Spaltenbreiten haben können
     /// </summary>
     public int ControlColumnsPermanentWidth { get; private set; }
 
     /// <summary>
     /// Controll gibt an, dass es sich um Koordinten auf Controll ebene handel (nicht Canvas)
+    /// Es muss mit Control-Koordinaten gearbeitet werden, da verschiedene Zoom-Stufen anderen Spaltenbreiten haben können
     /// </summary>
     public int ControlColumnsWidth { get; private set; }
 
@@ -389,7 +391,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Reduce(string[] columns) {
         foreach (var thiscv in _internal) {
             if (thiscv?.Column is { IsDisposed: false } ci) {
-                thiscv.Reduced = columns.Contains(ci.KeyName);
+                thiscv.IsExpanded = !columns.Contains(ci.KeyName);
             }
         }
     }
@@ -397,7 +399,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public List<ColumnItem> ReducedColumns() {
         var x = new List<ColumnItem>();
         foreach (var thiscol in _internal) {
-            if (thiscol is { Column: not null, Reduced: true }) { x.Add(thiscol.Column); }
+            if (thiscol is { Column: not null, IsExpanded: false }) { x.Add(thiscol.Column); }
         }
         return x;
     }

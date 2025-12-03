@@ -82,7 +82,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
     private DateTime? _tableDrawError;
-    private bool mustResort = true;
+    private bool mustDoAllViewItems = true;
 
     #endregion
 
@@ -216,7 +216,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             Table.PowerEdit = value;
             Filter.Invalidate_FilteredRows(); // Split-Spalten-Filter
             FilterCombined.Invalidate_FilteredRows();
-            Invalidate_SortedRowData(false); // Neue Zeilen können nun erlaubt sein
+            Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
         }
     }
 
@@ -243,7 +243,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (value == field) { return; }
             CloseAllComponents();
             field = value;
-            Invalidate_SortedRowData(false);
+            Invalidate_AllViewItems(false);
             Invalidate();
         }
     }
@@ -297,11 +297,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private List<AbstractListItem>? AllViewItems {
         get {
             if (IsDisposed) { return null; }
-            if (!mustResort) { return _rowViewItems; }
+            if (!mustDoAllViewItems) { return _rowViewItems; }
 
             try {
-                mustResort = false;
-                CalculateSortedRows(_rowViewItems);
+                mustDoAllViewItems = false;
+                CalculateAllViewItems(_rowViewItems);
 
                 OnVisibleRowsChanged();
 
@@ -309,7 +309,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             } catch {
                 // Komisch, manchmal wird die Variable _sortedRowData verworfen.
                 Develop.AbortAppIfStackOverflow();
-                Invalidate_SortedRowData(false);
+                Invalidate_AllViewItems(false);
                 return AllViewItems;
             }
         }
@@ -917,10 +917,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (AllViewItems is not { } _rowsFilteredAndPinned) { return; }
 
         foreach (var thisR in _rowsFilteredAndPinned) {
-            if (thisR is RowCaptionListItem { IsDisposed: false, Expanded: true } rcli) { rcli.Expanded = false; did = true; }
+            if (thisR is RowCaptionListItem { IsDisposed: false, IsExpanded: true } rcli) { rcli.IsExpanded = false; did = true; }
         }
 
-        if (did) { Invalidate_SortedRowData(false); }
+        if (did) { Invalidate_AllViewItems(false); }
     }
 
     public void CursorPos_Set(ColumnViewItem? column, AbstractListItem? row, bool ensureVisible) {
@@ -964,13 +964,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (AllViewItems is not { } _rowsFilteredAndPinned) { return; }
 
         foreach (var thisR in _rowsFilteredAndPinned) {
-            if (thisR is RowCaptionListItem { IsDisposed: false, Expanded: false } rcli) { rcli.Expanded = true; did = true; }
+            if (thisR is RowCaptionListItem { IsDisposed: false, IsExpanded: false } rcli) { rcli.IsExpanded = true; did = true; }
         }
 
         if (did) {
             CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
 
-            Invalidate_SortedRowData(false);
+            Invalidate_AllViewItems(false);
         }
     }
 
@@ -1303,21 +1303,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         PinnedRows.Clear();
         PinnedRows.AddRange(rows);
-        Invalidate_SortedRowData(false);
+        Invalidate_AllViewItems(false);
         OnPinnedChanged();
     }
 
     public void PinAdd(RowItem? row) {
         if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Add(row);
-        Invalidate_SortedRowData(false);
+        Invalidate_AllViewItems(false);
         OnPinnedChanged();
     }
 
     public void PinRemove(RowItem? row) {
         if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Remove(row);
-        Invalidate_SortedRowData(false);
+        Invalidate_AllViewItems(false);
         OnPinnedChanged();
     }
 
@@ -1327,7 +1327,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         PinnedRows.Clear();
 
-        Invalidate_SortedRowData(true);
+        Invalidate_AllViewItems(true);
 
         QuickInfo = string.Empty;
         _sortDefinitionTemporary = null;
@@ -1390,7 +1390,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Refresh(); // um die Uhr anzuzeigen
         Table = tb;
         Invalidate_CurrentArrangement();
-        Invalidate_SortedRowData(true);
+        Invalidate_AllViewItems(true);
         Filter.Table = tb;
         FilterCombined.Table = tb;
 
@@ -1778,9 +1778,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_mouseOverRow is RowCaptionListItem rcli) {
                 CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
 
-                rcli.Expanded = !rcli.Expanded;
+                rcli.IsExpanded = !rcli.IsExpanded;
 
-                Invalidate_SortedRowData(false);
+                Invalidate_AllViewItems(false);
             }
             EnsureVisible(_mouseOverColumn, _mouseOverRow);
             CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
@@ -1856,8 +1856,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
 
                 if (_mouseOverRowItem is ColumnsHeadListItem) {
-                    _mouseOverColumn.Reduced = !_mouseOverColumn.Reduced;
-                    Invalidate();
+                    _mouseOverColumn.IsExpanded = !_mouseOverColumn.IsExpanded;
+                    Invalidate_AllViewItems(false);
                     return;
                 }
 
@@ -1895,8 +1895,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             _isinSizeChanged = true;
 
             Invalidate_CurrentArrangement();
-            Invalidate_SortedRowData(false); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
-                                             //CurrentArrangement?.Invalidate_DrawWithOfAllItems();
+            Invalidate_AllViewItems(false); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
+                                            //CurrentArrangement?.Invalidate_DrawWithOfAllItems();
 
             _isinSizeChanged = false;
         }
@@ -2010,14 +2010,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (SortUsed() is { } rsd) {
             if (rsd.UsedForRowSort(e.Column) || e.Column == Table?.Column.SysChapter) {
-                Invalidate_SortedRowData(false);
+                Invalidate_AllViewItems(false);
             }
         }
 
         if (e.Column.MultiLine) {
             if (CurrentArrangement is { IsDisposed: false } ca) {
                 if (ca[e.Column] is { IsDisposed: false }) {
-                    Invalidate_SortedRowData(false); // Zeichenhöhe kann sich ändern...
+                    Invalidate_AllViewItems(false); // Zeichenhöhe kann sich ändern...
                 }
 
                 //cv.Invalidate_CanvasContentWidth(); // Kann auf sich selbst aufpassen
@@ -2042,7 +2042,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         _pg?.Update(e.Current);
     }
 
-    private void _Table_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData(false);
+    private void _Table_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_AllViewItems(false);
 
     private void _Table_StoreView(object sender, System.EventArgs e) =>
                 //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
@@ -2063,7 +2063,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 ResetView();
             }
 
-            Invalidate_SortedRowData(false); // Neue Zeilen können nun erlaubt sein
+            Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
             Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
             CheckView();
         } else {
@@ -2253,10 +2253,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         tb.Edit(typeof(TableHeadEditor));
     }
 
-    private void CalculateSortedRows(List<AbstractListItem>? items) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || items == null || SortUsed() is not { } sortused) {
+    private void CalculateAllViewItems(List<AbstractListItem>? allItems) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb || allItems == null || SortUsed() is not { } sortused) {
             VisibleRowCount = 0;
-            items?.Clear();
+            allItems?.Clear();
             return;
         }
 
@@ -2274,40 +2274,40 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #region Spaltenkopf erstellen
 
-        var columnHead = items.First<ColumnsHeadListItem>();
+        var columnHead = allItems.First<ColumnsHeadListItem>();
         if (columnHead == null) {
             columnHead = new ColumnsHeadListItem(arrangement);
-            items.Add(columnHead);
+            allItems.Add(columnHead);
         }
 
         #endregion
 
         #region Sort-Anzeige erstellen
 
-        var sortAnzeige = items.First<SortBarListItem>();
+        var sortAnzeige = allItems.First<SortBarListItem>();
         if (sortAnzeige == null) {
             sortAnzeige = new SortBarListItem(arrangement);
-            items.Add(sortAnzeige);
+            allItems.Add(sortAnzeige);
         }
 
         #endregion
 
         #region Filter erstellen
 
-        var columnFilter = items.First<FilterBarListItem>();
+        var columnFilter = allItems.First<FilterBarListItem>();
         if (columnFilter == null) {
             columnFilter = new FilterBarListItem(arrangement);
-            items.Add(columnFilter);
+            allItems.Add(columnFilter);
         }
 
         #endregion
 
         #region NeueZeileItem erstellen
 
-        var newRow = items.First<NewRowListItem>();
+        var newRow = allItems.First<NewRowListItem>();
         if (newRow == null) {
             newRow = new NewRowListItem(arrangement);
-            items.Add(newRow);
+            allItems.Add(newRow);
         }
 
         #endregion
@@ -2336,11 +2336,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         foreach (var thisCap in expandedCaps) {
             lock (lockMe) {
-                var capi = items.Get(null, thisCap);
+                var capi = allItems.Get(null, thisCap);
 
                 if (capi == null) {
                     capi = new RowCaptionListItem(thisCap, arrangement);
-                    items.Add(capi);
+                    allItems.Add(capi);
                 }
                 //capi.Visible = true;
             }
@@ -2366,13 +2366,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             foreach (var thisCap in caps) {
                 RowListItem? it;
                 lock (lockMe) {
-                    it = items.Get(thisRow, thisCap) as RowListItem;
+                    it = allItems.Get(thisRow, thisCap) as RowListItem;
                 }
 
                 if (it is null) {
                     it = new RowListItem(thisRow, thisCap, arrangement);
                     lock (lockMe) {
-                        items.Add(it);
+                        allItems.Add(it);
                     }
                 }
 
@@ -2392,14 +2392,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var l = new List<string>();
 
-        foreach (var thisR in items) {
+        foreach (var thisR in allItems) {
             lock (lockMe) {
-                if (thisR is RowCaptionListItem { IsDisposed: false, Expanded: false } rcli) {
+                if (thisR is RowCaptionListItem { IsDisposed: false, IsExpanded: false } rcli) {
                     l.Add(rcli.ChapterText.ToUpperInvariant());
 
                     // Alle Untereinträge hinzufügen
                     var prefix = rcli.ChapterText.ToUpperInvariant() + "\\";
-                    foreach (var otherR in items) {
+                    foreach (var otherR in allItems) {
                         if (otherR is RowCaptionListItem { IsDisposed: false } otherRcli) {
                             if (otherRcli.ChapterText.ToUpperInvariant().StartsWith(prefix)) {
                                 l.Add(otherRcli.ChapterText);
@@ -2415,8 +2415,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #endregion
 
+        var wi = (int)arrangement.ControlColumnsWidth.ControlToCanvas(Zoom);
+
         lock (lockMe) {
-            foreach (var thisItem in items) {
+            foreach (var thisItem in allItems) {
                 if (thisItem is RowListItem rdli) {
                     rdli.UserDefCompareKey = sortused.Reverse ? "~" + rdli.Row.CompareKey(sortused) : rdli.Row.CompareKey(sortused);
                     rdli.Visible = false;
@@ -2428,6 +2430,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 if (thisItem is RowBackgroundListItem rbli) {
                     rbli.Arrangement = arrangement;
+                    rbli.CanvasPosition = rbli.CanvasPosition with { Width = wi };
                     //rbli.Visible = !_collapsed.Contains(rbli.AlignsToChapter);
                 }
 
@@ -2453,7 +2456,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
             }
 
-            items.Sort();
+            allItems.Sort();
 
             #region captionOrder erstellen
 
@@ -2461,7 +2464,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var captionOrder = new List<string>();
 
             // "Angepinnt" zuerst (falls vorhanden)
-            var pinnedCaption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.ChapterText == "Angepinnt");
+            var pinnedCaption = allItems.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.ChapterText == "Angepinnt");
             if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.ChapterText.ToUpperInvariant()); }
 
             // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
@@ -2485,7 +2488,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // Captions und ihre RowDataListItems in der ermittelten Reihenfolge hinzufügen
             foreach (var captionKey in captionOrder) {
                 // Caption hinzufügen
-                var caption = items.OfType<RowCaptionListItem>().FirstOrDefault(x => x.ChapterText.Equals(captionKey, StringComparison.OrdinalIgnoreCase));
+                var caption = allItems.OfType<RowCaptionListItem>().FirstOrDefault(x => x.ChapterText.Equals(captionKey, StringComparison.OrdinalIgnoreCase));
 
                 if (caption != null) { sortedItems.Add(caption); }
 
@@ -2502,9 +2505,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // Teil 3: CanvasPosition (y) setzen
             // ══════════════════════════════════════════════════════════════
             var y = 0;
+
             foreach (var thisItem in sortedItems) {
                 thisItem.Visible = true;
-                thisItem.CanvasPosition = new Rectangle(0, y, displayR.Width, thisItem.HeightInControl(ListBoxAppearance.Listbox, displayR.Width, Design.Item_Listbox));
+                thisItem.CanvasPosition = new Rectangle(0, y, wi, thisItem.HeightInControl(ListBoxAppearance.Listbox, wi, Design.Item_Listbox));
                 y = thisItem.CanvasPosition.Bottom;
             }
         }
@@ -2736,14 +2740,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         foreach (var thisR in r) {
             if (thisR is RowCaptionListItem { IsDisposed: false } rcli) {
-                if (rcli.Expanded == t.Contains(rcli.ChapterText)) {
-                    rcli.Expanded = !rcli.Expanded;
+                if (rcli.IsExpanded == t.Contains(rcli.ChapterText)) {
+                    rcli.IsExpanded = !rcli.IsExpanded;
                     did = true;
                 }
             }
         }
 
-        if (did) { Invalidate_SortedRowData(false); }
+        if (did) { Invalidate_AllViewItems(false); }
     }
 
     private void Column_ItemRemoving(object sender, ColumnEventArgs e) {
@@ -2999,7 +3003,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
         }
 
-        Invalidate_SortedRowData(false);
+        Invalidate_AllViewItems(false);
     }
 
     private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnFilterCombinedChanged();
@@ -3022,16 +3026,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //DoFilterOutput();
     }
 
-    private void Invalidate_CurrentArrangement() {
-        CurrentArrangement = null;
-        Invalidate();
-    }
-
-    private void Invalidate_SortedRowData(bool andclear) {
-        mustResort = true;
+    private void Invalidate_AllViewItems(bool andclear) {
+        mustDoAllViewItems = true;
         if (andclear) { _rowViewItems.Clear(); }
 
         Invalidate_MaxBounds();
+        Invalidate();
+    }
+
+    private void Invalidate_CurrentArrangement() {
+        CurrentArrangement = null;
         Invalidate();
     }
 
@@ -3087,7 +3091,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void OnViewChanged() {
         Invalidate_CurrentArrangement();
-        Invalidate_SortedRowData(false); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
+        Invalidate_AllViewItems(false); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -3119,7 +3123,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }
         if (PinnedRows.Contains(e.Row)) {
             PinnedRows.Remove(e.Row);
-            Invalidate_SortedRowData(false);
+            Invalidate_AllViewItems(false);
         }
     }
 

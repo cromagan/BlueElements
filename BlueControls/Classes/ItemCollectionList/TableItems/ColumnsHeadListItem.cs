@@ -59,7 +59,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         #region Recude-Button zeichnen
 
-        if (positionControl.Width > 70 || viewItem.Reduced) {
+        if (positionControl.Width > 70 || !viewItem.IsExpanded) {
             // Anpassen der Reduce-Button-CanvasPosition
 
             var p14 = 14.CanvasToControl(scale);
@@ -67,7 +67,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             var origReduceButtonLocation = new Rectangle((int)positionControl.Right - p14, (int)positionControl.Top, p14, p14);
 
             gr.DrawImage(
-                viewItem.Reduced ? QuickImage.Get("Pfeil_Rechts|" + origReduceButtonLocation.Width + "|||FF0000|||||20")
+                !viewItem.IsExpanded ? QuickImage.Get("Pfeil_Rechts|" + origReduceButtonLocation.Width + "|||FF0000|||||20")
                                 : QuickImage.Get("Pfeil_Links|" + origReduceButtonLocation.Width + "||||||||75"),
                 origReduceButtonLocation.Left,
                 origReduceButtonLocation.Top

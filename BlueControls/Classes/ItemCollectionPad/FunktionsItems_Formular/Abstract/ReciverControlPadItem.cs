@@ -132,9 +132,9 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             var g = GetFilterFromGet();
 
             if (g.Count > 0) {
-                if (g[0].TableOutput is { IsDisposed: false } db) {
-                    db.Editor ??= typeof(TableHeadEditor);
-                    return db;
+                if (g[0].TableOutput is { IsDisposed: false } tb) {
+                    tb.Editor ??= typeof(TableHeadEditor);
+                    return tb;
                 }
             }
             return null;

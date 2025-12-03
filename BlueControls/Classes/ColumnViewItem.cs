@@ -48,11 +48,13 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     /// <summary>
     /// Koordinaten OHNE ShiftX, aber skaliert auf Controlebene
+    /// Es muss mit Control-Koordinaten gearbeitet werden, da verschiedene Zoom-Stufen anderen Spaltenbreiten haben können
     /// </summary>
     private int _controlColumnLeft;
 
     /// <summary>
     /// Control heißt, dass die Kooridanten sich auf die Controllebene beziehen und nicht auf den Canvas
+    /// Es muss mit Control-Koordinaten gearbeitet werden, da verschiedene Zoom-Stufen anderen Spaltenbreiten haben können
     /// </summary>
     private int _controlColumnWidth;
 
@@ -81,7 +83,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         //AutoFilterLocation = Rectangle.Empty;
         //ReduceLocation = Rectangle.Empty;
         Invalidate_CanvasContentWidth();
-        Reduced = false;
+        IsExpanded = true;
         Renderer = string.Empty;
         RendererSettings = string.Empty;
     }
@@ -171,6 +173,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public bool IsDisposed { get; private set; }
 
+    public bool IsExpanded {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ColumnLineStyle LineLeft => Column?.LineStyleLeft ?? ColumnLineStyle.Dünn;
 
     public ColumnLineStyle LineRight => Column?.LineStyleRight ?? ColumnLineStyle.Ohne;
@@ -178,15 +189,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public bool Permanent {
         get => ViewType == ViewType.PermanentColumn;
         set => ViewType = value ? ViewType.PermanentColumn : ViewType.Column;
-    }
-
-    public bool Reduced {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
     }
 
     public string Renderer { get; set; }
@@ -401,7 +403,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             return _controlColumnWidth;
         }
 
-        if (Reduced) {
+        if (!IsExpanded) {
             _controlColumnWidth = 16;
         } else {
             _controlColumnWidth = ViewType == ViewType.PermanentColumn
@@ -419,8 +421,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (_column != null) {
             _column.PropertyChanged += _column_PropertyChanged;
 
-            if (_column.Table is { IsDisposed: false } db) {
-                db.Cell.CellValueChanged += Cell_CellValueChanged;
+            if (_column.Table is { IsDisposed: false } tb) {
+                tb.Cell.CellValueChanged += Cell_CellValueChanged;
             }
         }
     }
@@ -428,8 +430,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private void UnRegisterEvents() {
         if (_column != null) {
             _column.PropertyChanged -= _column_PropertyChanged;
-            if (_column.Table is { IsDisposed: false } db) {
-                db.Cell.CellValueChanged -= Cell_CellValueChanged;
+            if (_column.Table is { IsDisposed: false } tb) {
+                tb.Cell.CellValueChanged -= Cell_CellValueChanged;
             }
         }
     }
