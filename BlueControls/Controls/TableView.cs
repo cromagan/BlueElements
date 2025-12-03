@@ -158,18 +158,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         get {
             if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
 
-            if (field != null) { return field; }
+            if (field == null) {
+                var tcvc = ColumnViewCollection.ParseAll(tb);
+                field = tcvc.GetByKey(_arrangement);
 
-            var tcvc = ColumnViewCollection.ParseAll(tb);
-            field = tcvc.GetByKey(_arrangement);
-
-            if (field == null && tcvc.Count > 1) { field = tcvc[1]; }
-            if (field == null && tcvc.Count > 0) { field = tcvc[0]; }
-
-            if (field is { } cu) {
-                cu.SheetStyle = SheetStyle;
-                cu.ComputeAllColumnPositions(AvailableControlPaintArea().Width, Zoom);
+                if (field == null && tcvc.Count > 1) { field = tcvc[1]; }
+                if (field == null && tcvc.Count > 0) { field = tcvc[0]; }
             }
+
+            field?.SheetStyle = SheetStyle;
+            field?.ComputeAllColumnPositions(AvailableControlPaintArea().Width, Zoom);
 
             return field;
         }
@@ -245,6 +243,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (value == field) { return; }
             CloseAllComponents();
             field = value;
+            Invalidate_SortedRowData(false);
             Invalidate();
         }
     }
@@ -1604,6 +1603,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
         // Haupt-Aufbau-Routine ------------------------------------
+
         var t = sortedRowData.CanvasItemData(Design.Item_Listbox);
         sortedRowData.DrawItems(gr, AvailableControlPaintArea(), null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
 
@@ -2069,8 +2069,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         } else {
             _storedView = string.Empty;
             if (CurrentArrangement is { } ca) {
-                ca.Invalidate_ContentWidthOfAllItems();
-                ca.Invalidate_XOfAllItems();
+                ca.Invalidate();
             }
             CheckView();
         }
@@ -3050,14 +3049,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (newColumn != null) {
             if (direction.HasFlag(Direction.Links)) {
-                if (ca.PreviousVisible(newColumn) != null) {
-                    newColumn = ca.PreviousVisible(newColumn);
-                }
+                if (ca.PreviousVisible(newColumn) is { } c) { newColumn = c; }
             }
             if (direction.HasFlag(Direction.Rechts)) {
-                if (ca.NextVisible(newColumn) != null) {
-                    newColumn = ca.NextVisible(newColumn);
-                }
+                if (ca.NextVisible(newColumn) is { } c) { newColumn = c; }
             }
         }
 

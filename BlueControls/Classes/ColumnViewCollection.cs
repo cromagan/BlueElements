@@ -38,6 +38,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<string> _permissionGroups_show = [];
 
+    private bool _invalidated = true;
+
     #endregion
 
     #region Constructors
@@ -169,7 +171,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         for (var z = 0; z < ca.Count; z++) {
             if (ca[z]?.Column == null || !tb.Column.Contains(ca[z]?.Column)) {
-                ca.RemoveAt(z);
+                ca.Remove(ca[z]);
                 z--;
             }
         }
@@ -205,26 +207,27 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Add(ColumnItem column) {
         if (column is not { IsDisposed: false }) { return; }
 
-        Add(new ColumnViewItem(column, this));
+        Add(new ColumnViewItem(column));
     }
 
-    public void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
+    public void Add(ColumnViewItem columnViewItem) {
+        columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
+        _internal.Add(columnViewItem);
+    }
 
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
 
     public void ComputeAllColumnPositions(int tableviewWith, float zoom) {
-        foreach (var thisViewItem in this) {
-            thisViewItem.Invalidate_ControlColumnWidth();
-            thisViewItem.Invalidate_ControlColumnLeft();
-        }
+        if (!_invalidated) { return; }
         ControlColumnsPermanentWidth = 0;
         ControlColumnsWidth = 0;
         if (IsDisposed) { return; }
 
+        _invalidated = false;
         var maxX = 0;
 
         foreach (var thisViewItem in this) {
-            thisViewItem.ComputeLocation(maxX, tableviewWith, zoom);
+            thisViewItem.ComputeLocation(this, maxX, tableviewWith, zoom);
 
             maxX = thisViewItem.ControlColumnRight(0);
 
@@ -261,7 +264,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void HideSystemColumns() {
         foreach (var thisViewItem in this) {
             if (thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn())) {
-                _internal.Remove(thisViewItem);
+                Remove(thisViewItem);
                 HideSystemColumns();
                 return;
             }
@@ -270,17 +273,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem == null ? -1 : _internal.IndexOf(columnViewItem);
 
-    public void Invalidate_ContentWidthOfAllItems() {
-        foreach (var thisViewItem in _internal) {
-            thisViewItem?.Invalidate_CanvasContentWidth();
-        }
-    }
-
-    public void Invalidate_XOfAllItems() {
-        foreach (var thisViewItem in _internal) {
-            thisViewItem?.Invalidate_ControlColumnLeft();
-        }
-    }
+    public void Invalidate() => _invalidated = true;
 
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
@@ -300,7 +293,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public ColumnViewItem? NextVisible(ColumnViewItem? viewItem) {
         if (viewItem == null) { return null; }
+
         var viewItemNo = _internal.IndexOf(viewItem);
+
         if (viewItemNo < 0) { return null; }
         do {
             viewItemNo++;
@@ -343,14 +338,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             case "column":
             case "columndata":
 
-                _internal.Add(new ColumnViewItem(this, value.FromNonCritical())); // BAse, um Events zu vermeiden
+                Add(new ColumnViewItem(Table, value.FromNonCritical())); // BAse, um Events zu vermeiden
 
                 return true;
 
             case "columns":
                 if (value.GetAllTags() is { } x) {
                     foreach (var pair2 in x) {
-                        _internal.Add(new ColumnViewItem(this, pair2.Value.FromNonCritical())); // BAse, um Events zu vermeiden
+                        Add(new ColumnViewItem(Table, pair2.Value.FromNonCritical())); // BAse, um Events zu vermeiden
                     }
                 }
                 return true;
@@ -372,8 +367,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return false;
     }
 
-    public ColumnViewItem? PreviousVisible(ColumnViewItem viewItem) {
+    public ColumnViewItem? PreviousVisible(ColumnViewItem? viewItem) {
+        if (viewItem == null) { return null; }
+
         var viewItemNo = _internal.IndexOf(viewItem);
+
         do {
             viewItemNo--;
             if (viewItemNo < 0) { return null; }
@@ -404,22 +402,26 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return x;
     }
 
-    public void RemoveAll() => _internal.Clear();
+    public void RemoveAll() {
+        List<ColumnViewItem> l = [.. _internal];
 
-    public void RemoveAt(int z) => _internal.RemoveAt(z);
+        foreach (var thiscol in l) {
+            Remove(thiscol);
+        }
+    }
 
     public void ShowAllColumns() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         foreach (var thisColumn in tb.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
-                Add(new ColumnViewItem(thisColumn, this));
+                Add(new ColumnViewItem(thisColumn));
             }
         }
 
         foreach (var thisColumn in tb.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
-                Add(new ColumnViewItem(thisColumn, this));
+                Add(new ColumnViewItem(thisColumn));
             }
         }
     }
@@ -431,27 +433,34 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             var thisColumn = Table?.Column[thisColumnName];
 
             if (thisColumn != null && this[thisColumn] == null && this[thisColumn] == null && !thisColumn.IsDisposed) {
-                Add(new ColumnViewItem(thisColumn, this));
+                Add(new ColumnViewItem(thisColumn));
             }
         }
     }
 
-    public void Swap(int index1, int index2) {
-        if (index1 == index2) { return; }
-
-        (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
-
-        if (_internal[index2].ViewType != ViewType.PermanentColumn) { _internal[index1].ViewType = ViewType.Column; }
-    }
-
     public QuickImage? SymbolForReadableText() => null;
 
+    //    if (_internal[index2].ViewType != ViewType.PermanentColumn) { _internal[index1].ViewType = ViewType.Column; }
+    //}
     public override string ToString() => ParseableItems().FinishParseable();
 
+    //    (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+
+    private void ColumnViewItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        Invalidate();
+    }
 
     private void OnStyleChanged() {
         StyleChanged?.Invoke(this, System.EventArgs.Empty);
+        Invalidate();
+    }
+
+    private void Remove(ColumnViewItem? columnViewItem) {
+        if (columnViewItem == null || !_internal.Contains(columnViewItem)) { return; }
+        columnViewItem.PropertyChanged -= ColumnViewItem_PropertyChanged;
+        Invalidate();
+        _internal.Remove(columnViewItem);
     }
 
     #endregion

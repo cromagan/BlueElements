@@ -24,17 +24,17 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
+using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
 namespace BlueTable;
 
-public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable, INotifyPropertyChanged {
+public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable, INotifyPropertyChanged, IHasTable {
 
     #region Fields
 
@@ -49,12 +49,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     /// <summary>
     /// Koordinaten OHNE ShiftX, aber skaliert auf Controlebene
     /// </summary>
-    private int? _controlColumnLeft;
+    private int _controlColumnLeft;
 
     /// <summary>
     /// Control heißt, dass die Kooridanten sich auf die Controllebene beziehen und nicht auf den Canvas
     /// </summary>
-    private int? _controlColumnWidth;
+    private int _controlColumnWidth;
 
     private Color _fontColor_Caption = Color.Transparent;
 
@@ -66,22 +66,21 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Constructors
 
-    public ColumnViewItem(ColumnItem column, ColumnViewCollection parent) : this(parent) {
+    public ColumnViewItem(ColumnItem column) : this(column.Table) {
         Column = column;
         ViewType = ViewType.Column;
         Renderer = string.Empty;
     }
 
-    public ColumnViewItem(ColumnViewCollection parent, string toParse) : this(parent) => this.Parse(toParse);
+    public ColumnViewItem(Table? table, string toParse) : this(table) => this.Parse(toParse);
 
-    private ColumnViewItem(ColumnViewCollection parent) : base() {
-        Parent = parent;
+    private ColumnViewItem(Table? parent) : base() {
+        Table = parent;
         ViewType = ViewType.None;
         Column = null;
         //AutoFilterLocation = Rectangle.Empty;
         //ReduceLocation = Rectangle.Empty;
         Invalidate_CanvasContentWidth();
-        Invalidate_ControlColumnLeft();
         Reduced = false;
         Renderer = string.Empty;
         RendererSettings = string.Empty;
@@ -146,6 +145,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             _column = value;
             Invalidate_CanvasContentWidth();
             RegisterEvents();
+            OnPropertyChanged();
         }
     }
 
@@ -175,28 +175,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public ColumnLineStyle LineRight => Column?.LineStyleRight ?? ColumnLineStyle.Ohne;
 
-    ///// <summary>
-    ///// Koordinate der Spalte mit einbrechneten Slider
-    ///// </summary>
-    //public int? X_WithSlider { get; set; }
-    public ColumnViewCollection? Parent {
-        get;
-        set {
-            if (field == value) { return; }
-
-            if (field != null) {
-                field.StyleChanged -= _parent_StyleChanged;
-            }
-
-            field = value;
-            _parent_StyleChanged(null, System.EventArgs.Empty);
-
-            if (field != null) {
-                field.StyleChanged += _parent_StyleChanged;
-            }
-        }
-    }
-
     public bool Permanent {
         get => ViewType == ViewType.PermanentColumn;
         set => ViewType = value ? ViewType.PermanentColumn : ViewType.Column;
@@ -205,10 +183,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public bool Reduced {
         get;
         set {
-            if (field != value) {
-                field = value;
-                Invalidate_ControlColumnWidth();
-            }
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
         }
     }
 
@@ -216,18 +193,17 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string RendererSettings { get; set; }
 
-    public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : Win11;
+    public string SheetStyle { get; set; }
 
+    public Table? Table { get; }
     public int? TmpIfFilterRemoved { get; set; }
 
     public ViewType ViewType {
         get;
         set {
-            if (field != value) {
-                field = value;
-                Invalidate_ControlColumnWidth();
-                OnPropertyChanged();
-            }
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
         }
     } = ViewType.None;
 
@@ -258,10 +234,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public int ControlColumnLeft(float shiftX) {
         if (Permanent) {
-            return _controlColumnLeft ?? 0;
+            return _controlColumnLeft;
         }
 
-        return (_controlColumnLeft ?? 0) + (int)shiftX;
+        return _controlColumnLeft + (int)shiftX;
     }
 
     public int ControlColumnRight(float shiftX) => ControlColumnLeft(shiftX) + ControlColumnWidth ?? 0;
@@ -274,7 +250,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (!IsDisposed) {
             if (disposing) {
                 UnRegisterEvents();
-                Parent = null;
                 _column = null;
             }
             IsDisposed = true;
@@ -291,20 +266,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public void Invalidate_CanvasContentWidth() {
         _canvasContentWidth = null;
-        Invalidate_ControlColumnWidth();
+        OnPropertyChanged(nameof(CanvasContentWidth));
     }
-
-    public void Invalidate_ControlColumnLeft() => _controlColumnLeft = null;
-
-    public void Invalidate_ControlColumnWidth() {
-        if (ControlColumnWidth is null) { return; }
-
-        ControlColumnWidth = null;
-
-        Parent?.Invalidate_XOfAllItems();
-    }
-
-    public ColumnViewItem? NextVisible() => Parent?.NextVisible(this);
 
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -335,7 +298,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public bool ParseThis(string key, string value) {
-        if (Parent?.Table is not { IsDisposed: false } tb) {
+        if (Table is not { IsDisposed: false } tb) {
             Develop.DebugPrint(ErrorType.Error, "Tabelle unbekannt");
             return false;
         }
@@ -386,8 +349,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return false;
     }
 
-    public ColumnViewItem? PreviewsVisible() => Parent?.PreviousVisible(this);
-
     public string ReadableText() => _column?.ReadableText() ?? "?";
 
     public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();
@@ -396,12 +357,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     //}
     public override string ToString() => ParseableItems().FinishParseable();
 
-    internal void ComputeLocation(int x, int tableviewWith, float zoom) {
+    internal void ComputeLocation(ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
         if (Column == null) { return; }
 
         _controlColumnLeft = x;
 
-        ControlColumnWidth = ComputeControlColumnWidth(tableviewWith, zoom);
+        ControlColumnWidth = ComputeControlColumnWidth(parent, tableviewWith, zoom);
     }
 
     //    //if (!string.IsNullOrEmpty(CaptionGroup3)) {
@@ -411,13 +372,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     //    //} else if (!string.IsNullOrEmpty(CaptionGroup1)) {
     //    //    moveDown += pcch;
     //    //}
-    private void _column_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate_CanvasContentWidth();
-
-    //public Rectangle ReduceButtonLocation(float scale, float sliderx) {
-    //    var r = RealHead(scale, sliderx);
-    //    var size = (int)(18.CanvasToControl(scale));
-    //    var pcch = (int)(ColumnCaptionSizeY.CanvasToControl(scale));
-    private void _parent_StyleChanged(object? sender, System.EventArgs e) => Invalidate_CanvasContentWidth();
+    private void _column_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(Column));
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Column == _column) { Invalidate_CanvasContentWidth(); }
@@ -429,21 +384,21 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     /// <param name="tableviewWith"></param>
     /// <param name="zoom"></param>
     /// <returns></returns>
-    private int ComputeControlColumnWidth(int tableviewWith, float zoom) {
+    private int ComputeControlColumnWidth(ColumnViewCollection parent, int tableviewWith, float zoom) {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
-        if (Parent == null) { return 16; }
+        if (parent == null) { return 16; }
 
-        if (_controlColumnWidth is { } v) { return v; }
+        //if (_controlColumnWidth is { } v) { return v; }
 
         if (_column is not { IsDisposed: false }) {
             _controlColumnWidth = 16;
-            return (int)_controlColumnWidth;
+            return _controlColumnWidth;
         }
 
-        if (Parent.Count == 1) {
+        if (parent.Count == 1) {
             _controlColumnWidth = tableviewWith;
-            return (int)_controlColumnWidth;
+            return _controlColumnWidth;
         }
 
         if (Reduced) {
@@ -455,7 +410,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
 
         _controlColumnWidth = Math.Max((int)_controlColumnWidth, FilterBarListItem.AutoFilterSize); // Mindestens so groß wie der Autofilter;
-        return (int)_controlColumnWidth;
+        return _controlColumnWidth;
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

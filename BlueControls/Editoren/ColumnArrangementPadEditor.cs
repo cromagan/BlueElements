@@ -361,7 +361,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             var leftestItem = LeftestItem(itemsdone);
             if (leftestItem?.CVI is not { IsDisposed: false } cvi) { break; }
 
-            var item = new ColumnViewItem(ca, cvi.ParseableItems().FinishParseable());
+            var item = new ColumnViewItem(tb, cvi.ParseableItems().FinishParseable());
 
             if (!permanentPossible) { item.ViewType = ViewType.Column; }
             if (item.ViewType != ViewType.PermanentColumn) { permanentPossible = false; }
@@ -512,7 +512,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
                             var c2 = c.LinkedTable.Column[c.ColumnNameOfLinkedTable];
                             if (c2 != null) {
-                                var it2 = new ColumnPadItem(new ColumnViewItem(c2, ca), thisc.GetRenderer(Constants.Win11));
+                                var it2 = new ColumnPadItem(new ColumnViewItem(c2), thisc.GetRenderer(Constants.Win11));
                                 Pad.Items.Add(it2);
                                 it2.SetLeftTopPoint(kx, 600);
                                 if (it != null) {

@@ -256,15 +256,16 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
-
-        _column = _table?.CurrentArrangement?[_column]?.NextVisible()?.Column ?? _column;
+        var cu = _table?.CurrentArrangement?[_column];
+        _column = _table?.CurrentArrangement?.NextVisible(cu)?.Column ?? _column;
         Column_DatenAuslesen();
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
-        _column = _table?.CurrentArrangement?[_column]?.PreviewsVisible()?.Column ?? _column;
+        var cu = _table?.CurrentArrangement?[_column];
+        _column = _table?.CurrentArrangement?.PreviousVisible(cu)?.Column ?? _column;
         Column_DatenAuslesen();
     }
 
@@ -340,9 +341,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         lbxCellEditor.ItemAddRange(TableView.Permission_AllUsed(true));
 
-        if (_table?.CurrentArrangement is { IsDisposed: false } car) {
-            butAktuellZurueck.Enabled = car[_column]?.PreviewsVisible() != null;
-            butAktuellVor.Enabled = car[_column]?.NextVisible() != null;
+        if (_table?.CurrentArrangement is { IsDisposed: false } cu) {
+            var column = cu[_column];
+            butAktuellZurueck.Enabled = cu?.PreviousVisible(column) != null;
+            butAktuellVor.Enabled = cu?.NextVisible(column) != null;
         } else {
             butAktuellVor.Enabled = false;
             butAktuellZurueck.Enabled = false;

@@ -26,7 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Text;
 using System.Windows.Forms;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
