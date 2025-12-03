@@ -19,11 +19,12 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace BlueTable;
 
-public sealed class RowSortDefinition : List<ColumnItem>, IParseable {
+public sealed class RowSortDefinition : IParseable {
 
     #region Fields
 
@@ -61,8 +62,8 @@ public sealed class RowSortDefinition : List<ColumnItem>, IParseable {
     #region Properties
 
     public bool Reverse { get; private set; }
-
     public Table Table { get; }
+    public ReadOnlyCollection<ColumnItem> UsedColumns => _internal.AsReadOnly();
 
     #endregion
 
@@ -128,7 +129,7 @@ public sealed class RowSortDefinition : List<ColumnItem>, IParseable {
         }
     }
 
-    public List<RowItem> SortetdRows(IEnumerable<RowItem> rows) {
+    public List<RowItem> SortedRows(IEnumerable<RowItem> rows) {
         var sortedList = rows.OrderBy(item => item.CompareKey(_internal)).ToList();
 
         if (Reverse) { sortedList.Reverse(); }

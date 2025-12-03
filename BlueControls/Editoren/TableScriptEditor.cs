@@ -288,31 +288,32 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         // Das ausgewählte Skript aus der Liste abrufen
         var selectedlstEventScripts = lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem item ? (TableScriptDescription)item.Item : null;
         var l = new List<string>();
-        // Durchlaufen aller Undo-Operationen in der Tabelle
-        foreach (var thisUndo in tb.Undo) {
-            if (thisUndo.Command is TableDataType.EventScript) {
-                l.Add("############################################################################");
-                l.Add("############################################################################");
-                l.Add("############################################################################");
-                l.Add("############################################################################");
-                l.Add("############################################################################");
-                l.Add(thisUndo.DateTimeUtc.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + thisUndo.User);
+        // Durchlaufen aller Undox-Operationen in der Tabelle
 
-                l.Add("Art: " + thisUndo.Command);
-                // Überprüfen, ob das Skript geändert wurde
-                var ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
-                var found = false;
-                foreach (var t in ai) {
-                    var s = new TableScriptDescription(tb, t);
-                    if (s.KeyName == selectedlstEventScripts?.KeyName && selectedlstEventScripts.Script != s.Script) {
-                        l.Add(s.Script);
-                        found = true;
-                        break;
-                    }
+        var sortedUndoItems = tb.Undo.Where(item => item.Command is TableDataType.EventScript).OrderByDescending(item => item.DateTimeUtc);
+
+        foreach (var thisUndo in sortedUndoItems) {
+            l.Add("############################################################################");
+            l.Add("############################################################################");
+            l.Add("############################################################################");
+            l.Add("############################################################################");
+            l.Add("############################################################################");
+            l.Add(thisUndo.DateTimeUtc.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + thisUndo.User);
+
+            l.Add("Art: " + thisUndo.Command);
+            // Überprüfen, ob das Skript geändert wurde
+            var ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
+            var found = false;
+            foreach (var t in ai) {
+                var s = new TableScriptDescription(tb, t);
+                if (s.KeyName == selectedlstEventScripts?.KeyName && selectedlstEventScripts.Script != s.Script) {
+                    l.Add(s.Script);
+                    found = true;
+                    break;
                 }
-                if (!found) {
-                    l.Add("    -> Keine Änderung am gewählten Skript");
-                }
+            }
+            if (!found) {
+                l.Add("    -> Keine Änderung am gewählten Skript");
             }
         }
         // Schreiben der Liste in eine temporäre Datei

@@ -47,6 +47,11 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string ToString7(this DateTime value) => value.ToString("dd.MM.yyyy HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
+    /// <summary>
+    /// Zeitanzeige, bestens geeignet zum Sortieren.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static string ToString9(this DateTime value) => value.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
     #endregion

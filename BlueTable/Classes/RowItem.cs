@@ -376,7 +376,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return _lastCheckedEventArgs;
     }
 
-    public string CompareKey(List<ColumnItem> columns) {
+    public string CompareKey(ICollection<ColumnItem> columns) {
         var key = new StringBuilder();
 
         foreach (var thisColumn in columns) {
@@ -391,7 +391,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         var columns = new List<ColumnItem>();
-        if (tb.SortDefinition is { } lc) { columns.AddRange(lc); }
+        if (tb.SortDefinition is { } lc) { columns.AddRange(lc.UsedColumns); }
         if (tb.Column.SysChapter is { IsDisposed: false } csc) { columns.AddIfNotExists(csc); }
         if (tb.Column.First is { IsDisposed: false } cf) { columns.AddIfNotExists(cf); }
 
@@ -923,7 +923,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     /// <summary>
-    /// Setzt den Wert ohne Undo Logging
+    /// Setzt den Wert ohne Undox Logging
     /// </summary>
     /// <param name="column"></param>
     /// <param name="value"></param>

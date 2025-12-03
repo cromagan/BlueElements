@@ -48,7 +48,7 @@ public class Method_SortedRows : Method_TableGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
 
-        var r = tb.SortDefinition?.SortetdRows(tb.Row) ?? new RowSortDefinition(tb, tb.Column.First, false).SortetdRows(tb.Row);
+        var r = tb.SortDefinition?.SortedRows(tb.Row) ?? new RowSortDefinition(tb, tb.Column.First, false).SortedRows(tb.Row);
         return new DoItFeedback(new VariableListRow(r));
     }
 

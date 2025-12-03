@@ -188,7 +188,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         //EventScript_RemoveAll(true);
         //_variables.Clear();
         _variableTmp = string.Empty;
-        //Undo.Clear();
+        //Undox.Clear();
 
         // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
         // Die Events registriert werden, um z.B: das Passwort abzufragen
@@ -1202,7 +1202,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     //    if (!FileExists(ci.AdditionalData)) { return null; }
     /// <summary>
-    /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
+    /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undox).
     /// Der Wert wird intern fest verankert - bei ReadOnly werden aber weitere Schritte ignoriert.
     /// </summary>
     /// <param name="type"></param>
@@ -2010,8 +2010,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(TableVersion.Replace(".", string.Empty))) { Freeze("Tabelleversions-Konflikt"); }
 
-        Undo.OrderBy(k => k.DateTimeUtc);
-        //Undo.OrderByDescending(k => k.DateTimeUtc)
+        //Undox.OrderByDescending(k => k.DateTimeUtc)
 
         return true;
     }
@@ -2144,7 +2143,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
+    /// Befüllt den Undox Speicher und schreibt den auch im Filesystem
     /// </summary>
     /// <param name="type"></param>
     /// <param name="column"></param>

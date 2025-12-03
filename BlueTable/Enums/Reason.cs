@@ -21,7 +21,7 @@ public enum Reason {
     SetCommand = 0,
 
     /// <summary>
-    /// Es werden keine Werte invalidiert. Kein Undo geloggt. und auch keine Repairs oder Skripte ausgeführt.
+    /// Es werden keine Werte invalidiert. Kein Undox geloggt. und auch keine Repairs oder Skripte ausgeführt.
     /// Allerdings wird der Freeze-State umgangen. Z.B. um eine Tabelle laden zu können
     /// Wird benutzt beim Laden einer Tabelle, beim Systemspalten befüllen, oder nichtspeicherbare Spalten zu befüllen
     /// </summary>

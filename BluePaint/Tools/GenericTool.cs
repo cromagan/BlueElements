@@ -93,7 +93,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     public virtual void OnToolChanging() { }
 
     /// <summary>
-    /// Z.B: bei Undo
+    /// Z.B: bei Undox
     /// </summary>
     /// <returns></returns>
     internal virtual void PictureChangedByMainWindow() { }

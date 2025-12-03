@@ -143,7 +143,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-
     /// <summary>
     /// Gibt an, ob das Standard-Kontextmenu der Tabellenansicht angezeitgt werden soll oder nicht
     /// </summary>
@@ -324,7 +323,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             t += " - Systemspalte<br>";
         }
 
-        if (tb.SortDefinition?.Contains(column) ?? false) { t += " - Sortierung<br>"; }
+        if (tb.SortDefinition?.UsedColumns.Contains(column) ?? false) { t += " - Sortierung<br>"; }
         //var view = false;
         //foreach (var thisView in OldFormulaViews) {
         //    if (thisView[column] != null) { view = true; }
@@ -831,39 +830,40 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     //    }
     public static string Table_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolder.Text);
 
-    public static List<AbstractListItem> UndoItems(Table? db, string cellkey) {
+    public static List<AbstractListItem> UndoItems(Table? tb, string cellkey) {
         List<AbstractListItem> i = [];
 
-        if (db is { IsDisposed: false }) {
-            //table.GetUndoCache();
+        if (tb is not { IsDisposed: false }) { return i; }
+        if (tb.Undo.Count == 0) { return i; }
 
-            if (db.Undo.Count == 0) { return i; }
+        var sortedUndoItems = tb.Undo.Where(item => item.CellKey == cellkey).OrderByDescending(item => item.DateTimeUtc);
 
-            var isfirst = true;
-            TextListItem? las = null;
-            var lasNr = -1;
-            var co = 0;
-            for (var z = db.Undo.Count - 1; z >= 0; z--) {
-                if (db.Undo[z].CellKey == cellkey) {
-                    co++;
-                    lasNr = z;
-                    las = isfirst
-                        ? new TextListItem(
-                            "Aktueller Text - ab " + db.Undo[z].DateTimeUtc + " UTC, geändert von " +
-                            db.Undo[z].User, "Cancel", null, false, true, string.Empty)
-                        : new TextListItem(
-                            "ab " + db.Undo[z].DateTimeUtc + " UTC, geändert von " + db.Undo[z].User,
-                            co.ToStringInt5() + db.Undo[z].ChangedTo, null, false, true,
-                            string.Empty);
-                    isfirst = false;
-                    i.Add(las);
-                }
-            }
+        var isfirst = true;
+        TextListItem? las = null;
+        var lasNr = -1;
+        var co = 0;
 
-            if (las != null) {
-                co++;
-                i.Add(ItemOf("vor " + db.Undo[lasNr].DateTimeUtc + " UTC", co.ToStringInt5() + db.Undo[lasNr].PreviousValue));
-            }
+        foreach (var undoItem in sortedUndoItems) {
+            co++;
+            lasNr = tb.Undo.IndexOf(undoItem);
+            las = isfirst
+                ? new TextListItem(
+                    $"Aktueller Text - ab {undoItem.DateTimeUtc} UTC, geändert von {undoItem.User}",
+                    "Cancel", null, false, true, undoItem.DateTimeUtc.ToString9())
+                : new TextListItem(
+                   $"ab {undoItem.DateTimeUtc}  UTC, geändert von {undoItem.User}",
+                    co.ToStringInt5() + undoItem.ChangedTo, null, false, true, undoItem.DateTimeUtc.ToString9());
+            isfirst = false;
+
+            i.Add(las);
+        }
+
+        if (las != null) {
+            var undoItem = tb.Undo[lasNr];
+            var l2 = ItemOf($"vor {undoItem.DateTimeUtc} UTC",
+                co.ToStringInt5() + undoItem.PreviousValue, null, false, true, undoItem.DateTimeUtc.ToString9());
+
+            i.Add(l2);
         }
 
         return i;
@@ -2256,16 +2256,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             allItems?.Clear();
             return;
         }
-
-        //var displayR = AvailableControlPaintArea();
+        if (CurrentArrangement is not { } arrangement) { return; }
         _newRowsAllowed = UserEdit_NewRowAllowed();
-
         List<RowItem> pinnedRows = [.. PinnedRows];
-        var filteredRows = FilterCombined.Rows;
-        var arrangement = CurrentArrangement;
-
-        if (arrangement == null) { return; }
-
+        var filteredRows = sortused.SortedRows(FilterCombined.Rows);
         var nullcap = string.Empty;
         HashSet<string> expandedCaps = [];
 
@@ -2349,7 +2343,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         List<RowItem> allrows = [.. pinnedRows, .. filteredRows];
         allrows = [.. allrows.Distinct()];
-        var vis = new List<RowListItem>();
+        var visibleRowListItems = new List<RowListItem>();
 
         Parallel.ForEach(allrows, thisRow => {
             var markYellow = pinnedRows.Contains(thisRow);
@@ -2374,7 +2368,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
 
                 lock (lockMe) {
-                    vis.Add(it);
+                    visibleRowListItems.Add(it);
                 }
 
                 it.MarkYellow = markYellow;
@@ -2417,7 +2411,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         lock (lockMe) {
             foreach (var thisItem in allItems) {
                 if (thisItem is RowListItem rdli) {
-                    rdli.UserDefCompareKey = rdli.Row.CompareKey(sortused);
+                    rdli.UserDefCompareKey = rdli.Row.CompareKey(sortused.UsedColumns);
                     rdli.Visible = false;
                 }
                 if (thisItem is RowCaptionListItem rcli) {
@@ -2444,7 +2438,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (thisItem is SortBarListItem sli) {
                     sli.Visible = arrangement.ShowHead;
                     sli.FilterCombined = FilterCombined;
-                    sli.Sort = SortUsed();
+                    sli.Sort = sortused;
                 }
 
                 if (thisItem is NewRowListItem nrli) {
@@ -2465,7 +2459,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.ChapterText.ToUpperInvariant()); }
 
             // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
-            foreach (var dataItem in vis) {
+            foreach (var dataItem in visibleRowListItems) {
                 captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
             }
 
@@ -2493,12 +2487,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     // Alle RowDataListItems dieser Caption hinzufügen
 
                     if (sortused.Reverse) {
-                        var captionDataItems = vis.Where(x => x.AlignsToChapter == captionKey)
-                                                  .OrderBy(item => item.CompareKey());
+                        var captionDataItems = visibleRowListItems.Where(x => x.AlignsToChapter == captionKey)
+                                                  .OrderByDescending(item => item.CompareKey());
                         sortedItems.AddRange(captionDataItems);
                     } else {
-                        var captionDataItems = vis.Where(x => x.AlignsToChapter == captionKey)
-                                                  .OrderByDescending(item => item.CompareKey());
+                        var captionDataItems = visibleRowListItems.Where(x => x.AlignsToChapter == captionKey)
+                                                  .OrderBy(item => item.CompareKey());
                         sortedItems.AddRange(captionDataItems);
                     }
                 }
@@ -3014,8 +3008,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnFilterCombinedChanged();
 
     private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
-
-
 
     private void Invalidate_AllViewItems(bool andclear) {
         mustDoAllViewItems = true;

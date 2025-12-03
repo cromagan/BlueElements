@@ -62,7 +62,7 @@ public class UndoItem : IParseable {
 
     /// <summary>
     ///  Wird nicht vestringt!
-    ///  Welchen Usprung das Undo-Item hat
+    ///  Welchen Usprung das Undox-Item hat
     /// </summary>
     public string Container { get; set; } = string.Empty;
 

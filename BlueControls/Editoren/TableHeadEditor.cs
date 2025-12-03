@@ -281,7 +281,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (tb.SortDefinition != null) {
             btnSortRichtung.Checked = tb.SortDefinition.Reverse;
             if (tb.SortDefinition != null) {
-                foreach (var thisColumn in tb.SortDefinition) {
+                foreach (var thisColumn in tb.SortDefinition.UsedColumns) {
                     if (thisColumn is { IsDisposed: false }) {
                         lbxSortierSpalten.AddAndCheck(ItemOf(thisColumn));
                     }
