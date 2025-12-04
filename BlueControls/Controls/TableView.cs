@@ -39,6 +39,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -59,8 +60,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Fields
 
+    public const string Angepinnt = "Angepinnt";
     public const string CellDataFormat = "BlueElements.CellLink";
 
+    public const string Weitere_Zeilen = "Weitere Zeilen";
     private readonly Dictionary<string, AbstractListItem> _allViewItems = [];
 
     /// <summary>
@@ -2341,128 +2344,178 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
         if (CurrentArrangement is not { } arrangement) { return; }
         _newRowsAllowed = UserEdit_NewRowAllowed();
+
         List<RowItem> pinnedRows = [.. PinnedRows];
         var filteredRows = sortused.SortedRows(FilterCombined.Rows);
-        var nullcap = string.Empty;
-        HashSet<string> expandedCaps = [];
 
-        #region Spaltenkopf erstellen
+        List<RowItem> allrows = [.. pinnedRows, .. filteredRows];
+        allrows = [.. allrows.Distinct()];
 
-        allItems.TryGetValue(ColumnsHeadListItem.Identifier, out var columnHead);
-        if (columnHead == null) {
-            columnHead = new ColumnsHeadListItem(arrangement);
-            allItems.Add(columnHead.KeyName, columnHead);
-        }
+        var sortedItems = new List<AbstractListItem>();
 
-        #endregion
+        CalculateAllViewItems_AddHeadElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
 
-        #region Sort-Anzeige erstellen
+        var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, tb, filteredRows, pinnedRows);
 
-        allItems.TryGetValue(SortBarListItem.Identifier, out var sortAnzeige);
-        if (sortAnzeige == null) {
-            sortAnzeige = new SortBarListItem(arrangement);
-            allItems.Add(sortAnzeige.KeyName, sortAnzeige);
-        }
+        var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, tb, allrows, pinnedRows, allVisibleCaps, sortused);
 
-        #endregion
+        CalculateAllViewItems_Collapsed(allItems);
 
-        #region Filter erstellen
+        CalculateAllViewItems_HildeAllItems(allItems, arrangement);
 
-        allItems.TryGetValue(FilterBarListItem.Identifier, out var columnFilter);
-        if (columnFilter == null) {
-            columnFilter = new FilterBarListItem(arrangement);
-            allItems.Add(columnFilter.KeyName, columnFilter);
-        }
+        var captionOrder = CalculateAllViewItems_CaptionOrder(visibleRowListItems, allVisibleCaps);
 
-        #endregion
+        CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, sortused, visibleRowListItems);
 
-        #region NeueZeileItem erstellen
+        CalculateAllViewItems_CalculateYPosition(sortedItems, arrangement);
 
-        allItems.TryGetValue(NewRowListItem.Identifier, out var newRow);
-        if (newRow == null) {
-            newRow = new NewRowListItem(arrangement);
-            allItems.Add(newRow.KeyName, newRow);
-        }
+        DoCursorPos();
 
-        #endregion
+        _rowsVisibleUnique = allrows;
+    }
 
-        #region Überschriften erstellen
+    private HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, Table tb, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
+        HashSet<string> allCaps = [];
 
         if (tb.Column.SysChapter is { IsDisposed: false } cap) {
             var caps = cap.Contents(filteredRows);
+
             foreach (var capValue in caps) {
                 var parts = capValue.Trim('\\').Split('\\');
                 var currentPath = parts[0];
-                expandedCaps.Add(parts[0]);
+                allCaps.Add(parts[0]);
+
                 for (var i = 1; i < parts.Length; i++) {
                     currentPath += "\\" + parts[i];
-                    expandedCaps.Add(currentPath);
+                    allCaps.Add(currentPath);
                 }
             }
         }
 
         if (pinnedRows.Count > 0) {
-            nullcap = "Weitere Zeilen";
-            expandedCaps.Add("Angepinnt");
-            expandedCaps.Add(nullcap);
+            allCaps.Add(Angepinnt);
+            allCaps.Add(Weitere_Zeilen);
         }
 
-        foreach (var thisCap in expandedCaps) {
-            lock (lockMe) {
-                allItems.TryGetValue(RowCaptionListItem.Identifier(thisCap), out var capi);
-                if (capi == null) {
-                    capi = new RowCaptionListItem(thisCap, arrangement);
-                    allItems.Add(capi.KeyName, capi);
-                }
-                //capi.Visible = true;
+        foreach (var thisCap in allCaps) {
+            if (!allItems.TryGetValue(RowCaptionListItem.Identifier(thisCap), out var capi)) {
+                capi = new RowCaptionListItem(thisCap, arrangement);
+                allItems.Add(capi.KeyName, capi);
             }
         }
 
-        #endregion
+        return allCaps;
+    }
 
-        #region Gefiltere Zeilen erstellen (_rowData)
+    private void CalculateAllViewItems_AddCaptionsAndRows(Dictionary<string, AbstractListItem> allItems, List<AbstractListItem> sortedItems, List<string> captionOrder, RowSortDefinition sortused, List<RowListItem> visibleRowListItems) {
+        // Captions und ihre RowDataListItems in der ermittelten Reihenfolge hinzufügen
+        foreach (var captionKey in captionOrder) {
+            // Caption hinzufügen
 
-        List<RowItem> allrows = [.. pinnedRows, .. filteredRows];
-        allrows = [.. allrows.Distinct()];
-        var visibleRowListItems = new List<RowListItem>();
+            allItems.TryGetValue(RowCaptionListItem.Identifier(captionKey), out var caption);
+            if (caption != null) { sortedItems.Add(caption); }
 
-        Parallel.ForEach(allrows, thisRow => {
-            var markYellow = pinnedRows.Contains(thisRow);
-
-            var caps = tb.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
-            caps.Remove(string.Empty);
-            if (caps.Count == 0) { caps.Add(nullcap); }
-
-            if (markYellow) { caps.Add("Angepinnt"); }
-
-            foreach (var thisCap in caps) {
-                RowListItem? it;
-                lock (lockMe) {
-                    allItems.TryGetValue(RowListItem.Identifier(thisRow, thisCap), out var it2);
-                    it = it2 as RowListItem;
+            if (!_collapsed.Contains(captionKey)) {
+                if (sortused.Reverse) {
+                    var captionDataItems = visibleRowListItems.Where(x => x.AlignsToChapter == captionKey).OrderByDescending(item => item.CompareKey());
+                    sortedItems.AddRange(captionDataItems);
+                } else {
+                    var captionDataItems = visibleRowListItems.Where(x => x.AlignsToChapter == captionKey).OrderBy(item => item.CompareKey());
+                    sortedItems.AddRange(captionDataItems);
                 }
-
-                if (it is null) {
-                    it = new RowListItem(thisRow, thisCap, arrangement);
-                    lock (lockMe) {
-                        allItems.Add(it.KeyName, it);
-                    }
-                }
-
-                lock (lockMe) {
-                    visibleRowListItems.Add(it);
-                }
-
-                it.MarkYellow = markYellow;
             }
-        });
+        }
+    }
 
-        #endregion
+    private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
+        if (!arrangement.ShowHead) { return; }
 
-        // ---------------------------------------------------------------------------
+        // Spaltenköpfe direkt
+        allItems.TryGetValue(ColumnsHeadListItem.Identifier, out var item0);
+        if (item0 is not ColumnsHeadListItem columnHead) {
+            columnHead = new ColumnsHeadListItem(arrangement);
+            allItems.Add(columnHead.KeyName, columnHead);
+        }
+        columnHead.Visible = arrangement.ShowHead;
+        columnHead.IgnoreYOffset = true;
+        sortedItems.Add(columnHead);
+ 
 
-        #region Collapsed ermitteln
+        // Die Sortierung
+        allItems.TryGetValue(SortBarListItem.Identifier, out var item1);
+        if (item1 is not SortBarListItem sortAnzeige) {
+            sortAnzeige = new SortBarListItem(arrangement);
+            allItems.Add(sortAnzeige.KeyName, sortAnzeige);
+        }
+        sortAnzeige.Visible = arrangement.ShowHead;
+        sortAnzeige.FilterCombined = filterCombined;
+        sortAnzeige.Sort = sortused;
+        sortAnzeige.IgnoreYOffset = true;
+        sortedItems.Add(sortAnzeige);
 
+
+        // Filterleiste
+        allItems.TryGetValue(FilterBarListItem.Identifier, out var item2);
+        if (item2 is not FilterBarListItem columnFilter) {
+            columnFilter = new FilterBarListItem(arrangement);
+            allItems.Add(columnFilter.KeyName, columnFilter);
+        }
+        columnFilter.Visible = arrangement.ShowHead;
+        columnFilter.ShowNumber = ShowNumber;
+        columnFilter.FilterCombined = filterCombined;
+        columnFilter.RowsFilteredCount = filterCombined.Rows.Count;
+        columnFilter.IgnoreYOffset = true;
+        sortedItems.Add(columnFilter);
+
+
+        // Neue Zeile
+        if (string.IsNullOrEmpty(_newRowsAllowed)) {
+            allItems.TryGetValue(NewRowListItem.Identifier, out var item3);
+            if (item3 is not NewRowListItem newRow) {
+                newRow = new NewRowListItem(arrangement);
+                allItems.Add(newRow.KeyName, newRow);
+            }
+            newRow.Visible = string.IsNullOrEmpty(_newRowsAllowed);
+            newRow.FilterCombined = FilterCombined;
+            newRow.IgnoreYOffset = true;
+            sortedItems.Add(newRow);
+        }
+
+
+     
+    }
+
+    private void CalculateAllViewItems_CalculateYPosition(List<AbstractListItem> sortedItems, ColumnViewCollection arrangement) {
+        var wi = (int)arrangement.ControlColumnsWidth.ControlToCanvas(Zoom);
+
+        var y = 0;
+
+        foreach (var thisItem in sortedItems) {
+            thisItem.Visible = true;
+            thisItem.CanvasPosition = new Rectangle(0, y, wi, thisItem.HeightInControl(ListBoxAppearance.Listbox, wi, Design.Item_Listbox));
+            y = thisItem.CanvasPosition.Bottom;
+        }
+    }
+
+    private List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> visibleRowListItems, HashSet<string> allVisibleCaps) {
+        var captionOrder = new List<string>();
+
+        // "Angepinnt" zuerst (falls vorhanden)
+        if (allVisibleCaps.Contains(Angepinnt)) { captionOrder.Add(Angepinnt.ToUpperInvariant()); }
+
+        // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
+        foreach (var dataItem in visibleRowListItems) {
+            captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
+        }
+
+        return captionOrder;
+    }
+
+    /// <summary>
+    /// Berechnet die Variable _collapsed
+    /// </summary>
+    /// <param name="allItems"></param>
+    private void CalculateAllViewItems_Collapsed(Dictionary<string, AbstractListItem> allItems) {
         var l = new List<string>();
 
         foreach (var thisR in allItems.Values) {
@@ -2485,116 +2538,61 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         _collapsed.Clear();
         _collapsed.AddRange(l.SortedDistinctList());
+    }
 
-        #endregion
-
+    private void CalculateAllViewItems_HildeAllItems(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement) {
         var wi = (int)arrangement.ControlColumnsWidth.ControlToCanvas(Zoom);
 
-        lock (lockMe) {
-            foreach (var thisItem in allItems.Values) {
-                if (thisItem is RowListItem rdli) {
-                    rdli.UserDefCompareKey = rdli.Row.CompareKey(sortused.UsedColumns);
-                    rdli.Visible = false;
-                }
-                if (thisItem is RowCaptionListItem rcli) {
-                    rcli.Visible = false;
-                    //rcli.Visible = !_collapsed.Contains(rcli.RowChapter.PathParent());
-                }
+        foreach (var thisItem in allItems.Values) {
+            thisItem.Visible = false;
 
-                if (thisItem is RowBackgroundListItem rbli) {
-                    rbli.Arrangement = arrangement;
-                    rbli.CanvasPosition = rbli.CanvasPosition with { Width = wi };
-                    //rbli.Visible = !_collapsed.Contains(rbli.AlignsToChapter);
-                }
-
-                if (thisItem is ColumnsHeadListItem chli) {
-                    chli.Visible = arrangement.ShowHead;
-                }
-                if (thisItem is FilterBarListItem cfli) {
-                    cfli.Visible = arrangement.ShowHead;
-                    cfli.ShowNumber = ShowNumber;
-                    cfli.FilterCombined = FilterCombined;
-                    cfli.RowsFilteredCount = filteredRows.Count;
-                }
-
-                if (thisItem is SortBarListItem sli) {
-                    sli.Visible = arrangement.ShowHead;
-                    sli.FilterCombined = FilterCombined;
-                    sli.Sort = sortused;
-                }
-
-                if (thisItem is NewRowListItem nrli) {
-                    nrli.Visible = string.IsNullOrEmpty(_newRowsAllowed);
-                    nrli.FilterCombined = FilterCombined;
-                }
-            }
-
-            allItems.Sort();
-
-            #region captionOrder erstellen
-
-            // Caption "Angepinnt" (falls vorhanden) an zweiter Stelle, dann alle anderen Captions
-            var captionOrder = new List<string>();
-
-            // "Angepinnt" zuerst (falls vorhanden)
-            var pinnedCaption = allItems.OfType<RowCaptionListItem>().FirstOrDefault(x => x.Visible && x.ChapterText == "Angepinnt");
-            if (pinnedCaption != null) { captionOrder.Add(pinnedCaption.ChapterText.ToUpperInvariant()); }
-
-            // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
-            foreach (var dataItem in visibleRowListItems) {
-                captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
-            }
-
-            #endregion
-
-            #region Neue sortierte Liste erstellen
-
-            var sortedItems = new List<AbstractListItem>();
-
-            if (columnHead?.Visible == true) { sortedItems.Add(columnHead); }
-            if (sortAnzeige?.Visible == true) { sortedItems.Add(sortAnzeige); }
-            if (columnFilter?.Visible == true) { sortedItems.Add(columnFilter); }
-            if (newRow?.Visible == true) { sortedItems.Add(newRow); }
-
-            #endregion
-
-            // Captions und ihre RowDataListItems in der ermittelten Reihenfolge hinzufügen
-            foreach (var captionKey in captionOrder) {
-                // Caption hinzufügen
-                var caption = allItems.OfType<RowCaptionListItem>().FirstOrDefault(x => x.ChapterText.Equals(captionKey, StringComparison.OrdinalIgnoreCase));
-
-                if (caption != null) { sortedItems.Add(caption); }
-
-                if (!_collapsed.Contains(captionKey)) {
-                    // Alle RowDataListItems dieser Caption hinzufügen
-
-                    if (sortused.Reverse) {
-                        var captionDataItems = visibleRowListItems.Where(x => x.AlignsToChapter == captionKey)
-                                                  .OrderByDescending(item => item.CompareKey());
-                        sortedItems.AddRange(captionDataItems);
-                    } else {
-                        var captionDataItems = visibleRowListItems.Where(x => x.AlignsToChapter == captionKey)
-                                                  .OrderBy(item => item.CompareKey());
-                        sortedItems.AddRange(captionDataItems);
-                    }
-                }
-            }
-
-            // ══════════════════════════════════════════════════════════════
-            // Teil 3: CanvasPosition (y) setzen
-            // ══════════════════════════════════════════════════════════════
-            var y = 0;
-
-            foreach (var thisItem in sortedItems) {
-                thisItem.Visible = true;
-                thisItem.CanvasPosition = new Rectangle(0, y, wi, thisItem.HeightInControl(ListBoxAppearance.Listbox, wi, Design.Item_Listbox));
-                y = thisItem.CanvasPosition.Bottom;
+            if (thisItem is RowBackgroundListItem rbli) {
+                rbli.Arrangement = arrangement;
+                rbli.CanvasPosition = rbli.CanvasPosition with { Width = wi };
             }
         }
+    }
 
-        DoCursorPos();
+    private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, Table tb, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused) {
+        var nullcap = allVisibleCaps.Count > 0;
 
-        _rowsVisibleUnique = allrows;
+        var visibleRowListItems = new List<RowListItem>();
+
+        Parallel.ForEach(allrows, thisRow => {
+            var markYellow = pinnedRows.Contains(thisRow);
+
+            var capsOfRow = tb.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
+            capsOfRow.Remove(string.Empty);
+            if (capsOfRow.Count == 0 && nullcap) { capsOfRow.Add(Weitere_Zeilen); }
+            if (markYellow) { capsOfRow.Add(Angepinnt); }
+            if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
+
+            foreach (var thisCap in capsOfRow) {
+                RowListItem? rowListItem;
+                lock (lockMe) {
+                    allItems.TryGetValue(RowListItem.Identifier(thisRow, thisCap), out var it2);
+                    rowListItem = it2 as RowListItem;
+                }
+
+                if (rowListItem is null) {
+                    rowListItem = new RowListItem(thisRow, thisCap, arrangement);
+                    lock (lockMe) {
+                        allItems.Add(rowListItem.KeyName, rowListItem);
+                    }
+                }
+
+                rowListItem.UserDefCompareKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
+                rowListItem.Visible = false;
+
+                lock (lockMe) {
+                    visibleRowListItems.Add(rowListItem);
+                }
+
+                rowListItem.MarkYellow = markYellow;
+            }
+        });
+
+        return visibleRowListItems;
     }
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowListItem? cellInThisTableRow, bool preverDropDown, string? chunkval) {
@@ -3126,6 +3124,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void Invalidate_CurrentArrangement() {
         CurrentArrangement = null;
+        Invalidate_AllViewItems(false); // Spaltenbreite, Slider
         Invalidate();
     }
 

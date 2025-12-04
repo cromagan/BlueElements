@@ -79,7 +79,7 @@ public class Renderer_DateTime : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
         if (string.IsNullOrEmpty(content)) { return; }
         //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
@@ -87,7 +87,7 @@ public class Renderer_DateTime : Renderer_Abstract {
         QuickImage? qi = null;
 
         if (_showSymbol) {
-            var pix = 14.CanvasToControl(scale);
+            var pix = 14.CanvasToControl(zoom);
             if (_utcToLocal) {
                 qi = QuickImage.Get(ImageCode.Haus, pix);
             } else {
@@ -95,7 +95,7 @@ public class Renderer_DateTime : Renderer_Abstract {
             }
         }
 
-        Skin.Draw_FormatedText(gr, replacedText, qi, align, scaleddrawarea, this.GetFont(scale), false);
+        Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, this.GetFont(zoom), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

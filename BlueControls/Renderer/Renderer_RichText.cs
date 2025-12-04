@@ -38,7 +38,7 @@ public class Renderer_RichText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         //gr.SetClip(positionControl);
@@ -52,13 +52,12 @@ public class Renderer_RichText : Renderer_Abstract {
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
             //etxt.DrawingArea = new Rectangle((int)CanvasUsedArea().Left, (int)CanvasUsedArea().Top, (int)(CanvasUsedArea().Width / AdditionalScale / SheetStyleScale), -1);
             //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-            TextDimensions = new Size(scaleddrawarea.Width, -1),
+            TextDimensions = new Size(drawingAreaControl.Width, -1),
             Ausrichtung = align,
-            DrawingAreaControl = scaleddrawarea,
-            DrawingPosControl = scaleddrawarea.PointOf(Alignment.Top_Left)
+            AreaControl = drawingAreaControl,
         };
 
-        _txt.Draw(gr, scale);
+        _txt.Draw(gr, zoom, drawingAreaControl.Left, drawingAreaControl.Top);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) => [];

@@ -66,10 +66,10 @@ public class ExtCharCellLink : ExtChar {
 
     #region Methods
 
-    public override void Draw(Graphics gr, Point offset, float zoom) {
+    public override void Draw(Graphics gr, float zoom, float offsetX, float offsetY) {
         if (string.IsNullOrEmpty(_displayText)) { return; }
 
-        var controlP = PosCanvas.CanvasToControl(zoom, offset.X, offset.Y);
+        var controlP = PosCanvas.CanvasToControl(zoom, offsetX, offsetY);
 
         try {
             var f = this.GetFont();

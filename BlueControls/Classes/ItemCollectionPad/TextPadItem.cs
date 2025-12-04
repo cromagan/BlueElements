@@ -249,10 +249,12 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             if (_txt == null) { MakeNewETxt(); }
 
             if (_txt != null && Parent != null) {
-                _txt.DrawingPosControl = new Point((int)(positionControl.Left - trp.X), (int)(positionControl.Top - trp.Y));
-                _txt.DrawingAreaControl = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
+                var offsetX2 = (int)(positionControl.Left - trp.X);
+                var offsetY2 = (int)(positionControl.Top - trp.Y);
+
+                _txt.AreaControl = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
                 if (!string.IsNullOrEmpty(_textReplaced) || !ForPrinting) {
-                    _txt.Draw(gr, zoom * _textScale);
+                    _txt.Draw(gr, zoom * _textScale, offsetX2, offsetY2);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);

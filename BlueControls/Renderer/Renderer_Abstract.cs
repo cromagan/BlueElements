@@ -106,7 +106,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
         return contentsize;
     }
 
-    public abstract void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale);
+    public abstract void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom);
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 

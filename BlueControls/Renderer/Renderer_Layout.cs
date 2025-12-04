@@ -58,7 +58,7 @@ public class Renderer_Layout : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
         if (affectingRow == null) { return; }
 
         try {
@@ -69,7 +69,7 @@ public class Renderer_Layout : Renderer_Abstract {
             if (!l.Any()) {
                 var replacedText = ValueReadable("Layout nicht gefunden oder fehlerhaft.", ShortenStyle.Replaced, translate);
 
-                Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
+                Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
                 return;
             }
 
@@ -86,14 +86,14 @@ public class Renderer_Layout : Renderer_Abstract {
 
                 if (scx.Failed) {
                     var replacedText = ValueReadable("Layout Generierung fehlgeschlagen.", ShortenStyle.Replaced, translate);
-                    Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
+                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
                     return;
                 }
 
-                var bmp = l.ToBitmap(scale);
+                var bmp = l.ToBitmap(zoom);
                 if (bmp == null) {
                     var replacedText = ValueReadable("Bild Erstellung fehlgeschlagen.", ShortenStyle.Replaced, translate);
-                    Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
+                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
                     return;
                 }
 
@@ -110,11 +110,11 @@ public class Renderer_Layout : Renderer_Abstract {
                 cachedBmp = bmp;
             }
 
-            var scale2 = Math.Min((float)scaleddrawarea.Width / cachedBmp.Width, (float)scaleddrawarea.Height / cachedBmp.Height);
-            gr.DrawImage(cachedBmp, new Rectangle(scaleddrawarea.X + ((scaleddrawarea.Width - cachedBmp.Width.CanvasToControl(scale2)) / 2), scaleddrawarea.Y + ((scaleddrawarea.Height - cachedBmp.Height.CanvasToControl(scale2)) / 2), cachedBmp.Width.CanvasToControl(scale2), cachedBmp.Height.CanvasToControl(scale2)));
+            var scale2 = Math.Min((float)drawingAreaControl.Width / cachedBmp.Width, (float)drawingAreaControl.Height / cachedBmp.Height);
+            gr.DrawImage(cachedBmp, new Rectangle(drawingAreaControl.X + ((drawingAreaControl.Width - cachedBmp.Width.CanvasToControl(scale2)) / 2), drawingAreaControl.Y + ((drawingAreaControl.Height - cachedBmp.Height.CanvasToControl(scale2)) / 2), cachedBmp.Width.CanvasToControl(scale2), cachedBmp.Height.CanvasToControl(scale2)));
         } catch {
             var replacedText = ValueReadable("Anzeige fehlgeschlagen.", ShortenStyle.Replaced, translate);
-            Skin.Draw_FormatedText(gr, replacedText, null, align, scaleddrawarea, this.GetFont(scale), false);
+            Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
         }
     }
 

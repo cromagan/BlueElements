@@ -78,12 +78,11 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     #region Constructors
 
     public ExtText() : base() {
-        DrawingPosControl = new Point(0, 0);
         Ausrichtung = Alignment.Top_Left;
         MaxTextLength = 4000;
         Multiline = true;
         AllowedChars = string.Empty;
-        DrawingAreaControl = new Rectangle(0, 0, -1, -1);
+        AreaControl = Rectangle.Empty;
         _textDimensions = Size.Empty;
         _widthControl = null;
         _heightControl = null;
@@ -117,20 +116,15 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public string AllowedChars { get; set; }
 
+    /// <summary>
+    /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
+    /// </summary>
+    public Rectangle AreaControl { get; set; }
+
     // Todo: Implementieren
     public Alignment Ausrichtung { get; set; }
 
     public int Count => _internal.Count;
-
-    /// <summary>
-    /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
-    /// </summary>
-    public Rectangle DrawingAreaControl { get; set; }
-
-    /// <summary>
-    /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
-    /// </summary>
-    public Point DrawingPosControl { get; set; }
 
     public int HeightControl {
         get {
@@ -245,7 +239,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     ///     Wird kein Char gefunden, wird der logischste Char gewählt. (z.B. Nach ZeilenEnde = Letzzter Buchstabe der Zeile)
     /// </summary>
     /// <remarks></remarks>
-    public int Char_Search(double pixX, double pixY) {
+    public int Char_Search(float canvasX, float canvasY) {
         EnsurePositions();
 
         var cZ = -1;
@@ -258,20 +252,20 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             cZ++;
             if (cZ > _internal.Count - 1) { break; }// Das Ende des Textes
             if (_internal[cZ].SizeCanvas.Width > 0) {
-                var matchX = pixX >= DrawingPosControl.X + _internal[cZ].PosCanvas.X && pixX <= DrawingPosControl.X + _internal[cZ].PosCanvas.X + _internal[cZ].SizeCanvas.Width;
-                var matchY = pixY >= DrawingPosControl.Y + _internal[cZ].PosCanvas.Y && pixY <= DrawingPosControl.Y + _internal[cZ].PosCanvas.Y + _internal[cZ].SizeCanvas.Height;
+                var matchX = canvasX >= _internal[cZ].PosCanvas.X && canvasX <= _internal[cZ].PosCanvas.X + _internal[cZ].SizeCanvas.Width;
+                var matchY = canvasY >= _internal[cZ].PosCanvas.Y && canvasY <= _internal[cZ].PosCanvas.Y + _internal[cZ].SizeCanvas.Height;
 
                 if (matchX && matchY) { return cZ; }
 
                 double tmpDi;
                 if (!matchX && matchY) {
-                    tmpDi = Math.Abs(pixX - (DrawingPosControl.X + _internal[cZ].PosCanvas.X + (_internal[cZ].SizeCanvas.Width / 2.0)));
+                    tmpDi = Math.Abs(canvasX - (_internal[cZ].PosCanvas.X + (_internal[cZ].SizeCanvas.Width / 2.0)));
                     if (tmpDi < xDi) {
                         xNr = cZ;
                         xDi = tmpDi;
                     }
                 } else if (matchX && !matchY) {
-                    tmpDi = Math.Abs(pixY - (DrawingPosControl.Y + _internal[cZ].PosCanvas.Y + (_internal[cZ].SizeCanvas.Height / 2.0)));
+                    tmpDi = Math.Abs(canvasY - (_internal[cZ].PosCanvas.Y + (_internal[cZ].SizeCanvas.Height / 2.0)));
                     if (tmpDi < yDi) {
                         yNr = cZ;
                         yDi = tmpDi;
@@ -284,7 +278,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return xNr >= 0 ? xNr : yNr >= 0 ? yNr : cZ >= 0 ? cZ : 0;
     }
 
-    public Rectangle CursorPixelPosX(int charPos) {
+    public Rectangle CursorCanvasPosX(int charPos) {
         EnsurePositions();
 
         if (charPos > _internal.Count + 1) { charPos = _internal.Count + 1; }
@@ -326,13 +320,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public void Dispose() => IsDisposed = true;
 
-    public void Draw(Graphics gr, float zoom) {
+    public void Draw(Graphics gr, float zoom, int offsetX, int offsetY) {
         EnsurePositions();
-        DrawStates(gr, zoom);
+        DrawStates(gr, zoom, offsetY, offsetY);
 
         foreach (var t in _internal) {
-            if (t.IsVisible(zoom, DrawingPosControl, DrawingAreaControl)) {
-                t.Draw(gr, DrawingPosControl, zoom);
+            if (t.IsVisible(AreaControl, zoom, offsetX, offsetY)) {
+                t.Draw(gr, zoom, offsetX, offsetY);
             }
         }
     }
@@ -767,7 +761,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    private void DrawState(Graphics gr, float scale, MarkState state) {
+    private void DrawState(Graphics gr, float scale, MarkState state, int offsetX, int offsetY) {
         var tmas = -1;
         for (var pos = 0; pos < _internal.Count; pos++) {
             var tempVar = _internal[pos];
@@ -778,9 +772,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (!marked || pos == _internal.Count - 1) {
                 if (tmas > -1) {
                     if (pos == _internal.Count - 1) {
-                        DrawZone(gr, scale, state, tmas, pos);
+                        DrawZone(gr, scale, state, tmas, pos, offsetX, offsetY);
                     } else {
-                        DrawZone(gr, scale, state, tmas, pos - 1);
+                        DrawZone(gr, scale, state, tmas, pos - 1, offsetX, offsetY);
                     }
                     tmas = -1;
                 }
@@ -788,26 +782,26 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    private void DrawStates(Graphics gr, float scale) {
-        DrawState(gr, scale, MarkState.Field);
-        DrawState(gr, scale, MarkState.MyOwn);
-        DrawState(gr, scale, MarkState.Other);
-        DrawState(gr, scale, MarkState.Ringelchen);
+    private void DrawStates(Graphics gr, float scale, int offsetX, int offsetY) {
+        DrawState(gr, scale, MarkState.Field, offsetX, offsetY);
+        DrawState(gr, scale, MarkState.MyOwn, offsetX, offsetY);
+        DrawState(gr, scale, MarkState.Other, offsetX, offsetY);
+        DrawState(gr, scale, MarkState.Ringelchen, offsetX, offsetY);
     }
 
-    private void DrawZone(Graphics gr, float scale, MarkState thisState, int markStart, int markEnd) {
-        var startX = _internal[markStart].PosCanvas.X.CanvasToControl(scale, DrawingPosControl.X);
-        var startY = _internal[markStart].PosCanvas.Y.CanvasToControl(scale, DrawingPosControl.Y);
-        var endX = _internal[markEnd].PosCanvas.X.CanvasToControl(scale, DrawingPosControl.X) + _internal[markEnd].SizeCanvas.Width.CanvasToControl(scale);
-        var endy = _internal[markEnd].PosCanvas.Y.CanvasToControl(scale, DrawingPosControl.Y) + _internal[markEnd].SizeCanvas.Height.CanvasToControl(scale);
+    private void DrawZone(Graphics gr, float zoom, MarkState thisState, int markStart, int markEnd, int offsetX, int offsetY) {
+        var startX = _internal[markStart].PosCanvas.X.CanvasToControl(zoom, offsetX);
+        var startY = _internal[markStart].PosCanvas.Y.CanvasToControl(zoom, offsetY);
+        var endX = _internal[markEnd].PosCanvas.X.CanvasToControl(zoom, offsetX) + _internal[markEnd].SizeCanvas.Width.CanvasToControl(zoom);
+        var endy = _internal[markEnd].PosCanvas.Y.CanvasToControl(zoom, offsetY) + _internal[markEnd].SizeCanvas.Height.CanvasToControl(zoom);
 
         switch (thisState) {
             case MarkState.None:
                 break;
 
             case MarkState.Ringelchen:
-                using (var pen = new Pen(Color.Red, 3.CanvasToControl(scale))) {
-                    gr.DrawLine(pen, startX, (int)(startY + (_internal[markStart].SizeCanvas.Height.CanvasToControl(scale) * 0.9)), endX, (int)(startY + (_internal[markStart].SizeCanvas.Height.CanvasToControl(scale) * 0.9)));
+                using (var pen = new Pen(Color.Red, 3.CanvasToControl(zoom))) {
+                    gr.DrawLine(pen, startX, (int)(startY + (_internal[markStart].SizeCanvas.Height.CanvasToControl(zoom) * 0.9)), endX, (int)(startY + (_internal[markStart].SizeCanvas.Height.CanvasToControl(zoom) * 0.9)));
                 }
                 break;
 

@@ -99,22 +99,22 @@ public class Renderer_Number : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        var pix16 = 16.CanvasToControl(scale);
+        var pix16 = 16.CanvasToControl(zoom);
 
         var splitedContent = content.SplitAndCutByCrAndBr();
 
         var y = 0;
         for (var z = 0; z <= splitedContent.GetUpperBound(0); z++) {
-            var rect = new Rectangle(scaleddrawarea.Left, scaleddrawarea.Top + y, scaleddrawarea.Width, pix16);
+            var rect = new Rectangle(drawingAreaControl.Left, drawingAreaControl.Top + y, drawingAreaControl.Width, pix16);
 
-            if (rect.Bottom > scaleddrawarea.Bottom) { break; }
+            if (rect.Bottom > drawingAreaControl.Bottom) { break; }
 
             var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, translate);
 
-            Skin.Draw_FormatedText(gr, replacedText, null, align, rect, this.GetFont(scale), false);
+            Skin.Draw_FormatedText(gr, replacedText, null, align, rect, this.GetFont(zoom), false);
 
             y += pix16;
         }

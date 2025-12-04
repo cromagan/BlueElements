@@ -43,9 +43,9 @@ public class Renderer_Font : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
         if (string.IsNullOrEmpty(content)) { return; }
-        Skin.Draw_FormatedText(gr, txt, null, align, scaleddrawarea, BlueFont.Get(content).Scale(scale), false);
+        Skin.Draw_FormatedText(gr, txt, null, align, drawingAreaControl, BlueFont.Get(content).Scale(zoom), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) => [];

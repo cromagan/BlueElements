@@ -172,11 +172,10 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                 etxt.SheetStyle = sh.SheetStyle;
                 //etxt.ChangeStyle(sh.Stil);
                 etxt.Zeilenabstand = 0.65f;
-                etxt.DrawingPosControl = new Point(0, 43);
                 etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
                 etxt.Ausrichtung = Alignment.Horizontal_Vertical_Center;
                 etxt.HtmlText = tt;
-                etxt.Draw(gr, 1);
+                etxt.Draw(gr, 1, 0, 43);
             }
         } else if (buttontype is not Design.OptionButton_TextStyle and not Design.CheckBox_TextStyle) {
             Skin.Draw_FormatedText(gr, text, qi, align, displayRectangle, design, control, false, translate);
@@ -187,7 +186,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             //etxt.ChangeStyle(sh.Stil);
             etxt.TextDimensions = displayRectangle.Size;
             etxt.HtmlText = tt;
-            etxt.Draw(gr, 1);
+            etxt.Draw(gr, 1, 0, 0);
         }
     }
 

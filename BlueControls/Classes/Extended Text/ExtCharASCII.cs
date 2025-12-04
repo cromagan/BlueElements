@@ -63,10 +63,10 @@ public class ExtCharAscii : ExtChar {
 
     #region Methods
 
-    public override void Draw(Graphics gr, Point offset, float zoom) {
+    public override void Draw(Graphics gr, float zoom, float offsetX, float offsetY) {
         if (_charInt < 20) { return; }
 
-        var controlP = PosCanvas.CanvasToControl(zoom, offset.X, offset.Y);
+        var controlP = PosCanvas.CanvasToControl(zoom, offsetX, offsetY);
 
         try {
             this.GetFont().DrawString(gr, _charString, controlP.X, controlP.Y, zoom);

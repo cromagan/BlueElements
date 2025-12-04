@@ -169,29 +169,29 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        var pix16 = 16.CanvasToControl(scale);
+        var pix16 = 16.CanvasToControl(zoom);
 
         var splitedContent = content.SplitAndCutByCrAndBr();
 
         var y = 0;
         for (var z = 0; z <= splitedContent.GetUpperBound(0); z++) {
-            var rect = new Rectangle(scaleddrawarea.Left, scaleddrawarea.Top + y, scaleddrawarea.Width, pix16);
+            var rect = new Rectangle(drawingAreaControl.Left, drawingAreaControl.Top + y, drawingAreaControl.Width, pix16);
 
-            if (rect.Bottom > scaleddrawarea.Bottom) { break; }
+            if (rect.Bottom > drawingAreaControl.Bottom) { break; }
 
-            var image = GetImage(splitedContent[z], _constantWidth, _constantHeight)?.Scale(scale);
+            var image = GetImage(splitedContent[z], _constantWidth, _constantHeight)?.Scale(zoom);
 
             var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, translate);
 
-            if (rect.Bottom + pix16 > scaleddrawarea.Bottom && z < splitedContent.GetUpperBound(0)) {
+            if (rect.Bottom + pix16 > drawingAreaControl.Bottom && z < splitedContent.GetUpperBound(0)) {
                 replacedText = "...";
                 image = null;
             }
 
-            Skin.Draw_FormatedText(gr, replacedText, image, align, rect, this.GetFont(scale), false);
+            Skin.Draw_FormatedText(gr, replacedText, image, align, rect, this.GetFont(zoom), false);
 
             if (image != null) {
                 y += Math.Max(image.Height, pix16);

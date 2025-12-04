@@ -79,7 +79,7 @@ public class Renderer_Button : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle scaleddrawarea, TranslationType translate, Alignment align, float scale) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var s = States.Standard;
@@ -96,9 +96,9 @@ public class Renderer_Button : Renderer_Abstract {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
 
-        scaleddrawarea.Inflate(-Skin.PaddingSmal, -Skin.PaddingSmal);
+        drawingAreaControl.Inflate(-Skin.PaddingSmal, -Skin.PaddingSmal);
 
-        Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, scaleddrawarea, true);
+        Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, drawingAreaControl, true);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

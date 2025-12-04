@@ -229,11 +229,11 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                         _eText.TextDimensions = Size.Empty;
                         break;
                 }
-                _eText.DrawingAreaControl = ClientRectangle;
+                _eText.AreaControl = ClientRectangle;
             }
             if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
             Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-            if (!string.IsNullOrEmpty(Text)) { _eText?.Draw(gr, 1); }
+            if (!string.IsNullOrEmpty(Text)) { _eText?.Draw(gr, 1, 0, 0); }
         } catch { }
     }
 

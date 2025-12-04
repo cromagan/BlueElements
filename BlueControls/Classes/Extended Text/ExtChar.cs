@@ -114,7 +114,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         GC.SuppressFinalize(this);
     }
 
-    public abstract void Draw(Graphics gr, Point offset, float zoom);
+    public abstract void Draw(Graphics gr, float zoom, float offsetX, float offsetY);
 
     public abstract string HtmlText();
 
@@ -124,15 +124,22 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     public abstract bool IsSpace();
 
-    public bool IsVisible(float zoom, Point offset, Rectangle controlArea) {
-        if (controlArea.Width < 1 || controlArea.Height < 1) { return true; }
+    public bool IsVisible(Rectangle areaControl, float zoom, float offsetX, float offsetY) {
+        if (areaControl.Width < 1 || areaControl.Height < 1) { return true; }
 
-        var px = PosCanvas.X.CanvasToControl(zoom, offset.X);
-        if (px > controlArea.Right) { return false; }
+        var controlX = PosCanvas.X.CanvasToControl(zoom, offsetX);
+        if (controlX > areaControl.Right) { return false; }
 
-        var py = PosCanvas.Y.CanvasToControl(zoom, offset.Y);
-        return py <= controlArea.Bottom && px + SizeCanvas.Width.CanvasToControl(zoom) >= controlArea.Left &&
-               py + SizeCanvas.Height.CanvasToControl(zoom) >= controlArea.Top;
+        var controlWidth = SizeCanvas.Width.CanvasToControl(zoom);
+        if (controlX + controlWidth < areaControl.Left) { return false; }
+
+        var controlY = PosCanvas.Y.CanvasToControl(zoom, offsetY);
+        if (controlY > areaControl.Top) { return false; }
+
+        var controlHeight = SizeCanvas.Height.CanvasToControl(zoom);
+        if (controlY + controlHeight < areaControl.Top) { return false; }
+
+        return true;
     }
 
     public abstract bool IsWordSeparator();
@@ -146,7 +153,6 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         return result;
     }
 
-  
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "classid":
