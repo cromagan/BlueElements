@@ -30,22 +30,6 @@ using System.Linq;
 namespace BlueControls.ItemCollectionList;
 
 public static class RowBackgroundListItemListItemExtensions {
-
-    #region Methods
-
-    public static RowListItem? Get(this List<AbstractListItem>? l, RowItem? row) => row == null ? null : l?.FirstOrDefault(thisr => thisr is RowListItem r && r.Row == row) as RowListItem;
-
-    public static RowBackgroundListItem? Get(this List<AbstractListItem>? l, RowItem? row, string caption) {
-        if (l == null) { return null; }
-
-        if (l.GetByKey(RowBackgroundListItem.Key(row, caption)) is RowBackgroundListItem { } bli) {
-            return bli;
-        }
-
-        return null;
-    }
-
-    #endregion
 }
 
 /// <summary>
@@ -114,12 +98,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
     #endregion
 
     #region Methods
-
-    public static string Key(RowItem? row, string chapter) {
-        if (row == null) { return chapter.Trim('\\').ToUpperInvariant() + '\\'; }
-
-        return chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
-    }
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.

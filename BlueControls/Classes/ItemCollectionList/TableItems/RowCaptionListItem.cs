@@ -36,7 +36,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Key(null, chapterText), arrangement, chapterText.Trim('\\').PathParent()) {
+    public RowCaptionListItem(string chapterText, ColumnViewCollection arrangement) : base(Identifier(chapterText), arrangement, chapterText.Trim('\\').PathParent()) {
         ChapterText = chapterText;
         IsExpanded = true;
     }
@@ -53,6 +53,8 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
     #endregion
 
     #region Methods
+
+    public static string Identifier(string caption) => $"CAP-{caption.ToUpperInvariant()}";
 
     public override void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) {
     }

@@ -34,7 +34,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public RowListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Key(row, alignsToCaption), arrangement, alignsToCaption) {
+    public RowListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Identifier(row, alignsToCaption), arrangement, alignsToCaption) {
         Row = row;
         MarkYellow = false;
     }
@@ -55,11 +55,14 @@ public sealed class RowListItem : RowBackgroundListItem {
     }
 
     public override string QuickInfo => Row.GetQuickInfo();
+
     public RowItem Row { get; }
 
     #endregion
 
     #region Methods
+
+    public static string Identifier(RowItem row, string chapter) => chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
 
     public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);

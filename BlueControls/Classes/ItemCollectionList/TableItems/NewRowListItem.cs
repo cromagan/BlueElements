@@ -31,6 +31,12 @@ namespace BlueControls.ItemCollectionList;
 /// </summary>
 public sealed class NewRowListItem : RowBackgroundListItem {
 
+    #region Fields
+
+    public const string Identifier = "NewRowListItem";
+
+    #endregion
+
     #region Constructors
 
     public NewRowListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) => IgnoreYOffset = true;

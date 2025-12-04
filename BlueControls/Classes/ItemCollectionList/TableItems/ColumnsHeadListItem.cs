@@ -29,9 +29,15 @@ namespace BlueControls.ItemCollectionList;
 /// </summary>
 public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
+    #region Fields
+
+    public const string Identifier = "ColumnsHeadListItem";
+
+    #endregion
+
     #region Constructors
 
-    public ColumnsHeadListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) => IgnoreYOffset = true;
+    public ColumnsHeadListItem(ColumnViewCollection? arrangement) : base(Identifier, arrangement, string.Empty) => IgnoreYOffset = true;
 
     #endregion
 

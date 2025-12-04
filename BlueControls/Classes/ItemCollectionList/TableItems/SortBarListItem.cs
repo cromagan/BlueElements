@@ -25,6 +25,12 @@ namespace BlueControls.ItemCollectionList;
 
 public sealed class SortBarListItem : RowBackgroundListItem {
 
+    #region Fields
+
+    public const string Identifier = "SortBarListItem";
+
+    #endregion
+
     #region Constructors
 
     public SortBarListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) => IgnoreYOffset = true;

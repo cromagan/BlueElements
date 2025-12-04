@@ -27,6 +27,8 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     #region Fields
 
+    public const string Identifier = "FilterBarListItem";
+
     public static readonly int AutoFilterSize = 22;
 
     #endregion
