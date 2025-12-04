@@ -70,7 +70,7 @@ public static class Export {
         return string.Empty;
     }
 
-    public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
+    public static (List<string>? files, string error) GenerateLayout_FileSystem(IReadOnlyList<RowItem>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
         if (liste == null) { return (null, "Keine Zeilen angegeben"); }
 
         List<string> l = [];
@@ -109,7 +109,7 @@ public static class Export {
 
     private static string CreateLayout(RowItem row, string loadFile, string saveFile) => CreateLayout([row], loadFile, saveFile);
 
-    private static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile) {
+    private static string CreateLayout(IReadOnlyList<RowItem> rows, string loadFile, string saveFile) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
 
         return InternalCreateLayout(rows, ReadAllText(loadFile, Constants.Win1252), saveFile);
@@ -500,7 +500,7 @@ public static class Export {
     //}
     //public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Table.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
-    private static string InternalCreateLayout(List<RowItem> rows, string fileLoaded, string saveFileName) {
+    private static string InternalCreateLayout(IReadOnlyList<RowItem> rows, string fileLoaded, string saveFileName) {
         var head = string.Empty;
         var foot = string.Empty;
         var body = fileLoaded;

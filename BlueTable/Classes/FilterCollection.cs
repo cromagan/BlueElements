@@ -466,7 +466,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
             if (!string.IsNullOrEmpty(f)) { return f; }
 
-            if (_table != thisf.Table) {
+            if (_table != thisf.Table && thisf.FilterType != FilterType.AlwaysFalse) {
                 return "Filter haben unterschiedliche Tabellen";
             }
         }

@@ -267,27 +267,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         OnMouseWheel(x);
     }
 
-    internal void EnsureVisibleX(int controlX) {
-        if (!ShowSliderX) { return; }
-        var pa = AvailableControlPaintArea();
-
-        if (controlX < pa.Left) {
-            OffsetX = OffsetX + controlX - pa.Width;
-        } else if (controlX > pa.Width) {
-            OffsetX = OffsetX + controlX - pa.Width;
-        }
-    }
-
-    internal void EnsureVisibleY(int controlY) {
-        var pa = AvailableControlPaintArea();
-
-        if (controlY < pa.Top) {
-            OffsetY = OffsetY + controlY - pa.Height;
-        } else if (controlY > pa.Width) {
-            OffsetY = OffsetY + controlY - pa.Height;
-        }
-    }
-
     protected abstract RectangleF CalculateCanvasMaxBounds();
 
     protected RectangleF CanvasMaxBounds() {
@@ -379,13 +358,13 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         switch (e.KeyCode) {
             case Keys.PageDown:
                 if (SliderY.Enabled) {
-                    OffsetY += (int)SliderY.LargeChange;
+                    OffsetY -= (int)SliderY.LargeChange;
                 }
                 break;
 
             case Keys.PageUp: //Bildab
                 if (SliderY.Enabled) {
-                    OffsetY -= (int)SliderY.LargeChange;
+                    OffsetY += (int)SliderY.LargeChange;
                 }
                 break;
 

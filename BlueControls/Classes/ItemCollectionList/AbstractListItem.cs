@@ -102,7 +102,7 @@ public static class AbstractListItemExtension {
                     var itemState = controlState;
                     if (_mouseOverItem == thisItem && !controlState.HasFlag(States.Checked_Disabled)) { itemState |= States.Standard_MouseOver; }
 
-                    if (!thisItem.Enabled) { itemState = States.Standard_Disabled; }
+                    if (!thisItem.Enabled || controlState.HasFlag(States.Standard_Disabled)) { itemState = States.Standard_Disabled; }
 
                     if (_checked?.Contains(thisItem.KeyName) ?? false) { itemState |= States.Checked; }
 
@@ -528,6 +528,10 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
             controlIndented.X += 20.CanvasToControl(zoom);
             controlIndented.Width -= 20.CanvasToControl(zoom);
             if (state.HasFlag(States.Checked)) { state ^= States.Checked; }
+        }
+
+        if (state.HasFlag(States.Standard_Disabled)) {
+            state &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
         }
 
         DrawExplicit(gr, visibleArea, controlIndented, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);

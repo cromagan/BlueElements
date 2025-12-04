@@ -415,7 +415,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (Table.Table != null) {
             capZeilen1.Text = "<imagecode=Information|16> " + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " +
-                              Table.VisibleRowCount + " " + LanguageTool.DoTranslate("St.");
+                              Table.RowsVisibleUnique().Count + " " + LanguageTool.DoTranslate("St.");
         } else {
             {
                 capZeilen1.Text = string.Empty;
@@ -830,10 +830,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
-            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, new { Script = script, Rows = (Func<List<RowItem>>)Table.RowsVisibleUnique }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible())));
+            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible())));
         }
 
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, (Func<List<RowItem>>)Table.RowsVisibleUnique, tb.CanDoValueChangedScript(true)));
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique, tb.CanDoValueChangedScript(true)));
 
         if (addedit) {
             lstAufgaben.ItemAdd(ItemOf("Skripte bearbeiten", ImageCode.Skript, ContextMenu_OpenScriptEditor, null, tb.IsAdministrator()));

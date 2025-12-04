@@ -42,7 +42,7 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Fields
 
-    private readonly List<RowItem>? _rowsForExport;
+    private readonly IReadOnlyList<RowItem>? _rowsForExport;
     private readonly string _saveTo = string.Empty;
     private readonly string _zielPfad;
     private int _itemNrForPrint;
@@ -54,10 +54,10 @@ public sealed partial class ExportDialog : IHasTable {
     public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) {
     }
 
-    public ExportDialog(Table tb, List<RowItem>? rows) : this(tb, rows, string.Empty) {
+    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) {
     }
 
-    public ExportDialog(Table tb, List<RowItem>? rows, string autosaveFile) {
+    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -120,7 +120,7 @@ public sealed partial class ExportDialog : IHasTable {
     /// <param name="rowsForExport"></param>
     /// <param name="abstandMm"></param>
     /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
-    public static int GeneratePrintPad(CreativePad pad, int startNr, string layoutFileName, List<RowItem>? rowsForExport, float abstandMm) {
+    public static int GeneratePrintPad(CreativePad pad, int startNr, string layoutFileName, IReadOnlyList<RowItem>? rowsForExport, float abstandMm) {
         if (pad.Items == null) { return -1; }
 
         pad.Items.Clear();

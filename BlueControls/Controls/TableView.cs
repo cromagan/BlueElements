@@ -34,7 +34,6 @@ using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -78,6 +77,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private bool _isinSizeChanged;
     private string _newRowsAllowed = string.Empty;
     private Progressbar? _pg;
+    private List<RowItem> _rowsVisibleUnique = new([]);
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
     private DateTime? _tableDrawError;
@@ -217,9 +217,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public List<RowListItem> RowViewItems => AllViewItems?
-                                                                                                                                                                                                                        .Where(thisitem => thisitem.Visible && thisitem is RowListItem)
-                                            .Cast<RowListItem>()
-                                            .ToList() ?? [];
+        .OfType<RowListItem>()
+        .Where(thisitem => thisitem.Visible)
+        .ToList() ?? [];
 
     public string SheetStyle {
         get;
@@ -272,11 +272,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public long VisibleRowCount { get; private set; }
 
     /// <summary>
     /// Interne Filter, die im Controll erstellt wurden und auch geändert werden dürfen.
@@ -364,7 +359,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var rows = new List<RowItem>();
         if (e.Data is RowItem row) { rows.Add(row); }
         if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
-        if (e.Data is Func<List<RowItem>> fRows) { rows.AddRange(fRows()); }
+        if (e.Data is Func<IReadOnlyList<RowItem>> fRows) { rows.AddRange(fRows()); }
 
         if (rows.Count == 0) {
             Forms.MessageBox.Show("Keine Zeilen zum Prüfen vorhanden.", ImageCode.Kreuz, "OK");
@@ -485,7 +480,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 rows.Add(singleRow);
             } else if (type.GetProperty("Rows")?.GetValue(data) is List<RowItem> rowList) {
                 rows.AddRange(rowList);
-            } else if (type.GetProperty("Rows")?.GetValue(data) is Func<List<RowItem>> fRows) {
+            } else if (type.GetProperty("Rows")?.GetValue(data) is Func<IReadOnlyList<RowItem>> fRows) {
                 rows.AddRange(fRows());
             }
 
@@ -1290,7 +1285,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         CheckView();
     }
 
-    public void Pin(List<RowItem>? rows) {
+    public void Pin(IReadOnlyList<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
 
         rows ??= [];
@@ -1336,29 +1331,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         OnViewChanged();
     }
 
-    public List<RowItem> RowsVisibleUnique() {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return []; }
-
-        var f = FilterCombined.Rows;
-
-        ConcurrentBag<RowItem> l = [];
-
-        try {
-            var lockMe = new object();
-            Parallel.ForEach(Table.Row, thisRowItem => {
-                if (thisRowItem != null) {
-                    if (f.Contains(thisRowItem) || PinnedRows.Contains(thisRowItem)) {
-                        lock (lockMe) { l.Add(thisRowItem); }
-                    }
-                }
-            });
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return RowsVisibleUnique();
-        }
-
-        return [.. l];
-    }
+    public IReadOnlyList<RowItem> RowsVisibleUnique() => _rowsVisibleUnique;
 
     public void TableSet(Table? tb, string viewCode) {
         if (Table == tb && string.IsNullOrEmpty(viewCode)) { return; }
@@ -1573,6 +1546,46 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         return false;
+    }
+
+    internal void EnsureVisibleX(int controlX) {
+        if (CurrentArrangement is not { } ca) { return; }
+
+        var pa = AvailableControlPaintArea();
+
+        var controlLeft = ca.ControlColumnsPermanentWidth;
+
+        var controlWidth = AvailableControlPaintArea().Right; // Bottom = Height
+
+        if (controlX < controlLeft) {
+            OffsetX = OffsetX - controlX + controlLeft;
+        } else if (controlX > controlWidth) {
+            OffsetX = OffsetX - controlX + controlWidth;
+        }
+    }
+
+    internal void EnsureVisibleY(int controlY) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+
+        if (AllViewItems is not { } avi) { return; }
+
+        var maxBottom = 0;
+
+        foreach (var thisItem in avi) {
+            if (thisItem.Visible && thisItem.IgnoreYOffset) {
+                maxBottom = Math.Max(thisItem.CanvasPosition.Bottom, maxBottom);
+            }
+        }
+
+        var controlTop = maxBottom.CanvasToControl(Zoom);
+
+        var controlHeight = AvailableControlPaintArea().Bottom; // Bottom = Height
+
+        if (controlY < controlTop) {
+            OffsetY = OffsetY - controlY + controlTop;
+        } else if (controlY > controlHeight) {
+            OffsetY = OffsetY - controlY + controlHeight;
+        }
     }
 
     internal void RowCleanUp() {
@@ -2179,7 +2192,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             case "doeinzigartig":
                 Filter.Remove(e.Column);
-                RowCollection.GetUniques(e.Column, RowsVisibleUnique(), out var einzigartig, out _);
+                RowCollection.GetUniques(e.Column, _rowsVisibleUnique, out var einzigartig, out _);
                 if (einzigartig.Count > 0) {
                     Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, einzigartig));
                     Notification.Show("Die aktuell einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", ImageCode.Trichter);
@@ -2190,7 +2203,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             case "donichteinzigartig":
                 Filter.Remove(e.Column);
-                RowCollection.GetUniques(e.Column, RowsVisibleUnique(), out _, out var xNichtEinzigartig);
+                RowCollection.GetUniques(e.Column, _rowsVisibleUnique, out _, out var xNichtEinzigartig);
                 if (xNichtEinzigartig.Count > 0) {
                     Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, xNichtEinzigartig));
                     Notification.Show("Die aktuell <b>nicht</b> einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", ImageCode.Trichter);
@@ -2326,7 +2339,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void CalculateAllViewItems(List<AbstractListItem>? allItems) {
         if (IsDisposed || Table is not { IsDisposed: false } tb || allItems == null || SortUsed() is not { } sortused) {
-            VisibleRowCount = 0;
+            _rowsVisibleUnique = new([]);
             allItems?.Clear();
             return;
         }
@@ -2586,7 +2599,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         DoCursorPos();
 
-        VisibleRowCount = allrows.Count;
+        _rowsVisibleUnique = allrows;
     }
 
     private void Cell_Edit(ColumnViewCollection ca, ColumnViewItem? viewItem, RowListItem? cellInThisTableRow, bool preverDropDown, string? chunkval) {
@@ -2915,7 +2928,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column.MultiLine) {
             split = Forms.MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
         }
-        column.Statistik(RowsVisibleUnique(), !split);
+        column.Statistik(_rowsVisibleUnique, !split);
     }
 
     private void ContextMenu_Sum(object sender, ObjectEventArgs e) {
@@ -3049,23 +3062,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private bool EnsureVisible(AbstractListItem? rowdata) {
         if (rowdata is not RowListItem rli) { return false; }
-        //var dispR = DisplayRectangleWithoutSlider();
 
-        //// Stellen sicher, dass die Zeile im sichtbaren Bereich ist
-        //// Berücksichtigen der Filterleistenhöhe
-        //var rowY = rowdata.CanvasPosition.Top - OffsetY;
-
-        //// Wenn die Zeile über dem sichtbaren Bereich liegt
-        //if (rowY < ControlToCanvasX(ca.HeadSize() + FilterleisteHeight, Zoom)) {
-        //    OffsetY = OffsetY + rowY - ControlToCanvasX(ca.HeadSize(), Zoom) - FilterleisteHeight;
-        //}
-        //// Wenn die Zeile unter dem sichtbaren Bereich liegt
-        //else if (rowY + rowdata.CanvasPosition.Height > dispR.Height + FilterleisteHeight) {
-        //    OffsetY = OffsetY + rowY + ControlToCanvasX(rowdata.CanvasPosition.Height, Zoom) - (dispR.Height + FilterleisteHeight);
-        //}
-
-        EnsureVisibleY(rli.CanvasPosition.Bottom.CanvasToControl(Zoom));
-        EnsureVisibleY(rli.CanvasPosition.Top.CanvasToControl(Zoom));
+        var p = rli.ControlPosition(Zoom, OffsetX, OffsetY);
+        EnsureVisibleY(p.Bottom);
+        EnsureVisibleY(p.Top);
         return true;
     }
 

@@ -90,7 +90,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
-
     public bool IsDisposed {
         get;
         private set {

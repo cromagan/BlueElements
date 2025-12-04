@@ -1906,7 +1906,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return true;
     }
 
-    public void Statistik(List<RowItem> rows, bool ignoreMultiLine) {
+    public void Statistik(ICollection<RowItem> rows, bool ignoreMultiLine) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
         if (rows.Count < 1) { return; }

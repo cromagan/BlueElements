@@ -213,11 +213,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public long VisibleRowCount { get; private set; }
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public float Zoom {
         get => TableInternal.Zoom;
         set => TableInternal.Zoom = value;
@@ -427,7 +422,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void ParseView(string toParse) => TableInternal.ParseView(toParse);
 
-    public void Pin(List<RowItem>? rows) => TableInternal.Pin(rows);
+    public void Pin(IReadOnlyList<RowItem>? rows) => TableInternal.Pin(rows);
 
     public void PinAdd(RowItem? row) => TableInternal.PinAdd(row);
 
@@ -435,7 +430,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void RowCleanUp() => TableInternal.RowCleanUp();
 
-    public List<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
+    public IReadOnlyList<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
 
     public void TableSet(Table? tb, string viewCode) => TableInternal.TableSet(tb, viewCode);
 

@@ -221,7 +221,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="rows"></param>
     /// <param name="unique"></param>
     /// <param name="notUnique"></param>
-    public static void GetUniques(ColumnItem column, List<RowItem> rows, out List<string> unique, out List<string> notUnique) {
+    public static void GetUniques(ColumnItem column, ICollection<RowItem> rows, out List<string> unique, out List<string> notUnique) {
         unique = [];
         notUnique = [];
         HashSet<string> uniqueSet = [];
