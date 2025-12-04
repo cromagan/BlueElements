@@ -1426,23 +1426,97 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public RowListItem? View_NextRow(RowListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
-        return AllViewItems is not { } sr ? null : sr.Next<RowListItem>(row);
+
+        if (AllViewItems is not { } avi) { return null; }
+
+        var currentIndex = avi.IndexOf(row);
+        if (currentIndex < 0) { return null; }
+
+        var currentBottom = row.CanvasPosition.Bottom;
+
+        RowListItem? closestRow = null;
+        var minDistance = double.MaxValue;
+
+        foreach (var thisItem in avi) {
+            if (thisItem is RowListItem rli && thisItem.Visible && thisItem.CanvasPosition.Top >= currentBottom) {
+                var distance = thisItem.CanvasPosition.Top - currentBottom;
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestRow = rli;
+                }
+            }
+        }
+
+        return closestRow;
     }
 
     public RowListItem? View_PreviousRow(RowListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
-        return AllViewItems is not { } sr ? null : sr.Previous<RowListItem>(row);
+
+        if (AllViewItems is not { } avi) { return null; }
+
+        var currentIndex = avi.IndexOf(row);
+        if (currentIndex < 0) { return null; }
+
+        var currentTop = row.CanvasPosition.Top;
+
+        RowListItem? closestRow = null;
+        var minDistance = double.MaxValue;
+
+        foreach (var thisItem in avi) {
+            if (thisItem is RowListItem rli && thisItem.Visible && thisItem.CanvasPosition.Bottom <= currentTop) {
+                var distance = currentTop - thisItem.CanvasPosition.Bottom;
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestRow = rli;
+                }
+            }
+        }
+
+        return closestRow;
     }
 
     public RowListItem? View_RowFirst() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-        return AllViewItems is not { } sr ? null : sr.First<RowListItem>();
+
+        if (AllViewItems is not { } avi) { return null; }
+
+        RowListItem? firstRow = null;
+        var minTop = int.MaxValue;
+
+        foreach (var thisItem in avi) {
+            if (thisItem is RowListItem rli && thisItem.Visible) {
+                var top = thisItem.CanvasPosition.Top;
+                if (top < minTop) {
+                    minTop = top;
+                    firstRow = rli;
+                }
+            }
+        }
+
+        return firstRow;
     }
 
     public RowListItem? View_RowLast() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-        return AllViewItems is not { } sr ? null : sr.Last<RowListItem>();
+
+        if (AllViewItems is not { } avi) { return null; }
+
+        RowListItem? lastRow = null;
+        var maxBottom = int.MinValue;
+
+        foreach (var thisItem in avi) {
+            if (thisItem is RowListItem rli && thisItem.Visible) {
+                var bottom = thisItem.CanvasPosition.Bottom;
+                if (bottom > maxBottom) {
+                    maxBottom = bottom;
+                    lastRow = rli;
+                }
+            }
+        }
+
+        return lastRow;
     }
 
     public override List<string> ViewToString() {
@@ -2865,10 +2939,38 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         v.ShowDialog();
     }
 
-    private void Cursor_Move(Direction richtung) {
+    private void Cursor_Move(Direction direction) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        Neighbour(CursorPosColumn, CursorPosRow, richtung, out var newCol, out var newRow);
-        CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
+
+        if (CurrentArrangement is not { IsDisposed: false } ca) {
+            CursorPos_Set(null, null, false);
+            return;
+        }
+
+        if (direction == Direction.Nichts) { return; }
+
+        var newColumn = CursorPosColumn;
+        var newRow = CursorPosRow;
+
+        if (newColumn != null) {
+            if (direction.HasFlag(Direction.Links)) {
+                if (ca.PreviousVisible(newColumn) is { } c) { newColumn = c; }
+            }
+            if (direction.HasFlag(Direction.Rechts)) {
+                if (ca.NextVisible(newColumn) is { } c) { newColumn = c; }
+            }
+        }
+
+        if (newRow != null) {
+            if (direction.HasFlag(Direction.Oben)) {
+                if (View_PreviousRow(newRow) != null) { newRow = View_PreviousRow(newRow); }
+            }
+            if (direction.HasFlag(Direction.Unten)) {
+                if (View_NextRow(newRow) != null) { newRow = View_NextRow(newRow); }
+            }
+        }
+
+        CursorPos_Set(newColumn, newRow, true);
     }
 
     private void CursorPos_Reset() => CursorPos_Set(null, null, false);
@@ -3023,35 +3125,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     //private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, OffsetX, 0).Contains(e.Location);
-
-    private void Neighbour(ColumnViewItem? column, RowListItem? row, Direction direction, out ColumnViewItem? newColumn, out RowListItem? newRow) {
-        if (CurrentArrangement is not { IsDisposed: false } ca) {
-            newColumn = null;
-            newRow = null;
-            return;
-        }
-
-        newColumn = column;
-        newRow = row;
-
-        if (newColumn != null) {
-            if (direction.HasFlag(Direction.Links)) {
-                if (ca.PreviousVisible(newColumn) is { } c) { newColumn = c; }
-            }
-            if (direction.HasFlag(Direction.Rechts)) {
-                if (ca.NextVisible(newColumn) is { } c) { newColumn = c; }
-            }
-        }
-
-        if (newRow != null) {
-            if (direction.HasFlag(Direction.Oben)) {
-                if (View_PreviousRow(newRow) != null) { newRow = View_PreviousRow(newRow); }
-            }
-            if (direction.HasFlag(Direction.Unten)) {
-                if (View_NextRow(newRow) != null) { newRow = View_NextRow(newRow); }
-            }
-        }
-    }
 
     private void OnAutoFilterClicked(FilterEventArgs e) => AutoFilterClicked?.Invoke(this, e);
 

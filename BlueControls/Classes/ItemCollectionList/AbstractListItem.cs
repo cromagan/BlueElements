@@ -340,64 +340,6 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    /// <summary>
-    /// Gibt das letzte sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
-    /// </summary>
-    /// <typeparam name="T">Der Typ des gesuchten Elements, muss von <see cref="AbstractListItem"/> erben.</typeparam>
-    /// <param name="list">Die Liste, in der gesucht werden soll.</param>
-    /// <returns>
-    /// Das letzte sichtbare Element vom Typ <typeparamref name="T"/>, oder <c>null</c>,
-    /// wenn kein passendes Element gefunden wurde oder die Liste ungültig ist.
-    /// </returns>
-    /// <example>
-    /// <code>
-    /// var items = new List&lt;AbstractListItem&gt; { item1, item2, item3 };
-    /// var lastButton = items.Last&lt;ButtonItem&gt;();
-    /// </code>
-    /// </example>
-    public static T? Last<T>(this List<AbstractListItem>? list) where T : AbstractListItem? {
-        if (list == null) { return null; }
-
-        for (var i = list.Count - 1; i >= 0; i--) {
-            if (list[i] is T typedItem && list[i].Visible) {
-                return typedItem;
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Gibt das nächste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
-    /// </summary>
-    /// <typeparam name="T">Der Typ des gesuchten Elements, muss von <see cref="AbstractListItem"/> erben.</typeparam>
-    /// <param name="list">Die Liste, in der gesucht werden soll.</param>
-    /// <param name="currentItem">Das aktuelle Element, ab dem gesucht wird.</param>
-    /// <returns>
-    /// Das nächste sichtbare Element vom Typ <typeparamref name="T"/>, oder <c>null</c>,
-    /// wenn kein passendes Element gefunden wurde oder die Eingabeparameter ungültig sind.
-    /// </returns>
-    /// <example>
-    /// <code>
-    /// var items = new List&lt;AbstractListItem&gt; { item1, item2, item3 };
-    /// var nextButton = items.Next&lt;ButtonItem&gt;(currentItem);
-    /// </code>
-    /// </example>
-    public static T? Next<T>(this List<AbstractListItem>? list, AbstractListItem? currentItem) where T : AbstractListItem? {
-        if (list == null || currentItem == null) { return null; }
-
-        var currentIndex = list.IndexOf(currentItem);
-        if (currentIndex < 0) { return null; }
-
-        for (var i = currentIndex + 1; i < list.Count; i++) {
-            if (list[i] is T typedItem && list[i].Visible) {
-                return typedItem;
-            }
-        }
-
-        return null;
-    }
-
     public static void PreComputeSize(this List<AbstractListItem> item, Design itemDesign) {
         try {
             Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
@@ -405,37 +347,6 @@ public static class AbstractListItemExtension {
             Develop.AbortAppIfStackOverflow();
             PreComputeSize(item, itemDesign);
         }
-    }
-
-    /// <summary>
-    /// Gibt das vorherige sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
-    /// </summary>
-    /// <typeparam name="T">Der Typ des gesuchten Elements, muss von <see cref="AbstractListItem"/> erben.</typeparam>
-    /// <param name="list">Die Liste, in der gesucht werden soll.</param>
-    /// <param name="currentItem">Das aktuelle Element, ab dem rückwärts gesucht wird.</param>
-    /// <returns>
-    /// Das vorherige sichtbare Element vom Typ <typeparamref name="T"/>, oder <c>null</c>,
-    /// wenn kein passendes Element gefunden wurde oder die Eingabeparameter ungültig sind.
-    /// </returns>
-    /// <example>
-    /// <code>
-    /// var items = new List&lt;AbstractListItem&gt; { item1, item2, item3 };
-    /// var previousButton = items.Previous&lt;ButtonItem&gt;(currentItem);
-    /// </code>
-    /// </example>
-    public static T? Previous<T>(this List<AbstractListItem>? list, AbstractListItem? currentItem) where T : AbstractListItem? {
-        if (list == null || currentItem == null) { return null; }
-
-        var currentIndex = list.IndexOf(currentItem);
-        if (currentIndex < 0) { return null; }
-
-        for (var i = currentIndex - 1; i >= 0; i--) {
-            if (list[i] is T typedItem && list[i].Visible) {
-                return typedItem;
-            }
-        }
-
-        return null;
     }
 
     public static LineListItem Separator() => SeparatorWith(string.Empty);
