@@ -283,7 +283,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (column.RelationType == RelationType.CellValues) {
                 var (lcolumn, lrow, _, _) = LinkedCellData(column, false, false);
-                return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
+                if (lcolumn != null && lrow != null) { return lrow.CellGetString(lcolumn); } // Chunks werden NICHT nachgeladen!
             }
 
             return CellGetStringCore(column);
@@ -504,6 +504,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedTable, inputColumn, this, null);
         if (!string.IsNullOrEmpty(info)) { return (targetColumn, null, info, false); }
         if (fc is not { Count: not 0 }) { return (targetColumn, null, "Filter konnten nicht generiert werden", false); }
+
+        if (linkedTable is TableChunk tbc) {
+            if (!repairallowed && !tbc.ChunkIsLoaded(fc.ChunkVal)) { return (targetColumn, null, "Chunk nicht geladen", true); }
+        }
 
         RowItem? targetRow = null;
         var rows = fc.Rows;

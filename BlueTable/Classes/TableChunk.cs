@@ -335,6 +335,15 @@ public class TableChunk : TableFile {
         }
     }
 
+    public bool ChunkIsLoaded(string chunkVal) {
+        var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
+
+        lock (chunksBeingSaved) {
+            _chunks.TryGetValue(chunkId, out var chunk);
+            return chunk != null;
+        }
+    }
+
     public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
         if (f.Failed) { return f; }
