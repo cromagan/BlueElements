@@ -114,7 +114,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
         GC.SuppressFinalize(this);
     }
 
-    public abstract void Draw(Graphics gr, float zoom, float offsetX, float offsetY);
+    public abstract void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom);
 
     public abstract string HtmlText();
 
@@ -124,20 +124,12 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     public abstract bool IsSpace();
 
-    public bool IsVisible(Rectangle areaControl, float zoom, float offsetX, float offsetY) {
+    public bool IsVisible(Rectangle areaControl, Point controlPos, Size controlSize) {
         if (areaControl.Width < 1 || areaControl.Height < 1) { return true; }
-
-        var controlX = PosCanvas.X.CanvasToControl(zoom, offsetX);
-        if (controlX > areaControl.Right) { return false; }
-
-        var controlWidth = SizeCanvas.Width.CanvasToControl(zoom);
-        if (controlX + controlWidth < areaControl.Left) { return false; }
-
-        var controlY = PosCanvas.Y.CanvasToControl(zoom, offsetY);
-        if (controlY > areaControl.Top) { return false; }
-
-        var controlHeight = SizeCanvas.Height.CanvasToControl(zoom);
-        if (controlY + controlHeight < areaControl.Top) { return false; }
+        if (controlPos.X > areaControl.Right) { return false; }
+        if (controlPos.X + controlSize.Width < areaControl.Left) { return false; }
+        if (controlPos.Y > areaControl.Bottom) { return false; }
+        if (controlPos.Y + controlSize.Height < areaControl.Top) { return false; }
 
         return true;
     }

@@ -195,7 +195,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string RendererSettings { get; set; }
 
-    public string SheetStyle { get; set; }
+    public string SheetStyle { get; set; } = Constants.Win11;
 
     public Table? Table { get; }
     public int? TmpIfFilterRemoved { get; set; }

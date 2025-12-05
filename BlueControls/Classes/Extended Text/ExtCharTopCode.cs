@@ -38,7 +38,7 @@ internal class ExtCharTopCode : ExtChar {
 
     #region Methods
 
-    public override void Draw(Graphics gr, float zoom, float offsetX, float offsetY) { }
+    public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) { }
 
     public override string HtmlText() => "<top>";
 

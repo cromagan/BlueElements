@@ -29,27 +29,27 @@ public static partial class Extensions {
     ///
     /// </summary>
     /// <param name="rect"></param>
-    /// <param name="scale"></param>
+    /// <param name="zoom"></param>
     /// <param name="offsetX"></param>
     /// <param name="offsetY"></param>
     /// <param name="outerLine">true = die Punkte komplett umschlossen (für Fills), false = Mitte der Punkte</param>
     /// <returns></returns>
-    public static Rectangle CanvasToControl(this RectangleF rect, float scale, float offsetX, float offsetY, bool outerLine) {
+    public static Rectangle CanvasToControl(this RectangleF rect, float zoom, float offsetX, float offsetY, bool outerLine) {
         if (outerLine) {
             // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
             //               0 und 25 rauskommen
-            return new Rectangle(rect.X.CanvasToControl(scale) + (int)offsetX,
-                                  rect.Y.CanvasToControl(scale) + (int)offsetY,
-                                  rect.Width.CanvasToControl(scale),
-                                  rect.Height.CanvasToControl(scale));
+            return new Rectangle(rect.X.CanvasToControl(zoom) + (int)offsetX,
+                                  rect.Y.CanvasToControl(zoom) + (int)offsetY,
+                                  rect.Width.CanvasToControl(zoom),
+                                  rect.Height.CanvasToControl(zoom));
         }
 
         // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
         //               2,5 und 27,5 rauskommen
-        return new Rectangle(rect.X.CanvasToControl(scale, offsetX),
-                              rect.Y.CanvasToControl(scale, offsetY),
-                              rect.Width.CanvasToControl(scale),
-                              rect.Height.CanvasToControl(scale));
+        return new Rectangle(rect.X.CanvasToControl(zoom, offsetX),
+                              rect.Y.CanvasToControl(zoom, offsetY),
+                              rect.Width.CanvasToControl(zoom),
+                              rect.Height.CanvasToControl(zoom));
     }
 
     /// <summary>

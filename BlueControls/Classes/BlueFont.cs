@@ -282,10 +282,10 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 
-    public void DrawString(Graphics gr, string text, float x, float y) => DrawString(gr, text, x, y, 1);
+    public void DrawString(Graphics gr, string text, float offsetX, float offsetY) => DrawString(gr, text, 1, offsetX, offsetY);
 
-    public void DrawString(Graphics gr, string text, float x, float y, float scale) {
-        var font = FontWithoutLines(scale);
+    public void DrawString(Graphics gr, string text, float zoom, float offsetX, float offsetY) {
+        var font = FontWithoutLines(zoom);
 
         var size = SizeF.Empty;
         if (Underline || StrikeOut || BackColor) {
@@ -295,13 +295,13 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             //if (BackColor) {
             //    //var s = gr.MeasureString(text, _fontOl, int.MaxValue, DefaultWithTrailingSpaces);
             //    var backColorBrush = GetBackColorBrush();
-            //    //gr.FillRectangle(backColorBrush, x, y, size.Width, size.Height);
-            //    //gr.DrawString(text, _fontOl, GetMainBrush(), x, y, DefaultWithTrailingSpaces);
+            //    //gr.FillRectangle(backColorBrush, offsetX, offsetY, size.Width, size.Height);
+            //    //gr.DrawString(text, _fontOl, GetMainBrush(), offsetX, offsetY, DefaultWithTrailingSpaces);
             //    //return;
 
             //    var s = gr.MeasureString(text, _fontOl, new SizeF(float.PositiveInfinity, float.PositiveInfinity), DefaultWithTrailingSpaces);
 
-            //    var r = new RectangleF(x, y, size.Width, size.Height);
+            //    var r = new RectangleF(offsetX, offsetY, size.Width, size.Height);
 
             //    gr.FillRectangle(backColorBrush, r);
 
@@ -309,7 +309,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             //    return;
             //}
             if (BackColor) {
-                gr.FillRectangle(GetBackColorBrush(), x, y, size.Width.CanvasToControl(scale), size.Height.CanvasToControl(scale));
+                gr.FillRectangle(GetBackColorBrush(), offsetX, offsetY, size.Width.CanvasToControl(zoom), size.Height.CanvasToControl(zoom));
             }
         }
 
@@ -323,8 +323,8 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
                         continue; // Überspringen der Mitte
                     }
 
-                    var dx = x + px.CanvasToControl(scale);
-                    var dy = y + py.CanvasToControl(scale);
+                    var dx = offsetX + px.CanvasToControl(zoom);
+                    var dy = offsetY + py.CanvasToControl(zoom);
                     DrawString(gr, text, font, outlineBrush, dx, dy);
                 }
             }
@@ -332,20 +332,20 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
         // Haupttext
 
-        DrawString(gr, text, font, GetMainBrush(), x, y);
+        DrawString(gr, text, font, GetMainBrush(), offsetX, offsetY);
 
         // Linien
         if (Underline || StrikeOut) {
-            var lineWidth = CalculateLineWidth(scale);
+            var lineWidth = CalculateLineWidth(zoom);
             using var scaledPen = new Pen(ColorMain, lineWidth);
 
             if (Underline) {
-                var underlineY = y + Oberlänge(scale) + lineWidth + scale + 0.5f;
-                gr.DrawLine(scaledPen, x, (int)underlineY, x + (1 + size.Width).CanvasToControl(scale), (int)underlineY);
+                var underlineY = offsetY + Oberlänge(zoom) + lineWidth + zoom + 0.5f;
+                gr.DrawLine(scaledPen, offsetX, (int)underlineY, offsetX + (1 + size.Width).CanvasToControl(zoom), (int)underlineY);
             }
             if (StrikeOut) {
-                var strikeY = y + (size.Height * 0.55f);
-                gr.DrawLine(scaledPen, x - 1, (int)strikeY, (int)(x + 1 + size.Width), (int)strikeY);
+                var strikeY = offsetY + (size.Height * 0.55f);
+                gr.DrawLine(scaledPen, offsetX - 1, (int)strikeY, (int)(offsetX + 1 + size.Width), (int)strikeY);
             }
         }
     }

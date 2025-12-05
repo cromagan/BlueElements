@@ -61,7 +61,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private readonly List<ExtChar> _internal = [];
     private int? _heightControl;
-    private string _sheetStyle = string.Empty;
+    private string _sheetStyle = Constants.Win11;
 
     private Size _textDimensions;
 
@@ -325,8 +325,11 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         DrawStates(gr, zoom, offsetY, offsetY);
 
         foreach (var t in _internal) {
-            if (t.IsVisible(AreaControl, zoom, offsetX, offsetY)) {
-                t.Draw(gr, zoom, offsetX, offsetY);
+            var controlPos = t.PosCanvas.CanvasToControl(zoom, offsetX, offsetY);
+            var controlSize = t.SizeCanvas.CanvasToControl(zoom);
+
+            if (t.IsVisible(AreaControl, controlPos, controlSize)) {
+                t.Draw(gr, controlPos, controlSize, zoom);
             }
         }
     }
@@ -761,7 +764,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    private void DrawState(Graphics gr, float scale, MarkState state, int offsetX, int offsetY) {
+    private void DrawState(Graphics gr, MarkState state, float zoom, int offsetX, int offsetY) {
         var tmas = -1;
         for (var pos = 0; pos < _internal.Count; pos++) {
             var tempVar = _internal[pos];
@@ -772,9 +775,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (!marked || pos == _internal.Count - 1) {
                 if (tmas > -1) {
                     if (pos == _internal.Count - 1) {
-                        DrawZone(gr, scale, state, tmas, pos, offsetX, offsetY);
+                        DrawZone(gr, zoom, state, tmas, pos, offsetX, offsetY);
                     } else {
-                        DrawZone(gr, scale, state, tmas, pos - 1, offsetX, offsetY);
+                        DrawZone(gr, zoom, state, tmas, pos - 1, offsetX, offsetY);
                     }
                     tmas = -1;
                 }
@@ -783,10 +786,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private void DrawStates(Graphics gr, float scale, int offsetX, int offsetY) {
-        DrawState(gr, scale, MarkState.Field, offsetX, offsetY);
-        DrawState(gr, scale, MarkState.MyOwn, offsetX, offsetY);
-        DrawState(gr, scale, MarkState.Other, offsetX, offsetY);
-        DrawState(gr, scale, MarkState.Ringelchen, offsetX, offsetY);
+        DrawState(gr, MarkState.Field, scale, offsetX, offsetY);
+        DrawState(gr, MarkState.MyOwn, scale, offsetX, offsetY);
+        DrawState(gr, MarkState.Other, scale, offsetX, offsetY);
+        DrawState(gr, MarkState.Ringelchen, scale, offsetX, offsetY);
     }
 
     private void DrawZone(Graphics gr, float zoom, MarkState thisState, int markStart, int markEnd, int offsetX, int offsetY) {

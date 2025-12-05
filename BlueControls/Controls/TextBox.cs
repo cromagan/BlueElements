@@ -1097,10 +1097,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var sr = state | States.Checked;
 
         for (var cc = mas; cc < mae; cc++) {
-            if (_eTxt[cc].IsVisible(_eTxt.AreaControl, 1f, OffsetX, OffsetY)) {
+            var controlPos = _eTxt[cc].PosCanvas.CanvasToControl(1f, OffsetX, OffsetY);
+            var controlSize = _eTxt[cc].SizeCanvas.CanvasToControl(1f);
+
+            if (_eTxt[cc].IsVisible(_eTxt.AreaControl, controlPos, controlSize)) {
                 var f = _eTxt[cc].Font;
                 _eTxt[cc].Font = Skin.GetBlueFont(Design.TextBox, sr);
-                _eTxt[cc].Draw(gr, 1f, OffsetX, OffsetY);
+                _eTxt[cc].Draw(gr, controlPos, controlSize, 1f);
                 _eTxt[cc].Font = f;
             }
         }

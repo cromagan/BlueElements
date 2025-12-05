@@ -24,6 +24,8 @@ public static partial class Extensions {
 
     #region Methods
 
+    public static Size CanvasToControl(this SizeF p, float zoom) => new(p.Width.CanvasToControl(zoom), p.Height.CanvasToControl(zoom));
+
     public static SizeF SizeFParse(this string toParse) {
         toParse = toParse.FromNonCritical().RemoveChars("{}Widtheg= ");
         var w = toParse.SplitBy(",H");

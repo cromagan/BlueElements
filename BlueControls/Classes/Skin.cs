@@ -834,15 +834,14 @@ public static class Skin {
     public const int Padding = 9;
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(GetDpiScale(), 2, MidpointRounding.AwayFromZero);
-    public static Table? StyleTb;
-    public static ColumnItem? StyleTb_Font;
-    public static ColumnItem? StyleTb_Name;
-    public static ColumnItem? StyleTb_Style;
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
+    private static ColumnItem? _styleTb_Font;
+    private static ColumnItem? _styleTb_Name;
+    private static ColumnItem? _styleTb_Style;
 
     #endregion
 
@@ -855,6 +854,16 @@ public static class Skin {
             (byte)Constants.GlobalRnd.Next(0, 255),
             (byte)Constants.GlobalRnd.Next(0, 255));
 
+    public static Table? StyleTb {
+        get;
+        private set {
+            field = value;
+            _styleTb_Name = value?.Column["Name"];
+            _styleTb_Style = value?.Column["Style"];
+            _styleTb_Font = value?.Column["Font"];
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -863,7 +872,7 @@ public static class Skin {
 
     public static List<string>? AllStyles() {
         InitStyles();
-        return StyleTb?.Column.First?.Contents();
+        return _styleTb_Name?.Contents();
     }
 
     public static void ChangeDesign(Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc2, string f, string pic) {
@@ -1207,9 +1216,9 @@ public static class Skin {
 
         InitStyles();
         if (StyleTb is not { IsDisposed: false } tb ||
-            StyleTb_Style is not { IsDisposed: false } cs ||
-            StyleTb_Name is not { IsDisposed: false } cn ||
-            StyleTb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
+            _styleTb_Style is not { IsDisposed: false } cs ||
+            _styleTb_Name is not { IsDisposed: false } cn ||
+            _styleTb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
 
         var f1 = new FilterItem(cn, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, style);
         var f2 = new FilterItem(cs, BlueTable.Enums.FilterType.Istgleich, ((int)format).ToString());
@@ -1235,7 +1244,7 @@ public static class Skin {
     }
 
     public static BlueFont GetBlueFont(RowItem? r) {
-        if (r == null || StyleTb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
+        if (r == null || _styleTb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
 
         var s = r.CellGetString(cf);
 
@@ -1323,10 +1332,6 @@ public static class Skin {
 
     public static void InitStyles() {
         StyleTb ??= Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
-
-        StyleTb_Name = StyleTb?.Column["Name"];
-        StyleTb_Style = StyleTb?.Column["Style"];
-        StyleTb_Font = StyleTb?.Column["Font"];
     }
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
