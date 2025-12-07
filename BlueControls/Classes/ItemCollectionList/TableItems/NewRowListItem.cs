@@ -39,7 +39,7 @@ public sealed class NewRowListItem : RowBackgroundListItem {
 
     #region Constructors
 
-    public NewRowListItem(ColumnViewCollection? arrangement) : base(string.Empty, arrangement, string.Empty) => IgnoreYOffset = true;
+    public NewRowListItem(ColumnViewCollection? arrangement) : base(Identifier, arrangement, string.Empty) => IgnoreYOffset = true;
 
     #endregion
 

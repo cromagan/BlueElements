@@ -1938,7 +1938,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     return;
                 }
 
-                if (_mouseOverRowItem is ColumnsHeadListItem) {
+                if (_mouseOverRowItem is CollapesBarListItem && _mouseOverColumn.CollapsableEnabled()) {
                     _mouseOverColumn.IsExpanded = !_mouseOverColumn.IsExpanded;
                     Invalidate_AllViewItems(false);
                     return;
@@ -2430,16 +2430,37 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
         if (!arrangement.ShowHead) { return; }
 
+        for (var z = 0; z < 3; z++) {
+            // Caption 1 bis 3 Expand Button
+            allItems.TryGetValue(CaptionBarListItem.Identifier(z), out var itemcap);
+            if (itemcap is not CaptionBarListItem captionBar) {
+                captionBar = new CaptionBarListItem(arrangement, z);
+                allItems.Add(captionBar.KeyName, captionBar);
+            }
+            captionBar.Visible = arrangement.ShowHead;
+            captionBar.IgnoreYOffset = true;
+            sortedItems.Add(captionBar);
+        }
+
+        // Grüner Expand Button
+        allItems.TryGetValue(CollapesBarListItem.Identifier, out var item0);
+        if (item0 is not CollapesBarListItem collapseBar) {
+            collapseBar = new CollapesBarListItem(arrangement);
+            allItems.Add(collapseBar.KeyName, collapseBar);
+        }
+        collapseBar.Visible = arrangement.ShowHead;
+        collapseBar.IgnoreYOffset = true;
+        sortedItems.Add(collapseBar);
+
         // Spaltenköpfe direkt
-        allItems.TryGetValue(ColumnsHeadListItem.Identifier, out var item0);
-        if (item0 is not ColumnsHeadListItem columnHead) {
+        allItems.TryGetValue(ColumnsHeadListItem.Identifier, out var itemHead);
+        if (itemHead is not ColumnsHeadListItem columnHead) {
             columnHead = new ColumnsHeadListItem(arrangement);
             allItems.Add(columnHead.KeyName, columnHead);
         }
         columnHead.Visible = arrangement.ShowHead;
         columnHead.IgnoreYOffset = true;
         sortedItems.Add(columnHead);
- 
 
         // Die Sortierung
         allItems.TryGetValue(SortBarListItem.Identifier, out var item1);
@@ -2452,7 +2473,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         sortAnzeige.Sort = sortused;
         sortAnzeige.IgnoreYOffset = true;
         sortedItems.Add(sortAnzeige);
-
 
         // Filterleiste
         allItems.TryGetValue(FilterBarListItem.Identifier, out var item2);
@@ -2467,7 +2487,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnFilter.IgnoreYOffset = true;
         sortedItems.Add(columnFilter);
 
-
         // Neue Zeile
         if (string.IsNullOrEmpty(_newRowsAllowed)) {
             allItems.TryGetValue(NewRowListItem.Identifier, out var item3);
@@ -2480,9 +2499,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             newRow.IgnoreYOffset = true;
             sortedItems.Add(newRow);
         }
-
-
-     
     }
 
     private void CalculateAllViewItems_CalculateYPosition(List<AbstractListItem> sortedItems, ColumnViewCollection arrangement) {

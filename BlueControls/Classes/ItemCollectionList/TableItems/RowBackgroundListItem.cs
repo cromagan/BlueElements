@@ -95,6 +95,12 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     } = Constants.Win11;
 
+    /// <summary>
+    /// True: Erst Non Permanent, dann Permanent
+    /// False: Alle der Reihe Nach
+    /// </summary>
+    protected abstract bool DoSpezialOrder { get; }
+
     #endregion
 
     #region Methods
@@ -178,7 +184,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
         for (var du = 0; du < 2; du++) {
             foreach (var viewItem in Arrangement) {
-                if ((viewItem.Permanent && du == 0) || (!viewItem.Permanent && du == 1)) { continue; }
+                if (DoSpezialOrder && ((viewItem.Permanent && du == 0) || (!viewItem.Permanent && du == 1))) { continue; }
                 if (viewItem.Column == null) { continue; }
 
                 var left = viewItem.ControlColumnLeft((int)offsetX);
@@ -202,6 +208,8 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 Draw_UpperLine(gr, ColumnLineStyle.Ohne, area.Right, area.Left, area.Top);
                 Draw_LowerLine(gr, ColumnLineStyle.Dünn, area.Right, area.Left, area.Bottom - 1);
             }
+
+            if (!DoSpezialOrder) { return; }
         }
     }
 

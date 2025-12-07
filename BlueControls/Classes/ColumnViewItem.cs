@@ -198,6 +198,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public string SheetStyle { get; set; } = Constants.Win11;
 
     public Table? Table { get; }
+
     public int? TmpIfFilterRemoved { get; set; }
 
     public ViewType ViewType {
@@ -233,6 +234,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         return newContentWidth;
     }
+
+    public bool CollapsableEnabled() => CanvasContentWidth > 40 || !IsExpanded;
 
     public int ControlColumnLeft(float shiftX) {
         if (Permanent) {
@@ -389,12 +392,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private int ComputeControlColumnWidth(ColumnViewCollection parent, int tableviewWith, float zoom) {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
-        if (parent == null) { return 16; }
+        var p16 = 16.CanvasToControl(zoom);
+
+        if (parent == null) { return p16; }
 
         //if (_controlColumnWidth is { } v) { return v; }
 
         if (_column is not { IsDisposed: false }) {
-            _controlColumnWidth = 16;
+            _controlColumnWidth = p16;
             return _controlColumnWidth;
         }
 
@@ -404,14 +409,14 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
 
         if (!IsExpanded) {
-            _controlColumnWidth = 16;
+            _controlColumnWidth = p16;
         } else {
             _controlColumnWidth = ViewType == ViewType.PermanentColumn
                 ? Math.Min(CanvasContentWidth.CanvasToControl(zoom), (int)(tableviewWith * 0.3))
                 : Math.Min(CanvasContentWidth.CanvasToControl(zoom), (int)(tableviewWith * 0.6));
         }
 
-        _controlColumnWidth = Math.Max(_controlColumnWidth, FilterBarListItem.AutoFilterSize); // Mindestens so groß wie der Autofilter;
+        _controlColumnWidth = Math.Max(_controlColumnWidth, FilterBarListItem.AutoFilterSize.CanvasToControl(zoom)); // Mindestens so groß wie der Autofilter;
         return _controlColumnWidth;
     }
 

@@ -62,24 +62,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
         if (viewItem.Column is not { IsDisposed: false } column) { return; }
 
-        #region Recude-Button zeichnen
-
-        if (positionControl.Width > 70 || !viewItem.IsExpanded) {
-            // Anpassen der Reduce-Button-CanvasPosition
-
-            var p14 = 14.CanvasToControl(scale);
-
-            var origReduceButtonLocation = new Rectangle((int)positionControl.Right - p14, (int)positionControl.Top, p14, p14);
-
-            gr.DrawImage(
-                !viewItem.IsExpanded ? QuickImage.Get("Pfeil_Rechts|" + origReduceButtonLocation.Width + "|||FF0000|||||20")
-                                : QuickImage.Get("Pfeil_Links|" + origReduceButtonLocation.Width + "||||||||75"),
-                origReduceButtonLocation.Left,
-                origReduceButtonLocation.Top
-            );
-        }
-
-        #endregion
+        gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), positionControl);
 
         #region Roten Rand für Split-Spalten
 
