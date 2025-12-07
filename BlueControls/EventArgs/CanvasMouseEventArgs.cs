@@ -36,7 +36,7 @@ public class CanvasMouseEventArgs : System.EventArgs {
         CanvasY = mouseControl.Y.ControlToCanvas(scale, offsetY);
 
         ControlPoint = new Point(ControlX, ControlY);
-        CanvasPoint = new PointF(CanvasX, ControlY);
+        CanvasPoint = new PointF(CanvasX, CanvasY);
     }
 
     public CanvasMouseEventArgs(CanvasMouseEventArgs e) : base() {
@@ -50,7 +50,7 @@ public class CanvasMouseEventArgs : System.EventArgs {
         CanvasY = e.CanvasY;
 
         ControlPoint = new Point(ControlX, ControlY);
-        CanvasPoint = new PointF(CanvasX, ControlY);
+        CanvasPoint = new PointF(CanvasX, CanvasY);
     }
 
     #endregion

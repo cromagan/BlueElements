@@ -399,25 +399,26 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
                 break;
 
             case Keys.Up:
-                MoveItems(0, -1 * multi, false, false);
+                MoveItems(0, -multi, false);
                 break;
 
             case Keys.Down:
-                MoveItems(0, 1 * multi, false, false);
+                MoveItems(0, multi, false);
                 break;
 
             case Keys.Left:
-                MoveItems(-1 * multi, 0, false, false);
+                MoveItems(-multi, 0, false);
                 break;
 
             case Keys.Right:
-                MoveItems(1 * multi, 0, false, false);
+                MoveItems(multi, 0, false);
                 break;
         }
     }
 
     protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);
+
         if (!EditAllowed) { return; }
 
         QuickInfo = string.Empty;
@@ -472,7 +473,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         if (e.Button == MouseButtons.Left) {
             QuickInfo = string.Empty;
 
-            MoveItems(e.CanvasX - MouseDownCanvas.X, e.CanvasY - MouseDownCanvas.Y, true, true);
+            MoveItems(e.CanvasX - MouseDownCanvas.X, e.CanvasY - MouseDownCanvas.Y, true);
 
             Refresh(); // Ansonsten werden einige Redraws übersprungen
         }
@@ -650,7 +651,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         return tmp;
     }
 
-    private void MoveItems(float canvasX, float canvasY, bool doSnap, bool modifyMouseDown) {
+    private void MoveItems(float canvasX, float canvasY, bool doSnap) {
         PointM? pointToMove = null;
         foreach (var thisIt in _itemsToMove) {
             if (thisIt is PointM p) { pointToMove = p; break; }
@@ -678,10 +679,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         if (canvasX == 0f && canvasY == 0f) { return; }
 
         foreach (var thisIt in _itemsToMove) {
-            thisIt.Move(canvasX, canvasY, modifyMouseDown);
+            thisIt.Move(canvasX, canvasY, doSnap);
         }
 
-        if (doSnap && modifyMouseDown) {
+        if (doSnap) {
             // Maus-Daten modifizieren, da ja die tasächliche Bewegung wegen der SnapPoints abweichen kann.
             MouseDownCanvas = new PointF(MouseDownCanvas.X + canvasX, MouseDownCanvas.Y + canvasY);
         }
