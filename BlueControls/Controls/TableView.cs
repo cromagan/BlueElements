@@ -2431,15 +2431,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (!arrangement.ShowHead) { return; }
 
         for (var z = 0; z < 3; z++) {
-            // Caption 1 bis 3 Expand Button
-            allItems.TryGetValue(CaptionBarListItem.Identifier(z), out var itemcap);
-            if (itemcap is not CaptionBarListItem captionBar) {
-                captionBar = new CaptionBarListItem(arrangement, z);
-                allItems.Add(captionBar.KeyName, captionBar);
+            var add = false;
+            foreach (var thisColumn in arrangement) {
+                if (thisColumn.Column is { } c && !string.IsNullOrEmpty(c.CaptionGroup(z))) { add = true; break; }
             }
-            captionBar.Visible = arrangement.ShowHead;
-            captionBar.IgnoreYOffset = true;
-            sortedItems.Add(captionBar);
+
+            if (add) {
+                // Caption 1 bis 3 Expand Button
+                allItems.TryGetValue(CaptionBarListItem.Identifier(z), out var itemcap);
+                if (itemcap is not CaptionBarListItem captionBar) {
+                    captionBar = new CaptionBarListItem(arrangement, z);
+                    allItems.Add(captionBar.KeyName, captionBar);
+                }
+                captionBar.Visible = arrangement.ShowHead;
+                captionBar.IgnoreYOffset = true;
+                sortedItems.Add(captionBar);
+            }
         }
 
         // Grüner Expand Button

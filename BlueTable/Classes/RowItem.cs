@@ -257,8 +257,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
     }
 
-    public Point CellGetPoint(string columnName) => CellGetPoint(Table?.Column[columnName]);
-
     public string CellGetString(string columnName) => CellGetString(Table?.Column[columnName]) ?? string.Empty;
 
     public string CellGetString(ColumnItem? column) // Main Method
@@ -281,10 +279,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 return string.Empty;
             }
 
-            if (column.RelationType == RelationType.CellValues) {
-                var (lcolumn, lrow, _, _) = LinkedCellData(column, false, false);
-                if (lcolumn != null && lrow != null) { return lrow.CellGetString(lcolumn); } // Chunks werden NICHT nachgeladen!
-            }
+            //if (column.RelationType == RelationType.CellValues) {
+            //    var (lcolumn, lrow, _, _) = LinkedCellData(column, false, false);
+            //    if (lcolumn != null && lrow != null) { return lrow.CellGetString(lcolumn); } // Chunks werden NICHT nachgeladen!
+            //}
 
             return CellGetStringCore(column);
         } catch {
@@ -311,10 +309,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public void CellSet(string columnName, int value, string comment) => Set(Table?.Column[columnName], value.ToStringInt1(), comment);
 
     public void CellSet(ColumnItem column, int value, string comment) => Set(column, value.ToStringInt1(), comment);
-
-    public void CellSet(string columnName, Point value, string comment) => Set(Table?.Column[columnName], value.ToString(), comment);
-
-    public void CellSet(ColumnItem column, Point value, string comment) => Set(column, value.ToString(), comment);
 
     public void CellSet(string columnName, IEnumerable<string>? value, string comment) => Set(Table?.Column[columnName], value.JoinWithCr(), comment);
 

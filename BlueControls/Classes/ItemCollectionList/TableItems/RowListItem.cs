@@ -55,8 +55,8 @@ public sealed class RowListItem : RowBackgroundListItem {
     }
 
     public override string QuickInfo => Row.GetQuickInfo();
-
     public RowItem Row { get; }
+    protected override bool DoSpezialOrder => true;
 
     #endregion
 

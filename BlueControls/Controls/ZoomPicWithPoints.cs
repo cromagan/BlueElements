@@ -286,7 +286,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         OnOverwriteMouseImageData(newCanvasCoords);
 
         // Mittellinie
-        var canvasPicturePos = base.CanvasMaxBounds();
+        var canvasPicturePos = CanvasMaxBounds();
         if (_mittelLinie.HasFlag(Orientation.Waagerecht)) {
             var p1 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Left).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
             var p2 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Right).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);

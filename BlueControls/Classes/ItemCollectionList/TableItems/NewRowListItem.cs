@@ -47,6 +47,7 @@ public sealed class NewRowListItem : RowBackgroundListItem {
 
     public FilterCollection? FilterCombined { get; set; }
     public override string QuickInfo => string.Empty;
+    protected override bool DoSpezialOrder => true;
 
     #endregion
 
@@ -76,6 +77,8 @@ public sealed class NewRowListItem : RowBackgroundListItem {
             gr.DrawImage(qi, new Point((int)positionControl.Left + p1, (int)positionControl.Top + p1));
             viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, null, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
         }
+
+        gr.FillRectangle(GrayBrush2, positionControl);
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;

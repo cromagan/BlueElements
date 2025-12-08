@@ -45,6 +45,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
     public override string QuickInfo => string.Empty;
+    protected override bool DoSpezialOrder => true;
 
     #endregion
 
@@ -56,13 +57,15 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         return QuickImage.Get(column.CaptionBitmapCode + "|100");
     }
 
+    public static string CaptionTranslated(string caption) => LanguageTool.DoTranslate(caption, true).Replace("\r", "\r\n");
+
     public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Ohne, left, right, bottom);
 
     public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
         if (viewItem.Column is not { IsDisposed: false } column) { return; }
 
-        gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), positionControl);
+        gr.FillRectangle(GrayBrush, positionControl);
 
         #region Roten Rand für Split-Spalten
 
@@ -74,7 +77,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         #endregion
 
-        var capTranslated = CaptionTranslated(column);
+        var capTranslated = CaptionTranslated(column.Caption);
         var Font_Head_Default_Scaled = Font_Head_Default.Scale(scale).MeasureString(capTranslated);
 
         if (CaptionBitmap(column) is { IsError: false } cb) {
@@ -127,7 +130,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         foreach (var thisC in Arrangement) {
             if (thisC.Column is { IsDisposed: false } column) {
-                var capTranslated = CaptionTranslated(column);
+                var capTranslated = CaptionTranslated(column.Caption);
                 var s = f.MeasureString(capTranslated);
 
                 minH = Math.Max(minH, (int)s.Width);
@@ -136,8 +139,6 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         return new(100, minH + 3);
     }
-
-    private static string CaptionTranslated(ColumnItem column) => LanguageTool.DoTranslate(column.Caption, true).Replace("\r", "\r\n");
 
     #endregion
 }

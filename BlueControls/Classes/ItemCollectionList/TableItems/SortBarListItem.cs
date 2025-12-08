@@ -49,8 +49,8 @@ public sealed class SortBarListItem : RowBackgroundListItem {
     }
 
     public override string QuickInfo => string.Empty;
-
     public RowSortDefinition? Sort { get; set; }
+    protected override bool DoSpezialOrder => true;
 
     #endregion
 
@@ -60,6 +60,7 @@ public sealed class SortBarListItem : RowBackgroundListItem {
 
     public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
+        gr.FillRectangle(GrayBrush, positionControl);
 
         if (Sort != null && Sort.UsedForRowSort(viewItem.Column)) {
             var p6 = 6.CanvasToControl(scale);

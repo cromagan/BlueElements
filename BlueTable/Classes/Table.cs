@@ -55,6 +55,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public const string TableVersion = "4.10";
     public static readonly ObservableCollection<Table> AllFiles = [];
 
+    public static readonly object AllFilesLocker = new object();
+
     /// <summary>
     /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
     /// </summary>
@@ -121,7 +123,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
     private string _globalShowPass = string.Empty;
-
     private DateTime _powerEditTime = DateTime.MinValue;
 
     private string _rowQuickInfo = string.Empty;
@@ -153,48 +154,50 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         // Keine Konstruktoren mit Dateiname, Filestreams oder sonst was.
         // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
         Develop.StartService();
+        lock (AllFilesLocker) {
+            QuickImage.NeedImage += QuickImage_NeedImage;
 
-        QuickImage.NeedImage += QuickImage_NeedImage;
+            KeyName = MakeValidTableName(tablename);
 
-        KeyName = MakeValidTableName(tablename);
+            if (!IsValidTableName(KeyName)) {
+                Develop.DebugPrint(ErrorType.Error, "Tabellenname ungültig: " + tablename);
+            }
 
-        if (!IsValidTableName(KeyName)) {
-            Develop.DebugPrint(ErrorType.Error, "Tabellenname ungültig: " + tablename);
+            Cell = new CellCollection(this);
+            Row = new RowCollection(this);
+            Column = new ColumnCollection(this);
+
+            Column.ColumnDisposed += Column_ColumnDisposed;
+            Column.ColumnRemoving += Column_ColumnRemoving;
+
+            Undo = [];
+
+            //_columnArrangements.Clear();
+            //_permissionGroupsNewRow.Clear();
+            //_tags.Clear();
+            //_tableAdmin.Clear();
+            //_globalShowPass = string.Empty;
+            _creator = UserName;
+            _createDate = DateTime.UtcNow.ToString9();
+            LastSaveMainFileUtcDate = new DateTime(0);
+            //_caption = string.Empty;
+            LoadedVersion = TableVersion;
+            //_globalScale = 1f;
+            _additionalFilesPath = "AdditionalFiles";
+            //_rowQuickInfo = string.Empty;
+            //_sortDefinition = null;
+            //EventScript_RemoveAll(true);
+            //_variables.Clear();
+            _variableTmp = string.Empty;
+            //Undox.Clear();
+
+            // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
+            // Die Events registriert werden, um z.B: das Passwort abzufragen
+            // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Tabelle finden können.
+            // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
+
+            AllFiles.Add(this);
         }
-
-        Cell = new CellCollection(this);
-        Row = new RowCollection(this);
-        Column = new ColumnCollection(this);
-
-        Column.ColumnDisposed += Column_ColumnDisposed;
-        Column.ColumnRemoving += Column_ColumnRemoving;
-
-        Undo = [];
-
-        //_columnArrangements.Clear();
-        //_permissionGroupsNewRow.Clear();
-        //_tags.Clear();
-        //_tableAdmin.Clear();
-        //_globalShowPass = string.Empty;
-        _creator = UserName;
-        _createDate = DateTime.UtcNow.ToString9();
-        LastSaveMainFileUtcDate = new DateTime(0);
-        //_caption = string.Empty;
-        LoadedVersion = TableVersion;
-        //_globalScale = 1f;
-        _additionalFilesPath = "AdditionalFiles";
-        //_rowQuickInfo = string.Empty;
-        //_sortDefinition = null;
-        //EventScript_RemoveAll(true);
-        //_variables.Clear();
-        _variableTmp = string.Empty;
-        //Undox.Clear();
-
-        // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
-        // Die Events registriert werden, um z.B: das Passwort abzufragen
-        // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Tabelle finden können.
-        // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
-        AllFiles.Add(this);
     }
 
     #endregion
@@ -571,7 +574,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public static Table Get() {
-        var t = new Table(UniqueKeyValue());
+        Table t;
+
+        lock (AllFilesLocker) {
+            t = new Table(UniqueKeyValue());
+        }
         t.InitDummyTable();
         return t;
     }
@@ -610,15 +617,23 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             fileOrTableName = MakeValidTableName(fileOrTableName);
 
-            foreach (var thisFile in AllFiles) {
-                if (string.Equals(thisFile.KeyName, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
-                    thisFile.WaitInitialDone();
-                    return thisFile;
-                }
+            Table? ok = null;
+            lock (AllFilesLocker) {
+                foreach (var thisFile in AllFiles) {
+                    if (string.Equals(thisFile.KeyName, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
+                        ok = thisFile;
+                        break;
+                    }
 
-                if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder.FilepathAndName)) {
-                    folder.AddIfNotExists(tbf.Filename.FilePath());
+                    if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder.FilepathAndName)) {
+                        folder.AddIfNotExists(tbf.Filename.FilePath());
+                    }
                 }
+            }
+
+            if (ok is { } okt) {
+                okt.WaitInitialDone();
+                return okt;
             }
 
             #endregion
@@ -626,23 +641,29 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             foreach (var thisfolder in folder) {
                 var f = thisfolder + fileOrTableName;
 
-                if (FileExists(f + ".cbdb")) {
+                var fs = f + ".cbdb";
+                if (FileExists(fs)) {
+                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
                     var db = new TableChunk(fileOrTableName);
-                    db.LoadFromFile(f + ".cbdb", false, needPassword, string.Empty, instantUpdate);
+                    db.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
                     db.WaitInitialDone();
                     return db;
                 }
 
-                if (FileExists(f + ".mbdb")) {
+                fs = f + ".mbdb";
+                if (FileExists(fs)) {
+                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
                     var db = new TableFragments(fileOrTableName);
-                    db.LoadFromFile(f + ".mbdb", false, needPassword, string.Empty, instantUpdate);
+                    db.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
                     db.WaitInitialDone();
                     return db;
                 }
 
-                if (FileExists(f + ".bdb")) {
+                fs = f + ".bdb";
+                if (FileExists(fs)) {
+                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
                     var db = new TableFile(fileOrTableName);
-                    db.LoadFromFile(f + ".bdb", false, needPassword, string.Empty, instantUpdate);
+                    db.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
                     db.WaitInitialDone();
                     return db;
                 }
@@ -1032,24 +1053,26 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public static string UniqueKeyValue() {
-        var x = 9999;
-        do {
-            x += 1;
-            if (x > 99999) { Develop.DebugPrint(ErrorType.Error, "Unique ID konnte nicht erzeugt werden"); }
+        lock (AllFilesLocker) {
+            var x = 9999;
+            do {
+                x += 1;
+                if (x > 99999) { Develop.DebugPrint(ErrorType.Error, "Unique ID konnte nicht erzeugt werden"); }
 
-            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToStringInt5()).RemoveChars(Char_DateiSonderZeichen + " _.");
-            var ok = true;
+                var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToStringInt5()).RemoveChars(Char_DateiSonderZeichen + " _.");
+                var ok = true;
 
-            if (IsValidTableName(unique)) {
-                foreach (var thisfile in AllFiles) {
-                    if (string.Equals(unique, thisfile.KeyName, StringComparison.Ordinal)) { ok = false; break; }
+                if (IsValidTableName(unique)) {
+                    foreach (var thisfile in AllFiles) {
+                        if (string.Equals(unique, thisfile.KeyName, StringComparison.Ordinal)) { ok = false; break; }
+                    }
+                } else {
+                    ok = false;
                 }
-            } else {
-                ok = false;
-            }
 
-            if (ok) { return unique; }
-        } while (true);
+                if (ok) { return unique; }
+            } while (true);
+        }
     }
 
     public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {

@@ -798,6 +798,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void TableInternal_SelectedRowChanged(object sender, RowNullableEventArgs e) => OnSelectedRowChanged(e);
 
     private void TableInternal_TableChanged(object sender, System.EventArgs e) {
+        FilterFix.Table = Table;
         OnTableChanged();
     }
 

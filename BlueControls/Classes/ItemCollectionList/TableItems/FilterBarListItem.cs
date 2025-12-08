@@ -28,7 +28,6 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
     #region Fields
 
     public const string Identifier = "FilterBarListItem";
-
     public static readonly int AutoFilterSize = 22;
 
     #endregion
@@ -58,10 +57,9 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
     }
 
     public override string QuickInfo => string.Empty;
-
     public int RowsFilteredCount { get; set; }
-
     public bool ShowNumber { get; set; }
+    protected override bool DoSpezialOrder => true;
 
     #endregion
 
@@ -71,6 +69,8 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
+
+        gr.FillRectangle(GrayBrush, positionControl);
 
         #region Trichter-Text && trichterState
 

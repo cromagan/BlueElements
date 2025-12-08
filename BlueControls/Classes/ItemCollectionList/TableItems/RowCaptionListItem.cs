@@ -49,6 +49,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
     public BlueFont Font_RowChapter => Skin.GetBlueFont(SheetStyle, PadStyles.Überschrift);
     public bool IsExpanded { get; set; }
     public override string QuickInfo => string.Empty;
+    protected override bool DoSpezialOrder => true;
 
     #endregion
 

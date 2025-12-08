@@ -28,7 +28,6 @@ public sealed class CollapesBarListItem : RowBackgroundListItem {
     #region Fields
 
     public const string Identifier = "CollapesBarListItem";
-
     public static readonly int CollapseButtonSize = 14;
 
     #endregion
@@ -42,6 +41,7 @@ public sealed class CollapesBarListItem : RowBackgroundListItem {
     #region Properties
 
     public override string QuickInfo => string.Empty;
+    protected override bool DoSpezialOrder => true;
 
     #endregion
 
@@ -51,6 +51,8 @@ public sealed class CollapesBarListItem : RowBackgroundListItem {
 
     public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
+
+        gr.FillRectangle(GrayBrush, positionControl);
 
         if (viewItem.CollapsableEnabled()) {
             // Anpassen der Reduce-Button-CanvasPosition

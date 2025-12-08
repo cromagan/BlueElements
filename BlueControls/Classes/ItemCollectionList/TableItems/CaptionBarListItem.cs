@@ -52,7 +52,10 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
     public int Caption { get; private set; }
 
+    public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
     public override string QuickInfo => string.Empty;
+
+    protected override bool DoSpezialOrder => false;
 
     #endregion
 
@@ -60,10 +63,14 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
     public static string Identifier(int captionRow) => $"CaptionBar{captionRow}";
 
-    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Dick, left, right, bottom);
+    public override void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) => base.Draw_Border(gr, ColumnLineStyle.Ohne, xPos, top, bottom);
+
+    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Dünn, left, right, bottom);
 
     public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
+
+        gr.FillRectangle(GrayBrush, positionControl);
 
         var newCaptionGroup = viewItem.Column?.CaptionGroup(Caption) ?? string.Empty;
 
@@ -72,7 +79,7 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
             #region Ende einer Gruppierung gefunden
 
             if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is { }) {
-                Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, positionControl, prevCaptionGroup);
+                Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, positionControl, prevCaptionGroup, scale);
             }
 
             prevViewItemWithOtherCaption = viewItem;
@@ -86,7 +93,7 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
         // Zeichen-Routine für das letzte Element aufrufen
         if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is { }) {
-            Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, Rectangle.Empty, displayRectangleWoSlider, pccy, pcch, prevCaptionGroup);
+            Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, Rectangle.Empty, prevCaptionGroup, scale);
         }
     }
 
@@ -94,13 +101,15 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);
 
-    private void Draw_Column_Head_Captions_Now(Graphics gr, ColumnViewItem prevViewItemWithOtherCaption, RectangleF positionControl, string prevCaptionGroup) {
+    private void Draw_Column_Head_Captions_Now(Graphics gr, ColumnViewItem prevViewItemWithOtherCaption, RectangleF positionControl, string prevCaptionGroup, float _zoom) {
         if (prevViewItemWithOtherCaptionLe < positionControl.Right) {
-            var r = new Rectangle(prevViewItemWithOtherCaptionLe, positionControl.Top, positionControl.Right - prevViewItemWithOtherCaptionLe, positionControl.Height);
+            var capTranslated = ColumnsHeadListItem.CaptionTranslated(prevCaptionGroup);
+
+            var r = new RectangleF(prevViewItemWithOtherCaptionLe, positionControl.Top, positionControl.Right - prevViewItemWithOtherCaptionLe, positionControl.Height);
             gr.FillRectangle(new SolidBrush(prevViewItemWithOtherCaption.BackColor_ColumnHead), r);
             gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
             gr.DrawRectangle(Skin.PenLinieKräftig, r);
-            Skin.Draw_FormatedText(gr, prevCaptionGroup, null, Alignment.Horizontal_Vertical_Center, r, this, false, prevViewItemWithOtherCaption.Font_Head_Default.Scale(_zoom), Translate);
+            Skin.Draw_FormatedText(gr, capTranslated, null, Alignment.Horizontal_Vertical_Center, r.ToRect(), null, false, Font_Head_Default.Scale(_zoom), false);
         }
     }
 

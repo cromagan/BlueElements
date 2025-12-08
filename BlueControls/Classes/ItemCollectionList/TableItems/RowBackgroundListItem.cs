@@ -39,6 +39,14 @@ public static class RowBackgroundListItemListItemExtensions {
 /// </summary>
 public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExtended, IStyleable {
 
+    #region Fields
+
+    public static Brush GrayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
+
+    public static Brush GrayBrush2 = new SolidBrush(Color.FromArgb(150, 255, 255, 255));
+
+    #endregion
+
     #region Constructors
 
     protected RowBackgroundListItem(string keyname, ColumnViewCollection? arrangement, string alignsToCaption) : base(keyname, true) {

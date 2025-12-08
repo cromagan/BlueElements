@@ -63,6 +63,22 @@ public class TableFile : Table {
 
     #region Methods
 
+    public static bool IsFileAllowedToLoad(string fileName) {
+        lock (AllFilesLocker) {
+            foreach (var thisFile in AllFiles) {
+                if (thisFile is TableFile { IsDisposed: false } tbf) {
+                    if (string.Equals(tbf.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
+                        //tbf.Save(false);
+                        //Develop.DebugPrint(ErrorType.Warning, "Doppletes Laden von " + fileName);
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+    }
+
     public override List<string>? AllAvailableTables(List<Table>? allreadychecked) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Tabelle
 
@@ -81,7 +97,7 @@ public class TableFile : Table {
         return [.. GetFiles(path, "*." + fx, System.IO.SearchOption.TopDirectoryOnly)];
     }
 
-     /// <summary>
+    /// <summary>
     /// Konkrete Prüfung, ob jetzt gespeichert werden kann
     /// </summary>
     /// <returns></returns>
@@ -96,7 +112,6 @@ public class TableFile : Table {
 
         return CanSaveFile(Filename, 5);
     }
-
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
@@ -201,7 +216,6 @@ public class TableFile : Table {
         DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
     }
 
-
     public override void RepairAfterParse() {
         // Nicht IsInCache setzen, weil ansonsten TableFragments nicht mehr funktioniert
 
@@ -232,7 +246,6 @@ public class TableFile : Table {
 
         MainChunkLoadDone = true;
     }
-
 
     protected static FileOperationResult SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.CanSaveMainChunk();
@@ -347,6 +360,16 @@ public class TableFile : Table {
         return string.Empty;
     }
 
+    private static void GenerateTableUpdateTimer() {
+        lock (_timerLock) {
+            _activeTableCount++;
+
+            if (_tableUpdateTimer != null) { return; }
+
+            _tableUpdateTimer = new Timer(TableUpdater, null, 10000, UpdateTable * 60 * 1000);
+        }
+    }
+
     private static void TableUpdater(object state) {
         foreach (var thisTb in AllFiles) {
             if (thisTb is TableFile { IsDisposed: false } tbf) {
@@ -358,30 +381,6 @@ public class TableFile : Table {
         }
 
         BeSureToBeUpToDate(AllFiles, false);
-    }
-
-    private static void GenerateTableUpdateTimer() {
-        lock (_timerLock) {
-            _activeTableCount++;
-
-            if (_tableUpdateTimer != null) { return; }
-
-            _tableUpdateTimer = new Timer(TableUpdater, null, 10000, UpdateTable * 60 * 1000);
-        }
-    }
-
-    private static bool IsFileAllowedToLoad(string fileName) {
-        foreach (var thisFile in AllFiles) {
-            if (thisFile is TableFile { IsDisposed: false } tbf) {
-                if (string.Equals(tbf.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    tbf.Save(false);
-                    Develop.DebugPrint(ErrorType.Warning, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 
     private FileOperationResult TrySave(List<string> affectingFiles, params object?[] args) {
