@@ -514,7 +514,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     private void _Items_ItemAdded(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(nameof(Items));
-        if (!_items.Any() || Fitting) { ZoomFit(); }
+        if (Fitting) { ZoomFit(); }
         Invalidate();
     }
 

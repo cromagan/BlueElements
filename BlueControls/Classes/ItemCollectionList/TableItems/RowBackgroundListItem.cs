@@ -27,9 +27,6 @@ using System.Drawing.Drawing2D;
 
 namespace BlueControls.ItemCollectionList;
 
-public static class RowBackgroundListItemListItemExtensions {
-}
-
 /// <summary>
 /// Enthält Daten, wie eine Zeile angezeigt werden soll.
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
@@ -39,9 +36,9 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
     #region Fields
 
-    public static Brush GrayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
+    public static readonly Brush GrayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
 
-    public static Brush GrayBrush2 = new SolidBrush(Color.FromArgb(150, 255, 255, 255));
+    public static readonly Brush GrayBrush2 = new SolidBrush(Color.FromArgb(150, 255, 255, 255));
 
     #endregion
 

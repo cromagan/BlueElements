@@ -211,7 +211,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         List<string> itc = [];
         if (DrawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_items, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, AutoSort);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_items, CheckBehavior.SingleSelection, itc, x, y, Width, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, AutoSort);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         _btnDropDownIsIn = false;

@@ -41,7 +41,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent(nameof(ItemClicked))]
-public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, ITranslateable {
+public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     #region Fields
 
@@ -277,8 +277,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
     }
 
     public void Check(IEnumerable<string> ali) {
-        if (ali == null) { return; }
-
         // Sammle nur die Items, die noch nicht in der checked-Liste sind
         var itemsToAdd = ali.Where(name => !IsChecked(name)).ToList();
 
@@ -296,17 +294,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
         List<string> l = [.. _checked, name];
 
         ValidateCheckStates(l, name);
-    }
-
-    public ReadOnlyCollection<AbstractListItem> CheckedItems() {
-        var l = new List<AbstractListItem>();
-
-        foreach (var thisItem in _item) {
-            if (thisItem != null && IsChecked(thisItem)) {
-                l.Add(thisItem);
-            }
-        }
-        return l.AsReadOnly();
     }
 
     public new void Focus() {
@@ -463,19 +450,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
     }
 
     public void UnCheck(AbstractListItem ali) => UnCheck(ali.KeyName);
-
-    public void UnCheck(IEnumerable<string> ali) {
-        if (ali == null) { return; }
-
-        // Filtere die zu entfernenden Items aus der vorhandenen Liste
-        var newCheckedList = _checked.Except(ali).ToList();
-
-        // Wenn sich nichts geändert hat, früh zurückkehren
-        if (newCheckedList.Count == _checked.Count) { return; }
-
-        // Validiere alle auf einmal
-        ValidateCheckStates(newCheckedList, string.Empty);
-    }
 
     public void UnCheck(string name) {
         if (!IsChecked(name)) { return; }

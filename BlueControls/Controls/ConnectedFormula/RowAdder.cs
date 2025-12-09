@@ -218,7 +218,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             return;
         }
 
-        if (OriginIDColumn == null) {
+        if (OriginIDColumn is not { } tmpOriginIDColumn) {
             Fehler("Interner Fehler: OriginIDColumn", ImageCode.Kritisch);
             return;
         }
@@ -247,10 +247,10 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             return;
         }
 
-        FilterOutput.ChangeTo(new FilterItem(OriginIDColumn, FilterType.BeginntMit, nowGeneratedId.newid + "\\"));
+        FilterOutput.ChangeTo(new FilterItem(tmpOriginIDColumn, FilterType.BeginntMit, nowGeneratedId.newid + "\\"));
 
-        var selected = OriginIDColumn.Contents(FilterOutput, null);
-        selected = selected.Select(s => s.TrimStart(nowGeneratedId.newid + "\\").Trim("\\")).ToList().SortedDistinctList();
+        var selected = tmpOriginIDColumn.Contents(FilterOutput, null);
+        selected = selected.Select(s => s.TrimStart(nowGeneratedId.newid + "\\").Trim("\\")).SortedDistinctList();
 
         selected = RepairMenu(selected);
 
@@ -426,7 +426,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             var x = Cursor.Position.X - MousePos().X + dli.CanvasPosition.X + (dli.Indent * 20);
             var y = Cursor.Position.Y - MousePos().Y + dli.CanvasPosition.Bottom; //Identisch
 
-            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DropDownItems, CheckBehavior.SingleSelection, null, x, y, dli.CanvasPosition.Width, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
+            var dropDownMenu = FloatingInputBoxListBoxStyle.Show(dli.DropDownItems, CheckBehavior.SingleSelection, null, x, y, dli.CanvasPosition.Width, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
             dropDownMenu.Cancel += DropDownMenu_Cancel;
             dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         }

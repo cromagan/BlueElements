@@ -294,7 +294,7 @@ public class TableChunk : TableFile {
     public override bool BeSureRowIsLoaded(string chunkValue) {
         if (!base.BeSureRowIsLoaded(chunkValue)) { return false; }
 
-        var chunkValues = chunkValue.SplitAndCutByCr().ToList().SortedDistinctList();
+        var chunkValues = chunkValue.SplitAndCutByCr().SortedDistinctList();
 
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);

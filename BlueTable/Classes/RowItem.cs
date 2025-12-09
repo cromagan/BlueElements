@@ -1209,7 +1209,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (!string.IsNullOrEmpty(oldValue) && t.ToUpperInvariant().Contains(oldValue.ToUpperInvariant())) {
                     t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
                     t = ChangeTextFromRowId(t);
-                    var t2 = t.SplitAndCutByCr().ToList().SortedDistinctList();
+                    var t2 = t.SplitAndCutByCr().SortedDistinctList();
                     thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
                 }
                 if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {

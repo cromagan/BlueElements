@@ -166,10 +166,10 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public Size RequiredTextSize() {
         if (_design == Design.Undefiniert) { GetDesign(); }
 
-        if (!QuickModePossible(Text, TextAnzeigeVerhalten) && _eText == null) {
-            if (DesignMode) { Refresh(); }// Damit das Skin initialisiert wird
-            DrawControl(null, States.Standard);
-        }
+        //if (!QuickModePossible(Text, TextAnzeigeVerhalten) && _eText == null) {
+        //    if (DesignMode) { Refresh(); }// Damit das Skin initialisiert wird
+        //    DrawControl(null, States.Standard);
+        //}
 
         return RequiredTextSize(Text, TextAnzeigeVerhalten, _design, _eText, Translate, -1);
     }

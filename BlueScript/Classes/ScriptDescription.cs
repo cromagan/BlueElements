@@ -167,7 +167,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
                 return true;
 
             case "usergroups":
-                UserGroups = value.FromNonCritical().SplitBy("|").ToList().SortedDistinctList().AsReadOnly();
+                UserGroups = value.FromNonCritical().SplitBy("|").SortedDistinctList().AsReadOnly();
                 return true;
 
             case "changevalues": // Todo: 08.10.2024
