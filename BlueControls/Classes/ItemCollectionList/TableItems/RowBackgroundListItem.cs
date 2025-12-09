@@ -22,10 +22,8 @@ using BlueControls.Interfaces;
 using BlueTable;
 using BlueTable.Enums;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 
 namespace BlueControls.ItemCollectionList;
 
