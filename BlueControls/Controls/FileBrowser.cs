@@ -29,6 +29,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
@@ -547,8 +548,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 _watcher.Deleted -= Watcher_Deleted;
                 _watcher.Renamed -= Watcher_Renamed;
                 _watcher.Error -= Watcher_Error;
-                _watcher?.Dispose();
+
+                var watcherToDispose = _watcher;
                 _watcher = null;
+
+                Task.Run(watcherToDispose.Dispose);
             }
         } catch { }
 

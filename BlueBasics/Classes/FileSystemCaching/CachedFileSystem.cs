@@ -328,8 +328,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 _watcher.Deleted -= OnFileDeleted;
                 _watcher.Renamed -= OnFileRenamed;
                 _watcher.Error -= OnWatcherError;
-                _watcher.Dispose();
+
+                var watcherToDispose = _watcher;
                 _watcher = null;
+
+                Task.Run(watcherToDispose.Dispose);
             }
         } finally {
             try {
