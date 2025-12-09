@@ -115,19 +115,18 @@ public class TableFile : Table {
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
-            var db = Get(thisFile, null, true);
-            if (db == null) {
+            if (Get(thisFile, null, true) is not { } tb) {
                 return thisFile + " konnte nicht geladen werden.";
             }
 
-            db.Freeze("Import im Gange.");
+            tb.Freeze("Import im Gange.");
 
-            foreach (var thisr in db.Row) {
+            foreach (var thisr in tb.Row) {
                 var r = Row.GenerateAndAdd("Dummy", "BDB Import");
 
                 if (r == null) { return "Zeile konnte nicht generiert werden."; }
 
-                foreach (var thisc in db.Column) {
+                foreach (var thisc in tb.Column) {
                     if (thisc != colForFilename) {
                         var c = Column[thisc.KeyName];
                         if (c == null) {
@@ -152,7 +151,7 @@ public class TableFile : Table {
             if (deleteImportet) {
                 var ok = Save(true);
                 if (!ok) { return "Speicher-Fehler!"; }
-                db.Dispose();
+                tb.Dispose();
                 var d = DeleteFile(thisFile, false);
                 if (!d) { return "Lösch-Fehler!"; }
             }

@@ -89,7 +89,7 @@ public partial class ZoomPic : ZoomPad {
         base.DrawControl(gr, state);
 
         // Get drawable area considering scrollbars
-        var drawArea = AvailableControlPaintArea();
+        var drawArea = AvailableControlPaintArea;
 
         // Create and draw gradient background
         using LinearGradientBrush lgb = new(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);

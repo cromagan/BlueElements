@@ -126,8 +126,8 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         var row = RowSingleOrNull();
         BlueTable.Table? tb = null;
 
-        if (row?.Table is { IsDisposed: false } rtb) {
-            tb = rtb;
+        if (row?.Table is { IsDisposed: false } row_tb) {
+            tb = row_tb;
             vars = tb.CreateVariableCollection(row, false, false, true, true);
         } else {
             vars = [];

@@ -274,7 +274,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     private void DrawHelpers(AdditionalDrawingEventArgs e) {
         if (Bmp?.IsValid() != true) { return; }
 
-        var controlDrawArea = AvailableControlPaintArea();
+        var controlDrawArea = AvailableControlPaintArea;
         e.Graphics.SetClip(controlDrawArea);
 
         PositionEventArgs newCanvasCoords;
@@ -397,7 +397,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         using var bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
         using var fn = new Font("Arial", DrawSize, FontStyle.Bold);
 
-        var drawArea = AvailableControlPaintArea();
+        var drawArea = AvailableControlPaintArea;
         e.Graphics.SetClip(drawArea);
 
         // Hole alle Bildschirme

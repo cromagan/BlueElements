@@ -168,7 +168,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             field?.SheetStyle = SheetStyle;
-            field?.ComputeAllColumnPositions(AvailableControlPaintArea().Width, Zoom);
+            field?.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
 
             return field;
         }
@@ -1175,7 +1175,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return "Keine Spalte angekommen.";
         }
 
-        var visCanvasArea = AvailableControlPaintArea().ControlToCanvas(Zoom, OffsetX, OffsetY).ToRect();
+        var visCanvasArea = AvailableControlPaintArea.ControlToCanvas(Zoom, OffsetX, OffsetY).ToRect();
 
         if (cellInThisTableRow != null) {
             if (maychangeview && !EnsureVisible(cellInThisTableColumn, cellInThisTableRow)) {
@@ -1550,11 +1550,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     internal void EnsureVisibleX(int controlX) {
         if (CurrentArrangement is not { } ca) { return; }
 
-        var pa = AvailableControlPaintArea();
-
         var controlLeft = ca.ControlColumnsPermanentWidth;
-
-        var controlWidth = AvailableControlPaintArea().Right; // Bottom = Height
+        var controlWidth = AvailableControlPaintArea.Right; // Bottom = Height
 
         if (controlX < controlLeft) {
             OffsetX = OffsetX - controlX + controlLeft;
@@ -1578,7 +1575,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var controlTop = maxBottom.CanvasToControl(Zoom);
 
-        var controlHeight = AvailableControlPaintArea().Bottom; // Bottom = Height
+        var controlHeight = AvailableControlPaintArea.Bottom; // Bottom = Height
 
         if (controlY < controlTop) {
             OffsetY = OffsetY - controlY + controlTop;
@@ -1594,8 +1591,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     protected override RectangleF CalculateCanvasMaxBounds() {
-        var x = AvailableControlPaintArea().Width;
-        var y = AvailableControlPaintArea().Height;
+        var x = AvailableControlPaintArea.Width;
+        var y = AvailableControlPaintArea.Height;
 
         if (CurrentArrangement is { } ca) {
             x = (int)ca.ControlColumnsWidth.ControlToCanvas(Zoom);
@@ -1688,7 +1685,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Haupt-Aufbau-Routine ------------------------------------
 
         //var t = sortedRowData.CanvasItemData(Design.Item_Listbox);
-        avi.Values.ToList().DrawItems(gr, AvailableControlPaintArea(), null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
+        avi.Values.ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
 
         // Rahmen um die gesamte Tabelle zeichnen
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
@@ -2398,8 +2395,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         foreach (var thisCap in allCaps) {
-            if (!allItems.TryGetValue(RowCaptionListItem.Identifier(thisCap), out var capi)) {
-                capi = new RowCaptionListItem(thisCap, arrangement);
+            if (!allItems.TryGetValue(RowCaptionListItem.Identifier(thisCap), out _)) {
+                AbstractListItem? capi = new RowCaptionListItem(thisCap, arrangement);
                 allItems.Add(capi.KeyName, capi);
             }
         }
@@ -3161,10 +3158,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Bestehenden Code belassen
         FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);//FillFilters(); // Die Flexs reagiren nur auf FilterOutput der Table
 
-    private void OnPinnedChanged() {
+    private void OnPinnedChanged() =>
         // Bestehenden Code belassen
         PinnedChanged?.Invoke(this, System.EventArgs.Empty);
-    }
 
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 

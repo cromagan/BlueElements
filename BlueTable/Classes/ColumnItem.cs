@@ -1278,7 +1278,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         foreach (var thisRowItem in rows) {
             if (thisRowItem != null) {
                 if (!_saveContent) { thisRowItem.CheckRow(); }
-
                 if (_multiLine) {
                     list.AddRange(thisRowItem.CellGetList(this));
                 } else {

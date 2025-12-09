@@ -555,8 +555,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             DeleteFile(SaveTab.FileName, true);
         }
 
-        var db = new TableFile(SaveTab.FileName.FileNameWithoutSuffix());
-        db.SaveAsAndChangeTo(SaveTab.FileName);
+        var tb = new TableFile(SaveTab.FileName.FileNameWithoutSuffix());
+        tb.SaveAsAndChangeTo(SaveTab.FileName);
         SwitchTabToTable(SaveTab.FileName);
     }
 

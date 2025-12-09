@@ -640,7 +640,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
     }
 
     protected override RectangleF CalculateCanvasMaxBounds() {
-        var areaControl = AvailableControlPaintArea();
+        var areaControl = AvailableControlPaintArea;
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(_itemDesign);
         var s = ComputeAllItemPositions(new Size(areaControl.Width, areaControl.Height), biggestItemX, heightAdded, senkrechtAllowed, Renderer);
 
@@ -667,7 +667,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, IBackgroundNone, IT
         var controlState = state;
         controlState &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
 
-        var visControPaintArea = AvailableControlPaintArea();
+        var visControPaintArea = AvailableControlPaintArea;
         var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(_itemDesign);
         ComputeAllItemPositions(new Size(visControPaintArea.Width, visControPaintArea.Height), biggestItemX, heightAdded, senkrechtAllowed, Renderer);
 

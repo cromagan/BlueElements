@@ -457,18 +457,18 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
 
-        var dbColumnCombi = new List<string>();
+        var tbColumnCombi = new List<string>();
         foreach (var thisc in tb.Column) {
             if (thisc.LinkedTable != null) {
-                var dbN = thisc.LinkedTable.KeyName + "|" + thisc.LinkedCellFilter.JoinWithCr();
-                dbColumnCombi.AddIfNotExists(dbN);
+                var tbName = thisc.LinkedTable.KeyName + "|" + thisc.LinkedCellFilter.JoinWithCr();
+                tbColumnCombi.AddIfNotExists(tbName);
             }
         }
 
         #endregion
 
         var kx = 0f;
-        foreach (var thisCombi in dbColumnCombi) {
+        foreach (var thisCombi in tbColumnCombi) {
             foreach (var thisc in ca) {
                 if (thisc?.Column is { IsDisposed: false } c) {
                     var it = Pad.Items[c.Table?.KeyName + "|" + c.KeyName] as ColumnPadItem;

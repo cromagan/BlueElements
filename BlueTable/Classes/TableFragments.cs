@@ -464,7 +464,7 @@ public class TableFragments : TableFile {
             fileStream = null; // StreamWriter übernimmt ownership
 
             _writer.AutoFlush = true;
-            _writer.WriteLine("- DB " + TableVersion);
+            _writer.WriteLine("- Version " + TableVersion);
             _writer.WriteLine("- Filename " + Filename);
             _writer.WriteLine("- User " + UserName);
 

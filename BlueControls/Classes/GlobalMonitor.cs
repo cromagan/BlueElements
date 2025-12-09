@@ -35,8 +35,8 @@ public partial class GlobalMonitor : Form {
     public static void GenerateLogTable(Controls.TableViewWithFilters tblLog) {
         //    public void Message(string category, string symbol, string message, int indent) {
         var tb = Table.Get();
-        var dbi = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
-        dbi.IsFirst = true;
+        var tbID = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        tbID.IsFirst = true;
         tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.BildCode);
         var az = tb.Column.GenerateAndAdd("Zeit", "Zeit", ColumnFormatHolder.DateTime);
         tb.Column.GenerateAndAdd("category", "Kategorie", ColumnFormatHolder.Text);

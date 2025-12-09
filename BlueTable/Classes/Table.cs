@@ -644,28 +644,28 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var fs = f + ".cbdb";
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
-                    var db = new TableChunk(fileOrTableName);
-                    db.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
-                    db.WaitInitialDone();
-                    return db;
+                    var tb = new TableChunk(fileOrTableName);
+                    tb.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
+                    tb.WaitInitialDone();
+                    return tb;
                 }
 
                 fs = f + ".mbdb";
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
-                    var db = new TableFragments(fileOrTableName);
-                    db.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
-                    db.WaitInitialDone();
-                    return db;
+                    var tb = new TableFragments(fileOrTableName);
+                    tb.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
+                    tb.WaitInitialDone();
+                    return tb;
                 }
 
                 fs = f + ".bdb";
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
-                    var db = new TableFile(fileOrTableName);
-                    db.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
-                    db.WaitInitialDone();
-                    return db;
+                    var tb = new TableFile(fileOrTableName);
+                    tb.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
+                    tb.WaitInitialDone();
+                    return tb;
                 }
             }
 

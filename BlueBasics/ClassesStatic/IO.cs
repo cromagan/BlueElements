@@ -284,17 +284,17 @@ public static class IO {
         }
     }
 
-    public static string[] GetDirectories(string directory) => ProcessFile(TryGetDirectories, [directory], false, 5, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
+    public static string[] GetDirectories(string directory) => ProcessFile(TryGetDirectories, [directory], false, 5, "*", SearchOption.TopDirectoryOnly) as string[] ?? [];
 
-    public static string[] GetDirectories(string directory, string pattern, SearchOption suchOption) => ProcessFile(TryGetDirectories, [directory], false, 5, pattern, suchOption) as string[] ?? Array.Empty<string>();
+    public static string[] GetDirectories(string directory, string pattern, SearchOption suchOption) => ProcessFile(TryGetDirectories, [directory], false, 5, pattern, suchOption) as string[] ?? [];
 
     public static FileInfo? GetFileInfo(string filename) => ProcessFile(TryGetFileInfo, [filename], false, 5) as FileInfo;
 
     public static string[] GetFiles(string directory, string pattern, SearchOption suchOption)
-                            => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption) as string[] ?? Array.Empty<string>();
+                            => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption) as string[] ?? [];
 
     public static string[] GetFiles(string directory)
-                         => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly) as string[] ?? Array.Empty<string>();
+                         => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly) as string[] ?? [];
 
     /// <summary>
     /// Liefert Dateiinformationen mit Fehlerbehandlung und Wiederholungsversuchen
@@ -429,7 +429,7 @@ public static class IO {
     /// <returns>Die geladenen Bytes oder ein leeres Array bei Fehler</returns>
     public static byte[] ReadAllBytes(string filename, float time) {
         var result = ProcessFile(TryReadAllBytes, [filename], false, time);
-        return result as byte[] ?? Array.Empty<byte>();
+        return result as byte[] ?? [];
     }
 
     /// <summary>
@@ -440,7 +440,7 @@ public static class IO {
     /// <returns>Der gesamte Inhalt der Datei als String</returns>
     public static string ReadAllText(string filename, Encoding encoding) {
         var result = ProcessFile(TryReadAllBytes, [filename], false, 10);
-        var b = result as byte[] ?? Array.Empty<byte>();
+        var b = result as byte[] ?? [];
 
         // UTF-8 BOM (EF BB BF) entfernen, falls am Anfang vorhanden
         if (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) {
@@ -992,7 +992,7 @@ public static class IO {
             if (result.Retry) { return FileOperationResult.DoRetry; }
             if (result.Failed) { return FileOperationResult.ValueFailed; }
 
-            var bytes = result.ReturnValue as byte[] ?? Array.Empty<byte>();
+            var bytes = result.ReturnValue as byte[] ?? [];
             if (bytes.IsZipped()) { bytes = bytes.UnzipIt(); }
             if (bytes == null) { return FileOperationResult.ValueFailed; }
 

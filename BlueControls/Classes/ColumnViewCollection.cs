@@ -449,9 +449,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     //    (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    private void ColumnViewItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-        Invalidate();
-    }
+    private void ColumnViewItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => Invalidate();
 
     private void OnStyleChanged() {
         StyleChanged?.Invoke(this, System.EventArgs.Empty);

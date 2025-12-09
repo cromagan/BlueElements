@@ -112,7 +112,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             field = value;
             GetÄhnlich();
         }
-    }
+    } = string.Empty;
 
     [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
@@ -667,9 +667,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         DoÄhnlich();
     }
 
-    private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-        DoFilterOutput();
-    }
+    private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterOutput();
 
     private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate_FilterInput();
 
@@ -713,14 +711,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     private void OnDoubleClick(CellExtEventArgs e) => DoubleClick?.Invoke(this, e);
-
-    private void OnPinnedChanged() {
-        // Filterleiste aktualisieren, wenn sie sichtbar ist
-        if (FilterleisteZeilen > 0) {
-            btnPinZurück.Enabled = Table is not null && TableInternal.PinnedRows.Count > 0;
-            FillFilters();
-        }
-    }
 
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 
@@ -783,15 +773,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void TableInternal_CellClicked(object sender, CellEventArgs e) => OnCellClicked(e);
 
-    private void TableInternal_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        OnContextMenuInit(e);
-    }
+    private void TableInternal_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
     private void TableInternal_DoubleClick(object sender, CellExtEventArgs e) => OnDoubleClick(e);
 
-    private void TableInternal_FilterCombinedChanged(object sender, System.EventArgs e) {
-        DoFilterOutput();
-    }
+    private void TableInternal_FilterCombinedChanged(object sender, System.EventArgs e) => DoFilterOutput();
 
     private void TableInternal_SelectedCellChanged(object sender, CellExtEventArgs e) => OnSelectedCellChanged(e);
 

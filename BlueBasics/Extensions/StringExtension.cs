@@ -840,7 +840,7 @@ public static partial class Extensions {
     /// <param name="trennzeichen"></param>
     /// <returns></returns>
     public static string[] SplitAndCutBy(this string textToSplit, string trennzeichen) {
-        if (string.IsNullOrEmpty(textToSplit)) { return Array.Empty<string>(); }
+        if (string.IsNullOrEmpty(textToSplit)) { return []; }
 
         var parts = textToSplit.Split([trennzeichen], StringSplitOptions.None);
 
@@ -850,7 +850,7 @@ public static partial class Extensions {
             lastNonEmpty--;
         }
 
-        if (lastNonEmpty < 0) { return Array.Empty<string>(); }
+        if (lastNonEmpty < 0) { return []; }
 
         if (lastNonEmpty == parts.Length - 1) { return parts; }// Keine leeren Einträge am Ende
 

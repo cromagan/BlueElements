@@ -62,11 +62,9 @@ public sealed class NewRowListItem : RowBackgroundListItem {
         var p1 = 1.CanvasToControl(scale);
 
         string toDrawd;
-        var plus = 0;
         QuickImage? qi;
         if (viewItem.Column.IsFirst) {
             toDrawd = "[Neue Zeile]";
-            plus = 16.CanvasToControl(scale);
             qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
         } else {
             toDrawd = FilterCollection.InitValue(viewItem.Column, false, false, [.. FilterCombined]) ?? string.Empty;
@@ -83,9 +81,7 @@ public sealed class NewRowListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
-        return new(18, 18);
-    }
+    protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(18, 18);
 
     #endregion
 }

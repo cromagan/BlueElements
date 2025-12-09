@@ -122,17 +122,11 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
     //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
 
-    public virtual void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) {
-        DrawLine(gr, lin, xPos, xPos, top, bottom);
-    }
+    public virtual void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) => DrawLine(gr, lin, xPos, xPos, top, bottom);
 
-    public virtual void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) {
-        DrawLine(gr, lin, left, right, bottom, bottom);
-    }
+    public virtual void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => DrawLine(gr, lin, left, right, bottom, bottom);
 
-    public virtual void Draw_UpperLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) {
-        DrawLine(gr, lin, left, right, bottom, bottom);
-    }
+    public virtual void Draw_UpperLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => DrawLine(gr, lin, left, right, bottom, bottom);
 
     public virtual void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
     }

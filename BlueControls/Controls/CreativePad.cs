@@ -328,9 +328,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
         base.DrawControl(gr, state);
 
-        var controla = AvailableControlPaintArea();
+        var controla = AvailableControlPaintArea;
 
-        LinearGradientBrush lgb = new(controla, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+        var lgb = new LinearGradientBrush(controla, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, controla);
 
         if (_items != null) {

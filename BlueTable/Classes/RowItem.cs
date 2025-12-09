@@ -233,7 +233,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public int CellGetInteger(ColumnItem? column) => IntParse(CellGetString(column));
 
     public List<string> CellGetList(ColumnItem? column) {
-        if (column?.Table is not { IsDisposed: false } tb) { return []; }
+        if (column?.Table is not { IsDisposed: false }) { return []; }
 
         if (column.TextFormatingAllowed) {
             return [.. CellGetString(column).SplitAndCutBy("<br>")];
@@ -1033,10 +1033,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     private string CellGetCompareKey(ColumnItem column) => Table?.Cell.CompareKey(column, this) ?? string.Empty;
 
     private string ChangeTextFromRowId(string completeRelationText) {
-        var dbtmp = Table;
-        if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
+        if (Table is not { IsDisposed: false } tb) { return completeRelationText; }
 
-        foreach (var rowItem in dbtmp.Row) {
+        foreach (var rowItem in tb.Row) {
             if (rowItem != null) {
                 completeRelationText = completeRelationText.Replace("/@X" + rowItem.KeyName + "X@/", rowItem.CellFirstString());
             }
@@ -1045,10 +1044,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     private string ChangeTextToRowId(string completeRelationText, string oldValue, string newValue, string keyOfCHangedRow) {
-        var dbtmp = Table;
-        if (dbtmp is not { IsDisposed: false }) { return completeRelationText; }
+        if (Table is not { IsDisposed: false } tb) { return completeRelationText; }
 
-        var c = dbtmp.Column.First;
+        var c = tb.Column.First;
         if (c == null) { return completeRelationText; }
 
         var names = c.GetUcaseNamesSortedByLength();
@@ -1064,7 +1062,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 DoReplace(newValue, keyOfCHangedRow);
             }
             if (completeRelationText.ToUpperInvariant().Contains(names[z])) {
-                var r = dbtmp.Row[names[z]];
+                var r = tb.Row[names[z]];
                 if (r is { IsDisposed: false }) { DoReplace(names[z], r.KeyName); }
             }
         }

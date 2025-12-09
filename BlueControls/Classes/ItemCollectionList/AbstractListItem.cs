@@ -220,14 +220,14 @@ public static class AbstractListItemExtension {
         if (column.ShowValuesOfOtherCellsInDropdown) { l.AddRange(column.Contents()); }
 
         if (column.RelationType == RelationType.DropDownValues) {
-            var db2 = column.LinkedTable;
-            if (db2 == null) { Notification.Show("Verknüpfte Tabelle nicht vorhanden", ImageCode.Information); return []; }
+            var tbLinked = column.LinkedTable;
+            if (tbLinked == null) { Notification.Show("Verknüpfte Tabelle nicht vorhanden", ImageCode.Information); return []; }
 
             // Spalte aus der Ziel-Tabelle ermitteln
-            var targetColumn = db2.Column[column.ColumnNameOfLinkedTable];
+            var targetColumn = tbLinked.Column[column.ColumnNameOfLinkedTable];
             if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieltabelle nicht vorhanden."); return []; }
 
-            var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow, null);
+            var (fc, info) = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
             if (!string.IsNullOrEmpty(info)) {
                 Notification.Show(info, ImageCode.Information);
                 return [];

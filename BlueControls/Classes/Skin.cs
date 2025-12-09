@@ -1330,9 +1330,7 @@ public static class Skin {
         }
     }
 
-    public static void InitStyles() {
-        StyleTb ??= Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
-    }
+    public static void InitStyles() => StyleTb ??= Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {

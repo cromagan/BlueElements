@@ -39,7 +39,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
 
-    private Rectangle _availableControlPaintArea;
     private RectangleF? _canvasMaxbounds;
     private Size _lastSize;
 
@@ -57,6 +56,36 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Gibt den Zeichenbereich zurück. Entspricht der Control-Größe abzüglich der Slider-Breite/Höhe
+    /// </summary>
+    /// <returns></returns>
+    public Rectangle AvailableControlPaintArea {
+        get {
+            // Schneller Check ob sich etwas geändert hat
+            if (_lastSize == Size &&
+                _lastSliderXVisible == SliderX.Visible &&
+                _lastSliderYVisible == SliderY.Visible) {
+                return field;
+            }
+
+            // Nur bei Änderungen neu berechnen
+
+            // Cache aktualisieren
+            field = new(
+                0,
+                0,
+                Size.Width - (SliderY.Visible ? SliderY.Width : 0),
+                Size.Height - (SliderX.Visible ? SliderX.Height : 0)
+            );
+            _lastSize = Size;
+            _lastSliderXVisible = SliderX.Visible;
+            _lastSliderYVisible = SliderY.Visible;
+
+            return field;
+        }
+    }
 
     public abstract bool ControlMustPressed { get; }
 
@@ -166,35 +195,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         return true;
     }
 
-    /// <summary>
-    /// Gibt den Zeichenbereich zurück. Entspricht der Control-Größe abzüglich der Slider-Breite/Höhe
-    /// </summary>
-    /// <returns></returns>
-    public Rectangle AvailableControlPaintArea() {
-        // Schneller Check ob sich etwas geändert hat
-        if (_lastSize == Size &&
-            _lastSliderXVisible == SliderX.Visible &&
-            _lastSliderYVisible == SliderY.Visible) {
-            return _availableControlPaintArea;
-        }
-
-        // Nur bei Änderungen neu berechnen
-
-        // Cache aktualisieren
-        _availableControlPaintArea = new(
-            0,
-            0,
-            Size.Width - (SliderY.Visible ? SliderY.Width : 0),
-            Size.Height - (SliderX.Visible ? SliderX.Height : 0)
-        );
-        _lastSize = Size;
-        _lastSliderXVisible = SliderX.Visible;
-        _lastSliderYVisible = SliderY.Visible;
-
-        return _availableControlPaintArea;
-    }
-
-    //public RectangleF AvailablePaintAreaScaled() => AvailableControlPaintArea().CanvasToControlX(Zoom, 0, 0, true);
+    //public RectangleF AvailablePaintAreaScaled() => AvailableControlPaintArea.CanvasToControlX(Zoom, 0, 0, true);
 
     public void DoZoom(bool zoomIn) {
         var nz = Zoom;
@@ -247,7 +248,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     public void ZoomFit() {
         if (IsDisposed) { return; }
         var canvasBounds = CanvasMaxBounds();
-        var controlBounds = AvailableControlPaintArea();
+        var controlBounds = AvailableControlPaintArea;
         _zoomFit = ItemCollectionPadItem.ZoomFitValue(canvasBounds, controlBounds.Size);
         Zoom = _zoomFit;
         Fitting = true;
@@ -277,7 +278,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         var tmpCanvasMaxBounds = CalculateCanvasMaxBounds();
         _canvasMaxbounds = tmpCanvasMaxBounds;
 
-        var controlArea = AvailableControlPaintArea();
+        var controlArea = AvailableControlPaintArea;
 
         var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
 
@@ -445,13 +446,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         //SliderY.Value = (m.Y * _zoom) - (Height / 2) - SliderX.Height
     }
 
-    protected virtual void OnOffsetXChanged() {
-        Invalidate();
-    }
+    protected virtual void OnOffsetXChanged() => Invalidate();
 
-    protected virtual void OnOffsetYChanged() {
-        Invalidate();
-    }
+    protected virtual void OnOffsetYChanged() => Invalidate();
 
     protected override void OnSizeChanged(System.EventArgs e) {
         Invalidate_MaxBounds(); // Slider
