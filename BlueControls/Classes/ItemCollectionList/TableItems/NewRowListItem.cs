@@ -58,25 +58,36 @@ public sealed class NewRowListItem : RowBackgroundListItem {
 
         if (viewItem.Column == null) { return; }
 
-        var p14 = 14.CanvasToControl(scale);
-        var p1 = 1.CanvasToControl(scale);
+        //var p14 = 14.CanvasToControl(scale);
+        //var p1 = 1.CanvasToControl(scale);
 
         string toDrawd;
-        QuickImage? qi;
+        var doWhiteAfter = true;
+        //QuickImage? plusszeichen;
         if (viewItem.Column.IsFirst) {
             toDrawd = "[Neue Zeile]";
-            qi = QuickImage.Get(ImageCode.PlusZeichen, p14);
+            //plusszeichen = QuickImage.Get(ImageCode.PlusZeichen, p14);
+            doWhiteAfter = false;
         } else {
             toDrawd = FilterCollection.InitValue(viewItem.Column, false, false, [.. FilterCombined]) ?? string.Empty;
-            qi = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
+            //plusszeichen = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
+        }
+
+        if (!doWhiteAfter) {
+            gr.FillRectangle(GrayBrush2, positionControl);
         }
 
         if (!string.IsNullOrEmpty(toDrawd)) {
-            gr.DrawImage(qi, new Point((int)positionControl.Left + p1, (int)positionControl.Top + p1));
+            gr.SetClip(positionControl);
             viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, null, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+
+            //gr.DrawImage(plusszeichen, new Point((int)positionControl.Left + p1, (int)positionControl.Top + p1));
+            gr.ResetClip();
         }
 
-        gr.FillRectangle(GrayBrush2, positionControl);
+        if (doWhiteAfter) {
+            gr.FillRectangle(GrayBrush2, positionControl);
+        }
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;

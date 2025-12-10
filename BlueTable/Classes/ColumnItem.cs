@@ -1972,7 +1972,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         double summ = 0;
         foreach (var thisrow in rows) {
             var val = thisrow.CellGetString(this);
-            if (val.IsNumeral()) { return null; }
+            if (!val.IsNumeral()) { return null; }
             summ += DoubleParse(val);
         }
         return summ;
