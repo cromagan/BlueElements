@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
@@ -47,10 +48,11 @@
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
+	 
+	  <!-- Code-Analyse -->
+	 <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
 
-    <!-- NuGet-Pakete -->
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+	  <!-- NuGet-Pakete -->
 
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusAbschneiden.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusEinpassen.png" />

@@ -442,7 +442,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
                     l2.Add(vs);
                 }
             }
-            Table.Variables = new VariableCollection(l2);
+            Table.Variables = [.. l2];
         }
 
         #endregion

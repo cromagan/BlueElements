@@ -991,7 +991,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (name.Length > 128) { return false; }
 
         // Illegale Namen definieren (nur Oracle + SQL Server relevante Wörter)
-        string[] illegalNames = {
+        string[] illegalNames = [
         // SQL Standard Schlüsselwörter (beide Systeme)
         //"SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "JOIN", "INNER", "LEFT", "RIGHT", "FULL", "OUTER",
         //"ON", "AS", "AND", "OR", "NOT", "NULL", "IS", "IN", "EXISTS", "BETWEEN", "LIKE", "ORDER", "BY", "GROUP",
@@ -1030,7 +1030,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         // BlueTable spezifisch
         TmpNewDummy
-    };
+    ];
 
         // Prüfen ob Name in der Liste der illegalen Namen steht
         return !illegalNames.Contains(name, StringComparer.OrdinalIgnoreCase);
@@ -1271,8 +1271,8 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return Contents(r2);
     }
 
-    public List<string> Contents(ICollection<RowItem> rows) {
-        if (rows.Count == 0) { return []; }
+    public List<string> Contents(ICollection<RowItem>? rows) {
+        if (rows == null || rows.Count == 0) { return []; }
 
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
@@ -1972,7 +1972,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         double summ = 0;
         foreach (var thisrow in rows) {
             var val = thisrow.CellGetString(this);
-            if (val.IsDouble()) { return null; }
+            if (val.IsNumeral()) { return null; }
             summ += DoubleParse(val);
         }
         return summ;

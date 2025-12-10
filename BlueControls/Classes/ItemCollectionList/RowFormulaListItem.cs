@@ -45,6 +45,7 @@ public class RowFormulaListItem : AbstractListItem {
     /// <param name="row"></param>
     /// <param name="layoutId"></param>
     /// <param name="userDefCompareKey"></param>
+    /// <param name="tag"></param>
     public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey, object? tag) : base(row.KeyName, true) {
         _row = row;
         _layoutFileName = layoutId;

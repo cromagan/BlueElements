@@ -47,7 +47,7 @@ internal class Method_ForEach : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, attvar); }
 
         var l = attvar.ValueListStringGet(1);
 
@@ -73,7 +73,7 @@ internal class Method_ForEach : Method {
             new VariableDouble("Index", index, true, "Iterations-Variable")
             };
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEach-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
             if (t.ElapsedMilliseconds > 1000) {

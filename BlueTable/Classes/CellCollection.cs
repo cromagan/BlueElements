@@ -229,12 +229,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
     /// </summary>
     /// <param name="row"></param>
+    /// <param name="newChunkValue"></param>
     /// <param name="column"></param>
-    /// <param name="mode"></param>
-    /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei internen Prozessen angeben.</param>
-    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Tabelleansicht empfohlen.</param>
-    /// <param name="repairallowed"></param>
-    /// <param name="ignoreLinked"></param>
     /// <returns></returns>
     public static string IsCellEditable(ColumnItem? column, RowItem? row, string? newChunkValue) {
         if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
@@ -315,9 +311,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// Diese Routine erstellt den umgekehrten Linked-Cell-Filter:
     /// Es versucht rauszufinden, welche Zeile in der Tabelle von mycolumn von der Zeile linkedrow befüllt werden.
     /// </summary>
-    /// <param name="mycolumn"></param>
-    /// <param name="linkedcolumn"></param>
-    /// <param name="linkedrow"></param>
+    /// <param name="colname"></param>
+    /// <param name="rowKey"></param>
     /// <returns></returns>
     public static string KeyOfCell(string colname, string rowKey) => colname.ToUpperInvariant() + "|" + rowKey;
 

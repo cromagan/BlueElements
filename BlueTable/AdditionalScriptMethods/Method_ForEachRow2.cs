@@ -48,7 +48,7 @@ internal class Method_ForEachRow2 : Method_TableGeneric {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
-        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, this, attvar); }
+        if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, attvar); }
 
         var varnam = "value";
         if (attvar.Attributes[0] is VariableUnknown vkn) { varnam = vkn.Value; }
@@ -72,7 +72,7 @@ internal class Method_ForEachRow2 : Method_TableGeneric {
             new VariableDouble("Index", index, true, "Iterations-Variable")
             };
 
-            scx = Method_CallByFilename.CallSub(varCol, scp2, "ForEachRow2-Schleife", infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow2", infos.LogData);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEachRow2", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 

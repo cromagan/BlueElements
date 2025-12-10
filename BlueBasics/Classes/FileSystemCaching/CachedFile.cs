@@ -34,6 +34,7 @@ public sealed class CachedFile : IDisposable {
     public readonly string Filename;
     private readonly int _checkIntervalMs = 180000;
     private readonly object _lock = new();
+    private byte[]? _content;
     private int _isDisposed;
     private Timer? _staleCheckTimer;
     private string? _timestamp;
@@ -57,19 +58,19 @@ public sealed class CachedFile : IDisposable {
             if (_isDisposed > 0) { return []; }
 
             lock (_lock) {
-                if (_timestamp != null && field != null) { return field; }
+                if (_timestamp != null && _content != null) { return _content; }
             }
 
             (var content, var timestamp) = ReadContentFromFileSystem();
 
             lock (_lock) {
-                if (_timestamp != null && field != null) { return field; }
+                if (_timestamp != null && _content != null) { return _content; }
 
                 _timestamp = timestamp;
-                field = content;
+                _content = content;
 
                 StartStaleCheckTimer();
-                return field;
+                return _content;
             }
         }
 

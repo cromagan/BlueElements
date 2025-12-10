@@ -121,7 +121,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public override string Type => "ConnectedFormula";
 
     /// <summary>
-    // 0.50 seit 08.03.2024
+    /// 0.50 seit 08.03.2024
     /// </summary>
     public override string Version => "0.50";
 
@@ -349,7 +349,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// <summary>
     /// Gibt alle bekannten Fomulare zurück - außer die in notAllowedChilds
     /// </summary>
-    /// <param name="list"></param>
     /// <param name="notAllowedChilds"></param>
     internal List<AbstractListItem> AllKnownChilds(ReadOnlyCollection<string> notAllowedChilds) {
         List<AbstractListItem> list = [];

@@ -85,6 +85,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
+    /// <param name="originalPic"></param>
     public new virtual void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) { }
 
     /// <summary>
@@ -117,6 +118,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
     /// </summary>
     /// <param name="bmp"></param>
+    /// <param name="zoomfit"></param>
     protected void OnOverridePic(Bitmap? bmp, bool zoomfit) => OverridePic?.Invoke(this, new ZoomBitmapEventArgs(bmp, zoomfit));
 
     protected void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);

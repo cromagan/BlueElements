@@ -137,7 +137,7 @@ public static partial class Extensions {
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
-        if (string.IsNullOrEmpty(value)) { return; }
+        if (value == null || string.IsNullOrEmpty(value)) { return; }
         col.Add(tagname + "=\"" + value.ToNonCritical() + "\"");
     }
 
@@ -221,6 +221,7 @@ public static partial class Extensions {
     /// <param name="col"></param>
     /// <param name="tagname"></param>
     /// <param name="value"></param>
+    /// <param name="ignoreEmpty"></param>
     public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value, bool ignoreEmpty) {
         if (value is not { Count: not 0 }) {
             if (ignoreEmpty) { return; }

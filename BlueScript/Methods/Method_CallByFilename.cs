@@ -28,7 +28,6 @@ using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
-
 public class Method_CallByFilename : Method {
 
     #region Properties
@@ -72,7 +71,7 @@ public class Method_CallByFilename : Method {
     /// <param name="varCol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string aufgerufenVon, string normalizedscripttext, int lineadd, string subname, List<Variable>? addMe, List<string>? attributes, string chainlog, LogData ld) {
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string normalizedscripttext, int lineadd, string subname, List<Variable>? addMe, List<string>? attributes, string chainlog, LogData ld) {
         if (scp.Stufe > 10) {
             return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
         }
@@ -153,7 +152,7 @@ public class Method_CallByFilename : Method {
 
         #endregion
 
-        var scx = CallSub(varCol, scp, "Datei-Subroutinen-Aufruf [" + file.FileNameWithoutSuffix() + "]", scripttxt, 0, file.FileNameWithSuffix(), null, a, file.FileNameWithSuffix(), ld);
+        var scx = CallSub(varCol, scp, scripttxt, 0, file.FileNameWithSuffix(), null, a, file.FileNameWithSuffix(), ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         return scx;
     }

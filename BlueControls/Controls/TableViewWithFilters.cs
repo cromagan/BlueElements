@@ -191,7 +191,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         internal set => TableInternal.ShowWaitScreen = value;
     }
 
-    public RowSortDefinition SortDefinitionTemporary {
+    public RowSortDefinition? SortDefinitionTemporary {
         get => TableInternal.SortDefinitionTemporary;
         internal set => TableInternal.SortDefinitionTemporary = value;
     }

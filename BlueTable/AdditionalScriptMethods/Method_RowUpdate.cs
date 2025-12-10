@@ -24,7 +24,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_RowUpdate : Method_TableGeneric {
 
     #region Properties
@@ -105,8 +104,6 @@ public class Method_RowUpdate : Method_TableGeneric {
 
         return DoItFeedback.Wahr();
     }
-
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => rowarg + ", " + args[0] + ", " + args[1];
 
     #endregion
 }

@@ -1742,7 +1742,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (CursorPosColumn?.Column is not { IsDisposed: false } c) { return; }
         if (CursorPosRow?.Row is not { IsDisposed: false }) { return; }
 
-        if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
+        if (CurrentArrangement is not { IsDisposed: false }) { return; }
 
         lock (_lockUserAction) {
             if (_isinKeyDown) { return; }
@@ -3030,7 +3030,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void DropDownMenu_ItemClicked(object sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
 
-        if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
+        if (CurrentArrangement is not { IsDisposed: false }) { return; }
 
         CellExtEventArgs? ck = null;
         if (e.Item.Tag is CellExtEventArgs tmp) { ck = tmp; }

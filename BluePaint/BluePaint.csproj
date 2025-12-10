@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
@@ -37,15 +38,17 @@
 
   <ItemGroup>
     <!-- NuGet-Pakete -->
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
-
     <!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
 	 <Reference Include="System.Windows.Forms" />
 	 <Reference Include="WindowsBase" />
-    <!-- Standard-Referenzen -->
+
+	  <!-- Code-Analyse -->
+	  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
+
+	  <!-- Standard-Referenzen -->
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

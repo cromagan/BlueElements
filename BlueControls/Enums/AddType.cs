@@ -31,7 +31,7 @@ public enum AddType {
 
     ///// <summary>
     ///// Hinzu-Button wird angezeigt, und auf einen Klick dessen wird  ein Item mittels einer File-Select-Box erstellt.
-    ///Die Original-Dateien werden nicht verändert.
+    /////Die Original-Dateien werden nicht verändert.
     ///// </summary>
     //BinarysFromFileSystem = 2,
 

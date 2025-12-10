@@ -505,7 +505,7 @@ public abstract class Method : IReadableTextWithKey {
         try {
             var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
             return attvar.Failed
-                ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
+                ? DoItFeedback.AttributFehler(infos.LogData, attvar)
                 : DoIt(varCol, attvar, scp, infos.LogData);
         } catch (Exception ex) {
             return new DoItFeedback("Interner Programmfehler: " + ex.Message, true, infos.LogData);

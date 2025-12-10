@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

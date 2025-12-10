@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueScript.Methods;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing;
@@ -79,7 +78,7 @@ public class DoItFeedback {
 
     #region Methods
 
-    public static DoItFeedback AttributFehler(LogData? ld, Method method, SplittedAttributesFeedback f) =>
+    public static DoItFeedback AttributFehler(LogData? ld, SplittedAttributesFeedback f) =>
         new(f.FailedReason, f.NeedsScriptFix, ld);
 
     public static DoItFeedback Falsch() => new(false);

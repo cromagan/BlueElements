@@ -55,7 +55,7 @@ internal class Method_Sort : Method {
         }
 
         if (attvar.Attributes[0] is not VariableListString vli) {
-            return DoItFeedback.AttributFehler(ld, this, attvar);
+            return DoItFeedback.AttributFehler(ld, attvar);
         }
 
         vli.ValueList = x;

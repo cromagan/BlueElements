@@ -163,7 +163,6 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     /// <summary>
     /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist, ab.
     /// </summary>
-    /// <param name="column"></param>
     /// <param name="renderer"></param>
     /// <param name="content"></param>
     private string TextSizeKey(string renderer, string content) => renderer + "|" + content;

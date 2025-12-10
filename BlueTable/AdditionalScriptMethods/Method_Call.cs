@@ -95,7 +95,7 @@ internal class Method_Call : Method_TableGeneric, IUseableForButton {
         //Diese Routine kann nicht benutzt werden, weil sie die Zeilenvariableen neu erstellt
         //        var scx = myDb.ExecuteScript(null, vs, scp.ProduktivPhase, null, a, true, true);
 
-        var scx = Method_CallByFilename.CallSub(varCol, scp, "Subroutinen-Aufruf [" + vs + "]", f, 0, vs, null, a, vs, ld);
+        var scx = Method_CallByFilename.CallSub(varCol, scp, f, 0, vs, null, a, vs, ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
             Table.UpdateScript(sc, failedReason: scx.ProtocolText);

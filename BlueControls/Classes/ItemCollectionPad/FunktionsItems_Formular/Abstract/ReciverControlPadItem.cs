@@ -121,7 +121,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     /// <summary>
     /// Holt die Datebank aus dem erst Parent, anschließend aus dem Output
     /// </summary>
-    /// <param name="item"></param>
     /// <returns></returns>
     public Table? TableInput {
         get {

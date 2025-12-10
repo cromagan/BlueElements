@@ -886,6 +886,7 @@ public static partial class Extensions {
 
     /// <summary>
     /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r).
+    /// </summary>
     /// <param name="textToSplit"></param>
     /// <returns></returns>
     public static string[] SplitByCr(this string textToSplit) => textToSplit.Replace("\r\n", "\r").Replace("\n", "\r").SplitBy("\r");

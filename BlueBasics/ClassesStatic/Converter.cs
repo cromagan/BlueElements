@@ -136,7 +136,7 @@ public static class Converter {
     /// <returns></returns>
     public static bool DoubleTryParse(string? s, out double result) {
         result = 0;
-        if (string.IsNullOrEmpty(s)) { return false; }
+        if (s == null || string.IsNullOrEmpty(s)) { return false; }
 
         return double.TryParse(s, out result)
                || double.TryParse(s.Replace(",", "."), out result)
@@ -158,7 +158,7 @@ public static class Converter {
     /// <returns></returns>
     public static bool FloatTryParse(string? s, out float result) {
         result = 0;
-        if (string.IsNullOrEmpty(s)) { return false; }
+        if (s == null || string.IsNullOrEmpty(s)) { return false; }
 
         return float.TryParse(s, out result)
                || float.TryParse(s.Replace(",", "."), out result)

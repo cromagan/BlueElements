@@ -152,8 +152,9 @@ public sealed partial class ExportDialog : IHasTable {
 
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
-                var it = new ItemCollectionPadItem(layoutFileName);
-                it.ForPrinting = true;
+                var it = new ItemCollectionPadItem(layoutFileName) {
+                    ForPrinting = true
+                };
 
                 //if (it._internal is { }) {
                 it.ReplaceVariables(rowsForExport[startNr]);

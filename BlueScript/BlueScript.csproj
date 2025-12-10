@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
     <OutputType>Library</OutputType>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
@@ -36,10 +37,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- NuGet-Pakete -->
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
+	  <!-- Code-Analyse -->
+	  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
 
-    <!-- Projekt-Referenzen -->
+	  <!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
 
     <!-- System-Referenzen -->

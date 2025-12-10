@@ -386,6 +386,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     /// <summary>
     /// Control heißt, dass die Kooridanten sich auf die Controllebene beziehen und nicht auf den Canvas
     /// </summary>
+    /// <param name="parent"></param>
     /// <param name="tableviewWith"></param>
     /// <param name="zoom"></param>
     /// <returns></returns>

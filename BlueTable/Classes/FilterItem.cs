@@ -94,6 +94,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     /// </summary>
     /// <param name="table">Die Tabelle für die Spaltenreferenzen</param>
     /// <param name="whereCondition">Die SQL-WHERE-Bedingung</param>
+    /// <param name="origin"></param>
     public FilterItem(Table? table, string whereCondition, string origin) {
         Table = table;
         SearchValue = new List<string>().AsReadOnly();

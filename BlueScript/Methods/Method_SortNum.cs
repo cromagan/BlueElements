@@ -57,7 +57,7 @@ internal class Method_SortNum : Method {
         nums.Sort();
 
         if (attvar.Attributes[0] is not VariableListString vli) {
-            return DoItFeedback.AttributFehler(ld, this, attvar);
+            return DoItFeedback.AttributFehler(ld, attvar);
         }
 
         vli.ValueList = nums.ConvertAll(i => i.ToStringFloat5());

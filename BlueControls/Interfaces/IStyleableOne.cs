@@ -22,7 +22,7 @@ using System;
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Wird vermendet, wenn das Element sein Aussehen verändern kann - mittels StyleDB
+/// Wird verwendet, wenn das Element sein Aussehen verändern kann - mittels StyleDB
 /// Zusätzlich wenn es davon EINEN bestimmten Stil benutzt. Z.B. die Überschrift davon
 /// </summary>
 public interface IStyleableOne : IStyleable {

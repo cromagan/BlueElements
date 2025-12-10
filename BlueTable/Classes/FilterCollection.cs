@@ -819,7 +819,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var conditions = new List<string>();
 
         // Einfache Aufteilung bei AND (da bereits uppercase: nur " AND ")
-        var parts = whereClause.Split(new[] { " AND " }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = whereClause.Split([" AND "], StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var part in parts) {
             if (!string.IsNullOrWhiteSpace(part)) {

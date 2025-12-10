@@ -109,7 +109,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
             }
         }
 
-        return new VariableCollection(vaa);
+        return [.. vaa];
     }
 
     public bool Add(Variable? variable) {

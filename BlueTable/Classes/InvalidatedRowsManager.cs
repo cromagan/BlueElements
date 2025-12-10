@@ -32,9 +32,6 @@ public class InvalidatedRowsManager {
     /// <summary>
     /// Eine Routine, die sich um das Update der Row kümmert. Kann evtl. umgeleitet werden. Ruft im Regelfall UpdateRow auf.
     /// </summary>
-    /// <param name="masterRow"></param>
-    /// <param name="row"></param>
-    /// <param name="extendedAllowed"></param>
     public static DGDoUpdateRow DoUpdateRow = UpdateRow;
 
     // ConcurrentDictionary für threadsichere Sammlung der ungültigen Zeilen (Key = KeyName, Value = RowItem)
@@ -133,6 +130,7 @@ public class InvalidatedRowsManager {
     /// </summary>
     /// <param name="masterRow">Die Hauptzeile, falls vorhanden</param>
     /// <param name="extendedAllowed">Flag für erweiterte Verarbeitung</param>
+    /// <param name="minutelyDelegate"></param>
     public void DoAllInvalidatedRows(RowItem? masterRow, bool extendedAllowed, Action? minutelyDelegate) {
         lock (_processingLock) {
             if (_isProcessing) { return; }

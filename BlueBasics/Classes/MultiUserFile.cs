@@ -385,7 +385,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     public bool SaveAs(string filename) => ProcessFile(TrySave, [filename], false, 120) is true;
 
     public void UnlockEditing() {
-        if (!AmIBlocker()) { return ; }
+        if (!AmIBlocker()) { return; }
 
         Save(true);
 
@@ -439,6 +439,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private double AgeOfBlockDatei() {
         if (!FileExists(Blockdateiname())) { return -1; }
         var f = GetFileInfo(Blockdateiname());
+        if (f == null) { return -1; }
+
         var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
         return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
     }

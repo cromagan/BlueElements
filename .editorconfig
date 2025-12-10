@@ -296,3 +296,6 @@ dotnet_diagnostic.CA5401.severity = none
 
 # IDE0055: Formatierung korrigieren
 dotnet_diagnostic.IDE0055.severity = none
+
+# CS1591: Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
+dotnet_diagnostic.CS1591.severity = none

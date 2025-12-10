@@ -455,8 +455,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 break;
         }
 
-        int offsetX = 0;
-        int offsetY = 0;
+        var offsetX = 0;
+        var offsetY = 0;
 
         if (sliderVisible) {
             GenerateSlider();

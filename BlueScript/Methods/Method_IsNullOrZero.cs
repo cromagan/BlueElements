@@ -48,7 +48,7 @@ internal class Method_IsNullOrZero : Method {
 
         if (attvar.Attributes.Count == 0) {
             return attvar.ScriptIssueType != ScriptIssueType.VariableNichtGefunden
-                ? DoItFeedback.AttributFehler(infos.LogData, this, attvar)
+                ? DoItFeedback.AttributFehler(infos.LogData, attvar)
                 : DoItFeedback.Wahr();
         }
 

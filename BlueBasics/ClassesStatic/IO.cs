@@ -300,7 +300,8 @@ public static class IO {
     /// Liefert Dateiinformationen mit Fehlerbehandlung und Wiederholungsversuchen
     /// </summary>
     /// <param name="filename">Der Dateiname</param>
-    /// <param name="mustDo">True wenn die Funktion auf jeden Fall ein Ergebnis liefern muss</param>
+    /// <param name="abortIfFailed"></param>
+    /// <param name="time"></param>
     /// <returns>Dateizeitstempel und -größe als String</returns>
     public static string GetFileState(string filename, bool abortIfFailed, float time) => ProcessFile(TryGetFileState, [filename], abortIfFailed, time) as string ?? string.Empty;
 
@@ -382,7 +383,9 @@ public static class IO {
     /// Führt einen Datei-Befehl mit erweiterter Fehlerbehandlung und Wiederholungsversuchen aus
     /// </summary>
     /// <param name="processMethod">Die auszuführende Methode</param>
+    /// <param name="affectingFiles"></param>
     /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
+    /// <param name="trySeconds"></param>
     /// <param name="args">Variable Parameter</param>
     public static object? ProcessFile(DoThis processMethod, List<string> affectingFiles, bool abortIfFailed, float trySeconds, params object?[] args) {
         if (Develop.AllReadOnly) { return true; }
@@ -426,6 +429,7 @@ public static class IO {
     /// Lädt alle Bytes aus einer Datei mit automatischer Retry-Logik
     /// </summary>
     /// <param name="filename">Der Pfad zur zu ladenden Datei</param>
+    /// <param name="time"></param>
     /// <returns>Die geladenen Bytes oder ein leeres Array bei Fehler</returns>
     public static byte[] ReadAllBytes(string filename, float time) {
         var result = ProcessFile(TryReadAllBytes, [filename], false, time);
@@ -1008,6 +1012,7 @@ public static class IO {
     /// <summary>
     ///
     /// </summary>
+    /// <param name="affectingFiles"></param>
     /// <param name="args">Filename, Byte[]</param>
     /// <returns></returns>
     private static FileOperationResult TryWriteAllBytes(List<string> affectingFiles, params object?[] args) {

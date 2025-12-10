@@ -855,7 +855,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen!", true); }
 
-        if (!tb.IsEditable(false)) { return (null, "Neue Zeilen nicht möglich: " + tb.IsNotEditableReason, true); }
+        if (!tb.IsEditable(false)) { return (null, "Neue Zeilen nicht möglich: " + tb.IsNotEditableReason(false), true); }
 
         if (GetByKey(key) != null) { return (null, "Schlüssel bereits belegt!", true); }
 

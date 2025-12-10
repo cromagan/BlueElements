@@ -761,8 +761,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         break;
                 }
                 if (FileExists(pf)) {
-                    var tb = new TableFile(name);
-                    tb.DropMessages = false;
+                    var tb = new TableFile(name) {
+                        DropMessages = false
+                    };
                     tb.LoadFromFile(pf, false, null, string.Empty, false);
                     return tb;
                 }
@@ -1236,6 +1237,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="user"></param>
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
+    /// <param name="oldchunkvalue"></param>
+    /// <param name="newchunkvalue"></param>
     public string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, string oldchunkvalue, string newchunkvalue) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
@@ -1374,6 +1377,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="attributes"></param>
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
+    /// <param name="ignoreError"></param>
     /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
         // Vorab-Prüfungen
@@ -2176,6 +2180,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="userName"></param>
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
+    /// <param name="container"></param>
+    /// <param name="chunkValue"></param>
     protected void AddUndo(TableDataType type, string column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container, string chunkValue) {
         if (IsDisposed) { return; }
         if (type.IsObsolete()) { return; }

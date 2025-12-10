@@ -379,9 +379,8 @@ public class TableChunk : TableFile {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="value"></param>
     /// <param name="chunkId"></param>
-    /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
+    /// <param name="isFirst"></param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
     public bool LoadChunkWithChunkId(string chunkId, bool isFirst) {
         if (string.IsNullOrEmpty(chunkId)) { return false; }
