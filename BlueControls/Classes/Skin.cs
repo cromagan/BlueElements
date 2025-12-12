@@ -927,8 +927,7 @@ public static class Skin {
                     break;
 
                 case HintergrundArt.Verlauf_Vertical_2:
-                    LinearGradientBrush lgb = new(r, design.BackColor1, design.BackColor2,
-                        LinearGradientMode.Vertical);
+                    var lgb = new LinearGradientBrush(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
                     gr.FillPath(lgb, Kontur(design.Kontur, r));
                     break;
                 //case enHintergrundArt.Verlauf_Vertical_3:

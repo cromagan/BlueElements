@@ -117,14 +117,18 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
     //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
 
-    public virtual void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) => DrawLine(gr, lin, xPos, xPos, top, bottom);
+    public virtual void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) => DrawLine(gr, lin, xPos, xPos, top, bottom);
 
-    public virtual void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => DrawLine(gr, lin, left, right, bottom, bottom);
+    public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnCell), positionControl);
+    }
+
+    public virtual void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+    }
+
+    public virtual void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => DrawLine(gr, lin, left, right, bottom, bottom);
 
     public virtual void Draw_UpperLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => DrawLine(gr, lin, left, right, bottom, bottom);
-
-    public virtual void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
-    }
 
     public void DrawLine(Graphics gr, ColumnLineStyle lin, float left, float right, float top, float bottom) {
         if (IsDisposed) { return; }
@@ -187,23 +191,28 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 var left = viewItem.ControlColumnLeft((int)offsetX);
 
                 if (left > visibleAreaControl.Width) { continue; }
-                if (left + positionControl.Width < 0) { continue; }
+                if (left + (viewItem.ControlColumnWidth ?? 0) < 0) { continue; }
 
                 var area = new Rectangle(left, (int)positionControl.Top, viewItem.ControlColumnWidth ?? 0, (int)positionControl.Height);
 
                 if (Arrangement.Count == 1) { area = positionControl.ToRect(); }
 
-                gr.SmoothingMode = SmoothingMode.None;
-                gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnCell), area);
-
                 var t = viewItem.Column.DoOpticalTranslation;
                 if (!translate) { t = TranslationType.Original_Anzeigen; }
 
-                DrawColumn(gr, viewItem, area, scale, t, offsetX, offsetY, state);
-                Draw_Border(gr, viewItem.LineLeft, area.Left, area.Top, area.Bottom);
-                Draw_Border(gr, viewItem.LineRight, area.Right, area.Top, area.Bottom);
+                if (!DoSpezialOrder) {
+                    if (!viewItem.Permanent) {
+                        area.X = Math.Max(area.X, Arrangement.ControlColumnsPermanentWidth);
+                    }
+                }
+
+                gr.SmoothingMode = SmoothingMode.None;
+                Draw_ColumnBackGround(gr, viewItem, area, state);
+                Draw_Border(gr, viewItem, viewItem.LineLeft, area.Left, area.Top, area.Bottom);
+                Draw_Border(gr, viewItem, viewItem.LineRight, area.Right, area.Top, area.Bottom);
                 Draw_UpperLine(gr, ColumnLineStyle.Ohne, area.Right, area.Left, area.Top);
-                Draw_LowerLine(gr, ColumnLineStyle.Dünn, area.Right, area.Left, area.Bottom - 1);
+                Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dünn, area.Right, area.Left, area.Bottom - 1);
+                Draw_ColumnContent(gr, viewItem, area, scale, t, offsetX, offsetY, state);
             }
 
             if (!DoSpezialOrder) { return; }

@@ -1682,6 +1682,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
+        ca.SheetStyle = SheetStyle;
+        ca.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
+
         // Haupt-Aufbau-Routine ------------------------------------
 
         //var t = sortedRowData.CanvasItemData(Design.Item_Listbox);
@@ -2295,7 +2298,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         var headX = columnviewitem.ControlColumnLeft(OffsetX);
-        headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
+        //headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
 
         _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth, columnviewitem.GetRenderer(SheetStyle));
         _autoFilter.Position_LocateToPosition(new Point(screenx + headX, screeny + bottom));
@@ -2363,6 +2366,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, sortused, visibleRowListItems);
 
+        CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
+
         CalculateAllViewItems_CalculateYPosition(sortedItems, arrangement);
 
         DoCursorPos();
@@ -2421,6 +2426,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
             }
         }
+    }
+
+    private void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
+        allItems.TryGetValue(TableEndListItem.Identifier, out var item0);
+        if (item0 is not TableEndListItem tableEnd) {
+            tableEnd = new TableEndListItem(arrangement);
+            allItems.Add(tableEnd.KeyName, tableEnd);
+        }
+        tableEnd.Visible = arrangement.ShowHead;
+        tableEnd.IgnoreYOffset = false;
+        sortedItems.Add(tableEnd);
     }
 
     private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
@@ -3084,6 +3100,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private bool EnsureVisible(ColumnViewItem? viewItem) {
         if (IsDisposed) { return false; }
         if (viewItem?.Column is not { IsDisposed: false }) { return false; }
+        if (viewItem.Permanent) { return true; }
         //var dispR = DisplayRectangleWithoutSlider();
 
         //if (CurrentArrangement is not { IsDisposed: false } cax) { return false; }

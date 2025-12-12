@@ -108,15 +108,15 @@ public class TableFragments : TableFile {
 
     #region Methods
 
-    public override bool AmITemporaryMaster(int ranges, int rangee) {
+    public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (_isInCache.Year < 2000) { return false; }
         if (!FirstTimAlleFragmentsLoaded) { return false; }
 
-        if (DateTime.UtcNow.Subtract(_isInCache).TotalMinutes > UpdateTable) {
+        if (updateAllowed && DateTime.UtcNow.Subtract(_isInCache).TotalMinutes > UpdateTable) {
             if (!BeSureToBeUpToDate(false, true)) { return false; }
         }
 
-        return base.AmITemporaryMaster(ranges, rangee);
+        return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
 
     public override bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) {
@@ -279,7 +279,7 @@ public class TableFragments : TableFile {
 
         #region Bei Bedarf neue Komplett-Tabelle erstellen
 
-        if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil)) {
+        if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
             DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
 
             var t = LastSaveMainFileUtcDate;

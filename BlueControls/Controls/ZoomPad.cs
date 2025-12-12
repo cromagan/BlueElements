@@ -39,7 +39,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
 
-    private RectangleF? _canvasMaxbounds;
     private Size _lastSize;
 
     private bool _lastSliderXVisible;
@@ -51,7 +50,10 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    protected ZoomPad() : base(true, true, false) => InitializeComponent();
+    protected ZoomPad() : base(true, true, false) {
+        InitializeComponent();
+        DoSlider();
+    }
 
     #endregion
 
@@ -147,9 +149,11 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             if (field == value) { return; }
             field = value;
 
-            Invalidate_MaxBounds();
-
-            if (value) { ZoomFit(); }
+            if (value) {
+                ZoomFit();
+            } else {
+                DoSlider();
+            }
 
             Invalidate();
         }
@@ -173,6 +177,16 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     } = 1;
 
     protected abstract bool AutoCenter { get; }
+
+    protected RectangleF CanvasMaxBounds {
+        get {
+            if (!field.IsEmpty) { return field; }
+            field = CalculateCanvasMaxBounds();
+            return field;
+        }
+        private set;
+    }
+
     protected abstract bool ShowSliderX { get; }
 
     protected abstract int SmallChangeY { get; }
@@ -247,9 +261,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public void ZoomFit() {
         if (IsDisposed) { return; }
-        var canvasBounds = CanvasMaxBounds();
         var controlBounds = AvailableControlPaintArea;
-        _zoomFit = ItemCollectionPadItem.ZoomFitValue(canvasBounds, controlBounds.Size);
+        _zoomFit = ItemCollectionPadItem.ZoomFitValue(CanvasMaxBounds, controlBounds.Size);
         Zoom = _zoomFit;
         Fitting = true;
     }
@@ -266,65 +279,10 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected abstract RectangleF CalculateCanvasMaxBounds();
 
-    protected RectangleF CanvasMaxBounds() {
-        if (_canvasMaxbounds is RectangleF r) {
-            if (!MousePressing()) {
-                if (SliderY.Enabled) { SliderY.Value = -OffsetY; }
-                if (SliderX.Enabled) { SliderX.Value = -OffsetX; }
-            }
-            return r;
-        }
-
-        var tmpCanvasMaxBounds = CalculateCanvasMaxBounds();
-        _canvasMaxbounds = tmpCanvasMaxBounds;
-
-        var controlArea = AvailableControlPaintArea;
-
-        var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
-
-        SliderX.Visible = ShowSliderX && !ScreenshotMode;
-        if (freiraumControl.X < 0 && SliderX.Visible) {
-            SliderX.Enabled = true;
-            SliderX.Minimum = tmpCanvasMaxBounds.Right.CanvasToControl(Zoom) - controlArea.Right - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom);
-            SliderX.Maximum = tmpCanvasMaxBounds.Left.CanvasToControl(Zoom) - controlArea.Left;
-            SliderX.LargeChange = controlArea.Width;
-            SliderX.Value = -OffsetX;
-        } else {
-            SliderX.Enabled = false;
-            if (!MousePressing()) {
-                var val = 0;
-                if (AutoCenter) { val = (freiraumControl.X - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom)) / 2; }
-                SliderX.Minimum = -val;
-                SliderX.Maximum = -val;
-                SliderX.Value = -val;
-            }
-        }
-
-        SliderY.Visible = !ScreenshotMode;
-        if (freiraumControl.Y < 0 && SliderY.Visible) {
-            SliderY.Enabled = true;
-            SliderY.Maximum = tmpCanvasMaxBounds.Bottom.CanvasToControl(Zoom) - controlArea.Bottom - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom);
-            SliderY.Minimum = tmpCanvasMaxBounds.Top.CanvasToControl(Zoom) - controlArea.Top;
-            SliderY.LargeChange = controlArea.Height;
-            SliderY.Value = -OffsetY;
-        } else {
-            SliderY.Enabled = false;
-            if (!MousePressing()) {
-                var val = 0;
-                if (AutoCenter) { val = (freiraumControl.Y - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom)) / 2; }
-                SliderY.Minimum = -val;
-                SliderY.Maximum = -val;
-                SliderY.Value = -val;
-            }
-        }
-        return tmpCanvasMaxBounds;
-    }
-
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
+        DoSlider();
         base.DrawControl(gr, state);
-
-        CanvasMaxBounds();
     }
 
     protected void DrawWaitScreen(Graphics gr, string info) {
@@ -341,7 +299,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected void Invalidate_MaxBounds() {
-        _canvasMaxbounds = null;
+        CanvasMaxBounds = RectangleF.Empty;
+
         Invalidate();
     }
 
@@ -451,16 +410,60 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     protected virtual void OnOffsetYChanged() => Invalidate();
 
     protected override void OnSizeChanged(System.EventArgs e) {
-        Invalidate_MaxBounds(); // Slider
         if (ScreenshotMode || Fitting) {
             ZoomFit();
+        } else {
+            DoSlider();
         }
         base.OnSizeChanged(e);
     }
 
     protected virtual void OnZoomChanged() {
-        Invalidate_MaxBounds(); // Slider
+        DoSlider();
         Invalidate();
+    }
+
+    private void DoSlider() {
+        var tmpCanvasMaxBounds = CanvasMaxBounds;
+        var controlArea = AvailableControlPaintArea;
+
+        var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
+
+        SliderX.Visible = ShowSliderX && !ScreenshotMode;
+        if (freiraumControl.X < 0 && SliderX.Visible) {
+            SliderX.Enabled = true;
+            SliderX.Minimum = tmpCanvasMaxBounds.Right.CanvasToControl(Zoom) - controlArea.Right - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom);
+            SliderX.Maximum = tmpCanvasMaxBounds.Left.CanvasToControl(Zoom) - controlArea.Left;
+            SliderX.LargeChange = controlArea.Width;
+            SliderX.Value = -OffsetX;
+        } else {
+            SliderX.Enabled = false;
+            if (!MousePressing()) {
+                var val = 0;
+                if (AutoCenter) { val = (freiraumControl.X - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom)) / 2; }
+                SliderX.Minimum = -val;
+                SliderX.Maximum = -val;
+                SliderX.Value = -val;
+            }
+        }
+
+        SliderY.Visible = !ScreenshotMode;
+        if (freiraumControl.Y < 0 && SliderY.Visible) {
+            SliderY.Enabled = true;
+            SliderY.Maximum = tmpCanvasMaxBounds.Bottom.CanvasToControl(Zoom) - controlArea.Bottom - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom);
+            SliderY.Minimum = tmpCanvasMaxBounds.Top.CanvasToControl(Zoom) - controlArea.Top;
+            SliderY.LargeChange = controlArea.Height;
+            SliderY.Value = -OffsetY;
+        } else {
+            SliderY.Enabled = false;
+            if (!MousePressing()) {
+                var val = 0;
+                if (AutoCenter) { val = (freiraumControl.Y - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom)) / 2; }
+                SliderY.Minimum = -val;
+                SliderY.Maximum = -val;
+                SliderY.Value = -val;
+            }
+        }
     }
 
     private void SliderX_ValueChanged(object sender, System.EventArgs e) => OffsetX = -(int)SliderX.Value;

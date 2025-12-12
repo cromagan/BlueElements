@@ -57,10 +57,22 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     public static string Identifier(string caption) => $"CAP-{caption.ToUpperInvariant()}";
 
-    public override void Draw_Border(Graphics gr, ColumnLineStyle lin, float xPos, float top, float bottom) {
+    public override void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) {
     }
 
-    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Dick, left, right, bottom);
+    //public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+    //    base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
+
+    //    var r2 = new RectangleF(positionControl.Left, positionControl.Top + positionControl.Height *0.1f, positionControl.Width, positionControl.Height *0.9f);
+
+    //    var co = viewItem.BackColor_ColumnCell.Darken(0.1);
+
+    //    var lgb = new LinearGradientBrush(r2, viewItem.BackColor_ColumnCell, co, LinearGradientMode.Vertical);
+
+    //    gr.FillRectangle(lgb, r2);
+    //}
+
+    public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dick, left, right, bottom);
 
     public override void Draw_UpperLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_UpperLine(gr, ColumnLineStyle.Dick, left, right, bottom);
 

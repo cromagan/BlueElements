@@ -899,7 +899,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (tb.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        if (mastertoo && tb.AmITemporaryMaster(MasterTry, MasterUntil) && t.TotalMinutes > MyRowLost) { return true; }
+        if (mastertoo && tb.AmITemporaryMaster(MasterTry, MasterUntil, true) && t.TotalMinutes > MyRowLost) { return true; }
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 

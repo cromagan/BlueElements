@@ -237,15 +237,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public bool CollapsableEnabled() => CanvasContentWidth > 40 || !IsExpanded;
 
-    public int ControlColumnLeft(float shiftX) {
+    public int ControlColumnLeft(float offsetX) {
         if (Permanent) {
             return _controlColumnLeft;
         }
 
-        return _controlColumnLeft + (int)shiftX;
+        return _controlColumnLeft + (int)offsetX;
     }
 
-    public int ControlColumnRight(float shiftX) => ControlColumnLeft(shiftX) + ControlColumnWidth ?? 0;
+    public int ControlColumnRight(float offsetX) => ControlColumnLeft(offsetX) + ControlColumnWidth ?? 0;
 
     public void Dispose() =>
                 // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.

@@ -55,37 +55,6 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         _column = column;
 
-        GenerateAll(fc, pinned, minWidth, renderer);
-    }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler<FilterCommandEventArgs>? FilterCommand;
-
-    #endregion
-
-    #region Methods
-
-    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned, bool removeKeyFilter) {
-        if (column is not { IsDisposed: false }) { return []; }
-
-        if (fc is not { Count: >= 0 }) { return column.Contents(); }
-        var fc2 = (FilterCollection)fc.Clone("autofilter");
-        fc2.Remove(column);
-        if (removeKeyFilter) { fc2.Remove(FilterType.RowKey); }
-
-        //foreach (var thisFilter in filter) {
-        //    if (thisFilter != null && column != thisFilter.Column) {
-        //        tfilter.Add(thisFilter);
-        //    }
-        //}
-
-        return column.Contents(fc2, pinned);
-    }
-
-    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth, Renderer_Abstract renderer) {
         var nochOk = true;
         var listFilterString = Autofilter_ItemList(_column, fc, pinned, false);
         //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
@@ -198,6 +167,33 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             if (_column.FilterOptions == FilterOptions.Enabled_OnlyAndAllowed) { ChangeToMultiUnd(); }
             if (_column.FilterOptions == FilterOptions.Enabled_OnlyOrAllowed) { ChangeToMultiOder(); }
         }
+    }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler<FilterCommandEventArgs>? FilterCommand;
+
+    #endregion
+
+    #region Methods
+
+    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned, bool removeKeyFilter) {
+        if (column is not { IsDisposed: false }) { return []; }
+
+        if (fc is not { Count: >= 0 }) { return column.Contents(); }
+        var fc2 = (FilterCollection)fc.Clone("autofilter");
+        fc2.Remove(column);
+        if (removeKeyFilter) { fc2.Remove(FilterType.RowKey); }
+
+        //foreach (var thisFilter in filter) {
+        //    if (thisFilter != null && column != thisFilter.Column) {
+        //        tfilter.Add(thisFilter);
+        //    }
+        //}
+
+        return column.Contents(fc2, pinned);
     }
 
     protected override void OnLostFocus(System.EventArgs e) {

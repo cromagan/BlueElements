@@ -1195,7 +1195,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
     /// </param>
     /// <returns></returns>
-    public virtual bool AmITemporaryMaster(int ranges, int rangee) {
+    public virtual bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (!MultiUserPossible) { return true; }
         if (!IsEditable(false)) { return false; }
 
@@ -2105,7 +2105,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public virtual void TryToSetMeTemporaryMaster() {
         if (!IsEditable(false)) { return; }
 
-        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax)) { return; }
+        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) { return; }
 
         if (!NewMasterPossible()) { return; }
 
@@ -2113,7 +2113,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public void UnMasterMe() {
-        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax)) {
+        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
             TemporaryTableMasterUser = "Unset: " + UserName;
             TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
         }
@@ -2710,7 +2710,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         try {
             var masters = 0;
             foreach (var thisTb in AllFiles) {
-                if (MultiUserPossible && !thisTb.IsDisposed && thisTb.AmITemporaryMaster(MasterBlockedMin, MasterCount)) {
+                if (MultiUserPossible && !thisTb.IsDisposed && thisTb.AmITemporaryMaster(MasterBlockedMin, MasterCount, false)) {
                     masters++;
                     if (masters >= MaxMasterCount) { return false; }
                 }

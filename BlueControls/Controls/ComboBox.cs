@@ -237,7 +237,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
     protected override void DrawControl(Graphics gr, States state) {
-        if (IsDisposed) { return; }
+            if (IsDisposed) { return; }
 
         if (_dropDownStyle == ComboBoxStyle.DropDownList) {
             if (_items.Count == 0) {
@@ -294,9 +294,10 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         if (!FloatingForm.IsShowing(this)) {
             // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
-            var r = i.CanvasPosition;
+            var r = i.UntrimmedCanvasSize(Design.Item_DropdownMenu);
+            i.CanvasPosition = new Rectangle(0, 0, r.Width, r.Height);
             var ymod = (int)((DisplayRectangle.Height - r.Height) / 2.0);
-            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal - r.Left, ymod - r.Top, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert, 1f);
+            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal , ymod , Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert, 1f);
         }
         Skin.Draw_Border(gr, vType, state, DisplayRectangle);
         btnDropDown.Invalidate();

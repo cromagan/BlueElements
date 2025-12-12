@@ -56,10 +56,8 @@ public sealed class SortBarListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Ohne, left, right, bottom);
-
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
-        base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
+    public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
         gr.FillRectangle(GrayBrush, positionControl);
 
         if (Sort != null && Sort.UsedForRowSort(viewItem.Column)) {
@@ -72,6 +70,8 @@ public sealed class SortBarListItem : RowBackgroundListItem {
                 positionControl.Y + (positionControl.Height - im.Height) / 2f);
         }
     }
+
+    public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
 

@@ -59,13 +59,14 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     public static string CaptionTranslated(string caption) => LanguageTool.DoTranslate(caption, true).Replace("\r", "\r\n");
 
-    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Ohne, left, right, bottom);
-
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
-        base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
-        if (viewItem.Column is not { IsDisposed: false } column) { return; }
-
+    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
         gr.FillRectangle(GrayBrush, positionControl);
+    }
+
+    public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
+        if (viewItem.Column is not { IsDisposed: false } column) { return; }
 
         #region Roten Rand für Split-Spalten
 
@@ -84,7 +85,9 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
             #region Spalte mit Bild zeichnen
 
-            var pos = new Point((int)positionControl.X + (int)((positionControl.Width - Font_Head_Default_Scaled.Width) / 2.0), 3);
+            var p3 = 3.CanvasToControl(scale);
+
+            var pos = new Point((int)positionControl.X + (int)((positionControl.Width - Font_Head_Default_Scaled.Width) / 2.0), (int)(positionControl.Top + p3));
             gr.DrawImageInRectAspectRatio(cb, (int)positionControl.X + 2, (int)(pos.Y + Font_Head_Default_Scaled.Height), (int)positionControl.Width - 4, (int)positionControl.Bottom - (int)(pos.Y + Font_Head_Default_Scaled.Height) - 6 - 18);
             // Dann der Text
             gr.TranslateTransform(pos.X, pos.Y);
@@ -107,6 +110,8 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             #endregion
         }
     }
+
+    public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
     public BlueFont Font_Head_Colored(ColumnViewItem column) {
         if (column != null) {

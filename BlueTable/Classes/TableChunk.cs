@@ -253,10 +253,10 @@ public class TableChunk : TableFile {
         return Chunk_MainData.ToLowerInvariant();
     }
 
-    public override bool AmITemporaryMaster(int ranges, int rangee) {
+    public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (!LoadChunkWithChunkId(Chunk_Master, false)) { return false; }
 
-        return base.AmITemporaryMaster(ranges, rangee);
+        return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
 
     public override bool BeSureAllDataLoaded(int anzahl) {

@@ -455,9 +455,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 break;
         }
 
-        var offsetX = 0;
-        var offsetY = 0;
-
         if (sliderVisible) {
             GenerateSlider();
             if (_sliderY != null) {
@@ -466,7 +463,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _sliderY.Height = Height;
                 _sliderY.Left = Width - _sliderY.Width;
                 _sliderY.Top = 0;
-                offsetY = -(int)_sliderY.Value;
+                OffsetY = -(int)_sliderY.Value;
                 _sliderY.Maximum = _eTxt.HeightControl + 16 - DisplayRectangle.Height;
             }
         } else {
@@ -475,17 +472,17 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _sliderY.Value = 0;
             }
 
-            offsetY = Skin.PaddingSmal;
+            OffsetY = Skin.PaddingSmal;
         }
 
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
         Cursor_Show(gr);
 
-        _eTxt.Draw(gr, 1, offsetX, offsetY);
+        _eTxt.Draw(gr, 1, OffsetX, OffsetY);
         MarkAndGenerateZone(gr, state);
 
         if (!string.IsNullOrEmpty(Suffix)) {
-            var r = new Rectangle(_eTxt.WidthControl + offsetX, offsetY, 1000, 1000);
+            var r = new Rectangle(_eTxt.WidthControl + OffsetX, OffsetY, 1000, 1000);
             if (_eTxt.Count > 0) {
                 r.X += 2;
                 Skin.Draw_FormatedText(gr, Suffix, null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, false);

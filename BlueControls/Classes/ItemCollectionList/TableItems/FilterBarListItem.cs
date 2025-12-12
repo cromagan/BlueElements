@@ -65,12 +65,13 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public override void Draw_LowerLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, ColumnLineStyle.Dick, left, right, bottom);
-
-    public override void DrawColumn(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
-        base.DrawColumn(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
-
+    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
         gr.FillRectangle(GrayBrush, positionControl);
+    }
+
+    public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
+        base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
         #region Trichter-Text && trichterState
 
@@ -144,6 +145,8 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
         #endregion
     }
+
+    public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dick, left, right, bottom);
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => AutoFilterSize + 2;
 
