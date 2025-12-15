@@ -470,10 +470,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             QuickInfo = !string.IsNullOrEmpty(bpi.ColumnQuickInfo) ? bpi.ColumnQuickInfo + "<hr>" + bpi.Description : bpi.Description;
         }
 
-        if (e.Button == MouseButtons.Left) {
+        if (e.Button == MouseButtons.Left && MouseDownData is { }) {
             QuickInfo = string.Empty;
 
-            MoveItems(e.CanvasX - MouseDownCanvas.X, e.CanvasY - MouseDownCanvas.Y, true);
+            MoveItems(e.CanvasX - MouseDownData.CanvasX, e.CanvasY - MouseDownData.CanvasY, true);
 
             Refresh(); // Ansonsten werden einige Redraws übersprungen
         }
@@ -682,9 +682,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             thisIt.Move(canvasX, canvasY, doSnap);
         }
 
-        if (doSnap) {
+        if (doSnap && MouseDownData != null) {
             // Maus-Daten modifizieren, da ja die tasächliche Bewegung wegen der SnapPoints abweichen kann.
-            MouseDownCanvas = new PointF(MouseDownCanvas.X + canvasX, MouseDownCanvas.Y + canvasY);
+            MouseDownData = new CanvasMouseEventArgs(MouseDownData.CanvasX + canvasX, MouseDownData.CanvasY + canvasY, Zoom, OffsetX, OffsetY);
         }
     }
 

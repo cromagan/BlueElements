@@ -1175,7 +1175,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return "Keine Spalte angekommen.";
         }
 
-        var visCanvasArea = AvailableControlPaintArea.ControlToCanvas(Zoom, OffsetX, OffsetY).ToRect();
+        //var visCanvasArea = AvailableControlPaintArea.ControlToCanvas(Zoom, OffsetX, OffsetY).ToRect();
 
         if (cellInThisTableRow != null) {
             if (maychangeview && !EnsureVisible(cellInThisTableColumn, cellInThisTableRow)) {
@@ -1187,7 +1187,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             //    return "Spalte konnte nicht angezeigt werden.";
             //}
 
-            if (!cellInThisTableRow.IsVisible(visCanvasArea, Zoom, OffsetX, OffsetY)) {
+            if (!cellInThisTableRow.IsVisible(AvailableControlPaintArea, Zoom, OffsetX, OffsetY)) {
                 return "Die Zeile wird nicht angezeigt.";
             }
         } else {
@@ -1706,31 +1706,30 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    protected override void OnDoubleClick(System.EventArgs e) {
+    protected override void OnDoubleClick(CanvasMouseEventArgs e) {
         //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereignis ausgelöst
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
         lock (_lockUserAction) {
+            var (_mouseOverColumn, _mouseOverRow) = CellOnCoordinate(ca, e);
+            if (_mouseOverRow is not { }) { return; }
+
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
-            //var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(cax, MousePos().ControlX, MousePos().Y);
-            //var  = _mouseOverRowItem as RowListItem;
 
-            var c = CursorPosColumn;
-            if (CursorPosRow is not { } mr) { return; }
 
-            var ea = new CellExtEventArgs(c, mr);
+            var ea = new CellExtEventArgs(_mouseOverColumn, _mouseOverRow as RowListItem);
             DoubleClick?.Invoke(this, ea);
 
-            if (mr.Row is { } r) {
-                Cell_Edit(c, mr, true, r.ChunkValue);
-            } else {
+            if (_mouseOverRow is RowListItem rli) {
+                Cell_Edit(_mouseOverColumn, rli, true, rli.Row.ChunkValue);
+            } else if (_mouseOverRow is NewRowListItem nrli) {
                 if (tb.Column.ChunkValueColumn == tb.Column.First) {
-                    Cell_Edit(c, null, true, null);
+                    Cell_Edit(_mouseOverColumn, nrli, true, null);
                 } else {
-                    Cell_Edit(c, null, true, FilterCombined.ChunkVal);
+                    Cell_Edit(_mouseOverColumn, nrli, true, FilterCombined.ChunkVal);
                 }
             }
 
@@ -2630,8 +2629,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return visibleRowListItems;
     }
 
-    private void Cell_Edit(ColumnViewItem? viewItem, RowListItem? cellInThisTableRow, bool preverDropDown, string? chunkval) {
-        var f = IsCellEditable(viewItem, cellInThisTableRow, chunkval, true);
+    private void Cell_Edit(ColumnViewItem? viewItem, AbstractListItem? rowItem, bool preverDropDown, string? chunkval) {
+        var f = IsCellEditable(viewItem, rowItem as RowListItem, chunkval, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
 
         if (viewItem?.Column is not { IsDisposed: false } contentHolderCellColumn) {
@@ -2639,7 +2638,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        var contentHolderCellRow = cellInThisTableRow?.Row;
+        var contentHolderCellRow = (rowItem as RowListItem)?.Row;
 
         if (viewItem.Column.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
@@ -2659,26 +2658,26 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         switch (dia) {
             case EditTypeTable.Textfeld:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextBox(viewItem, cellInThisTableRow, BTB, 0);
+                Cell_Edit_TextBox(viewItem, rowItem, BTB, 0);
                 break;
 
             case EditTypeTable.Textfeld_mit_Auswahlknopf:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextBox(viewItem, cellInThisTableRow, BCB, 20);
+                Cell_Edit_TextBox(viewItem, rowItem, BCB, 20);
                 break;
 
             case EditTypeTable.Dropdown_Single:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_Dropdown(viewItem, cellInThisTableRow, contentHolderCellColumn, contentHolderCellRow);
+                Cell_Edit_Dropdown(viewItem, rowItem, contentHolderCellColumn, contentHolderCellRow);
                 break;
 
             case EditTypeTable.Farb_Auswahl_Dialog:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                if (viewItem.Column != contentHolderCellColumn || cellInThisTableRow?.Row != contentHolderCellRow) {
-                    NotEditableInfo("Verlinkte Zellen hier verboten.");
-                    return;
-                }
-                Cell_Edit_Color(viewItem, cellInThisTableRow);
+                //if (viewItem.Column != contentHolderCellColumn || rowItem?.Row != contentHolderCellRow) {
+                //    NotEditableInfo("Verlinkte Zellen hier verboten.");
+                //    return;
+                //}
+                Cell_Edit_Color(viewItem, rowItem);
                 break;
 
             case EditTypeTable.Font_AuswahlDialog:
@@ -2706,12 +2705,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private void Cell_Edit_Color(ColumnViewItem viewItem, RowListItem? cellInThisTableRow) {
+    private void Cell_Edit_Color(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+
+        if (cellInThisTableRow is not RowListItem rli) { return; }
+
 
         var colDia = new ColorDialog();
 
-        if (cellInThisTableRow?.Row is { IsDisposed: false } r) {
+        if (rli.Row is { IsDisposed: false } r) {
             colDia.Color = r.CellGetColor(viewItem.Column);
         }
         colDia.Tag = (List<object?>)[viewItem.Column, cellInThisTableRow];
@@ -2728,10 +2731,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         colDia.ShowDialog();
         colDia.Dispose();
 
-        NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToStringInt1(), viewItem, cellInThisTableRow, false));
+        NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToStringInt1(), viewItem, cellInThisTableRow as RowListItem, false));
     }
 
-    private void Cell_Edit_Dropdown(ColumnViewItem viewItem, RowListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
+    private void Cell_Edit_Dropdown(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
         if (viewItem.Column != contentHolderCellColumn) {
             if (contentHolderCellRow == null) {
                 NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
@@ -2743,24 +2746,27 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
         }
 
+        if (cellInThisTableRow is not RowListItem rli) { return; }
+
+
         var t = new List<AbstractListItem>();
 
         var r = viewItem.GetRenderer(SheetStyle);
-        var cell = new CellExtEventArgs(viewItem, cellInThisTableRow);
+        var cell = new CellExtEventArgs(viewItem, cellInThisTableRow as RowListItem);
 
         t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r, cell));
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
-            if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row.ChunkValue ?? FilterCombined.ChunkVal); } else {
+            if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(viewItem, cellInThisTableRow, false, rli.Row.ChunkValue ?? FilterCombined.ChunkVal); } else {
                 NotEditableInfo("Keine Items zum Auswählen vorhanden.");
             }
             return;
         }
 
         if (contentHolderCellColumn.EditableWithTextInput) {
-            if (t.Count == 0 && string.IsNullOrWhiteSpace(cellInThisTableRow?.Row.CellGetString(viewItem.Column))) {
+            if (t.Count == 0 && string.IsNullOrWhiteSpace(rli.Row.CellGetString(viewItem.Column))) {
                 // Bei nur einem Wert, wenn Texteingabe erlaubt, Dropdown öffnen
-                Cell_Edit(viewItem, cellInThisTableRow, false, cellInThisTableRow?.Row.ChunkValue ?? FilterCombined.ChunkVal);
+                Cell_Edit(viewItem, cellInThisTableRow, false, rli.Row.ChunkValue ?? FilterCombined.ChunkVal);
                 return;
             }
             var erw = ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1");
@@ -2797,7 +2803,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //    }
         //}
 
-        var controlX = viewItem.ControlColumnLeft(OffsetX);// (ControlToCanvasX(, Zoom) - OffsetX);
+        var controlX = viewItem.ControlColumnLeft(OffsetX);
 
         var controlWidth = viewItem.ControlColumnWidth ?? 16;
 
@@ -2811,7 +2817,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             contentHolderCellRow = rli.Row;
         } else if (cellInThisTableRow is NewRowListItem) {
             // Neue Zeile...
-            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
+            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
             box.Location = new Point(controlX, controlPos.Y);
             box.Size = new Size(controlWidth + addWith, controlPos.Height);
             box.Text = string.Empty;

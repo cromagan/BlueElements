@@ -98,9 +98,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     public bool IsMaxYOffset => Math.Abs(OffsetY - SliderY.Maximum) < IntTolerance;
 
     /// <summary>
-    /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde. Zoom und Slider wurden eingerechnet, dass die Koordinaten Massstabsunabhängis sind.
+    /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde.
     /// </summary>
-    public PointF MouseDownCanvas { get; protected set; }
+    public CanvasMouseEventArgs? MouseDownData { get; protected set; }
 
     [DefaultValue(0f)]
     [Browsable(false)]
@@ -345,12 +345,21 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected override sealed void OnMouseDown(MouseEventArgs e) {
         var cme = new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY);
-        MouseDownCanvas = cme.CanvasPoint;
+        MouseDownData = cme;
         base.OnMouseDown(e);
         OnMouseDown(cme);
     }
 
+
+    protected override void OnDoubleClick(System.EventArgs e) {
+        base.OnDoubleClick(e);
+        if(MouseDownData == null) {  return; }
+        OnDoubleClick(MouseDownData);
+    }
+
     protected virtual void OnMouseDown(CanvasMouseEventArgs e) { }
+
+    protected virtual void OnDoubleClick(CanvasMouseEventArgs e) { }
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
@@ -366,7 +375,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected override sealed void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        MouseDownCanvas = Point.Empty;
+        MouseDownData = null;
         OnMouseUp(new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY));
     }
 

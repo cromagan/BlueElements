@@ -329,8 +329,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         if (_helper.HasFlag(Helpers.MouseDownPoint)) {
             var m1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
             e.Graphics.DrawEllipse(PenRotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
-            if (e.MouseDown != null) {
-                var md1 = MouseDownCanvas.CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
+            if (e.MouseDown != null && MouseDownData != null) {
+                var md1 = MouseDownData.ControlPoint;
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
                 e.Graphics.DrawEllipse(PenRotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
                 e.Graphics.DrawLine(PenRotTransp, mc1, md1);
@@ -338,8 +338,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
 
         if (_helper.HasFlag(Helpers.FilledRectancle)) {
-            if (e.MouseDown != null) {
-                var md1 = MouseDownCanvas.CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
+            if (e.MouseDown != null && MouseDownData != null) {
+                var md1 = MouseDownData.ControlPoint;
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
                 RectangleF r = new(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                 e.Graphics.FillRectangle(BrushRotTransp, r);
@@ -348,8 +348,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
         // Rechteck zeichnen
         if (_helper.HasFlag(Helpers.DrawRectangle)) {
-            if (e.MouseDown != null) {
-                var md1 = MouseDownCanvas.CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
+            if (e.MouseDown != null && MouseDownData != null) {
+                var md1 = MouseDownData.ControlPoint;
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
                 RectangleF r = new(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                 e.Graphics.DrawRectangle(PenRotTransp, r.X, r.Y, r.Width, r.Height);

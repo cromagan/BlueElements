@@ -1194,6 +1194,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
     /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
     /// </param>
+    /// <param name="updateAllowed"></param>
     /// <returns></returns>
     public virtual bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (!MultiUserPossible) { return true; }
@@ -2113,7 +2114,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public void UnMasterMe() {
-        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
+        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, false)) {
             TemporaryTableMasterUser = "Unset: " + UserName;
             TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
         }
@@ -2602,11 +2603,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (args.Length < 5 ||
             args[0] is not string newChunkValue ||
             args[1] is not ColumnItem column ||
-            args[2] is not RowItem row ||
             args[3] is not int waitforseconds ||
              args[4] is not bool onlyTopLevel) {
             return new("Ungültige Parameter.", false, true);
         }
+
+        var row = args[2] as RowItem;
 
         try {
             if (column.Table is not { IsDisposed: false } tb) { return new("Es ist keine Spalte ausgewählt.", false, true); }
@@ -2616,12 +2618,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             var fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
             if (fo.Failed) { return fo; }
 
-            fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-            if (fo.Failed) { return fo; }
+            if (row != null) {
+                fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+                if (fo.Failed) { return fo; }
+            } else {
+               if( column.RelationType == RelationType.CellValues) {
+                     return new("Verknüpfte Tabelle kann keine Initialzeile erstellt werden.", false, true); 
+                }
+            }
 
             if (onlyTopLevel) { return FileOperationResult.ValueStringEmpty; }
 
-            if (column.RelationType == RelationType.CellValues) {
+            if (column.RelationType == RelationType.CellValues && row != null) {
                 var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
                 if (!string.IsNullOrEmpty(info) && !canrepair) { return new(info, false, true); }
 

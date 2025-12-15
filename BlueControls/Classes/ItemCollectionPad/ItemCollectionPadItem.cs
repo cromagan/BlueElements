@@ -90,6 +90,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
         if (layoutFileName.IsFormat(FormatHolder.FilepathAndName)) {
+
+            if(!IO.DirectoryExists(layoutFileName.FilePath())) {
+                IO.CreateDirectory(layoutFileName.FilePath());
+            }
+
             var f = CachedFileSystem.Get(layoutFileName.FilePath());
 
             if (f.FileExists(layoutFileName)) {

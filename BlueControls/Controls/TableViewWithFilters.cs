@@ -142,7 +142,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowListItem? CursorPosRow => TableInternal.CursorPosRow;
+    public RowListItem? CursorPosRow => TableInternal.CursorPosRow ;
 
     [DefaultValue(false)]
     public bool EditButton {

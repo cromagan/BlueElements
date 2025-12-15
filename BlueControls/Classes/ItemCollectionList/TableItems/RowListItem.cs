@@ -32,6 +32,8 @@ namespace BlueControls.ItemCollectionList;
 /// </summary>
 public sealed class RowListItem : RowBackgroundListItem {
 
+    public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
+
     #region Constructors
 
     public RowListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Identifier(row, alignsToCaption), arrangement, alignsToCaption) {
@@ -61,6 +63,18 @@ public sealed class RowListItem : RowBackgroundListItem {
     #endregion
 
     #region Methods
+
+
+    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
+
+        if (MarkYellow) {
+            gr.FillRectangle(BrushYellowTransparent, positionControl);
+        }
+
+    }
+
+
 
     public static string Identifier(RowItem row, string chapter) => chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
 
