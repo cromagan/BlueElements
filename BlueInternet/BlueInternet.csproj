@@ -40,9 +40,9 @@
   <ItemGroup>
     <!-- NuGet-Pakete -->
     <PackageReference Include="Anthropic.SDK" Version="5.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
+	<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
 
-    <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
+	 <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
 
