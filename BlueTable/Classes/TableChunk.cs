@@ -254,7 +254,9 @@ public class TableChunk : TableFile {
     }
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
-        if (!LoadChunkWithChunkId(Chunk_Master, false)) { return false; }
+        if (updateAllowed) {
+            if (!LoadChunkWithChunkId(Chunk_Master, false)) { return false; }
+        }
 
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
@@ -438,6 +440,12 @@ public class TableChunk : TableFile {
         return ok;
     }
 
+    public override void MasterMe() {
+        if (GrantWriteAccess(TableDataType.TemporaryTableMasterUser, string.Empty).Failed) { return; }
+
+        base.MasterMe();
+    }
+
     public override void ReorganizeChunks() {
         if (!IsEditable(false)) { return; }
 
@@ -477,12 +485,6 @@ public class TableChunk : TableFile {
     }
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => GetChunkId(r) == chunk.KeyName)];
-
-    public override void TryToSetMeTemporaryMaster() {
-        if (GrantWriteAccess(TableDataType.TemporaryTableMasterUser, string.Empty).Failed) { return; }
-
-        base.TryToSetMeTemporaryMaster();
-    }
 
     /// <summary>
     /// Wartet bis zu 120 Sekunden, bis die Speicherung ausgeführt wurde

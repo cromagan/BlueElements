@@ -1719,7 +1719,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
 
-
             var ea = new CellExtEventArgs(_mouseOverColumn, _mouseOverRow as RowListItem);
             DoubleClick?.Invoke(this, ea);
 
@@ -2143,17 +2142,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             } else {
                 ResetView();
             }
-
-            Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
-            Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
-            CheckView();
         } else {
             _storedView = string.Empty;
-            if (CurrentArrangement is { } ca) {
-                ca.Invalidate();
-            }
-            CheckView();
         }
+
+        Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
+        Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
+        CheckView();
     }
 
     private void _Table_ViewChanged(object sender, System.EventArgs e) {
@@ -2708,9 +2703,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void Cell_Edit_Color(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-
         if (cellInThisTableRow is not RowListItem rli) { return; }
-
 
         var colDia = new ColorDialog();
 
@@ -2747,7 +2740,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         if (cellInThisTableRow is not RowListItem rli) { return; }
-
 
         var t = new List<AbstractListItem>();
 

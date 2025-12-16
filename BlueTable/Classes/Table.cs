@@ -1363,6 +1363,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     //    PermissionGroupsNewRow = new(sourceTable.PermissionGroupsNewRow.Clone());
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        AllFiles.Remove(this);
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -1859,7 +1860,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         OnLoaded(true);
     }
 
-    public void MasterMe() {
+    public virtual void MasterMe() {
         RowCollection.WaitDelay = 0;
         TemporaryTableMasterUser = UserName;
         TemporaryTableMasterTimeUtc = DateTime.UtcNow.ToString5();
@@ -2103,7 +2104,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <summary>
     /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
     /// </summary>
-    public virtual void TryToSetMeTemporaryMaster() {
+    public void TryToSetMeTemporaryMaster() {
         if (!IsEditable(false)) { return; }
 
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) { return; }
@@ -2115,8 +2116,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public void UnMasterMe() {
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, false)) {
-            TemporaryTableMasterUser = "Unset: " + UserName;
-            TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
+            if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
+                TemporaryTableMasterUser = "Unset: " + UserName;
+                TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
+            }
         }
     }
 
@@ -2622,8 +2625,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
                 if (fo.Failed) { return fo; }
             } else {
-               if( column.RelationType == RelationType.CellValues) {
-                     return new("Verknüpfte Tabelle kann keine Initialzeile erstellt werden.", false, true); 
+                if (column.RelationType == RelationType.CellValues) {
+                    return new("Verknüpfte Tabelle kann keine Initialzeile erstellt werden.", false, true);
                 }
             }
 

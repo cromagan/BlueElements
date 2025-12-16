@@ -32,7 +32,11 @@ namespace BlueControls.ItemCollectionList;
 /// </summary>
 public sealed class RowListItem : RowBackgroundListItem {
 
+    #region Fields
+
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
+
+    #endregion
 
     #region Constructors
 
@@ -64,6 +68,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     #region Methods
 
+    public static string Identifier(RowItem row, string chapter) => chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
 
     public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
@@ -71,12 +76,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
         }
-
     }
-
-
-
-    public static string Identifier(RowItem row, string chapter) => chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
 
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
@@ -94,6 +94,11 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         var toDrawd = Row.CellGetString(viewItem.Column);
+
+        var pax = 4.ControlToCanvas(scale);
+        var pay = 2.ControlToCanvas(scale);
+        positionControl.Inflate(-pax, -pay);
+
         viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
     }
 
@@ -112,7 +117,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         drawHeight = Math.Min(drawHeight, 200);
-        drawHeight = Math.Max(drawHeight, 18);
+        drawHeight = Math.Max(drawHeight+4, 18);
 
         return new(100, drawHeight);
     }

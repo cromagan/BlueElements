@@ -191,9 +191,9 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 var left = viewItem.ControlColumnLeft((int)offsetX);
 
                 if (left > visibleAreaControl.Width) { continue; }
-                if (left + (viewItem.ControlColumnWidth ?? 0) < 0) { continue; }
+                if (left + (viewItem.ControlColumnWidth ?? 16) < 0) { continue; }
 
-                var area = new Rectangle(left, (int)positionControl.Top, viewItem.ControlColumnWidth ?? 0, (int)positionControl.Height);
+                var area = new Rectangle(left, (int)positionControl.Top, viewItem.ControlColumnWidth ?? 16, (int)positionControl.Height);
 
                 if (Arrangement.Count == 1) { area = positionControl.ToRect(); }
 
