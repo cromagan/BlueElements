@@ -1343,7 +1343,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                     return "Spalten mit Verlinkungen zu anderen Tabellen können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
                 }
 
-                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(l_tb, this, l_tb.Row.First(), null);
+                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(l_tb, this, Table.Row.First(), null);
                 if (!string.IsNullOrWhiteSpace(info)) { return $"Zell-Verlinkung fehlerhaft: {info}"; }
                 fc?.Dispose();
             }

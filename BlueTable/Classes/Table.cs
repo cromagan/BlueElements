@@ -2328,29 +2328,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (type.IsCommand()) {
             switch (type) {
                 case TableDataType.Command_RemoveColumn:
-                    var c = Column[value];
-                    if (c == null) { return string.Empty; }
+                    if (Column[value] is not { } c) { return string.Empty; }
                     return Column.ExecuteCommand(type, c.KeyName, reason);
 
                 case TableDataType.Command_AddColumnByName:
-                    var f2 = Column.ExecuteCommand(type, value, reason);
-                    if (!string.IsNullOrEmpty(f2)) { return f2; }
-
-                    var thisColumn = Column[value];
-                    if (thisColumn == null) { return "Hinzufügen fehlgeschlagen"; }
-
-                    return string.Empty;
+                    return Column.ExecuteCommand(type, value, reason);
 
                 case TableDataType.Command_RemoveRow:
-                    var r = Row.GetByKey(value);
-                    if (r == null) { return string.Empty; }
+                    if (Row.GetByKey(value) is not { } r) { return string.Empty; }
                     return Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc);
 
                 case TableDataType.Command_AddRow:
-                    var f1 = Row.ExecuteCommand(type, value, reason, user, datetimeutc);
-                    if (!string.IsNullOrEmpty(f1)) { return f1; }
-                    //var thisRow = Row.SearchByKey(value);
-                    return string.Empty;
+                    return Row.ExecuteCommand(type, value, reason, user, datetimeutc);
 
                 case TableDataType.Command_NewStart:
                     return string.Empty;

@@ -1368,6 +1368,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate_AllViewItems(true);
         Filter.Table = tb;
         FilterCombined.Table = tb;
+        FilterFix.Table = tb;
 
         _tableDrawError = null;
         //InitializeSkin(); // Neue Schriftgrößen

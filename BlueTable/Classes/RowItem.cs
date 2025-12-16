@@ -672,7 +672,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var column in tb.Column) {
             if (!erg.Contains("~")) { return erg; }
 
-            if (column is { RelationType: RelationType.None }) {
+            if (column is { } && column.RelationType != RelationType.CellValues) {
                 if (erg.ToUpperInvariant().Contains("~" + column.KeyName.ToUpperInvariant())) {
                     var replacewith = CellGetString(column);
                     //if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
