@@ -307,7 +307,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(ColumnUsage(_column));
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(ColumnUsage(Column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Column?.Table is not { IsDisposed: false }) { return; }
@@ -408,10 +408,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (!Column.IsSystemColumn()) {
             btnStandard.Enabled = false;
-            capInfo.Text = _column.SymbolForReadableText()?.HTMLCode + " Normale Spalte";
+            capInfo.Text = Column.SymbolForReadableText()?.HTMLCode + " Normale Spalte";
         } else {
             btnStandard.Enabled = true;
-            capInfo.Text = _column.SymbolForReadableText()?.HTMLCode + " System Spalte";
+            capInfo.Text = Column.SymbolForReadableText()?.HTMLCode + " System Spalte";
         }
 
         txbName.Text = Column.KeyName;
