@@ -136,6 +136,11 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         var toDrawd = Row.CellGetString(viewItem.Column);
+
+        var pax = 4.ControlToCanvas(scale);
+        var pay = 2.ControlToCanvas(scale);
+        positionControl.Inflate(-pax, -pay);
+
         viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
     }
 
@@ -180,7 +185,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         drawHeight = Math.Min(drawHeight, 200);
-        drawHeight = Math.Max(drawHeight, 18);
+        drawHeight = Math.Max(drawHeight+4, 18);
 
         return new(100, drawHeight);
     }

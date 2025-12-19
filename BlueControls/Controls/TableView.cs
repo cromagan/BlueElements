@@ -2069,17 +2069,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             } else {
                 ResetView();
             }
-
-            Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
-            Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
-            CheckView();
         } else {
             _storedView = string.Empty;
-            if (CurrentArrangement is { } ca) {
-                ca.Invalidate();
-            }
-            CheckView();
         }
+
+        Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
+        Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
+        CheckView();
     }
 
     private void _Table_ViewChanged(object sender, System.EventArgs e) {

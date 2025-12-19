@@ -394,10 +394,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
         var p16 = 16.CanvasToControl(zoom);
+        var pa = 8.CanvasToControl(zoom);
 
         if (parent == null) { return p16; }
-
-        //if (_controlColumnWidth is { } v) { return v; }
 
         if (_column is not { IsDisposed: false }) {
             _controlColumnWidth = p16;
@@ -409,15 +408,18 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             return _controlColumnWidth;
         }
 
+        var minw = p16 * (_column.Caption.CountString("\r") + 1) + pa;
+
         if (!IsExpanded) {
-            _controlColumnWidth = p16;
+            _controlColumnWidth = minw;
         } else {
             _controlColumnWidth = ViewType == ViewType.PermanentColumn
-                ? Math.Min(CanvasContentWidth.CanvasToControl(zoom), (int)(tableviewWith * 0.3))
-                : Math.Min(CanvasContentWidth.CanvasToControl(zoom), (int)(tableviewWith * 0.6));
+                ? Math.Min(CanvasContentWidth.CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.3))
+                : Math.Min(CanvasContentWidth.CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.6));
         }
 
         _controlColumnWidth = Math.Max(_controlColumnWidth, FilterBarListItem.AutoFilterSize.CanvasToControl(zoom)); // Mindestens so groß wie der Autofilter;
+        _controlColumnWidth = Math.Max(_controlColumnWidth, minw);
         return _controlColumnWidth;
     }
 

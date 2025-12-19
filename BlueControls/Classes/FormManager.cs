@@ -96,7 +96,7 @@ public class FormManager : ApplicationContext {
         List<Table> allTables = [.. Table.AllFiles];
         foreach (var thisTable in allTables) {
             try {
-                if (lastForm is Forms.FormWithStatusBar fws) {
+                if (lastForm is Forms.FormWithStatusBar fws && !string.IsNullOrEmpty(thisTable.Caption)) {
                     fws.UpdateStatus(ErrorType.Info, ImageCode.Tabelle, $"Entlade '{thisTable.Caption}'...", true);
                 }
             } catch { }

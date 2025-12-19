@@ -177,10 +177,10 @@ public class TableFragments : TableFile {
         return string.Empty;
     }
 
-    public override void TryToSetMeTemporaryMaster() {
+    public override void MasterMe() {
         if (DateTime.UtcNow.Subtract(_isInCache).TotalMinutes > 1) { return; }
         if (!FirstTimAlleFragmentsLoaded) { return; }
-        base.TryToSetMeTemporaryMaster();
+        base.MasterMe();
     }
 
     protected override void Dispose(bool disposing) {

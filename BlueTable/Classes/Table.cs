@@ -1344,6 +1344,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     //    PermissionGroupsNewRow = new(sourceTable.PermissionGroupsNewRow.Clone());
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        AllFiles.Remove(this);
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -1840,7 +1841,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         OnLoaded(true);
     }
 
-    public void MasterMe() {
+    public virtual void MasterMe() {
         RowCollection.WaitDelay = 0;
         TemporaryTableMasterUser = UserName;
         TemporaryTableMasterTimeUtc = DateTime.UtcNow.ToString5();
@@ -2084,7 +2085,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <summary>
     /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
     /// </summary>
-    public virtual void TryToSetMeTemporaryMaster() {
+    public void TryToSetMeTemporaryMaster() {
         if (!IsEditable(false)) { return; }
 
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) { return; }
@@ -2096,8 +2097,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public void UnMasterMe() {
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, false)) {
-            TemporaryTableMasterUser = "Unset: " + UserName;
-            TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
+            if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
+                TemporaryTableMasterUser = "Unset: " + UserName;
+                TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
+            }
         }
     }
 
@@ -2306,29 +2309,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (type.IsCommand()) {
             switch (type) {
                 case TableDataType.Command_RemoveColumn:
-                    var c = Column[value];
-                    if (c == null) { return string.Empty; }
+                    if (Column[value] is not { } c) { return string.Empty; }
                     return Column.ExecuteCommand(type, c.KeyName, reason);
 
                 case TableDataType.Command_AddColumnByName:
-                    var f2 = Column.ExecuteCommand(type, value, reason);
-                    if (!string.IsNullOrEmpty(f2)) { return f2; }
-
-                    var thisColumn = Column[value];
-                    if (thisColumn == null) { return "Hinzufügen fehlgeschlagen"; }
-
-                    return string.Empty;
+                    return Column.ExecuteCommand(type, value, reason);
 
                 case TableDataType.Command_RemoveRow:
-                    var r = Row.GetByKey(value);
-                    if (r == null) { return string.Empty; }
+                    if (Row.GetByKey(value) is not { } r) { return string.Empty; }
                     return Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc);
 
                 case TableDataType.Command_AddRow:
-                    var f1 = Row.ExecuteCommand(type, value, reason, user, datetimeutc);
-                    if (!string.IsNullOrEmpty(f1)) { return f1; }
-                    //var thisRow = Row.SearchByKey(value);
-                    return string.Empty;
+                    return Row.ExecuteCommand(type, value, reason, user, datetimeutc);
 
                 case TableDataType.Command_NewStart:
                     return string.Empty;
