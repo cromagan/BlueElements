@@ -54,8 +54,6 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
     public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
 
-    public override string QuickInfo => string.Empty;
-
     protected override bool DoSpezialOrder => false;
 
     #endregion
@@ -78,8 +76,6 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
         base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
         gr.FillRectangle(GrayBrush, positionControl);
     }
-
-    //public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) { }
 
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
@@ -119,6 +115,8 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CaptionHeight;
+
+    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);
 

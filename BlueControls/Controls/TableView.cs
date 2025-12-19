@@ -314,51 +314,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Methods
 
-    public static string ColumnUsage(ColumnItem? column) {
-        if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
-
-        var t = "<b><u>Verwendung von " + column.ReadableText() + "</b></u><br>";
-        if (column.IsSystemColumn()) {
-            t += " - Systemspalte<br>";
-        }
-
-        if (tb.SortDefinition?.UsedColumns.Contains(column) ?? false) { t += " - Sortierung<br>"; }
-        //var view = false;
-        //foreach (var thisView in OldFormulaViews) {
-        //    if (thisView[column] != null) { view = true; }
-        //}
-        //if (view) { t += " - Formular-Ansichten<br>"; }
-        var cola = false;
-        var first = true;
-
-        var tcvc = ColumnViewCollection.ParseAll(tb);
-        foreach (var thisView in tcvc) {
-            if (!first && thisView[column] != null) { cola = true; }
-            first = false;
-        }
-        if (cola) { t += " - Spalten-Anordnungen<br>"; }
-        if (column.UsedInScript()) { t += " - Skripte<br>"; }
-        if (tb.RowQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
-        //if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Tabellen-Tags<br>"; }
-
-        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
-
-        if (!string.IsNullOrEmpty(column.ColumnSystemInfo)) {
-            t += "<br><br><b>Gesammelte Infos:</b><br>";
-            t += column.ColumnSystemInfo;
-        }
-
-        if (column.SaveContent) {
-            var l = column.Contents();
-            if (l.Count > 0) {
-                t += "<br><br><b>Zusatz-Info:</b><br>";
-                t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
-            }
-        }
-
-        return t;
-    }
-
     public static void ContextMenu_DataValidation(object sender, ObjectEventArgs e) {
         var rows = new List<RowItem>();
         if (e.Data is RowItem row) { rows.Add(row); }
@@ -446,7 +401,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var bearbColumn = column;
         if (columnLinked != null) {
             columnLinked.Repair();
-            if (Forms.MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
+            if (!columnLinked.IsOk()) {
+                bearbColumn = columnLinked;
+                Forms.MessageBox.Show("Zuerst muss die verlinkte Spalte\rrepariert werden.", ImageCode.Information, "Ok");
+            } else if (Forms.MessageBox.Show("Welche Spalte bearbeiten?", ImageCode.Frage, "Spalte in dieser Tabelle", "Verlinkte Spalte") == 1) {
                 bearbColumn = columnLinked;
             }
         } else {
@@ -676,23 +634,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         e.RemoveString(Administrator, false);
 
         return RepairUserGroups(e);
-    }
-
-    public static string QuickInfoText(ColumnItem col, string additionalText) {
-        if (col.IsDisposed || col.Table is not { IsDisposed: false }) { return string.Empty; }
-
-        var T = string.Empty;
-        if (!string.IsNullOrEmpty(col.ColumnQuickInfo)) { T += col.ColumnQuickInfo; }
-        if (col.Table.IsAdministrator() && !string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
-        if (col.Table.IsAdministrator() && col.ColumnTags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.ColumnTags.JoinWith("<br>"); }
-        if (col.Table.IsAdministrator()) { T = T + "<br><br>" + ColumnUsage(col); }
-        T = T.Trim();
-        T = T.Trim("<br>");
-        T = T.Trim();
-        if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(additionalText)) {
-            T = "<b><u>" + additionalText + "</b></u><br><br>" + T;
-        }
-        return T;
     }
 
     public static Renderer_Abstract RendererOf(ColumnItem? column, string style) {
@@ -1368,6 +1309,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate_AllViewItems(true);
         Filter.Table = tb;
         FilterCombined.Table = tb;
+        FilterFix.Table = tb;
 
         _tableDrawError = null;
         //InitializeSkin(); // Neue Schriftgrößen
@@ -1719,7 +1661,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
 
-
             var ea = new CellExtEventArgs(_mouseOverColumn, _mouseOverRow as RowListItem);
             DoubleClick?.Invoke(this, ea);
 
@@ -1883,29 +1824,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(ca, e);
 
-            if (_mouseOverColumn?.Column is not { IsDisposed: false } column) { _isinMouseMove = false; return; }
-
-            if (e.Button == MouseButtons.None) {
-                if (_mouseOverRowItem is ColumnsHeadListItem) {
-                    QuickInfo = QuickInfoText(column, string.Empty);
-                } else if (_mouseOverRowItem is RowListItem rdli && rdli.Row is { } mor) {
-                    if (column.RelationType == RelationType.CellValues) {
-                        if (column.LinkedTable != null) {
-                            var (lcolumn, _, info, _) = mor.LinkedCellData(column, true, false);
-                            if (lcolumn != null) { QuickInfo = QuickInfoText(lcolumn, column.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
-
-                            if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
-                                if (string.IsNullOrEmpty(QuickInfo)) { QuickInfo += "\r\n"; }
-                                QuickInfo = "Verlinkungs-Status: " + info;
-                            }
-                        } else {
-                            QuickInfo = "Verknüpfung zur Ziel-Tabelle fehlerhaft.";
-                        }
-                    } else if (tb.IsAdministrator()) {
-                        QuickInfo = UndoText(_mouseOverColumn?.Column, mor);
-                    }
-                }
+            if (_mouseOverColumn is { IsDisposed: false } &&
+                _mouseOverRowItem is RowBackgroundListItem { } rbi &&
+                e.Button == MouseButtons.None) {
+                QuickInfo = rbi.QuickInfoForColumn(_mouseOverColumn);
+            } else {
+                QuickInfo = string.Empty;
             }
+
             _isinMouseMove = false;
         }
     }
@@ -2480,6 +2406,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnHead.IgnoreYOffset = true;
         sortedItems.Add(columnHead);
 
+        // Die Infos
+        allItems.TryGetValue(RowInfoListItem.Identifier, out var itemAdmin);
+        if (itemAdmin is not RowInfoListItem itemHeadx) {
+            itemHeadx = new RowInfoListItem(arrangement);
+            allItems.Add(itemHeadx.KeyName, itemHeadx);
+        }
+        itemHeadx.Visible = arrangement.ShowHead;
+        sortedItems.Add(itemHeadx);
+
         // Die Sortierung
         allItems.TryGetValue(SortBarListItem.Identifier, out var item1);
         if (item1 is not SortBarListItem sortAnzeige) {
@@ -2708,9 +2643,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void Cell_Edit_Color(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-
         if (cellInThisTableRow is not RowListItem rli) { return; }
-
 
         var colDia = new ColorDialog();
 
@@ -2747,7 +2680,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         if (cellInThisTableRow is not RowListItem rli) { return; }
-
 
         var t = new List<AbstractListItem>();
 

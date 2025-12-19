@@ -1105,7 +1105,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (column.Relationship_to_First) { RepairRelationText(column, previewsValue); }
 
-        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
+        if (column.Am_A_Key_For.Count > 0) {
             foreach (var thisColumn in tb.Column) {
                 if (thisColumn.RelationType == RelationType.CellValues) {
                     LinkedCellData(thisColumn, true, false);

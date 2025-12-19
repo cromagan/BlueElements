@@ -122,6 +122,7 @@ public sealed class QuickImage : IReadableText, IEditable {
     public Color? Färbung { get; }
     public int Height { get; private set; }
     public int Helligkeit { get; }
+    public string HTMLCode => $"<Imagecode={Code}>";
     public bool IsError { get; }
     public string Name { get; } = string.Empty;
     public int Sättigung { get; }

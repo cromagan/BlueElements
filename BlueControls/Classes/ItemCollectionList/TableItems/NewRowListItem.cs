@@ -46,7 +46,6 @@ public sealed class NewRowListItem : RowBackgroundListItem {
     #region Properties
 
     public FilterCollection? FilterCombined { get; set; }
-    public override string QuickInfo => string.Empty;
     protected override bool DoSpezialOrder => true;
 
     #endregion
@@ -91,6 +90,8 @@ public sealed class NewRowListItem : RowBackgroundListItem {
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
+
+    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(18, 18);
 

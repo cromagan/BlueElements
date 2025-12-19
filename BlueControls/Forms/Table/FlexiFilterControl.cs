@@ -324,7 +324,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
         #region QuickInfo erstellen
 
-        var qi = TableView.QuickInfoText(FilterSingleColumn, string.Empty);
+        var qi = RowListItem.QuickInfoText(FilterSingleColumn, string.Empty);
 
         if (filterSingle != null) {
             if (string.IsNullOrEmpty(qi)) {

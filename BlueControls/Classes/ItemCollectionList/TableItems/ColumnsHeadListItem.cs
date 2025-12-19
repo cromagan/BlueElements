@@ -44,7 +44,6 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
     #region Properties
 
     public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
-    public override string QuickInfo => string.Empty;
     protected override bool DoSpezialOrder => true;
 
     #endregion
@@ -123,6 +122,8 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
+
+    public override string QuickInfoForColumn(ColumnViewItem cvi) => RowListItem.QuickInfoText(cvi.Column, string.Empty);
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         if (IsDisposed || Arrangement is null) { return new(16, 16); }

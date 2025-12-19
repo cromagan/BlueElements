@@ -99,6 +99,51 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     #region Methods
 
+    public static string ColumnUsage(ColumnItem? column) {
+        if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
+
+        var t = "<b><u>Verwendung von " + column.ReadableText() + "</b></u><br>";
+        if (column.IsSystemColumn()) {
+            t += " - Systemspalte<br>";
+        }
+
+        if (tb.SortDefinition?.UsedColumns.Contains(column) ?? false) { t += " - Sortierung<br>"; }
+        //var view = false;
+        //foreach (var thisView in OldFormulaViews) {
+        //    if (thisView[column] != null) { view = true; }
+        //}
+        //if (view) { t += " - Formular-Ansichten<br>"; }
+        var cola = false;
+        var first = true;
+
+        var tcvc = ColumnViewCollection.ParseAll(tb);
+        foreach (var thisView in tcvc) {
+            if (!first && thisView[column] != null) { cola = true; }
+            first = false;
+        }
+        if (cola) { t += " - Spalten-Anordnungen<br>"; }
+        if (column.UsedInScript()) { t += " - Skripte<br>"; }
+        if (tb.RowQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
+        //if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Tabellen-Tags<br>"; }
+
+        if (column.Am_A_Key_For.Count > 0) { t += QuickImage.Get(ImageCode.Schlüssel, 16).HTMLCode + " " + column.Am_A_Key_For.JoinWith("; "); }
+
+        if (!string.IsNullOrEmpty(column.ColumnSystemInfo)) {
+            t += "<br><br><b>Gesammelte Infos:</b><br>";
+            t += column.ColumnSystemInfo;
+        }
+
+        if (column.SaveContent) {
+            var l = column.Contents();
+            if (l.Count > 0) {
+                t += "<br><br><b>Zusatz-Info:</b><br>";
+                t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
+            }
+        }
+
+        return t;
+    }
+
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
         if (!AllOk()) {
@@ -251,7 +296,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(TableView.ColumnUsage(_column));
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(ColumnUsage(_column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || _column?.Table is not { IsDisposed: false }) { return; }
@@ -352,10 +397,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (!_column.IsSystemColumn()) {
             btnStandard.Enabled = false;
-            capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> Normale Spalte";
+            capInfo.Text = _column.SymbolForReadableText()?.HTMLCode + " Normale Spalte";
         } else {
             btnStandard.Enabled = true;
-            capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> System Spalte";
+            capInfo.Text = _column.SymbolForReadableText()?.HTMLCode + " System Spalte";
         }
 
         txbName.Text = _column.KeyName;

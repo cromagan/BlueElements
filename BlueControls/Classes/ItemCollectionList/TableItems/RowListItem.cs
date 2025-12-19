@@ -17,6 +17,8 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.BlueTableDialogs;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueTable;
 using BlueTable.Enums;
@@ -32,7 +34,11 @@ namespace BlueControls.ItemCollectionList;
 /// </summary>
 public sealed class RowListItem : RowBackgroundListItem {
 
+    #region Fields
+
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
+
+    #endregion
 
     #region Constructors
 
@@ -56,14 +62,55 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
     }
 
-    public override string QuickInfo => Row.GetQuickInfo();
     public RowItem Row { get; }
+
     protected override bool DoSpezialOrder => true;
 
     #endregion
 
     #region Methods
 
+    public static string Identifier(RowItem row, string chapter) => chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
+
+    public static string QuickInfoText(ColumnItem? col, string additionalText) {
+        if (col?.Table is not { IsDisposed: false }) { return string.Empty; }
+
+        var T = string.Empty;
+        if (!string.IsNullOrEmpty(col.ColumnQuickInfo)) { T += col.ColumnQuickInfo; }
+
+        if (col.Table.IsAdministrator()) {
+            if (!string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
+            if (col.ColumnTags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.ColumnTags.JoinWith("<br>"); }
+            T = T + "<br><br>" + ColumnEditor.ColumnUsage(col);
+        }
+
+        T = T.Trim();
+        T = T.Trim("<br>");
+        T = T.Trim();
+        if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(additionalText)) {
+            T = "<b><u>" + additionalText + "</b></u><br><br>" + T;
+        }
+        return T;
+    }
+
+    public static string UndoText(ColumnItem? column, RowItem? row) {
+        if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
+
+        if (tb.Undo.Count == 0) { return string.Empty; }
+
+        var cellKey = CellCollection.KeyOfCell(column, row);
+        var t = string.Empty;
+        for (var z = tb.Undo.Count - 1; z >= 0; z--) {
+            if (tb.Undo[z] != null && tb.Undo[z].CellKey == cellKey) {
+                t = t + tb.Undo[z].UndoTextTableMouseOver() + "<br>";
+            }
+        }
+        t = t.Trim("<br>");
+        t = t.Trim("<hr>");
+        t = t.Trim("<br>");
+        t = t.Trim("<hr>");
+        return t;
+    }
 
     public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
@@ -71,12 +118,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
         }
-
     }
-
-
-
-    public static string Identifier(RowItem row, string chapter) => chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
 
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
@@ -98,6 +140,32 @@ public sealed class RowListItem : RowBackgroundListItem {
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
+
+    public override string QuickInfoForColumn(ColumnViewItem cvi) {
+        if (cvi.Column is not { } column) { return string.Empty; }
+        if (column.Table is not { } tb) { return string.Empty; }
+
+        if (column.RelationType == RelationType.CellValues) {
+            if (column.LinkedTable == null) { return "Verknüpfung zur Ziel-Tabelle fehlerhaft."; }
+
+            var t = string.Empty;
+            var (lcolumn, _, info, _) = Row.LinkedCellData(column, true, false);
+            if (lcolumn != null) { t = QuickInfoText(lcolumn, column.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
+
+            if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
+                if (string.IsNullOrEmpty(QuickInfo)) { t += "\r\n"; }
+                t = "Verlinkungs-Status: " + info;
+            }
+
+            return t;
+        }
+
+        if (tb.IsAdministrator()) {
+            return UndoText(column, Row);
+        }
+
+        return string.Empty;
+    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         if (IsDisposed || Row.IsDisposed || Arrangement is null) { return new(16, 16); }

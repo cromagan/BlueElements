@@ -48,8 +48,8 @@ public sealed class SortBarListItem : RowBackgroundListItem {
         }
     }
 
-    public override string QuickInfo => string.Empty;
     public RowSortDefinition? Sort { get; set; }
+
     protected override bool DoSpezialOrder => true;
 
     #endregion
@@ -74,6 +74,8 @@ public sealed class SortBarListItem : RowBackgroundListItem {
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
+
+    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(14, 14);
 

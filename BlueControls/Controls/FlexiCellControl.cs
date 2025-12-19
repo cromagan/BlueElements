@@ -488,7 +488,7 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
         var delay = 1;
 
         if (realColumn != null) {
-            QuickInfo = TableView.QuickInfoText(realColumn, string.Empty);
+            QuickInfo = RowListItem.QuickInfoText(realColumn, string.Empty);
 
             f.GetStyleFrom(realColumn);
             if (TableView.RendererOf(realColumn, Constants.Win11) is Renderer_TextOneLine r) {

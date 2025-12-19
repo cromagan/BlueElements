@@ -128,7 +128,7 @@ public partial class FormWithStatusBar : Form {
             //if (type == ErrorType.Error) { imagecode = ImageCode.Kritisch; }
 
             if (type is ErrorType.Info || !DropMessages || didAlreadyMessagebox) {
-                capStatusBar.Text = "<imagecode=" + QuickImage.Get(symbol, 16) + "> " + message;
+                capStatusBar.Text = QuickImage.Get(symbol, 16).HTMLCode + " " + message;
                 capStatusBar.Refresh();
                 return false;
             }
@@ -189,7 +189,7 @@ public partial class FormWithStatusBar : Form {
 
         if (DateTime.UtcNow.Subtract(_lastMessage).TotalSeconds >= MessageSeconds) {
             timMessageClearer.Enabled = false;
-            capStatusBar.Text = "<imagecode=" + QuickImage.Get(ImageCode.Häkchen, 16) + "> Nix besonderes zu berichten...";
+            capStatusBar.Text = QuickImage.Get(ImageCode.Häkchen, 16).HTMLCode + " Nix besonderes zu berichten...";
             capStatusBar.Refresh();
         }
     }

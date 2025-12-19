@@ -41,6 +41,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
     #region Fields
 
+    public readonly List<string> Am_A_Key_For = [];
     internal List<string>? UcaseNamesSortedByLength;
     private const string TmpNewDummy = "TMPNEWDUMMY";
     private readonly List<string> _afterEditAutoReplace = [];
@@ -191,7 +192,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _editAllowedDespiteLock = false;
         _linkedTableTableName = string.Empty;
         UcaseNamesSortedByLength = null;
-        Am_A_Key_For_Other_Column = string.Empty;
+        Am_A_Key_For.Clear();
 
         #endregion
 
@@ -337,8 +338,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             OnPropertyChanged();
         }
     }
-
-    public string Am_A_Key_For_Other_Column { get; private set; }
 
     public string AutoFilterJoker {
         get => _autoFilterJoker;
@@ -2469,25 +2468,21 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void CheckIfIAmAKeyColumn() {
-        Am_A_Key_For_Other_Column = string.Empty;
+        Am_A_Key_For.Clear();
 
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         foreach (var c in tb.Column) {
-            //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
-            //if (thisColumn.LinkedCell_RowKeyIsInColumn == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-            //if (ThisColumn.LinkedCell_ColumnValueFoundIn == _name) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
             if (c.RelationType == RelationType.CellValues) {
                 foreach (var thisitem in c.LinkedCellFilter) {
                     var tmp = thisitem.SplitBy("|");
 
                     if (tmp[2].ToLowerInvariant().Contains("~" + _keyName.ToLowerInvariant() + "~")) {
-                        Am_A_Key_For_Other_Column = "Spalte " + c.ReadableText() + " verweist auf diese Spalte";
+                        Am_A_Key_For.Add(c.KeyName);
                     }
                 }
             }
         }
-        //if (_format == DataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
     }
 
     private void Dispose(bool disposing) {

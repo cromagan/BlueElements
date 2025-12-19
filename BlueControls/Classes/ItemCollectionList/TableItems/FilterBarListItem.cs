@@ -56,9 +56,10 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
         }
     }
 
-    public override string QuickInfo => string.Empty;
     public int RowsFilteredCount { get; set; }
+
     public bool ShowNumber { get; set; }
+
     protected override bool DoSpezialOrder => true;
 
     #endregion
@@ -149,6 +150,8 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dick, left, right, bottom);
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => AutoFilterSize + 2;
+
+    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(AutoFilterSize, AutoFilterSize + 2);
 

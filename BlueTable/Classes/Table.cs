@@ -1034,25 +1034,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public static string UndoText(ColumnItem? column, RowItem? row) {
-        if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
-
-        if (tb.Undo.Count == 0) { return string.Empty; }
-
-        var cellKey = CellCollection.KeyOfCell(column, row);
-        var t = string.Empty;
-        for (var z = tb.Undo.Count - 1; z >= 0; z--) {
-            if (tb.Undo[z] != null && tb.Undo[z].CellKey == cellKey) {
-                t = t + tb.Undo[z].UndoTextTableMouseOver() + "<br>";
-            }
-        }
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        return t;
-    }
-
     public static string UniqueKeyValue() {
         lock (AllFilesLocker) {
             var x = 9999;
@@ -2622,8 +2603,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
                 if (fo.Failed) { return fo; }
             } else {
-               if( column.RelationType == RelationType.CellValues) {
-                     return new("Verknüpfte Tabelle kann keine Initialzeile erstellt werden.", false, true); 
+                if (column.RelationType == RelationType.CellValues) {
+                    return new("Verknüpfte Tabelle kann keine Initialzeile erstellt werden.", false, true);
                 }
             }
 

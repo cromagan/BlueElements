@@ -51,7 +51,7 @@ public partial class MessageBox : Form {
         InitializeComponent();
         Text = Develop.AppName();
         capText.Text = pic is { } im
-            ? "<imagecode=" + QuickImage.Get(im, 32) + "> <zbx_store><top>" + LanguageTool.DoTranslate(txt, false)
+            ? QuickImage.Get(im, 32).HTMLCode + " <zbx_store><top>" + LanguageTool.DoTranslate(txt, false)
             : LanguageTool.DoTranslate(txt, false);
         Size = new Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
         if (buttons.Length == 0) { buttons = ["OK"]; }
@@ -72,7 +72,7 @@ public partial class MessageBox : Form {
 
     #region Properties
 
-    public sealed override string Text {
+    public override sealed string Text {
         get => base.Text;
         set => base.Text = value;
     }
@@ -109,8 +109,8 @@ public partial class MessageBox : Form {
             if (!string.IsNullOrEmpty(names[z])) {
                 erT.TextDimensions = Size.Empty;
                 erT.PlainText = names[z];
-                Button b = new() {
-                    Name = z.ToString(),
+                var b = new Button() {
+                    Name = z.ToStringInt1(),
                     Text = names[z]
                 };
                 var w = 2;

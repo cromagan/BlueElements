@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueTable;
@@ -37,7 +38,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
     #region Fields
 
     public static readonly Brush GrayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
-
     public static readonly Brush GrayBrush2 = new SolidBrush(Color.FromArgb(150, 255, 255, 255));
 
     #endregion
@@ -86,6 +86,8 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
+    public override sealed string QuickInfo => string.Empty;
+
     public string SheetStyle {
         get;
         set {
@@ -115,10 +117,9 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         GC.SuppressFinalize(this);
     }
 
-    //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
-
     public virtual void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) => DrawLine(gr, lin, xPos, xPos, top, bottom);
 
+    //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Align, _zoom);
     public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnCell), positionControl);
     }
@@ -165,6 +166,8 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
             }
         } catch { }
     }
+
+    public abstract string QuickInfoForColumn(ColumnViewItem cvi);
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {
