@@ -211,7 +211,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         return false;
     }
 
-    public string ReplaceInText(string txt) => !txt.ToLowerInvariant().Contains("~" + KeyName.ToLowerInvariant() + "~")
+    public string ReplaceInText(string txt) => !txt.ContainsIgnoreCase("~" + KeyName + "~")
             ? txt
             : txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
 

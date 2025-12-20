@@ -28,6 +28,7 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
@@ -112,43 +113,52 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     public static string ColumnUsage(ColumnItem? column) {
         if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
-        var t = "<b><u>Verwendung von " + column.ReadableText() + "</b></u><br>";
-        if (column.IsSystemColumn()) {
-            t += " - Systemspalte<br>";
+        var t = $"<b><u>Infos zu '{column.ReadableText()}'</b></u>\r";
+
+        if (column.LinkedTable is { } tb2) {
+            t += GenQIText("Tabelle", ImageCode.Tabelle, tb2.Caption);
+        } else {
+            t += GenQIText("Tabelle", ImageCode.Tabelle, tb.Caption);
         }
 
-        if (tb.SortDefinition?.UsedColumns.Contains(column) ?? false) { t += " - Sortierung<br>"; }
-        //var view = false;
-        //foreach (var thisView in OldFormulaViews) {
-        //    if (thisView[column] != null) { view = true; }
-        //}
-        //if (view) { t += " - Formular-Ansichten<br>"; }
-        var cola = false;
-        var first = true;
+        if (!column.IsSystemColumn()) {
+            t += GenQIText("Typ", column.SymbolForReadableText(), "Normale Spalte");
+        } else {
+            t += GenQIText("Typ", column.SymbolForReadableText(), "System Spalte");
+        }
 
+        var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column, tb.Row.First(), "dummy"));
+        t += GenQIText("Admin bearbeitbar", ImageCode.Stift, editable);
+
+        t += GenQIText("Für Sortierung", ImageCode.AZ, tb.SortDefinition?.UsedColumns.Contains(column) ?? false);
+
+        var cola = new List<string>();
         var tcvc = ColumnViewCollection.ParseAll(tb);
         foreach (var thisView in tcvc) {
-            if (!first && thisView[column] != null) { cola = true; }
-            first = false;
+            if (thisView[column] is { }) { cola.Add(thisView.KeyName); }
         }
-        if (cola) { t += " - Spalten-Anordnungen<br>"; }
-        if (column.UsedInScript()) { t += " - Skripte<br>"; }
-        if (tb.RowQuickInfo.ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Zeilen-Quick-Info<br>"; }
-        //if (column.Tags.JoinWithCr().ToUpperInvariant().Contains(column.KeyName.ToUpperInvariant())) { t += " - Tabellen-Tags<br>"; }
-
-        if (column.Am_A_Key_For.Count > 0) { t += QuickImage.Get(ImageCode.Schlüssel, 16).HTMLCode + " " + column.Am_A_Key_For.JoinWith("; "); }
-
-        if (!string.IsNullOrEmpty(column.ColumnSystemInfo)) {
-            t += "<br><br><b>Gesammelte Infos:</b><br>";
-            t += column.ColumnSystemInfo;
-        }
+        t += GenQIText("In Spalten-Anord.", ImageCode.Spalte, cola);
+        t += GenQIText("In Skripten", ImageCode.Skript, column.UsedInScript());
+        t += GenQIText("In Zeilen-Quick-Info", ImageCode.Zeile, tb.RowQuickInfo.ContainsIgnoreCase(column.KeyName));
+        t += GenQIText("Schlüssel für", ImageCode.Schlüssel, column.Am_A_Key_For);
 
         if (column.SaveContent) {
             var l = column.Contents();
-            if (l.Count > 0) {
-                t += "<br><br><b>Zusatz-Info:</b><br>";
-                t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
-            }
+            t += GenQIText("Verschiedene Werte", ImageCode.Textfeld, l.Count.ToStringInt1());
+        } else {
+            t += GenQIText("Verschiedene Werte", ImageCode.Textfeld, "[wird nicht gespeichert]");
+        }
+
+        if (!string.IsNullOrEmpty(column.ColumnSystemInfo)) {
+            t += "\r\r<b><u>Ermittelt:</b></u>\r";
+            t += GenQIText("Seit UTC", ImageCode.Uhr, "Seit UTC", column.ColumnSystemInfo);
+            t += GenQIText("Bearbeitet in Tab.", ImageCode.Stift, "Edit in Table", column.ColumnSystemInfo);
+            t += GenQIText("Gefiltert in Tab.", ImageCode.Trichter, "Filter Clicked", column.ColumnSystemInfo);
+            t += GenQIText("Gibt Werte an", ImageCode.Tabelle, "Links to me", column.ColumnSystemInfo);
+            t += GenQIText("Skript-'Filter'", ImageCode.Skript, "Filter in Script", column.ColumnSystemInfo);
+            t += GenQIText("Skript-'Get'", ImageCode.Skript, "Value used in Script", column.ColumnSystemInfo);
+            t += GenQIText("Skript-'Set'", ImageCode.Skript, "Edit with Script", column.ColumnSystemInfo);
+            //t += column.ColumnSystemInfo;
         }
 
         return t;
@@ -160,6 +170,40 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             e.Cancel = true;
         }
         Column = null;
+    }
+
+    private static string GenQIText(string name, QuickImage? quickImage, string text) => $"<b>{quickImage?.HTMLCode} {name}:</b><tab>{text}\r";
+
+    private static string GenQIText(string name, ImageCode img, string text) => GenQIText(name, QuickImage.Get(img, 16), text);
+
+    private static string GenQIText(string name, ImageCode img, bool state) {
+        if (state) {
+            return $"<b>{QuickImage.Get(img, 16).HTMLCode} {name}:</b><tab>{QuickImage.Get(ImageCode.Häkchen, 16).HTMLCode}\r";
+        } else {
+            return $"<b>{QuickImage.Get(img, 16).HTMLCode} {name}:</b><tab>{QuickImage.Get(ImageCode.Kreuz, 16).HTMLCode}\r";
+        }
+    }
+
+    private static string GenQIText(string name, ImageCode img, string suchwert, string columnSystemInfo) {
+        var t = columnSystemInfo.SplitAndCutByCrAndBr().SortedDistinctList();
+
+        var l = t.TagGetAll(suchwert);
+
+        return GenQIText(name, img, l);
+    }
+
+    private static string GenQIText(string name, ImageCode img, List<string> werte) {
+        var t2 = string.Empty;
+
+        if (werte.Count == 0) {
+            t2 = "-";
+        } else if (werte.Count is > 0 and < 4) {
+            t2 = werte.JoinWith("; ");
+        } else {
+            t2 = werte.Take(4).JoinWith("; ") + "; ...";
+        }
+
+        return $"<b>{QuickImage.Get(img, 16).HTMLCode} {name} </b><i>({werte.Count})</i><b>:</b><tab>{t2}\r";
     }
 
     private void _renderer_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _renderer.DoForm(RendererEditor);
@@ -425,17 +469,17 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         chkIsFirst.Checked = Column.IsFirst;
         chkIsKeyColumn.Checked = Column.IsKeyColumn;
         chkRelation.Checked = Column.Relationship_to_First;
-        cbxRelationType.Text = ((int)Column.RelationType).ToString();
-        cbxChunk.Text = ((int)Column.Value_for_Chunk).ToString();
-        cbxRandLinks.Text = ((int)Column.LineStyleLeft).ToString();
-        cbxRandRechts.Text = ((int)Column.LineStyleRight).ToString();
-        cbxAlign.Text = ((int)Column.Align).ToString();
-        cbxAdditionalCheck.Text = ((int)Column.AdditionalFormatCheck).ToString();
-        cbxScriptType.Text = ((int)Column.ScriptType).ToString();
-        cbxTranslate.Text = ((int)Column.DoOpticalTranslation).ToString();
+        cbxRelationType.Text = ((int)Column.RelationType).ToStringInt1();
+        cbxChunk.Text = ((int)Column.Value_for_Chunk).ToStringInt1();
+        cbxRandLinks.Text = ((int)Column.LineStyleLeft).ToStringInt1();
+        cbxRandRechts.Text = ((int)Column.LineStyleRight).ToStringInt1();
+        cbxAlign.Text = ((int)Column.Align).ToStringInt1();
+        cbxAdditionalCheck.Text = ((int)Column.AdditionalFormatCheck).ToStringInt1();
+        cbxScriptType.Text = ((int)Column.ScriptType).ToStringInt1();
+        cbxTranslate.Text = ((int)Column.DoOpticalTranslation).ToStringInt1();
         cbxRenderer.Text = Column.DefaultRenderer;
         cbxRenderer_TextChanged(cbxRenderer, System.EventArgs.Empty);
-        cbxSort.Text = ((int)Column.SortType).ToString();
+        cbxSort.Text = ((int)Column.SortType).ToStringInt1();
         btnAutoFilterMoeglich.Checked = Column.FilterOptions.HasFlag(FilterOptions.Enabled);
         btnAutoFilterTXTErlaubt.Checked = Column.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
         btnAutoFilterErweitertErlaubt.Checked = Column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled);
@@ -446,8 +490,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         btnEditableDropdown.Checked = Column.EditableWithDropdown;
         btnCanBeEmpty.Checked = Column.DropdownDeselectAllAllowed;
         btnAutoEditAutoSort.Checked = Column.AfterEditQuickSortRemoveDouble;
-        txbRunden.Text = Column.AfterEditRound is > -1 and < 7 ? Column.AfterEditRound.ToString() : string.Empty;
-        txbFixedColumnWidth.Text = Column.FixedColumnWidth > 0 ? Column.FixedColumnWidth.ToString() : string.Empty;
+        txbRunden.Text = Column.AfterEditRound is > -1 and < 7 ? Column.AfterEditRound.ToStringInt1() : string.Empty;
+        txbFixedColumnWidth.Text = Column.FixedColumnWidth > 0 ? Column.FixedColumnWidth.ToStringInt1() : string.Empty;
         btnAutoEditToUpper.Checked = Column.AfterEditDoUCase;
         btnAutoEditKleineFehler.Checked = Column.AfterEditAutoCorrect;
         txbJoker.Text = Column.AutoFilterJoker;
@@ -465,8 +509,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         lbxCellEditor.UncheckAll();
         lbxCellEditor.Check(Column.PermissionGroupsChangeCell);
         txbAllowedChars.Text = Column.AllowedChars;
-        txbMaxTextLength.Text = Column.MaxTextLength.ToString();
-        txbMaxCellLength.Text = Column.MaxCellLength.ToString();
+        txbMaxTextLength.Text = Column.MaxTextLength.ToStringInt1();
+        txbMaxCellLength.Text = Column.MaxCellLength.ToStringInt1();
         btnOtherValuesToo.Checked = Column.ShowValuesOfOtherCellsInDropdown;
         btnIgnoreLock.Checked = Column.EditAllowedDespiteLock;
         txbAdminInfo.Text = Column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);

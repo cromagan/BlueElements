@@ -26,11 +26,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;
 
-/// <summary>
-/// Enthält Daten, wie eine Zeile angezeigt werden soll.
-/// RowData kann mehrfach in einer Tabelle angezeigt werden.
-/// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
-/// </summary>
+// TODO: UNUSED!!!!!
 public sealed class RowInfoListItem : RowBackgroundListItem {
 
     #region Fields
@@ -82,7 +78,7 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
         var txz = c.LinkedTableTableName.FileNameWithoutSuffix();
         //if (string.IsNullOrEmpty(txz)) { txz = "[DIESE]"; }
 
-        var r = new RectangleF(positionControl.Left , positionControl.Top + p1pic,
+        var r = new RectangleF(positionControl.Left, positionControl.Top + p1pic,
            positionControl.Width, positionControl.Height - p1pic);
 
         Skin.Draw_FormatedText(gr, txz, null, Alignment.VerticalCenter_Left, r.ToRect(), null, false, Font_Default.Scale(scale * 0.8f), false);
@@ -124,7 +120,7 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
 
         var t = $"Ziel-Tabelle: {c.LinkedTableTableName.FileNameWithoutSuffix()}\r";
         t = t + $"Fehler: {c.ErrorReason()}\r";
-t = t + $"Bearbeitung: {CellCollection.IsCellEditable(c, tb.Row.First(), "dummy")}";
+        t = t + $"Bearbeitung: {CellCollection.IsCellEditable(c, tb.Row.First(), "dummy")}";
 
         return t;
     }

@@ -544,7 +544,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
-    public virtual bool FilterMatch(string filterText) => KeyName.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
+    public virtual bool FilterMatch(string filterText) => KeyName.ContainsIgnoreCase(filterText);
 
     public abstract int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign);
 

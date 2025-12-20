@@ -129,6 +129,8 @@ public static partial class Extensions {
 
     public static bool ContainsChars(this string tXt, string chars) => chars.Where((_, z) => tXt.Contains(chars.Substring(z, 1))).Any();
 
+    public static bool ContainsIgnoreCase(this string source, string toCheck) => source?.IndexOf(toCheck, StringComparison.OrdinalIgnoreCase) >= 0;
+
     public static bool ContainsOnlyChars(this string tXt, string chars) => !tXt.Where((_, z) => !chars.Contains(tXt.Substring(z, 1))).Any();
 
     public static bool ContainsWord(this string input, string value, RegexOptions options) => input.IndexOfWord(value, 0, options) >= 0;

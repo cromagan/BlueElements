@@ -52,7 +52,7 @@ internal class ExtCharTabCode : ExtChar {
 
     public override string PlainText() => "\t";
 
-    protected override SizeF CalculateSizeCanvas() => SizeF.Empty;
+    protected override SizeF CalculateSizeCanvas() => new SizeF(150 - PosCanvas.X % 150, 0);
 
     #endregion
 }

@@ -2400,13 +2400,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         string oTxt;
         do {
             oTxt = txt;
-            if (oTxt.ToLowerInvariant().Contains(".at")) { break; }
-            if (oTxt.ToLowerInvariant().Contains(".de")) { break; }
-            if (oTxt.ToLowerInvariant().Contains(".com")) { break; }
-            if (oTxt.ToLowerInvariant().Contains("http")) { break; }
-            if (oTxt.ToLowerInvariant().Contains("ftp")) { break; }
-            if (oTxt.ToLowerInvariant().Contains(".xml")) { break; }
-            if (oTxt.ToLowerInvariant().Contains(".doc")) { break; }
+            if (oTxt.ContainsIgnoreCase(".at")) { break; }
+            if (oTxt.ContainsIgnoreCase(".de")) { break; }
+            if (oTxt.ContainsIgnoreCase(".com")) { break; }
+            if (oTxt.ContainsIgnoreCase("http")) { break; }
+            if (oTxt.ContainsIgnoreCase("ftp")) { break; }
+            if (oTxt.ContainsIgnoreCase(".xml")) { break; }
+            if (oTxt.ContainsIgnoreCase(".doc")) { break; }
             if (oTxt.IsDateTime()) { break; }
             txt = txt.Replace("\r\n", "\r");
             // 1/2 l Milch
@@ -2477,7 +2477,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 foreach (var thisitem in c.LinkedCellFilter) {
                     var tmp = thisitem.SplitBy("|");
 
-                    if (tmp[2].ToLowerInvariant().Contains("~" + _keyName.ToLowerInvariant() + "~")) {
+                    if (tmp[2].ContainsIgnoreCase("~" + _keyName.ToLowerInvariant() + "~")) {
                         Am_A_Key_For.Add(c.KeyName);
                     }
                 }

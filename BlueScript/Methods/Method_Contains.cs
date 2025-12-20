@@ -24,7 +24,6 @@ using System.Linq;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_Contains : Method {
 
     #region Properties
@@ -72,7 +71,7 @@ internal class Method_Contains : Method {
                         return DoItFeedback.Wahr();
                     }
                 } else {
-                    if (vs2.ValueString.ToLowerInvariant().Contains(thisW.ToLowerInvariant())) {
+                    if (vs2.ValueString.ContainsIgnoreCase(thisW)) {
                         return DoItFeedback.Wahr();
                     }
                 }

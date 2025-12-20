@@ -70,7 +70,7 @@ public class TextListItem : AbstractListItem {
 
     #region Methods
 
-    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpperInvariant().Contains(filterText.ToUpperInvariant());
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ContainsIgnoreCase(filterText);
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 

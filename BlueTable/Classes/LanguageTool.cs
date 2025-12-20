@@ -52,7 +52,7 @@ public static class LanguageTool {
             if (_german == txt) { return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
             _german = txt;
             //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
-            //if (txt.ToLowerInvariant().Contains("imagecode")) { English = German; return string.Format(English, args); }
+            //if (txt.ContainsIgnoreCase("imagecode")) { English = German; return string.Format(English, args); }
             var addend = string.Empty;
             if (txt.EndsWith(":")) {
                 txt = txt.TrimEnd(":");

@@ -720,13 +720,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 ist1 = l.PlainText;
             }
             // Allgemeine Prüfung
-            if (!string.IsNullOrEmpty(ist1) && ist1.ToLowerInvariant().Contains(searchTxt.ToLowerInvariant())) {
+            if (!string.IsNullOrEmpty(ist1) && ist1.ContainsIgnoreCase(searchTxt)) {
                 foundColumn = column;
                 foundRow = row;
                 return;
             }
             // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
-            if (!string.IsNullOrEmpty(ist2) && ist2.ToLowerInvariant().Contains(searchTxt.ToLowerInvariant())) {
+            if (!string.IsNullOrEmpty(ist2) && ist2.ContainsIgnoreCase(searchTxt)) {
                 foundColumn = column;
                 foundRow = row;
                 return;
@@ -734,7 +734,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (vereinfachteSuche) {
                 var ist3 = ist2.StarkeVereinfachung(" ,", true);
                 var searchTxt3 = searchTxt.StarkeVereinfachung(" ,", true);
-                if (!string.IsNullOrEmpty(ist3) && ist3.ToLowerInvariant().Contains(searchTxt3.ToLowerInvariant())) {
+                if (!string.IsNullOrEmpty(ist3) && ist3.ContainsIgnoreCase(searchTxt3)) {
                     foundColumn = column;
                     foundRow = row;
                     return;
@@ -2402,14 +2402,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnHead.IgnoreYOffset = true;
         sortedItems.Add(columnHead);
 
-        // Die Infos
-        allItems.TryGetValue(RowInfoListItem.Identifier, out var itemAdmin);
-        if (itemAdmin is not RowInfoListItem itemHeadx) {
-            itemHeadx = new RowInfoListItem(arrangement);
-            allItems.Add(itemHeadx.KeyName, itemHeadx);
-        }
-        itemHeadx.Visible = arrangement.ShowHead;
-        sortedItems.Add(itemHeadx);
+        //// Die Infos
+        //allItems.TryGetValue(RowInfoListItem.Identifier, out var itemAdmin);
+        //if (itemAdmin is not RowInfoListItem itemHeadx) {
+        //    itemHeadx = new RowInfoListItem(arrangement);
+        //    allItems.Add(itemHeadx.KeyName, itemHeadx);
+        //}
+        //itemHeadx.Visible = arrangement.ShowHead;
+        //sortedItems.Add(itemHeadx);
 
         // Die Sortierung
         allItems.TryGetValue(SortBarListItem.Identifier, out var item1);

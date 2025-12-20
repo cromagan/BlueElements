@@ -652,7 +652,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (!erg.Contains("~")) { return erg; }
 
                 if (vari != null) {
-                    if (erg.ToUpperInvariant().Contains("~" + vari.KeyName.ToUpperInvariant())) {
+                    if (erg.ContainsIgnoreCase("~" + vari.KeyName)) {
                         var replacewith = vari.SearchValue;
 
                         //if (vari is VariableString vs) { replacewith =  vs.v}
@@ -673,7 +673,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (!erg.Contains("~")) { return erg; }
 
             if (column is { } && column.RelationType != RelationType.CellValues) {
-                if (erg.ToUpperInvariant().Contains("~" + column.KeyName.ToUpperInvariant())) {
+                if (erg.ContainsIgnoreCase("~" + column.KeyName)) {
                     var replacewith = CellGetString(column);
                     //if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
 
@@ -1063,7 +1063,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 didNew = true;
                 DoReplace(newValue, keyOfCHangedRow);
             }
-            if (completeRelationText.ToUpperInvariant().Contains(names[z])) {
+            if (completeRelationText.ContainsIgnoreCase(names[z])) {
                 var r = tb.Row[names[z]];
                 if (r is { IsDisposed: false }) { DoReplace(names[z], r.KeyName); }
             }
@@ -1208,13 +1208,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisRowItem in tb.Row) {
             var t = thisRowItem.CellGetString(columnToRepair);
             if (!string.IsNullOrEmpty(t)) {
-                if (!string.IsNullOrEmpty(oldValue) && t.ToUpperInvariant().Contains(oldValue.ToUpperInvariant())) {
+                if (!string.IsNullOrEmpty(oldValue) && t.ContainsIgnoreCase(oldValue)) {
                     t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
                     t = ChangeTextFromRowId(t);
                     var t2 = t.SplitAndCutByCr().SortedDistinctList();
                     thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
                 }
-                if (t.ToUpperInvariant().Contains(newValue.ToUpperInvariant())) {
+                if (t.ContainsIgnoreCase(newValue)) {
                     MakeNewRelations(columnToRepair, thisRowItem, [], [.. t.SplitAndCutByCr()]);
                 }
             }
@@ -1259,7 +1259,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 if (!thisColumnItem.IgnoreAtRowFilter) {
                     var txt = CellGetString(thisColumnItem);
                     txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, thisColumnItem.DoOpticalTranslation, null);
-                    if (!string.IsNullOrEmpty(txt) && txt.ToUpperInvariant().Contains(searchText)) { return true; }
+                    if (!string.IsNullOrEmpty(txt) && txt.ContainsIgnoreCase(searchText)) { return true; }
                 }
             }
         }

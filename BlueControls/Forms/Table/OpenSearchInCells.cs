@@ -126,7 +126,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
                 if (btnAehnliches.Checked) {
                     var ist3 = ist1.StarkeVereinfachung(" ,", true);
                     var searchTxt3 = searchT.StarkeVereinfachung(" ,", true);
-                    if (!string.IsNullOrEmpty(ist3) && ist3.ToLowerInvariant().Contains(searchTxt3.ToLowerInvariant())) {
+                    if (!string.IsNullOrEmpty(ist3) && ist3.ContainsIgnoreCase(searchTxt3)) {
                         break;
                     }
                 }
