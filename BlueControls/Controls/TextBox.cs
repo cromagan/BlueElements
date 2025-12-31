@@ -646,8 +646,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             } else {
                 if (e.Button == MouseButtons.Right) {
                     var tags = new List<string>();
-                    tags.TagSet("MarkStart", _markStart.ToString1());
-                    tags.TagSet("MarkEnd", _markEnd.ToString1());
+
+                    if (_markEnd < 0) {
+                        var cp = Cursor_PosAt(e.X, e.Y);
+                        tags.TagSet("MarkStart", _eTxt.WordStart(cp).ToString1());
+                        tags.TagSet("MarkEnd", _eTxt.WordEnd(cp).ToString1());
+                    } else {
+                        tags.TagSet("MarkStart", _markStart.ToString1());
+                        tags.TagSet("MarkEnd", _markEnd.ToString1());
+                    }
+
                     FloatingInputBoxListBoxStyle.ContextMenuShow(this, tags, e);
                 } else if (e.Button == MouseButtons.Left) {
                     _markEnd = Cursor_PosAt(e.X, e.Y);
