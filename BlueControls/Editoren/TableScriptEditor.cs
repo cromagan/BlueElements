@@ -298,7 +298,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             l.Add("############################################################################");
             l.Add("############################################################################");
             l.Add("############################################################################");
-            l.Add(thisUndo.DateTimeUtc.ToString("dd.MM.yyyy HH:mm:ss.fff") + " " + thisUndo.User);
+            l.Add(thisUndo.DateTimeUtc.ToString7() + " " + thisUndo.User);
 
             l.Add("Art: " + thisUndo.Command);
             // Überprüfen, ob das Skript geändert wurde

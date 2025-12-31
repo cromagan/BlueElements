@@ -78,7 +78,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         }
     }
 
-    public string CompareKey => CheckOrder.ToStringInt3() + "|" + KeyName.ToUpperInvariant();
+    public string CompareKey => CheckOrder.ToString3() + "|" + KeyName.ToUpperInvariant();
     public abstract bool GetFromStringPossible { get; }
     public abstract bool IsNullOrEmpty { get; }
     public bool KeyIsCaseSensitive => false;

@@ -143,7 +143,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
         foreach (int z1 in Enum.GetValues(t)) {
             if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
-                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
+                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString1(), null, false, true, string.Empty));
             }
         }
         return l;
@@ -187,14 +187,9 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
         if (Column is not { IsDisposed: false }) { return result; }
 
-        var u = new List<AbstractListItem>();
-        u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
+        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));
         result.Add(new FlexiControlForProperty<bool>(() => AutoX));
-
-        var b = new List<AbstractListItem>();
-        b.AddRange(GetAllowedEditTypes(Column));
-        result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
+        result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, GetAllowedEditTypes(Column)));
 
         return result;
     }

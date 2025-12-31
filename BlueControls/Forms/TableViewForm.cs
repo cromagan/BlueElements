@@ -194,7 +194,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         var nTabPage = new TabPage {
-            Name = tbcTableSelector.TabCount.ToString(),
+            Name = tbcTableSelector.TabCount.ToString1(),
             Text = tablename.ToTitleCase(),
             Tag = (List<object>)[tablename, settings]
         };

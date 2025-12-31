@@ -110,7 +110,7 @@ public partial class MessageBox : Form {
                 erT.TextDimensions = Size.Empty;
                 erT.PlainText = names[z];
                 var b = new Button() {
-                    Name = z.ToStringInt1(),
+                    Name = z.ToString1(),
                     Text = names[z]
                 };
                 var w = 2;

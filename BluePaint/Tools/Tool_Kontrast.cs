@@ -126,7 +126,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         //sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
-        capGamma.Text = sldGamma.Value.ToStringFloat2();
+        capGamma.Text = sldGamma.Value.ToString1_2();
         OnDoInvalidate();
     }
 
@@ -134,7 +134,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         //sldHelligkeit.Value = 0f;
-        capHelligkeit.Text = sldHelligkeit.Value.ToStringFloat2();
+        capHelligkeit.Text = sldHelligkeit.Value.ToString1_2();
         OnDoInvalidate();
     }
 
@@ -142,7 +142,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldGamma.Value = 1f;
         //sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
-        capKontrast.Text = sldKontrast.Value.ToStringFloat2();
+        capKontrast.Text = sldKontrast.Value.ToString1_2();
         OnDoInvalidate();
     }
 

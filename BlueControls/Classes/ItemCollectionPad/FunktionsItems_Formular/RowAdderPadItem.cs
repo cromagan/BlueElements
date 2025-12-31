@@ -249,9 +249,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         }
 
         if (TableOutput is { IsDisposed: false } tb) {
-            var lst = new List<AbstractListItem>();
-            lst.AddRange(ItemsOf(tb.Column, true));
-
+            var lst = ItemsOf(tb.Column, true);
             result.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
             result.Add(new FlexiControlForProperty<string>(() => AdditionalInfoColumnName, lst));
         }

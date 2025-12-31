@@ -142,10 +142,10 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<AbstractListItem> comms =
         [
-            ItemOf("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(),
+            ItemOf("Abschneiden", ((int)SizeModes.BildAbschneiden).ToString1(),
                 QuickImage.Get("BildmodusAbschneiden|32")),
-            ItemOf("Verzerren", ((int)SizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32")),
-            ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32"))
+            ItemOf("Verzerren", ((int)SizeModes.Verzerren).ToString1(), QuickImage.Get("BildmodusVerzerren|32")),
+            ItemOf("Einpassen", ((int)SizeModes.EmptySpace).ToString1(), QuickImage.Get("BildmodusEinpassen|32"))
         ];
 
         List<GenericControl> result =

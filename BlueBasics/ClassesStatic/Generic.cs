@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -29,6 +30,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 using Point = System.Drawing.Point;
 
@@ -38,9 +40,7 @@ public static class Generic {
 
     #region Fields
 
-    public static string UserGroup = Constants.Everybody;
     private static int _getUniqueKeyCount;
-
     private static string _getUniqueKeyLastTime = "InitialDummy";
 
     #endregion
@@ -49,6 +49,7 @@ public static class Generic {
 
     public static bool Ending { get; set; }
     public static string MyId { get; } = Guid.NewGuid().ToString();
+    public static string UserGroup { get; set; } = Constants.Everybody;
 
     public static string UserName {
         get {
@@ -218,7 +219,7 @@ public static class Generic {
         if (inputString is { }) {
             var sb = new StringBuilder();
             foreach (var b in GetHash(inputString)) {
-                sb.Append(b.ToString("X2"));
+                sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
             }
 
             return sb.ToString();
@@ -283,7 +284,7 @@ public static class Generic {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
         var s = type + "\r\n" + UserName + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
         var key = x + (s.GetHashCode() * 100000000) + tmp;
-        return key < 0 ? (key * -1).ToString() : key.ToString();
+        return key < 0 ? (key * -1).ToString1() : key.ToString1();
     }
 
     public static string GetUniqueKey() {
@@ -295,7 +296,7 @@ public static class Generic {
             _getUniqueKeyCount = 0;
             _getUniqueKeyLastTime = neueZeit;
         }
-        return "ID_" + neueZeit + "_" + _getUniqueKeyCount.ToStringInt3();
+        return "ID_" + neueZeit + "_" + _getUniqueKeyCount.ToString3();
     }
 
     public static bool IsAdministrator() => string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);

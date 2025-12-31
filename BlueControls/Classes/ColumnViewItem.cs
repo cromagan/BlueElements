@@ -121,6 +121,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
+    public ColumnBackgroundStyle BackgroundStyle => Column?.BackgroundStyle ?? ColumnBackgroundStyle.None;
+
     public int CanvasContentWidth {
         get {
             if (_canvasContentWidth is { } v) { return v; }
@@ -131,7 +133,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public string Caption => Column?.Caption ?? "[Spalte]";
-
     public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
 
     public string CaptionGroup2 => Column?.CaptionGroup2 ?? string.Empty;

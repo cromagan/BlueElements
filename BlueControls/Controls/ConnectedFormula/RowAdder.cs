@@ -293,7 +293,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                 if (rli.Item is AdderItem ai) {
                     ai.KeysAndInfo.Add(keyAndInfo[z]);
                 }
-                rli.UserDefCompareKey = z.ToStringInt10();
+                rli.UserDefCompareKey = z.ToString10();
 
                 rli.Enabled = !HasChildNode(selected, key);
 
@@ -313,7 +313,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     if (rliDD.Item is AdderItem aiDD) {
                         aiDD.KeysAndInfo.Add(keyAndInfo[z]);
                     }
-                    dli.UserDefCompareKey = z.ToStringInt10();
+                    dli.UserDefCompareKey = z.ToString10();
                     dli.Enabled = !HasChildNode(selected, key);
 
                     #endregion
@@ -347,7 +347,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     it.Indent = Math.Max(keyAndInfo[z].CountChar('\\'), 0);
                     f.ItemAdd(it);
                     olditems.Remove(key);
-                    it.UserDefCompareKey = z.ToStringInt10();
+                    it.UserDefCompareKey = z.ToString10();
                     it.Enabled = !HasChildNode(selected, key);
 
                     #endregion
@@ -360,7 +360,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
                     ndli.Indent = Math.Max(keyAndInfo[z].CountChar('\\'), 0);
                     f.ItemAdd(ndli);
                     olditems.Remove(dd_Name);
-                    ndli.UserDefCompareKey = z.ToStringInt10();
+                    ndli.UserDefCompareKey = z.ToString10();
                     ndli.Enabled = !HasChildNode(selected, key);
 
                     #endregion

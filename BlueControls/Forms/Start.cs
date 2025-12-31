@@ -52,19 +52,19 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
 
             if (Forms[kat] is { } cap) {
                 var tmp = Math.Min(IntParse(cap.UserDefCompareKey) / 10, sort);
-                cap.UserDefCompareKey = tmp.ToStringInt10() + "0";
+                cap.UserDefCompareKey = tmp.ToString10() + "0";
             } else {
-                var pk = new TextListItem(kat, kat, null, true, true, sort.ToStringInt10() + "0");
+                var pk = new TextListItem(kat, kat, null, true, true, sort.ToString10() + "0");
                 Forms.ItemAdd(pk);
             }
 
             var bli = new BitmapListItem(i, string.Empty, name) {
                 Padding = 5,
                 Tag = thisType,
-                UserDefCompareKey = sort.ToStringInt10() + "1" + name
+                UserDefCompareKey = sort.ToString10() + "1" + name
             };
 
-            //var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToStringInt10() + "1" + name) {
+            //var p = new TextListItem(name, string.Empty, QuickImage.Get(i, 24), false, true, sort.ToString10() + "1" + name) {
             //    Tag = thisType
             //};
             Forms.ItemAdd(bli);

@@ -21,6 +21,7 @@ using BlueControls.Designer_Support;
 using BlueTable;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
@@ -110,7 +111,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         _n--;
         if (_n < 0) { _n = 99999; }
 
-        lstDone.ItemAdd(ItemOf(message, Generic.GetUniqueKey(), symbol, false, _n.ToStringInt7()));
+        lstDone.ItemAdd(ItemOf(message, Generic.GetUniqueKey(), symbol, false, _n.ToString7()));
 
         lstDone.Refresh();
         //capInfo.Text = message;
@@ -120,7 +121,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
     /// Handler für Develop.Message - prüft ob die Referenz der überwachten Row entspricht
     /// </summary>
     private void OnDevelopMessage(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
-        message = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message;
+        message = "[" + DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture) + "] " + message;
 
         // Nur Meldungen verarbeiten, die sich auf die überwachte Row beziehen
         if (reference == LastRow && LastRow != null) {

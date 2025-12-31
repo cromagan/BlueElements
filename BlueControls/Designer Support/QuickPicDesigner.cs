@@ -67,8 +67,8 @@ public partial class QuickPicDesigner : Panel {
         chkbDurchgestrichen.Checked = l.Effekt.HasFlag(ImageCodeEffect.Durchgestrichen);
         chkbMEDisabled.Checked = l.Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled);
         chkbXPDisabled.Checked = l.Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled);
-        txbWidth.Text = l.Width.ToStringInt1();
-        txbHeight.Text = l.Height.ToStringInt1();
+        txbWidth.Text = l.Width.ToString1();
+        txbHeight.Text = l.Height.ToString1();
         txbZweitsymbol.Text = l.Zweitsymbol;
     }
 

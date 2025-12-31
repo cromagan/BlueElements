@@ -123,9 +123,7 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
             new FlexiControlForProperty<string>(() => Anzeige),
         ];
 
-        var u = new List<AbstractListItem>();
-        u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
+        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));
 
         return result;
     }

@@ -224,11 +224,11 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         List<AbstractListItem> za =
         [
-            ItemOf("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()),
-            ItemOf("...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString()),
+            ItemOf("...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString1()),
+            ItemOf("...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString1()),
             ItemOf("...genau eine oder mehr Zeilen gefunden wurden",
-                ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString()),
-            ItemOf("...egal - immer", ((int)ButtonArgs.Egal).ToString())
+                ((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString1()),
+            ItemOf("...egal - immer", ((int)ButtonArgs.Egal).ToString1())
         ];
 
         result.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));

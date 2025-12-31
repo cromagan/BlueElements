@@ -177,15 +177,9 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         //var inr = GetFilterFromGet();
         if (TableOutput is { IsDisposed: false } tb) {
             var ic = new List<AbstractListItem>();
-            ic.AddRange(ItemsOf(tb.Column, true));
-            result.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
-
-            var ic2 = new List<AbstractListItem>();
-            ic2.AddRange(ItemsOf(typeof(FilterTypeRowInputItem)));
-            result.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
-
+            result.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ItemsOf(tb.Column, true)));
+            result.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ItemsOf(typeof(FilterTypeRowInputItem))));
             result.Add(new FlexiControlForProperty<string>(() => Filter_Wert, 5));
-
             result.Add(new FlexiControlForProperty<string>(() => Fehler_Text));
         }
 

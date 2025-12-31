@@ -317,11 +317,8 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
 
         if (Bei_Export_sichtbar) {
-            var u = new List<AbstractListItem>();
-            u.AddRange(ItemsOf(typeof(XPosition)));
-
             result.Add(new FlexiControl("Sichtbarkeit:", widthOfControl, true));
-            result.Add(new FlexiControlForProperty<XPosition>(() => X_Position, u));
+            result.Add(new FlexiControlForProperty<XPosition>(() => X_Position, ItemsOf(typeof(XPosition))));
             //result.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
             //result.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 

@@ -260,9 +260,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             case "script":
                 result.Add(new FlexiControl("Erstellt ein leeres Blatt, das durch das folgende Skript befüllt wird.", widthOfControl, false));
                 result.Add(new FlexiDelegateControl(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
-                var art = new List<AbstractListItem>();
-                art.AddRange(ItemsOf(Skin.AllStyles()));
-                result.Add(new FlexiControlForProperty<string>(() => Design, art));
+                result.Add(new FlexiControlForProperty<string>(() => Design, ItemsOf(Skin.AllStyles())));
                 result.Add(new FlexiControlForProperty<float>(() => Scale));
 
                 //result.Add(new FlexiControl("Info: Das Skript darf keine Werte ändern und muss sich auf eine Zeile beziehen. Außerdem muss die Variable PAD definiert werden: var PAD = ItemCollectionPadItem();", widthOfControl, false));

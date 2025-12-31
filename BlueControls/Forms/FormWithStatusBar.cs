@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -73,7 +74,7 @@ public partial class FormWithStatusBar : Form {
     /// Statischer Handler der an alle FormWithStatusBar-Instanzen weiterleitet
     /// </summary>
     public static void UpdateStatusBar(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
-        message = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + message;
+        message = "[" + DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture) + "] " + message;
 
         List<FormWithStatusBar> l = [.. _formsWithStatusBar];
 

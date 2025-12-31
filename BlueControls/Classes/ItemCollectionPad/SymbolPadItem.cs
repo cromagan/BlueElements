@@ -85,17 +85,9 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     #region Methods
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        List<AbstractListItem> comms =
-        [
-            ItemOf("Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32")),
-            ItemOf("Rechteck", ((int)Symbol.Rechteck).ToString(), QuickImage.Get("Stop|32")),
-            ItemOf("Rechteck gerundet", ((int)Symbol.Rechteck_gerundet).ToString()),
-            ItemOf("Pfeil", ((int)Symbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32")),
-            ItemOf("Bruchlinie", ((int)Symbol.Bruchlinie).ToString())
-        ];
         List<GenericControl> result =
         [
-            new FlexiControlForProperty<Symbol>(() => Symbol, comms),
+            new FlexiControlForProperty<Symbol>(() => Symbol, ItemsOf(typeof(Symbol))),
             new FlexiControlForProperty<float>(() => Randdicke),
             new FlexiControlForProperty<Color>(() => Randfarbe),
             new FlexiControlForProperty<Color>(() => Hintergrundfarbe),

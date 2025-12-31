@@ -176,24 +176,12 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         ];
 
         if (TableOutput is { IsDisposed: false } tb) {
-            var lst = new List<AbstractListItem>();
-            lst.AddRange(ItemsOf(tb.Column, true));
-
-            result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
+            result.Add(new FlexiControlForProperty<string>(() => ColumnName, ItemsOf(tb.Column, true)));
         }
 
-        var u = new List<AbstractListItem>();
-        u.AddRange(ItemsOf(typeof(CaptionPosition)));
-        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
-
-        var u2 = new List<AbstractListItem>();
-        u2.AddRange(ItemsOf(typeof(FlexiFilterDefaultOutput)));
-        result.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
-
-        var u3 = new List<AbstractListItem>();
-        u3.AddRange(ItemsOf(typeof(FlexiFilterDefaultFilter)));
-        result.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
-
+        result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));
+        result.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, ItemsOf(typeof(FlexiFilterDefaultOutput))));
+        result.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, ItemsOf(typeof(FlexiFilterDefaultFilter))));
         result.Add(new FlexiControlForProperty<bool>(() => Einschnappen));
 
         return result;

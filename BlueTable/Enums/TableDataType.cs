@@ -58,8 +58,6 @@ public static class TableDataTypeExtension {
                                                                        TableDataType.SystemValue;
 
     #endregion
-
-    //public static bool Nameless(this TableDataType type) => type.ToString() == ((int)type).ToString();
 }
 
 public enum TableDataType : byte {
@@ -209,7 +207,7 @@ public enum TableDataType : byte {
 
     ColumnTags = 126,
 
-    //co_ReserveBits = 127
+    BackgroundStyle = 127,  //co_ReserveBits = 127
     //co_FehlerWennLeer = 128
     //co_FehlerWenn = 129
     //co_FehlerWennText = 130

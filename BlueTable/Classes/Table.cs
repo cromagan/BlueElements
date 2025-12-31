@@ -32,6 +32,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -840,7 +841,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             case Routinen.CellFormatUTF8_V401: {
                     type = (TableDataType)bLoaded[pointerIn + 1];
                     var les = NummerCode3(bLoaded, pointerIn + 2);
-                    rowKey = NummerCode7(bLoaded, pointerIn + 5).ToString();
+                    rowKey = NummerCode7(bLoaded, pointerIn + 5).ToString1();
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointerIn + 12, b, 0, les);
                     value = b.ToStringUtf8();
@@ -1041,7 +1042,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 x += 1;
                 if (x > 99999) { Develop.DebugPrint(ErrorType.Error, "Unique ID konnte nicht erzeugt werden"); }
 
-                var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToStringInt5()).RemoveChars(Char_DateiSonderZeichen + " _.");
+                var unique = ("X" + DateTime.UtcNow.ToString("mm.fff", CultureInfo.InvariantCulture) + x.ToString5()).RemoveChars(Char_DateiSonderZeichen + " _.");
                 var ok = true;
 
                 if (IsValidTableName(unique)) {
@@ -1119,7 +1120,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var sw = Stopwatch.StartNew();
         var runTimeID = ExecutingScriptThreadsAnyTable.JoinWithCr();
 
-        var myThread = Thread.CurrentThread.ManagedThreadId.ToStringInt10();
+        var myThread = Thread.CurrentThread.ManagedThreadId.ToString10();
 
         while (HasActiveThreadsExcept(myThread)) {
             try {
@@ -1381,7 +1382,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         var isNewId = false;
-        var scriptThreadId = Thread.CurrentThread.ManagedThreadId.ToStringInt10();
+        var scriptThreadId = Thread.CurrentThread.ManagedThreadId.ToString10();
         if (script.ChangeValuesAllowed) {
             WaitScriptsDone();
 
@@ -1663,7 +1664,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     dictNeu.Add(zeil[rowNo][0].ToUpperInvariant(), zeil[rowNo]);
                 }
             } else {
-                dictNeu.Add(rowNo.ToStringInt1(), zeil[rowNo]);
+                dictNeu.Add(rowNo.ToString1(), zeil[rowNo]);
             }
         }
 

@@ -128,6 +128,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabDatenFormat = new System.Windows.Forms.TabPage();
+            this.chkRelation = new BlueControls.Controls.Button();
             this.chkIsKeyColumn = new BlueControls.Controls.Button();
             this.chkIsFirst = new BlueControls.Controls.Button();
             this.btnMaxTextLength = new BlueControls.Controls.Button();
@@ -146,6 +147,8 @@ namespace BlueControls.BlueTableDialogs {
             this.btnSchnellGleitkommazahl = new BlueControls.Controls.Button();
             this.btnSchnellGanzzahl = new BlueControls.Controls.Button();
             this.tabSpaltenVerlinkung = new System.Windows.Forms.TabPage();
+            this.cbxRelationType = new BlueControls.Controls.ComboBox();
+            this.caption1 = new BlueControls.Controls.Caption();
             this.tblFilterliste = new BlueControls.Controls.TableView();
             this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
             this.capTargetColumn = new BlueControls.Controls.Caption();
@@ -154,9 +157,8 @@ namespace BlueControls.BlueTableDialogs {
             this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.capTabellenname = new BlueControls.Controls.Caption();
             this.btnSpaltenkopf = new BlueControls.Controls.Button();
-            this.chkRelation = new BlueControls.Controls.Button();
-            this.cbxRelationType = new BlueControls.Controls.ComboBox();
-            this.caption1 = new BlueControls.Controls.Caption();
+            this.capHintergrund = new BlueControls.Controls.Caption();
+            this.cbxBackground = new BlueControls.Controls.ComboBox();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -179,6 +181,8 @@ namespace BlueControls.BlueTableDialogs {
             // tabAnzeige
             // 
             this.tabAnzeige.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAnzeige.Controls.Add(this.cbxBackground);
+            this.tabAnzeige.Controls.Add(this.capHintergrund);
             this.tabAnzeige.Controls.Add(this.cbxRenderer);
             this.tabAnzeige.Controls.Add(this.txbSpaltenbild);
             this.tabAnzeige.Controls.Add(this.txbUeberschift1);
@@ -227,7 +231,7 @@ namespace BlueControls.BlueTableDialogs {
             // txbSpaltenbild
             // 
             this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbSpaltenbild.Location = new System.Drawing.Point(8, 360);
+            this.txbSpaltenbild.Location = new System.Drawing.Point(8, 376);
             this.txbSpaltenbild.Name = "txbSpaltenbild";
             this.txbSpaltenbild.RegexCheck = null;
             this.txbSpaltenbild.Size = new System.Drawing.Size(400, 24);
@@ -245,7 +249,7 @@ namespace BlueControls.BlueTableDialogs {
             // txbUeberschift3
             // 
             this.txbUeberschift3.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbUeberschift3.Location = new System.Drawing.Point(104, 303);
+            this.txbUeberschift3.Location = new System.Drawing.Point(104, 319);
             this.txbUeberschift3.Name = "txbUeberschift3";
             this.txbUeberschift3.RegexCheck = null;
             this.txbUeberschift3.Size = new System.Drawing.Size(304, 24);
@@ -254,7 +258,7 @@ namespace BlueControls.BlueTableDialogs {
             // capSpaltenbild
             // 
             this.capSpaltenbild.CausesValidation = false;
-            this.capSpaltenbild.Location = new System.Drawing.Point(8, 344);
+            this.capSpaltenbild.Location = new System.Drawing.Point(8, 360);
             this.capSpaltenbild.Name = "capSpaltenbild";
             this.capSpaltenbild.Size = new System.Drawing.Size(72, 24);
             this.capSpaltenbild.Text = "Spaltenbild:";
@@ -264,7 +268,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.txbFixedColumnWidth.AllowedChars = "0123456789|";
             this.txbFixedColumnWidth.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFixedColumnWidth.Location = new System.Drawing.Point(136, 208);
+            this.txbFixedColumnWidth.Location = new System.Drawing.Point(136, 224);
             this.txbFixedColumnWidth.Name = "txbFixedColumnWidth";
             this.txbFixedColumnWidth.QuickInfo = "Wenn ein Wert >0 eingegeben wird, \r\nwird die Spalte immer in dieser Breite angeze" +
     "igt.";
@@ -287,7 +291,7 @@ namespace BlueControls.BlueTableDialogs {
             // capFixedColumnWidth
             // 
             this.capFixedColumnWidth.CausesValidation = false;
-            this.capFixedColumnWidth.Location = new System.Drawing.Point(8, 208);
+            this.capFixedColumnWidth.Location = new System.Drawing.Point(8, 224);
             this.capFixedColumnWidth.Name = "capFixedColumnWidth";
             this.capFixedColumnWidth.Size = new System.Drawing.Size(120, 16);
             this.capFixedColumnWidth.Text = "Feste Spaltenbreite:";
@@ -295,7 +299,7 @@ namespace BlueControls.BlueTableDialogs {
             // txbUeberschift2
             // 
             this.txbUeberschift2.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbUeberschift2.Location = new System.Drawing.Point(104, 279);
+            this.txbUeberschift2.Location = new System.Drawing.Point(104, 295);
             this.txbUeberschift2.Name = "txbUeberschift2";
             this.txbUeberschift2.RegexCheck = null;
             this.txbUeberschift2.Size = new System.Drawing.Size(304, 24);
@@ -303,7 +307,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // btnTextColor
             // 
-            this.btnTextColor.Location = new System.Drawing.Point(272, 8);
+            this.btnTextColor.Location = new System.Drawing.Point(280, 8);
             this.btnTextColor.Name = "btnTextColor";
             this.btnTextColor.Size = new System.Drawing.Size(128, 32);
             this.btnTextColor.TabIndex = 4;
@@ -312,7 +316,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // btnBackColor
             // 
-            this.btnBackColor.Location = new System.Drawing.Point(272, 40);
+            this.btnBackColor.Location = new System.Drawing.Point(280, 40);
             this.btnBackColor.Name = "btnBackColor";
             this.btnBackColor.Size = new System.Drawing.Size(128, 32);
             this.btnBackColor.TabIndex = 3;
@@ -322,7 +326,7 @@ namespace BlueControls.BlueTableDialogs {
             // capUeberschrift3
             // 
             this.capUeberschrift3.CausesValidation = false;
-            this.capUeberschrift3.Location = new System.Drawing.Point(8, 304);
+            this.capUeberschrift3.Location = new System.Drawing.Point(8, 320);
             this.capUeberschrift3.Name = "capUeberschrift3";
             this.capUeberschrift3.Size = new System.Drawing.Size(88, 16);
             this.capUeberschrift3.Text = "Überschrift 3:";
@@ -339,7 +343,7 @@ namespace BlueControls.BlueTableDialogs {
             // btnSpellChecking
             // 
             this.btnSpellChecking.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.btnSpellChecking.Location = new System.Drawing.Point(8, 184);
+            this.btnSpellChecking.Location = new System.Drawing.Point(8, 200);
             this.btnSpellChecking.Name = "btnSpellChecking";
             this.btnSpellChecking.Size = new System.Drawing.Size(200, 16);
             this.btnSpellChecking.TabIndex = 33;
@@ -348,7 +352,7 @@ namespace BlueControls.BlueTableDialogs {
             // capUeberschrift1
             // 
             this.capUeberschrift1.CausesValidation = false;
-            this.capUeberschrift1.Location = new System.Drawing.Point(8, 256);
+            this.capUeberschrift1.Location = new System.Drawing.Point(8, 272);
             this.capUeberschrift1.Name = "capUeberschrift1";
             this.capUeberschrift1.Size = new System.Drawing.Size(88, 16);
             this.capUeberschrift1.Text = "Überschrift 1:";
@@ -358,7 +362,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.cbxTranslate.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxTranslate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxTranslate.Location = new System.Drawing.Point(104, 152);
+            this.cbxTranslate.Location = new System.Drawing.Point(104, 168);
             this.cbxTranslate.Name = "cbxTranslate";
             this.cbxTranslate.RegexCheck = null;
             this.cbxTranslate.Size = new System.Drawing.Size(304, 24);
@@ -367,7 +371,7 @@ namespace BlueControls.BlueTableDialogs {
             // capTranslate
             // 
             this.capTranslate.CausesValidation = false;
-            this.capTranslate.Location = new System.Drawing.Point(8, 152);
+            this.capTranslate.Location = new System.Drawing.Point(8, 168);
             this.capTranslate.Name = "capTranslate";
             this.capTranslate.Size = new System.Drawing.Size(88, 24);
             this.capTranslate.Text = "Übersetzen:";
@@ -375,7 +379,7 @@ namespace BlueControls.BlueTableDialogs {
             // capUeberschrift2
             // 
             this.capUeberschrift2.CausesValidation = false;
-            this.capUeberschrift2.Location = new System.Drawing.Point(8, 280);
+            this.capUeberschrift2.Location = new System.Drawing.Point(8, 296);
             this.capUeberschrift2.Name = "capUeberschrift2";
             this.capUeberschrift2.Size = new System.Drawing.Size(88, 16);
             this.capUeberschrift2.Text = "Überschrift 2:";
@@ -384,7 +388,7 @@ namespace BlueControls.BlueTableDialogs {
             // capLinkerRand
             // 
             this.capLinkerRand.CausesValidation = false;
-            this.capLinkerRand.Location = new System.Drawing.Point(8, 64);
+            this.capLinkerRand.Location = new System.Drawing.Point(8, 80);
             this.capLinkerRand.Name = "capLinkerRand";
             this.capLinkerRand.Size = new System.Drawing.Size(80, 16);
             this.capLinkerRand.Text = "Linker Rand:";
@@ -394,7 +398,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.cbxAlign.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxAlign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxAlign.Location = new System.Drawing.Point(104, 120);
+            this.cbxAlign.Location = new System.Drawing.Point(104, 136);
             this.cbxAlign.Name = "cbxAlign";
             this.cbxAlign.RegexCheck = null;
             this.cbxAlign.Size = new System.Drawing.Size(304, 24);
@@ -404,7 +408,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.cbxRandLinks.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRandLinks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRandLinks.Location = new System.Drawing.Point(8, 80);
+            this.cbxRandLinks.Location = new System.Drawing.Point(8, 96);
             this.cbxRandLinks.Name = "cbxRandLinks";
             this.cbxRandLinks.RegexCheck = null;
             this.cbxRandLinks.Size = new System.Drawing.Size(128, 24);
@@ -422,7 +426,7 @@ namespace BlueControls.BlueTableDialogs {
             // capRechterRand
             // 
             this.capRechterRand.CausesValidation = false;
-            this.capRechterRand.Location = new System.Drawing.Point(144, 64);
+            this.capRechterRand.Location = new System.Drawing.Point(144, 80);
             this.capRechterRand.Name = "capRechterRand";
             this.capRechterRand.Size = new System.Drawing.Size(88, 16);
             this.capRechterRand.Text = "Rechter Rand:";
@@ -432,7 +436,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.cbxRandRechts.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRandRechts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRandRechts.Location = new System.Drawing.Point(144, 80);
+            this.cbxRandRechts.Location = new System.Drawing.Point(144, 96);
             this.cbxRandRechts.Name = "cbxRandRechts";
             this.cbxRandRechts.RegexCheck = null;
             this.cbxRandRechts.Size = new System.Drawing.Size(128, 24);
@@ -441,7 +445,7 @@ namespace BlueControls.BlueTableDialogs {
             // capAlign
             // 
             this.capAlign.CausesValidation = false;
-            this.capAlign.Location = new System.Drawing.Point(8, 120);
+            this.capAlign.Location = new System.Drawing.Point(8, 136);
             this.capAlign.Name = "capAlign";
             this.capAlign.Size = new System.Drawing.Size(88, 24);
             this.capAlign.Text = "Ausrichtung:";
@@ -1222,6 +1226,17 @@ namespace BlueControls.BlueTableDialogs {
             this.tabDatenFormat.TabIndex = 12;
             this.tabDatenFormat.Text = "Daten-Format";
             // 
+            // chkRelation
+            // 
+            this.chkRelation.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkRelation.Location = new System.Drawing.Point(312, 40);
+            this.chkRelation.Name = "chkRelation";
+            this.chkRelation.QuickInfo = "Ist in den Einträgen der Spalte ein Wert, der in ein der ersten Spalte wiederzufi" +
+    "nden ist, werden die Einträge in beiden Feldern dieser Spalte dupliziert.";
+            this.chkRelation.Size = new System.Drawing.Size(336, 16);
+            this.chkRelation.TabIndex = 51;
+            this.chkRelation.Text = "Beziehungen automatisch mit erster Spalte abgleichen";
+            // 
             // chkIsKeyColumn
             // 
             this.chkIsKeyColumn.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
@@ -1414,11 +1429,31 @@ namespace BlueControls.BlueTableDialogs {
             this.tabSpaltenVerlinkung.TabIndex = 11;
             this.tabSpaltenVerlinkung.Text = "Spalten-Verlinkung";
             // 
+            // cbxRelationType
+            // 
+            this.cbxRelationType.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxRelationType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxRelationType.Location = new System.Drawing.Point(248, 8);
+            this.cbxRelationType.Name = "cbxRelationType";
+            this.cbxRelationType.RegexCheck = null;
+            this.cbxRelationType.Size = new System.Drawing.Size(232, 24);
+            this.cbxRelationType.TabIndex = 41;
+            // 
+            // caption1
+            // 
+            this.caption1.CausesValidation = false;
+            this.caption1.Location = new System.Drawing.Point(8, 8);
+            this.caption1.Name = "caption1";
+            this.caption1.Size = new System.Drawing.Size(232, 16);
+            this.caption1.Text = "Werte aus anderer Tabelle benutzen:";
+            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
             // tblFilterliste
             // 
             this.tblFilterliste.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tblFilterliste.ContextMenuDefault = true;
             this.tblFilterliste.Location = new System.Drawing.Point(8, 112);
             this.tblFilterliste.Name = "tblFilterliste";
             this.tblFilterliste.SheetStyle = "Windows 11";
@@ -1496,38 +1531,27 @@ namespace BlueControls.BlueTableDialogs {
             this.btnSpaltenkopf.TabIndex = 49;
             this.btnSpaltenkopf.Click += new System.EventHandler(this.btnSpaltenkopf_Click);
             // 
-            // chkRelation
+            // capHintergrund
             // 
-            this.chkRelation.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkRelation.Location = new System.Drawing.Point(312, 40);
-            this.chkRelation.Name = "chkRelation";
-            this.chkRelation.Size = new System.Drawing.Size(336, 16);
-            this.chkRelation.QuickInfo = "Ist in den Einträgen der Spalte ein Wert, der in ein der ersten Spalte wiederzufinden ist, werden die Einträge in beiden Feldern dieser Spalte dupliziert.";
-            this.chkRelation.TabIndex = 51;
-            this.chkRelation.Text = "Beziehungen automatisch mit erster Spalte abgleichen";
+            this.capHintergrund.CausesValidation = false;
+            this.capHintergrund.Location = new System.Drawing.Point(280, 80);
+            this.capHintergrund.Name = "capHintergrund";
+            this.capHintergrund.Size = new System.Drawing.Size(88, 16);
+            this.capHintergrund.Text = "Hintergrund:";
+            this.capHintergrund.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // cbxRelationType
+            // cbxBackground
             // 
-            this.cbxRelationType.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxRelationType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRelationType.Location = new System.Drawing.Point(248, 8);
-            this.cbxRelationType.Name = "cbxRelationType";
-            this.cbxRelationType.RegexCheck = null;
-            this.cbxRelationType.Size = new System.Drawing.Size(232, 24);
-            this.cbxRelationType.TabIndex = 41;
-            // 
-            // caption1
-            // 
-            this.caption1.CausesValidation = false;
-            this.caption1.Location = new System.Drawing.Point(8, 8);
-            this.caption1.Name = "caption1";
-            this.caption1.Size = new System.Drawing.Size(232, 16);
-            this.caption1.Text = "Werte aus anderer Tabelle benutzen:";
-            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.cbxBackground.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxBackground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxBackground.Location = new System.Drawing.Point(280, 96);
+            this.cbxBackground.Name = "cbxBackground";
+            this.cbxBackground.RegexCheck = null;
+            this.cbxBackground.Size = new System.Drawing.Size(128, 24);
+            this.cbxBackground.TabIndex = 47;
             // 
             // ColumnEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1112, 796);
             this.Controls.Add(this.btnSpaltenkopf);
@@ -1682,5 +1706,7 @@ namespace BlueControls.BlueTableDialogs {
         private Button chkRelation;
         private ComboBox cbxRelationType;
         private Caption caption1;
+        private Caption capHintergrund;
+        private ComboBox cbxBackground;
     }
 }

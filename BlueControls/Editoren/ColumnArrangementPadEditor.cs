@@ -534,7 +534,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         SortColumns();
 
         chkShowCaptions.Checked = ca.ShowHead;
-        txbFilterRows.Text = ca.FilterRows.ToStringInt1();
+        txbFilterRows.Text = ca.FilterRows.ToString1();
     }
 
     private void SortColumns() {

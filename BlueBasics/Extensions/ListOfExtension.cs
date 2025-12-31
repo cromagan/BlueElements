@@ -38,26 +38,18 @@ public static partial class Extensions {
 
     public static bool AddIfNotExists<T>(this ICollection<T> l, ICollection<T>? values) {
         if (values is not { Count: not 0 }) { return false; }
-        var ok1 = values.Count(l.AddIfNotExists) > 0;
-        return ok1;
+        return values.Count(l.AddIfNotExists) > 0;
     }
 
     public static bool AddIfNotExists<T>(this ICollection<T> l, T value) {
-        if (l.Contains(value)) {
-            return false;
-        }
-
+        if (l.Contains(value)) { return false; }
         l.Add(value);
         return true;
     }
 
     public static void AddRange<T>(this ConcurrentBag<T> @this, IEnumerable<T> toAdd) => toAdd.AsParallel().ForAll(@this.Add);
 
-    public static List<T> Clone<T>(this ICollection<T> l) {
-        var l2 = new List<T>();
-        l2.AddRange(l);
-        return l2;
-    }
+    public static List<T> Clone<T>(this ICollection<T> l) => [.. l];
 
     public static List<T> CloneWithClones<T>(this ICollection<T>? l) where T : ICloneable {
         var l2 = new List<T>();
@@ -184,9 +176,9 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add(tagname + "=" + value.ToString().ToNonCritical());
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToStringFloat5().ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToString1_5().ToNonCritical());
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, double value) => col.Add(tagname + "=" + value.ToStringFloat5().ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, double value) => col.Add(tagname + "=" + value.ToString1_5().ToNonCritical());
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
         if (value is null or IDisposableExtended { IsDisposed: true }) { return; }

@@ -59,6 +59,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private string _allowedChars;
     private string _autoFilterJoker;
     private Color _backColor;
+    private ColumnBackgroundStyle _backgroundStyle;
     private string _caption;
     private string _captionBitmapCode;
     private string _captionGroup1;
@@ -155,6 +156,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         //_dropDownKey = -1;
         //_vorschlagsColumn = -1;
         _align = AlignmentHorizontal.Links;
+        _backgroundStyle = ColumnBackgroundStyle.None;
         //_keyColumnKey = -1;
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
@@ -228,7 +230,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_additionalFormatCheck == value) { return; }
 
-            Table?.ChangeData(TableDataType.AdditionalFormatCheck, this, ((int)_additionalFormatCheck).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.AdditionalFormatCheck, this, ((int)_additionalFormatCheck).ToString1(), ((int)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -312,7 +314,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_afterEditRound == value) { return; }
 
-            Table?.ChangeData(TableDataType.AfterEditRound, this, _afterEditRound.ToStringInt1(), value.ToStringInt1());
+            Table?.ChangeData(TableDataType.AfterEditRound, this, _afterEditRound.ToString1(), value.ToString1());
             OnPropertyChanged();
         }
     }
@@ -323,7 +325,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_align == value) { return; }
 
-            Table?.ChangeData(TableDataType.ColumnAlign, this, ((int)_align).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.ColumnAlign, this, ((int)_align).ToString1(), ((int)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -356,7 +358,18 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_backColor.ToArgb() == value.ToArgb()) { return; }
 
-            Table?.ChangeData(TableDataType.BackColor, this, _backColor.ToArgb().ToStringInt1(), value.ToArgb().ToStringInt1());
+            Table?.ChangeData(TableDataType.BackColor, this, _backColor.ToArgb().ToString1(), value.ToArgb().ToString1());
+            OnPropertyChanged();
+        }
+    }
+
+    public ColumnBackgroundStyle BackgroundStyle {
+        get => _backgroundStyle;
+        set {
+            if (IsDisposed) { return; }
+            if (_backgroundStyle == value) { return; }
+
+            Table?.ChangeData(TableDataType.BackgroundStyle, this, ((long)_backgroundStyle).ToString1(), ((long)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -494,7 +507,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_doOpticalTranslation == value) { return; }
 
-            Table?.ChangeData(TableDataType.DoOpticalTranslation, this, ((int)_doOpticalTranslation).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.DoOpticalTranslation, this, ((int)_doOpticalTranslation).ToString1(), ((int)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -562,7 +575,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_filterOptions == value) { return; }
 
-            Table?.ChangeData(TableDataType.FilterOptions, this, ((int)_filterOptions).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.FilterOptions, this, ((int)_filterOptions).ToString1(), ((int)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -572,7 +585,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (_fixedColumnWidth == value) { return; }
-            Table?.ChangeData(TableDataType.FixedColumnWidth, this, _fixedColumnWidth.ToStringInt1(), value.ToStringInt1());
+            Table?.ChangeData(TableDataType.FixedColumnWidth, this, _fixedColumnWidth.ToString1(), value.ToString1());
             OnPropertyChanged();
         }
     }
@@ -583,7 +596,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_foreColor.ToArgb() == value.ToArgb()) { return; }
 
-            Table?.ChangeData(TableDataType.ForeColor, this, _foreColor.ToArgb().ToStringInt1(), value.ToArgb().ToStringInt1());
+            Table?.ChangeData(TableDataType.ForeColor, this, _foreColor.ToArgb().ToString1(), value.ToArgb().ToString1());
             OnPropertyChanged();
         }
     }
@@ -676,7 +689,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_lineStyleLeft == value) { return; }
 
-            Table?.ChangeData(TableDataType.LineStyleLeft, this, ((int)_lineStyleLeft).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.LineStyleLeft, this, ((int)_lineStyleLeft).ToString1(), ((int)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -695,7 +708,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_lineStyleRight == value) { return; }
 
-            Table?.ChangeData(TableDataType.LineStyleRight, this, ((int)_lineStyleRight).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.LineStyleRight, this, ((int)_lineStyleRight).ToString1(), ((int)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -766,7 +779,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (_maxCellLength == value) { return; }
-            Table?.ChangeData(TableDataType.MaxCellLength, this, _maxCellLength.ToStringInt1(), value.ToStringInt1());
+            Table?.ChangeData(TableDataType.MaxCellLength, this, _maxCellLength.ToString1(), value.ToString1());
             OnPropertyChanged();
         }
     }
@@ -776,7 +789,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             if (_maxTextLength == value) { return; }
-            Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToStringInt1(), value.ToStringInt1());
+            Table?.ChangeData(TableDataType.MaxTextLength, this, _maxTextLength.ToString1(), value.ToString1());
             OnPropertyChanged();
         }
     }
@@ -855,7 +868,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_relationType == value) { return; }
 
-            Table?.ChangeData(TableDataType.RelationType, this, ((int)_value_for_Chunk).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.RelationType, this, ((int)_value_for_Chunk).ToString1(), ((int)value).ToString1());
             Invalidate_ColumAndContent();
 
             OnPropertyChanged();
@@ -889,7 +902,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_scriptType == value) { return; }
 
-            Table?.ChangeData(TableDataType.ScriptType, this, ((int)_scriptType).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.ScriptType, this, ((int)_scriptType).ToString1(), ((int)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -911,7 +924,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
             if (IsDisposed) { return; }
             if (_sortType == value) { return; }
 
-            Table?.ChangeData(TableDataType.SortType, this, ((int)_sortType).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.SortType, this, ((int)_sortType).ToString1(), ((int)value).ToString1());
             OnPropertyChanged();
         }
     }
@@ -966,7 +979,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             var oldd = _value_for_Chunk;
 
-            Table?.ChangeData(TableDataType.Value_for_Chunk, this, ((int)_value_for_Chunk).ToStringInt1(), ((int)value).ToStringInt1());
+            Table?.ChangeData(TableDataType.Value_for_Chunk, this, ((int)_value_for_Chunk).ToString1(), ((int)value).ToString1());
             Invalidate_ColumAndContent();
 
             if (oldd != _value_for_Chunk) {
@@ -1111,7 +1124,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (_afterEditRound > -1 && DoubleTryParse(value, out var erg)) {
             erg = Math.Round(erg, _afterEditRound, MidpointRounding.AwayFromZero);
-            value = erg.ToStringFloat();
+            value = erg.ToString1_X();
         }
 
         if (_afterEditQuickSortRemoveDouble) {
@@ -1207,6 +1220,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         CaptionBitmapCode = source.CaptionBitmapCode;
         LineStyleLeft = source.LineStyleLeft;
         LineStyleRight = source.LineStyleRight;
+        BackgroundStyle = source.BackgroundStyle;
         MultiLine = source.MultiLine;
         ColumnQuickInfo = source.ColumnQuickInfo;
         ForeColor = source.ForeColor;
@@ -2150,6 +2164,10 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _lineStyleRight = (ColumnLineStyle)IntParse(newvalue);
                 break;
 
+            case TableDataType.BackgroundStyle:
+                _backgroundStyle = (ColumnBackgroundStyle)IntParse(newvalue);
+                break;
+
             case TableDataType.ColumnQuickInfo:
                 _columnQuickInfo = newvalue;
                 break;
@@ -2386,7 +2404,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             default:
-                if (!string.Equals(type.ToString(), ((int)type).ToStringInt1(), StringComparison.Ordinal)) {
+                if (!string.Equals(type.ToString(), ((int)type).ToString1(), StringComparison.Ordinal)) {
                     return "Interner Fehler: Für den Datentyp '" + type + "' wurde keine Laderegel definiert.";
                 }
                 break;

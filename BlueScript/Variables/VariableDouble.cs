@@ -56,7 +56,7 @@ public class VariableDouble : Variable {
     /// <summary>
     /// Der Zahlenwert mit maximal 5 Kommastellen (0.#####)
     /// </summary>
-    public override string ReadableText => _double.ToStringFloat5();
+    public override string ReadableText => _double.ToString1_5();
 
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;

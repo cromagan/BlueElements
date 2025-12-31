@@ -62,7 +62,7 @@ internal class Method_AutoCorrect : Method_TableGeneric {
             var s = string.Empty;
             switch (columnVar) {
                 case VariableDouble vf:
-                    s = vf.ValueNum.ToStringFloat5();
+                    s = vf.ValueNum.ToString1_5();
                     break;
 
                 case VariableListString vl:

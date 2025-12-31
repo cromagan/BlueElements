@@ -60,6 +60,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxRelationType.ItemAddRange(ItemsOf(typeof(RelationType)));
         cbxRandLinks.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
         cbxRandRechts.ItemAddRange(ItemsOf(typeof(ColumnLineStyle)));
+        cbxBackground.ItemAddRange(ItemsOf(typeof(ColumnBackgroundStyle)));
         cbxAlign.ItemAddRange(ItemsOf(typeof(AlignmentHorizontal)));
         cbxAdditionalCheck.ItemAddRange(ItemsOf(typeof(AdditionalCheck)));
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
@@ -138,13 +139,13 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             if (thisView[column] is { }) { cola.Add(thisView.KeyName); }
         }
         t += GenQIText("In Spalten-Anord.", ImageCode.Spalte, cola);
-        t += GenQIText("In Skripten", ImageCode.Skript, column.UsedInScript());
+        t += GenQIText("In intern. Skripten", ImageCode.Skript, column.UsedInScript());
         t += GenQIText("In Zeilen-Quick-Info", ImageCode.Zeile, tb.RowQuickInfo.ContainsIgnoreCase(column.KeyName));
         t += GenQIText("Schlüssel für", ImageCode.Schlüssel, column.Am_A_Key_For);
 
         if (column.SaveContent) {
             var l = column.Contents();
-            t += GenQIText("Verschiedene Werte", ImageCode.Textfeld, l.Count.ToStringInt1());
+            t += GenQIText("Verschiedene Werte", ImageCode.Textfeld, l.Count.ToString1());
         } else {
             t += GenQIText("Verschiedene Werte", ImageCode.Textfeld, "[wird nicht gespeichert]");
         }
@@ -155,9 +156,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             t += GenQIText("Bearbeitet in Tab.", ImageCode.Stift, "Edit in Table", column.ColumnSystemInfo);
             t += GenQIText("Gefiltert in Tab.", ImageCode.Trichter, "Filter Clicked", column.ColumnSystemInfo);
             t += GenQIText("Gibt Werte an", ImageCode.Tabelle, "Links to me", column.ColumnSystemInfo);
-            t += GenQIText("Skript-'Filter'", ImageCode.Skript, "Filter in Script", column.ColumnSystemInfo);
-            t += GenQIText("Skript-'Get'", ImageCode.Skript, "Value used in Script", column.ColumnSystemInfo);
-            t += GenQIText("Skript-'Set'", ImageCode.Skript, "Edit with Script", column.ColumnSystemInfo);
+            t += GenQIText("Ext. Skript-'Filter'", ImageCode.Skript, "Filter in Script", column.ColumnSystemInfo);
+            t += GenQIText("Ext. Skript-'Get'", ImageCode.Skript, "Value used in Script", column.ColumnSystemInfo);
+            t += GenQIText("Ext. Skript-'Set'", ImageCode.Skript, "Edit with Script", column.ColumnSystemInfo);
             //t += column.ColumnSystemInfo;
         }
 
@@ -243,12 +244,12 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void btnCalculateMaxCellLength_Click(object sender, System.EventArgs e) {
         if (Column == null) { return; }
 
-        txbMaxCellLength.Text = Column.CalculatePreveredMaxCellLength(1.2f).ToStringInt1();
+        txbMaxCellLength.Text = Column.CalculatePreveredMaxCellLength(1.2f).ToString1();
     }
 
     private void btnMaxTextLength_Click(object sender, System.EventArgs e) {
         if (Column == null) { return; }
-        txbMaxTextLength.Text = Column.CalculatePreveredMaxTextLength(1.2f).ToStringInt1();
+        txbMaxTextLength.Text = Column.CalculatePreveredMaxTextLength(1.2f).ToString1();
     }
 
     private void btnOk_Click(object sender, System.EventArgs e) {
@@ -469,17 +470,18 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         chkIsFirst.Checked = Column.IsFirst;
         chkIsKeyColumn.Checked = Column.IsKeyColumn;
         chkRelation.Checked = Column.Relationship_to_First;
-        cbxRelationType.Text = ((int)Column.RelationType).ToStringInt1();
-        cbxChunk.Text = ((int)Column.Value_for_Chunk).ToStringInt1();
-        cbxRandLinks.Text = ((int)Column.LineStyleLeft).ToStringInt1();
-        cbxRandRechts.Text = ((int)Column.LineStyleRight).ToStringInt1();
-        cbxAlign.Text = ((int)Column.Align).ToStringInt1();
-        cbxAdditionalCheck.Text = ((int)Column.AdditionalFormatCheck).ToStringInt1();
-        cbxScriptType.Text = ((int)Column.ScriptType).ToStringInt1();
-        cbxTranslate.Text = ((int)Column.DoOpticalTranslation).ToStringInt1();
+        cbxRelationType.Text = ((int)Column.RelationType).ToString1();
+        cbxChunk.Text = ((int)Column.Value_for_Chunk).ToString1();
+        cbxRandLinks.Text = ((int)Column.LineStyleLeft).ToString1();
+        cbxRandRechts.Text = ((int)Column.LineStyleRight).ToString1();
+        cbxAlign.Text = ((int)Column.Align).ToString1();
+        cbxBackground.Text = ((long)Column.BackgroundStyle).ToString1();
+        cbxAdditionalCheck.Text = ((int)Column.AdditionalFormatCheck).ToString1();
+        cbxScriptType.Text = ((int)Column.ScriptType).ToString1();
+        cbxTranslate.Text = ((int)Column.DoOpticalTranslation).ToString1();
         cbxRenderer.Text = Column.DefaultRenderer;
         cbxRenderer_TextChanged(cbxRenderer, System.EventArgs.Empty);
-        cbxSort.Text = ((int)Column.SortType).ToStringInt1();
+        cbxSort.Text = ((int)Column.SortType).ToString1();
         btnAutoFilterMoeglich.Checked = Column.FilterOptions.HasFlag(FilterOptions.Enabled);
         btnAutoFilterTXTErlaubt.Checked = Column.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
         btnAutoFilterErweitertErlaubt.Checked = Column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled);
@@ -490,8 +492,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         btnEditableDropdown.Checked = Column.EditableWithDropdown;
         btnCanBeEmpty.Checked = Column.DropdownDeselectAllAllowed;
         btnAutoEditAutoSort.Checked = Column.AfterEditQuickSortRemoveDouble;
-        txbRunden.Text = Column.AfterEditRound is > -1 and < 7 ? Column.AfterEditRound.ToStringInt1() : string.Empty;
-        txbFixedColumnWidth.Text = Column.FixedColumnWidth > 0 ? Column.FixedColumnWidth.ToStringInt1() : string.Empty;
+        txbRunden.Text = Column.AfterEditRound is > -1 and < 7 ? Column.AfterEditRound.ToString1() : string.Empty;
+        txbFixedColumnWidth.Text = Column.FixedColumnWidth > 0 ? Column.FixedColumnWidth.ToString1() : string.Empty;
         btnAutoEditToUpper.Checked = Column.AfterEditDoUCase;
         btnAutoEditKleineFehler.Checked = Column.AfterEditAutoCorrect;
         txbJoker.Text = Column.AutoFilterJoker;
@@ -509,8 +511,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         lbxCellEditor.UncheckAll();
         lbxCellEditor.Check(Column.PermissionGroupsChangeCell);
         txbAllowedChars.Text = Column.AllowedChars;
-        txbMaxTextLength.Text = Column.MaxTextLength.ToStringInt1();
-        txbMaxCellLength.Text = Column.MaxCellLength.ToStringInt1();
+        txbMaxTextLength.Text = Column.MaxTextLength.ToString1();
+        txbMaxCellLength.Text = Column.MaxCellLength.ToString1();
         btnOtherValuesToo.Checked = Column.ShowValuesOfOtherCellsInDropdown;
         btnIgnoreLock.Checked = Column.EditAllowedDespiteLock;
         txbAdminInfo.Text = Column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
@@ -602,6 +604,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         Column.LinkedTableTableName = cbxLinkedTable.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
         Column.ColumnNameOfLinkedTable = cbxTargetColumn.Text; // LINKED TABLE
         Column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
+        Column.BackgroundStyle = (ColumnBackgroundStyle)LongParse(cbxBackground.Text);
         Column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
         Column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
         Column.DoOpticalTranslation = (TranslationType)IntParse(cbxTranslate.Text);

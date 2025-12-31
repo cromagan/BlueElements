@@ -302,13 +302,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CellSet(ColumnItem? column, string value, string comment) => Set(column, value, comment);
 
-    public void CellSet(string columnName, double value, string comment) => Set(Table?.Column[columnName], value.ToStringFloat5(), comment);
+    public void CellSet(string columnName, double value, string comment) => Set(Table?.Column[columnName], value.ToString1_5(), comment);
 
-    public void CellSet(ColumnItem column, double value, string comment) => Set(column, value.ToStringFloat5(), comment);
+    public void CellSet(ColumnItem column, double value, string comment) => Set(column, value.ToString1_5(), comment);
 
-    public void CellSet(string columnName, int value, string comment) => Set(Table?.Column[columnName], value.ToStringInt1(), comment);
+    public void CellSet(string columnName, int value, string comment) => Set(Table?.Column[columnName], value.ToString1(), comment);
 
-    public void CellSet(ColumnItem column, int value, string comment) => Set(column, value.ToStringInt1(), comment);
+    public void CellSet(ColumnItem column, int value, string comment) => Set(column, value.ToString1(), comment);
 
     public void CellSet(string columnName, IEnumerable<string>? value, string comment) => Set(Table?.Column[columnName], value.JoinWithCr(), comment);
 

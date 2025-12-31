@@ -74,8 +74,8 @@ public static partial class Extensions {
                 if (string.IsNullOrEmpty(isValue)) { return compareKeySNok + "A0000000000"; }
                 if (int.TryParse(isValue, out var w)) {
                     return w >= 0
-                        ? compareKeySOk + "A" + w.ToStringInt10()
-                        : compareKeySOk + w.ToStringInt10();
+                        ? compareKeySOk + "A" + w.ToString10()
+                        : compareKeySOk + w.ToString10();
                 }
 
                 return compareKeySNok + isValue;
@@ -91,7 +91,7 @@ public static partial class Extensions {
 
             case SortierTyp.ZahlenwertFloat:
                 if (DoubleTryParse(isValue, out var dw)) {
-                    var t = dw.ToStringFloat10_3();
+                    var t = dw.ToString10_3();
                     if (!t.Contains(",")) { t += ",000"; }
 
                     if (dw < 0) {

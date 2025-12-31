@@ -55,7 +55,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         this.Parse(filterCode);
     }
 
-    public FilterItem(ColumnItem column, double from, double to) : this(column, FilterType.Between | FilterType.UND, from.ToStringFloat5() + "|" + to.ToStringFloat5()) { }
+    public FilterItem(ColumnItem column, double from, double to) : this(column, FilterType.Between | FilterType.UND, from.ToString1_5() + "|" + to.ToString1_5()) { }
 
     /// <summary>
     /// Bei diesem Construktor muss der Tag 'Table' vorkommen!

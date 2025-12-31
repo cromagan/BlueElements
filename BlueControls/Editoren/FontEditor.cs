@@ -106,12 +106,12 @@ public partial class FontEditor : EditorEasy {
         if (toEdit is not BlueFont { } bf) { return false; }
 
         if (lstName[bf.FontName] == null) { lstName.ItemAdd(ItemOf(bf.FontName, bf.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }
-        if (listSize[bf.Size.ToStringFloat2()] == null) { listSize.ItemAdd(ItemOf(bf.Size.ToStringFloat2())); }
+        if (listSize[bf.Size.ToString1_2()] == null) { listSize.ItemAdd(ItemOf(bf.Size.ToString1_2())); }
 
         lstName.UncheckAll();
         lstName.Check(bf.FontName);
         listSize.UncheckAll();
-        listSize.Check(bf.Size.ToStringFloat2());
+        listSize.Check(bf.Size.ToString1_2());
         chkFett.Checked = bf.Bold;
         chkKursiv.Checked = bf.Italic;
         chkUnterstrichen.Checked = bf.Underline;

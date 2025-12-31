@@ -57,8 +57,8 @@ public partial class PadEditor : FormWithStatusBar {
 
         if (Pad.Items != null) {
             ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
-            txbRasterAnzeige.Text = Pad.Items.GridShow.ToStringFloat2();
-            txbRasterFangen.Text = Pad.Items.GridSnap.ToStringFloat2();
+            txbRasterAnzeige.Text = Pad.Items.GridShow.ToString1_2();
+            txbRasterFangen.Text = Pad.Items.GridSnap.ToString1_2();
             PadDesign.Text = Pad.Items.SheetStyle;
         }
     }

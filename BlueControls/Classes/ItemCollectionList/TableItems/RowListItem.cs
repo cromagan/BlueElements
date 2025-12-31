@@ -24,6 +24,7 @@ using BlueTable;
 using BlueTable.Enums;
 using System;
 using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -37,6 +38,14 @@ public sealed class RowListItem : RowBackgroundListItem {
     #region Fields
 
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
+
+    private static Brush BrushBrighten = new SolidBrush(Color.FromArgb(128, 255, 255, 255));
+
+    private static Brush BrushDarken = new SolidBrush(Color.FromArgb(128, 0, 0, 0));
+
+    private static Pen PenBrighten = new Pen(Color.FromArgb(128, 255, 255, 255));
+
+    private static Pen PenDarken = new Pen(Color.FromArgb(128, 0, 0, 0));
 
     #endregion
 
@@ -69,6 +78,53 @@ public sealed class RowListItem : RowBackgroundListItem {
     #endregion
 
     #region Methods
+
+    public static void ColumbBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        switch (viewItem.BackgroundStyle) {
+            case ColumnBackgroundStyle.None:
+            case ColumnBackgroundStyle.Brighten:
+            case ColumnBackgroundStyle.Darken:
+                break;
+
+            case ColumnBackgroundStyle.PopIn:
+
+                for (var z = 0; z < 4; z++) {
+                    gr.DrawLine(PenDarken, positionControl.Left + z, positionControl.Top + z, positionControl.Right - z, positionControl.Top + z);
+                    gr.DrawLine(PenDarken, positionControl.Left + z, positionControl.Top + z, positionControl.Left + z, positionControl.Bottom - z);
+                    gr.DrawLine(PenBrighten, positionControl.Right - z, positionControl.Top + z, positionControl.Right - z, positionControl.Bottom - z);
+                    gr.DrawLine(PenBrighten, positionControl.Left + z, positionControl.Bottom - z, positionControl.Right - z, positionControl.Bottom - z);
+                }
+                break;
+
+            case ColumnBackgroundStyle.PopOut:
+
+                for (var z = 0; z < 4; z++) {
+                    gr.DrawLine(PenBrighten, positionControl.Left + z, positionControl.Top + z, positionControl.Right - z, positionControl.Top + z);
+                    gr.DrawLine(PenBrighten, positionControl.Left + z, positionControl.Top + z, positionControl.Left + z, positionControl.Bottom - z);
+                    gr.DrawLine(PenDarken, positionControl.Right - z, positionControl.Top + z, positionControl.Right - z, positionControl.Bottom - z);
+                    gr.DrawLine(PenDarken, positionControl.Left + z, positionControl.Bottom - z, positionControl.Right - z, positionControl.Bottom - z);
+                }
+                break;
+        }
+    }
+
+    public static void ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        switch (viewItem.BackgroundStyle) {
+            case ColumnBackgroundStyle.None:
+            case ColumnBackgroundStyle.PopIn:
+            case ColumnBackgroundStyle.PopOut:
+                break;
+
+            case ColumnBackgroundStyle.Brighten:
+
+                gr.FillRectangle(BrushBrighten, positionControl);
+                break;
+
+            case ColumnBackgroundStyle.Darken:
+                gr.FillRectangle(BrushDarken, positionControl);
+                break;
+        }
+    }
 
     public static string Identifier(RowItem row, string chapter) => chapter.Trim('\\').ToUpperInvariant() + "\\" + row.KeyName;
 
@@ -115,6 +171,8 @@ public sealed class RowListItem : RowBackgroundListItem {
     public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
 
+        ColumbBackGround(gr, viewItem, positionControl, state);
+
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
         }
@@ -142,6 +200,12 @@ public sealed class RowListItem : RowBackgroundListItem {
         positionControl.Inflate(-pax, -pay);
 
         viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+    }
+
+    public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
+
+        ColumnOverlay(gr, viewItem, positionControl, state);
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
@@ -185,7 +249,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         drawHeight = Math.Min(drawHeight, 200);
-        drawHeight = Math.Max(drawHeight+4, 18);
+        drawHeight = Math.Max(drawHeight + 4, 18);
 
         return new(100, drawHeight);
     }

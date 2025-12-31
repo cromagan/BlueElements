@@ -642,11 +642,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
                 switch (Sort) {
                     case "Größe":
-                        bli.UserDefCompareKey = ((int)fi.Length).ToStringInt10();
+                        bli.UserDefCompareKey = ((int)fi.Length).ToString10();
                         break;
 
                     case "Erstelldatum":
-                        bli.UserDefCompareKey = fi.CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
+                        bli.UserDefCompareKey = fi.CreationTime.ToString9();
                         break;
 
                     default:

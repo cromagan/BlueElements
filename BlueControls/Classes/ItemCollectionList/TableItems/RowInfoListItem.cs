@@ -101,7 +101,7 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
 
         //if (!string.IsNullOrEmpty(toDrawd)) {
         //    gr.SetClip(positionControl);
-        //    viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, null, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+        //    viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, null, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Alignx, scale);
 
         //    //gr.DrawImage(plusszeichen, new Point((int)positionControl.Left + p1, (int)positionControl.Top + p1));
         //    gr.ResetClip();

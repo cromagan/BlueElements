@@ -185,8 +185,8 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
                 if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f2 == x[0]) {
                     nr++;
                     if (nr < MaxRecentFilterEntries) {
-                        var show = (nr + 1).ToStringInt3() + ": " + x[1];
-                        TextListItem it = new(show, x[1], null, false, true, nr.ToStringInt3());
+                        var show = (nr + 1).ToString3() + ": " + x[1];
+                        TextListItem it = new(show, x[1], null, false, true, nr.ToString3());
                         cbx.ItemAdd(it);
                     }
                 }
@@ -221,7 +221,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
         } else {
             if (filterSingle is { SearchValue.Count: > 0 } && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
                 btn.ImageCode = "Trichter|16";
-                btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString());
+                btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString1());
             } else {
                 btn.ImageCode = "Trichter|16";
                 btn.Text = LanguageTool.DoTranslate("Gewählt: " + f.Value);

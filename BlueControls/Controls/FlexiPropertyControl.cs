@@ -440,7 +440,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 if (_accessor.Get() is null) {
                 } else if (_accessor.Get() is IEditable) {
                 } else if (_accessor.Get() is Enum) {
-                    int.TryParse(Value, out var ef);
+                    var ef = IntParse(Value);
                     var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                     if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
                 } else {
@@ -499,19 +499,19 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case int iv:
-                ValueSet(iv.ToString(), true);
+                ValueSet(iv.ToString1(), true);
                 break;
 
             case Enum:
-                ValueSet(((int)x).ToString(), true);
+                ValueSet(((int)x).ToString1(), true);
                 break;
 
             case double db:
-                ValueSet(db.ToStringFloat2(), true);
+                ValueSet(db.ToString1_2(), true);
                 break;
 
             case float fl:
-                ValueSet(fl.ToStringFloat2(), true);
+                ValueSet(fl.ToString1_2(), true);
                 break;
 
             case Color co:

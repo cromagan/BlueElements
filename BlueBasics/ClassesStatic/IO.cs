@@ -491,7 +491,7 @@ public static class IO {
         string? filename;
         do {
             z++;
-            filename = z > 0 ? directory + preferedfilename + "_" + z.ToStringInt5() + "." + suffix : directory + preferedfilename + "." + suffix;
+            filename = z > 0 ? directory + preferedfilename + "_" + z.ToString5() + "." + suffix : directory + preferedfilename + "." + suffix;
         } while (TryFileExists([filename]).ReturnValue is true);
         return filename;
     }

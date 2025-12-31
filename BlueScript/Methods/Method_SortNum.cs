@@ -60,7 +60,7 @@ internal class Method_SortNum : Method {
             return DoItFeedback.AttributFehler(ld, attvar);
         }
 
-        vli.ValueList = nums.ConvertAll(i => i.ToStringFloat5());
+        vli.ValueList = nums.ConvertAll(i => i.ToString1_5());
         return DoItFeedback.Null();
     }
 

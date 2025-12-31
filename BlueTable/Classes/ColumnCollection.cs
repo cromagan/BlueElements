@@ -223,7 +223,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (thisColumnItem != null) {
                 lfdn++;
                 da.RowBeginn();
-                da.CellAdd(lfdn.ToString());
+                da.CellAdd(lfdn.ToString1());
                 da.CellAdd(thisColumnItem.KeyName);
                 da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
                 da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));

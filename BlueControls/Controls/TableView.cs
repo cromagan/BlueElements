@@ -377,7 +377,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             column = type.GetProperty("Column")?.GetValue(data) as ColumnItem;
 
             row = type.GetProperty("Row")?.GetValue(data) as RowItem;
-            view = type.GetProperty(nameof(View))?.GetValue(data) as TableView;
+            view = type.GetProperty("View")?.GetValue(data) as TableView;
         }
 
         if (column is not { IsDisposed: false }) { return; }
@@ -385,15 +385,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
 
-        if (row is not { IsDisposed: false }) {
-            column.Edit();
-            return;
-        }
+        //if (row is not { IsDisposed: false }) {
+        //    column.Edit();
+        //    return;
+        //}
 
         ColumnItem? columnLinked = null;
         var posError = false;
 
-        if (column.RelationType == RelationType.CellValues) {
+        if (column.RelationType == RelationType.CellValues && row is { }) {
             (columnLinked, _, _, _) = row.LinkedCellData(column, true, false);
             posError = true;
         }
@@ -793,7 +793,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     "Cancel", null, false, true, undoItem.DateTimeUtc.ToString9())
                 : new TextListItem(
                    $"ab {undoItem.DateTimeUtc}  UTC, geändert von {undoItem.User}",
-                    co.ToStringInt5() + undoItem.ChangedTo, null, false, true, undoItem.DateTimeUtc.ToString9());
+                    co.ToString5() + undoItem.ChangedTo, null, false, true, undoItem.DateTimeUtc.ToString9());
             isfirst = false;
 
             i.Add(las);
@@ -802,7 +802,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (las != null) {
             var undoItem = tb.Undo[lasNr];
             var l2 = ItemOf($"vor {undoItem.DateTimeUtc} UTC",
-                co.ToStringInt5() + undoItem.PreviousValue, null, false, true, undoItem.DateTimeUtc.ToString9());
+                co.ToString5() + undoItem.PreviousValue, null, false, true, undoItem.DateTimeUtc.ToString9());
 
             i.Add(l2);
         }
@@ -1037,7 +1037,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (_mouseOverColumn is { IsDisposed: false } column3) {
                 e.ContextMenu.Add(ItemOf("Spalte", true));
-                e.ContextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, new { Column = column3, Row = _mouseOverRow, View = Table }, tb.IsAdministrator()));
+                e.ContextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, new { Column = column3, Row = _mouseOverRow, View = this }, tb.IsAdministrator()));
                 e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, column3, tb.IsAdministrator()));
                 e.ContextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, column3, tb.IsAdministrator()));
                 e.ContextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, column3, tb.IsAdministrator()));
@@ -2660,7 +2660,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         colDia.ShowDialog();
         colDia.Dispose();
 
-        NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToStringInt1(), viewItem, cellInThisTableRow as RowListItem, false));
+        NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToString1(), viewItem, cellInThisTableRow as RowListItem, false));
     }
 
     private void Cell_Edit_Dropdown(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {

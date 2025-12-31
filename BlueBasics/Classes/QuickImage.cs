@@ -251,7 +251,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         //if (string.IsNullOrEmpty(image)) { return null; }
         if (image.Contains("|")) {
             var w = (image + "||||||").Split('|');
-            w[1] = squareWidth.ToString();
+            w[1] = squareWidth.ToString1();
             w[2] = string.Empty;
             return Get(w.JoinWith("|"));
         }

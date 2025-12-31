@@ -122,12 +122,12 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<AbstractListItem> verhalt =
         [
-            ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(),
+            ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString1(),
                 QuickImage.Get(ImageCode.Linie)),
-            ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString(),
+            ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString1(),
                 QuickImage.Get(ImageCode.Linie)),
             ItemOf("Linie soll Objekten ausweichen und rechtwinklig sein",
-                ((int)ConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(ImageCode.Linie))
+                ((int)ConectorStyle.AusweichenUndGerade).ToString1(), QuickImage.Get(ImageCode.Linie))
         ];
 
         List<GenericControl> result =

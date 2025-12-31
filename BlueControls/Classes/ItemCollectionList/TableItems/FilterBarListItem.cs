@@ -84,7 +84,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
             if (fi != null) {
                 trichterState = States.Checked;
                 var anz = Autofilter_Text(viewItem);
-                trichterText = anz > -100 ? (anz * -1).ToStringInt1() : "∞";
+                trichterText = anz > -100 ? (anz * -1).ToString1() : "∞";
             } else {
                 trichterState = States.Standard;
             }

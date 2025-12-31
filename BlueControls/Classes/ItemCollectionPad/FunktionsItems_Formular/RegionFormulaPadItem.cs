@@ -119,15 +119,12 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var cl = ParentFormula?.AllKnownChilds(ParentFormula.NotAllowedChilds);
 
-        var u = new List<AbstractListItem>();
-        u.AddRange(ItemsOf(typeof(GroupBoxStyle)));
-
         List<GenericControl> result =
             [.. base.GetProperties(widthOfControl),
                 new FlexiControl("Einstellungen:", widthOfControl, true),
                 new FlexiControlForProperty<string>(() => Child, cl),
 
-                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil, u)
+                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil,ItemsOf(typeof(GroupBoxStyle)) )
             ];
 
         return result;

@@ -127,7 +127,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
                     nr++;
                     if (nr < MaxCount) {
                         vis = true;
-                        var show = (nr + 1).ToStringInt3() + ": ";
+                        var show = (nr + 1).ToString3() + ": ";
                         if (MustExist) {
                             show += x[0].FileNameWithSuffix();
                         } else {
@@ -137,7 +137,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
                             show = show + " - " + x[1];
                         }
                         TextListItem it = new(show, x[0], null, false, true,
-                            nr.ToStringInt3());
+                            nr.ToString3());
                         List<string> t = [x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) ? x[1] : string.Empty];
                         it.Tag = t;
                         ItemAdd(it);

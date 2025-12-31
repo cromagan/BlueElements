@@ -52,6 +52,12 @@ public sealed class NewRowListItem : RowBackgroundListItem {
 
     #region Methods
 
+    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
+
+        RowListItem.ColumbBackGround(gr, viewItem, positionControl, state);
+    }
+
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
@@ -87,6 +93,12 @@ public sealed class NewRowListItem : RowBackgroundListItem {
         if (doWhiteAfter) {
             gr.FillRectangle(GrayBrush2, positionControl);
         }
+    }
+
+    public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
+
+        RowListItem.ColumnOverlay(gr, viewItem, positionControl, state);
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;

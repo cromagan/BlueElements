@@ -142,9 +142,9 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<AbstractListItem> aursicht =
         [
-            ItemOf("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig),
-            ItemOf("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString(), ImageCode.Zentrieren),
-            ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString(), ImageCode.Rechtsbündig)
+            ItemOf("Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString1(), ImageCode.Linksbündig),
+            ItemOf("Zentrieren", ((int)Alignment.Top_HorizontalCenter).ToString1(), ImageCode.Zentrieren),
+            ItemOf("Rechtsbündig ausrichten", ((int)Alignment.Top_Right).ToString1(), ImageCode.Rechtsbündig)
         ];
 
         List<GenericControl> result =

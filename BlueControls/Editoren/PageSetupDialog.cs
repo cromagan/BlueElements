@@ -66,10 +66,10 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         //Höhe.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Height.ToString
         //   Format.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Width.ToString & ";" & _PrintDocument1.DefaultPageSettings.PaperSize.Height.ToString
         // Zufuhr.Text = _PrintDocument1.
-        Oben.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Top).ToStringFloat2();
-        Unten.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Bottom).ToStringFloat2();
-        Links.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Left).ToStringFloat2();
-        Rechts.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Right).ToStringFloat2();
+        Oben.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Top).ToString1_2();
+        Unten.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Bottom).ToString1_2();
+        Links.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Left).ToString1_2();
+        Rechts.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Right).ToString1_2();
         DrawSampleAndCheckButton();
         // PrepareForShowing(Controls)
         _doing = false;
@@ -236,8 +236,8 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
                     break;
             }
         }
-        Breite.Text = b.ToStringFloat1();
-        Höhe.Text = h.ToStringFloat1();
+        Breite.Text = b.ToString1_1();
+        Höhe.Text = h.ToString1_1();
     }
 
     private void Format_ItemClicked(object sender, AbstractListItemEventArgs e) {

@@ -131,11 +131,11 @@ public partial class GlobalMonitor : Form {
 
         //var e = $"[{DateTime.Now.ToString7()}] [Ebene {indent + 1}] {category}: {new string(' ', indent * 6)} {message}";
 
-        //lstLog.ItemAdd(ItemOf(e, _n.ToStringInt7()));
+        //lstLog.ItemAdd(ItemOf(e, _n.ToString7()));
 
         //lstLog.Refresh();
 
-        var r = tblLog.Table?.Row.GenerateAndAdd(_n.ToStringInt1(), "New Undo Item");
+        var r = tblLog.Table?.Row.GenerateAndAdd(_n.ToString1(), "New Undo Item");
         if (r == null) { return; }
 
         r.CellSet("symbol", symbol + "|16", string.Empty);

@@ -45,14 +45,20 @@ public sealed class TableEndListItem : RowBackgroundListItem {
 
     #endregion
 
+    //public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+    //    base.Draw_ColumnBackGround(gr, viewItem, positionControl, state); // Weiße Lüken schließen
+
+    //    var lgb = new LinearGradientBrush(positionControl, viewItem.BackColor_ColumnCell, Color.White, LinearGradientMode.Vertical);
+
+    //    gr.FillRectangle(lgb, positionControl);
+    //}
+
     #region Methods
 
-    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
-        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state); // Weiße Lüken schließen
+    public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
 
-        var lgb = new LinearGradientBrush(positionControl, viewItem.BackColor_ColumnCell, Color.White, LinearGradientMode.Vertical);
-
-        gr.FillRectangle(lgb, positionControl);
+        RowListItem.ColumnOverlay(gr, viewItem, positionControl, state);
     }
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
@@ -62,6 +68,12 @@ public sealed class TableEndListItem : RowBackgroundListItem {
     public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(18 * 3, 18 * 3);
+
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
+        var lgb = new LinearGradientBrush(positionControl, Color.Transparent, Color.White, LinearGradientMode.Vertical);
+        gr.FillRectangle(lgb, positionControl);
+    }
 
     #endregion
 }
