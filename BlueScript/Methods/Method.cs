@@ -49,7 +49,6 @@ public abstract class Method : IReadableTextWithKey {
     }
 
     public abstract List<List<string>> Args { get; }
-    public string ColumnQuickInfo => HintText();
     public abstract string Command { get; }
     public abstract List<string> Constants { get; }
     public abstract string Description { get; }
@@ -85,6 +84,7 @@ public abstract class Method : IReadableTextWithKey {
     //TODO: 0 implementieren
     public abstract bool MustUseReturnValue { get; }
 
+    public string QuickInfo => HintText();
     public abstract string Returns { get; }
 
     public abstract string StartSequence { get; }

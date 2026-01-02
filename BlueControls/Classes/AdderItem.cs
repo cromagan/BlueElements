@@ -45,10 +45,7 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Properties
 
-    //public ColumnItem? OriginIDColumn { get; }
-    public string ColumnQuickInfo => KeyName;
-
-    public bool KeyIsCaseSensitive => true; // Es wird mit Zeilenschlüsseln gearbeitet
+    public bool KeyIsCaseSensitive => true;
 
     //public ColumnItem? AdditionalInfoColumn { get; }
     //public string GeneratedEntityID { get; set; }
@@ -60,6 +57,8 @@ internal class AdderItem : IReadableTextWithKey {
     public List<string> KeysAndInfo { get; } = [];
 
     public string Last { get; }
+
+    public string QuickInfo => KeyName;
 
     #endregion
 

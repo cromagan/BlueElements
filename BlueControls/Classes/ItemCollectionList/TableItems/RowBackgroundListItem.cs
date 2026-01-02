@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueTable;
@@ -85,8 +84,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
             OnPropertyChanged();
         }
     }
-
-    public override sealed string QuickInfo => string.Empty;
 
     public string SheetStyle {
         get;

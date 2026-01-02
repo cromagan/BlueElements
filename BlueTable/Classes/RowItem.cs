@@ -381,17 +381,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return key.ToString();
     }
 
-    public string CompareKey() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
-
-        var columns = new List<ColumnItem>();
-        if (tb.SortDefinition is { } lc) { columns.AddRange(lc.UsedColumns); }
-        if (tb.Column.SysChapter is { IsDisposed: false } csc) { columns.AddIfNotExists(csc); }
-        if (tb.Column.First is { IsDisposed: false } cf) { columns.AddIfNotExists(cf); }
-
-        return CompareKey(columns);
-    }
-
     public void Dispose() {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);

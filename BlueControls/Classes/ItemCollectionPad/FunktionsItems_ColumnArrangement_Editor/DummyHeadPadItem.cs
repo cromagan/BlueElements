@@ -18,23 +18,17 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
-using BlueControls.CellRenderer;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueTable;
 using BlueTable.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
+using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 
-/// <summary>
-/// Zum Darstellen einer Spalte. Im ViewEditpt benutzt
-/// </summary>
 public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
     #region Constructors
@@ -50,6 +44,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
     public static string ClassId => "FI-DummyHead";
 
+    public string Chapter_Column { get; set; } = string.Empty;
     public override string Description => string.Empty;
 
     public int FilterRows { get; set; }
@@ -71,12 +66,16 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
         tb.Editor = typeof(TableHeadEditor);
 
+        var col = ItemsOf(tb.Column, true);
+        col.Add(ItemOf("Keine Überschriften", "#ohne", ImageCode.Kreuz, true, "!!!"));
+
         List<GenericControl> result =
         [
             new FlexiDelegateControl(tb.Edit, "Tabelle: " + tb.Caption, ImageCode.Tabelle),
             new FlexiControl(),
             new FlexiControlForProperty<bool>(() => ShowHead),
-            new FlexiControlForProperty<int>(() => FilterRows)
+            new FlexiControlForProperty<int>(() => FilterRows),
+            new FlexiControlForProperty<string>(() => Chapter_Column, col )
         ];
 
         return result;

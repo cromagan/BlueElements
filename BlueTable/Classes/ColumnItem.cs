@@ -71,7 +71,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     /// </summary>
     private string _columnNameOfLinkedTable;
 
-    private string _columnQuickInfo;
     private string _columnSystemInfo;
     private string _defaultRenderer;
     private TranslationType _doOpticalTranslation;
@@ -98,6 +97,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     private int _maxCellLength;
     private int _maxTextLength;
     private bool _multiLine;
+    private string _quickInfo;
     private string _regexCheck = string.Empty;
     private bool _relationship_to_First;
     private RelationType _relationType;
@@ -141,7 +141,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         _relationType = RelationType.None;
         _value_for_Chunk = ChunkType.None;
         _isFirst = false;
-        _columnQuickInfo = string.Empty;
+        _quickInfo = string.Empty;
         _captionGroup1 = string.Empty;
         _captionGroup2 = string.Empty;
         _captionGroup3 = string.Empty;
@@ -450,17 +450,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
             Table?.ChangeData(TableDataType.ColumnNameOfLinkedTable, this, _columnNameOfLinkedTable, value);
             Invalidate_ColumAndContent();
-            OnPropertyChanged();
-        }
-    }
-
-    public string ColumnQuickInfo {
-        get => _columnQuickInfo;
-        set {
-            if (IsDisposed) { return; }
-            if (_columnQuickInfo == value) { return; }
-
-            Table?.ChangeData(TableDataType.ColumnQuickInfo, this, _columnQuickInfo, value);
             OnPropertyChanged();
         }
     }
@@ -839,6 +828,17 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
+    public string QuickInfo {
+        get => _quickInfo;
+        set {
+            if (IsDisposed) { return; }
+            if (_quickInfo == value) { return; }
+
+            Table?.ChangeData(TableDataType.ColumnQuickInfo, this, _quickInfo, value);
+            OnPropertyChanged();
+        }
+    }
+
     public string RegexCheck {
         get => _regexCheck;
         set {
@@ -1089,7 +1089,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return value; }
 
-        if (IsSystemColumn() && this != tb.Column.SysChapter) { return value; }
+        if (IsSystemColumn()) { return value; }
         //if (Function == ColumnFunction.Virtelle_Spalte) { return value; }
 
         if (exitifLinkedFormat && _relationType != RelationType.None) { return value; }
@@ -1222,7 +1222,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         LineStyleRight = source.LineStyleRight;
         BackgroundStyle = source.BackgroundStyle;
         MultiLine = source.MultiLine;
-        ColumnQuickInfo = source.ColumnQuickInfo;
+        QuickInfo = source.QuickInfo;
         ForeColor = source.ForeColor;
         BackColor = source.BackColor;
         EditAllowedDespiteLock = source.EditAllowedDespiteLock;
@@ -1729,15 +1729,16 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_CHAPTER":
+                KeyName = "CHAPTER";
 
-                _multiLine = true;
+                //_multiLine = true;
 
-                if (setOpticalToo) {
-                    Caption = "Kapitel";
-                    ForeColor = Color.FromArgb(0, 0, 0);
-                    BackColor = Color.FromArgb(255, 255, 150);
-                    LineStyleLeft = ColumnLineStyle.Dick;
-                }
+                //if (setOpticalToo) {
+                //    Caption = "Kapitel";
+                //    ForeColor = Color.FromArgb(0, 0, 0);
+                //    BackColor = Color.FromArgb(255, 255, 150);
+                //    LineStyleLeft = ColumnLineStyle.Dick;
+                //}
                 break;
 
             case "SYS_DATECREATED":
@@ -1870,7 +1871,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _maxCellLength = 1;
 
                 if (_editableWithTextInput || _editableWithDropdown) {
-                    _columnQuickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
+                    _quickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
                     _editableWithTextInput = false;
                     _editableWithDropdown = true;
                     _editAllowedDespiteLock = true;
@@ -2016,7 +2017,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (!_saveContent) { return QuickImage.Get(ImageCode.Tabelle, 16); }
 
         foreach (var thisFormat in FormatHolder.AllFormats) {
-            if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.Image; }
+            if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.SymbolForReadableText(); }
         }
 
         if (_editableWithDropdown) {
@@ -2169,7 +2170,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case TableDataType.ColumnQuickInfo:
-                _columnQuickInfo = newvalue;
+                _quickInfo = newvalue;
                 break;
 
             case TableDataType.CaptionGroup1:

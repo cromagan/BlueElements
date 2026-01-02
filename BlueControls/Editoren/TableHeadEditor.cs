@@ -366,6 +366,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         tb.Column.GenerateAndAddSystem();
+        tb.RepairAfterParse();
     }
 
     private void GenerateInfoText() {

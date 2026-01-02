@@ -201,7 +201,7 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Primitive Methode. Erswetzt nur Umlaute und \r
+    /// Primitive Methode. Ersetzt nur Umlaute und \r
     /// Besser: Siehe MethodStringAsciiToHTML
     /// </summary>
     /// <param name="text"></param>

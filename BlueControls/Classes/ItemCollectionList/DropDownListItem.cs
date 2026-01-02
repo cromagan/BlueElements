@@ -33,17 +33,9 @@ public class DropDownListItem : AbstractListItem {
 
     #endregion
 
-    //public AbstractListItem? Selected;
-
     #region Constructors
 
     public DropDownListItem(string keyName, bool enabled, string userDefCompareKey) : base(keyName, enabled) => UserDefCompareKey = userDefCompareKey;
-
-    #endregion
-
-    #region Properties
-
-    public override string QuickInfo => string.Empty;
 
     #endregion
 

@@ -80,8 +80,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// <returns></returns>
     public bool IsDisposed { get; private set; }
 
-    public ColumnItem? SysChapter { get; private set; }
-
     public ColumnItem? SysCorrect { get; private set; }
 
     public ColumnItem? SysLocked { get; private set; }
@@ -174,14 +172,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         item.Caption = caption;
 
         item.GetStyleFrom(format);
-        item.ColumnQuickInfo = quickinfo;
+        item.QuickInfo = quickinfo;
         return item;
     }
 
     public void GenerateAndAddSystem() {
         string[] w = [
             "SYS_ROWSTATE",
-            "SYS_CHAPTER",
             "SYS_ROWCOLOR",
             "SYS_DATECHANGED",
             "SYS_CHANGER",
@@ -229,10 +226,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));
                 var name = string.Empty;
                 foreach (var thisFormat in FormatHolder.AllFormats) {
-                    if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.Name; }
+                    if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.KeyName; }
                 }
                 da.CellAdd(name + " (" + thisColumnItem.MaxCellLength + " Char)");
-                da.CellAdd(thisColumnItem.ColumnQuickInfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.QuickInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.ColumnTags.JoinWith("<br>"));
                 da.CellAdd(thisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
@@ -256,7 +253,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysCorrect = null;
         SysRowChanger = null;
         SysRowChangeDate = null;
-        SysChapter = null;
         SysRowState = null;
         SysRowColor = null;
         ChunkValueColumn = null;
@@ -298,7 +294,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                             break;
 
                         case "SYS_CHAPTER":
-                            SysChapter = thisColumnItem;
+                            //SysChapter = thisColumnItem;
                             break;
 
                         case "SYS_ROWSTATE":
@@ -408,7 +404,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Spalten erzeugen und Format übertragen
         foreach (var thisColumn in sourceTable.Column) {
             var l = this[thisColumn.KeyName] ??
-                GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, null, thisColumn.ColumnQuickInfo);
+                GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, null, thisColumn.QuickInfo);
 
             if (l != null) {
                 l.CloneFrom(thisColumn, true);

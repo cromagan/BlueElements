@@ -102,8 +102,6 @@ public class BitmapListItem : AbstractListItem {
 
     public int Padding { get; set; }
 
-    public override string QuickInfo => string.Empty;
-
     #endregion
 
     #region Methods

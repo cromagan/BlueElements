@@ -60,7 +60,21 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
 
     public static string ClassId => "ROW";
 
-    public override string ColumnQuickInfo {
+    public override string Description => string.Empty;
+
+    /// <summary>
+    /// Namen so lassen, wegen Kontextmenu
+    /// </summary>
+    public string Layout_Dateiname {
+        get => _layoutFileName;
+        set {
+            if (value == _layoutFileName) { return; }
+            _layoutFileName = value;
+            RemovePic();
+        }
+    }
+
+    public override string QuickInfo {
         get {
             var r = Row;
             if (r is not { IsDisposed: false }) { return string.Empty; }
@@ -75,20 +89,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
             // Werte zurücksetzen
             _lastQuickInfo = string.Empty;
             _tmpQuickInfo = string.Empty;
-        }
-    }
-
-    public override string Description => string.Empty;
-
-    /// <summary>
-    /// Namen so lassen, wegen Kontextmenu
-    /// </summary>
-    public string Layout_Dateiname {
-        get => _layoutFileName;
-        set {
-            if (value == _layoutFileName) { return; }
-            _layoutFileName = value;
-            RemovePic();
         }
     }
 

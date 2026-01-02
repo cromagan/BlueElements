@@ -39,7 +39,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
         AdminInfo = adminInfo;
         Image = image;
         KeyName = name;
-        ColumnQuickInfo = quickInfo;
+        QuickInfo = quickInfo;
         Script = script;
         UserGroups = userGroups;
         FailedReason = failedReason;
@@ -70,13 +70,13 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
     #region Properties
 
     public string AdminInfo { get; private set; }
-    public string ColumnQuickInfo { get; private set; }
     public string CompareKey => KeyName;
     public string FailedReason { get; private set; }
     public string Image { get; private set; }
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; private set; }
+    public string QuickInfo { get; private set; }
     public string Script { get; private set; }
 
     public ReadOnlyCollection<string> UserGroups { get; private set; }
@@ -115,7 +115,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
 
             result.ParseableAdd("Name", KeyName.Trim());
             result.ParseableAdd("Script", Script.Replace("\r\n", "\r").TrimEnd(' '));
-            result.ParseableAdd("QuickInfo", ColumnQuickInfo.Replace("\r\n", "\r").TrimEnd(' '));
+            result.ParseableAdd("QuickInfo", QuickInfo.Replace("\r\n", "\r").TrimEnd(' '));
             result.ParseableAdd("AdminInfo", AdminInfo.Replace("\r\n", "\r").TrimEnd(' '));
             result.ParseableAdd("Image", Image);
             result.ParseableAdd("UserGroups", UserGroups, false);
@@ -150,7 +150,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyC
                 return true;
 
             case "quickinfo":
-                ColumnQuickInfo = value.FromNonCritical();
+                QuickInfo = value.FromNonCritical();
                 return true;
 
             case "admininfo":

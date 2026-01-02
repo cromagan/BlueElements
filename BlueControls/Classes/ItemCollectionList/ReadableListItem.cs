@@ -59,8 +59,6 @@ public class ReadableListItem : TextListItem {
         }
     }
 
-    public override string QuickInfo => Item.ColumnQuickInfo;
-
     #endregion
 
     #region Methods
@@ -71,6 +69,7 @@ public class ReadableListItem : TextListItem {
         Text = Item.ReadableText();
         Symbol = Item.SymbolForReadableText();
         KeyName = Item.KeyName;
+        QuickInfo = Item.QuickInfo;
     }
 
     #endregion

@@ -454,7 +454,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
-    public abstract string QuickInfo { get; }
+    public string QuickInfo { get; set; }
 
     /// <summary>
     /// Falls eine spezielle Information gespeichert und zurückgegeben werden soll

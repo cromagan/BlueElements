@@ -325,7 +325,7 @@ public class Chunk : IHasKeyName {
         SaveToByteList(TableDataType.RegexCheck, c.RegexCheck, name);
         SaveToByteList(TableDataType.DropdownDeselectAllAllowed, c.DropdownDeselectAllAllowed.ToPlusMinus(), name);
         SaveToByteList(TableDataType.ShowValuesOfOtherCellsInDropdown, c.ShowValuesOfOtherCellsInDropdown.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.ColumnQuickInfo, c.ColumnQuickInfo, name);
+        SaveToByteList(TableDataType.ColumnQuickInfo, c.QuickInfo, name);
         SaveToByteList(TableDataType.ColumnAdminInfo, c.AdminInfo, name);
         //SaveToByteList(TableDataType.ColumnSystemInfo, c.SystemInfo, name);
         //SaveToByteList(l, TableDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);

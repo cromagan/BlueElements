@@ -1466,18 +1466,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         for (var z = 0; z < Math.Max(2, tcvc.Count); z++) {
             if (tcvc.Count < z + 1) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
-            ColumnViewCollection.Repair(tcvc[z], z);
+            tcvc[z].Repair(z);
         }
-
-        //var i = tb.Column.IndexOf(tcvc[0][0].Column.KeyName);
-
-        //if(i!= 0) {
-        //    Develop.DebugPrint(ErrorType.Warning, "Spalte 0 nicht auf erster CanvasPosition!");
-
-        //    tb.Column.RemoveAt
-
-        //    Generic.Swap(tb.Column[0], tb.Column[i]);
-        //}
 
         var n = tcvc.ToString(false);
 
@@ -2014,15 +2004,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void _Table_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
-
-        if (SortUsed() is { } rsd) {
-            if (rsd.UsedForRowSort(e.Column) || e.Column == Table?.Column.SysChapter) {
-                Invalidate_AllViewItems(false);
+        if (CurrentArrangement is { IsDisposed: false } ca) {
+            if (SortUsed() is { } rsd) {
+                if (rsd.UsedForRowSort(e.Column) || e.Column == ca.ColumnForChapter) {
+                    Invalidate_AllViewItems(false);
+                }
             }
-        }
 
-        if (e.Column.MultiLine) {
-            if (CurrentArrangement is { IsDisposed: false } ca) {
+            if (e.Column.MultiLine) {
                 if (ca[e.Column] is { IsDisposed: false }) {
                     Invalidate_AllViewItems(false); // Zeichenhöhe kann sich ändern...
                 }
@@ -2299,7 +2288,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, Table tb, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
         HashSet<string> allCaps = [];
 
-        if (tb.Column.SysChapter is { IsDisposed: false } cap) {
+        if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
             var caps = cap.Contents(filteredRows);
 
             foreach (var capValue in caps) {
@@ -2526,7 +2515,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Parallel.ForEach(allrows, thisRow => {
             var markYellow = pinnedRows.Contains(thisRow);
 
-            var capsOfRow = tb.Column.SysChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
+            var capsOfRow = arrangement.ColumnForChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
             capsOfRow.Remove(string.Empty);
             if (capsOfRow.Count == 0 && nullcap) { capsOfRow.Add(Weitere_Zeilen); }
             if (markYellow) { capsOfRow.Add(Angepinnt); }

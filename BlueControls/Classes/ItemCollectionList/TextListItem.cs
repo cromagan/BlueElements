@@ -31,6 +31,7 @@ public class TextListItem : AbstractListItem {
         Text = readableText;
         Symbol = symbol;
         UserDefCompareKey = userDefCompareKey;
+        QuickInfo = Text.CreateHtmlCodes();
     }
 
     #endregion
@@ -45,8 +46,6 @@ public class TextListItem : AbstractListItem {
             OnPropertyChanged();
         }
     }
-
-    public override string QuickInfo => Text.CreateHtmlCodes();
 
     public QuickImage? Symbol {
         get;
@@ -97,6 +96,7 @@ public class TextListItem : AbstractListItem {
                 case Design.Item_KontextMenu:
                     return Design.Item_KontextMenu_Caption;
 
+                case Design.Item_DropdownMenu:
                 case Design.Item_Listbox:
                     return Design.Item_Listbox_Caption;
             }

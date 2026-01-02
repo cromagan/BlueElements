@@ -33,6 +33,8 @@ namespace BlueControls.BlueTableDialogs {
         private void InitializeComponent() {
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabAnzeige = new System.Windows.Forms.TabPage();
+            this.cbxBackground = new BlueControls.Controls.ComboBox();
+            this.capHintergrund = new BlueControls.Controls.Caption();
             this.cbxRenderer = new BlueControls.Controls.ComboBox();
             this.txbSpaltenbild = new BlueControls.Controls.TextBox();
             this.txbUeberschift1 = new BlueControls.Controls.TextBox();
@@ -118,34 +120,23 @@ namespace BlueControls.BlueTableDialogs {
             this.cbxLinkedTable = new BlueControls.Controls.ComboBox();
             this.capLinkedTable = new BlueControls.Controls.Caption();
             this.BlueFrame1 = new BlueControls.Controls.GroupBox();
-            this.btnSystemInfo = new BlueControls.Controls.Button();
-            this.btnVerwendung = new BlueControls.Controls.Button();
             this.capInfo = new BlueControls.Controls.Caption();
             this.Caption3 = new BlueControls.Controls.Caption();
             this.txbName = new BlueControls.Controls.TextBox();
             this.Caption2 = new BlueControls.Controls.Caption();
             this.txbCaption = new BlueControls.Controls.TextBox();
+            this.btnSystemInfo = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabDatenFormat = new System.Windows.Forms.TabPage();
+            this.lstStyles = new BlueControls.Controls.ListBox();
+            this.capInfos = new BlueControls.Controls.Caption();
             this.chkRelation = new BlueControls.Controls.Button();
             this.chkIsKeyColumn = new BlueControls.Controls.Button();
             this.chkIsFirst = new BlueControls.Controls.Button();
             this.btnMaxTextLength = new BlueControls.Controls.Button();
             this.txbMaxTextLength = new BlueControls.Controls.TextBox();
             this.capMaxTextLength = new BlueControls.Controls.Caption();
-            this.grpSchnellformat = new BlueControls.Controls.GroupBox();
-            this.btnSchnellText = new BlueControls.Controls.Button();
-            this.btnSchnellBit = new BlueControls.Controls.Button();
-            this.btnSchnellDatum = new BlueControls.Controls.Button();
-            this.btnSchnellBildCode = new BlueControls.Controls.Button();
-            this.btnSchnellDatumUhrzeit = new BlueControls.Controls.Button();
-            this.btnSchnellIInternetAdresse = new BlueControls.Controls.Button();
-            this.btnSchnellEmail = new BlueControls.Controls.Button();
-            this.btnSchnellAuswahloptionen = new BlueControls.Controls.Button();
-            this.btnSchnellTelefonNummer = new BlueControls.Controls.Button();
-            this.btnSchnellGleitkommazahl = new BlueControls.Controls.Button();
-            this.btnSchnellGanzzahl = new BlueControls.Controls.Button();
             this.tabSpaltenVerlinkung = new System.Windows.Forms.TabPage();
             this.cbxRelationType = new BlueControls.Controls.ComboBox();
             this.caption1 = new BlueControls.Controls.Caption();
@@ -157,8 +148,7 @@ namespace BlueControls.BlueTableDialogs {
             this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.capTabellenname = new BlueControls.Controls.Caption();
             this.btnSpaltenkopf = new BlueControls.Controls.Button();
-            this.capHintergrund = new BlueControls.Controls.Caption();
-            this.cbxBackground = new BlueControls.Controls.ComboBox();
+            this.grpStyles = new BlueControls.Controls.GroupBox();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -169,8 +159,8 @@ namespace BlueControls.BlueTableDialogs {
             this.BlueFrame1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabDatenFormat.SuspendLayout();
-            this.grpSchnellformat.SuspendLayout();
             this.tabSpaltenVerlinkung.SuspendLayout();
+            this.grpStyles.SuspendLayout();
             this.SuspendLayout();
             // 
             // ColorDia
@@ -214,6 +204,25 @@ namespace BlueControls.BlueTableDialogs {
             this.tabAnzeige.Size = new System.Drawing.Size(1098, 594);
             this.tabAnzeige.TabIndex = 0;
             this.tabAnzeige.Text = "Anzeige";
+            // 
+            // cbxBackground
+            // 
+            this.cbxBackground.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxBackground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxBackground.Location = new System.Drawing.Point(280, 96);
+            this.cbxBackground.Name = "cbxBackground";
+            this.cbxBackground.RegexCheck = null;
+            this.cbxBackground.Size = new System.Drawing.Size(128, 24);
+            this.cbxBackground.TabIndex = 47;
+            // 
+            // capHintergrund
+            // 
+            this.capHintergrund.CausesValidation = false;
+            this.capHintergrund.Location = new System.Drawing.Point(280, 80);
+            this.capHintergrund.Name = "capHintergrund";
+            this.capHintergrund.Size = new System.Drawing.Size(88, 16);
+            this.capHintergrund.Text = "Hintergrund:";
+            this.capHintergrund.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxRenderer
             // 
@@ -1008,12 +1017,10 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // txbRegex
             // 
-            this.txbRegex.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.txbRegex.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRegex.Location = new System.Drawing.Point(8, 168);
             this.txbRegex.Name = "txbRegex";
-            this.txbRegex.Size = new System.Drawing.Size(1081, 48);
+            this.txbRegex.Size = new System.Drawing.Size(744, 48);
             this.txbRegex.TabIndex = 9;
             // 
             // capSortiermaske
@@ -1035,13 +1042,11 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // txbAllowedChars
             // 
-            this.txbAllowedChars.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.txbAllowedChars.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAllowedChars.Location = new System.Drawing.Point(8, 88);
             this.txbAllowedChars.Name = "txbAllowedChars";
             this.txbAllowedChars.RegexCheck = null;
-            this.txbAllowedChars.Size = new System.Drawing.Size(1081, 56);
+            this.txbAllowedChars.Size = new System.Drawing.Size(744, 56);
             this.txbAllowedChars.TabIndex = 30;
             this.txbAllowedChars.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -1080,8 +1085,6 @@ namespace BlueControls.BlueTableDialogs {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
-            this.BlueFrame1.Controls.Add(this.btnSystemInfo);
-            this.BlueFrame1.Controls.Add(this.btnVerwendung);
             this.BlueFrame1.Controls.Add(this.capInfo);
             this.BlueFrame1.Controls.Add(this.Caption3);
             this.BlueFrame1.Controls.Add(this.txbName);
@@ -1093,24 +1096,6 @@ namespace BlueControls.BlueTableDialogs {
             this.BlueFrame1.TabIndex = 16;
             this.BlueFrame1.TabStop = false;
             this.BlueFrame1.Text = "Allgemein";
-            // 
-            // btnSystemInfo
-            // 
-            this.btnSystemInfo.Location = new System.Drawing.Point(152, 80);
-            this.btnSystemInfo.Name = "btnSystemInfo";
-            this.btnSystemInfo.Size = new System.Drawing.Size(152, 24);
-            this.btnSystemInfo.TabIndex = 4;
-            this.btnSystemInfo.Text = "Systeminfos zurücksetzen";
-            this.btnSystemInfo.Click += new System.EventHandler(this.btnSystemInfo_Click);
-            // 
-            // btnVerwendung
-            // 
-            this.btnVerwendung.Location = new System.Drawing.Point(8, 80);
-            this.btnVerwendung.Name = "btnVerwendung";
-            this.btnVerwendung.Size = new System.Drawing.Size(128, 24);
-            this.btnVerwendung.TabIndex = 3;
-            this.btnVerwendung.Text = "Verwendungs-Info";
-            this.btnVerwendung.Click += new System.EventHandler(this.btnVerwendung_Click);
             // 
             // capInfo
             // 
@@ -1161,6 +1146,17 @@ namespace BlueControls.BlueTableDialogs {
             this.txbCaption.Size = new System.Drawing.Size(785, 64);
             this.txbCaption.TabIndex = 2;
             // 
+            // btnSystemInfo
+            // 
+            this.btnSystemInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSystemInfo.Location = new System.Drawing.Point(760, 88);
+            this.btnSystemInfo.Name = "btnSystemInfo";
+            this.btnSystemInfo.Size = new System.Drawing.Size(328, 24);
+            this.btnSystemInfo.TabIndex = 4;
+            this.btnSystemInfo.Text = "Alle gesammelten Infos zurücksetzen";
+            this.btnSystemInfo.Click += new System.EventHandler(this.btnSystemInfo_Click);
+            // 
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -1198,6 +1194,9 @@ namespace BlueControls.BlueTableDialogs {
             // tabDatenFormat
             // 
             this.tabDatenFormat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabDatenFormat.Controls.Add(this.grpStyles);
+            this.tabDatenFormat.Controls.Add(this.capInfos);
+            this.tabDatenFormat.Controls.Add(this.btnSystemInfo);
             this.tabDatenFormat.Controls.Add(this.chkRelation);
             this.tabDatenFormat.Controls.Add(this.chkIsKeyColumn);
             this.tabDatenFormat.Controls.Add(this.chkSaveContent);
@@ -1206,7 +1205,6 @@ namespace BlueControls.BlueTableDialogs {
             this.tabDatenFormat.Controls.Add(this.txbMaxTextLength);
             this.tabDatenFormat.Controls.Add(this.capMaxTextLength);
             this.tabDatenFormat.Controls.Add(this.txbAllowedChars);
-            this.tabDatenFormat.Controls.Add(this.grpSchnellformat);
             this.tabDatenFormat.Controls.Add(this.cbxSort);
             this.tabDatenFormat.Controls.Add(this.capSortiermaske);
             this.tabDatenFormat.Controls.Add(this.txbRegex);
@@ -1225,6 +1223,29 @@ namespace BlueControls.BlueTableDialogs {
             this.tabDatenFormat.Size = new System.Drawing.Size(1098, 594);
             this.tabDatenFormat.TabIndex = 12;
             this.tabDatenFormat.Text = "Daten-Format";
+            // 
+            // lstStyles
+            // 
+            this.lstStyles.AddAllowed = BlueControls.Enums.AddType.None;
+            this.lstStyles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lstStyles.Appearance = BlueControls.Enums.ListBoxAppearance.ButtonList;
+            this.lstStyles.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
+            this.lstStyles.Location = new System.Drawing.Point(8, 24);
+            this.lstStyles.Name = "lstStyles";
+            this.lstStyles.Size = new System.Drawing.Size(728, 192);
+            this.lstStyles.TabIndex = 54;
+            this.lstStyles.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstStyles_ItemClicked);
+            // 
+            // capInfos
+            // 
+            this.capInfos.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.capInfos.CausesValidation = false;
+            this.capInfos.Location = new System.Drawing.Point(760, 112);
+            this.capInfos.Name = "capInfos";
+            this.capInfos.Size = new System.Drawing.Size(328, 472);
             // 
             // chkRelation
             // 
@@ -1260,7 +1281,7 @@ namespace BlueControls.BlueTableDialogs {
             // btnMaxTextLength
             // 
             this.btnMaxTextLength.ImageCode = "Taschenrechner|16";
-            this.btnMaxTextLength.Location = new System.Drawing.Point(816, 232);
+            this.btnMaxTextLength.Location = new System.Drawing.Point(656, 256);
             this.btnMaxTextLength.Name = "btnMaxTextLength";
             this.btnMaxTextLength.QuickInfo = "Prüft alle Zellen und berechnet die ideale\r\nmaximale Text Länge";
             this.btnMaxTextLength.Size = new System.Drawing.Size(40, 24);
@@ -1272,7 +1293,7 @@ namespace BlueControls.BlueTableDialogs {
             this.txbMaxTextLength.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Integer;
             this.txbMaxTextLength.AllowedChars = "0123456789";
             this.txbMaxTextLength.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbMaxTextLength.Location = new System.Drawing.Point(720, 232);
+            this.txbMaxTextLength.Location = new System.Drawing.Point(560, 256);
             this.txbMaxTextLength.MaxTextLength = 255;
             this.txbMaxTextLength.Name = "txbMaxTextLength";
             this.txbMaxTextLength.RegexCheck = "^((-?[1-9]\\d*)|0)$";
@@ -1287,131 +1308,9 @@ namespace BlueControls.BlueTableDialogs {
             this.capMaxTextLength.QuickInfo = "Pro Zeile!\r\nEs wird wirklich die Anzahl der Zeichen gezählt.\r\nEs bezeht sich nur " +
     "auf das Format, und es wird evtl. eine Meldung ausgegeben,\r\ndas die Eingabe nich" +
     "t dem Format entspricht.";
-            this.capMaxTextLength.Size = new System.Drawing.Size(160, 24);
+            this.capMaxTextLength.Size = new System.Drawing.Size(136, 24);
             this.capMaxTextLength.Text = "Maximale Text-Länge:";
             this.capMaxTextLength.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // grpSchnellformat
-            // 
-            this.grpSchnellformat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpSchnellformat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpSchnellformat.Controls.Add(this.btnSchnellText);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellBit);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellDatum);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellBildCode);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellDatumUhrzeit);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellIInternetAdresse);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellEmail);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellAuswahloptionen);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellTelefonNummer);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellGleitkommazahl);
-            this.grpSchnellformat.Controls.Add(this.btnSchnellGanzzahl);
-            this.grpSchnellformat.Location = new System.Drawing.Point(8, 384);
-            this.grpSchnellformat.Name = "grpSchnellformat";
-            this.grpSchnellformat.Size = new System.Drawing.Size(1081, 80);
-            this.grpSchnellformat.TabIndex = 11;
-            this.grpSchnellformat.TabStop = false;
-            this.grpSchnellformat.Text = "Schnell-Format";
-            // 
-            // btnSchnellText
-            // 
-            this.btnSchnellText.Location = new System.Drawing.Point(8, 16);
-            this.btnSchnellText.Name = "btnSchnellText";
-            this.btnSchnellText.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellText.TabIndex = 0;
-            this.btnSchnellText.Text = "Text";
-            this.btnSchnellText.Click += new System.EventHandler(this.btnSchnellText_Click);
-            // 
-            // btnSchnellBit
-            // 
-            this.btnSchnellBit.Location = new System.Drawing.Point(280, 16);
-            this.btnSchnellBit.Name = "btnSchnellBit";
-            this.btnSchnellBit.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellBit.TabIndex = 10;
-            this.btnSchnellBit.Text = "Bit (Ja/Nein)";
-            this.btnSchnellBit.Click += new System.EventHandler(this.btnSchnellBit_Click);
-            // 
-            // btnSchnellDatum
-            // 
-            this.btnSchnellDatum.Location = new System.Drawing.Point(8, 48);
-            this.btnSchnellDatum.Name = "btnSchnellDatum";
-            this.btnSchnellDatum.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellDatum.TabIndex = 1;
-            this.btnSchnellDatum.Text = "Datum";
-            this.btnSchnellDatum.Click += new System.EventHandler(this.btnSchnellDatum_Click);
-            // 
-            // btnSchnellBildCode
-            // 
-            this.btnSchnellBildCode.Location = new System.Drawing.Point(688, 48);
-            this.btnSchnellBildCode.Name = "btnSchnellBildCode";
-            this.btnSchnellBildCode.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellBildCode.TabIndex = 9;
-            this.btnSchnellBildCode.Text = "Bild-Code";
-            this.btnSchnellBildCode.Click += new System.EventHandler(this.btnSchnellBildCode_Click);
-            // 
-            // btnSchnellDatumUhrzeit
-            // 
-            this.btnSchnellDatumUhrzeit.Location = new System.Drawing.Point(144, 48);
-            this.btnSchnellDatumUhrzeit.Name = "btnSchnellDatumUhrzeit";
-            this.btnSchnellDatumUhrzeit.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellDatumUhrzeit.TabIndex = 2;
-            this.btnSchnellDatumUhrzeit.Text = "Datum/Uhrzeit";
-            this.btnSchnellDatumUhrzeit.Click += new System.EventHandler(this.btnSchnellDatumUhrzeit_Click);
-            // 
-            // btnSchnellIInternetAdresse
-            // 
-            this.btnSchnellIInternetAdresse.Location = new System.Drawing.Point(552, 48);
-            this.btnSchnellIInternetAdresse.Name = "btnSchnellIInternetAdresse";
-            this.btnSchnellIInternetAdresse.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellIInternetAdresse.TabIndex = 8;
-            this.btnSchnellIInternetAdresse.Text = "Internet-Adresse";
-            this.btnSchnellIInternetAdresse.Click += new System.EventHandler(this.btnSchnellIInternetAdresse_Click);
-            // 
-            // btnSchnellEmail
-            // 
-            this.btnSchnellEmail.Location = new System.Drawing.Point(280, 48);
-            this.btnSchnellEmail.Name = "btnSchnellEmail";
-            this.btnSchnellEmail.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellEmail.TabIndex = 3;
-            this.btnSchnellEmail.Text = "Email";
-            this.btnSchnellEmail.Click += new System.EventHandler(this.btnSchnellEmail_Click);
-            // 
-            // btnSchnellAuswahloptionen
-            // 
-            this.btnSchnellAuswahloptionen.Location = new System.Drawing.Point(144, 16);
-            this.btnSchnellAuswahloptionen.Name = "btnSchnellAuswahloptionen";
-            this.btnSchnellAuswahloptionen.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellAuswahloptionen.TabIndex = 7;
-            this.btnSchnellAuswahloptionen.Text = "Auswahl-Optionen";
-            this.btnSchnellAuswahloptionen.Click += new System.EventHandler(this.btnSchnellAuswahloptionen_Click);
-            // 
-            // btnSchnellTelefonNummer
-            // 
-            this.btnSchnellTelefonNummer.Location = new System.Drawing.Point(416, 48);
-            this.btnSchnellTelefonNummer.Name = "btnSchnellTelefonNummer";
-            this.btnSchnellTelefonNummer.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellTelefonNummer.TabIndex = 4;
-            this.btnSchnellTelefonNummer.Text = "Telefonnummer";
-            this.btnSchnellTelefonNummer.Click += new System.EventHandler(this.btnSchnellTelefonNummer_Click);
-            // 
-            // btnSchnellGleitkommazahl
-            // 
-            this.btnSchnellGleitkommazahl.Location = new System.Drawing.Point(688, 16);
-            this.btnSchnellGleitkommazahl.Name = "btnSchnellGleitkommazahl";
-            this.btnSchnellGleitkommazahl.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellGleitkommazahl.TabIndex = 6;
-            this.btnSchnellGleitkommazahl.Text = "Gleitkommazahl";
-            this.btnSchnellGleitkommazahl.Click += new System.EventHandler(this.btnSchnellGleitkommazahl_Click);
-            // 
-            // btnSchnellGanzzahl
-            // 
-            this.btnSchnellGanzzahl.Location = new System.Drawing.Point(552, 16);
-            this.btnSchnellGanzzahl.Name = "btnSchnellGanzzahl";
-            this.btnSchnellGanzzahl.Size = new System.Drawing.Size(128, 24);
-            this.btnSchnellGanzzahl.TabIndex = 5;
-            this.btnSchnellGanzzahl.Text = "Ganzzahl";
-            this.btnSchnellGanzzahl.Click += new System.EventHandler(this.btnSchnellGanzzahl_Click);
             // 
             // tabSpaltenVerlinkung
             // 
@@ -1531,24 +1430,19 @@ namespace BlueControls.BlueTableDialogs {
             this.btnSpaltenkopf.TabIndex = 49;
             this.btnSpaltenkopf.Click += new System.EventHandler(this.btnSpaltenkopf_Click);
             // 
-            // capHintergrund
+            // grpStyles
             // 
-            this.capHintergrund.CausesValidation = false;
-            this.capHintergrund.Location = new System.Drawing.Point(280, 80);
-            this.capHintergrund.Name = "capHintergrund";
-            this.capHintergrund.Size = new System.Drawing.Size(88, 16);
-            this.capHintergrund.Text = "Hintergrund:";
-            this.capHintergrund.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // cbxBackground
-            // 
-            this.cbxBackground.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxBackground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxBackground.Location = new System.Drawing.Point(280, 96);
-            this.cbxBackground.Name = "cbxBackground";
-            this.cbxBackground.RegexCheck = null;
-            this.cbxBackground.Size = new System.Drawing.Size(128, 24);
-            this.cbxBackground.TabIndex = 47;
+            this.grpStyles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpStyles.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpStyles.Controls.Add(this.lstStyles);
+            this.grpStyles.Location = new System.Drawing.Point(8, 360);
+            this.grpStyles.Name = "grpStyles";
+            this.grpStyles.Size = new System.Drawing.Size(744, 224);
+            this.grpStyles.TabIndex = 55;
+            this.grpStyles.TabStop = false;
+            this.grpStyles.Text = "Schnellauswahl";
             // 
             // ColumnEditor
             // 
@@ -1575,8 +1469,8 @@ namespace BlueControls.BlueTableDialogs {
             this.BlueFrame1.ResumeLayout(false);
             this.tabControl.ResumeLayout(false);
             this.tabDatenFormat.ResumeLayout(false);
-            this.grpSchnellformat.ResumeLayout(false);
             this.tabSpaltenVerlinkung.ResumeLayout(false);
+            this.grpStyles.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1662,29 +1556,16 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capAutoReplace;
         private Button chkFilterOnlyAND;
         private Button chkFilterOnlyOr;
-        private Button btnVerwendung;
         private TextBox txbSpaltenbild;
-        private Button btnSchnellAuswahloptionen;
-        private Button btnSchnellGleitkommazahl;
-        private Button btnSchnellGanzzahl;
-        private Button btnSchnellTelefonNummer;
-        private Button btnSchnellEmail;
-        private Button btnSchnellDatumUhrzeit;
-        private Button btnSchnellDatum;
-        private Button btnSchnellText;
-        private Button btnSchnellIInternetAdresse;
         private ComboBox cbxSort;
         private ComboBox cbxTranslate;
         private Caption capTranslate;
         private Button chkFormatierungErlaubt;
         private ComboBox cbxAdditionalCheck;
         private Caption capcbxAdditionalCheck;
-        private Button btnSchnellBildCode;
         private ComboBox cbxScriptType;
         private Caption capScriptType;
-        private Button btnSchnellBit;
         private TabPage tabDatenFormat;
-        private GroupBox grpSchnellformat;
         private TabPage tabSpaltenVerlinkung;
         private TableView tblFilterliste;
         private TextBox txbMaxCellLength;
@@ -1708,5 +1589,8 @@ namespace BlueControls.BlueTableDialogs {
         private Caption caption1;
         private Caption capHintergrund;
         private ComboBox cbxBackground;
+        private Caption capInfos;
+        protected ListBox lstStyles;
+        private GroupBox grpStyles;
     }
 }

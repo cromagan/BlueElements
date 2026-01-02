@@ -21,6 +21,7 @@ using BlueControls.Enums;
 using BlueControls.ItemCollectionPad;
 using BlueTable;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollectionList;
@@ -51,6 +52,10 @@ public class RowFormulaListItem : AbstractListItem {
         _layoutFileName = layoutId;
         UserDefCompareKey = userDefCompareKey;
         Tag = tag;
+
+        QuickInfo = !string.IsNullOrEmpty(row.Table?.RowQuickInfo)
+                   ? _row.GetQuickInfo().CreateHtmlCodes()
+                   : _row.CellFirstString().CreateHtmlCodes();
     }
 
     /// <summary>
@@ -70,16 +75,6 @@ public class RowFormulaListItem : AbstractListItem {
     //}
 
     #region Properties
-
-    public override string QuickInfo {
-        get {
-            if (_row?.Table is not { IsDisposed: false } tb) { return string.Empty; }
-
-            return !string.IsNullOrEmpty(tb.RowQuickInfo)
-                ? _row.GetQuickInfo().CreateHtmlCodes()
-                : _row.CellFirstString().CreateHtmlCodes();
-        }
-    }
 
     public RowItem? Row {
         get => _row;
@@ -133,7 +128,17 @@ public class RowFormulaListItem : AbstractListItem {
         }
     }
 
-    protected override string GetCompareKey() => _row?.CompareKey() ?? string.Empty;
+    protected override string GetCompareKey() {
+        if (_row is not { IsDisposed: false } r) { return string.Empty; }
+        if (r.Table is not { IsDisposed: false } tb) { return string.Empty; }
+
+        var columns = new List<ColumnItem>();
+        if (tb.SortDefinition is { } lc) { columns.AddRange(lc.UsedColumns); }
+        //if (arrangemen.ColumnForChapter is { IsDisposed: false } csc) { columns.AddIfNotExists(csc); }
+        if (tb.Column.First is { IsDisposed: false } cf) { columns.AddIfNotExists(cf); }
+
+        return r.CompareKey(columns);
+    }
 
     private void GeneratePic() {
         if (string.IsNullOrEmpty(_layoutFileName) || !_layoutFileName.StartsWith("#") || Row?.Table is not { IsDisposed: false }) {

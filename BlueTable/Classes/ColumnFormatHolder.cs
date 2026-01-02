@@ -21,6 +21,7 @@ using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace BlueTable;
@@ -28,6 +29,8 @@ namespace BlueTable;
 public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     #region Fields
+
+    public new static readonly List<ColumnFormatHolder> AllFormats = [];
 
     public static readonly ColumnFormatHolder BildCode = new(FormatHolder.Text) {
         Align = AlignmentHorizontal.Links,
@@ -210,6 +213,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public new static readonly ColumnFormatHolder Text = new(FormatHolder.Text) {
+        KeyName = "Text One Line", // Verhalten von Setformat überschreiben
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,
@@ -240,6 +244,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
     };
 
     public static readonly ColumnFormatHolder TextOptions = new(FormatHolder.Text) {
+        KeyName = "Items Select", // Verhalten von Setformat überschreiben
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Sprachneutral_String,
         DoOpticalTranslation = TranslationType.Übersetzen,
@@ -272,9 +277,10 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     #region Constructors
 
-    private ColumnFormatHolder(FormatHolder vorlage) : base(vorlage.Name) {
+    private ColumnFormatHolder(FormatHolder vorlage) : base(vorlage.KeyName, vorlage.SymbolForReadableText()) {
         AllFormats.Add(this);
         this.GetStyleFrom(vorlage);
+        QuickInfo = vorlage.QuickInfo;
     }
 
     #endregion

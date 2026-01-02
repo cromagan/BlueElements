@@ -21,7 +21,6 @@ using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueTable.Enums;
 using System.Collections.Generic;

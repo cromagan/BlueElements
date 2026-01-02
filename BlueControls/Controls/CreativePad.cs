@@ -466,7 +466,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         QuickInfo = string.Empty;
 
         if (e.Button == MouseButtons.None && it is AbstractPadItem bpi) {
-            QuickInfo = !string.IsNullOrEmpty(bpi.ColumnQuickInfo) ? bpi.ColumnQuickInfo + "<hr>" + bpi.Description : bpi.Description;
+            QuickInfo = !string.IsNullOrEmpty(bpi.QuickInfo) ? bpi.QuickInfo + "<hr>" + bpi.Description : bpi.Description;
         }
 
         if (e.Button == MouseButtons.Left && MouseDownData is { }) {

@@ -22,7 +22,6 @@ using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueTable;
 using System.Collections.Generic;

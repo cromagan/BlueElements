@@ -21,7 +21,7 @@ public interface IReadableTextWithKey : IReadableText, IHasKeyName {
 
     #region Properties
 
-    string ColumnQuickInfo { get; }
+    string QuickInfo { get; }
 
     #endregion
 }

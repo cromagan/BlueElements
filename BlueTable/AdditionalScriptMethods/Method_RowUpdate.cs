@@ -18,7 +18,6 @@
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 

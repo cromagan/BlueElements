@@ -44,6 +44,7 @@ namespace BlueControls.BlueTableDialogs {
             this.cbxInternalColumnArrangementSelector = new BlueControls.Controls.ComboBox();
             this.btnNeueAnsichtErstellen = new BlueControls.Controls.Button();
             this.btnAktuelleAnsichtLoeschen = new BlueControls.Controls.Button();
+            this.butSystemspaltenErstellen = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -59,14 +60,14 @@ namespace BlueControls.BlueTableDialogs {
             // Pad
             // 
             this.Pad.ContextMenuAllowed = false;
-            this.Pad.Size = new System.Drawing.Size(612, 316);
+            this.Pad.Size = new System.Drawing.Size(732, 316);
             this.Pad.ItemRemoved += new System.EventHandler<System.EventArgs>(this.Item_ItemRemoved);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
             // 
             this.Ribbon.Controls.Add(this.tabAnsichten);
-            this.Ribbon.Size = new System.Drawing.Size(984, 110);
+            this.Ribbon.Size = new System.Drawing.Size(1104, 110);
             this.Ribbon.TabDefault = this.tabAnsichten;
             this.Ribbon.TabDefaultOrder = new string[] {
         "Ansichten",
@@ -80,19 +81,23 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.tabStart.Size = new System.Drawing.Size(976, 81);
             // 
+            // tabHintergrund
+            // 
+            this.tabHintergrund.Size = new System.Drawing.Size(976, 81);
+            // 
             // tabRightSide
             // 
-            this.tabRightSide.Location = new System.Drawing.Point(612, 110);
+            this.tabRightSide.Location = new System.Drawing.Point(732, 110);
             this.tabRightSide.Size = new System.Drawing.Size(372, 340);
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(612, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(732, 24);
             // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 426);
-            this.pnlStatusBar.Size = new System.Drawing.Size(612, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(732, 24);
             // 
             // tabAnsichten
             // 
@@ -102,7 +107,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabAnsichten.Controls.Add(this.grpAnsichtsVerwaltung);
             this.tabAnsichten.Location = new System.Drawing.Point(4, 25);
             this.tabAnsichten.Name = "tabAnsichten";
-            this.tabAnsichten.Size = new System.Drawing.Size(976, 81);
+            this.tabAnsichten.Size = new System.Drawing.Size(1096, 81);
             this.tabAnsichten.TabIndex = 4;
             this.tabAnsichten.Text = "Ansichten";
             // 
@@ -110,12 +115,13 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.grpSpalten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpSpalten.CausesValidation = false;
+            this.grpSpalten.Controls.Add(this.butSystemspaltenErstellen);
             this.grpSpalten.Controls.Add(this.btnNeueSpalte);
             this.grpSpalten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpSpalten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpSpalten.Location = new System.Drawing.Point(864, 0);
+            this.grpSpalten.Location = new System.Drawing.Point(704, 0);
             this.grpSpalten.Name = "grpSpalten";
-            this.grpSpalten.Size = new System.Drawing.Size(168, 81);
+            this.grpSpalten.Size = new System.Drawing.Size(280, 81);
             this.grpSpalten.TabIndex = 6;
             this.grpSpalten.TabStop = false;
             this.grpSpalten.Text = "Spalten";
@@ -144,7 +150,7 @@ namespace BlueControls.BlueTableDialogs {
             this.grpAktuelleAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAktuelleAnsicht.Location = new System.Drawing.Point(432, 0);
             this.grpAktuelleAnsicht.Name = "grpAktuelleAnsicht";
-            this.grpAktuelleAnsicht.Size = new System.Drawing.Size(432, 81);
+            this.grpAktuelleAnsicht.Size = new System.Drawing.Size(272, 81);
             this.grpAktuelleAnsicht.TabIndex = 5;
             this.grpAktuelleAnsicht.TabStop = false;
             this.grpAktuelleAnsicht.Text = "Aktuelle Ansicht";
@@ -263,10 +269,22 @@ namespace BlueControls.BlueTableDialogs {
             this.btnAktuelleAnsichtLoeschen.Text = "Ansicht löschen";
             this.btnAktuelleAnsichtLoeschen.Click += new System.EventHandler(this.btnAktuelleAnsichtLoeschen_Click);
             // 
+            // butSystemspaltenErstellen
+            // 
+            this.butSystemspaltenErstellen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.butSystemspaltenErstellen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.butSystemspaltenErstellen.ImageCode = "Spalte|16";
+            this.butSystemspaltenErstellen.Location = new System.Drawing.Point(80, 2);
+            this.butSystemspaltenErstellen.Name = "butSystemspaltenErstellen";
+            this.butSystemspaltenErstellen.Size = new System.Drawing.Size(184, 22);
+            this.butSystemspaltenErstellen.TabIndex = 50;
+            this.butSystemspaltenErstellen.Text = "Alle Systemspalten erstellen";
+            this.butSystemspaltenErstellen.Click += new System.EventHandler(this.butSystemspaltenErstellen_Click);
+            // 
             // ColumnArrangementPadEditor
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(984, 450);
+            this.ClientSize = new System.Drawing.Size(1104, 450);
             this.Name = "ColumnArrangementPadEditor";
             this.Text = "Spalten-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -300,5 +318,6 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnBerechtigungsgruppen;
         internal GroupBox grpSpalten;
         private Button btnNeueSpalte;
+        private Button butSystemspaltenErstellen;
     }
 }

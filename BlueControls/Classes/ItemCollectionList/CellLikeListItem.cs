@@ -43,13 +43,8 @@ public class CellLikeListItem : AbstractListItem {
         _align = align;
         _sortType = sortType;
         Tag = tag;
+        QuickInfo = KeyName.CreateHtmlCodes();
     }
-
-    #endregion
-
-    #region Properties
-
-    public override string QuickInfo => KeyName.CreateHtmlCodes();
 
     #endregion
 

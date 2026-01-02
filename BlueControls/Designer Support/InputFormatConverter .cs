@@ -23,7 +23,7 @@ public class InputFormatConverter : TypeConverter {
         if (value is string stringValue) {
             // Durchsuchen Sie die Liste der verfügbaren Formate, um das entsprechende IInputFormat-Objekt zu finden.
             foreach (var format in FormatHolder.AllFormats) {
-                if (format.Name.Equals(stringValue, StringComparison.OrdinalIgnoreCase)) {
+                if (format.KeyName.Equals(stringValue, StringComparison.OrdinalIgnoreCase)) {
                     return format; // Gibt das gefundene IInputFormat-Objekt zurück.
                 }
             }
@@ -38,7 +38,7 @@ public class InputFormatConverter : TypeConverter {
             foreach (var format in FormatHolder.AllFormats) {
                 if (format.Equals(inputFormat)) {
                     // Angenommen, jedes IInputFormat-Objekt hat eine Eigenschaft 'Name'.
-                    return format.Name;
+                    return format.KeyName;
                 }
             }
             throw new ArgumentException($"Cannot convert type {typeof(IInputFormat)} to string.");
@@ -52,7 +52,7 @@ public class InputFormatConverter : TypeConverter {
         IList<string> formatNames = [];
         foreach (var formatHolder in FormatHolder.AllFormats) {
             // Fügen Sie den Namen des Formats zur Liste hinzu.
-            formatNames.Add(formatHolder.Name);
+            formatNames.Add(formatHolder.KeyName);
         }
         return new StandardValuesCollection(formatNames.ToArray());
     }

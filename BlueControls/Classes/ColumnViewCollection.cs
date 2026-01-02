@@ -64,7 +64,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public string CaptionForEditor => "Spaltenanordnung";
 
-    public string ColumnQuickInfo => string.Empty;
+    public ColumnItem? ColumnForChapter { get; internal set; }
 
     /// <summary>
     /// Controll gibt an, dass es sich um Koordinten auf Controll ebene handel (nicht Canvas)
@@ -79,15 +79,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public int ControlColumnsWidth { get; private set; }
 
     public int Count => _internal.Count;
-
     public Type? Editor { get; set; }
-
     public int FilterRows { get; internal set; } = 1;
-
     public bool IsDisposed { get; private set; }
-
     public bool KeyIsCaseSensitive => false;
-
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
@@ -101,6 +96,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             }
         }
     }
+
+    public string QuickInfo => string.Empty;
 
     public string SheetStyle {
         get;
@@ -159,51 +156,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
 
         return tcvc;
-    }
-
-    /// <summary>
-    /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
-    /// </summary>
-    /// <param name="ca"></param>
-    /// <param name="number"></param>
-    public static void Repair(ColumnViewCollection ca, int number) {
-        if (ca.Table is not { IsDisposed: false } tb) { return; }
-
-        #region Ungültige Spalten entfernen
-
-        for (var z = 0; z < ca.Count; z++) {
-            if (ca[z]?.Column == null || !tb.Column.Contains(ca[z]?.Column)) {
-                ca.Remove(ca[z]);
-                z--;
-            }
-        }
-        //_ = ca.RemoveNull();
-
-        #endregion
-
-        var tmp = ca.PermissionGroups_Show.SortedDistinctList();
-        tmp.RemoveString(Administrator, false);
-        //tmp.RemoveNullOrEmpty();
-
-        switch (number) {
-            case 0:
-                if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Alle Spalten"; }
-                ca.ShowAllColumns();
-                break;
-
-            case 1:
-                if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Standard"; }
-                tmp.AddIfNotExists(Everybody);
-                break;
-        }
-
-        ca.PermissionGroups_Show = tmp.AsReadOnly();
-
-        if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Ansicht " + number; }
-
-        //foreach (var thisView in ca) {
-        //    thisView.Repair();
-        //}
     }
 
     public void Add(ColumnItem column) {
@@ -313,6 +265,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
         result.ParseableAdd("FilterRows", FilterRows);
+        result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("Column", _internal);
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
@@ -339,9 +292,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "column":
             case "columndata":
+                Add(new ColumnViewItem(Table, value.FromNonCritical())); // Base, um Events zu vermeiden
+                return true;
 
-                Add(new ColumnViewItem(Table, value.FromNonCritical())); // BAse, um Events zu vermeiden
-
+            case "chaptercolumn":
+                ColumnForChapter = Table?.Column[value.FromNonCritical()];
                 return true;
 
             case "columns":
@@ -410,6 +365,43 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         foreach (var thiscol in l) {
             Remove(thiscol);
         }
+    }
+
+    public void Repair(int number) {
+        if (Table is not { IsDisposed: false } tb) { return; }
+
+        #region Ungültige Spalten entfernen
+
+        for (var z = 0; z < _internal.Count; z++) {
+            if (_internal[z]?.Column == null || !tb.Column.Contains(_internal[z]?.Column)) {
+                _internal.Remove(_internal[z]);
+                z--;
+            }
+        }
+
+        #endregion
+
+        var tmp = Table.RepairUserGroups(PermissionGroups_Show);
+        tmp.RemoveString(Administrator, false);
+
+        switch (number) {
+            case 0:
+                if (string.IsNullOrEmpty(KeyName)) { KeyName = "Alle Spalten"; }
+                ShowAllColumns();
+                break;
+
+            case 1:
+                if (string.IsNullOrEmpty(KeyName)) { KeyName = "Standard"; }
+                tmp.AddIfNotExists(Everybody);
+                break;
+        }
+
+        PermissionGroups_Show = tmp.AsReadOnly();
+
+        if (string.IsNullOrEmpty(KeyName)) { KeyName = "Ansicht " + number; }
+
+        ColumnForChapter ??= tb.Column["SYS_CHAPTER"];
+        ColumnForChapter ??= tb.Column["CHAPTER"];
     }
 
     public void ShowAllColumns() {

@@ -22,6 +22,7 @@ using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionList;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
@@ -73,6 +74,15 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
 
+        foreach (var thisItem in ColumnFormatHolder.AllFormats) {
+            var bli = new BitmapListItem(thisItem.SymbolForReadableText(), thisItem.KeyName, thisItem.ReadableText()) {
+                Padding = 5,
+                Tag = thisItem,
+                QuickInfo = thisItem.QuickInfo
+            };
+            lstStyles.ItemAdd(bli);
+        }
+
         Column = column;
     }
 
@@ -111,7 +121,15 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     #region Methods
 
-    public static string ColumnUsage(ColumnItem? column) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
+        base.OnFormClosing(e);
+        if (!AllOk()) {
+            e.Cancel = true;
+        }
+        Column = null;
+    }
+
+    private static string ColumnUsage(ColumnItem? column) {
         if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         var t = $"<b><u>Infos zu '{column.ReadableText()}'</b></u>\r";
@@ -163,14 +181,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         return t;
-    }
-
-    protected override void OnFormClosing(FormClosingEventArgs e) {
-        base.OnFormClosing(e);
-        if (!AllOk()) {
-            e.Cancel = true;
-        }
-        Column = null;
     }
 
     private static string GenQIText(string name, QuickImage? quickImage, string text) => $"<b>{quickImage?.HTMLCode} {name}:</b><tab>{text}\r";
@@ -259,73 +269,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(txbQuickinfo.Text.Replace("\r", "<br>") + "<br><br><br>" + txbAdminInfo.Text.Replace("\r", "<br>"));
 
-    private void btnSchnellAuswahloptionen_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.TextOptions);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellBildCode_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.BildCode);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellBit_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.Bit);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellDatum_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.Date);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellDatumUhrzeit_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.DateTime);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellEmail_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.Email);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellGanzzahl_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.Long);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellGleitkommazahl_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.Float);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellIInternetAdresse_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.Url);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellTelefonNummer_Click(object sender, System.EventArgs e) {
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.PhoneNumber);
-        Column_DatenAuslesen();
-    }
-
-    private void btnSchnellText_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false }) { return; }
-        if (!AllOk()) { return; }
-        Column.GetStyleFrom(ColumnFormatHolder.Text);
-        Column_DatenAuslesen();
-    }
-
     private void btnSpaltenkopf_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Column?.Table is not { IsDisposed: false } tb) { return; }
         if (TableViewForm.EditabelErrorMessage(tb)) { return; }
@@ -341,9 +284,13 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void btnSystemInfo_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false }) { return; }
+        if (IsDisposed || Column?.Table?.Column is not { IsDisposed: false } cc) { return; }
 
-        Column.SystemInfoReset(true);
+        foreach (var item in cc) {
+            Column.SystemInfoReset(true);
+        }
+
+        capInfos.Text = ColumnEditor.ColumnUsage(Column);
     }
 
     private void btnTextColor_Click(object sender, System.EventArgs e) {
@@ -351,8 +298,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         ColorDia.ShowDialog();
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
     }
-
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => Forms.MessageBox.Show(ColumnUsage(Column));
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Column?.Table is not { IsDisposed: false }) { return; }
@@ -516,10 +461,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         btnOtherValuesToo.Checked = Column.ShowValuesOfOtherCellsInDropdown;
         btnIgnoreLock.Checked = Column.EditAllowedDespiteLock;
         txbAdminInfo.Text = Column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        txbQuickinfo.Text = Column.ColumnQuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        txbQuickinfo.Text = Column.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         cbxLinkedTable.Text = Column.LinkedTableTableName;
         txbAutoRemove.Text = Column.AfterEditAutoRemoveChar;
         cbxLinkedTable_TextChanged(null, System.EventArgs.Empty);
+        capInfos.Text = ColumnEditor.ColumnUsage(Column);
     }
 
     /// <summary>
@@ -538,7 +484,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         Column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
-        Column.ColumnQuickInfo = txbQuickinfo.Text.Replace("\r", "<br>");
+        Column.QuickInfo = txbQuickinfo.Text.Replace("\r", "<br>");
         Column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<br>");
         Column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.White;
         Column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo ?? Color.White;
@@ -656,7 +602,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
             var b = tb.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
             if (b is not { IsDisposed: false }) { return; }
-            b.ColumnQuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
+            b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.EditableWithTextInput = true;
             b.DropdownDeselectAllAllowed = true;
@@ -745,6 +691,14 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     /// Holt die Werte aus _Column.LinkedCellFilter und schreibt sie in tblFilterliste
     ///Leer evtl. Werte aus tblFilterliste
     /// </summary>
+
+    private void lstStyles_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+        if (e.Item is not BitmapListItem bli || bli.Tag is not ColumnFormatHolder chf) { return; }
+
+        if (!AllOk()) { return; }
+        Column.GetStyleFrom(chf);
+        Column_DatenAuslesen();
+    }
 
     private void SetLinkedCellFilter() {
         if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } tb) { return; }

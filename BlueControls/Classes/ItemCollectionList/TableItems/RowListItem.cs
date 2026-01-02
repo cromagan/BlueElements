@@ -17,14 +17,11 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueTableDialogs;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueTable;
 using BlueTable.Enums;
 using System;
 using System.Drawing;
-using System.Security.Cryptography.X509Certificates;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -132,12 +129,12 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (col?.Table is not { IsDisposed: false }) { return string.Empty; }
 
         var T = string.Empty;
-        if (!string.IsNullOrEmpty(col.ColumnQuickInfo)) { T += col.ColumnQuickInfo; }
+        if (!string.IsNullOrEmpty(col.QuickInfo)) { T += col.QuickInfo; }
 
         if (col.Table.IsAdministrator()) {
             if (!string.IsNullOrEmpty(col.AdminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + col.AdminInfo; }
-            if (col.ColumnTags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.ColumnTags.JoinWith("<br>"); }
-            T = T + "<br><br>" + ColumnEditor.ColumnUsage(col);
+            //if (col.ColumnTags.Count > 0) { T = T + "<br><br><b><u>Spalten-Tags:</b></u><br>" + col.ColumnTags.JoinWith("<br>"); }
+            //T = T + "<br><br>" + ColumnEditor.ColumnUsage(col);
         }
 
         T = T.Trim();

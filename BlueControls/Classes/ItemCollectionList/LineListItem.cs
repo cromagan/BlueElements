@@ -31,12 +31,6 @@ public class LineListItem : AbstractListItem {
 
     #endregion
 
-    #region Properties
-
-    public override string QuickInfo => string.Empty;
-
-    #endregion
-
     #region Methods
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 4;

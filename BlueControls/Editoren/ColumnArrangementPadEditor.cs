@@ -23,20 +23,15 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
@@ -227,6 +222,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditabelErrorMessage(tb)) { return; }
 
+        FixColumnArrangement();
+
         ColumnItem? vorlage = null;
         if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.CVI?.Column?.Table == tb) {
             vorlage = cpi.CVI?.Column;
@@ -316,6 +313,14 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         ShowOrder();
     }
 
+    private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditabelErrorMessage(tb)) { return; }
+        FixColumnArrangement();
+        tb.Column.GenerateAndAddSystem();
+        tb.RepairAfterParse();
+        ShowOrder();
+    }
+
     private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
 
@@ -374,6 +379,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                 if (thisItem is DummyHeadPadItem d) {
                     ca.ShowHead = d.ShowHead;
                     ca.FilterRows = d.FilterRows;
+                    ca.ColumnForChapter = tb.Column[d.Chapter_Column];
                     break;
                 }
             }
@@ -465,6 +471,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         t.Page = "xxx";
         t.ShowHead = ca.ShowHead;
         t.FilterRows = ca.FilterRows;
+        t.Chapter_Column = ca.ColumnForChapter?.KeyName ?? "#ohne";
 
         Pad.Items.Add(t);
 

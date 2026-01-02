@@ -117,7 +117,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    public virtual string ColumnQuickInfo { get; set; } = string.Empty;
     public abstract string Description { get; }
 
     public bool ForPrinting {
@@ -187,6 +186,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// wenn das ganze Objekt verschoben werden muss.
     /// </summary>
     public List<PointM> PointsForSuccesfullyMove { get; } = [];
+
+    public virtual string QuickInfo { get; set; } = string.Empty;
 
     public bool ShowAlways {
         get {
@@ -406,7 +407,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Key", KeyName);
         result.ParseableAdd("Print", _beiExportSichtbar);
-        result.ParseableAdd("QuickInfo", ColumnQuickInfo);
+        result.ParseableAdd("QuickInfo", QuickInfo);
         //result.ParseableAdd("ZoomPadding", _zoomPadding);
 
         foreach (var thisPoint in MovablePoint) {
@@ -479,7 +480,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "quickinfo":
-                ColumnQuickInfo = value.FromNonCritical();
+                QuickInfo = value.FromNonCritical();
                 return true;
 
             case "page":

@@ -74,7 +74,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             if (value != null) {
                 tbcScriptEigenschaften.Enabled = true;
                 txbName.Text = value.KeyName;
-                txbQuickInfo.Text = value.ColumnQuickInfo;
+                txbQuickInfo.Text = value.QuickInfo;
 
                 cbxPic.Text = value.Image;
 

@@ -82,8 +82,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     public string CaptionForEditor => "Formular";
 
-    public string ColumnQuickInfo => string.Empty;
-
     public Type? Editor { get; set; }
 
     public ReadOnlyCollection<string> NotAllowedChilds {
@@ -118,6 +116,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
     }
 
+    public string QuickInfo => string.Empty;
     public override string Type => "ConnectedFormula";
 
     /// <summary>

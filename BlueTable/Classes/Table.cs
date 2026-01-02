@@ -1076,7 +1076,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     var hasChanges = (keyname != null && keyname != existingScript.KeyName) ||
                                     (scriptContent != null && scriptContent != existingScript.Script) ||
                                     (image != null && image != existingScript.Image) ||
-                                    (quickInfo != null && quickInfo != existingScript.ColumnQuickInfo) ||
+                                    (quickInfo != null && quickInfo != existingScript.QuickInfo) ||
                                     (adminInfo != null && adminInfo != existingScript.AdminInfo) ||
                                     (eventTypes != null && !eventTypes.Equals(existingScript.EventTypes)) ||
                                     (needRow != null && needRow != existingScript.NeedRow) ||
@@ -1090,7 +1090,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                             keyname ?? existingScript.KeyName,
                             scriptContent ?? existingScript.Script,
                             image ?? existingScript.Image,
-                            quickInfo ?? existingScript.ColumnQuickInfo,
+                            quickInfo ?? existingScript.QuickInfo,
                             adminInfo ?? existingScript.AdminInfo,
                             userGroups ?? existingScript.UserGroups,
                             eventTypes ?? existingScript.EventTypes,
@@ -1350,7 +1350,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         GC.SuppressFinalize(this);
     }
 
-    public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE");
+    public void EnableScript() {
+        Column.GenerateAndAddSystem("SYS_ROWSTATE");
+        Column?.Table?.RepairAfterParse();
+    }
 
     /// <summary>
     ///
@@ -1894,14 +1897,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        Column.GetSystems();
+        //Column.GetSystems();
 
-        if (Column.SysChapter is { IsDisposed: false } c) {
-            var x = c.Contents();
-            if (x.Count < 2) {
-                Column.Remove(c, "Automatische Optimierung");
-            }
-        }
+        //if (Column.SysChapter is { IsDisposed: false } c) {
+        //    var x = c.Contents();
+        //    if (x.Count < 2) {
+        //        Column.Remove(c, "Automatische Optimierung");
+        //    }
+        //}
     }
 
     public bool Parse(byte[] data, bool isMain) {
