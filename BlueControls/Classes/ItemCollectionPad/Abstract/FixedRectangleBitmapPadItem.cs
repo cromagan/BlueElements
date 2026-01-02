@@ -77,7 +77,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         if (_generatedBitmap == null) { GeneratePic(); }
 
         #region Bild zeichnen

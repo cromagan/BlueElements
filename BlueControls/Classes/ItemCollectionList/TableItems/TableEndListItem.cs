@@ -69,8 +69,8 @@ public sealed class TableEndListItem : RowBackgroundListItem {
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(18 * 3, 18 * 3);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
         var lgb = new LinearGradientBrush(positionControl, Color.Transparent, Color.White, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, positionControl);
     }

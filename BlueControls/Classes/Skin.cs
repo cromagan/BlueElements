@@ -1253,19 +1253,19 @@ public static class Skin {
     public static List<AbstractListItem> GetFonts(string sheetStyle) {
         List<AbstractListItem> rahms =
         [
-            ItemOf("Haupt-Überschrift", ((int)PadStyles.Überschrift).ToString(),
+            ItemOf("Haupt-Überschrift", ((int)PadStyles.Überschrift).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Überschrift).SymbolForReadableText()),
-            ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Untertitel).ToString(),
+            ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Untertitel).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolForReadableText()),
-            ItemOf("Überschrift für Kapitel", ((int)PadStyles.Kapitel).ToString(),
+            ItemOf("Überschrift für Kapitel", ((int)PadStyles.Kapitel).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolForReadableText()),
-            ItemOf("Standard", ((int)PadStyles.Standard).ToString(),
+            ItemOf("Standard", ((int)PadStyles.Standard).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Standard).SymbolForReadableText()),
-            ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString(),
+            ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Hervorgehoben).SymbolForReadableText()),
-            ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString(),
+            ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Alternativ).SymbolForReadableText()),
-            ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString(),
+            ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Kleiner_Zusatz).SymbolForReadableText())
         ];
         //rahms.Sort();
@@ -1275,15 +1275,15 @@ public static class Skin {
     public static List<AbstractListItem> GetRahmenArt(string sheetStyle, bool mitOhne) {
         var rahms = new List<AbstractListItem>();
         if (mitOhne) {
-            rahms.Add(ItemOf("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz));
+            rahms.Add(ItemOf("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString1(), ImageCode.Kreuz));
         }
-        rahms.Add(ItemOf("Haupt-Überschrift", ((int)PadStyles.Überschrift).ToString(), GetBlueFont(sheetStyle, PadStyles.Überschrift).SymbolOfLine()));
-        rahms.Add(ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Untertitel).ToString(), GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolOfLine()));
-        rahms.Add(ItemOf("Überschrift für Kapitel", ((int)PadStyles.Kapitel).ToString(), GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolOfLine()));
-        rahms.Add(ItemOf("Standard", ((int)PadStyles.Standard).ToString(), GetBlueFont(sheetStyle, PadStyles.Standard).SymbolOfLine()));
-        rahms.Add(ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString(), GetBlueFont(sheetStyle, PadStyles.Hervorgehoben).SymbolOfLine()));
-        rahms.Add(ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString(), GetBlueFont(sheetStyle, PadStyles.Alternativ).SymbolOfLine()));
-        rahms.Add(ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString(), GetBlueFont(sheetStyle, PadStyles.Kleiner_Zusatz).SymbolOfLine()));
+        rahms.Add(ItemOf("Haupt-Überschrift", ((int)PadStyles.Überschrift).ToString1(), GetBlueFont(sheetStyle, PadStyles.Überschrift).SymbolOfLine()));
+        rahms.Add(ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Untertitel).ToString1(), GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolOfLine()));
+        rahms.Add(ItemOf("Überschrift für Kapitel", ((int)PadStyles.Kapitel).ToString1(), GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolOfLine()));
+        rahms.Add(ItemOf("Standard", ((int)PadStyles.Standard).ToString1(), GetBlueFont(sheetStyle, PadStyles.Standard).SymbolOfLine()));
+        rahms.Add(ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString1(), GetBlueFont(sheetStyle, PadStyles.Hervorgehoben).SymbolOfLine()));
+        rahms.Add(ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString1(), GetBlueFont(sheetStyle, PadStyles.Alternativ).SymbolOfLine()));
+        rahms.Add(ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString1(), GetBlueFont(sheetStyle, PadStyles.Kleiner_Zusatz).SymbolOfLine()));
         //rahms.Sort();
         return rahms;
     }

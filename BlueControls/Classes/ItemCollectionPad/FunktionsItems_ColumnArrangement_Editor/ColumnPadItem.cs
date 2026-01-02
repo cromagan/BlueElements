@@ -24,6 +24,7 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueTable;
+using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,7 +35,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor
 /// <summary>
 /// Zum Darstellen einer Spalte. Im ViewEditpt benutzt
 /// </summary>
-public class ColumnPadItem : FixedRectangleBitmapPadItem {
+public class ColumnPadItem : FixedRectangleBitmapPadItem, IHasTable {
 
     #region Fields
 
@@ -66,7 +67,8 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public override string Description => string.Empty;
     public Renderer_Abstract Renderer { get; }
-    public string Tabelle => IsDisposed || CVI?.Column?.Table is not { IsDisposed: false } tb ? "?" : tb.KeyName;
+
+    public Table? Table => CVI?.Column?.Table;
 
     /// <summary>
     /// Wird von Flexoptions aufgerufen
@@ -105,16 +107,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             new FlexiControlForProperty<string>(() => col.ColumnQuickInfo, 5),
             new FlexiControlForProperty<string>(() => col.AdminInfo, 5)
         ];
-
-        return result;
-    }
-
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
-
-        //result.ParseableAdd("Table", Column?.Table);
-        //result.ParseableAdd("ColumnName", Column);
 
         return result;
     }

@@ -315,26 +315,26 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
-        DrawArrowOutput(gr, positionControl, scale, ForPrinting, OutputColorId);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+        DrawArrowOutput(gr, positionControl, zoom, ForPrinting, OutputColorId);
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, false);
+            DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
         //if (Column  ==null || Column .IsDisposed) {
         //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
-        //DrawFakeControl(gr, positionControl, scale, CaptionPosition, Column?.ReadableText() + ":", EditType);
+        //DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);
         //}
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
 
-        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
     }
 
     #endregion

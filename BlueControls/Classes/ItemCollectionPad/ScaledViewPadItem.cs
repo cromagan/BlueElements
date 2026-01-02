@@ -210,11 +210,11 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     }
 
     //}
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
 
         var newarea = positionControl.ToRect();
-        var (childScale, childOffsetX, childOffsetY) = ItemCollectionPadItem.AlterView(positionControl, scale, offsetX, offsetY, true, CalculateCanvasShowingArea());
+        var (childScale, childOffsetX, childOffsetY) = ItemCollectionPadItem.AlterView(positionControl, zoom, offsetX, offsetY, true, CalculateCanvasShowingArea());
 
         foreach (var thisItem in icpi) {
             if (thisItem is not ScaledViewPadItem) {
@@ -229,33 +229,33 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
             }
         }
 
-        var bFont = this.GetFont(_textScale.CanvasToControl(scale));
+        var bFont = this.GetFont(_textScale.CanvasToControl(zoom));
         //var font = bFont.Font(allScale);
 
-        Pen colorPen = new(bFont.ColorMain, (float)(8.7d * scale)) {
+        Pen colorPen = new(bFont.ColorMain, (float)(8.7d * zoom)) {
             DashPattern = [5, 1, 1, 1]
         };
-        Pen whitePen = new(Color.White, (float)(8.7d * scale) + 2f);
+        Pen whitePen = new(Color.White, (float)(8.7d * zoom) + 2f);
         var textSize = bFont.MeasureString(Caption);
 
         // Umrandung der Detailansicht
         gr.DrawRectangle(whitePen, positionControl);
         gr.DrawRectangle(colorPen, positionControl);
         if (_ausrichtung != (Alignment)(-1)) {
-            gr.FillRectangle(Brushes.White, new RectangleF(positionControl.Left, positionControl.Top - textSize.Height - 9.CanvasToControl(scale), textSize.Width, textSize.Height));
-            bFont.DrawString(gr, Caption, positionControl.Left, positionControl.Top - textSize.Height - 9.CanvasToControl(scale));
+            gr.FillRectangle(Brushes.White, new RectangleF(positionControl.Left, positionControl.Top - textSize.Height - 9.CanvasToControl(zoom), textSize.Width, textSize.Height));
+            bFont.DrawString(gr, Caption, positionControl.Left, positionControl.Top - textSize.Height - 9.CanvasToControl(zoom));
         }
 
         //Markierung in der Zeichnung
-        var f = CalculateCanvasShowingArea().CanvasToControl(scale, offsetX, offsetY, false);
+        var f = CalculateCanvasShowingArea().CanvasToControl(zoom, offsetX, offsetY, false);
         gr.DrawRectangle(whitePen, f);
         gr.DrawRectangle(colorPen, f);
         if (_ausrichtung != (Alignment)(-1)) {
-            gr.FillRectangle(Brushes.White, new RectangleF(f.Left, f.Top - textSize.Height - 9f.CanvasToControl(scale), textSize.Width, textSize.Height));
-            bFont.DrawString(gr, Caption, f.Left, f.Top - textSize.Height - 9f.CanvasToControl(scale));
+            gr.FillRectangle(Brushes.White, new RectangleF(f.Left, f.Top - textSize.Height - 9f.CanvasToControl(zoom), textSize.Width, textSize.Height));
+            bFont.DrawString(gr, Caption, f.Left, f.Top - textSize.Height - 9f.CanvasToControl(zoom));
         }
 
-        //base.DrawExplicit(gr,visibleArea,positionControl,scale, offsetX, offsetY);
+        //base.DrawExplicit(gr,visibleArea,positionControl,zoom, offsetX, offsetY);
     }
 
     private RectangleF CalculateCanvasShowingArea() {

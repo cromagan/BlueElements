@@ -22,7 +22,6 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_StartsWith : Method {
 
     #region Properties
@@ -50,7 +49,7 @@ internal class Method_StartsWith : Method {
                     return DoItFeedback.Wahr();
                 }
             } else {
-                if (attvar.ValueStringGet(0).ToLowerInvariant().StartsWith(attvar.ValueStringGet(z).ToLowerInvariant())) {
+                if (attvar.ValueStringGet(0).StartsWith(attvar.ValueStringGet(z), System.StringComparison.OrdinalIgnoreCase)) {
                     return DoItFeedback.Wahr();
                 }
             }

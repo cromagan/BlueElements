@@ -42,7 +42,7 @@ public partial class FormWithStatusBar : Form {
     /// <summary>
     /// Tracks ob der statische Handler bereits registriert wurde
     /// </summary>
-    private static bool _staticHandlerRegistered = false;
+    private static bool _staticHandlerRegistered;
 
     private DateTime _lastMessage = DateTime.UtcNow;
 

@@ -48,6 +48,14 @@ public partial class PadEditor : FormWithStatusBar {
 
     #region Methods
 
+    protected virtual void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
+        if (Pad.LastClickedItem != null) {
+            Pad.LastClickedItem.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
+        }
+
+        LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
+    }
+
     protected virtual void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
         btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
@@ -108,19 +116,6 @@ public partial class PadEditor : FormWithStatusBar {
     }
 
     private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
-
-    private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
-        // FALLS ein PadEditor doppelt offen ist, kann ein Control Element aber nur
-        // einem Parent zugeordnet werden.
-        // Deswegen müssen die Element einzigartig sein (also extra für das Menü generiert werden)
-        // Und deswegen können sie auch disposed werden.
-
-        if (Pad.LastClickedItem != null) {
-            Pad.LastClickedItem.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
-        }
-
-        LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
-    }
 
     private void Pad_ClickedItemChanging(object sender, System.EventArgs e) {
         if (Pad.LastClickedItem != null) {

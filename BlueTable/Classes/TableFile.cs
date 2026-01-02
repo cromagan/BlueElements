@@ -88,8 +88,8 @@ public class TableFile : Table {
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is TableFile { IsDisposed: false } tbf) {
-                    if (string.Equals(tbf.Filename.FilePath(), path) &&
-                        string.Equals(tbf.Filename.FileSuffix(), fx)) { return null; }
+                    if (string.Equals(tbf.Filename.FilePath(), path, StringComparison.Ordinal) &&
+                        string.Equals(tbf.Filename.FileSuffix(), fx, StringComparison.Ordinal)) { return null; }
                 }
             }
         }

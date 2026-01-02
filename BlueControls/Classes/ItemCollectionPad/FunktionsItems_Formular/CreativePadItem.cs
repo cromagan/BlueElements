@@ -337,36 +337,12 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Layout, 16, Skin.IdColor(InputColorId), Color.Transparent);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
-        DrawColorScheme(gr, positionControl, scale, null, false, false, false);
-        //var headh = 25 * zoom;
-        //var headb = 70 * zoom;
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+        DrawColorScheme(gr, positionControl, zoom, null, false, false, false);
 
-        //var body = positionControl with { Y = positionControl.Y + headh, Height = positionControl.Height - headh };
-        //var c = -1;
-        //foreach (var thisC in _childs) {
-        //    c++;
-        //    var it = new RectangleF(positionControl.ControlX + (c * headb), positionControl.Y, headb, headh);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
 
-        //    gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
-
-        //    Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(zoom), false);
-        //    gr.DrawRectangle(new Pen(Color.Black, zoom), it);
-        //}
-
-        //gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
-        //gr.DrawRectangle(new Pen(Color.Black, zoom), body);
-
-        ////Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-        ////Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
-
-        //if (!ForPrinting) {
-        //    DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, true);
-        //}
-
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
-
-        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
     }
 
     #endregion

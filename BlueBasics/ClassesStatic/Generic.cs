@@ -282,7 +282,7 @@ public static class Generic {
 
     public static string GetUniqueKey(int tmp, string type) {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
-        var s = type + "\r\n" + UserName + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+        var s = type + "\r\n" + UserName + "\r\n" + Environment.CurrentManagedThreadId + "\r\n" + Environment.MachineName;
         var key = x + (s.GetHashCode() * 100000000) + tmp;
         return key < 0 ? (key * -1).ToString1() : key.ToString1();
     }
@@ -396,7 +396,7 @@ public static class Generic {
 
     public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);
 
-    private static IEnumerable<byte> GetHash(this string inputString) {
+    private static byte[] GetHash(this string inputString) {
         using HashAlgorithm algorithm = SHA256.Create();
         return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
     }

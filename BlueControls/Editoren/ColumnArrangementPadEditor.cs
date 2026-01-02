@@ -117,6 +117,21 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         base.OnFormClosing(e);
     }
 
+    protected override void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
+        base.Pad_ClickedItemChanged(sender, e);
+
+        if (Pad.LastClickedItem == null && Pad.Items != null) {
+            foreach (var thisIt in Pad.Items) {
+                if (thisIt is DummyHeadPadItem dhpi) {
+                    Pad.LastClickedItem = dhpi;
+                    return;
+                }
+            }
+        }
+
+        //LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
+    }
+
     private void _table_Disposing(object sender, System.EventArgs e) {
         Table = null;
         Close();
@@ -325,22 +340,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         tb.ColumnArrangements = tcvc.ToString(false);
     }
 
-    /// <summary>
-    /// Überträgt die aktuelle Ansicht fest in den Tabellecode hinein
-    /// </summary>
-
-    private void chkShowCaptions_CheckedChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-
-        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
-
-        if (ca.ShowHead == chkShowCaptions.Checked) { return; }
-
-        ca.ShowHead = chkShowCaptions.Checked;
-
-        ChangeCurrentArrangementto(ca);
-    }
-
     private void FixColumnArrangement() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
@@ -369,6 +368,16 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             ca.Add(item);
             itemsdone.Add(leftestItem);
         } while (true);
+
+        if (Pad.Items != null) {
+            foreach (var thisItem in Pad.Items) {
+                if (thisItem is DummyHeadPadItem d) {
+                    ca.ShowHead = d.ShowHead;
+                    ca.FilterRows = d.FilterRows;
+                    break;
+                }
+            }
+        }
 
         var did = oldcode != ca.ParseableItems().FinishParseable();
 
@@ -432,8 +441,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         Pad.Items.Clear();
 
-        ColumnPadItem? anyitem = null;
-
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) {
             return;
         }
@@ -447,94 +454,21 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                 Pad.Items.Add(it);
                 it.SetLeftTopPoint(x, 0);
                 x = it.CanvasUsedArea.Right;
-                anyitem = it;
             }
         }
 
         #endregion
-
-        if (anyitem == null) { return; }
-
-        #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
-
-        var tbColumnCombi = new List<string>();
-        foreach (var thisc in tb.Column) {
-            if (thisc.LinkedTable != null) {
-                var tbName = thisc.LinkedTable.KeyName + "|" + thisc.LinkedCellFilter.JoinWithCr();
-                tbColumnCombi.AddIfNotExists(tbName);
-            }
-        }
-
-        #endregion
-
-        var kx = 0f;
-        foreach (var thisCombi in tbColumnCombi) {
-            foreach (var thisc in ca) {
-                if (thisc?.Column is { IsDisposed: false } c) {
-                    var it = Pad.Items[c.Table?.KeyName + "|" + c.KeyName] as ColumnPadItem;
-
-                    if (c.LinkedTable != null) {
-                        // String als Namen als eindeutige Kennung
-                        var toCheckCombi = c.LinkedTable.KeyName + "|" + c.LinkedCellFilter.JoinWithCr();
-
-                        if (toCheckCombi == thisCombi) {
-                            if (Pad.Items[toCheckCombi] is not TextPadItem databItem) {
-                                var nam = c.LinkedTable.KeyName;
-                                databItem = new TextPadItem(toCheckCombi, nam);
-                                Pad.Items.Add(databItem);
-                                if (it != null) {
-                                    var r = new RectangleF(Math.Max(kx, it.CanvasUsedArea.Left - databItem.CanvasUsedArea.Width),
-                                                            600,
-                                                           (int)(anyitem.CanvasUsedArea.Height / 2),
-                                                           (int)anyitem.CanvasUsedArea.Height);
-
-                                    databItem.SetCoordinates(r);
-                                }
-                                kx = databItem.CanvasUsedArea.Right;
-                            }
-
-                            foreach (var thisitem in c.LinkedCellFilter) {
-                                var tmp = thisitem.SplitBy("|");
-
-                                if (c.Table is { IsDisposed: false } tb2) {
-                                    foreach (var thisc2 in tb2.Column) {
-                                        if (tmp[2].Contains("~" + thisc2.KeyName + "~")) {
-                                            if (thisc2.Table is { IsDisposed: false } tb3) {
-                                                var rkcolit = (ColumnPadItem?)Pad.Items[tb3.KeyName + "|" + thisc2.KeyName];
-                                                if (rkcolit != null) {
-                                                    Pad.Items.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            var c2 = c.LinkedTable.Column[c.ColumnNameOfLinkedTable];
-                            if (c2 != null) {
-                                var it2 = new ColumnPadItem(new ColumnViewItem(c2), thisc.GetRenderer(Constants.Win11));
-                                Pad.Items.Add(it2);
-                                it2.SetLeftTopPoint(kx, 600);
-                                if (it != null) {
-                                    Pad.Items.Connections.Add(new ItemConnection(it2, ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
-                                }
-                                kx = it2.CanvasUsedArea.Right;
-
-                                // und noch die Tabelle auf die Spalte zeigen lassem
-                                Pad.Items.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
-                            }
-                        }
-                    }
-                }
-            }
-
-            kx += 30;
-        }
 
         SortColumns();
 
-        chkShowCaptions.Checked = ca.ShowHead;
-        txbFilterRows.Text = ca.FilterRows.ToString1();
+        var t = new DummyHeadPadItem(tb);
+        t.Page = "xxx";
+        t.ShowHead = ca.ShowHead;
+        t.FilterRows = ca.FilterRows;
+
+        Pad.Items.Add(t);
+
+        Pad.LastClickedItem = t;
     }
 
     private void SortColumns() {
@@ -547,22 +481,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             x.SetLeftTopPoint(left, 0);
             left = x.CanvasUsedArea.Right;
         } while (true);
-    }
-
-    private void txbFilterRows_TextChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-
-        if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
-
-        var rows = IntParse(txbFilterRows.Text);
-        if (rows < 0) { rows = 0; }
-        if (rows > 10) { rows = 10; }
-
-        if (ca.FilterRows == rows) { return; }
-
-        ca.FilterRows = rows;
-
-        ChangeCurrentArrangementto(ca);
     }
 
     private void UpdateCombobox() => TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Table, _arrangement);

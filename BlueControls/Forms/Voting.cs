@@ -102,7 +102,7 @@ public partial class Voting : System.Windows.Forms.Form {
 
     private void cbxStil_TextChanged(object sender, System.EventArgs e) {
         _filename = string.Empty;
-        if (cbxStil.Text.FileSuffix().ToUpperInvariant() == "BCR") {
+        if (cbxStil.Text.FileSuffix().Equals("BCR", StringComparison.OrdinalIgnoreCase)) {
             _filename = cbxStil.Text;
         }
 

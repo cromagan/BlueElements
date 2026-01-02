@@ -149,14 +149,14 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         if (!ForPrinting) {
-            DrawArrowOutput(gr, positionControl, scale, ForPrinting, OutputColorId);
-            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, false);
+            DrawArrowOutput(gr, positionControl, zoom, ForPrinting, OutputColorId);
+            DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
-        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
+        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
     }
 
     #endregion

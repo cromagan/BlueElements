@@ -660,7 +660,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         set {
             if (IsDisposed) { return; }
             value = value.ToUpperInvariant();
-            if (value == _keyName.ToUpperInvariant()) { return; }
+            if (value.Equals(_keyName, StringComparison.OrdinalIgnoreCase)) { return; }
 
             if (!ColumNameAllowed(value)) {
                 Develop.DebugPrint(ErrorType.Warning, "Spaltenname nicht erlaubt: " + _keyName);
@@ -1569,7 +1569,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         var i = ret.IndexOf("-\r", StringComparison.Ordinal);
         if (i > 0 && i < ret.Length - 3) {
             var tzei = ret.Substring(i + 2, 1);
-            if (tzei.ToLowerInvariant() == tzei) {
+            if (tzei.Equals(tzei, StringComparison.OrdinalIgnoreCase)) {
                 ret = ret.Substring(0, i) + ret.Substring(i + 2);
             }
         }
@@ -2495,7 +2495,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 foreach (var thisitem in c.LinkedCellFilter) {
                     var tmp = thisitem.SplitBy("|");
 
-                    if (tmp[2].ContainsIgnoreCase("~" + _keyName.ToLowerInvariant() + "~")) {
+                    if (tmp[2].ContainsIgnoreCase("~" + _keyName + "~")) {
                         Am_A_Key_For.Add(c.KeyName);
                     }
                 }

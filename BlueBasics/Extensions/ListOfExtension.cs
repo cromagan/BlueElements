@@ -382,32 +382,31 @@ public static partial class Extensions {
         if (list == null) { return string.Empty; }
         var uTagName = tagName.ToUpperInvariant().Trim();
         foreach (var thisString in list) {
-            if (thisString.ToUpperInvariant().StartsWith(uTagName)) {
-                if (thisString.ToUpperInvariant().StartsWith(uTagName + ": ")) { return thisString.Substring(uTagName.Length + 2); }
-                if (thisString.ToUpperInvariant().StartsWith(uTagName + ":")) { return thisString.Substring(uTagName.Length + 1); }
-                if (thisString.ToUpperInvariant().StartsWith(uTagName + " = ")) { return thisString.Substring(uTagName.Length + 3); }
-                if (thisString.ToUpperInvariant().StartsWith(uTagName + "=")) { return thisString.Substring(uTagName.Length + 1); }
+            if (thisString.StartsWith(uTagName, StringComparison.OrdinalIgnoreCase)) {
+                if (thisString.StartsWith(uTagName + ": ", StringComparison.OrdinalIgnoreCase)) { return thisString.Substring(uTagName.Length + 2); }
+                if (thisString.StartsWith(uTagName + ":", StringComparison.OrdinalIgnoreCase)) { return thisString.Substring(uTagName.Length + 1); }
+                if (thisString.StartsWith(uTagName + " = ", StringComparison.OrdinalIgnoreCase)) { return thisString.Substring(uTagName.Length + 3); }
+                if (thisString.StartsWith(uTagName + "=", StringComparison.OrdinalIgnoreCase)) { return thisString.Substring(uTagName.Length + 1); }
             }
         }
         return string.Empty;
     }
 
     public static List<string> TagGetAll(this IEnumerable<string>? list, string tagName) {
-        //Used: Only BZL
         List<string> l = [];
         if (list == null) { return l; }
         var uTagName = tagName.ToUpperInvariant();
         foreach (var thisString in list) {
-            if (thisString.ToUpperInvariant().StartsWith(uTagName)) {
-                if (thisString.ToUpperInvariant().StartsWith(uTagName + ": ")) {
+            if (thisString.StartsWith(uTagName, StringComparison.OrdinalIgnoreCase)) {
+                if (thisString.StartsWith(uTagName + ": ", StringComparison.OrdinalIgnoreCase)) {
                     l.Add(thisString.Substring(uTagName.Length + 2));
                 } else {
-                    if (thisString.ToUpperInvariant().StartsWith(uTagName + ":")) { l.Add(thisString.Substring(uTagName.Length + 1)); }
+                    if (thisString.StartsWith(uTagName + ":", StringComparison.OrdinalIgnoreCase)) { l.Add(thisString.Substring(uTagName.Length + 1)); }
                 }
-                if (thisString.ToUpperInvariant().StartsWith(uTagName + " = ")) {
+                if (thisString.StartsWith(uTagName + " = ", StringComparison.OrdinalIgnoreCase)) {
                     l.Add(thisString.Substring(uTagName.Length + 3));
                 } else {
-                    if (thisString.ToUpperInvariant().StartsWith(uTagName + "=")) { l.Add(thisString.Substring(uTagName.Length + 1)); }
+                    if (thisString.StartsWith(uTagName + "=", StringComparison.OrdinalIgnoreCase)) { l.Add(thisString.Substring(uTagName.Length + 1)); }
                 }
             }
         }

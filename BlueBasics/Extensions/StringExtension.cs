@@ -1151,7 +1151,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
         was = was.ToUpperInvariant();
-        while (tXt.Length >= was.Length && tXt.Substring(tXt.Length - was.Length).ToUpperInvariant() == was) {
+        while (tXt.Length >= was.Length && tXt.Substring(tXt.Length - was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
             tXt = tXt.Remove(tXt.Length - was.Length);
         }
         return tXt;
@@ -1168,7 +1168,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
         was = was.ToUpperInvariant();
-        while (tXt.Length >= was.Length && tXt.Substring(0, was.Length).ToUpperInvariant() == was) {
+        while (tXt.Length >= was.Length && tXt.Substring(0, was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
             tXt = tXt.Remove(0, was.Length);
         }
         return tXt;

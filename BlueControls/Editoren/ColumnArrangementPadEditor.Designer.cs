@@ -34,9 +34,6 @@ namespace BlueControls.BlueTableDialogs {
             this.grpSpalten = new BlueControls.Controls.GroupBox();
             this.btnNeueSpalte = new BlueControls.Controls.Button();
             this.grpAktuelleAnsicht = new BlueControls.Controls.GroupBox();
-            this.txbFilterRows = new BlueControls.Controls.TextBox();
-            this.capFilterZeilen = new BlueControls.Controls.Caption();
-            this.chkShowCaptions = new BlueControls.Controls.Button();
             this.btnSystemspaltenAusblenden = new BlueControls.Controls.Button();
             this.btnSpalteEinblenden = new BlueControls.Controls.Button();
             this.btnAlleSpaltenEinblenden = new BlueControls.Controls.Button();
@@ -139,9 +136,6 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.grpAktuelleAnsicht.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAktuelleAnsicht.CausesValidation = false;
-            this.grpAktuelleAnsicht.Controls.Add(this.txbFilterRows);
-            this.grpAktuelleAnsicht.Controls.Add(this.capFilterZeilen);
-            this.grpAktuelleAnsicht.Controls.Add(this.chkShowCaptions);
             this.grpAktuelleAnsicht.Controls.Add(this.btnSystemspaltenAusblenden);
             this.grpAktuelleAnsicht.Controls.Add(this.btnSpalteEinblenden);
             this.grpAktuelleAnsicht.Controls.Add(this.btnAlleSpaltenEinblenden);
@@ -154,39 +148,6 @@ namespace BlueControls.BlueTableDialogs {
             this.grpAktuelleAnsicht.TabIndex = 5;
             this.grpAktuelleAnsicht.TabStop = false;
             this.grpAktuelleAnsicht.Text = "Aktuelle Ansicht";
-            // 
-            // txbFilterRows
-            // 
-            this.txbFilterRows.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Integer;
-            this.txbFilterRows.AllowedChars = "0123456789";
-            this.txbFilterRows.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFilterRows.Location = new System.Drawing.Point(352, 24);
-            this.txbFilterRows.MaxTextLength = 19;
-            this.txbFilterRows.Name = "txbFilterRows";
-            this.txbFilterRows.RegexCheck = "^(([1-9]\\d*)|0)$";
-            this.txbFilterRows.Size = new System.Drawing.Size(72, 22);
-            this.txbFilterRows.Suffix = "Stk.";
-            this.txbFilterRows.TabIndex = 35;
-            this.txbFilterRows.Text = "1";
-            this.txbFilterRows.TextChanged += new System.EventHandler(this.txbFilterRows_TextChanged);
-            // 
-            // capFilterZeilen
-            // 
-            this.capFilterZeilen.CausesValidation = false;
-            this.capFilterZeilen.Location = new System.Drawing.Point(264, 24);
-            this.capFilterZeilen.Name = "capFilterZeilen";
-            this.capFilterZeilen.Size = new System.Drawing.Size(80, 22);
-            this.capFilterZeilen.Text = "Filter-Zeilen:";
-            // 
-            // chkShowCaptions
-            // 
-            this.chkShowCaptions.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkShowCaptions.Location = new System.Drawing.Point(264, 2);
-            this.chkShowCaptions.Name = "chkShowCaptions";
-            this.chkShowCaptions.Size = new System.Drawing.Size(160, 22);
-            this.chkShowCaptions.TabIndex = 34;
-            this.chkShowCaptions.Text = "Spalten-Köpfe anzeigen";
-            this.chkShowCaptions.CheckedChanged += new System.EventHandler(this.chkShowCaptions_CheckedChanged);
             // 
             // btnSystemspaltenAusblenden
             // 
@@ -339,8 +300,5 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnBerechtigungsgruppen;
         internal GroupBox grpSpalten;
         private Button btnNeueSpalte;
-        private Button chkShowCaptions;
-        private Controls.TextBox txbFilterRows;
-        private Caption capFilterZeilen;
     }
 }

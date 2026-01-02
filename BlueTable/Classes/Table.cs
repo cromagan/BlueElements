@@ -66,7 +66,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <summary>
     /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
     /// </summary>
-    public static readonly int MasterBlockedMin = 0;
+    public static readonly int MasterBlockedMin;
 
     /// <summary>
     /// Wert in Minuten. Ist man selbst Master in diesen Range, dann zählt das, dass man ein Master ist
@@ -1120,7 +1120,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var sw = Stopwatch.StartNew();
         var runTimeID = ExecutingScriptThreadsAnyTable.JoinWithCr();
 
-        var myThread = Thread.CurrentThread.ManagedThreadId.ToString10();
+        var myThread = Environment.CurrentManagedThreadId.ToString10();
 
         while (HasActiveThreadsExcept(myThread)) {
             try {
@@ -1382,7 +1382,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         var isNewId = false;
-        var scriptThreadId = Thread.CurrentThread.ManagedThreadId.ToString10();
+        var scriptThreadId = Environment.CurrentManagedThreadId.ToString10();
         if (script.ChangeValuesAllowed) {
             WaitScriptsDone();
 
@@ -2041,19 +2041,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
-        var tmpName = UserName.ToUpperInvariant();
-        var tmpGroup = UserGroup.ToUpperInvariant();
         if (string.Equals(allowed, Everybody, StringComparison.OrdinalIgnoreCase)) {
             return true;
         }
 
         if (Column.SysRowCreator is { IsDisposed: false } src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
-            if (row != null && row.CellGetString(src).ToUpperInvariant() == tmpName) { return true; }
-        } else if (string.Equals(allowed, "#USER: " + tmpName, StringComparison.OrdinalIgnoreCase)) {
+            if (row != null && row.CellGetString(src).Equals(UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
+        } else if (string.Equals(allowed, "#USER: " + UserName, StringComparison.OrdinalIgnoreCase)) {
             return true;
-        } else if (string.Equals(allowed, "#USER:" + tmpName, StringComparison.OrdinalIgnoreCase)) {
+        } else if (string.Equals(allowed, "#USER:" + UserName, StringComparison.OrdinalIgnoreCase)) {
             return true;
-        } else if (string.Equals(allowed, tmpGroup, StringComparison.OrdinalIgnoreCase)) {
+        } else if (string.Equals(allowed, UserGroup, StringComparison.OrdinalIgnoreCase)) {
             return true;
         }
         return false;

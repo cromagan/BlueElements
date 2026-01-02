@@ -176,7 +176,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
 
             foreach (var thisColumn in tb.Column) {
-                if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
+                if (value.ContainsIgnoreCase("~" + thisColumn.KeyName + "~")) {
                     var l = linkedrow.CellGetList(c);
                     if (l.Count == 0) { l.Add(string.Empty); }
                     fc.Add(new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, l));
@@ -195,34 +195,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         return (fc, string.Empty);
-
-        //var columns = new List<ColumnItem>();
-
-        //foreach (var thisFi in column.LinkedCellFilter) {
-        //    if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
-
-        //    var x = thisFi.SplitBy("|");
-        //    var value = x[2].FromNonCritical().ToUpperInvariant();
-
-        //    foreach (var thisColumn in tb.Column) {
-        //        if (value.Contains("~" + thisColumn.KeyName.ToUpperInvariant() + "~")) {
-        //            columns.AddIfNotExists(thisColumn);
-        //        }
-        //    }
-        //}
-
-        //var fc = new FilterCollection(tb, "cell reverse get filter");
-
-        //foreach (var thisColumn in columns) {
-        //    var fi = new FilterItem(row, thisColumn);
-        //    fc.AddIfNotExists(fi);
-        //}
-
-        //if (fc.Count == 0) {
-        //    fc.Add(new FilterItem(tb, "Reverse Filter"));
-        //}
-
-        //return (fc, string.Empty);
     }
 
     /// <summary>

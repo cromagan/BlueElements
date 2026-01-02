@@ -268,7 +268,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                         e.ContextMenu.Add(Separator());
                     }
                     e.ContextMenu.Add(ItemOf($"'{tmpWord}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord, Dictionary.IsWriteable()));
-                    if (tmpWord.ToLowerInvariant() != tmpWord) {
+                    if (!tmpWord.Equals(tmpWord, StringComparison.OrdinalIgnoreCase)) {
                         e.ContextMenu.Add(ItemOf($"'{tmpWord.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord.ToLowerInvariant(), Dictionary.IsWriteable()));
                     }
                     e.ContextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", null, Contextmenu_SpellChecking, null, Dictionary.IsWriteable()));
@@ -1230,10 +1230,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
             case "Done":
                 _mustCheck = false;
-                break;
-
-            default:
-                Develop.DebugPrint(Convert.ToString(e.UserState));
                 break;
         }
     }

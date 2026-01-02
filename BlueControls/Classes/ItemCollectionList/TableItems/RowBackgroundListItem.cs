@@ -185,7 +185,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         if (Arrangement == null) { return; }
 
         for (var du = 0; du < 2; du++) {
@@ -217,7 +217,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 Draw_Border(gr, viewItem, viewItem.LineRight, area.Right, area.Top, area.Bottom);
                 Draw_UpperLine(gr, ColumnLineStyle.Ohne, area.Right, area.Left, area.Top);
                 Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dünn, area.Right, area.Left, area.Bottom - 1);
-                Draw_ColumnContent(gr, viewItem, area, scale, t, offsetX, offsetY, state);
+                Draw_ColumnContent(gr, viewItem, area, zoom, t, offsetX, offsetY, state);
                 Draw_ColumnOverlay(gr, viewItem, area, state);
             }
 

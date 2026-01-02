@@ -864,7 +864,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public void CursorPos_Set(ColumnViewItem? column, AbstractListItem? row, bool ensureVisible) {
         if (IsDisposed || Table is not { IsDisposed: false } || row == null || column == null ||
             CurrentArrangement is not { IsDisposed: false } ca2 || !ca2.Contains(column) ||
-            AllViewItems is not { } avi || !avi.Values.Contains(row)) {
+            AllViewItems is not { } avi || !avi.ContainsValue(row)) {
             column = null;
             row = null;
         }
@@ -2492,7 +2492,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     var prefix = rcli.ChapterText.ToUpperInvariant() + "\\";
                     foreach (var otherR in allItems.Values) {
                         if (otherR is RowCaptionListItem { IsDisposed: false } otherRcli) {
-                            if (otherRcli.ChapterText.ToUpperInvariant().StartsWith(prefix)) {
+                            if (otherRcli.ChapterText.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
                                 l.Add(otherRcli.ChapterText);
                             }
                         }
@@ -3074,7 +3074,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
-    private AbstractListItem? GetRow(RowItem? row) {
+    private RowListItem? GetRow(RowItem? row) {
         if (row == null) { return null; }
         if (AllViewItems is not { } avi) { return null; }
 

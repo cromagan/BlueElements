@@ -24,11 +24,11 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static int CanvasToControl(this int value, float zoom, float offset) => (int)Math.Round(value * zoom + offset, 0, MidpointRounding.AwayFromZero);
+    public static int CanvasToControl(this int value, float zoom, float offset) => (int)Math.Round((value * zoom) + offset, 0, MidpointRounding.AwayFromZero);
 
     public static int CanvasToControl(this int value, float zoom) => (int)Math.Round(value * zoom, 0, MidpointRounding.AwayFromZero);
 
-    public static int CanvasToControl(this float value, float zoom, float offset) => (int)Math.Round(value * zoom + offset, 0, MidpointRounding.AwayFromZero);
+    public static int CanvasToControl(this float value, float zoom, float offset) => (int)Math.Round((value * zoom) + offset, 0, MidpointRounding.AwayFromZero);
 
     public static int CanvasToControl(this float value, float zoom) => (int)Math.Round(value * zoom, 0, MidpointRounding.AwayFromZero);
 

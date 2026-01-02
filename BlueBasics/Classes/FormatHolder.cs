@@ -151,7 +151,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLength = long.MinValue.ToString().Length
+        MaxTextLength = long.MinValue.ToString1().Length
     };
 
     public static readonly FormatHolder LongPositive = new("Long only Positive") {
@@ -162,7 +162,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLength = long.MaxValue.ToString().Length
+        MaxTextLength = long.MaxValue.ToString1().Length
     };
 
     public static readonly FormatHolder PhoneNumber = new("PhoneNumber") {

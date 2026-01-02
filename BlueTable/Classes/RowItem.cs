@@ -662,7 +662,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                             replacewith = replacewith.Replace("\r", " ");
                         }
 
-                        erg = erg.Replace("~" + vari.KeyName.ToUpperInvariant() + "~", replacewith, RegexOptions.IgnoreCase);
+                        erg = erg.Replace("~" + vari.KeyName + "~", replacewith, RegexOptions.IgnoreCase);
                     }
                 }
             }
@@ -686,7 +686,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         replacewith = replacewith.Replace("\r", " ");
                     }
 
-                    erg = erg.Replace("~" + column.KeyName.ToUpperInvariant() + "~", replacewith, RegexOptions.IgnoreCase);
+                    erg = erg.Replace("~" + column.KeyName + "~", replacewith, RegexOptions.IgnoreCase);
                 }
             }
         }

@@ -90,8 +90,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
         if (layoutFileName.IsFormat(FormatHolder.FilepathAndName)) {
-
-            if(!IO.DirectoryExists(layoutFileName.FilePath())) {
+            if (!IO.DirectoryExists(layoutFileName.FilePath())) {
                 IO.CreateDirectory(layoutFileName.FilePath());
             }
 
@@ -1113,10 +1112,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Connections.RemoveAll();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         gr.PixelOffsetMode = PixelOffsetMode.None;
 
-        var d = !Endless ? CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false) : visibleAreaControl;
+        var d = !Endless ? CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false) : visibleAreaControl;
         var ds = !Endless ? positionControl : visibleAreaControl;
 
         if (BackColor.A > 0) {
@@ -1128,16 +1127,16 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (_gridShow > 0.1) {
             var tmpgrid = _gridShow;
 
-            while (MmToPixel(tmpgrid, Dpi).CanvasToControl(scale) < 5) { tmpgrid *= 2; }
+            while (MmToPixel(tmpgrid, Dpi).CanvasToControl(zoom) < 5) { tmpgrid *= 2; }
 
             var p = new Pen(Color.FromArgb(10, 0, 0, 0));
             float ex = 0;
 
-            var po = new PointM(0, 0).CanvasToControl(scale, offsetX, offsetY);
+            var po = new PointM(0, 0).CanvasToControl(zoom, offsetX, offsetY);
             float dxp, dyp, dxm, dym;
 
             do {
-                var mo = MmToPixel(ex * tmpgrid, Dpi).CanvasToControl(scale);
+                var mo = MmToPixel(ex * tmpgrid, Dpi).CanvasToControl(zoom);
 
                 dxp = po.X + mo;
                 dxm = po.X - mo;
@@ -1164,7 +1163,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         #region Items selbst
 
-        var (childScale, childOffsetX, childOffsetY) = AlterView(positionControl, scale, offsetX, offsetY, AutoZoomFit, UsedAreaOfItems());
+        var (childScale, childOffsetX, childOffsetY) = AlterView(positionControl, zoom, offsetX, offsetY, AutoZoomFit, UsedAreaOfItems());
 
         foreach (var thisItem in _internal) {
             gr.PixelOffsetMode = PixelOffsetMode.None;

@@ -210,11 +210,11 @@ public class ComicCompPadItem : AbstractPadItem {
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
-        var lOt = _ber_Lo.CanvasToControl(scale, offsetX, offsetY);
-        var rOt = _ber_Ro.CanvasToControl(scale, offsetX, offsetY);
-        var rUt = _ber_Ru.CanvasToControl(scale, offsetX, offsetY);
-        var lUt = _ber_Lu.CanvasToControl(scale, offsetX, offsetY);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+        var lOt = _ber_Lo.CanvasToControl(zoom, offsetX, offsetY);
+        var rOt = _ber_Ro.CanvasToControl(zoom, offsetX, offsetY);
+        var rUt = _ber_Ru.CanvasToControl(zoom, offsetX, offsetY);
+        var lUt = _ber_Lu.CanvasToControl(zoom, offsetX, offsetY);
         PointF[] destPara2 = [lOt, rOt, lUt];
         if (_bitmap != null) {
             gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
@@ -224,7 +224,7 @@ public class ComicCompPadItem : AbstractPadItem {
             gr.DrawLine(ZoomPad.PenGray, rOt, rUt);
             gr.DrawLine(ZoomPad.PenGray, rUt, lUt);
             gr.DrawLine(ZoomPad.PenGray, lUt, lOt);
-            gr.DrawLine(ZoomPad.PenGray, P1.CanvasToControl(scale, offsetX, offsetY), P2.CanvasToControl(scale, offsetX, offsetY));
+            gr.DrawLine(ZoomPad.PenGray, P1.CanvasToControl(zoom, offsetX, offsetY), P2.CanvasToControl(zoom, offsetX, offsetY));
         }
     }
 

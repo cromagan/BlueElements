@@ -142,7 +142,7 @@ public class BitmapListItem : AbstractListItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false); }
 
         var drawingCoordinates = positionControl;
@@ -162,12 +162,12 @@ public class BitmapListItem : AbstractListItem {
                 try {
                     lock (_bitmap) {
                         areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
-                        scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
+                        zoom = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
                             (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
-                        scaledImagePosition = new RectangleF(((drawingCoordinates.Width - _bitmap.Width.CanvasToControl(scale)) / 2) + drawingCoordinates.Left,
-                            ((drawingCoordinates.Height - _bitmap.Height.CanvasToControl(scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2f),
-                            _bitmap.Width.CanvasToControl(scale),
-                            _bitmap.Height.CanvasToControl(scale));
+                        scaledImagePosition = new RectangleF(((drawingCoordinates.Width - _bitmap.Width.CanvasToControl(zoom)) / 2) + drawingCoordinates.Left,
+                            ((drawingCoordinates.Height - _bitmap.Height.CanvasToControl(zoom)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2f),
+                            _bitmap.Width.CanvasToControl(zoom),
+                            _bitmap.Height.CanvasToControl(zoom));
                     }
                 } catch {
                     ok = false;

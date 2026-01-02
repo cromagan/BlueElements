@@ -147,7 +147,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         UnRegisterEvents();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);
@@ -175,7 +175,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
                 break;
 
             case Symbol.Rechteck_gerundet:
-                p = Poly_RoundRec(d2.ToRect(), 20.CanvasToControl(scale));
+                p = Poly_RoundRec(d2.ToRect(), 20.CanvasToControl(zoom));
                 break;
 
             default:
@@ -185,7 +185,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
         if (p != null && Parent != null) {
             gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
-            gr.DrawPath(new Pen(Randfarbe, Randdicke.CanvasToControl(scale)), p);
+            gr.DrawPath(new Pen(Randfarbe, Randdicke.CanvasToControl(zoom)), p);
         }
 
         gr.TranslateTransform(-trp.X, -trp.Y);

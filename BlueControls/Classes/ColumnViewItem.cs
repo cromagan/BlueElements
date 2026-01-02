@@ -409,7 +409,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             return _controlColumnWidth;
         }
 
-        var minw = p16 * (_column.Caption.CountString("\r") + 1) + pa;
+        var minw = (p16 * (_column.Caption.CountString("\r") + 1)) + pa;
 
         if (!IsExpanded) {
             _controlColumnWidth = minw;

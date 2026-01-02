@@ -30,12 +30,6 @@ public class Method_RowUpdate : Method_TableGeneric {
 
     public override List<List<string>> Args => [RowVar, FloatVal, FloatVal];
 
-    public List<List<string>> ArgsForButton => [FloatVal, FloatVal];
-
-    public List<string> ArgsForButtonDescription => ["MinAlter", "MaxAlter"];
-
-    public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
-
     public override string Command => "rowupdate";
 
     public override List<string> Constants => [];
@@ -51,8 +45,6 @@ public class Method_RowUpdate : Method_TableGeneric {
     public override MethodType MethodLevel => MethodType.LongTime;
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
-
-    public string NiceTextForUser => "Die gefundenen Zeilen aktualisieren";
 
     public override string Returns => VariableBool.ShortName_Plain;
 

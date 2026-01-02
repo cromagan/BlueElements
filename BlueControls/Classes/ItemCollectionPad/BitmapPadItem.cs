@@ -236,7 +236,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public bool ReplaceVariable(Variable variable) {
         if (IsDisposed) { return false; }
         if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
-        if ("~" + variable.KeyName.ToLowerInvariant() + "~" != Platzhalter_Für_Layout.ToLowerInvariant()) { return false; }
+        if (!("~" + variable.KeyName + "~").Equals(Platzhalter_Für_Layout, StringComparison.OrdinalIgnoreCase)) { return false; }
 
         Bitmap? ot;
 
@@ -290,7 +290,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         //positionControl.Inflate(-_padding, -_padding);
         //RectangleF r1 = new(positionControl.Left , positionControl.Top , positionControl.Width , positionControl.Height );
         RectangleF r2 = new();
@@ -342,7 +342,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             Generic.CollectGarbage();
         }
         if (_style != PadStyles.Undefiniert) {
-            gr.DrawRectangle(this.GetFont().Pen(scale), r1);
+            gr.DrawRectangle(this.GetFont().Pen(zoom), r1);
         }
 
         gr.TranslateTransform(-trp.X, -trp.Y);

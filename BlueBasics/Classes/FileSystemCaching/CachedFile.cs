@@ -25,13 +25,12 @@ namespace BlueBasics.FileSystemCaching;
 /// <summary>
 /// Repräsentiert eine gecachte Datei mit Lazy-Loading-Unterstützung und Versionierung.
 /// Thread-sicher durch Verwendung von Double-Checked-Locking.
-/// Metadaten und Content werden erst bei Bedarf geladen.
+/// Metadaten und GetContent werden erst bei Bedarf geladen.
 /// </summary>
 public sealed class CachedFile : IDisposable {
 
     #region Fields
 
-    public readonly string Filename;
     private readonly int _checkIntervalMs = 180000;
     private readonly object _lock = new();
     private byte[]? _content;
@@ -44,7 +43,7 @@ public sealed class CachedFile : IDisposable {
     #region Constructors
 
     /// <summary>
-    /// Erstellt eine neue CachedFile-Instanz für Metadaten und Content.
+    /// Erstellt eine neue CachedFile-Instanz für Metadaten und GetContent.
     /// </summary>
     /// <param name="filename">Dateipfad</param>
     public CachedFile(string filename) => Filename = filename;
@@ -53,29 +52,7 @@ public sealed class CachedFile : IDisposable {
 
     #region Properties
 
-    public byte[] Content {
-        get {
-            if (_isDisposed > 0) { return []; }
-
-            lock (_lock) {
-                if (_timestamp != null && _content != null) { return _content; }
-            }
-
-            (var content, var timestamp) = ReadContentFromFileSystem();
-
-            lock (_lock) {
-                if (_timestamp != null && _content != null) { return _content; }
-
-                _timestamp = timestamp;
-                _content = content;
-
-                StartStaleCheckTimer();
-                return _content;
-            }
-        }
-
-        private set;
-    }
+    public string Filename { get; } = string.Empty;
 
     #endregion
 
@@ -86,10 +63,30 @@ public sealed class CachedFile : IDisposable {
         Invalidate();
     }
 
+    public byte[] GetContent() {
+        if (_isDisposed > 0) { return []; }
+
+        lock (_lock) {
+            if (_timestamp != null && _content != null) { return _content; }
+        }
+
+        (var content, var timestamp) = ReadContentFromFileSystem();
+
+        lock (_lock) {
+            if (_timestamp != null && _content != null) { return _content; }
+
+            _timestamp = timestamp;
+            _content = content;
+
+            StartStaleCheckTimer();
+            return _content;
+        }
+    }
+
     public string GetContentAsString(Encoding? encoding = null) {
         if (_isDisposed > 0) { return string.Empty; }
 
-        var content = Content; // Lokale Kopie
+        var content = GetContent(); // Lokale Kopie
         if (content.Length == 0) { return string.Empty; }
 
         encoding ??= Encoding.UTF8;
@@ -101,7 +98,7 @@ public sealed class CachedFile : IDisposable {
         lock (_lock) {
             StopStaleCheckTimer();
             _timestamp = null;
-            Content = null;
+            _content = null;
         }
     }
 

@@ -78,18 +78,18 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
     //    var co = viewItem.BackColor_ColumnCell.Darken(0.1);
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
 
         if (Arrangement == null) { return; }
 
-        var Font_RowChapter_Scaled = Font_RowChapter.Scale(scale);
+        var Font_RowChapter_Scaled = Font_RowChapter.Scale(zoom);
 
         var tmp = ChapterText.Trim('\\');
 
-        var p14 = 14.CanvasToControl(scale);
-        var p5 = 5.CanvasToControl(scale);
-        var p23 = 23.CanvasToControl(scale);
+        var p14 = 14.CanvasToControl(zoom);
+        var p5 = 5.CanvasToControl(zoom);
+        var p23 = 23.CanvasToControl(zoom);
 
         var si = Font_RowChapter_Scaled.MeasureString(tmp);
         gr.FillRectangle(new SolidBrush(Skin.Color_Back(Design.Table_And_Pad, States.Standard).SetAlpha(50)), positionControl);

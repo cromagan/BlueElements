@@ -46,7 +46,7 @@ public static class SkinDesignExtensions {
         }
     }
 
-    private static void Add(this IDictionary<States, SkinDesign> dictStats, States status, string font, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc3, string pic) {
+    private static void Add(this Dictionary<States, SkinDesign> dictStats, States status, string font, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc3, string pic) {
         SkinDesign des = new() {
             Need = true,
             Kontur = enKontur,

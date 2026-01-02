@@ -79,7 +79,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public static void ColumbBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+    public static void ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         switch (viewItem.BackgroundStyle) {
             case ColumnBackgroundStyle.None:
             case ColumnBackgroundStyle.Brighten:
@@ -171,7 +171,7 @@ public sealed class RowListItem : RowBackgroundListItem {
     public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
 
-        ColumbBackGround(gr, viewItem, positionControl, state);
+        ColumnBackGround(gr, viewItem, positionControl, state);
 
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
@@ -254,8 +254,8 @@ public sealed class RowListItem : RowBackgroundListItem {
         return new(100, drawHeight);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, scale);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
         if (Column == null) { return; }
 
         //var stat = States.Standard;

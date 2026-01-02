@@ -246,10 +246,10 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
-        DrawColorScheme(gr, positionControl, scale, null, false, false, false);
-        var headh = 25.CanvasToControl(scale);
-        var headb = 70.CanvasToControl(scale);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+        DrawColorScheme(gr, positionControl, zoom, null, false, false, false);
+        var headh = 25.CanvasToControl(zoom);
+        var headb = 70.CanvasToControl(zoom);
 
         var body = positionControl with { Y = positionControl.Y + headh, Height = positionControl.Height - headh };
         var c = -1;
@@ -262,23 +262,20 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 
-            Skin.Draw_FormatedText(gr, thisC.BestCaption(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(scale), false);
-            gr.DrawRectangle(new Pen(Color.Black, scale), it);
+            Skin.Draw_FormatedText(gr, thisC.BestCaption(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(zoom), false);
+            gr.DrawRectangle(new Pen(Color.Black, zoom), it);
         }
 
         gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
-        gr.DrawRectangle(new Pen(Color.Black, scale), body);
-
-        //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-        //Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
+        gr.DrawRectangle(new Pen(Color.Black, zoom), body);
 
         if (!ForPrinting) {
-            DrawColorScheme(gr, positionControl, scale, InputColorId, true, true, true);
+            DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
 
-        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
     }
 
     private ListBox Childs() {

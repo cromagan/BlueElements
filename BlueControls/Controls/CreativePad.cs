@@ -132,12 +132,11 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
     public AbstractPadItem? LastClickedItem {
         get;
-        private set {
-            if (field != value) {
-                OnClickedItemChanging();
-                field = value;
-                OnClickedItemChanged();
-            }
+        set {
+            if (field == value) { return; }
+            OnClickedItemChanging();
+            field = value;
+            OnClickedItemChanged();
         }
     }
 

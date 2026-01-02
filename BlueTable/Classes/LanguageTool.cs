@@ -112,7 +112,7 @@ public static class LanguageTool {
             }
         }
 
-        return style is ShortenStyle.Replaced or ShortenStyle.HTML || ot.Equals(txt) ? txt : $"{ot} ({txt})";
+        return style is ShortenStyle.Replaced or ShortenStyle.HTML || ot.Equals(txt, System.StringComparison.Ordinal) ? txt : $"{ot} ({txt})";
     }
 
     #endregion

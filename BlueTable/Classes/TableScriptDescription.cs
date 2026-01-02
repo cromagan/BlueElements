@@ -205,7 +205,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
         if (NeedRow && !Table.IsRowScriptPossible()) { return "Zeilenskripte in dieser Tabelle nicht möglich"; }
 
-        if (EventTypes.ToString() == ((int)EventTypes).ToString()) { return "Skripte öffnen und neu speichern."; }
+        if (EventTypes.ToString() == ((int)EventTypes).ToString1()) { return "Skripte öffnen und neu speichern."; }
 
         foreach (var script in tb.EventScript) {
             if (script != this) {

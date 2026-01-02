@@ -91,7 +91,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public abstract bool ControlMustPressed { get; }
 
-    public bool Fitting { get; private set; } = false;
+    public bool Fitting { get; private set; }
 
     public new bool Focused => base.Focused || SliderX.Focused || SliderY.Focused;
 
@@ -304,6 +304,14 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Invalidate();
     }
 
+    protected override void OnDoubleClick(System.EventArgs e) {
+        base.OnDoubleClick(e);
+        if (MouseDownData == null) { return; }
+        OnDoubleClick(MouseDownData);
+    }
+
+    protected virtual void OnDoubleClick(CanvasMouseEventArgs e) { }
+
     protected override void OnKeyDown(KeyEventArgs e) {
         base.OnKeyDown(e);
 
@@ -350,16 +358,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         OnMouseDown(cme);
     }
 
-
-    protected override void OnDoubleClick(System.EventArgs e) {
-        base.OnDoubleClick(e);
-        if(MouseDownData == null) {  return; }
-        OnDoubleClick(MouseDownData);
-    }
-
     protected virtual void OnMouseDown(CanvasMouseEventArgs e) { }
-
-    protected virtual void OnDoubleClick(CanvasMouseEventArgs e) { }
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);

@@ -219,13 +219,13 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         UnRegisterEvents();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         if (_style != PadStyles.Undefiniert) {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
 
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-                gr.DrawLine(this.GetFont().Pen(scale), _tempPoints[z].CanvasToControl(scale, offsetX, offsetY), _tempPoints[z + 1].CanvasToControl(scale, offsetX, offsetY));
+                gr.DrawLine(this.GetFont().Pen(zoom), _tempPoints[z].CanvasToControl(zoom, offsetX, offsetY), _tempPoints[z + 1].CanvasToControl(zoom, offsetX, offsetY));
             }
         }
     }

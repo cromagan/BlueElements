@@ -174,17 +174,17 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float scale, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
         if (!ForPrinting) {
-            DrawArrowOutput(gr, positionControl, scale, ForPrinting, OutputColorId);
-            DrawFakeControl(gr, positionControl, scale, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
-            DrawColorScheme(gr, positionControl, scale, null, true, true, true);
+            DrawArrowOutput(gr, positionControl, zoom, ForPrinting, OutputColorId);
+            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawColorScheme(gr, positionControl, zoom, null, true, true, true);
         } else {
-            DrawFakeControl(gr, positionControl, scale, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
+            DrawFakeControl(gr, positionControl, zoom, CaptionPosition, _caption, EditTypeFormula.Textfeld_mit_Auswahlknopf);
         }
 
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, scale, offsetX, offsetY);
-        DrawArrorInput(gr, positionControl, scale, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
+        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
     }
 
     #endregion

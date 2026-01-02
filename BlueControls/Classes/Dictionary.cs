@@ -61,7 +61,7 @@ internal static class Dictionary {
         //    word != word.ToUpperInvariant() &&
         //    word != word.ToTitleCase()) { return false; }  //GmbH
 
-        if (word == word.ToLowerInvariant() && word != word.ToUpperInvariant() && word != word.ToTitleCase()) {
+        if (word.Equals(word, StringComparison.OrdinalIgnoreCase) && !word.Equals(word, StringComparison.OrdinalIgnoreCase) && word != word.ToTitleCase()) {
             // Wenn ein Wort klein geschrieben ist
             // nicht GROSS gescrieben
             // oder nicht am Worftanfang
@@ -116,7 +116,8 @@ internal static class Dictionary {
                 woEnd = etxt.WordEnd(pos);
                 var wort = etxt.Word(pos);
                 if (!IsWordOk(wort)) {
-                    var butt = wort.ToLowerInvariant() != wort
+                    var butt = !wort.Equals(wort
+, StringComparison.OrdinalIgnoreCase)
                         ? MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLowerInvariant() + "' aufnehmen", "Ignorieren", "Beenden")
                         : allOk ? 1 : MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
                     switch (butt) {

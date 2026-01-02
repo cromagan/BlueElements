@@ -66,8 +66,8 @@ public sealed class SortBarListItem : RowBackgroundListItem {
             var im = Sort.Reverse ? QuickImage.Get("ZA|" + p12 + "|" + p6 + "||||50") : QuickImage.Get("AZ|" + p12 + "|" + p6 + "||||50");
 
             gr.DrawImage(im,
-                positionControl.X + (positionControl.Width - im.Width) / 2f,
-                positionControl.Y + (positionControl.Height - im.Height) / 2f);
+                positionControl.X + ((positionControl.Width - im.Width) / 2f),
+                positionControl.Y + ((positionControl.Height - im.Height) / 2f));
         }
     }
 

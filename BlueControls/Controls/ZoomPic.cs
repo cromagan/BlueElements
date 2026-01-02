@@ -32,7 +32,7 @@ public partial class ZoomPic : ZoomPad {
     #region Fields
 
     private TrimmedCanvasMouseEventArgs? _mouseCurrent;
-    private TrimmedCanvasMouseEventArgs? _mouseDown;
+    private TrimmedCanvasMouseEventArgs _mouseDown = new TrimmedCanvasMouseEventArgs();
 
     #endregion
 

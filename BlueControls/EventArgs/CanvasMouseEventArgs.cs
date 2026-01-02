@@ -23,8 +23,9 @@ namespace BlueControls.EventArgs;
 
 public class CanvasMouseEventArgs : System.EventArgs {
 
-
     #region Constructors
+
+    public CanvasMouseEventArgs() { }
 
     public CanvasMouseEventArgs(MouseEventArgs mouseControl, float scale, float offsetX, float offsetY) : base() {
         ControlX = mouseControl.X;
@@ -60,7 +61,6 @@ public class CanvasMouseEventArgs : System.EventArgs {
 
         ControlX = canvasX.CanvasToControl(scale, offsetX);
         ControlY = canvasY.CanvasToControl(scale, offsetY);
-
     }
 
     #endregion

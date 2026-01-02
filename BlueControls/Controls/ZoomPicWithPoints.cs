@@ -40,17 +40,18 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     #region Fields
 
-    /// <summary>
-    /// Wenn eine Aktion ausgeführt wird, ein String, der den Aktionsnamen beinhaltet
-    /// </summary>
-    public string UserAction = string.Empty;
-
     private const int DrawSize = 20;
+
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
+
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
+
     private readonly List<PointM> _points = [];
+
     private Helpers _helper = Helpers.None;
+
     private Orientation _mittelLinie = Orientation.Ohne;
+
     private bool _pointAdding;
 
     #endregion
@@ -94,6 +95,11 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     public List<string> Tags { get; } = [];
+
+    /// <summary>
+    /// Wenn eine Aktion ausgeführt wird, ein String, der den Aktionsnamen beinhaltet
+    /// </summary>
+    public string UserAction { get; set; } = string.Empty;
 
     #endregion
 

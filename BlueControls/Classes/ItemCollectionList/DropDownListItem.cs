@@ -75,7 +75,7 @@ public class DropDownListItem : AbstractListItem {
         return new Size(wi, he);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float scale) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         //var tmpd = TempDesign(design);
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, Design.ComboBox_Textbox, state, positionControl.ToRect(), null, false);
