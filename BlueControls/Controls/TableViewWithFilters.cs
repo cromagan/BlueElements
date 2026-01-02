@@ -74,6 +74,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.TableChanged += TableInternal_TableChanged;
         TableInternal.CellClicked += TableInternal_CellClicked;
         TableInternal.DoubleClick += TableInternal_DoubleClick;
+        TableInternal.PinnedChanged += TableInternal_PinnedChanged;
         FilterFix.PropertyChanged += FilterFix_PropertyChanged;
     }
 
@@ -142,7 +143,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowListItem? CursorPosRow => TableInternal.CursorPosRow ;
+    public RowListItem? CursorPosRow => TableInternal.CursorPosRow;
 
     [DefaultValue(false)]
     public bool EditButton {
@@ -453,6 +454,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 TableInternal.ViewChanged -= TableInternal_ViewChanged;
                 TableInternal.SelectedCellChanged -= TableInternal_SelectedCellChanged;
                 TableInternal.TableChanged -= TableInternal_TableChanged;
+                TableInternal.PinnedChanged -= TableInternal_PinnedChanged;
+                TableInternal.DoubleClick -= TableInternal_DoubleClick;
+                TableInternal.CellClicked -= TableInternal_CellClicked;
 
                 _ähnliche?.Dispose();
                 TableInternal.Dispose();
@@ -778,6 +782,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void TableInternal_DoubleClick(object sender, CellExtEventArgs e) => OnDoubleClick(e);
 
     private void TableInternal_FilterCombinedChanged(object sender, System.EventArgs e) => DoFilterOutput();
+
+    private void TableInternal_PinnedChanged(object sender, System.EventArgs e) {
+        ddd
+    }
 
     private void TableInternal_SelectedCellChanged(object sender, CellExtEventArgs e) => OnSelectedCellChanged(e);
 

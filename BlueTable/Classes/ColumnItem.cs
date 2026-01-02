@@ -1270,7 +1270,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return true;
     }
 
-    public List<string> Contents() => Contents(Table?.Row.ToList());
+    public List<string> Contents() => Contents(Table?.Row.ToList(), string.Empty);
 
     public List<string> Contents(FilterCollection fc, List<RowItem>? pinned) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return []; }
@@ -1281,20 +1281,26 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
 
         if (pinned != null) { r2.AddIfNotExists(pinned); }
 
-        return Contents(r2);
+        return Contents(r2, string.Empty);
     }
 
-    public List<string> Contents(ICollection<RowItem>? rows) {
+    public List<string> Contents(ICollection<RowItem>? rows, string empty) {
         if (rows == null || rows.Count == 0) { return []; }
 
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
             if (thisRowItem != null) {
                 if (!_saveContent) { thisRowItem.CheckRow(); }
-                if (_multiLine) {
-                    list.AddRange(thisRowItem.CellGetList(this));
-                } else {
-                    list.Add(thisRowItem.CellGetString(this));
+
+                var t = thisRowItem.CellGetStringCore(this);
+                if (string.IsNullOrWhiteSpace(t)) { t = empty; }
+
+                if (!string.IsNullOrWhiteSpace(t)) {
+                    if (_multiLine) {
+                        list.AddRange(t.SplitByCr());
+                    } else {
+                        list.Add(t);
+                    }
                 }
             }
         }
@@ -1510,7 +1516,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return []; }
 
         if (UcaseNamesSortedByLength != null) { return UcaseNamesSortedByLength; }
-        var tmp = Contents([.. tb.Row]);
+        var tmp = Contents([.. tb.Row], string.Empty);
         tmp.Sort((s1, s2) => s2.Length.CompareTo(s1.Length));
         UcaseNamesSortedByLength = tmp;
         return UcaseNamesSortedByLength;

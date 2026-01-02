@@ -61,7 +61,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public const string Angepinnt = "Angepinnt";
     public const string CellDataFormat = "BlueElements.CellLink";
-
+    public const string Ohne = "-?-";
     public const string Weitere_Zeilen = "Weitere Zeilen";
     private readonly Dictionary<string, AbstractListItem> _allViewItems = [];
 
@@ -2288,8 +2288,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, Table tb, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
         HashSet<string> allCaps = [];
 
+        //var empty = Ohne;
+        //if (pinnedRows.Count > 0) { empty = Weitere_Zeilen; }
+
         if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
-            var caps = cap.Contents(filteredRows);
+            var caps = cap.Contents(filteredRows, Ohne);
 
             foreach (var capValue in caps) {
                 var parts = capValue.Trim('\\').Split('\\');
@@ -2301,11 +2304,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     allCaps.Add(currentPath);
                 }
             }
+        } else {
+            if (pinnedRows.Count > 0) {
+                allCaps.Add(Weitere_Zeilen);
+            }
         }
 
         if (pinnedRows.Count > 0) {
             allCaps.Add(Angepinnt);
-            allCaps.Add(Weitere_Zeilen);
         }
 
         foreach (var thisCap in allCaps) {
@@ -2517,7 +2523,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             var capsOfRow = arrangement.ColumnForChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
             capsOfRow.Remove(string.Empty);
-            if (capsOfRow.Count == 0 && nullcap) { capsOfRow.Add(Weitere_Zeilen); }
+            if (capsOfRow.Count == 0 && nullcap) {
+                if (pinnedRows.Count > 0 && arrangement.ColumnForChapter == null) {
+                    capsOfRow.Add(Weitere_Zeilen);
+                } else {
+                    capsOfRow.Add(Ohne);
+                }
+            }
             if (markYellow) { capsOfRow.Add(Angepinnt); }
             if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
 

@@ -284,10 +284,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void btnSystemInfo_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table?.Column is not { IsDisposed: false } cc) { return; }
+        if (IsDisposed || Column?.Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var item in cc) {
-            Column.SystemInfoReset(true);
+        foreach (var item in tb.Column ) {
+            item.SystemInfoReset(true);
         }
 
         capInfos.Text = ColumnEditor.ColumnUsage(Column);
