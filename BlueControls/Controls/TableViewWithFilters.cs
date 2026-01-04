@@ -248,11 +248,231 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void Export_HTML() => TableInternal.Export_HTML();
 
-    public void FillFilters() {
+    public void ImportBtb() => TableInternal.ImportBtb();
+
+    public void ImportClipboard() => TableInternal.ImportClipboard();
+
+    public void ImportCsv(string csvtxt) => TableInternal.ImportCsv(csvtxt);
+
+    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) => TableInternal.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, maychangeview);
+
+    public void OpenScriptEditor() => TableInternal.OpenScriptEditor();
+
+    public void OpenSearchAndReplaceInCells() => TableInternal.OpenSearchAndReplaceInCells();
+
+    public void OpenSearchAndReplaceInTbScripts() => TableInternal.OpenSearchAndReplaceInTbScripts();
+
+    public void OpenSearchInCells() => TableInternal.OpenSearchInCells();
+
+    public void ParseView(string toParse) => TableInternal.ParseView(toParse);
+
+    public void RowCleanUp() => TableInternal.RowCleanUp();
+
+    public IReadOnlyList<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
+
+    public void TableSet(Table? tb, string viewCode) => TableInternal.TableSet(tb, viewCode);
+
+    public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
+
+    public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
+
+    public List<string> ViewToString() => TableInternal.ViewToString();
+
+    //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+    [DebuggerNonUserCode]
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing) {
+                TableInternal.FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
+                TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
+                TableInternal.ContextMenuInit -= TableInternal_ContextMenuInit;
+                TableInternal.VisibleRowsChanged -= TableInternal_VisibleRowsChanged;
+                TableInternal.SelectedRowChanged -= TableInternal_SelectedRowChanged;
+                TableInternal.ViewChanged -= TableInternal_ViewChanged;
+                TableInternal.SelectedCellChanged -= TableInternal_SelectedCellChanged;
+                TableInternal.TableChanged -= TableInternal_TableChanged;
+                TableInternal.PinnedChanged -= TableInternal_PinnedChanged;
+                TableInternal.DoubleClick -= TableInternal_DoubleClick;
+                TableInternal.CellClicked -= TableInternal_CellClicked;
+
+                _ähnliche?.Dispose();
+                TableInternal.Dispose();
+            }
+        } finally {
+            base.Dispose(disposing);
+        }
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+
+        if (InvokeRequired) {
+            Invoke(new Action(() => DrawControl(gr, state)));
+            return;
+        }
+        base.DrawControl(gr, state);
+
+        //if(state.HasFlag(States.Standard_HasFocus)) { state ^= Standard_HasFocus}
+
+        // Hintergrund der Filterleiste zeichnen (falls nötig)
+        Skin.Draw_Back(gr, Design.GroupBox, States.Standard, base.DisplayRectangle, this, true);
+    }
+
+    protected override void HandleChangesNow() {
+        base.HandleChangesNow();
+        if (IsDisposed) { return; }
+        if (FilterInputChangedHandled) { return; }
+
+        if (Table is not { IsDisposed: false } tb) { return; }
+
+        DoInputFilter(FilterOutput.Table, false);
+
+        using var nfc = new FilterCollection(tb, "TmpFilterCombined");
+        nfc.RemoveOtherAndAdd(FilterFix, "Filter aus übergeordneten Element");
+        nfc.RemoveOtherAndAdd(FilterInput, null);
+        TableInternal.FilterFix.ChangeTo(nfc);
+    }
+
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        base.OnEnabledChanged(e);
+
+        // Status der Steuerelemente aktualisieren
+        var hasDb = Table != null;
+        var tableEnabled = Enabled;
+
+        txbZeilenFilter.Enabled = hasDb && LanguageTool.Translation == null && Enabled && tableEnabled;
+        btnAlleFilterAus.Enabled = hasDb && Enabled && tableEnabled;
+        btnPin.Enabled = hasDb && Enabled && tableEnabled;
+        btnPinZurück.Enabled = hasDb && TableInternal.PinnedRows.Count > 0 && Enabled && tableEnabled;
+
+        // Filterleisten-Initialisierung
+        btnTextLöschen.Enabled = false;
+        btnÄhnliche.Visible = false;
+    }
+
+    protected override void OnHandleCreated(System.EventArgs e) {
+        base.OnHandleCreated(e);
+
+        DoFilterOutput();
+
+        // Anfängliche Positionierung der Steuerelemente
+        UpdateFilterleisteVisibility();
+
+        GetÄhnlich();
+        DoFilterAndPinButtons();
+    }
+
+    protected override void OnSizeChanged(System.EventArgs e) {
+        base.OnSizeChanged(e);
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+        lock (_lockUserAction) {
+            if (_isinSizeChanged) { return; }
+            _isinSizeChanged = true;
+
+            RepositionControls();
+
+            DoFilterAndPinButtons();
+
+            _isinSizeChanged = false;
+        }
+    }
+
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        OnTableChanged();
+        base.OnVisibleChanged(e);
+    }
+
+    private void _Table_ViewChanged(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+
+        DoFilterAndPinButtons();
+    }
+
+    private void btnÄhnliche_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (tb.Column.First is not { IsDisposed: false } co) { return; }
+
+        var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
+
+        using var fc = new FilterCollection(fl, "ähnliche");
+
+        var r = fc.Rows;
+        if (r.Count != 1 || _ähnliche is not { Count: not 0 }) {
+            Forms.MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
+            return;
+        }
+
+        btnAlleFilterAus_Click(null, System.EventArgs.Empty);
+        foreach (var thiscolumnitem in _ähnliche) {
+            if (thiscolumnitem?.Column != null && TableInternal.FilterCombined != null) {
+                if (thiscolumnitem.AutoFilterSymbolPossible) {
+                    if (string.IsNullOrEmpty(r[0].CellGetString(thiscolumnitem.Column))) {
+                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
+                        TableInternal.Filter.Add(fi);
+                    } else if (thiscolumnitem.Column.MultiLine) {
+                        var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
+                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
+                        TableInternal.Filter.Add(fi);
+                    } else {
+                        var l = r[0].CellGetString(thiscolumnitem.Column);
+                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
+                        TableInternal.Filter.Add(fi);
+                    }
+                }
+            }
+        }
+
+        btnÄhnliche.Enabled = false;
+    }
+
+    private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
+        _lastLooked = string.Empty;
+        TableInternal.Filter.Clear();
+    }
+
+    private void btnPin_Click(object sender, System.EventArgs e) => TableInternal.Pin(RowsVisibleUnique());
+
+    private void btnPinZurück_Click(object sender, System.EventArgs e) {
+        _lastLooked = string.Empty;
+        TableInternal.Pin(null);
+    }
+
+    private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
+
+    private void DoÄhnlich() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb || tb.Column.Count == 0) { return; }
+
+        if (tb.Column.First is not { } colFirst) { return; } // Neue Tabelle?
+
+        var fi = new FilterItem(colFirst, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
+        using var fc = new FilterCollection(fi, "doähnliche");
+
+        var r = fc.Rows;
+        if (_ähnliche != null) {
+            btnÄhnliche.Visible = true;
+            btnÄhnliche.Enabled = r.Count == 1;
+        } else {
+            btnÄhnliche.Visible = false;
+        }
+
+        if (AutoPin && r.Count == 1) {
+            if (_lastLooked != r[0].KeyName) {
+                if (RowViewItems.GetByKey(r[0].KeyName) == null) {
+                    if (Forms.MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
+                        TableInternal.PinAdd(r[0]);
+                    }
+                    _lastLooked = r[0].KeyName;
+                }
+            }
+        }
+    }
+
+    private void DoFilterAndPinButtons() {
         if (IsDisposed || FilterleisteZeilen <= 0) { return; }
 
         if (InvokeRequired) {
-            Invoke(new Action(FillFilters));
+            Invoke(new Action(DoFilterAndPinButtons));
             return;
         }
 
@@ -405,232 +625,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         _isFilling = false;
     }
 
-    public void ImportBtb() => TableInternal.ImportBtb();
-
-    public void ImportClipboard() => TableInternal.ImportClipboard();
-
-    public void ImportCsv(string csvtxt) => TableInternal.ImportCsv(csvtxt);
-
-    public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) => TableInternal.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, maychangeview);
-
-    public void OpenScriptEditor() => TableInternal.OpenScriptEditor();
-
-    public void OpenSearchAndReplaceInCells() => TableInternal.OpenSearchAndReplaceInCells();
-
-    public void OpenSearchAndReplaceInTbScripts() => TableInternal.OpenSearchAndReplaceInTbScripts();
-
-    public void OpenSearchInCells() => TableInternal.OpenSearchInCells();
-
-    public void ParseView(string toParse) => TableInternal.ParseView(toParse);
-
-    public void Pin(IReadOnlyList<RowItem>? rows) => TableInternal.Pin(rows);
-
-    public void PinAdd(RowItem? row) => TableInternal.PinAdd(row);
-
-    public void PinRemove(RowItem? row) => TableInternal.PinRemove(row);
-
-    public void RowCleanUp() => TableInternal.RowCleanUp();
-
-    public IReadOnlyList<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
-
-    public void TableSet(Table? tb, string viewCode) => TableInternal.TableSet(tb, viewCode);
-
-    public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
-
-    public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
-
-    public List<string> ViewToString() => TableInternal.ViewToString();
-
-    //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-    [DebuggerNonUserCode]
-    protected override void Dispose(bool disposing) {
-        try {
-            if (disposing) {
-                TableInternal.FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
-                TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
-                TableInternal.ContextMenuInit -= TableInternal_ContextMenuInit;
-                TableInternal.VisibleRowsChanged -= TableInternal_VisibleRowsChanged;
-                TableInternal.SelectedRowChanged -= TableInternal_SelectedRowChanged;
-                TableInternal.ViewChanged -= TableInternal_ViewChanged;
-                TableInternal.SelectedCellChanged -= TableInternal_SelectedCellChanged;
-                TableInternal.TableChanged -= TableInternal_TableChanged;
-                TableInternal.PinnedChanged -= TableInternal_PinnedChanged;
-                TableInternal.DoubleClick -= TableInternal_DoubleClick;
-                TableInternal.CellClicked -= TableInternal_CellClicked;
-
-                _ähnliche?.Dispose();
-                TableInternal.Dispose();
-            }
-        } finally {
-            base.Dispose(disposing);
-        }
-    }
-
-    protected override void DrawControl(Graphics gr, States state) {
-        if (IsDisposed) { return; }
-
-        if (InvokeRequired) {
-            Invoke(new Action(() => DrawControl(gr, state)));
-            return;
-        }
-        base.DrawControl(gr, state);
-
-        //if(state.HasFlag(States.Standard_HasFocus)) { state ^= Standard_HasFocus}
-
-        // Hintergrund der Filterleiste zeichnen (falls nötig)
-        Skin.Draw_Back(gr, Design.GroupBox, States.Standard, base.DisplayRectangle, this, true);
-    }
-
-    protected override void HandleChangesNow() {
-        base.HandleChangesNow();
-        if (IsDisposed) { return; }
-        if (FilterInputChangedHandled) { return; }
-
-        if (Table is not { IsDisposed: false } tb) { return; }
-
-        DoInputFilter(FilterOutput.Table, false);
-
-        using var nfc = new FilterCollection(tb, "TmpFilterCombined");
-        nfc.RemoveOtherAndAdd(FilterFix, "Filter aus übergeordneten Element");
-        nfc.RemoveOtherAndAdd(FilterInput, null);
-        TableInternal.FilterFix.ChangeTo(nfc);
-    }
-
-    protected override void OnEnabledChanged(System.EventArgs e) {
-        base.OnEnabledChanged(e);
-
-        // Status der Steuerelemente aktualisieren
-        var hasDb = Table != null;
-        var tableEnabled = Enabled;
-
-        txbZeilenFilter.Enabled = hasDb && LanguageTool.Translation == null && Enabled && tableEnabled;
-        btnAlleFilterAus.Enabled = hasDb && Enabled && tableEnabled;
-        btnPin.Enabled = hasDb && Enabled && tableEnabled;
-        btnPinZurück.Enabled = hasDb && TableInternal.PinnedRows.Count > 0 && Enabled && tableEnabled;
-
-        // Filterleisten-Initialisierung
-        btnTextLöschen.Enabled = false;
-        btnÄhnliche.Visible = false;
-    }
-
-    protected override void OnHandleCreated(System.EventArgs e) {
-        base.OnHandleCreated(e);
-
-        DoFilterOutput();
-
-        // Anfängliche Positionierung der Steuerelemente
-        UpdateFilterleisteVisibility();
-
-        GetÄhnlich();
-        FillFilters();
-    }
-
-    protected override void OnSizeChanged(System.EventArgs e) {
-        base.OnSizeChanged(e);
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        lock (_lockUserAction) {
-            if (_isinSizeChanged) { return; }
-            _isinSizeChanged = true;
-
-            RepositionControls();
-
-            FillFilters();
-
-            _isinSizeChanged = false;
-        }
-    }
-
-    protected override void OnVisibleChanged(System.EventArgs e) {
-        OnTableChanged();
-        base.OnVisibleChanged(e);
-    }
-
-    private void _Table_ViewChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-
-        FillFilters();
-    }
-
-    private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (tb.Column.First is not { IsDisposed: false } co) { return; }
-
-        var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
-
-        using var fc = new FilterCollection(fl, "ähnliche");
-
-        var r = fc.Rows;
-        if (r.Count != 1 || _ähnliche is not { Count: not 0 }) {
-            Forms.MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
-            return;
-        }
-
-        btnAlleFilterAus_Click(null, System.EventArgs.Empty);
-        foreach (var thiscolumnitem in _ähnliche) {
-            if (thiscolumnitem?.Column != null && TableInternal.FilterCombined != null) {
-                if (thiscolumnitem.AutoFilterSymbolPossible) {
-                    if (string.IsNullOrEmpty(r[0].CellGetString(thiscolumnitem.Column))) {
-                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
-                        TableInternal.Filter.Add(fi);
-                    } else if (thiscolumnitem.Column.MultiLine) {
-                        var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
-                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                        TableInternal.Filter.Add(fi);
-                    } else {
-                        var l = r[0].CellGetString(thiscolumnitem.Column);
-                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                        TableInternal.Filter.Add(fi);
-                    }
-                }
-            }
-        }
-
-        btnÄhnliche.Enabled = false;
-    }
-
-    private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
-        _lastLooked = string.Empty;
-        TableInternal.Filter.Clear();
-    }
-
-    private void btnPin_Click(object sender, System.EventArgs e) => Pin(RowsVisibleUnique());
-
-    private void btnPinZurück_Click(object sender, System.EventArgs e) {
-        _lastLooked = string.Empty;
-        Pin(null);
-    }
-
-    private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
-
-    private void DoÄhnlich() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || tb.Column.Count == 0) { return; }
-
-        if (tb.Column.First is not { } colFirst) { return; } // Neue Tabelle?
-
-        var fi = new FilterItem(colFirst, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
-        using var fc = new FilterCollection(fi, "doähnliche");
-
-        var r = fc.Rows;
-        if (_ähnliche != null) {
-            btnÄhnliche.Visible = true;
-            btnÄhnliche.Enabled = r.Count == 1;
-        } else {
-            btnÄhnliche.Visible = false;
-        }
-
-        if (AutoPin && r.Count == 1) {
-            if (_lastLooked != r[0].KeyName) {
-                if (RowViewItems.GetByKey(r[0].KeyName) == null) {
-                    if (Forms.MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
-                        PinAdd(r[0]);
-                    }
-                    _lastLooked = r[0].KeyName;
-                }
-            }
-        }
-    }
-
     private void DoFilterOutput() {
         if (!FilterInputChangedHandled) {
             HandleChangesNow();
@@ -647,7 +641,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             FilterOutput.ChangeTo(TableInternal.FilterCombined);
         }
 
-        FillFilters();
+        DoFilterAndPinButtons();
     }
 
     private void Filter_ZeilenFilterSetzen() {
@@ -728,7 +722,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         Invalidate_RowsInput();
 
         GetÄhnlich();
-        FillFilters();
+        DoFilterAndPinButtons();
         UpdateFilterleisteVisibility();
         RepositionControls();
 
@@ -772,7 +766,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.Width = Width;
 
         // Bei kompletter Neupositionierung auch die FlexiFilterControls anpassen
-        FillFilters();
+        DoFilterAndPinButtons();
     }
 
     private void TableInternal_CellClicked(object sender, CellEventArgs e) => OnCellClicked(e);
@@ -784,7 +778,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void TableInternal_FilterCombinedChanged(object sender, System.EventArgs e) => DoFilterOutput();
 
     private void TableInternal_PinnedChanged(object sender, System.EventArgs e) {
-        ddd
+        DoFilterAndPinButtons();
+        Invalidate();
     }
 
     private void TableInternal_SelectedCellChanged(object sender, CellExtEventArgs e) => OnSelectedCellChanged(e);

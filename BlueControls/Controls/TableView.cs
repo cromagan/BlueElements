@@ -3107,7 +3107,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void OnFilterCombinedChanged() =>
         // Bestehenden Code belassen
-        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);//FillFilters(); // Die Flexs reagiren nur auf FilterOutput der Table
+        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);//DoFilterAndPinButtons(); // Die Flexs reagiren nur auf FilterOutput der Table
 
     private void OnPinnedChanged() =>
         // Bestehenden Code belassen
