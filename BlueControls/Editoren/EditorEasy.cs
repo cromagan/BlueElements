@@ -46,7 +46,7 @@ public partial class EditorEasy : UserControl, IIsEditor {
 
     #region Properties
 
-    public bool Editabe { get; set; }
+    public bool Editable { get; set; }
 
     public string Error { get; private set; } = "Nicht Initialisiert.";
 
@@ -60,6 +60,7 @@ public partial class EditorEasy : UserControl, IIsEditor {
         }
     } = GroupBoxStyle.Nothing;
 
+    [DefaultValue(null)]
     public IEditable? ToEdit {
         get => _toEdit;
 

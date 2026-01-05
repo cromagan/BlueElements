@@ -22,7 +22,6 @@ using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using BlueScript.Variables;
 using BlueTable;
 using BlueTable.Enums;
@@ -31,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -276,18 +274,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         lbxTableAdmin.Check(tb.TableAdmin);
 
         txbKennwort.Text = tb.GlobalShowPass;
-        lbxSortierSpalten.ItemClear();
 
-        if (tb.SortDefinition != null) {
-            btnSortRichtung.Checked = tb.SortDefinition.Reverse;
-            if (tb.SortDefinition != null) {
-                foreach (var thisColumn in tb.SortDefinition.UsedColumns) {
-                    if (thisColumn is { IsDisposed: false }) {
-                        lbxSortierSpalten.AddAndCheck(ItemOf(thisColumn));
-                    }
-                }
-            }
-        }
+        rowSortDefinitionEditor.ToEdit = tb.SortDefinition;
+
         txbTags.Text = tb.Tags.JoinWithCr();
 
         txbCaption.Text = tb.Caption;
@@ -297,9 +286,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         lbxTableAdmin.Suggestions.Clear();
         lbxTableAdmin.ItemAddRange(TableView.Permission_AllUsed(false));
-
-        lbxSortierSpalten.Suggestions.Clear();
-        lbxSortierSpalten.Suggestions.AddRange(ItemsOf(tb.Column, true));
 
         variableEditor.ToEdit = Table?.Variables;
 
@@ -424,12 +410,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tmp.Remove(Constants.Administrator);
         Table.PermissionGroupsNewRow = new(tmp);
 
-        #region Sortierung
-
-        var colnam = lbxSortierSpalten.Items.Select(thisk => (ColumnItem)((ReadableListItem)thisk).Item).ToList();
-        Table.SortDefinition = new RowSortDefinition(Table, colnam, btnSortRichtung.Checked);
-
-        #endregion
+        Table.SortDefinition = rowSortDefinitionEditor.ToEdit as RowSortDefinition;
 
         #region Variablen
 

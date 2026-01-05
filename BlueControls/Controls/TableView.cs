@@ -150,6 +150,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// <summary>
     /// Gibt an, ob das Standard-Kontextmenu der Tabellenansicht angezeitgt werden soll oder nicht
     /// </summary>
+    [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
     public override bool ControlMustPressed => true;

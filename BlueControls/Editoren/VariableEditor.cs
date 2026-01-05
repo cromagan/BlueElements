@@ -41,7 +41,7 @@ public partial class VariableEditor : EditorEasy {
         if (ToEdit is null) { return null; }
         if (!string.IsNullOrEmpty(Error)) { return null; }
 
-        if (!Editabe || IsDisposed) {
+        if (!Editable || IsDisposed) {
             Develop.DebugPrint_NichtImplementiert(true);
             // Bei Editable TRUE sind es nur string variablen
         }
@@ -80,7 +80,7 @@ public partial class VariableEditor : EditorEasy {
 
         tb.Column.GenerateAndAddSystem();
 
-        if (Editabe) {
+        if (Editable) {
             List<ColumnItem?> l = [na, inh, kom];
 
             foreach (var thisColumn2 in l) {
@@ -101,7 +101,7 @@ public partial class VariableEditor : EditorEasy {
         var tcvc = ColumnViewCollection.ParseAll(tb);
 
         //if (car != null) {
-        if (Editabe) {
+        if (Editable) {
             tcvc[0].ShowColumns("Name", "Inhalt", "Kommentar");
             tcvc[1].ShowColumns("Name", "Inhalt", "Kommentar");
         } else {
@@ -131,7 +131,7 @@ public partial class VariableEditor : EditorEasy {
                 ro.CellSet("RO", thisv.ReadOnly, string.Empty);
 
                 var tmpi = thisv.ReadableText;
-                if (!Editabe && tmpi.Length > 3990) {
+                if (!Editable && tmpi.Length > 3990) {
                     tmpi = tmpi.Substring(0, 3990) + "...";
                 }
 

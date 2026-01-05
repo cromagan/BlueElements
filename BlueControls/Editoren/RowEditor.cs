@@ -31,7 +31,7 @@ public partial class RowEditor : EditorEasy, IHasTable {
 
     #region Properties
 
-    public Table? Table => ToEdit is not RowItem { IsDisposed: false } r ? null : r.Table;
+    public Table? Table => ToEdit is RowItem { IsDisposed: false } r ? r.Table : null;
 
     #endregion
 

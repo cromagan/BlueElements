@@ -18,13 +18,16 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueTable.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace BlueTable;
 
-public sealed class RowSortDefinition : IParseable {
+public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquatable<RowSortDefinition> {
 
     #region Fields
 
@@ -46,14 +49,12 @@ public sealed class RowSortDefinition : IParseable {
         if (colum is { IsDisposed: false }) { _internal.Add(colum); }
     }
 
-    public RowSortDefinition(Table table, List<ColumnItem?>? column, bool reverse) {
+    public RowSortDefinition(Table table, List<ColumnItem> column, bool reverse) {
         Table = table;
         Reverse = reverse;
 
-        if (column != null) {
-            foreach (var thisColumn in column) {
-                if (thisColumn is { IsDisposed: false } c) { _internal.Add(c); }
-            }
+        foreach (var thisColumn in column) {
+            if (thisColumn is { IsDisposed: false } c) { _internal.Add(c); }
         }
     }
 
@@ -61,6 +62,8 @@ public sealed class RowSortDefinition : IParseable {
 
     #region Properties
 
+    public string CaptionForEditor => "Sortierung";
+    public Type? Editor { get; set; }
     public bool Reverse { get; private set; }
     public Table Table { get; }
     public ReadOnlyCollection<ColumnItem> UsedColumns => _internal.AsReadOnly();
@@ -68,6 +71,26 @@ public sealed class RowSortDefinition : IParseable {
     #endregion
 
     #region Methods
+
+    public bool Equals(RowSortDefinition? other) {
+        if (other == null) { return false; }
+        return Reverse == other.Reverse &&
+               _internal.Select(x => x.KeyName).SequenceEqual(other._internal.Select(x => x.KeyName));
+    }
+
+    public override bool Equals(object? obj) => Equals(obj as RowSortDefinition);
+
+    public override int GetHashCode() {
+        unchecked {
+            int hash = 17;
+            hash = hash * 23 + Reverse.GetHashCode();
+            foreach (var item in _internal)
+                hash = hash * 23 + (item.KeyName?.GetHashCode() ?? 0);
+            return hash;
+        }
+    }
+
+    public string IsNowEditable() => string.Empty;
 
     public List<string> ParseableItems() {
         List<string> result = [];

@@ -36,9 +36,6 @@ namespace BlueControls.BlueTableDialogs {
             this.grpKennwort = new BlueControls.Controls.GroupBox();
             this.capKennwort = new BlueControls.Controls.Caption();
             this.txbKennwort = new BlueControls.Controls.TextBox();
-            this.lbxSortierSpalten = new BlueControls.Controls.ListBox();
-            this.capSortierspalten = new BlueControls.Controls.Caption();
-            this.btnSortRichtung = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
             this.txbTags = new BlueControls.Controls.TextBox();
             this.txbCaption = new BlueControls.Controls.TextBox();
@@ -47,6 +44,7 @@ namespace BlueControls.BlueTableDialogs {
             this.capInfo = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.btnLoadAll = new BlueControls.Controls.Button();
             this.btnMasterMe = new BlueControls.Controls.Button();
             this.btnUnMaster = new BlueControls.Controls.Button();
             this.btnTabellenAnsicht = new BlueControls.Controls.Button();
@@ -68,7 +66,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabUndo = new System.Windows.Forms.TabPage();
             this.tblUndo = new BlueControls.Controls.TableViewWithFilters();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
-            this.btnLoadAll = new BlueControls.Controls.Button();
+            this.rowSortDefinitionEditor = new BlueControls.Forms.RowSortDefinitionEditor();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -78,7 +76,6 @@ namespace BlueControls.BlueTableDialogs {
             this.tabSortierung.SuspendLayout();
             this.tabVariablen.SuspendLayout();
             this.tabUndo.SuspendLayout();
-            this.grpUndoActions.SuspendLayout();
             this.SuspendLayout();
             // 
             // capStatusBar
@@ -204,37 +201,6 @@ namespace BlueControls.BlueTableDialogs {
             this.txbKennwort.Size = new System.Drawing.Size(216, 22);
             this.txbKennwort.TabIndex = 4;
             // 
-            // lbxSortierSpalten
-            // 
-            this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
-            this.lbxSortierSpalten.AutoSort = false;
-            this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
-            this.lbxSortierSpalten.FilterText = null;
-            this.lbxSortierSpalten.Location = new System.Drawing.Point(16, 32);
-            this.lbxSortierSpalten.MoveAllowed = true;
-            this.lbxSortierSpalten.Name = "lbxSortierSpalten";
-            this.lbxSortierSpalten.RemoveAllowed = true;
-            this.lbxSortierSpalten.Size = new System.Drawing.Size(256, 440);
-            this.lbxSortierSpalten.TabIndex = 5;
-            // 
-            // capSortierspalten
-            // 
-            this.capSortierspalten.CausesValidation = false;
-            this.capSortierspalten.Location = new System.Drawing.Point(16, 8);
-            this.capSortierspalten.Name = "capSortierspalten";
-            this.capSortierspalten.Size = new System.Drawing.Size(160, 24);
-            this.capSortierspalten.Text = "Sortier-Spalten:";
-            this.capSortierspalten.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // btnSortRichtung
-            // 
-            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.ButtonStyle.Yes_or_No;
-            this.btnSortRichtung.Location = new System.Drawing.Point(288, 32);
-            this.btnSortRichtung.Name = "btnSortRichtung";
-            this.btnSortRichtung.Size = new System.Drawing.Size(184, 40);
-            this.btnSortRichtung.TabIndex = 0;
-            this.btnSortRichtung.Text = "Umgekehrte Sortierung";
-            // 
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -343,6 +309,17 @@ namespace BlueControls.BlueTableDialogs {
             this.tabAllgemein.Size = new System.Drawing.Size(1178, 678);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
+            // 
+            // btnLoadAll
+            // 
+            this.btnLoadAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnLoadAll.ImageCode = "Ordner|16";
+            this.btnLoadAll.Location = new System.Drawing.Point(424, 632);
+            this.btnLoadAll.Name = "btnLoadAll";
+            this.btnLoadAll.Size = new System.Drawing.Size(200, 32);
+            this.btnLoadAll.TabIndex = 56;
+            this.btnLoadAll.Text = "Alle Daten laden";
+            this.btnLoadAll.Click += new System.EventHandler(this.btnLoadAll_Click);
             // 
             // btnMasterMe
             // 
@@ -506,9 +483,7 @@ namespace BlueControls.BlueTableDialogs {
             // tabSortierung
             // 
             this.tabSortierung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSortierung.Controls.Add(this.lbxSortierSpalten);
-            this.tabSortierung.Controls.Add(this.capSortierspalten);
-            this.tabSortierung.Controls.Add(this.btnSortRichtung);
+            this.tabSortierung.Controls.Add(this.rowSortDefinitionEditor);
             this.tabSortierung.Location = new System.Drawing.Point(4, 25);
             this.tabSortierung.Name = "tabSortierung";
             this.tabSortierung.Padding = new System.Windows.Forms.Padding(3);
@@ -530,7 +505,7 @@ namespace BlueControls.BlueTableDialogs {
             // variableEditor
             // 
             this.variableEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.variableEditor.Editabe = true;
+            this.variableEditor.Editable = true;
             this.variableEditor.Location = new System.Drawing.Point(3, 3);
             this.variableEditor.Name = "variableEditor";
             this.variableEditor.Size = new System.Drawing.Size(1172, 672);
@@ -569,20 +544,17 @@ namespace BlueControls.BlueTableDialogs {
             this.grpUndoActions.TabStop = false;
             this.grpUndoActions.Text = "Aktionen";
             // 
-            // btnLoadAll
+            // rowSortDefinitionEditor
             // 
-            this.btnLoadAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnLoadAll.ImageCode = "Ordner|16";
-            this.btnLoadAll.Location = new System.Drawing.Point(424, 632);
-            this.btnLoadAll.Name = "btnLoadAll";
-            this.btnLoadAll.Size = new System.Drawing.Size(200, 32);
-            this.btnLoadAll.TabIndex = 56;
-            this.btnLoadAll.Text = "Alle Daten laden";
-            this.btnLoadAll.Click += new System.EventHandler(this.btnLoadAll_Click);
+            this.rowSortDefinitionEditor.Editable = false;
+            this.rowSortDefinitionEditor.Location = new System.Drawing.Point(8, 8);
+            this.rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
+            this.rowSortDefinitionEditor.Size = new System.Drawing.Size(392, 664);
+            this.rowSortDefinitionEditor.TabIndex = 0;
+            this.rowSortDefinitionEditor.ToEdit = null;
             // 
             // TableHeadEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1189, 756);
             this.Controls.Add(this.btnOk);
@@ -603,14 +575,11 @@ namespace BlueControls.BlueTableDialogs {
             this.tabSortierung.ResumeLayout(false);
             this.tabVariablen.ResumeLayout(false);
             this.tabUndo.ResumeLayout(false);
-            this.grpUndoActions.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
         private Caption capInfo;
         private Button btnOk;
-        private Button btnSortRichtung;
-        private Caption capSortierspalten;
         private TextBox txbKennwort;
         private Caption capNeueZeilen;
         private ListBox PermissionGroups_NewRow;
@@ -618,7 +587,6 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capCaption;
         private TextBox txbCaption;
         private TextBox txbTags;
-        private ListBox lbxSortierSpalten;
         private Caption Caption22;
         private ListBox lbxTableAdmin;
         private TabPage tabAllgemein;
@@ -650,5 +618,6 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnUnMaster;
         private Button btnMasterMe;
         private Button btnLoadAll;
+        private Forms.RowSortDefinitionEditor rowSortDefinitionEditor;
     }
 }

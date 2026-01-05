@@ -268,7 +268,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpVariablen
             // 
             this.grpVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpVariablen.Editabe = false;
+            this.grpVariablen.Editable = false;
             this.grpVariablen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpVariablen.Location = new System.Drawing.Point(0, 0);
             this.grpVariablen.Name = "grpVariablen";

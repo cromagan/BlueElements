@@ -107,8 +107,8 @@ public static partial class Extensions {
     }
 
     public static bool IsDifferentTo<T>(this IEnumerable<T>? list1, IEnumerable<T>? list2) =>
-                // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
-                list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
+                    // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
+                    list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
     public static void Load(this List<string> l, string filename, Encoding code) {
         var t = ReadAllText(filename, code);
@@ -132,30 +132,6 @@ public static partial class Extensions {
         if (value == null || string.IsNullOrEmpty(value)) { return; }
         col.Add(tagname + "=\"" + value.ToNonCritical() + "\"");
     }
-
-    //public static void ParseableAdd<T>(this ICollection<string> col, string tagname, string nameofeveryItem, ICollection<T>? value) where T : IStringable? {
-    //    if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
-
-    //    if (value is IStringable) {
-    //        Develop.DebugPrint(ErrorType.Error, "Stringable Collection nicht möglich!");
-    //    }
-
-    //    if (value.Count < 1) { return; }
-
-    //    var txt = tagname + "={";
-
-    //    foreach (var item in value) {
-    //        var tmp2 = string.Empty;
-    //        if (item != null) { tmp2 = item.ToParseableString(); }
-    //        if (!string.IsNullOrEmpty(tmp2)) {
-    //            txt = txt + nameofeveryItem + "=" + tmp2.ToNonCritical() + ", ";
-    //        }
-    //    }
-
-    //    txt = txt.TrimEnd(", ") + "}";
-
-    //    col.Add(txt);
-    //}
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value) {
         if (value == null) { return; }
@@ -359,6 +335,20 @@ public static partial class Extensions {
                 list[i2] = v1;
             }
         }
+    }
+
+    /// <summary>
+    /// Sortiert die Liste alphabetisch und gibt diese ohne doppelten Einträgen und ohne Leeren zurück.
+    /// </summary>
+    /// <param name="arr"></param>
+    /// <returns></returns>
+    public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
+        if (arr == null) { return []; }
+
+        var arr2 = arr.Distinct().ToList();
+        arr2.Remove(string.Empty);
+        arr2.Sort();
+        return arr2;
     }
 
     public static void SplitAndCutByCr(this List<string> list, string textToSplit) {

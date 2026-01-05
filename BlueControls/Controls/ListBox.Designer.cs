@@ -77,16 +77,17 @@ namespace BlueControls.Controls
             this.btnMinus.Name = "btnMinus";
             this.btnMinus.Size = new Size(24, 24);
             this.btnMinus.TabIndex = 47;
+            this.btnMinus.TabStop = false;
             this.btnMinus.Visible = false;
             this.btnMinus.Click += new EventHandler(this.btnMinus_Click);
             // 
             // ListBox
             // 
-            this.Controls.Add(this.btnPlus);
             this.Controls.Add(this.btnMinus);
             this.Controls.Add(this.btnEdit);
             this.Controls.Add(this.btnDown);
             this.Controls.Add(this.btnUp);
+            this.Controls.Add(this.btnPlus);
             this.Size = new Size(177, 168);
             this.ResumeLayout(false);
 

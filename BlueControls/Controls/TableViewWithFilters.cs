@@ -128,6 +128,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     /// <summary>
     /// Gibt an, ob das Standard-Kontextmenu der Tabellenansicht angezeitgt werden soll oder nicht
     /// </summary>
+    [DefaultValue(true)]
     public bool ContextMenuDefault {
         get => TableInternal.ContextMenuDefault;
         set => TableInternal.ContextMenuDefault = value;

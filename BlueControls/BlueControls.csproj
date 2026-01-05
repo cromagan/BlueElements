@@ -66,6 +66,12 @@
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Editoren\RowSortDefinitionEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
 
 
 </Project>

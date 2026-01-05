@@ -102,6 +102,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     public event EventHandler<AbstractListItemEventArgs>? RemoveClicked;
 
+    public event EventHandler? UpDownClicked;
+
     #endregion
 
     #region Properties
@@ -663,7 +665,10 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        DoMouseMovement(-1, -1);
+        var clientPos = PointToClient(Cursor.Position);
+        if (!ClientRectangle.Contains(clientPos)) {
+            DoMouseMovement(-1, -1);
+        }
     }
 
     protected override void OnMouseMove(CanvasMouseEventArgs e) {
@@ -709,7 +714,10 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         if (IsDisposed) { return; }
         _mouseOverItem = null; // Damit die Buttons neu berechnet werden.
-        DoMouseMovement(-1, -1);
+
+        var p = PointToClient(Cursor.Position);
+
+        DoMouseMovement(p.X, p.Y);
         Invalidate();
     }
 
@@ -738,6 +746,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             if (_item[z] == _mouseOverItem) {
                 if (ln < 0) { return; }// Befehl verwerfen...
                 Swap(ln, z);
+                OnUpDownClicked();
                 return;
             }
             ln = z;
@@ -756,15 +765,20 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         //if (_checkBehaviorx == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
         if (CheckboxDesign() != Design.Undefiniert) { return; }
 
-        OnRemoveClicked(new AbstractListItemEventArgs(_mouseOverItem));
+        var tmp = _mouseOverItem;
 
-        UnCheck(_mouseOverItem);
+        UnCheck(tmp);
 
         if (_checkBehavior != CheckBehavior.AllSelected) {
             // Z.B. die Sktipt-Liste.
             // Items können gewählt werden, aber auch gelöscht
-            Remove(_mouseOverItem);
+            Remove(tmp);
         }
+
+        OnRemoveClicked(new AbstractListItemEventArgs(tmp));
+
+        var p = PointToClient(Cursor.Position);
+        DoMouseMovement(p.X, p.Y);
     }
 
     private void btnPlus_Click(object sender, System.EventArgs e) {
@@ -813,6 +827,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             if (thisItem == _mouseOverItem) {
                 if (ln == null) { return; }// Befehl verwerfen...
                 Swap(_item.IndexOf(ln), _item.IndexOf(thisItem));
+                OnUpDownClicked();
                 return;
             }
             ln = thisItem;
@@ -911,6 +926,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 btnDown.Left = right;
                 btnDown.Visible = true;
                 btnDown.Enabled = _item[_item.Count - 1] != _mouseOverItem;
+                btnDown.BringToFront();
             } else {
                 btnDown.Visible = false;
             }
@@ -927,6 +943,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 btnUp.Left = right;
                 btnUp.Visible = true;
                 btnUp.Enabled = _item[0] != _mouseOverItem;
+                btnUp.BringToFront();
             } else {
                 btnUp.Visible = false;
             }
@@ -939,6 +956,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
             if (CheckboxDesign() != Design.Undefiniert) { removeok = false; }
             if (CheckBehavior == CheckBehavior.MultiSelection) { removeok = false; }
+            if (!_mouseOverItem.IsClickable()) { removeok = false; }
 
             if (removeok) {
                 btnMinus.Width = p16;
@@ -948,6 +966,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 btnMinus.Left = right;
                 btnMinus.Visible = true;
                 btnMinus.Enabled = true;
+                btnMinus.BringToFront();
             } else {
                 btnMinus.Visible = false;
             }
@@ -983,9 +1002,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             btnEdit.Visible = false;
         }
 
-        Invalidate();
         DoQuickInfo();
-        Invalidate();
+        Refresh();
     }
 
     private void InvalidateItemOrder() {
@@ -1008,6 +1026,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     private void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
+
+    private void OnUpDownClicked() => UpDownClicked?.Invoke(this, System.EventArgs.Empty);
 
     private void RemoveAndUnRegister(AbstractListItem item) {
         item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
