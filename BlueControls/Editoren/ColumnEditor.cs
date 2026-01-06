@@ -104,6 +104,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
     }
 
+    public Type? EditorFor => typeof(ColumnItem);
     public Table? Table => Column?.Table;
 
     public IEditable? ToEdit {
@@ -273,7 +274,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (IsDisposed || Column?.Table is not { IsDisposed: false } tb) { return; }
         if (TableViewForm.EditabelErrorMessage(tb)) { return; }
 
-        tb.Edit(typeof(TableHeadEditor));
+        tb.Edit();
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {
@@ -286,7 +287,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void btnSystemInfo_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Column?.Table is not { IsDisposed: false } tb) { return; }
 
-        foreach (var item in tb.Column ) {
+        foreach (var item in tb.Column) {
             item.SystemInfoReset(true);
         }
 

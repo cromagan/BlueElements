@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionPad.Abstract;
@@ -63,8 +62,6 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
     //        if (value == Permanent) { return; }
     public override List<GenericControl> GetProperties(int widthOfControl) {
         if (Table is not { IsDisposed: false } tb) { return []; }
-
-        tb.Editor = typeof(TableHeadEditor);
 
         var col = ItemsOf(tb.Column, true);
         col.Add(ItemOf("Keine Überschriften", "#ohne", ImageCode.Kreuz, true, "!!!"));

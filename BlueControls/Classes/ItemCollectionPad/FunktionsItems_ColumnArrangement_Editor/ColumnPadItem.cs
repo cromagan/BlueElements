@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -84,9 +83,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem, IHasTable {
         if (CVI is not { IsDisposed: false } cvi) { return []; }
         if (cvi.Column is not { IsDisposed: false } col) { return []; }
         if (col.Table is not { IsDisposed: false } tb) { return []; }
-
-        tb.Editor = typeof(TableHeadEditor);
-        col.Editor = typeof(ColumnEditor);
 
         List<GenericControl> result =
         [

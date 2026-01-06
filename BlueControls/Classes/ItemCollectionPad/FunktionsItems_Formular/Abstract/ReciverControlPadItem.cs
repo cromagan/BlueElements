@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -124,15 +123,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     /// <returns></returns>
     public Table? TableInput {
         get {
-            //if (item.TableInputMustMatchOutputTable) {
-            //    return item is ReciverSenderControlPadItem iiss ? iiss.TableOutput : null;
-            //}
-
             var g = GetFilterFromGet();
 
             if (g.Count > 0) {
                 if (g[0].TableOutput is { IsDisposed: false } tb) {
-                    tb.Editor ??= typeof(TableHeadEditor);
                     return tb;
                 }
             }

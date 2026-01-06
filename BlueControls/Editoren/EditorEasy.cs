@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 using GroupBox = BlueControls.Controls.GroupBox;
@@ -47,6 +48,8 @@ public partial class EditorEasy : UserControl, IIsEditor {
     #region Properties
 
     public bool Editable { get; set; }
+
+    public virtual Type? EditorFor => null;
 
     public string Error { get; private set; } = "Nicht Initialisiert.";
 

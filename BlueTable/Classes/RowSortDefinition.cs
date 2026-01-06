@@ -23,7 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace BlueTable;
 
@@ -63,7 +62,6 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     #region Properties
 
     public string CaptionForEditor => "Sortierung";
-    public Type? Editor { get; set; }
     public bool Reverse { get; private set; }
     public Table Table { get; }
     public ReadOnlyCollection<ColumnItem> UsedColumns => _internal.AsReadOnly();

@@ -15,17 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
-
 namespace BlueBasics.Interfaces;
 
+/// <summary>
+/// Benötigt einen Gegenpart des Typs IIsEditor. EditorEasy würde sich anbieten
+/// </summary>
 public interface IEditable {
 
     #region Properties
 
     string CaptionForEditor { get; }
-
-    Type? Editor { get; set; }
 
     #endregion
 

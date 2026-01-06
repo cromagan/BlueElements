@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -69,8 +68,6 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public string CaptionForEditor => "Variablen";
 
     public int Count => _internal.Count;
-
-    public Type? Editor { get; set; }
 
     public bool ReadOnly { get; private set; }
 

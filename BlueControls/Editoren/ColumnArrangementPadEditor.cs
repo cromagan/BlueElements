@@ -29,6 +29,7 @@ using BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -51,6 +52,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     #endregion
 
     #region Properties
+
+    public virtual Type? EditorFor => typeof(ColumnViewCollection);
 
     public Table? Table {
         get;
@@ -251,7 +254,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         var newc = tb.Column.GenerateAndAdd();
 
         if (newc == null) { return; }
-        newc.Editor = typeof(ColumnEditor);
 
         if (vorlage != null) {
             newc.CloneFrom(vorlage, false);
@@ -261,8 +263,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                 }
             }
         }
-
-        newc.Editor = typeof(ColumnEditor);
         newc.Edit();
         newc.Invalidate_ColumAndContent();
 

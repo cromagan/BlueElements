@@ -192,21 +192,10 @@ public static class Generic {
     }
 
     public static List<Type> GetEnumerableOfType<T>() where T : class {
-        //List<Type> l = [];
-        //foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-        //    try {
-        //        foreach (var thist in thisas.GetTypes()) {
-        //            if (thist is { IsClass: true, IsAbstract: false } && thist.IsSubclassOf(typeof(T))) {
-        //                l.Add(thist);
-        //            }
-        //        }
-        //    } catch { }
-        //}
-        //return l;
-
         List<Type> l = [];
+        var targetType = typeof(T);
         foreach (var thist in AllTypes) {
-            if (thist.IsSubclassOf(typeof(T))) {
+            if (thist is { IsClass: true, IsAbstract: false } && targetType.IsAssignableFrom(thist)) {
                 l.Add(thist);
             }
         }

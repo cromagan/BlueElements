@@ -18,6 +18,7 @@
 using BlueBasics.Interfaces;
 using BlueTable;
 using BlueTable.Interfaces;
+using System;
 
 namespace BlueControls.Editoren;
 
@@ -31,6 +32,7 @@ public partial class RowEditor : EditorEasy, IHasTable {
 
     #region Properties
 
+    public override Type? EditorFor => typeof(RowItem);
     public Table? Table => ToEdit is RowItem { IsDisposed: false } r ? r.Table : null;
 
     #endregion

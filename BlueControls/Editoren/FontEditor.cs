@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Editoren;
 using BlueControls.ItemCollectionList;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
@@ -40,6 +41,12 @@ public partial class FontEditor : EditorEasy {
     #region Constructors
 
     public FontEditor() : base() => InitializeComponent();
+
+    #endregion
+
+    #region Properties
+
+    public override Type? EditorFor => typeof(BlueFont);
 
     #endregion
 

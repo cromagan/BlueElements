@@ -82,8 +82,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     public string CaptionForEditor => "Formular";
 
-    public Type? Editor { get; set; }
-
     public ReadOnlyCollection<string> NotAllowedChilds {
         get => new(_notAllowedChilds);
         set {

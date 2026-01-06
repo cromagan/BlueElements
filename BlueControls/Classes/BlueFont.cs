@@ -82,7 +82,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     public Color ColorBack { get; private set; } = Color.Transparent;
     public Color ColorMain { get; private set; } = Color.Black;
     public Color ColorOutline { get; private set; } = Color.Transparent;
-    public Type? Editor { get; set; }
     public string FontName { get; private set; } = "Arial";
     public bool Italic { get; private set; }
     public bool KeyIsCaseSensitive => false;

@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -260,8 +259,6 @@ public static class AbstractListItemExtension {
         foreach (var thisColumnItem in columns) {
             if (thisColumnItem != null) {
                 var co = ItemOf(thisColumnItem);
-
-                thisColumnItem.Editor = typeof(ColumnEditor);
 
                 if (doCaptionSort) {
                     var capt = thisColumnItem.CaptionsCombined;

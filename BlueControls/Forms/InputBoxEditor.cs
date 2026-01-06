@@ -64,13 +64,47 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     }
 
     /// <summary>
-    ///
+    /// Zeigt einen Editor für das angegebene IEditable-Objekt an.
+    /// Sucht automatisch nach einem passenden Editor basierend auf dem Typ.
     /// </summary>
-    /// <param name="toEdit"></param>
-    /// <param name="isDialog"></param>
-    /// <param name="supportsCancel"></param>
+    /// <param name="toEdit">Das zu bearbeitende Objekt</param>
+    /// <param name="isDialog">Gibt an, ob der Editor als Dialog angezeigt werden soll</param>
+    /// <param name="supportsCancel">Gibt an, ob der Dialog abbrechbar sein soll</param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Show(IEditable? toEdit, bool isDialog, bool supportsCancel) => Show(toEdit, toEdit?.Editor, isDialog, supportsCancel);
+    public static bool Show(IEditable? toEdit, bool isDialog, bool supportsCancel) {
+        if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return false; }
+
+        var m = toEdit.IsNowEditable();
+        if (!string.IsNullOrEmpty(m)) {
+            MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>{m}", ImageCode.Information, "Ok");
+            return false;
+        }
+
+        // Suche nach passendem Editor
+        var toEditType = toEdit.GetType();
+        Type? editorType = null;
+
+        var editorTypes = BlueBasics.Generic.GetEnumerableOfType<IIsEditor>();
+
+        foreach (var type in editorTypes) {
+            try {
+                var tempInstance = Activator.CreateInstance(type);
+                if (tempInstance is IIsEditor ie) {
+                    if (ie.EditorFor == toEditType) {
+                        editorType = type;
+                        break;
+                    }
+                }
+            } catch { }
+        }
+
+        if (editorType == null) {
+            MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Kein passender Editor gefunden", ImageCode.Information, "Ok");
+            return false;
+        }
+
+        return Show(toEdit, editorType, isDialog, supportsCancel);
+    }
 
     /// <summary>
     ///
@@ -79,7 +113,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// <param name="editortype"></param>
     /// <param name="supportsCancel"></param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Show(IEditable? toEdit, Type? editortype, bool supportsCancel) => Show(toEdit, editortype, true, supportsCancel);
+    public static bool Show(IEditable? toEdit, Type editortype, bool supportsCancel) => Show(toEdit, editortype, true, supportsCancel);
 
     /// <summary>
     ///
@@ -89,7 +123,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// <param name="isDialog"></param>
     /// <param name="supportsCancel"></param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Show(IEditable? toEdit, Type? editortype, bool isDialog, bool supportsCancel) {
+    public static bool Show(IEditable? toEdit, Type editortype, bool isDialog, bool supportsCancel) {
         if (editortype == null) {
             MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Interne Bearbeitungsmethode nicht definiert", ImageCode.Information, "Ok");
             return false;
@@ -105,12 +139,10 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
         if (!isDialog) { supportsCancel = false; }
 
-        toEdit.Editor = editortype;
-
         Form? mb = null;
 
         try {
-            var myObject = Activator.CreateInstance(toEdit.Editor);
+            var myObject = Activator.CreateInstance(editortype);
 
             if (myObject is IIsEditor ie) {
                 ie.ToEdit = toEdit;
@@ -167,7 +199,7 @@ public static class InputBoxEditorExtension {
     #region Methods
 
     /// <summary>
-    /// Routine für allgemeine Elemente, wenn nicht bekannt ist, welcher Form zuständig ist
+    /// Routine für allgemeine Elemente, wenn nicht bekannt ist, welcher Editor zuständig ist
     /// </summary>
     /// <param name="toEdit"></param>
     public static void Edit(this IEditable? toEdit) {
@@ -177,7 +209,7 @@ public static class InputBoxEditorExtension {
     }
 
     /// <summary>
-    /// Routine für allgemeine Elemente, wenn nicht bekannt ist, welcher Form zuständig ist
+    /// Routine für allgemeine Elemente, wenn nicht bekannt ist, welcher Editor zuständig ist
     /// </summary>
     /// <param name="toEdit"></param>
     /// <param name="isDialog"></param>
@@ -186,15 +218,7 @@ public static class InputBoxEditorExtension {
     public static bool Edit(this IEditable? toEdit, bool isDialog, bool supportsCancel) => toEdit != null && InputBoxEditor.Show(toEdit, isDialog, supportsCancel);
 
     /// <summary>
-    /// Erweitert, setzt auch gleich den Bearbeitungs-Modus.
-    /// </summary>
-    /// <param name="toEdit"></param>
-    /// <param name="type"></param>
-    ///     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Edit(this IEditable? toEdit, Type? type) => toEdit != null && type != null && InputBoxEditor.Show(toEdit, type, true);
-
-    /// <summary>
-    /// Erweitert, setzt auch gleich den Bearbeitungs-Modus.
+    /// Routine mit speziellen Editor öffnen, wenn ein Typ mehrere Editoren besitzt. Z.B. TableHead und Scripte
     /// </summary>
     /// <param name="toEdit"></param>
     /// <param name="type"></param>

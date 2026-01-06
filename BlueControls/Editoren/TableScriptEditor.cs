@@ -46,7 +46,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private bool _allowTemporay;
 
     private bool _didMessage;
+
     private TableScriptDescription? _item;
+
     private bool _loaded;
 
     #endregion
@@ -62,6 +64,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     #endregion
 
     #region Properties
+
+    public Type? EditorFor => null;
 
     public TableScriptDescription? Item {
         get => IsDisposed || Table is not { IsDisposed: false } ? null : _item;

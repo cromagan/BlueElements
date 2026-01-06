@@ -79,7 +79,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    public Type? Editor { get; set; }
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => true;
     public string KeyName { get; }

@@ -36,6 +36,8 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
 
     #region Properties
 
+    public override Type? EditorFor => typeof(RowSortDefinition);
+
     public Table? Table => ToEdit is RowSortDefinition r ? r.Table : null;
 
     #endregion

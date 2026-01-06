@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
@@ -143,7 +142,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         }
         if (!enableOutput) {
             if (outp != null) {
-                outp.Editor = typeof(TableHeadEditor);
                 result.Add(new FlexiDelegateControl(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Tabelle));
             } else {
                 result.Add(new FlexiControl("<imagecode=Information|16> Ausgangstabelle wird über den Eingang gewählt.", widthOfControl, false));
@@ -151,7 +149,6 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         } else {
             result.Add(new FlexiControlForProperty<Table?>(() => TableOutput, AllAvailableTables()));
             if (TableOutput is { } tbo) {
-                tbo.Editor = typeof(TableHeadEditor);
                 result.Add(new FlexiDelegateControl(tbo.Edit, "Tabelle: " + tbo.Caption, ImageCode.Tabelle));
             }
         }

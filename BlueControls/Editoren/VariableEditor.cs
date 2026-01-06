@@ -21,6 +21,7 @@ using BlueControls.Editoren;
 using BlueScript.Variables;
 using BlueTable;
 using BlueTable.EventArgs;
+using System;
 using System.Collections.Generic;
 
 namespace BlueControls;
@@ -30,6 +31,12 @@ public partial class VariableEditor : EditorEasy {
     #region Constructors
 
     public VariableEditor() : base() => InitializeComponent();
+
+    #endregion
+
+    #region Properties
+
+    public override Type? EditorFor => typeof(VariableCollection);
 
     #endregion
 

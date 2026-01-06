@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueTableDialogs;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
@@ -418,7 +417,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
             case Accessor<Table?> adb:
                 var tb = Table.Get(Value, TableView.Table_NeedPassword, true);
-                tb?.Editor = typeof(TableHeadEditor);
 
                 if (adb.Get() != tb) {
                     adb.Set(tb);

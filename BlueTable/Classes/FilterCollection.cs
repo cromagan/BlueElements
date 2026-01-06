@@ -154,8 +154,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public int Count => IsDisposed ? 0 : _internal.Count;
 
-    public Type? Editor { get; set; }
-
     public bool IsDisposed { get; private set; }
 
     public string RowFilterText {

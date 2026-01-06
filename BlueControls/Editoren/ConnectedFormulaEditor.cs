@@ -79,6 +79,8 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Properties
 
+    public virtual Type? EditorFor => null;
+
     public ConnectedFormula.ConnectedFormula? Formula {
         get;
         private set {
@@ -109,8 +111,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             } else {
                 Pad.Items = null;
             }
-
-            CheckButtons();
         }
     }
 
@@ -351,8 +351,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         AddCentered(api);
     }
 
-    private void CheckButtons() { }
-
     private void DoPages() {
         if (InvokeRequired) {
             Invoke(new Action(DoPages));
@@ -444,8 +442,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         } else {
             Pad.Items = null;
         }
-
-        CheckButtons();
     }
 
     private void GenQuickInfo(Button b, ReciverControlPadItem from) {

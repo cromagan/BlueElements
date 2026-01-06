@@ -310,8 +310,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
 
-    public Type? Editor { get; set; }
-
     public ReadOnlyCollection<TableScriptDescription> EventScript {
         get => _eventScript;
         set {

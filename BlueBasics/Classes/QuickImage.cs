@@ -117,7 +117,6 @@ public sealed class QuickImage : IReadableText, IEditable {
     public Color? ChangeGreenTo { get; }
     public string Code { get; } = string.Empty;
     public int DrehWinkel { get; }
-    public Type? Editor { get; set; }
     public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
     public Color? Färbung { get; }
     public int Height { get; private set; }

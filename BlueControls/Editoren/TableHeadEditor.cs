@@ -53,6 +53,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     #region Properties
 
+    public Type? EditorFor => typeof(Table);
+
     public Table? Table {
         get;
         private set {

@@ -382,7 +382,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         if (column is not { IsDisposed: false }) { return; }
-        column.Editor = typeof(ColumnEditor);
 
         if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
 
@@ -2243,7 +2242,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        tb.Edit(typeof(TableHeadEditor));
+        tb.Edit();
     }
 
     private void CalculateAllViewItems(Dictionary<string, AbstractListItem> allItems) {

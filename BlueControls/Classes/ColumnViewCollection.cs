@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.BlueTableDialogs;
 using BlueControls.Interfaces;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
@@ -79,7 +78,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public int ControlColumnsWidth { get; private set; }
 
     public int Count => _internal.Count;
-    public Type? Editor { get; set; }
     public int FilterRows { get; internal set; } = 1;
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => false;
@@ -150,10 +148,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
 
         if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
-
-        foreach (var thisC in tcvc) {
-            thisC.Editor = typeof(ColumnArrangementPadEditor);
-        }
 
         return tcvc;
     }

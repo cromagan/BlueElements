@@ -978,7 +978,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             var editok = false;
 
             if (ItemEditAllowed && _mouseOverItem is ReadableListItem rli) {
-                if (rli.Item is IEditable { Editor: not null }) { editok = true; }
+                if (rli.Item is IEditable) { editok = true; }
                 if (rli.Item is ISimpleEditor) { editok = true; }
             }
 

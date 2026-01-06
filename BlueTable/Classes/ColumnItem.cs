@@ -556,8 +556,6 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         }
     }
 
-    public Type? Editor { get; set; }
-
     public FilterOptions FilterOptions {
         get => _filterOptions;
         set {

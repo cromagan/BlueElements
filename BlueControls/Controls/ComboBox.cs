@@ -237,7 +237,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
     protected override void DrawControl(Graphics gr, States state) {
-            if (IsDisposed) { return; }
+        if (IsDisposed) { return; }
 
         if (_dropDownStyle == ComboBoxStyle.DropDownList) {
             if (_items.Count == 0) {
@@ -297,7 +297,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             var r = i.UntrimmedCanvasSize(Design.Item_DropdownMenu);
             i.CanvasPosition = new Rectangle(0, 0, r.Width, r.Height);
             var ymod = (int)((DisplayRectangle.Height - r.Height) / 2.0);
-            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal , ymod , Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert, 1f);
+            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal, ymod, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert, 1f);
         }
         Skin.Draw_Border(gr, vType, state, DisplayRectangle);
         btnDropDown.Invalidate();
@@ -338,7 +338,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         var editok = false;
 
         if (_mouseOverItem is ReadableListItem rli) {
-            if (rli.Item is IEditable { Editor: not null }) { editok = true; }
+            if (rli.Item is IEditable) { editok = true; }
             if (rli.Item is ISimpleEditor) { editok = true; }
         }
 

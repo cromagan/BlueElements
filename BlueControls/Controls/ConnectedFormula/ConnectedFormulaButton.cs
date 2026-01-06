@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueTableDialogs;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript;
@@ -226,7 +225,6 @@ internal partial class ConnectedFormulaButton : GenericControlReciver {
 
     private void mainButton_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (TableInput is { IsDisposed: false } tb) {
-            tb.Editor ??= typeof(TableHeadEditor);
             e.ContextMenu.Add(ItemOf(tb));
         }
     }
