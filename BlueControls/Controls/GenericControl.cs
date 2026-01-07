@@ -219,6 +219,23 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
         }
     }
 
+    /// <summary>
+    /// Prüft, über den ganzen Parents hinweg, ob eines Disabled ist
+    /// </summary>
+    /// <returns></returns>
+    public bool AnyDisabled() {
+        if (!Enabled) { return true; }
+
+        var c = Parent;
+
+        while (c != null) {
+            if (!c.Enabled) { return true; }
+            c = c.Parent;
+        }
+
+        return false;
+    }
+
     public Bitmap? BitmapOfControl() {
         if (_generatingBitmapOfControl) { return null; }
 
@@ -578,7 +595,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     }
 
     private States IsStatus() {
-        if (!Enabled) { return States.Standard_Disabled; }
+        if (AnyDisabled()) { return States.Standard_Disabled; }
 
         var s = States.Standard;
         if (_mouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }

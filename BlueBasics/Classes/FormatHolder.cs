@@ -96,7 +96,7 @@ public class FormatHolder : IInputFormat, IReadableTextWithKey {
 
     public static readonly FormatHolder Filepath = new("Filepath", QuickImage.Get(ImageCode.Ordner, 16)) {
         // https://regex101.com/r/xuJ7gR/1
-        RegexCheck = @"^([A-Za-z]:|\\\\[^\\\r\n]+\\[^\\\r\n]+)\\([^\\\r\n]+\\)*$",
+        RegexCheck = @"^([A-Za-z]:|\\\\[^\\\/:*?""<>|\r\n]+\\[^\\\/:*?""<>|\r\n]+)\\(?:[^\\\/:*?""<>|\r\n]+\\)*$|^[A-Za-z]:\\$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\!$&'@^%()[]{}!&#°`:;.,=+-_ ",
         TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,
@@ -107,7 +107,7 @@ public class FormatHolder : IInputFormat, IReadableTextWithKey {
 
     public static readonly FormatHolder FilepathAndName = new("FilepathAndName", QuickImage.Get(ImageCode.Ordner, 16)) {
         // https://regex101.com/r/5f7WVt/1
-        RegexCheck = @"^([A-Za-z]:|\\\\.+)\\([^\\\r\n]+\\)+[^\\\r\n]+$",
+        RegexCheck = @"^([A-Za-z]:|\\\\[^\\\/:*?""<>|\r\n]+)\\(?:[^\\\/:*?""<>|\r\n]+\\)*[^\\\/:*?""<>|\r\n]+$",
         AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\!$&'@^%()[]{}!&#°`:;.,=+-_ ",
         TextFormatingAllowed = false,
         AdditionalFormatCheck = AdditionalCheck.None,

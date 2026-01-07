@@ -447,7 +447,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             if (rows.Count > 0) {
-                if (Forms.MessageBox.Show($"Skript für {rows.Count} Zeile(n) ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
+                if (rows.Count == 1 ||  Forms.MessageBox.Show($"Skript für {rows.Count} Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
                     m = tb.Row.ExecuteScript(null, sc.KeyName, rows);
                 } else {
                     m = "Durch Benutzer abgebrochen";

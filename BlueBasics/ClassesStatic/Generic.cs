@@ -102,13 +102,6 @@ public static class Generic {
         return false;
     }
 
-    /// <summary>
-    /// Erstellt eine URL-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
-    /// </summary>
-    /// <param name="saveTo"></param>
-    /// <param name="linkUrl"></param>
-    /// <returns></returns>
-
     public static bool CreateInternetLink(string saveTo, string linkUrl) {
         var title = "unbekannt";
         // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -126,11 +119,6 @@ public static class Generic {
 
         return WriteAllText(fileName, content, Constants.Win1252, false);
     }
-
-    /// <summary>
-    /// Erstellt eine Datei-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
-    /// </summary>
-    /// <returns></returns>
 
     public static bool CreateShortCut(string saveTo, string linkName) {
         try {
@@ -158,6 +146,16 @@ public static class Generic {
         }
     }
 
+    /// <summary>
+    /// Erstellt eine URL-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
+    /// </summary>
+    /// <param name="saveTo"></param>
+    /// <param name="linkUrl"></param>
+    /// <returns></returns>
+    /// <summary>
+    /// Erstellt eine Datei-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
+    /// </summary>
+    /// <returns></returns>
     public static string Download(string url) {
         // My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
         using WebClient wc = new();
@@ -180,6 +178,20 @@ public static class Generic {
         }
 
         return null;
+    }
+
+    public static void EnsureMemoryAvailable(long requiredBytes) {
+        using var process = System.Diagnostics.Process.GetCurrentProcess();
+        var usedMemory = process.PrivateMemorySize64;
+        var maxMemory32Bit = 1_500_000_000L; // ~1.5 GB für 32-bit
+        var availableMemory = maxMemory32Bit - usedMemory;
+
+        // Wenn weniger als das Doppelte des benötigten Speichers frei ist
+        if (availableMemory < requiredBytes * 2) {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
     }
 
     public static System.IO.Stream? GetEmmbedResource(Assembly? assembly, string name) {

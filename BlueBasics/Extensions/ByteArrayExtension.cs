@@ -45,13 +45,17 @@ public static partial class Extensions {
             using ZipArchive zipArchive = new(originalFileStream);
             var entry = zipArchive.GetEntry("Main.bin");
             if (entry != null) {
+                Generic.EnsureMemoryAvailable(entry.Length);
+                var result = new byte[entry.Length];
                 using var stream = entry.Open();
-                using var ms = new System.IO.MemoryStream();
-                stream.CopyTo(ms);
-                return ms.ToArray();
+                var offset = 0;
+                int read;
+                while (offset < result.Length && (read = stream.Read(result, offset, result.Length - offset)) > 0) {
+                    offset += read;
+                }
+                return result;
             }
         } catch { }
-
         return null;
     }
 
