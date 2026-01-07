@@ -371,6 +371,8 @@ public class Chunk : IHasKeyName {
                 lastMessageTime = t.ElapsedMilliseconds;
                 Develop.Message?.Invoke(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Warte auf Abschluss der Initialisierung des Chunks {KeyName}", 0);
             }
+
+            if (LoadFailed && t.ElapsedMilliseconds > 100) { return false; }
         }
 
         return true; // Explizit true zurückgeben, wenn die Initialisierung erfolgreich ist

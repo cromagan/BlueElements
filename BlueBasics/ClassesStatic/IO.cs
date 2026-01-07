@@ -388,8 +388,6 @@ public static class IO {
     /// <param name="trySeconds"></param>
     /// <param name="args">Variable Parameter</param>
     public static object? ProcessFile(DoThis processMethod, List<string> affectingFiles, bool abortIfFailed, float trySeconds, params object?[] args) {
-        if (Develop.AllReadOnly) { return true; }
-
         var startTime = Stopwatch.StartNew();
         var stopw = Stopwatch.StartNew();
 
@@ -678,6 +676,7 @@ public static class IO {
         if (TryDirectoryExists(affectingFiles).ReturnValue is true) { return FileOperationResult.ValueTrue; }
 
         try {
+            if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
             Directory.CreateDirectory(directory);
             return FileOperationResult.ValueTrue;
         } catch (IOException) {
@@ -694,6 +693,7 @@ public static class IO {
         if (TryDirectoryExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
 
         try {
+            if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
             Directory.Delete(directory, true);
             RemoveFromCanWriteCache(directory);
 
@@ -715,6 +715,8 @@ public static class IO {
         if (TryFileExists(affectingFiles).ReturnValue is not true) { return FileOperationResult.ValueTrue; }
 
         filename = filename.NormalizeFile();
+
+        if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
 
         // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
         try {
@@ -777,6 +779,7 @@ public static class IO {
         if (TryGetFileInfo([source]).ReturnValue is not FileInfo sourceInfo) { return FileOperationResult.ValueFalse; }
 
         try {
+            if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
             File.Copy(source, target);
 
             // Warten, bis die Datei wirklich gelöscht ist
@@ -874,6 +877,7 @@ public static class IO {
         if (TryDirectoryExists([newName]).ReturnValue is true) { return FileOperationResult.ValueFalse; }
 
         try {
+            if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
             Directory.Move(oldName, newName);
             RemoveFromCanWriteCache(oldName);
             RemoveFromCanWriteCache(newName);
@@ -903,6 +907,7 @@ public static class IO {
         if (TryFileExists([newName]).ReturnValue is true) { return FileOperationResult.ValueFalse; }
 
         try {
+            if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
             // Sicherstellen, dass das Zielverzeichnis existiert
             var targetDir = Path.GetDirectoryName(newName);
             if (!string.IsNullOrEmpty(targetDir)) { TryCreateDirectory([targetDir]); }
