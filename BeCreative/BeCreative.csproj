@@ -38,9 +38,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <!-- NuGet-Pakete -->
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
-
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
     <ProjectReference Include="..\BlueInternet\BlueInternet.csproj" />

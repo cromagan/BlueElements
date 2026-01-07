@@ -46,9 +46,6 @@
     <!-- NuGet-Pakete -->
     <PackageReference Include="FCTB" Version="2.16.24" />
     
-    <!-- Code-Analyse -->
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
-
     <!-- .NET Framework Referenzen -->
     <Reference Include="System" />
     <Reference Include="System.Core" />

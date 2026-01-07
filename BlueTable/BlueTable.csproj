@@ -41,12 +41,7 @@
     <Compile Remove="TableSQLLite.cs" />
     <EmbeddedResource Remove="TableSQLLite.resx" />
 
-    <!-- NuGet-Pakete -->
-	  <!-- Code-Analyse -->
-	  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
-
-
-	  <!-- Projekt-Referenzen -->
+	<!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
 

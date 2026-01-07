@@ -37,10 +37,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <!-- Code-Analyse -->
-	  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
-
-	  <!-- Projekt-Referenzen -->
+	<!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
 
     <!-- System-Referenzen -->

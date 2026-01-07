@@ -49,11 +49,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
 	 
-	  <!-- Code-Analyse -->
-	 <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.101" />
-
-	  <!-- NuGet-Pakete -->
-
+	<!-- NuGet-Pakete -->
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusAbschneiden.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusEinpassen.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusVerzerren.png" />
