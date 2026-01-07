@@ -267,6 +267,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void ParseView(string toParse) => TableInternal.ParseView(toParse);
 
+    public void Pin(IReadOnlyList<RowItem>? rows) => TableInternal.Pin(rows);
+
     public void RowCleanUp() => TableInternal.RowCleanUp();
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
