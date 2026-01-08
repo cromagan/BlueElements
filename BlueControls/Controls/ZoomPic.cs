@@ -73,8 +73,7 @@ public partial class ZoomPic : ZoomPad {
         }
     }
 
-    public override bool ControlMustPressed => false;
-    protected override bool AutoCenter => true;
+    public override bool ControlMustPressedForZoomWithWheel => false;
     protected override bool ShowSliderX => true;
     protected override int SmallChangeY => 5;
 

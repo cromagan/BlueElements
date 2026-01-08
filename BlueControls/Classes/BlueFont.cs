@@ -506,7 +506,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
             }
         }
 
-        _widthOf2Points = MeasureString("..").Width;
+        _widthOf2Points = MeasureString("||").Width;
         //http://www.vb-helper.com/howto_net_rainbow_text.html
         //https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
         //http://www.typo-info.de/schriftgrad.htm
@@ -663,7 +663,7 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
 
     internal SizeF CharSize(char c) => _charSizeCache.GetOrAdd(c, ch => {
         if (ch <= 31) { return new SizeF(0, _zeilenabstand); }
-        return new SizeF(_fontOl.MeasureString($".{c}.").Width - _widthOf2Points + 0.05f, _zeilenabstand);
+        return new SizeF(_fontOl.MeasureString($"|{c}|").Width - _widthOf2Points + 0.05f, _zeilenabstand);
     });
 
     internal float Oberlänge(float scale) => _oberlänge.CanvasToControl(scale);

@@ -102,7 +102,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     [DefaultValue(true)]
     public bool ContextMenuAllowed { get; set; } = true;
 
-    public override bool ControlMustPressed => false;
+    public override bool ControlMustPressedForZoomWithWheel => false;
 
     [DefaultValue(true)]
     public bool EditAllowed { get; set; } = true;
@@ -164,7 +164,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
     }
 
-    protected override bool AutoCenter => true;
     protected override bool ShowSliderX => true;
     protected override int SmallChangeY => 5;
 

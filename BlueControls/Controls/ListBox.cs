@@ -158,7 +158,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     }
 
     public ReadOnlyCollection<string> Checked => _checked.AsReadOnly();
-    public override bool ControlMustPressed => true;
+    public override bool ControlMustPressedForZoomWithWheel => true;
 
     [DefaultValue("")]
     public string FilterText {
@@ -220,7 +220,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
-    protected override bool AutoCenter => false;
     protected override bool ShowSliderX => false;
     protected override int SmallChangeY => 10;
 
@@ -884,7 +883,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     }
 
     private void DoMouseMovement(int controlX, int controlY) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || Parent == null) { return; }
 
         var isInForm = true;
         var nd = _item.ElementAtPosition(controlX, controlY, Zoom, OffsetX, OffsetY);

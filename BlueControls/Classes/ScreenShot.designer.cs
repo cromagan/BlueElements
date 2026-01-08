@@ -31,7 +31,7 @@ namespace BlueControls {
             this.zoomPic.Location = new System.Drawing.Point(0, 0);
             this.zoomPic.Mittellinie = BlueBasics.Enums.Orientation.Ohne;
             this.zoomPic.Name = "zoomPic";
-            this.zoomPic.ScreenshotMode = true;
+            this.zoomPic.SlideAndZoomAllowed = false;
             this.zoomPic.Size = new System.Drawing.Size(508, 639);
             this.zoomPic.TabIndex = 0;
             this.zoomPic.MouseDown += new System.Windows.Forms.MouseEventHandler(this.zoomPic_MouseDown);

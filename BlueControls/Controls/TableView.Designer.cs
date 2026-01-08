@@ -65,6 +65,7 @@ namespace BlueControls.Controls {
             this.Controls.Add(this.BTB);
             this.Name = "TableView";
             this.Size = new Size(599, 388);
+            this.AutoCenter = false;
             this.ResumeLayout(false);
 
         }

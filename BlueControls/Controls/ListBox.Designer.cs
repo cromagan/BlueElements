@@ -89,6 +89,7 @@ namespace BlueControls.Controls
             this.Controls.Add(this.btnUp);
             this.Controls.Add(this.btnPlus);
             this.Size = new Size(177, 168);
+            this.AutoCenter = false;
             this.ResumeLayout(false);
 
         }

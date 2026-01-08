@@ -89,7 +89,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     }
 
-    public abstract bool ControlMustPressed { get; }
+    public abstract bool ControlMustPressedForZoomWithWheel { get; }
 
     public bool Fitting { get; private set; }
 
@@ -107,10 +107,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int OffsetX {
-        get => ShowSliderX ? field : 0;
+        get => ShowSliderX && SlideAndZoomAllowed ? field : 0;
         set {
-            if (ScreenshotMode) { return; }
-            if (!ShowSliderX) { value = 0; }
+            if (!ShowSliderX || !SlideAndZoomAllowed) { value = 0; }
 
             value = (int)Math.Min(value, -SliderX.Minimum);
             value = (int)Math.Max(value, -SliderX.Maximum);
@@ -126,9 +125,9 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int OffsetY {
-        get;
+        get => SlideAndZoomAllowed ? field : 0;
         set {
-            if (ScreenshotMode) { return; }
+            if (!SlideAndZoomAllowed) { value = 0; }
 
             value = (int)Math.Min(value, -SliderY.Minimum);
             value = (int)Math.Max(value, -SliderY.Maximum);
@@ -139,34 +138,34 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     }
 
-    [DefaultValue(false)]
+    [DefaultValue(true)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool ScreenshotMode {
+    public bool SlideAndZoomAllowed {
         get;
         set {
             if (field == value) { return; }
             field = value;
 
             if (value) {
-                ZoomFit();
-            } else {
                 DoSlider();
+            } else {
+                ZoomFit();
             }
 
             Invalidate();
         }
-    }
+    } = true;
 
     [DefaultValue(1f)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public float Zoom {
-        get;
+        get => SlideAndZoomAllowed ? field : 1f;
         set {
-            if (ScreenshotMode) { return; }
+            if (!SlideAndZoomAllowed) { return; }
             value = Math.Max(_zoomFit / 10f, value);
             value = Math.Min(20, value);
 
@@ -176,7 +175,11 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         }
     } = 1;
 
-    protected abstract bool AutoCenter { get; }
+    [DefaultValue(true)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    protected bool AutoCenter { get; set; } = true;
 
     protected RectangleF CanvasMaxBounds {
         get {
@@ -384,7 +387,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         // e enstricht den Control-Koordinaten
         base.OnMouseWheel(e);
 
-        if (ControlMustPressed && !ControlPressing) {
+        if (ControlMustPressedForZoomWithWheel && !ControlPressing) {
             var v = SmallChangeY.CanvasToControl(Zoom);
             if (SliderY.Enabled && e.Delta > 0) { OffsetY += v; }
             if (SliderY.Enabled && e.Delta < 0) { OffsetY -= v; }
@@ -418,7 +421,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     protected virtual void OnOffsetYChanged() => Invalidate();
 
     protected override void OnSizeChanged(System.EventArgs e) {
-        if (ScreenshotMode || Fitting) {
+        if (!SlideAndZoomAllowed || Fitting) {
             ZoomFit();
         } else {
             DoSlider();
@@ -437,7 +440,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
 
-        SliderX.Visible = ShowSliderX && !ScreenshotMode;
+        SliderX.Visible = ShowSliderX && SlideAndZoomAllowed;
         if (freiraumControl.X < 0 && SliderX.Visible) {
             SliderX.Enabled = true;
             SliderX.Minimum = tmpCanvasMaxBounds.Right.CanvasToControl(Zoom) - controlArea.Right - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom);
@@ -449,13 +452,14 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             if (!MousePressing()) {
                 var val = 0;
                 if (AutoCenter) { val = (freiraumControl.X - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom)) / 2; }
+                if (!SlideAndZoomAllowed) { val = 0; }
                 SliderX.Minimum = -val;
                 SliderX.Maximum = -val;
                 SliderX.Value = -val;
             }
         }
 
-        SliderY.Visible = !ScreenshotMode;
+        SliderY.Visible = SlideAndZoomAllowed;
         if (freiraumControl.Y < 0 && SliderY.Visible) {
             SliderY.Enabled = true;
             SliderY.Maximum = tmpCanvasMaxBounds.Bottom.CanvasToControl(Zoom) - controlArea.Bottom - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom);
@@ -467,6 +471,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             if (!MousePressing()) {
                 var val = 0;
                 if (AutoCenter) { val = (freiraumControl.Y - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom)) / 2; }
+                if (!SlideAndZoomAllowed) { val = 0; }
                 SliderY.Minimum = -val;
                 SliderY.Maximum = -val;
                 SliderY.Value = -val;

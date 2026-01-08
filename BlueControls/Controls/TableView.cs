@@ -153,7 +153,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public override bool ControlMustPressed => true;
+    public override bool ControlMustPressedForZoomWithWheel => true;
 
     public ColumnViewCollection? CurrentArrangement {
         get {
@@ -283,8 +283,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Werden bei FilterCombined ausgegeben.
     /// </summary>
     internal FilterCollection Filter { get; } = new("DefaultTableFilter");
-
-    protected override bool AutoCenter => false;
 
     protected override bool ShowSliderX => true;
 
@@ -447,7 +445,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             if (rows.Count > 0) {
-                if (rows.Count == 1 ||  Forms.MessageBox.Show($"Skript für {rows.Count} Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
+                if (rows.Count == 1 || Forms.MessageBox.Show($"Skript für {rows.Count} Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
                     m = tb.Row.ExecuteScript(null, sc.KeyName, rows);
                 } else {
                     m = "Durch Benutzer abgebrochen";
