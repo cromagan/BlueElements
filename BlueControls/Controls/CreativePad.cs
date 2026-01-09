@@ -310,9 +310,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     protected override RectangleF CalculateCanvasMaxBounds() {
         if (_items?.CanvasUsedArea is not { } a) { return new RectangleF(0, 0, 0, 0); }
 
-        var add = (float)Math.Max(a.Width * 0.1, a.Height * 0.1);
+        var add = 100;// (float)Math.Max(a.Width * 0.1, a.Height * 0.1);
 
-        return new RectangleF(a.Left - add, a.Top - add, a.Right + add, a.Bottom + add);
+        return new RectangleF(a.Left - add, a.Top - add, a.Width + add * 2, a.Height + add * 2);
     }
 
     protected override void Dispose(bool disposing) {
@@ -333,11 +333,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
         if (_items != null) {
             _items.ShowJointPoints = ShowJointPoint;
-            _items.ForPrinting = ShowInPrintMode;
             _items.ShowAlways = true;
             _items.AutoZoomFit = false;
 
-            _items.Draw(gr, controla, Zoom, OffsetX, OffsetY);
+            _items.Draw(gr, controla, Zoom, OffsetX, OffsetY, ShowInPrintMode);
 
             #region Dann die selektierten Punkte
 

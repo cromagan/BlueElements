@@ -452,7 +452,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             if (!MousePressing()) {
                 var val = 0;
                 if (AutoCenter) { val = (freiraumControl.X - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom)) / 2; }
-                if (!SlideAndZoomAllowed) { val = 0; }
+                if (!SlideAndZoomAllowed) { val = -freiraumControl.X; }
                 SliderX.Minimum = -val;
                 SliderX.Maximum = -val;
                 SliderX.Value = -val;
@@ -471,7 +471,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             if (!MousePressing()) {
                 var val = 0;
                 if (AutoCenter) { val = (freiraumControl.Y - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom)) / 2; }
-                if (!SlideAndZoomAllowed) { val = 0; }
+                if (!SlideAndZoomAllowed) { val = -freiraumControl.Y; }
                 SliderY.Minimum = -val;
                 SliderY.Maximum = -val;
                 SliderY.Value = -val;

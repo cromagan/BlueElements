@@ -78,8 +78,7 @@ public partial class Progressbar : FloatingForm {
 
     public void Update(int current) {
         if (InvokeRequired) {
-            // Es kommt zwar die ganze Berechnung durcheinander, aber besser als ein Fehler
-            Invoke(new Action(() => Update(current)));
+            Invoke(new Action(() => UpdateInternal(CalculateText(_baseText, current, _count))));
             return;
         }
         UpdateInternal(CalculateText(_baseText, current, _count));
@@ -91,7 +90,10 @@ public partial class Progressbar : FloatingForm {
             _eProgressbarLastTimeUpdate = DateTime.UtcNow;
             _eProgressbarLastCalulatedSeconds = int.MinValue;
         }
+
+        if (count <= 0) { return baseText; }
         var pr = current / (double)count;
+
         if (pr > 1) { pr = 1; }
         if (pr < 0) { pr = 0; }
         if (double.IsNaN(pr)) { pr = 0; }
@@ -113,7 +115,7 @@ public partial class Progressbar : FloatingForm {
         }
         if (_eProgressbarLastCalulatedSeconds != tmpCalculatedSeconds && DateTime.UtcNow.Subtract(_eProgressbarLastTimeUpdate).TotalSeconds > 5) {
             _eProgressbarLastTimeUpdate = DateTime.UtcNow;
-            if (current < 2) {
+            if (current < 2 && tmpCalculatedSeconds > 0) {
                 _eProgressbarLastCalulatedSeconds = tmpCalculatedSeconds;
             }
             if (tmpCalculatedSeconds < _eProgressbarLastCalulatedSeconds * 0.9) {
@@ -126,14 +128,26 @@ public partial class Progressbar : FloatingForm {
         var prt = (int)(pr * 100);
         if (prt > 100) { prt = 100; }
         if (prt < 0) { prt = 0; }
-        return baseText + "</b></i></u>" +
-               (count < 1 ? string.Empty
-                   : current <= 3 ? "<br>Restzeit wird ermittelt<tab>"
-                   : _eProgressbarLastCalulatedSeconds < -10 ? "<br>Restzeit wird ermittelt<tab>"
-                   : _eProgressbarLastCalulatedSeconds > 94 ? "<br>" + prt + " % - Geschätzte Restzeit:   " + (_eProgressbarLastCalulatedSeconds / 60) + " Minuten<tab>"
-                   : _eProgressbarLastCalulatedSeconds > 10 ? "<br>" + prt + " % - Geschätzte Restzeit: " + (_eProgressbarLastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
-                   : _eProgressbarLastCalulatedSeconds > 0 ? "<br>" + prt + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
-                   : "<br>100 % - ...abgeschlossen!<tab>");
+
+        baseText = baseText + "</b></i></u><br>" + prt + " % - ";
+
+        if (current <= 3 || count < 1 || _eProgressbarLastCalulatedSeconds < -10) {
+            return baseText + "Restzeit wird ermittelt";
+        }
+
+        if (_eProgressbarLastCalulatedSeconds > 94) {
+            return baseText + "Geschätzte Restzeit:   " + (_eProgressbarLastCalulatedSeconds / 60) + " Minuten";
+        }
+
+        if (_eProgressbarLastCalulatedSeconds > 10) {
+            return baseText + "Geschätzte Restzeit: " + (_eProgressbarLastCalulatedSeconds / 5 * 5) + " Sekunden";
+        }
+
+        if (_eProgressbarLastCalulatedSeconds > 0) {
+            return baseText + "Geschätzte Restzeit: <<> 10 Sekunden";
+        }
+
+        return baseText + "...abgeschlossen!";
     }
 
     private void UpdateInternal(string text) {

@@ -247,8 +247,8 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Stift, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
-        if (!ForPrinting) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
+        if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
@@ -258,13 +258,13 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);
         //}
 
-        if (!ForPrinting) {
+        if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
 
-        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
     }
 
     #endregion

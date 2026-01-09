@@ -119,14 +119,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     public abstract string Description { get; }
 
-    public bool ForPrinting {
-        get {
-            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) { return icpi.ForPrinting; }
-            if (this is ItemCollectionPadItem { IsDisposed: false } icip2) { return icip2.ForPrinting; } // Wichtig, wegen NEW!
-            return true;
-        }
-    }
-
     public bool IsDisposed { get; private set; }
 
     /// <summary>
@@ -276,15 +268,15 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    public void Draw(Graphics gr, Rectangle visibleAreaControl, float zoom, float offsetX, float offsetY) {
-        if (ForPrinting && !_beiExportSichtbar && !ShowAlways) { return; }
+    public void Draw(Graphics gr, Rectangle visibleAreaControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
+        if (forPrinting && !_beiExportSichtbar && !ShowAlways) { return; }
 
         var positionControl = CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false);
 
         if (ShowAlways || IsInDrawingArea(positionControl, visibleAreaControl)) {
-            DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
+            DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
 
-            if (!ForPrinting) {
+            if (!forPrinting) {
                 if (ShowJointPoints) {
                     DrawPoints(gr, JointPoints, zoom, offsetX, offsetY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
                 }
@@ -317,7 +309,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         #region Verknüpfte Pfeile Zeichnen
 
-        if (!ForPrinting) {
+        if (!forPrinting) {
             var line = 1f;
             if (zoom > 1) { line = zoom; }
 
@@ -349,7 +341,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
         var positionControl = CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
-        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionControl, scale, offsetX, offsetY);
+        DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionControl, scale, offsetX, offsetY, true);
         gr.Dispose();
     }
 
@@ -532,7 +524,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         var bmp = new Bitmap(r.Width.CanvasToControl(scale), r.Height.CanvasToControl(scale));
 
-        DrawToBitmap(bmp, scale, r.Left.CanvasToControl(scale), r.Top.CanvasToControl(scale));
+        DrawToBitmap(bmp, scale, -r.Left.CanvasToControl(scale), -r.Top.CanvasToControl(scale));
 
         //using var gr = Graphics.FromImage(I);
         //gr.Clear(BackColor);
@@ -622,7 +614,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY);
+    protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting);
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 

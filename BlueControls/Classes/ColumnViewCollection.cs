@@ -393,9 +393,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         PermissionGroups_Show = tmp.AsReadOnly();
 
         if (string.IsNullOrEmpty(KeyName)) { KeyName = "Ansicht " + number; }
-
-        ColumnForChapter ??= tb.Column["SYS_CHAPTER"];
-        ColumnForChapter ??= tb.Column["CHAPTER"];
     }
 
     public void ShowAllColumns() {

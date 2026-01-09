@@ -248,14 +248,14 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Trichter, 16, Skin.IdColor(OutputColorId), Color.Transparent); //  QuickImage.Get(ImageCode.Trichter, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
-        if (!ForPrinting) {
-            DrawArrowOutput(gr, positionControl, zoom, ForPrinting, OutputColorId);
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
+        if (!forPrinting) {
+            DrawArrowOutput(gr, positionControl, zoom, forPrinting, OutputColorId);
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
-        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
+        DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
     }
 
     #endregion

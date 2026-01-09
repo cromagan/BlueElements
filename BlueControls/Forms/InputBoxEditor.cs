@@ -90,7 +90,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             try {
                 var tempInstance = Activator.CreateInstance(type);
                 if (tempInstance is IIsEditor ie) {
-                    if (ie.EditorFor == toEditType) {
+                    if (ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
                         editorType = type;
                         break;
                     }

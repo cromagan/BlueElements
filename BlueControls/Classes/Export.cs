@@ -50,7 +50,6 @@ public static class Export {
         if (loadFile.FileType() != FileFormat.BlueCreativeFile) { return "Datei hat das falsche Format."; }
 
         using var l = new ItemCollectionPadItem(loadFile);
-        l.ForPrinting = true;
 
         if (!l.Any()) { return "Layout nicht gefunden oder fehlerhaft."; }
 

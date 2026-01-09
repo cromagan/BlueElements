@@ -146,7 +146,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         UnRegisterEvents();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);

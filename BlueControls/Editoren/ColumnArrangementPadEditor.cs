@@ -443,7 +443,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         Pad.Items = [];
         Pad.Items.Endless = true;
-        Pad.Items.ForPrinting = true;
 
         Pad.Items.Clear();
 

@@ -78,21 +78,21 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Monitor, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         //var id = GetRowFrom?.OutputColorId ?? -1;
 
-        if (!ForPrinting) {
+        if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
         //DrawFakeControl(gr, positionControl, zoom, CaptionPosition.Über_dem_Feld, "Monitor", EditTypeFormula.Listbox);
 
-        if (!ForPrinting) {
+        if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
-        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
+        DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
     }
 
     #endregion

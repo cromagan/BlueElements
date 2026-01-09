@@ -63,7 +63,6 @@ public class Renderer_Layout : Renderer_Abstract {
 
         try {
             using var l = new ItemCollectionPadItem(_file);
-            l.ForPrinting = true;
             l.GridShow = 0;
 
             if (!l.Any()) {
@@ -146,7 +145,6 @@ public class Renderer_Layout : Renderer_Abstract {
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         using var l = new ItemCollectionPadItem(_file);
-        l.ForPrinting = true;
 
         if (!l.Any()) {
             return new Size(16, 16);

@@ -246,7 +246,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         DrawColorScheme(gr, positionControl, zoom, null, false, false, false);
         var headh = 25.CanvasToControl(zoom);
         var headb = 70.CanvasToControl(zoom);
@@ -269,13 +269,13 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
         gr.DrawRectangle(new Pen(Color.Black, zoom), body);
 
-        if (!ForPrinting) {
+        if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, true);
         }
 
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
 
-        DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
+        DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
     }
 
     private ListBox Childs() {

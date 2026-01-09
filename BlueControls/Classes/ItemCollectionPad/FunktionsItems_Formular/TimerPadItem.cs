@@ -203,7 +203,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) =>
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) =>
         gr.DrawImage(SymbolForReadableText(), positionControl);
 
     #endregion

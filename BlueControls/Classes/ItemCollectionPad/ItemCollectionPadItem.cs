@@ -163,8 +163,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    public new bool ForPrinting { get; set; }
-
     /// <summary>
     /// in mm
     /// </summary>
@@ -296,13 +294,17 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// <summary>
     /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
     /// </summary>
-    /// <param name="maxCanvasBounds"></param>
+    /// <param name="canvasUsedArea"></param>
     /// <param name="controlArea"></param>
     /// <param name="zoom"></param>
     /// <returns></returns>
-    public static Point FreiraumControl(RectangleF maxCanvasBounds, Size controlArea, float zoom) {
-        var w = controlArea.Width - maxCanvasBounds.Width.CanvasToControl(zoom);
-        var h = controlArea.Height - maxCanvasBounds.Height.CanvasToControl(zoom);
+    public static Point FreiraumControl(RectangleF canvasUsedArea, Size controlArea, float zoom) {
+        var offsetX = canvasUsedArea.X.CanvasToControl(zoom);
+        var offsetY = canvasUsedArea.Y.CanvasToControl(zoom);
+
+        var w = controlArea.Width - canvasUsedArea.Width.CanvasToControl(zoom) - offsetX;
+        var h = controlArea.Height - canvasUsedArea.Height.CanvasToControl(zoom) - offsetY;
+
         return new Point(w, h);
     }
 
@@ -1096,7 +1098,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (!Endless) { return base.CalculateCanvasUsedArea(); }
 
         var f = UsedAreaOfItems();
-        return f with { X = f.X + _pLo.X, Y = f.Y + _pLo.Y };
+        return new RectangleF(f.X + _pLo.X, f.Y + _pLo.Y, f.Width, f.Height);
     }
 
     protected override void Dispose(bool disposing) {
@@ -1112,7 +1114,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Connections.RemoveAll();
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         gr.PixelOffsetMode = PixelOffsetMode.None;
 
         var d = !Endless ? CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false) : visibleAreaControl;
@@ -1167,7 +1169,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         foreach (var thisItem in _internal) {
             gr.PixelOffsetMode = PixelOffsetMode.None;
-            thisItem.Draw(gr, positionControl.ToRect(), childScale, childOffsetX, childOffsetY);
+            thisItem.Draw(gr, positionControl.ToRect(), childScale, childOffsetX, childOffsetY, forPrinting);
         }
 
         #endregion

@@ -293,7 +293,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                             SysRowChangeDate = thisColumnItem;
                             break;
 
-                        case "SYS_CHAPTER":
+                        case "SYS_CHAPTER": // TODO: Entfernen, 09.01.2026
                             //SysChapter = thisColumnItem;
                             break;
 

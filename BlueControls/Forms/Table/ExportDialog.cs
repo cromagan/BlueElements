@@ -132,7 +132,6 @@ public sealed partial class ExportDialog : IHasTable {
         tmp.ResetVariables();
         var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (scx.Failed) { return -1; }
-        tmp.ForPrinting = true;
 
         var oneItem = tmp.CanvasUsedArea;
         pad.Items.SheetStyle = tmp.SheetStyle;
@@ -152,9 +151,7 @@ public sealed partial class ExportDialog : IHasTable {
 
         for (var y = 0; y < maxY; y++) {
             for (var x = 0; x < maxX; x++) {
-                var it = new ItemCollectionPadItem(layoutFileName) {
-                    ForPrinting = true
-                };
+                var it = new ItemCollectionPadItem(layoutFileName);
 
                 //if (it._internal is { }) {
                 it.ReplaceVariables(rowsForExport[startNr]);

@@ -239,7 +239,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     //    base.CalculateSlavePoints();
     //    InvalidateText();
     //}
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (_style != PadStyles.Undefiniert) {
             gr.SetClip(positionControl);
             var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
@@ -253,7 +253,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 var offsetY2 = (int)(positionControl.Top - trp.Y);
 
                 _txt.AreaControl = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
-                if (!string.IsNullOrEmpty(_textReplaced) || !ForPrinting) {
+                if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {
                     _txt.Draw(gr, zoom * _textScale, offsetX2, offsetY2);
                 }
             }

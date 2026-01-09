@@ -82,7 +82,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Spalte, 16);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) { }
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) { }
 
     #endregion
 }

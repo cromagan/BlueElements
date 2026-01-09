@@ -290,7 +290,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         //positionControl.Inflate(-_padding, -_padding);
         //RectangleF r1 = new(positionControl.Left , positionControl.Top , positionControl.Width , positionControl.Height );
         RectangleF r2 = new();
@@ -329,7 +329,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
         try {
             if (Bitmap != null) {
-                if (ForPrinting) {
+                if (forPrinting) {
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 } else {
@@ -347,7 +347,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
         gr.TranslateTransform(-trp.X, -trp.Y);
         gr.ResetTransform();
-        if (!ForPrinting) {
+        if (!forPrinting) {
             if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
                 Font f = new("Arial", 8);
                 BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionControl.Left, positionControl.Top);

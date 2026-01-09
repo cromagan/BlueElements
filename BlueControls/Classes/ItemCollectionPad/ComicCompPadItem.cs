@@ -210,7 +210,7 @@ public class ComicCompPadItem : AbstractPadItem {
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         var lOt = _ber_Lo.CanvasToControl(zoom, offsetX, offsetY);
         var rOt = _ber_Ro.CanvasToControl(zoom, offsetX, offsetY);
         var rUt = _ber_Ru.CanvasToControl(zoom, offsetX, offsetY);
@@ -219,7 +219,7 @@ public class ComicCompPadItem : AbstractPadItem {
         if (_bitmap != null) {
             gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
         }
-        if (_bitmap == null || !ForPrinting) {
+        if (_bitmap == null || !forPrinting) {
             gr.DrawLine(ZoomPad.PenGray, lOt, rOt);
             gr.DrawLine(ZoomPad.PenGray, rOt, rUt);
             gr.DrawLine(ZoomPad.PenGray, rUt, lUt);

@@ -77,14 +77,14 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         }
     }
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (_generatedBitmap == null) { GeneratePic(); }
 
         #region Bild zeichnen
 
         try {
             if (_generatedBitmap != null) {
-                if (ForPrinting) {
+                if (forPrinting) {
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     gr.PixelOffsetMode = PixelOffsetMode.Half;
                 } else {

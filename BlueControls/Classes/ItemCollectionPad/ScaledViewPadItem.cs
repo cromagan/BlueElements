@@ -210,7 +210,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     }
 
     //}
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY) {
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
 
         var newarea = positionControl.ToRect();
@@ -223,7 +223,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
                 if (IsInDrawingArea(childpos, newarea)) {
                     // IsInDrawingArea extra abfragen, weil ShowAlways dazwischenfunkt
                     gr.SetClip(newarea);
-                    thisItem.Draw(gr, newarea, childScale, childOffsetX, childOffsetY);
+                    thisItem.Draw(gr, newarea, childScale, childOffsetX, childOffsetY, forPrinting);
                     gr.ResetClip();
                 }
             }
