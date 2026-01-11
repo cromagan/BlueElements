@@ -17,8 +17,12 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
+using BlueControls.Forms;
+using BlueTable;
 using BlueTable.Enums;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -28,34 +32,32 @@ public class FlexiControlForDelegate : FlexiControl {
 
     #region Fields
 
-    private readonly DoThis? _doThis;
+    private DoThis? _doThis;
 
     #endregion
 
     #region Constructors
 
-    public FlexiControlForDelegate() : this(null, string.Empty, null) { }
+    public FlexiControlForDelegate() : this(null, string.Empty, ImageCode.Kreuz) { }
 
-    public FlexiControlForDelegate(DoThis? doThis, string text, ImageCode? image) : base() {
-        _doThis = doThis;
+    public FlexiControlForDelegate(DoThis? doThis, string text, ImageCode image) : base() {
+        Init(doThis, text, QuickImage.Get(image, 22));
+    }
 
-        Size = new Size(200, 24);
-
-        EditType = EditTypeFormula.Button;
-        CaptionPosition = CaptionPosition.ohne;
-        var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
-
-        Size = new Size(s0.Width + 50 + 22, 30);
-        if (GetControl<Button>() is { IsDisposed: false } c0) {
-            c0.Text = text;
-            if (image is { } im) {
-                c0.ImageCode = QuickImage.Get(im, 22).Code;
-            }
+    /// <summary>
+    /// Öffnet den Dialog zum DIREKTEN Bearbeiten.
+    /// Soll es überschrieben werden  (z.B. Weil es readonly ist)
+    /// FlexiControlForProperty benutzen.
+    /// </summary>
+    /// <param name="editable"></param>
+    public FlexiControlForDelegate(IEditable editable) {
+        if (editable is IReadableTextWithKey irt) {
+            Init(editable.Edit, $"{editable.CaptionForEditor} '{irt.KeyName}' bearbeiten", irt.SymbolForReadableText());
+        } else if (editable is IReadableText ir) {
+            Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", ir.SymbolForReadableText());
+        } else {
+            Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", QuickImage.Get(ImageCode.Smiley, 22));
         }
-
-        GenFehlerText();
-
-        CheckEnabledState();
     }
 
     #endregion
@@ -94,6 +96,28 @@ public class FlexiControlForDelegate : FlexiControl {
     }
 
     private void GenFehlerText() => InfoText = string.Empty;
+
+    private void Init(DoThis? doThis, string text, QuickImage image) {
+        _doThis = doThis;
+
+        Size = new Size(200, 24);
+
+        EditType = EditTypeFormula.Button;
+        CaptionPosition = CaptionPosition.ohne;
+        var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+
+        Size = new Size(s0.Width + 50 + 22, 30);
+        if (GetControl<Button>() is { IsDisposed: false } c0) {
+            c0.Text = text;
+            if (image is { } im) {
+                c0.ImageCode = image.KeyName;
+            }
+        }
+
+        GenFehlerText();
+
+        CheckEnabledState();
+    }
 
     #endregion
 }

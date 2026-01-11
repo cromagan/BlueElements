@@ -124,8 +124,8 @@ public partial class FontEditor : EditorEasy {
         chkUnterstrichen.Checked = bf.Underline;
         chkDurchgestrichen.Checked = bf.StrikeOut;
         chkOutline.Checked = bf.ColorOutline.A > 0;
-        btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorMain).Code;
-        btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorOutline).Code;
+        btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorMain).KeyName;
+        btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorOutline).KeyName;
 
         return true;
     }
@@ -133,14 +133,14 @@ public partial class FontEditor : EditorEasy {
     private void btnBackColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
         ColorDia.ShowDialog();
-        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
         ChangeFont();
     }
 
     private void cFarbe_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
         ColorDia.ShowDialog();
-        btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
+        btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
         ChangeFont();
     }
 
@@ -161,7 +161,7 @@ public partial class FontEditor : EditorEasy {
     private void cRandF_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
         ColorDia.ShowDialog();
-        btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
+        btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
         ChangeFont();
     }
 

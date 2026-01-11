@@ -70,7 +70,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
         List<GenericControl> result =
         [
-            new FlexiControlForDelegate(tb.Edit, "Tabelle: " + tb.Caption, ImageCode.Tabelle),
+            new FlexiControlForDelegate(tb),
             new FlexiControl(),
             new FlexiControlForProperty<bool>(() => ShowHead),
             new FlexiControlForProperty<int>(() => FilterRows),

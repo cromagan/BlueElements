@@ -249,7 +249,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void btnBackColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.White;
         ColorDia.ShowDialog();
-        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
     }
 
     private void btnCalculateMaxCellLength_Click(object sender, System.EventArgs e) {
@@ -297,7 +297,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void btnTextColor_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo ?? Color.White;
         ColorDia.ShowDialog();
-        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).Code;
+        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
     }
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
@@ -410,8 +410,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         txbName.AllowedChars = Constants.AllowedCharsVariableName;
         txbCaption.Text = Column.Caption;
-        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Column.BackColor).Code;
-        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Column.ForeColor).Code;
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Column.BackColor).KeyName;
+        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Column.ForeColor).KeyName;
         chkMultiline.Checked = Column.MultiLine;
         chkIsFirst.Checked = Column.IsFirst;
         chkIsKeyColumn.Checked = Column.IsKeyColumn;

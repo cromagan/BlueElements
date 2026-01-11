@@ -69,11 +69,11 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         CorrectSize(width, height, null);
 
-        Code = imageCode;
+        KeyName = imageCode;
 
         (_bitmap, IsError) = Generate();
 
-        Pics.TryAdd(Code, this);
+        Pics.TryAdd(KeyName, this);
     }
 
     public QuickImage(string name, Bitmap bmp) {
@@ -91,13 +91,13 @@ public sealed class QuickImage : IReadableText, IEditable {
         }
 
         Name = name;
-        Code = Name;
+        KeyName = Name;
 
         CorrectSize(-1, -1, bmp);
 
         // Thread-sicheres Hinzufügen zur Collection
         lock (_picsLock) {
-            Pics.TryAdd(Code, this);
+            Pics.TryAdd(KeyName, this);
         }
 
         _bitmap = bmp.CloneFromBitmap();
@@ -115,14 +115,14 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     public string CaptionForEditor => "Bild";
     public Color? ChangeGreenTo { get; }
-    public string Code { get; } = string.Empty;
     public int DrehWinkel { get; }
     public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
     public Color? Färbung { get; }
     public int Height { get; private set; }
     public int Helligkeit { get; }
-    public string HTMLCode => $"<Imagecode={Code}>";
+    public string HTMLCode => $"<Imagecode={KeyName}>";
     public bool IsError { get; }
+    public string KeyName { get; } = string.Empty;
     public string Name { get; } = string.Empty;
     public int Sättigung { get; }
 
@@ -303,7 +303,7 @@ public sealed class QuickImage : IReadableText, IEditable {
     /// Gibt den ImageCode zurück
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Code;
+    public override string ToString() => KeyName;
 
     private static Bitmap GenerateErrorImage(int width, int height) {
         var bmp = new Bitmap(width, height);

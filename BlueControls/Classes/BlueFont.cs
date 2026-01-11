@@ -743,4 +743,5 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     }
 
     #endregion
+
 }
