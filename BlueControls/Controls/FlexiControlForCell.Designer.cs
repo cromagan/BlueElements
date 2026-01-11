@@ -4,12 +4,14 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueTable.Enums;
 
-namespace BlueControls.Controls{
-    partial class FlexiFilterControl {
+namespace BlueControls.Controls {
+    partial class FlexiControlForCell {
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>
         private IContainer components = null;
+
+
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -27,19 +29,23 @@ namespace BlueControls.Controls{
             this.f.Name = "f";
             this.f.Size = new Size(150, 150);
             this.f.TabIndex = 0;
-            this.f.ButtonClicked += new EventHandler(this.F_ButtonClick);
-            this.f.ControlAdded += new ControlEventHandler(F_ControlAdded);
-            this.f.ControlRemoved += new ControlEventHandler(F_ControlRemoved);
+            this.f.ControlAdded += new ControlEventHandler(this.F_ControlAdded);
+            this.f.ControlRemoved += new ControlEventHandler(this.F_ControlRemoved);
+            this.f.EnabledChanged += new EventHandler(this.F_EnabledChanged);
+            this.f.VisibleChanged += new EventHandler(this.F_VisibleChanged);
             this.f.ValueChanged += new EventHandler(this.F_ValueChanged);
             // 
-            // FlexiControlForFilter
+            // FlexiControlForCell
             // 
             this.Controls.Add(this.f);
-            this.Name = "FlexiControlForFilter";
+            this.Name = "FlexiControlForCell";
             this.ResumeLayout(false);
 
         }
-        #endregion
+
+
+
+       #endregion
 
         private FlexiControl f;
     }

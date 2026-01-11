@@ -605,7 +605,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         foreach (var thisString in zuwenig) {
             var it = IO.FileExists(thisString)
                 ? thisString.FileType() == FileFormat.Image
-                    ? ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix())
+                    ? ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix(), string.Empty)
                     : ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48))
                 : (AbstractListItem)ItemOf(thisString);
             AddAndRegister(it);

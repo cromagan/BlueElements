@@ -44,7 +44,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor {
+public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEditor {
 
     #region Fields
 
@@ -63,9 +63,9 @@ public partial class FlexiCellControl : GenericControlReciver, IOpenScriptEditor
     /// <summary>
     /// Für den Designer
     /// </summary>
-    public FlexiCellControl() : this(string.Empty, CaptionPosition.Über_dem_Feld, EditTypeFormula.None) { }
+    public FlexiControlForCell() : this(string.Empty, CaptionPosition.Über_dem_Feld, EditTypeFormula.None) { }
 
-    public FlexiCellControl(string columnName, CaptionPosition captionPosition, EditTypeFormula editType) : base(false, false, false) {
+    public FlexiControlForCell(string columnName, CaptionPosition captionPosition, EditTypeFormula editType) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

@@ -206,9 +206,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             LastClickedItem = null;
 
             if (e.HotItem is PointM) {
-                e.ContextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, e.HotItem, true));
-                e.ContextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, e.HotItem, true));
-                e.ContextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, e.HotItem, true));
+                e.ContextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, e.HotItem, true, string.Empty));
+                e.ContextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, e.HotItem, true, string.Empty));
+                e.ContextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, e.HotItem, true, string.Empty));
             }
         }
 

@@ -48,7 +48,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Constructors
 
-    public FilterCollection(string c) : this(null as Table, c) {
+    public FilterCollection(string coment) : this(null as Table, coment) {
     }
 
     public FilterCollection(Table? table, string coment) {

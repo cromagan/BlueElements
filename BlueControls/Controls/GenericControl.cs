@@ -208,7 +208,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
             case Panel:
                 return ParentType.Panel;
 
-            case FlexiCellControl:
+            case FlexiControlForCell:
                 return ParentType.FlexiControlForCell;
 
             case FlexiControl:

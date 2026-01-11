@@ -115,7 +115,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, List<string> tags) {
         var filenamePng = tags.TagGet("ImageFile");
-        BitmapListItem i = new(bmp, filenamePng, filenamePng.FileNameWithoutSuffix()) {
+        BitmapListItem i = new(bmp, filenamePng, filenamePng.FileNameWithoutSuffix(), string.Empty) {
             Padding = 10,
             Tag = tags
         };

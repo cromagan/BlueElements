@@ -25,25 +25,28 @@ public class StandaloneInfo : Attribute {
 
     #region Constructors
 
-    public StandaloneInfo(string name, ImageCode symbol, string kategorie, int sort) {
+    public StandaloneInfo(string name, ImageCode symbol, string kategorie, string quickInfo, int sort) {
         Name = name;
         Image = QuickImage.Get(symbol, 48);
         Kategorie = kategorie;
         Sort = sort;
+        QuickInfo = quickInfo;
     }
 
-    public StandaloneInfo(string name, QuickImage image, string kategorie, int sort) {
+    public StandaloneInfo(string name, QuickImage image, string kategorie, string quickInfo, int sort) {
         Name = name;
         Image = image;
         Kategorie = kategorie;
         Sort = sort;
+        QuickInfo = quickInfo;
     }
 
-    public StandaloneInfo(string name, string image, string kategorie, int sort) {
+    public StandaloneInfo(string name, string image, string kategorie, string quickInfo, int sort) {
         Name = name;
         Image = QuickImage.Get(image);
         Kategorie = kategorie;
         Sort = sort;
+        QuickInfo = quickInfo;
     }
 
     #endregion
@@ -53,6 +56,7 @@ public class StandaloneInfo : Attribute {
     public QuickImage Image { get; }
     public string Kategorie { get; }
     public string Name { get; }
+    public string QuickInfo { get; }
     public int Sort { get; }
 
     #endregion

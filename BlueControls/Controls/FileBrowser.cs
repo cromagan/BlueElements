@@ -412,10 +412,10 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (e.HotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
-        e.ContextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), Contextmenu_Rename, e.HotItem, FileExists(it.KeyName)));
-        e.ContextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, e.HotItem, FileExists(it.KeyName)));
+        e.ContextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), Contextmenu_Rename, e.HotItem, FileExists(it.KeyName), string.Empty));
+        e.ContextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, e.HotItem, FileExists(it.KeyName), string.Empty));
         e.ContextMenu.Add(Separator());
-        e.ContextMenu.Add(ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, e.HotItem, true));
+        e.ContextMenu.Add(ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, e.HotItem, true, string.Empty));
     }
 
     private void lsbFiles_DragDrop(object sender, DragEventArgs e) {
@@ -636,7 +636,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             if (AddThis(fi)) {
                 if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
 
-                var bli = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix()) {
+                var bli = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix(), string.Empty) {
                     Padding = 6
                 };
 
@@ -672,7 +672,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             var fi = GetFileInfo(thisString);
             if (AddThis(fi)) {
                 var tags = new List<string>();
-                var bli = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
+                var bli = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix(), string.Empty);
                 tags.TagSet("Folder", bool.TrueString);
                 bli.Padding = 10;
                 bli.UserDefCompareKey = Constants.FirstSortChar + thisString.ToUpperInvariant();

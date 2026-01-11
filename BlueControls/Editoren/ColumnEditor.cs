@@ -75,7 +75,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
 
         foreach (var thisItem in ColumnFormatHolder.AllFormats) {
-            var bli = new BitmapListItem(thisItem.SymbolForReadableText(), thisItem.KeyName, thisItem.ReadableText()) {
+            var bli = new BitmapListItem(thisItem.SymbolForReadableText(), thisItem.KeyName, thisItem.ReadableText(), thisItem.QuickInfo) {
                 Padding = 5,
                 Tag = thisItem,
                 QuickInfo = thisItem.QuickInfo

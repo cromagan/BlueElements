@@ -30,7 +30,7 @@ public class ReadableListItem : TextListItem {
 
     #region Constructors
 
-    public ReadableListItem(IReadableTextWithKey item, bool isCaption, bool enabled, string userDefCompareKey) : base(item.ReadableText(), item.KeyName, item.SymbolForReadableText(), isCaption, enabled, userDefCompareKey) {
+    public ReadableListItem(IReadableTextWithKey item, bool isCaption, bool enabled, string userDefCompareKey) : base(item.ReadableText(), item.KeyName, item.SymbolForReadableText(), isCaption, enabled, item.QuickInfo, userDefCompareKey) {
         Item = item;
         _item = item;
     }

@@ -111,7 +111,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
             target.AddAndCheck(sourceItem);
             did = true;
         } else if (sourceItem == null && targetItem == null) {
-            targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty);
+            targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty, string.Empty);
             target.AddAndCheck(targetItem);
             did = true;
         }

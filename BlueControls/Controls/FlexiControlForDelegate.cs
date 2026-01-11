@@ -24,7 +24,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-public class FlexiDelegateControl : FlexiControl {
+public class FlexiControlForDelegate : FlexiControl {
 
     #region Fields
 
@@ -34,9 +34,9 @@ public class FlexiDelegateControl : FlexiControl {
 
     #region Constructors
 
-    public FlexiDelegateControl() : this(null, string.Empty, null) { }
+    public FlexiControlForDelegate() : this(null, string.Empty, null) { }
 
-    public FlexiDelegateControl(DoThis? doThis, string text, ImageCode? image) : base() {
+    public FlexiControlForDelegate(DoThis? doThis, string text, ImageCode? image) : base() {
         _doThis = doThis;
 
         Size = new Size(200, 24);

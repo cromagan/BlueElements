@@ -61,7 +61,7 @@ public partial class MainWindow : BlueControls.Forms.Form {
 
     #region Methods
 
-    [BlueControls.StandaloneInfo("Bild-bearbeitung", ImageCode.Bild, "Allgemein", 802)]
+    [BlueControls.StandaloneInfo("Bild-bearbeitung", ImageCode.Bild, "Allgemein", "Einfache Bildbearbeitung", 802)]
     public static System.Windows.Forms.Form Start() => new MainWindow();
 
     /// <summary>

@@ -43,22 +43,22 @@ public class BitmapListItem : AbstractListItem {
 
     #region Constructors
 
-    public BitmapListItem(Bitmap? bmp, string keyName, string caption) : base(keyName, true) {
+    public BitmapListItem(Bitmap? bmp, string keyName, string caption, string quickInfo) : base(keyName, true) {
         _caption = caption;
         _captiontmp.Clear();
         _bitmap = bmp;
         Padding = 0;
         Overlays.Clear();
+        QuickInfo = quickInfo;
     }
 
-    public BitmapListItem(string filename, string keyName, string caption) : base(keyName, true) {
+    public BitmapListItem(string filename, string keyName, string caption, string quickInfo) : base(keyName, true) {
         _caption = caption;
         _captiontmp.Clear();
-        //_Bitmap = bmp;
         _imageFilename = filename;
         Padding = 0;
         Overlays.Clear();
-        //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
+        QuickInfo = quickInfo;
     }
 
     #endregion

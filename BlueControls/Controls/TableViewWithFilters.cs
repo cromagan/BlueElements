@@ -509,12 +509,12 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         #endregion
 
-        List<FlexiFilterControl> flexsToDelete = [];
+        List<FlexiControlForFilter> flexsToDelete = [];
 
         #region Vorhandene Flexis ermitteln
 
         foreach (var thisControl in Controls) {
-            if (thisControl is FlexiFilterControl flx) { flexsToDelete.Add(flx); }
+            if (thisControl is FlexiControlForFilter flx) { flexsToDelete.Add(flx); }
         }
 
         #endregion
@@ -577,7 +577,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                             flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiFilterControl(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil, true, false);
+                            flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil, true, false);
                             flx.FilterOutput.Table = thisColumn.Table;
                             //flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
                             //flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
@@ -672,9 +672,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate_FilterInput();
 
-    private FlexiFilterControl? FlexiItemOf(ColumnItem column) {
+    private FlexiControlForFilter? FlexiItemOf(ColumnItem column) {
         foreach (var thisControl in Controls) {
-            if (thisControl is FlexiFilterControl flx) {
+            if (thisControl is FlexiControlForFilter flx) {
                 if (flx.FilterSingleColumn == column) { return flx; }
             }
         }
@@ -682,7 +682,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     private void FlexSingeFilter_FilterOutputPropertyChanged(object sender, System.EventArgs e) {
-        if (sender is not FlexiFilterControl ffc) { return; }
+        if (sender is not FlexiControlForFilter ffc) { return; }
 
         if (ffc.FilterOutput is not { } fc) { return; }
 
@@ -855,7 +855,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         // Alle FlexiFilterControls ein-/ausblenden
         foreach (var control in Controls) {
-            if (control is FlexiFilterControl flx) {
+            if (control is FlexiControlForFilter flx) {
                 flx.Visible = visible;
             }
         }

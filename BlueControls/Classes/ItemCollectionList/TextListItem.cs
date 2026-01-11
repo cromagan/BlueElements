@@ -26,12 +26,18 @@ public class TextListItem : AbstractListItem {
 
     #region Constructors
 
-    public TextListItem(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(keyName, enabled) {
+    public TextListItem(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string quickInfo, string userDefCompareKey) : base(keyName, enabled) {
         IsCaption = isCaption;
         Text = readableText;
         Symbol = symbol;
         UserDefCompareKey = userDefCompareKey;
-        QuickInfo = Text.CreateHtmlCodes();
+        if(string.IsNullOrEmpty(quickInfo)) {
+            QuickInfo = Text.CreateHtmlCodes();
+        } else {
+            QuickInfo = quickInfo;
+        }
+
+      
     }
 
     #endregion

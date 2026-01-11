@@ -136,8 +136,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
                         if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
                             show = show + " - " + x[1];
                         }
-                        TextListItem it = new(show, x[0], null, false, true,
-                            nr.ToString3());
+                        var it = new TextListItem(show, x[0], null, false, true, string.Empty, nr.ToString3());
                         List<string> t = [x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) ? x[1] : string.Empty];
                         it.Tag = t;
                         ItemAdd(it);

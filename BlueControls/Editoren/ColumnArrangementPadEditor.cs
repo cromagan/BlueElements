@@ -57,26 +57,14 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
     public Table? Table {
         get;
-        private set {
-            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == field) { return; }
-
-            if (field != null) {
-                field.DisposingEvent -= _table_Disposing;
-            }
-
-            field = value;
-
-            if (field != null) {
-                field.DisposingEvent += _table_Disposing;
-            }
-        }
+        private set;
     }
 
     public IEditable? ToEdit {
         set {
             if (value is ColumnViewCollection cvc) {
                 Table = cvc.Table;
+                Table?.DisposingEvent += _table_Disposing;
                 _arrangement = cvc.KeyName;
                 UpdateCombobox();
                 ShowOrder();
@@ -110,8 +98,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     public bool IsDefaultView() => IndexOfCurrentArr() == 1;
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
+        Table?.DisposingEvent -= _table_Disposing;
         FixColumnArrangement();
-        Table = null;
         base.OnFormClosing(e);
     }
 
@@ -131,7 +119,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     }
 
     private void _table_Disposing(object sender, System.EventArgs e) {
-        Table = null;
+        Table?.DisposingEvent -= _table_Disposing;
         Close();
     }
 
@@ -380,6 +368,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                     ca.ShowHead = d.ShowHead;
                     ca.FilterRows = d.FilterRows;
                     ca.ColumnForChapter = tb.Column[d.Chapter_Column];
+                    ca.QuickInfo = d.QuickInfo;
+                    ca.SortDefinition = d.SortDefinition;
+                    ca.Filter = d.PflichtFilter;
                     break;
                 }
             }
@@ -471,7 +462,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         t.ShowHead = ca.ShowHead;
         t.FilterRows = ca.FilterRows;
         t.Chapter_Column = ca.ColumnForChapter?.KeyName ?? "#ohne";
-
+        t.QuickInfo = ca.QuickInfo;
+        t.SortDefinition = ca.SortDefinition;
+        t.PflichtFilter = ca.Filter;
         Pad.Items.Add(t);
 
         Pad.LastClickedItem = t;

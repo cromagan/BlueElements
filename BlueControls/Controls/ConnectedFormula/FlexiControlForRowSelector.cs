@@ -26,7 +26,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ConnectedFormula;
 
-public partial class FlexilRowSelectorControl : GenericControlReciverSender, IHasSettings {
+public partial class FlexiControlForRowSelector : GenericControlReciverSender, IHasSettings {
 
     #region Fields
 
@@ -36,7 +36,7 @@ public partial class FlexilRowSelectorControl : GenericControlReciverSender, IHa
 
     #region Constructors
 
-    public FlexilRowSelectorControl(Table? table, string caption, string showFormat) : base(false, false, false) {
+    public FlexiControlForRowSelector(Table? table, string caption, string showFormat) : base(false, false, false) {
         InitializeComponent();
         f.CaptionPosition = CaptionPosition.Über_dem_Feld;
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;

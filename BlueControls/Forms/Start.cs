@@ -41,6 +41,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
             var i = QuickImage.Get(ImageCode.Fragezeichen);
             var kat = "Sonstiges";
             var sort = 200;
+            var quickInfo = string.Empty;
 
             var attr = thisType.GetCustomAttribute<StandaloneInfo>();
             if (attr != null) {
@@ -48,17 +49,18 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
                 i = attr.Image;
                 kat = attr.Kategorie;
                 sort = attr.Sort;
+                quickInfo = attr.QuickInfo;
             }
 
             if (Forms[kat] is { } cap) {
                 var tmp = Math.Min(IntParse(cap.UserDefCompareKey) / 10, sort);
                 cap.UserDefCompareKey = tmp.ToString10() + "0";
             } else {
-                var pk = new TextListItem(kat, kat, null, true, true, sort.ToString10() + "0");
+                var pk = new TextListItem(kat, kat, null, true, true, quickInfo, sort.ToString10() + "0");
                 Forms.ItemAdd(pk);
             }
 
-            var bli = new BitmapListItem(i, string.Empty, name) {
+            var bli = new BitmapListItem(i, string.Empty, name, quickInfo) {
                 Padding = 5,
                 Tag = thisType,
                 UserDefCompareKey = sort.ToString10() + "1" + name

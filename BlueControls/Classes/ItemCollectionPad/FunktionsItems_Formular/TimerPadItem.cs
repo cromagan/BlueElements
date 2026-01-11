@@ -38,7 +38,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
 
     #region Fields
 
-    private FlexiDelegateControl? _button;
+    private FlexiControlForDelegate? _button;
     private string _script = string.Empty;
     private int _sekunden = 1;
 
@@ -143,7 +143,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpe
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result = [.. base.GetProperties(widthOfControl)];
 
-        _button = new FlexiDelegateControl(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
+        _button = new FlexiControlForDelegate(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
 
         result.Add(new FlexiControl("Einstellungen:", widthOfControl, true));
         result.Add(_button);

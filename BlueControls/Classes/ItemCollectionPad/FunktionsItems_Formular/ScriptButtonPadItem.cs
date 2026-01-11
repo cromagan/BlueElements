@@ -47,7 +47,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     private string _beschriftung = string.Empty;
 
-    private FlexiDelegateControl? _button;
+    private FlexiControlForDelegate? _button;
 
     private ButtonArgs _enabledwhenrows;
 
@@ -241,7 +241,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
             }
         }
 
-        _button = new FlexiDelegateControl(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
+        _button = new FlexiControlForDelegate(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
         result.Add(_button);
         result.Add(new FlexiControlForProperty<string>(() => Script, 3));
 

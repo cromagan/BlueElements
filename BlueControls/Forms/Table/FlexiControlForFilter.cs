@@ -37,7 +37,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiFilterControl : GenericControlReciverSender, IHasSettings, IHasFieldVariable {
+public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSettings, IHasFieldVariable {
 
     #region Fields
 
@@ -51,7 +51,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
 
     #region Constructors
 
-    public FlexiFilterControl(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, FlexiFilterDefaultOutput emptyInputBehavior, FlexiFilterDefaultFilter defaultTextInputFilter, bool einschnappen, bool saveSettings) : base(false, false, false) {
+    public FlexiControlForFilter(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, FlexiFilterDefaultOutput emptyInputBehavior, FlexiFilterDefaultFilter defaultTextInputFilter, bool einschnappen, bool saveSettings) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
@@ -186,7 +186,7 @@ public partial class FlexiFilterControl : GenericControlReciverSender, IHasSetti
                     nr++;
                     if (nr < MaxRecentFilterEntries) {
                         var show = (nr + 1).ToString3() + ": " + x[1];
-                        TextListItem it = new(show, x[1], null, false, true, nr.ToString3());
+                        var it = new TextListItem(show, x[1], null, false, true, string.Empty, nr.ToString3());
                         cbx.ItemAdd(it);
                     }
                 }

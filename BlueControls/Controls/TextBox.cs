@@ -263,16 +263,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     var sim = Dictionary.SimilarTo(tmpWord);
                     if (sim != null) {
                         foreach (var thisS in sim) {
-                            e.ContextMenu.Add(ItemOf($" - {thisS}", null, Contextmenu_ChangeTo, new { NewWord = thisS, Start = marS, End = marE }, true));
+                            e.ContextMenu.Add(ItemOf($" - {thisS}", null, Contextmenu_ChangeTo, new { NewWord = thisS, Start = marS, End = marE }, true, string.Empty));
                         }
                         e.ContextMenu.Add(Separator());
                     }
-                    e.ContextMenu.Add(ItemOf($"'{tmpWord}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord, Dictionary.IsWriteable()));
+                    e.ContextMenu.Add(ItemOf($"'{tmpWord}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord, Dictionary.IsWriteable(), string.Empty));
                     if (!tmpWord.Equals(tmpWord, StringComparison.OrdinalIgnoreCase)) {
-                        e.ContextMenu.Add(ItemOf($"'{tmpWord.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord.ToLowerInvariant(), Dictionary.IsWriteable()));
+                        e.ContextMenu.Add(ItemOf($"'{tmpWord.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord.ToLowerInvariant(), Dictionary.IsWriteable(), string.Empty));
                     }
-                    e.ContextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", null, Contextmenu_SpellChecking, null, Dictionary.IsWriteable()));
-                    e.ContextMenu.Add(ItemOf("Alle Wörter sind ok", null, Contextmenu_SpellAddAll, null, Dictionary.IsWriteable()));
+                    e.ContextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", null, Contextmenu_SpellChecking, null, Dictionary.IsWriteable(), string.Empty));
+                    e.ContextMenu.Add(ItemOf("Alle Wörter sind ok", null, Contextmenu_SpellAddAll, null, Dictionary.IsWriteable(), string.Empty));
                     e.ContextMenu.Add(Separator());
                 }
             }
@@ -287,9 +287,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, new { Text = tmpWord, Start = marS, End = marE }, marS > -1));
                     if (marE > -1) {
                         e.ContextMenu.Add(Separator());
-                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Überschrift).SymbolForReadableText(), Contextmenu_Caption, new { Start = marS, End = marE }, marE > -1));
-                        e.ContextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Hervorgehoben).SymbolForReadableText(), Contextmenu_Bold, new { Start = marS, End = marE }, marE > -1));
-                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, new { Start = marS, End = marE }, marE > -1));
+                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Überschrift).SymbolForReadableText(), Contextmenu_Caption, new { Start = marS, End = marE }, marE > -1, string.Empty));
+                        e.ContextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Hervorgehoben).SymbolForReadableText(), Contextmenu_Bold, new { Start = marS, End = marE }, marE > -1, string.Empty));
+                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, new { Start = marS, End = marE }, marE > -1, string.Empty));
                     }
                 }
             }

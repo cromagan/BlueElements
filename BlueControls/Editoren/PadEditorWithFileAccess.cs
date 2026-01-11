@@ -47,7 +47,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     #region Methods
 
-    [StandaloneInfo("Layout-Editor", "Layout|32|||||||||Stift", "Admin", 900)]
+    [StandaloneInfo("Layout-Editor", "Layout|32|||||||||Stift", "Admin", "Allgemeiner Layout-Editor (für Exporte von Zeilen)", 900)]
     public static System.Windows.Forms.Form Start() => new PadEditorWithFileAccess();
 
     /// <summary>

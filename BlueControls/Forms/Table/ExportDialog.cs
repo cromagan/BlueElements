@@ -322,8 +322,8 @@ public sealed partial class ExportDialog : IHasTable {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.ContextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, e.HotItem, true));
-        e.ContextMenu.Add(ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, e.HotItem, true));
+        e.ContextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, e.HotItem, true, string.Empty));
+        e.ContextMenu.Add(ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, e.HotItem, true, string.Empty));
     }
 
     private void NurStartEnablen() {

@@ -253,13 +253,13 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
             case "load":
                 result.Add(new FlexiControl("Lädt folgendes Skript vom Dateisystem und ersetzt die Variablen", widthOfControl, false));
                 result.Add(new FlexiControlForProperty<string>(() => Formular, layouts));
-                result.Add(new FlexiDelegateControl(Skripte_Bearbeiten, "Skripte bearbeiten", ImageCode.Skript));
+                result.Add(new FlexiControlForDelegate(Skripte_Bearbeiten, "Skripte bearbeiten", ImageCode.Skript));
                 result.Add(new FlexiControl("Info: Es wird zuvor das Skript 'Export' ausgeführt. Auch die Variablen aus dem Skript können benutzt werden.", widthOfControl, false));
                 break;
 
             case "script":
                 result.Add(new FlexiControl("Erstellt ein leeres Blatt, das durch das folgende Skript befüllt wird.", widthOfControl, false));
-                result.Add(new FlexiDelegateControl(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
+                result.Add(new FlexiControlForDelegate(Skript_Bearbeiten, "Skript bearbeiten", ImageCode.Skript));
                 result.Add(new FlexiControlForProperty<string>(() => Design, ItemsOf(Skin.AllStyles())));
                 result.Add(new FlexiControlForProperty<float>(() => Scale));
 

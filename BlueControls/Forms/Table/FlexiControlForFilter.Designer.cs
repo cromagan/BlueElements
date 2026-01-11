@@ -2,17 +2,14 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Controls;
 using BlueTable.Enums;
 
-namespace BlueControls.ConnectedFormula {
-    partial class FlexilRowSelectorControl {
+namespace BlueControls.Controls{
+    partial class FlexiControlForFilter {
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>
-        private IContainer components;
-
-
+        private IContainer components = null;
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -30,18 +27,19 @@ namespace BlueControls.ConnectedFormula {
             this.f.Name = "f";
             this.f.Size = new Size(150, 150);
             this.f.TabIndex = 0;
+            this.f.ButtonClicked += new EventHandler(this.F_ButtonClick);
+            this.f.ControlAdded += new ControlEventHandler(F_ControlAdded);
+            this.f.ControlRemoved += new ControlEventHandler(F_ControlRemoved);
             this.f.ValueChanged += new EventHandler(this.F_ValueChanged);
             // 
-            // FlexiControlRowSelector
+            // FlexiControlForFilter
             // 
             this.Controls.Add(this.f);
-            this.Name = "FlexiControlRowSelector";
+            this.Name = "FlexiControlForFilter";
             this.ResumeLayout(false);
 
         }
-
         #endregion
-
 
         private FlexiControl f;
     }

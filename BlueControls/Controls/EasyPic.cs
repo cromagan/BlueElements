@@ -129,7 +129,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (_bitmap != null) {
-            e.ContextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, _bitmap, true));
+            e.ContextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, _bitmap, true, string.Empty));
         }
 
         OnContextMenuInit(e);

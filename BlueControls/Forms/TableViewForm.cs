@@ -140,7 +140,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         return IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
     }
 
-    [StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", 800)]
+    [StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", "Allgemeine Tabellen-Ansicht", 800)]
     public static System.Windows.Forms.Form Start() => new TableViewForm();
 
     public void AddTabPage(string tablename) {
@@ -799,7 +799,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         var ok = true;
         foreach (var thisColumnItem in tb.Column) {
             if (!thisColumnItem.IsOk()) {
-                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, thisColumnItem, tb.IsAdministrator()));
+                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, thisColumnItem, tb.IsAdministrator(), thisColumnItem.ErrorReason()));
                 ok = false;
             }
             if (!ok) {
@@ -812,7 +812,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (l.Count > 1) {
             foreach (var thisColumnItem in l) {
-                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, thisColumnItem, tb.IsAdministrator()));
+                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, thisColumnItem, tb.IsAdministrator(), "Doppelt vorhanden!"));
             }
 
             lstAufgaben.Enabled = true;
@@ -830,10 +830,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
-            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible())));
+            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
         }
 
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique, tb.CanDoValueChangedScript(true)));
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique, tb.CanDoValueChangedScript(true), string.Empty));
 
         if (addedit) {
             lstAufgaben.ItemAdd(ItemOf("Skripte bearbeiten", ImageCode.Skript, ContextMenu_OpenScriptEditor, null, tb.IsAdministrator()));

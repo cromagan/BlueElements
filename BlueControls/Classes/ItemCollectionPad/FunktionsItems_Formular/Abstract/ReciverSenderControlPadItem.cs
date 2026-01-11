@@ -142,14 +142,14 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         }
         if (!enableOutput) {
             if (outp != null) {
-                result.Add(new FlexiDelegateControl(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Tabelle));
+                result.Add(new FlexiControlForDelegate(outp.Edit, "Tabelle: " + outp.Caption, ImageCode.Tabelle));
             } else {
                 result.Add(new FlexiControl("<imagecode=Information|16> Ausgangstabelle wird über den Eingang gewählt.", widthOfControl, false));
             }
         } else {
             result.Add(new FlexiControlForProperty<Table?>(() => TableOutput, AllAvailableTables()));
             if (TableOutput is { } tbo) {
-                result.Add(new FlexiDelegateControl(tbo.Edit, "Tabelle: " + tbo.Caption, ImageCode.Tabelle));
+                result.Add(new FlexiControlForDelegate(tbo.Edit, "Tabelle: " + tbo.Caption, ImageCode.Tabelle));
             }
         }
 

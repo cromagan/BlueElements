@@ -89,15 +89,10 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public void GetContextMenuItems(ContextMenuInitEventArgs e) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-            e.ContextMenu.Add(ItemOf("Variableninhalt kopieren", null, Contextmenu_CopyVariableContent, _lastVariableContent, true));
+            e.ContextMenu.Add(ItemOf("Variableninhalt kopieren", null, Contextmenu_CopyVariableContent, _lastVariableContent, true, _lastVariableContent));
         }
 
         OnContextMenuInit(e);
-    }
-
-    private void Contextmenu_CopyVariableContent(object sender, ObjectEventArgs e) {
-        if (e.Data is not string content) { return; }
-        Generic.CopytoClipboard(content);
     }
 
     public void Message(string txt) => txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
@@ -187,6 +182,11 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         btnSaveLoad.Enabled = true;
     }
 
+    private void Contextmenu_CopyVariableContent(object sender, ObjectEventArgs e) {
+        if (e.Data is not string content) { return; }
+        Generic.CopytoClipboard(content);
+    }
+
     private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {
         foreach (var thisc in Method.AllMethods) {
             if (thisc is IComandBuilder ic) {
@@ -209,7 +209,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
             foreach (var thisc in Method.AllMethods) {
                 if (thisc is IComandBuilder ic) {
-                    var t = new TextListItem(ic.ComandDescription(), ic.KeyName, ic.ComandImage(), false, true, string.Empty);
+                    var t = new TextListItem(ic.ComandDescription(), ic.KeyName, ic.ComandImage(), false, true, string.Empty, string.Empty);
 
                     lstAssistant.ItemAdd(t);
                 }

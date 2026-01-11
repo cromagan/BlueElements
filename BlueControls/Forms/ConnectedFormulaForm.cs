@@ -59,7 +59,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     #region Methods
 
-    [StandaloneInfo("Formular-Ansicht", ImageCode.Anwendung, "Allgemein", 801)]
+    [StandaloneInfo("Formular-Ansicht", ImageCode.Anwendung, "Allgemein", "Allgemeine Formularansicht", 801)]
     public static System.Windows.Forms.Form Start() => new ConnectedFormulaForm();
 
     protected void FormulaSet(string? filename) {

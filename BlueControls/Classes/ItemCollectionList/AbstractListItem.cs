@@ -161,11 +161,11 @@ public static class AbstractListItemExtension {
     /// </summary>
     public static RowFormulaListItem ItemOf(RowItem row, string layoutId, object? tag) => ItemOf(row, layoutId, string.Empty, tag);
 
-    public static BitmapListItem ItemOf(string filename, string keyName, string caption) => new(filename, keyName, caption);
+    public static BitmapListItem ItemOf(string filename, string keyName, string caption, string quickInfo) => new(filename, keyName, caption, quickInfo);
 
-    public static BitmapListItem ItemOf(Bitmap? bmp, string caption) => new(bmp, string.Empty, caption);
+    public static BitmapListItem ItemOf(Bitmap? bmp, string caption, string quickInfo) => new(bmp, string.Empty, caption, quickInfo);
 
-    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) => new(readableText, keyName, symbol, isCaption, enabled, userDefCompareKey);
+    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) => new(readableText, keyName, symbol, isCaption, enabled, string.Empty, userDefCompareKey);
 
     public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) => ItemOf(readableText, keyName, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
 
@@ -179,12 +179,13 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, tag, enabled);
+    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, tag, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled) {
+    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
         i.Tag = tag;
         i.LeftClickExecute += click;
+        i.QuickInfo = quickInfo;
         return i;
     }
 
@@ -267,7 +268,7 @@ public static class AbstractListItemExtension {
 
                     if (!cl.Contains(capt)) {
                         cl.Add(capt);
-                        l.Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
+                        l.Add(new TextListItem(capt, capt, null, true, true, string.Empty, capt + Constants.FirstSortChar));
                     }
                 }
 

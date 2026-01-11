@@ -128,7 +128,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Methods
 
-    [StandaloneInfo("Formular-Editor", "Anwendung|32|||||||||Stift", "Admin", 900)]
+    [StandaloneInfo("Formular-Editor", "Anwendung|32|||||||||Stift", "Admin", "Allgemeiner Formular-Editor (für Tabellen Eingaben)", 900)]
     public static System.Windows.Forms.Form Start() => new ConnectedFormulaEditor();
 
     /// <summary>

@@ -65,7 +65,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
         foreach (var thisString in files) {
             if (thisString.FileType() == FileFormat.Image) {
-                items.Add(new BitmapListItem(thisString, thisString, thisString.FileNameWithoutSuffix()));
+                items.Add(new BitmapListItem(thisString, thisString, thisString.FileNameWithoutSuffix(), string.Empty));
             }
         }
         var x = Show(items);

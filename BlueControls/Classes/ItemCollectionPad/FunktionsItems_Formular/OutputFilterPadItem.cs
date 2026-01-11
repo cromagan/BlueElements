@@ -142,7 +142,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new FlexiFilterControl(Column, _captionPosition, _standard_Bei_Keiner_Eingabe, _filterart_Bei_Texteingabe, _einschnappen, true) {
+        var con = new FlexiControlForFilter(Column, _captionPosition, _standard_Bei_Keiner_Eingabe, _filterart_Bei_Texteingabe, _einschnappen, true) {
             SavesSettings = true
         };
 
