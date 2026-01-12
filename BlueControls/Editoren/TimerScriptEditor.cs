@@ -110,7 +110,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
             #endregion
 
-            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars);
+            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row);
         }
 
         return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein");

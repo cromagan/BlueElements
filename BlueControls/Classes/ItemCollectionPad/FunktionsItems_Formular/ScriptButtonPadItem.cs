@@ -29,6 +29,7 @@ using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System.Collections.Generic;
@@ -147,7 +148,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields, RowItem? row) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -163,7 +164,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         vars.AddRange(fields);
 
-        var scp = new ScriptProperties("ScriptButton", Method.AllMethods, true, [], null, "ScriptButton", "ScriptButton in Formular");
+        var scp = new ScriptProperties("ScriptButton", Method.AllMethods, true, [], row, "ScriptButton", "ScriptButton in Formular");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

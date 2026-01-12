@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueTable;
 using BlueTable.Enums;
+using BlueTable.EventArgs;
 using System;
 using System.Drawing;
 
@@ -36,13 +37,14 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
 
-    private static Brush BrushBrighten = new SolidBrush(Color.FromArgb(128, 255, 255, 255));
+    public RowCheckedEventArgs? _rowCheckedEventArgs = null;
+    private static readonly Brush BrushBrighten = new SolidBrush(Color.FromArgb(128, 255, 255, 255));
 
-    private static Brush BrushDarken = new SolidBrush(Color.FromArgb(128, 0, 0, 0));
+    private static readonly Brush BrushDarken = new SolidBrush(Color.FromArgb(128, 0, 0, 0));
 
-    private static Pen PenBrighten = new Pen(Color.FromArgb(128, 255, 255, 255));
+    private static readonly Pen PenBrighten = new Pen(Color.FromArgb(128, 255, 255, 255));
 
-    private static Pen PenDarken = new Pen(Color.FromArgb(128, 0, 0, 0));
+    private static readonly Pen PenDarken = new Pen(Color.FromArgb(128, 0, 0, 0));
 
     #endregion
 
@@ -69,7 +71,6 @@ public sealed class RowListItem : RowBackgroundListItem {
     }
 
     public RowItem Row { get; }
-
     protected override bool DoSpezialOrder => true;
 
     #endregion
@@ -170,6 +171,10 @@ public sealed class RowListItem : RowBackgroundListItem {
 
         ColumnBackGround(gr, viewItem, positionControl, state);
 
+        if (_rowCheckedEventArgs?.RowColor != null) {
+            gr.FillRectangle(_rowCheckedEventArgs.RowColor, positionControl);
+        }
+
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
         }
@@ -252,6 +257,8 @@ public sealed class RowListItem : RowBackgroundListItem {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
+        _rowCheckedEventArgs = Row.CheckRow();
+
         base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
         if (Column == null) { return; }
 

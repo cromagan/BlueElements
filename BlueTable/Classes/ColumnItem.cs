@@ -1781,23 +1781,26 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_ROWCOLOR":
-                _isKeyColumn = false;
-                _isFirst = false;
-                _relationship_to_First = false;
-                //_relationType = RelationType.None;
-                _value_for_Chunk = ChunkType.None;
-                _spellCheckingEnabled = false;
-                _ignoreAtRowFilter = true;
-                this.GetStyleFrom(ColumnFormatHolder.Color); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-                MaxCellLength = MaxTextLength;
-                if (setOpticalToo) {
-                    Caption = "Zeilenfarbe";
-                    ForeColor = Color.FromArgb(0, 0, 0);
-                    BackColor = Color.FromArgb(255, 255, 255);
-                    //LineLeft = ColumnLineStyle.Dick;
-                    AdminInfo = "Muss Werte im Format RGB oder ARGB enthalten.\r\nBeispiel: #ff0000 oder #ff120320";
-                }
-                //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                KeyName = "ROWCOLOR";
+                Caption = "LÖSCHEN";
+                AdminInfo = "Früher mal Zeilenfarbe, wird nun im Skript 'Vorbereiten' gesetzt.";
+                //_isKeyColumn = false;
+                //_isFirst = false;
+                //_relationship_to_First = false;
+                ////_relationType = RelationType.None;
+                //_value_for_Chunk = ChunkType.None;
+                //_spellCheckingEnabled = false;
+                //_ignoreAtRowFilter = true;
+                //this.GetStyleFrom(ColumnFormatHolder.Color); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                //MaxCellLength = MaxTextLength;
+                //if (setOpticalToo) {
+                //    Caption = "Zeilenfarbe";
+                //    ForeColor = Color.FromArgb(0, 0, 0);
+                //    BackColor = Color.FromArgb(255, 255, 255);
+                //    //LineLeft = ColumnLineStyle.Dick;
+                //    AdminInfo = "Muss Werte im Format RGB oder ARGB enthalten.\r\nBeispiel: #ff0000 oder #ff120320";
+                //}
+                ////_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
 
                 break;
 

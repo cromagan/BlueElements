@@ -1324,6 +1324,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
         vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
+        if (virtualcolumns) {
+            vars.Add(new VariableString("RowColor", string.Empty, false, "Die Zeilenfarbe\r\nMuss Werte im Format RGB oder ARGB enthalten.\r\nBeispiel: #ff0000 oder #ff120320"));
+        }
+
         #endregion
 
         return vars;

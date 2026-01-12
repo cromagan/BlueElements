@@ -20,9 +20,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueTable;
 using BlueTable.Enums;
-using System;
 using System.Drawing;
 using System.Windows.Forms;
 

@@ -147,7 +147,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         #endregion
 
-        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, vars);
+        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, vars, row);
 
         var errorreason = string.Empty;
 

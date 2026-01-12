@@ -326,13 +326,22 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, 0, null, true, false);
 
+        Brush? b = null;
+        if (sef.Variables.GetByKey("RowColor") is VariableString vs) {
+            if (!string.IsNullOrEmpty(vs.ValueString)) {
+                if (ColorTryParse(vs.ValueString, out var c)) {
+                    b = new SolidBrush(c);
+                }
+            }
+        }
+
         if (sef.Failed) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}");
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}", b);
             return _lastCheckedEventArgs;
         }
 
         if (RowCollection.FailedRows.TryGetValue(this, out var reason)) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, reason);
+            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, reason, b);
             return _lastCheckedEventArgs;
         }
 
@@ -362,7 +371,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-        _lastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef, m);
+        _lastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef, m, b);
 
         OnRowChecked(_lastCheckedEventArgs);
 

@@ -93,8 +93,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? SysRowChanger { get; private set; }
 
-    public ColumnItem? SysRowColor { get; private set; }
-
     public ColumnItem? SysRowCreateDate { get; private set; }
 
     public ColumnItem? SysRowCreator { get; private set; }
@@ -254,7 +252,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysRowChanger = null;
         SysRowChangeDate = null;
         SysRowState = null;
-        SysRowColor = null;
         ChunkValueColumn = null;
         First = null;
 
@@ -265,8 +262,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
                 if (thisColumnItem.IsSystemColumn()) {
                     switch (thisColumnItem.KeyName.ToUpperInvariant()) {
-                        case "SYS_ROWCOLOR":
-                            SysRowColor = thisColumnItem;
+                        case "SYS_ROWCOLOR": // TODO: Entfernen, 12.01.2026
                             break;
 
                         case "SYS_LOCKED":
@@ -294,7 +290,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                             break;
 
                         case "SYS_CHAPTER": // TODO: Entfernen, 09.01.2026
-                            //SysChapter = thisColumnItem;
                             break;
 
                         case "SYS_ROWSTATE":

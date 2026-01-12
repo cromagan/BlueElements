@@ -213,7 +213,7 @@ public class FormatHolder : IInputFormat, IReadableTextWithKey {
         MaxTextLength = 2048
     };
 
-    private QuickImage _image;
+    private readonly QuickImage _image;
 
     #endregion
 

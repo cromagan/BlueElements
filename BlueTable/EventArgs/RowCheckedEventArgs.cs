@@ -17,6 +17,7 @@
 
 using BlueScript.Structures;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueTable.EventArgs;
 
@@ -30,9 +31,10 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, ScriptEndedFeedback scriptfeedback, string message) : base(row) {
+    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, ScriptEndedFeedback scriptfeedback, string message, Brush? rowcolor) : base(row) {
         ColumnsWithErrors = columnsWithErrors;
         Feedback = scriptfeedback;
+        RowColor = rowcolor;
         Message = string.Empty;
         Message = "<b><u>" + row.CellFirstString() + "</b></u><br><br>" + message;
     }
@@ -43,6 +45,7 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     public List<string>? ColumnsWithErrors { get; }
     public ScriptEndedFeedback Feedback { get; }
+    public Brush? RowColor { get; }
 
     #endregion
 }
