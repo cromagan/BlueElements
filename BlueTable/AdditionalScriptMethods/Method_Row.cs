@@ -21,8 +21,6 @@ using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -42,17 +40,11 @@ public static class Method_Row_Extension {
     #endregion
 }
 
-public class Method_Row : Method_TableGeneric, IUseableForButton {
+public class Method_Row : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [FloatVal, FilterVar];
-
-    public List<List<string>> ArgsForButton => [FloatVal];
-
-    public List<string> ArgsForButtonDescription => ["Invalidieren nach X Tagen"];
-
-    public ButtonArgs ClickableWhen => ButtonArgs.Keine_Zeile;
 
     public override string Command => "row";
 
@@ -72,8 +64,6 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
-
-    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen, wenn diese noch nicht vorhanden ist.";
 
     public override string Returns => VariableRowItem.ShortName_Variable;
 
@@ -171,8 +161,6 @@ public class Method_Row : Method_TableGeneric, IUseableForButton {
 
         return fb;
     }
-
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + filterarg;
 
     #endregion
 }

@@ -31,7 +31,6 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using BlueTable;
 using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -172,14 +171,6 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         return sc.Parse(0, "Main", null, null);
     }
 
-    public static bool PossibleFor(Method? toCheck, ButtonArgs clickableWhen) {
-        if (toCheck is not IUseableForButton ufb) { return false; }
-
-        if (!ufb.ClickableWhen.HasFlag(clickableWhen)) { return false; }
-
-        return true;
-    }
-
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new ConnectedFormulaScriptButton {
             Text = _beschriftung,
@@ -234,14 +225,6 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         result.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
 
-        var co = new List<AbstractListItem>();
-
-        foreach (var cmd in Method.AllMethods) {
-            if (PossibleFor(cmd, Drückbar_wenn) && cmd is IUseableForButton ufb2) {
-                co.Add(ItemOf(ufb2.NiceTextForUser, ufb2.Command));
-            }
-        }
-
         _button = new FlexiControlForDelegate(OpenScriptEditor, "Skript Editor", ImageCode.Skript);
         result.Add(_button);
         result.Add(new FlexiControlForProperty<string>(() => Script, 3));
@@ -275,10 +258,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         result.ParseableAdd("Caption", _beschriftung);
         result.ParseableAdd("Image", _image);
-
-        result.ParseableAdd("Version", Version);
         result.ParseableAdd("Script", _script);
-
         result.ParseableAdd("QuickInfo", _quickinfo);
         result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
         return result;

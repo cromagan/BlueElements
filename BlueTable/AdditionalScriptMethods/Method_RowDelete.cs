@@ -18,24 +18,15 @@
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
-public class Method_RowDelete : Method_TableGeneric, IUseableForButton {
+public class Method_RowDelete : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [FilterVar];
-
-    public List<List<string>> ArgsForButton => [];
-
-    public List<string> ArgsForButtonDescription => [];
-
-    public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
 
     public override string Command => "rowdelete";
 
@@ -50,8 +41,6 @@ public class Method_RowDelete : Method_TableGeneric, IUseableForButton {
     public override MethodType MethodLevel => MethodType.LongTime;
 
     public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
-
-    public string NiceTextForUser => "Die gefundenen Zeilen löschen";
 
     public override string Returns => VariableBool.ShortName_Plain;
 
@@ -75,8 +64,6 @@ public class Method_RowDelete : Method_TableGeneric, IUseableForButton {
         allFi.Dispose();
         return new DoItFeedback(r);
     }
-
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => filterarg;
 
     #endregion
 }

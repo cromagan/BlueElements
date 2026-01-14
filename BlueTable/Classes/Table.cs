@@ -1270,7 +1270,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable, FilterCollection? filter) {
 
         #region Variablen für Skript erstellen
 
@@ -1283,6 +1283,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
             vars.Add(new VariableString("CurrentRowKey", row.KeyName, true, "Der interne Zeilenschlüssel der Zeile,\r\nmit der das Skript aufgerufen wurde."));
             vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
+        }
+
+        if (filter is { IsDisposed: false }) {
+            var num = 0;
+            foreach (var thisFilter in filter) {
+                vars.Add(new VariableFilterItem($"FilterInput{num}", thisFilter, true, "Ein Eingangsfilter"));
+                num++;
+            }
         }
 
         if (dbVariables) {
@@ -1406,7 +1414,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 addinfo = row;
             }
 
-            var vars = CreateVariableCollection(row, !script.ChangeValuesAllowed, dbVariables, script.VirtalColumns, extended);
+            var vars = CreateVariableCollection(row, !script.ChangeValuesAllowed, dbVariables, script.VirtalColumns, extended, null);
             var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
             if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
@@ -1521,7 +1529,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (l.Count == 1) {
                     script = l[0];
                 } else if (l.Count == 0) {
-                    var vars = CreateVariableCollection(row, true, dbVariables, true, false);
+                    var vars = CreateVariableCollection(row, true, dbVariables, true, false, null);
                     return new ScriptEndedFeedback(vars, string.Empty);
                 }
             } else {

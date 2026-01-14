@@ -29,6 +29,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
     #region Fields
 
+    private bool _allReadOnly = false;
     private RectanglePadItem? _item;
 
     #endregion
@@ -58,13 +59,16 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
                 tbcScriptEigenschaften.Enabled = true;
                 Script = cpi.Script;
                 _item = cpi;
+                _allReadOnly = true;
             } else if (value is ScriptButtonPadItem sbpi) {
                 tbcScriptEigenschaften.Enabled = true;
                 Script = sbpi.Script;
                 _item = sbpi;
+                _allReadOnly = false;
             } else {
                 tbcScriptEigenschaften.Enabled = false;
                 Script = string.Empty;
+                _allReadOnly = true;
             }
         }
     }
@@ -96,7 +100,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             var row = sbpi.TableInput?.Row?.First();
 
             if (row?.Table is { IsDisposed: false } tb) {
-                vars = tb.CreateVariableCollection(row, true, false, false, true); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+                vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, null); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
             } else {
                 vars = [];
             }

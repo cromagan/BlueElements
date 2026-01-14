@@ -21,21 +21,16 @@ using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
-internal class Method_Call : Method_TableGeneric, IUseableForButton {
+internal class Method_Call : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
-    public List<List<string>> ArgsForButton => [StringVal, StringVal];
-    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Attribut0"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
+
     public override string Command => "call";
     public override List<string> Constants => [];
 
@@ -49,8 +44,6 @@ internal class Method_Call : Method_TableGeneric, IUseableForButton {
     public override MethodType MethodLevel => MethodType.Standard;
 
     public override bool MustUseReturnValue => false;
-
-    public string NiceTextForUser => "Ein Skript aus dieser Tabelle ausführen";
 
     public override string Returns => VariableString.ShortName_Plain;
 
@@ -103,8 +96,6 @@ internal class Method_Call : Method_TableGeneric, IUseableForButton {
         }
         return scx;
     }
-
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + args[1];
 
     #endregion
 }

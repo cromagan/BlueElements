@@ -94,7 +94,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     [DefaultValue("")]
     [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
     [Description("QuickInfo des Steuerelementes. Es können Codes wie <b> oder <u> verwendet werden.")]
-    public string QuickInfo {
+    public virtual string QuickInfo {
         get;
         set {
             value = value.Trim().Trim("<br>").Trim();

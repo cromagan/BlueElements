@@ -177,7 +177,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public void GenerateAndAddSystem() {
         string[] w = [
             "SYS_ROWSTATE",
-            "SYS_ROWCOLOR",
             "SYS_DATECHANGED",
             "SYS_CHANGER",
             "SYS_DATECREATED",

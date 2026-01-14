@@ -1781,7 +1781,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 break;
 
             case "SYS_ROWCOLOR":
-                KeyName = "ROWCOLOR";
+                KeyName = "ROWCOLOROLD";
                 Caption = "LÖSCHEN";
                 AdminInfo = "Früher mal Zeilenfarbe, wird nun im Skript 'Vorbereiten' gesetzt.";
                 //_isKeyColumn = false;

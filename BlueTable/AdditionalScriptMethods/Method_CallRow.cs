@@ -18,21 +18,15 @@
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
-public class Method_CallRow : Method_TableGeneric, IUseableForButton {
+public class Method_CallRow : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, RowVar, StringVal];
-    public List<List<string>> ArgsForButton => [StringVal, StringVal];
-    public List<string> ArgsForButtonDescription => ["Auszuführendes Skript", "Attribut0"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
     public override string Command => "callrow";
     public override List<string> Constants => [];
 
@@ -48,8 +42,6 @@ public class Method_CallRow : Method_TableGeneric, IUseableForButton {
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override bool MustUseReturnValue => false;
-
-    public string NiceTextForUser => "Ein Skript mit der eingehenden Zeile ausführen";
 
     public override string Returns => VariableString.ShortName_Plain;
 
@@ -82,8 +74,6 @@ public class Method_CallRow : Method_TableGeneric, IUseableForButton {
         scx.ConsumeBreakAndReturn();
         return scx;
     }
-
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) => args[0] + "," + rowarg + "," + args[1];
 
     #endregion
 }

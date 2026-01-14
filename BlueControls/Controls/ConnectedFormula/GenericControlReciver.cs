@@ -73,6 +73,17 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public virtual string Mode { get; set; } = string.Empty;
 
+    public override string QuickInfo {
+        get => base.QuickInfo;
+        set {
+            base.QuickInfo = value;
+
+            foreach (var thisC in Controls) {
+                if (thisC is GenericControl gc) { gc.QuickInfo = value; }
+            }
+        }
+    }
+
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]

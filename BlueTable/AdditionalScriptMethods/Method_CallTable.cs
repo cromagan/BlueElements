@@ -19,21 +19,16 @@ using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_CallTable : Method_TableGeneric, IUseableForButton {
+public class Method_CallTable : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [TableVar, StringVal, StringVal];
-    public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
-    public List<string> ArgsForButtonDescription => ["Tabelle", "Auszuführendes Skript", "Attribut0"];
-    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "calltable";
     public override List<string> Constants => [];
 
@@ -45,7 +40,7 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
     public override int LastArgMinCount => 0;
     public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => false;
-    public string NiceTextForUser => "Ein Skript einer anderen Tabelle ausführen";
+
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "CallTable(Table, Scriptname, Attribut0, ...);";
@@ -80,12 +75,6 @@ public class Method_CallTable : Method_TableGeneric, IUseableForButton {
             return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{tb.Caption}' hat Fehler verursacht.", false, ld);
         }
         return scx;
-    }
-
-    public string TranslateButtonArgs(List<string> args, string filterarg, string rowarg) {
-        var tb = Table.Get(args[0], null, true);
-        var vtb = new VariableTable(tb);
-        return vtb.ValueForReplace + "," + args[1] + "," + args[2];
     }
 
     #endregion

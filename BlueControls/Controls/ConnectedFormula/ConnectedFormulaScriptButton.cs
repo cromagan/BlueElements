@@ -128,7 +128,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         if (row?.Table is { IsDisposed: false } row_tb) {
             tb = row_tb;
-            vars = tb.CreateVariableCollection(row, false, false, true, true);
+            vars = tb.CreateVariableCollection(row, false, false, true, true, FilterInput);
         } else {
             vars = [];
         }
