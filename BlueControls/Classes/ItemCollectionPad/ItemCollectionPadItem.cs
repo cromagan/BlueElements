@@ -282,10 +282,19 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         if (autoZoomFit) {
             newS = ZoomFitValue(usedArea, positionControl.ToRect().Size);
-            newX = -positionControl.X - (positionControl.Width / 2f);
-            newY = -positionControl.Y - (positionControl.Height / 2f);
-            newX += (usedArea.Left + (usedArea.Width / 2f)) * newS;
-            newY += (usedArea.Top + (usedArea.Height / 2f)) * newS;
+
+            // Berechne den Mittelpunkt der 'usedArea' im unskalierten Koordinatensystem
+            var usedAreaCenterX = usedArea.X + (usedArea.Width / 2f);
+            var usedAreaCenterY = usedArea.Y + (usedArea.Height / 2f);
+
+            // Berechne den Mittelpunkt der 'positionControl' (der Anzeigebereich)
+            var positionControlCenterX = positionControl.X + (positionControl.Width / 2f);
+            var positionControlCenterY = positionControl.Y + (positionControl.Height / 2f);
+
+            // Der neue Offset sollte den Mittelpunkt der usedArea auf den Mittelpunkt von positionControl verschieben,
+            // unter Berücksichtigung des neuen Skalierungsfaktors.
+            newX = -usedAreaCenterX * newS + positionControlCenterX;
+            newY = -usedAreaCenterY * newS + positionControlCenterY;
         }
 
         return (newS, newX, newY);
