@@ -25,7 +25,7 @@ public partial class GlobalMonitor : Form {
         InitializeComponent();
         GenerateLogTable(tblLog);
 
-        Develop.Message += Message;
+        Develop.MessageDG += Message;
     }
 
     #endregion
@@ -148,13 +148,13 @@ public partial class GlobalMonitor : Form {
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-        Develop.Message -= Message;
+        Develop.MessageDG -= Message;
         base.OnFormClosing(e);
     }
 
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
-        Develop.Message?.Invoke(ErrorType.Info, this, "Global", ImageCode.Information, "Monitoring gestartet", 0);
+        Develop.Message(ErrorType.Info, this, "Global", ImageCode.Information, "Monitoring gestartet", 0);
     }
 
     private static void DisposeMonitor() {
@@ -232,7 +232,7 @@ public partial class GlobalMonitor : Form {
             tb.Row.Clear("Monitoring-Log geleert");
         }
 
-        Develop.Message?.Invoke(ErrorType.Info, this, "Global", ImageCode.Information, "Monitoring-Log geleert", 0);
+        Develop.Message(ErrorType.Info, this, "Global", ImageCode.Information, "Monitoring-Log geleert", 0);
     }
 
     #endregion

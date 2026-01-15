@@ -156,7 +156,7 @@ public partial class FormWithStatusBar : Form {
         // Handler nur entfernen, wenn keine Forms mehr vorhanden sind
         lock (_handlerLock) {
             if (_formsWithStatusBar.Count == 0 && _staticHandlerRegistered) {
-                Develop.Message -= UpdateStatusBar;
+                Develop.MessageDG -= UpdateStatusBar;
                 _staticHandlerRegistered = false;
             }
         }
@@ -170,7 +170,7 @@ public partial class FormWithStatusBar : Form {
     private static void RegisterStaticHandler() {
         lock (_handlerLock) {
             if (!_staticHandlerRegistered) {
-                Develop.Message += UpdateStatusBar;
+                Develop.MessageDG += UpdateStatusBar;
                 _staticHandlerRegistered = true;
             }
         }

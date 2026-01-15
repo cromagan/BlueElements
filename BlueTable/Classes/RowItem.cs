@@ -403,7 +403,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (Table is not { IsDisposed: false } tb) { return; }
         if (!tb.DropMessages) { return; }
 
-        Develop.Message?.Invoke(type, this, tb.Caption, ImageCode.Zeile, message, 0);
+        Develop.Message(type, this, tb.Caption, ImageCode.Zeile, message, 0);
     }
 
     //public int CompareTo(object obj) {

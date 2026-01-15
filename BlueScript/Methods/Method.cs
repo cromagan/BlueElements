@@ -298,7 +298,7 @@ public abstract class Method : IReadableTextWithKey {
 
             var scx = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
             if (scx.Failed) {
-                Develop.Message?.Invoke(BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Skript-Fehler: " + scx.FailedReason, scp.Stufe);
+                Develop.Message(BlueBasics.Enums.ErrorType.DevelopInfo, null, Develop.MonitorMessage, BlueBasics.Enums.ImageCode.Kritisch, "Skript-Fehler: " + scx.FailedReason, scp.Stufe);
                 return new GetEndFeedback(scx.FailedReason, scx.NeedsScriptFix, ld);
             }
 

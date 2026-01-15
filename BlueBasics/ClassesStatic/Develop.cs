@@ -40,22 +40,15 @@ public static class Develop {
     public static bool AllReadOnly;
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
-    public static MessageDelegate? Message;
+    public static MessageDelegate? MessageDG;
     public static string MonitorMessage = "Monitor-Message";
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
-
     private static readonly object SyncLockObject = new();
-
     private static string _currentTraceLogFile = string.Empty;
-
     private static bool _deleteTraceLog = true;
-
     private static ErrorType? _isTraceLogging;
-
     private static string _lastDebugMessage = string.Empty;
-
     private static DateTime _lastDebugTime = DateTime.UtcNow;
-
     private static TextWriterTraceListener? _traceListener;
 
     #endregion
@@ -166,12 +159,12 @@ public static class Develop {
 
                     case ErrorType.Info:
                         Trace.WriteLine("<th><font size = 3>Info");
-                        Message?.Invoke(type, null, "Info", ImageCode.Information, message, 0);
+                        MessageDG?.Invoke(type, null, "Info", ImageCode.Information, message, 0);
                         nr = 5;
                         break;
 
                     case ErrorType.Warning:
-                        Message?.Invoke(type, null, "Warnung", ImageCode.Warnung, message, 0);
+                        MessageDG?.Invoke(type, null, "Warnung", ImageCode.Warnung, message, 0);
 
                         if (IsHostRunning()) { Debugger.Break(); }
                         Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
@@ -179,7 +172,7 @@ public static class Develop {
                         break;
 
                     case ErrorType.Error:
-                        Message?.Invoke(type, null, "Fehler, Programmabbruch", ImageCode.Kritisch, message, 0);
+                        MessageDG?.Invoke(type, null, "Fehler, Programmabbruch", ImageCode.Kritisch, message, 0);
                         if (IsHostRunning()) { Debugger.Break(); }
                         if (!FileExists(tmp)) { l = []; }
                         Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
@@ -187,7 +180,7 @@ public static class Develop {
                         break;
 
                     default:
-                        Message?.Invoke(type, null, "Info Unbekannten Typs", ImageCode.Sonne, message, 0);
+                        MessageDG?.Invoke(type, null, "Info Unbekannten Typs", ImageCode.Sonne, message, 0);
                         Trace.WriteLine("<th>?");
                         _deleteTraceLog = false;
                         break;
@@ -339,6 +332,8 @@ public static class Develop {
     public static bool IsAllreadyRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
 
     public static bool IsHostRunning() => Debugger.IsAttached;
+
+    public static void Message(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) => MessageDG?.Invoke(type, reference, category, symbol, message, indent);
 
     public static void SetUserDidSomething() => LastUserActionUtc = DateTime.UtcNow;
 

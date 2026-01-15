@@ -201,13 +201,13 @@ public class Script {
             }
         }
 
-        Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
+        Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
 
         var t = Stopwatch.StartNew();
 
         do {
             if (pos >= normalizedScriptText.Length) {
-                Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
+                Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE (Regulär)", scp.Stufe);
 
                 return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, string.Empty, null);
             }
@@ -219,7 +219,7 @@ public class Script {
                 var previousPos = pos; // KRITISCHE ÄNDERUNG: Vorherige Position speichern
                 var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, ld);
                 if (scx.Failed) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, scx.NeedsScriptFix, false, false, scx.FailedReason, null);
                 }
 
@@ -227,18 +227,18 @@ public class Script {
 
                 // KRITISCHE ÄNDERUNG: Fortschrittsvalidierung
                 if (pos <= previousPos) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] FEHLER - Keine Fortschritt in der Parsing-Position", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] FEHLER - Keine Fortschritt in der Parsing-Position", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, "Parsing-Fehler: Position wurde nicht vorwärts bewegt", null);
                 }
 
                 ld.LineAdd(normalizedScriptText.CountChar('¶', pos) + 1 - ld.Line + lineadd);
                 if (scx.BreakFired) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] BREAK", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, string.Empty, null);
                 }
 
                 if (scx.ReturnFired) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] RETURN", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, true, string.Empty, scx.ReturnValue);
                 }
             }
@@ -248,7 +248,7 @@ public class Script {
                 var f = abort?.Invoke() ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(f)) {
-                    Develop.Message?.Invoke(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Abbruch: {f}", scp.Stufe);
+                    Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] Abbruch: {f}", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, f, null);
                 }
             }

@@ -1018,6 +1018,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blokiert ist.</param>
     public static void SaveAll(bool mustSave) {
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen", 0);
+
         if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
         var x = AllFiles.Count;
@@ -1031,6 +1033,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
         }
+
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, "Tabellen gespeichert", 0);
     }
 
     public static string UniqueKeyValue() {
@@ -2249,7 +2253,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     protected void DropMessage(ErrorType type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }
-        Develop.Message?.Invoke(type, this, Caption, ImageCode.Tabelle, message, 0);
+        Develop.Message(type, this, Caption, ImageCode.Tabelle, message, 0);
     }
 
     protected void OnAdditionalRepair() {

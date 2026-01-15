@@ -78,7 +78,7 @@ internal class Method_ForEach : Method {
 
             if (t.ElapsedMilliseconds > 1000) {
                 t = Stopwatch.StartNew();
-                Develop.Message?.Invoke(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
+                Develop.Message(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
             }
         }
 

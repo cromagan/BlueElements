@@ -363,13 +363,13 @@ public class Chunk : IHasKeyName {
             Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
 
             if (t.ElapsedMilliseconds > 120 * 1000) {
-                Develop.Message?.Invoke(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
+                Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
                 return false; // Explizit false zurückgeben, wenn die Initialisierung fehlschlägt
             }
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                Develop.Message?.Invoke(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Warte auf Abschluss der Initialisierung des Chunks {KeyName}", 0);
+                Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Warte auf Abschluss der Initialisierung des Chunks {KeyName}", 0);
             }
 
             if (LoadFailed && t.ElapsedMilliseconds > 100) { return false; }
@@ -393,7 +393,7 @@ public class Chunk : IHasKeyName {
 
     internal FileOperationResult DoExtendedSave() {
         var filename = ChunkFileName;
-        Develop.Message?.Invoke(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
+        Develop.Message(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
         var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());

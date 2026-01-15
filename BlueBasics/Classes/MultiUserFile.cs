@@ -172,6 +172,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     public static void SaveAll(bool mustSave) {
         if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 
+        Develop.Message(ErrorType.Info, null, "Formulare", ImageCode.Diskette, "Speichere alle Formulare", 0);
+
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
             thisFile?.Save(mustSave);
@@ -181,6 +183,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
                 return;
             }
         }
+
+        Develop.Message(ErrorType.Info, null, "Formulare", ImageCode.Häkchen, "Formulare gespeichert", 0);
     }
 
     public static void UnlockAllHard() {
@@ -371,7 +375,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (!LockEditing()) { return false; }
 
-        var t = ProcessFile(TrySave, [_filename], false, mustSave ? 120 : 3) is true;
+        var t = ProcessFile(TrySave, [_filename], false, mustSave ? 120 : 10) is true;
 
         if (t) {
             _isSaved = true;
@@ -448,6 +452,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private string Blockdateiname() => string.IsNullOrEmpty(_filename) ? string.Empty : _filename.FilePath() + _filename.FileNameWithoutSuffix() + ".blk";
 
     private void Checker_Tick(object? state) {
+        Develop.Message(ErrorType.Info, this, "Formulare", ImageCode.Information, $"Prüfe auf Aktualität des Formulares {Filename.FileNameWithSuffix()}", 0);
+
         if (IsDisposed) { return; }
         if (string.IsNullOrEmpty(_filename)) { return; }
 

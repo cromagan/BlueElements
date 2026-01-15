@@ -415,7 +415,7 @@ public static class IO {
                 var mess = string.Empty;
                 if (result.ReturnValue is string m) { mess = $"({m})"; }
 
-                Develop.Message?.Invoke(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... {mess}", 0);
+                Develop.Message(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... {mess}", 0);
                 stopw = Stopwatch.StartNew();
             }
 

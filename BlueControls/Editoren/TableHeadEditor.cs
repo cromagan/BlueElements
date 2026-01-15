@@ -81,7 +81,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public static void AddUndosToTable(TableViewWithFilters tblUndo, Table? table, float maxAgeInDays) {
         if (table is { IsDisposed: false } tb) {
-            Develop.Message?.Invoke(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{tb.Caption}'", 0);
+            Develop.Message(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{tb.Caption}'", 0);
 
             List<UndoItem> un = [.. tb.Undo]; // Kann und wird verändert!
 

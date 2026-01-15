@@ -44,7 +44,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         SetNotFocusable();
 
         // Handler für Develop.Message registrieren
-        Develop.Message += OnDevelopMessage;
+        Develop.MessageDG += OnDevelopMessage;
     }
 
     #endregion
@@ -79,7 +79,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
     protected override void Dispose(bool disposing) {
         if (disposing) {
             // Handler wieder entfernen
-            Develop.Message -= OnDevelopMessage;
+            Develop.MessageDG -= OnDevelopMessage;
         }
         base.Dispose(disposing);
     }
