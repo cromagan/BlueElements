@@ -15,7 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.ItemCollectionPad;
+using BlueScript.Methods;
+using BlueScript.Structures;
+using BlueTable;
 
 namespace BlueScript.Variables;
 
@@ -41,15 +46,20 @@ public class VariableItemCollectionPad : Variable {
 
     #region Properties
 
-    
     public static string ClassId => "icp";
 
     public static string ShortName_Variable => "*icp";
+
     public override int CheckOrder => 99;
+
     public override bool GetFromStringPossible => false;
+
     public override bool IsNullOrEmpty => _itemCol == null;
+
     public override string SearchValue => ReadableText;
+
     public override bool ToStringPossible => false;
+
     public override string ValueForCell => string.Empty;
 
     public ItemCollectionPadItem? ValueItemCollection {
@@ -65,6 +75,41 @@ public class VariableItemCollectionPad : Variable {
     #region Methods
 
     public override void DisposeContent() => _itemCol = null;
+
+    public ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn) {
+        DIESE ROUTINE WAR MAL IN ITEMCOLLECTIONPADITEM
+
+      //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
+      var vars = rowIn.Table?.CreateVariableCollection(rowIn, true, false, true, false, null) ?? [];
+
+        //var vars = new VariableCollection();
+        vars.Add(new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."));
+        vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        //vars.Add(new VariableListString("Menu", null, false, "Diese Variable muss das Rückgabemenü enthalten."));
+        //vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
+        //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
+        //vars.Add(new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."));
+        vars.Add(new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."));
+
+        vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
+
+        var m = Method.GetMethods(MethodType.ManipulatesUser);
+
+        var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, "CreativePad-Generator", "CreativePad-Generator");
+
+        var sc = new Script(vars, scp) {
+            ScriptText = scripttext
+        };
+
+        var t = sc.Parse(0, "Main", null, null);
+
+        if (t.Failed) {
+            var bpi = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));
+            Add(bpi);
+        }
+        return t;
+    }
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableItemCollectionPad v) { return VerschiedeneTypen(variable); }

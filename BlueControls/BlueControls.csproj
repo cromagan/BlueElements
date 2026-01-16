@@ -35,6 +35,30 @@
     <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+   
+  <ItemGroup>
+    <Compile Remove="AdditionalScriptMethods\Method_AddPadItem.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_ConnectPoints.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_ConnectPointsWithSameName.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_DeletePoints.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_Dimension.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_LoadPadItem.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_MirrorPadItem.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_mm.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_MovePadItem.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_ScaledView.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_SendToBack.cs" />
+    <Compile Remove="AdditionalScriptMethods\Method_ShowForm.cs" />
+    <Compile Remove="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
+    <Compile Remove="AdditionalScriptMethods\VariablePadItem.cs" />
+    <Compile Remove="Classes\ItemCollectionPad\FunktionsItems_Formular\CreativePadItem.cs" />
+    <Compile Remove="Classes\ItemCollectionPad\ScaledViewPadItem.cs" />
+    <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.cs" />
+    <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.Designer.cs" />
+    <Compile Remove="Editoren\CreativePadScriptEditor.cs" />
+    <Compile Remove="Editoren\CreativePadScriptEditor.Designer.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <None Remove="Ressources\Dictionary\Deutsch.BDB" />

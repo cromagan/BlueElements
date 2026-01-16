@@ -366,6 +366,10 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         if (items is not { Count: not 0 }) { return; }
 
         foreach (var thisIt in items) {
+            if (_item.GetByKey(thisIt.KeyName) is AbstractListItem it) {
+                Remove(it);
+            }
+
             AddAndRegister(thisIt);
         }
 
@@ -766,6 +770,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         var tmp = _mouseOverItem;
 
+        var p = PointToClient(Cursor.Position);
+
         UnCheck(tmp);
 
         if (_checkBehavior != CheckBehavior.AllSelected) {
@@ -776,7 +782,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         OnRemoveClicked(new AbstractListItemEventArgs(tmp));
 
-        var p = PointToClient(Cursor.Position);
         DoMouseMovement(p.X, p.Y);
     }
 
