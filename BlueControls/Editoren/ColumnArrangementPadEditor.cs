@@ -369,8 +369,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                     ca.FilterRows = d.FilterRows;
                     ca.ColumnForChapter = tb.Column[d.Chapter_Column];
                     ca.QuickInfo = d.QuickInfo;
-                    ca.SortDefinition = d.SortDefinition;
-                    ca.Filter = d.PflichtFilter;
                     break;
                 }
             }
@@ -463,8 +461,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         t.FilterRows = ca.FilterRows;
         t.Chapter_Column = ca.ColumnForChapter?.KeyName ?? "#ohne";
         t.QuickInfo = ca.QuickInfo;
-        t.SortDefinition = ca.SortDefinition;
-        t.PflichtFilter = ca.Filter;
         Pad.Items.Add(t);
 
         Pad.LastClickedItem = t;

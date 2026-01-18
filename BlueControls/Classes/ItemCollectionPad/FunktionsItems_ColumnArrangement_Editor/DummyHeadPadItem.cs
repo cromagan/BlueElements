@@ -46,9 +46,9 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
     public override string Description => string.Empty;
 
     public int FilterRows { get; set; }
-    public FilterCollection? PflichtFilter { get; set; }
+
     public bool ShowHead { get; set; }
-    public RowSortDefinition? SortDefinition { get; set; }
+
     public Table? Table { get; private set; }
 
     /// <summary>
@@ -74,8 +74,6 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForProperty<bool>(() => ShowHead),
             new FlexiControlForProperty<int>(() => FilterRows),
             new FlexiControlForProperty<string>(() => Chapter_Column, col ),
-            new FlexiControlForProperty<FilterCollection?>(() => PflichtFilter ),
-            new FlexiControlForProperty<RowSortDefinition?>(() => SortDefinition ),
             new FlexiControlForProperty<string>(() => QuickInfo, 3 )
         ];
 

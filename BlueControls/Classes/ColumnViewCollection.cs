@@ -78,7 +78,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public int ControlColumnsWidth { get; private set; }
 
     public int Count => _internal.Count;
-    public FilterCollection? Filter { get; set; }
     public int FilterRows { get; internal set; } = 1;
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => false;
@@ -109,8 +108,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     } = Win11;
 
     public bool ShowHead { get; set; } = true;
-
-    public RowSortDefinition? SortDefinition { get; set; }
 
     public Table? Table {
         get;
@@ -264,8 +261,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);
-        result.ParseableAdd("RowSortDefinition", SortDefinition);
-        result.ParseableAdd("Filter", Filter as IStringable);
         result.ParseableAdd("Column", _internal);
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
@@ -300,22 +295,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true;
 
             case "rowsortdefinition":
-                if (Table == null) {
-                    SortDefinition = null;
-                } else {
-                    SortDefinition = new RowSortDefinition(Table, value.FromNonCritical());
-                }
-
-                return true;
+                return true; // TODO Entfernen: 18.0.2026
 
             case "filter":
-                if (Table == null) {
-                    Filter = null;
-                } else {
-                    Filter = new FilterCollection(Table, "Arrangement");
-                    Filter.Parse(value.FromNonCritical());
-                }
-                return true;
+                return true; // TODO Entfernen: 18.0.2026
 
             case "quickinfo":
                 QuickInfo = value.FromNonCritical();
