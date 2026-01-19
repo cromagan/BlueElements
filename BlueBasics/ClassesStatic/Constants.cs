@@ -55,8 +55,6 @@ public static class Constants {
     //public const char TempLessThan = '\uE011';
     public const string Win11 = "Windows 11";
 
-    public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
-
     public static readonly string Char_NotFromClip = (char)3 + ((char)22).ToString() + (char)24 + "\n";
     public static readonly int ColumnCaptionSizeY = 22;
 

@@ -41,7 +41,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Fields
 
-    private RowCheckedEventArgs? _lastCheckedEventArgs;
+    private RowPrepareFormulaEventArgs? _lastCheckedEventArgs;
 
     #endregion
 
@@ -62,7 +62,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Events
 
-    public event EventHandler<RowCheckedEventArgs>? RowChecked;
+    public event EventHandler<RowPrepareFormulaEventArgs>? RowChecked;
 
     #endregion
 
@@ -317,9 +317,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void CellSet(ColumnItem column, DateTime value, string comment) => Set(column, value.ToString5(), comment);
 
-    public RowCheckedEventArgs CheckRow() {
+    public RowPrepareFormulaEventArgs CheckRow() {
         if (_lastCheckedEventArgs != null) {
-            if (_lastCheckedEventArgs.Feedback.NeedsScriptFix || !_lastCheckedEventArgs.Feedback.Failed) {
+            if (_lastCheckedEventArgs.PrepareFormulaFeedback.NeedsScriptFix || !_lastCheckedEventArgs.PrepareFormulaFeedback.Failed) {
                 return _lastCheckedEventArgs;
             }
         }
@@ -336,12 +336,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         if (sef.Failed) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}", b);
+            _lastCheckedEventArgs = new RowPrepareFormulaEventArgs(this, null, sef, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}", b);
             return _lastCheckedEventArgs;
         }
 
         if (RowCollection.FailedRows.TryGetValue(this, out var reason)) {
-            _lastCheckedEventArgs = new RowCheckedEventArgs(this, null, sef, reason, b);
+            _lastCheckedEventArgs = new RowPrepareFormulaEventArgs(this, null, sef, reason, b);
             return _lastCheckedEventArgs;
         }
 
@@ -371,7 +371,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-        _lastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef, m, b);
+        _lastCheckedEventArgs = new RowPrepareFormulaEventArgs(this, cols, sef, m, b);
 
         OnRowChecked(_lastCheckedEventArgs);
 
@@ -1196,7 +1196,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    private void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+    private void OnRowChecked(RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 
     private void RelationTextNameChanged(ColumnItem columnToRepair, string rowKey, string oldValue, string newValue) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }

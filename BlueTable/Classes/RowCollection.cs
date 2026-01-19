@@ -67,7 +67,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler<RowEventArgs>? RowAdded;
 
-    public event EventHandler<RowCheckedEventArgs>? RowChecked;
+    public event EventHandler<RowPrepareFormulaEventArgs>? RowChecked;
 
     public event EventHandler<RowEventArgs>? RowRemoved;
 
@@ -458,45 +458,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
-        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-
-        if (!tb.IsEditable(false)) { return tb.IsNotEditableReason(false); }
-
-        if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
-
-        var txt = "Skript wird ausgeführt: " + scriptname;
-
-        Table.OnProgressbarInfo(new ProgressbarEventArgs(txt, 0, rows.Count, true, false));
-
-        var all = rows.Count;
-        var start = DateTime.UtcNow;
-        while (rows.Count > 0) {
-            Table.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
-
-            var scx = rows[0].ExecuteScript(eventname, scriptname, true, 0, null, true, true);
-
-            if (scx.Failed) {
-                var w = rows[0].CellFirstString();
-                rows.Clear();
-                Table.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
-                Develop.Message(ErrorType.Warning, tb, "Table", ImageCode.Skript, "Skript fehlerhaft bei " + w, 0);
-                return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol[0];
-            }
-
-            rows.RemoveAt(0);
-
-            if (DateTime.UtcNow.Subtract(start).TotalMinutes > 1) {
-                if (tb is TableFile tbf) { tbf.Save(true); }
-
-                start = DateTime.UtcNow;
-            }
-        }
-        if (tb is TableFile tbf2) { tbf2.Save(true); }
-        Table.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
-        return string.Empty;
     }
 
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem is { IsDisposed: false });
@@ -925,7 +886,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowAdded?.Invoke(this, e);
     }
 
-    private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+    private void OnRowChecked(object sender, RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 
     private void OnRowRemoved(RowEventArgs e) => RowRemoved?.Invoke(this, e);
 

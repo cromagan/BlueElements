@@ -268,6 +268,10 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
+
+    private HatchBrush RedStripesBrush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
+
+
     public void Draw(Graphics gr, Rectangle visibleAreaControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (forPrinting && !_beiExportSichtbar && !ShowAlways) { return; }
 
@@ -297,8 +301,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     var r = iec.ErrorReason();
 
                     if (!string.IsNullOrEmpty(r)) {
-                        using var brush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
-                        gr.FillRectangle(brush, positionControl);
+
+                        gr.FillRectangle(RedStripesBrush, positionControl);
                         var q = QuickImage.Get("Kritisch|32||1");
                         gr.DrawImage(q, positionControl.X, positionControl.Y);
                     }

@@ -29,6 +29,7 @@ using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueScript.Structures;
 using BlueTable;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
@@ -319,29 +320,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
         if (e.Data is Func<IReadOnlyList<RowItem>> fRows) { rows.AddRange(fRows()); }
 
-        if (rows.Count == 0) {
-            Forms.MessageBox.Show("Keine Zeilen zum Prüfen vorhanden.", ImageCode.Kreuz, "OK");
-            return;
-        }
-
-        foreach (var thisR in rows) {
-            if (thisR.Table is { IsDisposed: false } tb) {
-                if (!tb.CanDoValueChangedScript(true)) {
-                    Forms.MessageBox.Show("Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
-                    RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
-                    return;
-                }
-
-                thisR.InvalidateRowState("TableView, Kontextmenü, Datenüberprüfung");
-                thisR.UpdateRow(true, "TableView, Kontextmenü, Datenüberprüfung");
-            }
-        }
-
-        if (rows.Count == 1) {
-            Forms.MessageBox.Show("Datenüberprüfung:\r\n" + rows[0].CheckRow().Message, ImageCode.HäkchenDoppelt, "Ok");
-        } else {
-            Forms.MessageBox.Show($"Alle {rows.Count} Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
-        }
+        DoScript(rows, true, null, "Datenüberprüfung");
     }
 
     public static void ContextMenu_DeleteRow(object sender, ObjectEventArgs e) {
@@ -431,8 +410,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (TableViewForm.EditabelErrorMessage(sc.Table)) { return; }
 
-        string m;
-
         if (sc.NeedRow) {
             var rows = new List<RowItem>();
 
@@ -444,19 +421,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 rows.AddRange(fRows());
             }
 
-            if (rows.Count > 0) {
-                if (rows.Count == 1 || Forms.MessageBox.Show($"Skript für {rows.Count} Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
-                    m = tb.Row.ExecuteScript(null, sc.KeyName, rows);
-                } else {
-                    m = "Durch Benutzer abgebrochen";
-                }
-            } else {
-                m = "Keine Zeile zum Ausführen des Skriptes vorhanden.";
-            }
-        } else {
-            var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
-            m = s.Protocol.JoinWithCr();
+            DoScript(rows, false, sc, $"Skript: {sc.KeyName}");
+            return;
         }
+
+        var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
+        var m = s.Protocol.JoinWithCr();
 
         if (string.IsNullOrEmpty(m)) {
             Forms.MessageBox.Show("Skript erfolgreich ausgeführt.", ImageCode.Häkchen, "Ok");
@@ -1292,7 +1262,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             tb1.Column.ColumnRemoving -= Column_ItemRemoving;
             tb1.Column.ColumnRemoved -= _Table_ViewChanged;
             tb1.Column.ColumnAdded -= _Table_ViewChanged;
-            tb1.ProgressbarInfo -= _Table_ProgressbarInfo;
             tb1.DisposingEvent -= _table_Disposing;
             tb1.InvalidateView -= Table_InvalidateView;
             SaveAll(false);
@@ -1322,7 +1291,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             tb2.Column.ColumnAdded += _Table_ViewChanged;
             tb2.Column.ColumnRemoving += Column_ItemRemoving;
             tb2.Column.ColumnRemoved += _Table_ViewChanged;
-            tb2.ProgressbarInfo += _Table_ProgressbarInfo;
             tb2.DisposingEvent += _table_Disposing;
             tb2.InvalidateView += Table_InvalidateView;
         }
@@ -1900,6 +1868,100 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.OnZoomChanged();
     }
 
+    private static void DoScript(List<RowItem> rows, bool generic, TableScriptDescription? sc, string info) {
+        var info2 = $"<b><u>{info}:</b></u>\r\n\r\n";
+
+        if (rows.Count == 0) {
+            Forms.MessageBox.Show($"{info2}Keine Zeilen zum Abarbeiten vorhanden.", ImageCode.Kreuz, "OK");
+            return;
+        }
+
+        if (rows[0]?.Table is not { IsDisposed: false } tb) {
+            Forms.MessageBox.Show($"{info2}Tabelle verworfen", ImageCode.Kreuz, "OK");
+            return;
+        }
+
+        var f = tb.IsNotEditableReason(false);
+        if (!string.IsNullOrEmpty(f)) {
+            Forms.MessageBox.Show($"{info2}{f}", ImageCode.Kreuz, "OK");
+            RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+            return;
+        }
+
+        if (!generic && sc == null) {
+            Forms.MessageBox.Show($"{info2}Interner Programmfehler,\r\nkein Skript angekommen.", ImageCode.Kreuz, "OK");
+            return;
+        }
+        foreach (var row in rows) {
+            if (row.Table != tb) {
+                Forms.MessageBox.Show($"{info2}Interner Programmfehler\r\nZeilen aus unterschiedlichen Datenbanken.", ImageCode.Kreuz, "OK");
+                return;
+            }
+        }
+
+        if (rows.Count > 1) {
+            if (Forms.MessageBox.Show($"'{info}' für {rows.Count} Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") != 0) {
+                Forms.MessageBox.Show($"{info2}Abbruch durch Benutzer.", ImageCode.Information, "OK");
+                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+                return;
+            }
+        }
+
+        var fehler = new List<ScriptEndedFeedback>();
+        Progressbar? _pg = null;
+
+        if (rows.Count > 3) {
+            _pg = Progressbar.Show(info, rows.Count);
+        }
+
+        var firstRow = rows[0];
+        var all = rows.Count;
+        var start = DateTime.UtcNow;
+        var c = 0;
+        while (rows.Count > 0) {
+            Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Skript, $"{info}: {rows[0].CellFirstString()}", 0);
+
+            _pg?.Update(c++);
+
+            if (!tb.CanDoValueChangedScript(true) || !tb.IsEditable(false)) {
+                _pg?.Close();
+                Forms.MessageBox.Show($"{info2}Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
+                RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
+                return;
+            }
+
+            ScriptEndedFeedback fb;
+            if (generic) {
+                rows[0].InvalidateRowState($"TableView, Kontextmenü, {info}");
+                fb = rows[0].UpdateRow(true, $"TableView, Kontextmenü, {info}");
+            } else {
+                fb = rows[0].ExecuteScript(null, sc?.KeyName ?? string.Empty, true, 0, null, true, true);
+            }
+
+            if (fb.Failed) {
+                fehler.Add(fb);
+            }
+
+            rows.RemoveAt(0);
+        }
+
+        _pg?.Close();
+
+        if (all == 1) {
+            if (fehler.Count == 1) {
+                Forms.MessageBox.Show($"{info2}<b>Es ist ein Skript-Fehler aufgetreten.</b>\r\n\r\n{fehler[0].ProtocolText}", ImageCode.Warnung, "Ok");
+            } else {
+                Forms.MessageBox.Show($"{info2}{firstRow.CheckRow().Message}", ImageCode.HäkchenDoppelt, "Ok");
+            }
+        } else {
+            if (fehler.Count > 0) {
+                Forms.MessageBox.Show($"{info2}Alle {all} Zeilen abgearbeitet.\r\nEs sind in {fehler.Count} Zeile(n) Skript-Fehler aufgetreten", ImageCode.Warnung, "OK");
+            } else {
+                Forms.MessageBox.Show($"{info2}Alle {all} Zeilen\r\nerfolgreich abgearbeitet.", ImageCode.HäkchenDoppelt, "OK");
+            }
+        }
+    }
+
     private static void NotEditableInfo(string reason) {
         if (string.IsNullOrEmpty(reason)) { return; }
         Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
@@ -2020,19 +2082,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void _table_Disposing(object sender, System.EventArgs e) => TableSet(null, string.Empty);
-
-    private void _Table_ProgressbarInfo(object sender, ProgressbarEventArgs e) {
-        if (IsDisposed) { return; }
-        if (e.Ends) {
-            _pg?.Close();
-            return;
-        }
-        if (e.Beginns) {
-            _pg = Progressbar.Show(e.Name, e.Count);
-            return;
-        }
-        _pg?.Update(e.Current);
-    }
 
     private void _Table_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_AllViewItems(false);
 

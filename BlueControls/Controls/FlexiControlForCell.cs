@@ -228,7 +228,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         Invalidate_FilterInput();
     }
 
-    protected override void TableInput_RowChecked(object sender, RowCheckedEventArgs e) {
+    protected override void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) {
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
         if (e.Row != _lastrow) { return; }

@@ -237,8 +237,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public event EventHandler? Loading;
 
-    public event EventHandler<ProgressbarEventArgs>? ProgressbarInfo;
-
     public event EventHandler? SortParameterChanged;
 
     public event EventHandler? ViewChanged;
@@ -2161,17 +2159,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     internal virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsNotEditableReason(false);
 
-    //public void Variables_RemoveAll(bool isLoading) {
-    //    //while (_variables.Count > 0) {
-    //    //    //var va = _variables[_eventScript.Count - 1];
-    //    //    //ev.Changed -= EventScript_PropertyChanged;
-    internal void OnProgressbarInfo(ProgressbarEventArgs e) {
-        if (IsDisposed) { return; }
-        ProgressbarInfo?.Invoke(this, e);
-    }
-
     /// <summary>
-    /// Befüllt den Undox Speicher und schreibt den auch im Filesystem
+    /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
     /// </summary>
     /// <param name="type"></param>
     /// <param name="column"></param>
@@ -2766,7 +2755,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             InvalidateView = null;
             Loaded = null;
             Loading = null;
-            ProgressbarInfo = null;
             SortParameterChanged = null;
             ViewChanged = null;
         } catch (Exception ex) {

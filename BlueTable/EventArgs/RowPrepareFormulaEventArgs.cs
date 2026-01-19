@@ -21,7 +21,7 @@ using System.Drawing;
 
 namespace BlueTable.EventArgs;
 
-public class RowCheckedEventArgs : RowEventArgs {
+public class RowPrepareFormulaEventArgs : RowEventArgs {
 
     #region Fields
 
@@ -31,9 +31,9 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, ScriptEndedFeedback scriptfeedback, string message, Brush? rowcolor) : base(row) {
+    public RowPrepareFormulaEventArgs(RowItem row, List<string>? columnsWithErrors, ScriptEndedFeedback prepareFormulaFeedback, string message, Brush? rowcolor) : base(row) {
         ColumnsWithErrors = columnsWithErrors;
-        Feedback = scriptfeedback;
+        PrepareFormulaFeedback = prepareFormulaFeedback;
         RowColor = rowcolor;
         Message = string.Empty;
         Message = "<b><u>" + row.CellFirstString() + "</b></u><br><br>" + message;
@@ -44,7 +44,7 @@ public class RowCheckedEventArgs : RowEventArgs {
     #region Properties
 
     public List<string>? ColumnsWithErrors { get; }
-    public ScriptEndedFeedback Feedback { get; }
+    public ScriptEndedFeedback PrepareFormulaFeedback { get; }
     public Brush? RowColor { get; }
 
     #endregion

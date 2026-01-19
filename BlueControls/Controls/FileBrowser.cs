@@ -216,7 +216,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             var tmpDirectory = string.Empty;
             var tmpDirectoryMin = string.Empty;
 
-            if (RowSingleOrNull()?.CheckRow().Feedback.Variables is { } list) {
+            if (RowSingleOrNull()?.CheckRow().PrepareFormulaFeedback.Variables is { } list) {
                 tmpDirectory = list.ReplaceInText(Var_Directory);
                 tmpDirectoryMin = list.ReplaceInText(Var_DirectoryMin);
             }

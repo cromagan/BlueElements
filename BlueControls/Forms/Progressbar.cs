@@ -153,9 +153,13 @@ public partial class Progressbar : FloatingForm {
     private void UpdateInternal(string text) {
         if (text != capTXT.Text) {
             capTXT.Text = text;
-            var wi = Math.Max(Size.Width, capTXT.Width + (Skin.Padding * 2));
-            var he = Math.Max(Size.Height, capTXT.Height + (Skin.Padding * 2));
+            var s = capTXT.RequiredTextSize();
+            var wi = Math.Max(Size.Width, s.Width + (Skin.Padding * 2));
+            var he = Math.Max(Size.Height, s.Height + (Skin.Padding * 2));
             Size = new Size(wi, he);
+            capTXT.Location = new Point(Skin.Padding, Skin.Padding);
+            capTXT.Width = s.Width + 1;
+            capTXT.Height = s.Height + 1;
             Refresh();
         }
     }

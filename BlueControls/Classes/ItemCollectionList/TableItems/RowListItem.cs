@@ -23,6 +23,7 @@ using BlueTable.Enums;
 using BlueTable.EventArgs;
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace BlueControls.ItemCollectionList;
 
@@ -36,8 +37,14 @@ public sealed class RowListItem : RowBackgroundListItem {
     #region Fields
 
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
+    public static readonly HatchBrush RedStripesBrush1 = new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(30, 255, 0, 0), Color.FromArgb(5, 255, 0, 0));
+    public static readonly HatchBrush RedStripesBrush2 = new HatchBrush(HatchStyle.DarkVertical, Color.FromArgb(80, 255, 100, 0), Color.FromArgb(80, 255, 0, 0));
 
-    public RowCheckedEventArgs? _rowCheckedEventArgs = null;
+    //public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
+
+    //public static readonly SolidBrush BrushRedTransparent2 = new(Color.FromArgb(180, 255, 128, 128));
+    public RowPrepareFormulaEventArgs? _rowCheckedEventArgs = null;
+
     private static readonly Brush BrushBrighten = new SolidBrush(Color.FromArgb(128, 255, 255, 255));
 
     private static readonly Brush BrushDarken = new SolidBrush(Color.FromArgb(128, 0, 0, 0));
@@ -173,6 +180,18 @@ public sealed class RowListItem : RowBackgroundListItem {
 
         if (_rowCheckedEventArgs?.RowColor != null) {
             gr.FillRectangle(_rowCheckedEventArgs.RowColor, positionControl);
+        }
+
+   //       var RedStripesBrush1 = new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(30, 255, 0, 0), Color.FromArgb(5, 255, 0, 0));
+   //var  RedStripesBrush2 = new HatchBrush(HatchStyle.DarkVertical, Color.FromArgb(80, 255, 100, 0), Color.FromArgb(80, 255, 0, 0));
+
+
+        if (Generic.IsAdministrator()) {
+            if (_rowCheckedEventArgs == null || RowCollection.FailedRows.ContainsKey(_rowCheckedEventArgs.Row)) {
+                gr.FillRectangle(RedStripesBrush2, positionControl);
+            } else if (_rowCheckedEventArgs?.Row?.NeedsRowUpdate() != false) {
+                gr.FillRectangle(RedStripesBrush1, positionControl);
+            }
         }
 
         if (MarkYellow) {

@@ -34,12 +34,13 @@ namespace BlueControls.Forms
             // 
             // capTXT
             // 
+            this.capTXT.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.capTXT.CausesValidation = false;
             this.capTXT.Location = new System.Drawing.Point(8, 8);
             this.capTXT.Name = "capTXT";
-            this.capTXT.Size = new System.Drawing.Size(1, 1);
-            this.capTXT.Translate = false;
-            this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
+            this.capTXT.Size = new System.Drawing.Size(72, 48);
             // 
             // Progressbar
             // 

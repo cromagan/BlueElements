@@ -380,7 +380,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected virtual void TableInput_Loaded(object sender, System.EventArgs e) { }
 
-    protected virtual void TableInput_RowChecked(object sender, RowCheckedEventArgs e) { }
+    protected virtual void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) { }
 
     private void FilterInput_DisposingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 
