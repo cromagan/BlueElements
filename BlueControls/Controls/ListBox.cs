@@ -277,14 +277,18 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         return ComputeAllItemPositions(new Size(1, 30), biggestItemX, heightAdded, orienation, renderer);
     }
 
-    public void Check(IEnumerable<string> ali) {
-        // Sammle nur die Items, die noch nicht in der checked-Liste sind
-        var itemsToAdd = ali.Where(name => !IsChecked(name)).ToList();
+    public void Check(IEnumerable<string> toCheck, bool uncheckOther) {
+        if (uncheckOther) {
+            if (!_checked.IsDifferentTo(toCheck)) { return; }
 
-        if (itemsToAdd.Count == 0) { return; } // Nichts zu tun
-
-        // Erstelle eine neue Liste mit kombiniertem Inhalt
-        ValidateCheckStates([.. _checked, .. itemsToAdd], itemsToAdd.FirstOrDefault());
+            ValidateCheckStates([.. toCheck], toCheck.FirstOrDefault());
+        } else {
+            // Sammle nur die Items, die noch nicht in der checked-Liste sind
+            var newItemsToCheck = toCheck.Where(name => !IsChecked(name)).ToList();
+            if (newItemsToCheck.Count == 0) { return; } // Nichts zu tun
+            // Erstelle eine neue Liste mit kombiniertem Inhalt
+            ValidateCheckStates([.. _checked, .. newItemsToCheck], newItemsToCheck.FirstOrDefault());
+        }
     }
 
     public void Check(AbstractListItem ali) => Check(ali.KeyName);

@@ -98,7 +98,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 var l = TableView.Permission_AllUsed(false).ToList();
                 l.AddIfNotExists(Administrator);
                 lstPermissionExecute.ItemAddRange(l);
-                lstPermissionExecute.Check(value.UserGroups);
+                lstPermissionExecute.Check(value.UserGroups, true);
                 lstPermissionExecute.Suggestions.Clear();
 
                 _item = value;

@@ -158,7 +158,7 @@ public class FormatHolder : IInputFormat, IReadableTextWithKey {
         MaxTextLength = long.MaxValue.ToString1().Length
     };
 
-    public static readonly FormatHolder PhoneNumber = new("PhoneNumber", QuickImage.Get(ImageCode.Telefon, 16)) {
+    public static readonly FormatHolder PhoneNumber = new("Phone Number", QuickImage.Get(ImageCode.Telefon, 16)) {
         //https://regex101.com/r/OzJr8j/1
         RegexCheck = @"^[+][1-9][\s0-9]*[0-9]$",
         AllowedChars = Constants.Char_Numerals + "+ ",

@@ -122,6 +122,36 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
+    public new static readonly ColumnFormatHolder FilePath = new(FormatHolder.Filepath) {
+        Align = AlignmentHorizontal.Links,
+        SortType = SortierTyp.Original_String,
+        DoOpticalTranslation = TranslationType.Original_Anzeigen,
+        AfterEditQuickSortRemoveDouble = false,
+        ScriptType = ScriptType.String,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
+        DropDownItems = new(Array.Empty<string>()),
+        ShowValuesOfOtherCellsInDropdown = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
+    };
+
+    public new static readonly ColumnFormatHolder FilepathAndName = new(FormatHolder.FilepathAndName) {
+        Align = AlignmentHorizontal.Links,
+        SortType = SortierTyp.Original_String,
+        DoOpticalTranslation = TranslationType.Original_Anzeigen,
+        AfterEditQuickSortRemoveDouble = false,
+        ScriptType = ScriptType.String,
+        DropdownDeselectAllAllowed = false,
+        EditableWithDropdown = false,
+        EditableWithTextInput = true,
+        DropDownItems = new(Array.Empty<string>()),
+        ShowValuesOfOtherCellsInDropdown = false,
+        DefaultRenderer = "TextOneLine",
+        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
+    };
+
     public new static readonly ColumnFormatHolder Float = new(FormatHolder.Float) {
         Align = AlignmentHorizontal.Rechts,
         SortType = SortierTyp.ZahlenwertFloat,

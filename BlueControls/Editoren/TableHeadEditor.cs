@@ -268,12 +268,12 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         PermissionGroups_NewRow.ItemClear();
-        PermissionGroups_NewRow.Check(tb.PermissionGroupsNewRow);
+        PermissionGroups_NewRow.Check(tb.PermissionGroupsNewRow, true);
         PermissionGroups_NewRow.Suggestions.Clear();
         PermissionGroups_NewRow.ItemAddRange(TableView.Permission_AllUsed(false));
 
         lbxTableAdmin.ItemClear();
-        lbxTableAdmin.Check(tb.TableAdmin);
+        lbxTableAdmin.Check(tb.TableAdmin, true);
 
         txbKennwort.Text = tb.GlobalShowPass;
 

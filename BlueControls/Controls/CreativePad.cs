@@ -301,8 +301,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     internal Point MiddleOfVisiblesScreen() {
-        var valx = ((float)Width / 2) + OffsetX;
-        var valy = ((float)Height / 2) + OffsetY;
+        var valx = ((float)Width / 2) - OffsetX;
+        var valy = ((float)Height / 2) - OffsetY;
 
         return new((int)(valx / Zoom), (int)(valy / Zoom));
     }

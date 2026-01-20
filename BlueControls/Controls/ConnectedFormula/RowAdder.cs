@@ -374,8 +374,7 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
             f.Remove(thisit);
         }
 
-        f.UncheckAll();
-        f.Check(selected);
+        f.Check(selected, true);
 
         _ignoreCheckedChanged = false;
     }

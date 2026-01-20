@@ -1701,6 +1701,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _maxTextLength = 20;
                 _maxCellLength = 20;
                 if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder.Text); // HIer ColumnFormatHolder
                     Caption = "Ersteller";
                     EditableWithDropdown = true;
                     ShowValuesOfOtherCellsInDropdown = true;
@@ -1726,6 +1727,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _maxTextLength = 20;
                 _maxCellLength = 20;
                 if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder.Text); // HIer ColumnFormatHolder
                     Caption = "Änderer";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
@@ -1752,6 +1754,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder.DateTime); // HIer ColumnFormatHolder
                     Caption = "Erstell-Datum";
                     ForeColor = Color.FromArgb(0, 0, 128);
                     BackColor = Color.FromArgb(185, 185, 255);
@@ -1771,12 +1774,13 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder.DateTime); // HIer ColumnFormatHolder
                     Caption = "Zeilen-Status";
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
                     //LineLeft = ColumnLineStyle.Dick;
                 }
-                //_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
+                _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
 
                 break;
 
@@ -1822,6 +1826,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _permissionGroupsChangeCell.Clear();
 
                 if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder.DateTime); // HIer ColumnFormatHolder
                     Caption = "Änder-Datum";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
@@ -1858,6 +1863,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 _adminInfo = "Diese Spalte kann nur über ein Skript bearbeitet<br>werden, mit dem Befehl 'SetError'";
 
                 if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder.Bit); // HIer ColumnFormatHolder
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
                     LineStyleLeft = ColumnLineStyle.Dick;
@@ -1889,6 +1895,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
                 }
 
                 if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder.Bit); // HIer ColumnFormatHolder
                     Caption = "Abgeschlossen";
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);

@@ -148,7 +148,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                     if (leere != null) { lsbStandardFilter.Check(leere); }
                 } else {
                     // Items des Istgleich-Filters anzeigen
-                    lsbFilterItems.Check(myFilter.SearchValue);
+                    lsbFilterItems.Check(myFilter.SearchValue, true);
                 }
             } else if (myFilter.FilterType.HasFlag(FilterType.Instr)) {
                 // Textfiler anzeigen

@@ -454,8 +454,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         txbAutoReplace.Text = Column.AfterEditAutoReplace.JoinWithCr();
         txbRegex.Text = Column.RegexCheck;
         txbTags.Text = Column.ColumnTags.JoinWithCr();
-        lbxCellEditor.UncheckAll();
-        lbxCellEditor.Check(Column.PermissionGroupsChangeCell);
+        lbxCellEditor.Check(Column.PermissionGroupsChangeCell, true);
         txbAllowedChars.Text = Column.AllowedChars;
         txbMaxTextLength.Text = Column.MaxTextLength.ToString1();
         txbMaxCellLength.Text = Column.MaxCellLength.ToString1();

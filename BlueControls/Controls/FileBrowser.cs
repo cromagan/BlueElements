@@ -587,7 +587,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         #region  Leeres Verzeichnis löschen
 
-        if (DeleteDir && Enabled) {
+        if (DeleteDir && Enabled && _todel != dir) {
             if (DirectoryExists(_todel)) {
                 var emd = GetDirectories(_todel, "*", System.IO.SearchOption.TopDirectoryOnly);
                 if (emd.Length == 0) {

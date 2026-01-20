@@ -40,7 +40,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
         txbText.CheckBehavior = checkBehavior;
         txbText.ItemAddRange(itemsOriginal);
-        if (check != null) { txbText.Check(check); }
+        if (check != null) { txbText.Check(check, true); }
         txbText.MoveAllowed = false;
         txbText.RemoveAllowed = false;
         txbText.AddAllowed = addNewAllowed;

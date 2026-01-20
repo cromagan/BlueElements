@@ -125,7 +125,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
         lstbx.CheckBehavior = CheckBehavior.MultiSelection;
         lstbx.ItemAddRange(items);
-        if (check != null) { lstbx.Check(check); }
+        if (check != null) { lstbx.Check(check, true); }
         lstbx.CheckBehavior = checkBehavior;
     }
 
