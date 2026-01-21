@@ -30,7 +30,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnDummyAdmin = new BlueControls.Controls.Button();
             this.PermissionGroups_NewRow = new BlueControls.Controls.ListBox();
             this.capNeueZeilenInfo = new BlueControls.Controls.Caption();
-            this.Caption22 = new BlueControls.Controls.Caption();
+            this.capTableAdmins = new BlueControls.Controls.Caption();
             this.lbxTableAdmin = new BlueControls.Controls.ListBox();
             this.capNeueZeilen = new BlueControls.Controls.Caption();
             this.grpKennwort = new BlueControls.Controls.GroupBox();
@@ -94,7 +94,7 @@ namespace BlueControls.BlueTableDialogs {
             this.grpBenutzergruppen.Controls.Add(this.btnDummyAdmin);
             this.grpBenutzergruppen.Controls.Add(this.PermissionGroups_NewRow);
             this.grpBenutzergruppen.Controls.Add(this.capNeueZeilenInfo);
-            this.grpBenutzergruppen.Controls.Add(this.Caption22);
+            this.grpBenutzergruppen.Controls.Add(this.capTableAdmins);
             this.grpBenutzergruppen.Controls.Add(this.lbxTableAdmin);
             this.grpBenutzergruppen.Controls.Add(this.capNeueZeilen);
             this.grpBenutzergruppen.Location = new System.Drawing.Point(16, 16);
@@ -137,16 +137,14 @@ namespace BlueControls.BlueTableDialogs {
             this.capNeueZeilenInfo.Name = "capNeueZeilenInfo";
             this.capNeueZeilenInfo.Size = new System.Drawing.Size(176, 40);
             this.capNeueZeilenInfo.Text = "<i>Die erste Spalte muss eine Bearbeitung zulassen";
-            this.capNeueZeilenInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // Caption22
+            // capTableAdmins
             // 
-            this.Caption22.CausesValidation = false;
-            this.Caption22.Location = new System.Drawing.Point(8, 24);
-            this.Caption22.Name = "Caption22";
-            this.Caption22.Size = new System.Drawing.Size(176, 22);
-            this.Caption22.Text = "Tabellen-Administratoren:";
-            this.Caption22.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capTableAdmins.CausesValidation = false;
+            this.capTableAdmins.Location = new System.Drawing.Point(8, 24);
+            this.capTableAdmins.Name = "capTableAdmins";
+            this.capTableAdmins.Size = new System.Drawing.Size(176, 22);
+            this.capTableAdmins.Text = "Tabellen-Administratoren:";
             // 
             // lbxTableAdmin
             // 
@@ -169,7 +167,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capNeueZeilen.Name = "capNeueZeilen";
             this.capNeueZeilen.Size = new System.Drawing.Size(176, 24);
             this.capNeueZeilen.Text = "Neue Zeilen anlegen:";
-            this.capNeueZeilen.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // grpKennwort
             // 
@@ -191,7 +188,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capKennwort.Name = "capKennwort";
             this.capKennwort.Size = new System.Drawing.Size(216, 22);
             this.capKennwort.Text = "Zum Öffnen der Tabelle:";
-            this.capKennwort.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbKennwort
             // 
@@ -240,7 +236,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capCaption.Name = "capCaption";
             this.capCaption.Size = new System.Drawing.Size(137, 16);
             this.capCaption.Text = "Überschrift bzw. Titel:";
-            this.capCaption.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capTags
             // 
@@ -250,7 +245,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capTags.QuickInfo = "Tags / Eigenschaften, die von einem";
             this.capTags.Size = new System.Drawing.Size(152, 16);
             this.capTags.Text = "Tags:";
-            this.capTags.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capInfo
             // 
@@ -258,7 +252,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capInfo.Location = new System.Drawing.Point(8, 56);
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(616, 144);
-            this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // GlobalTab
             // 
@@ -587,7 +580,7 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capCaption;
         private TextBox txbCaption;
         private TextBox txbTags;
-        private Caption Caption22;
+        private Caption capTableAdmins;
         private ListBox lbxTableAdmin;
         private TabPage tabAllgemein;
         private TabPage tabSortierung;

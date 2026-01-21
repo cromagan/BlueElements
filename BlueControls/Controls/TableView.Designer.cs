@@ -26,7 +26,6 @@ namespace BlueControls.Controls {
             this.BCB.Name = "BCB";
             this.BCB.Size = new Size(128, 32);
             this.BCB.TabIndex = 8;
-            this.BCB.Verhalten = SteuerelementVerhalten.Steuerelement_Anpassen;
             this.BCB.Visible = false;
             this.BCB.Enter += new EventHandler(this.BB_Enter);
             this.BCB.Esc += new EventHandler(this.BB_ESC);
@@ -40,7 +39,6 @@ namespace BlueControls.Controls {
             this.BTB.Name = "BTB";
             this.BTB.Size = new Size(128, 32);
             this.BTB.TabIndex = 7;
-            this.BTB.Verhalten = SteuerelementVerhalten.Steuerelement_Anpassen;
             this.BTB.Visible = false;
             this.BTB.Enter += new EventHandler(this.BB_Enter);
             this.BTB.Esc += new EventHandler(this.BB_ESC);

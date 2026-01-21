@@ -404,7 +404,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         var cx = -1;
         foreach (var thisIt in autoc) {
             if (thisIt.Left == left.Left && thisIt.Width == left.Width) {
-                var s1 = Caption.RequiredTextSize(thisIt.Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, false, -1);
+                var s1 = Caption.RequiredTextSize(thisIt.Caption, Design.Caption, false, -1);
                 cx = Math.Max(cx, s1.Width + 1);
                 dohere.Add(thisIt);
             } else {

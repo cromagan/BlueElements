@@ -29,29 +29,29 @@ namespace BlueControls.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.capTXT = new BlueControls.Controls.Caption();
+            this.capText = new BlueControls.Controls.Caption();
             this.SuspendLayout();
             // 
-            // capTXT
+            // capText
             // 
-            this.capTXT.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.capText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.capTXT.CausesValidation = false;
-            this.capTXT.Location = new System.Drawing.Point(8, 8);
-            this.capTXT.Name = "capTXT";
-            this.capTXT.Size = new System.Drawing.Size(72, 48);
+            this.capText.CausesValidation = false;
+            this.capText.Location = new System.Drawing.Point(8, 8);
+            this.capText.Name = "capText";
+            this.capText.Size = new System.Drawing.Size(72, 48);
             // 
             // Progressbar
             // 
             this.ClientSize = new System.Drawing.Size(86, 65);
-            this.Controls.Add(this.capTXT);
+            this.Controls.Add(this.capText);
             this.Name = "Progressbar";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.ResumeLayout(false);
         }
         #endregion
 
-        private Caption capTXT;
+        private Caption capText;
     }
 }

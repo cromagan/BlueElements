@@ -235,7 +235,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capAktuellAngezeigteAnsicht.Name = "capAktuellAngezeigteAnsicht";
             this.capAktuellAngezeigteAnsicht.Size = new System.Drawing.Size(160, 22);
             this.capAktuellAngezeigteAnsicht.Text = "Aktuell angezeigte Ansicht:";
-            this.capAktuellAngezeigteAnsicht.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxInternalColumnArrangementSelector
             // 

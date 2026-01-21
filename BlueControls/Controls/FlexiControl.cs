@@ -78,7 +78,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _caption = captionText;
         _captionPosition = CaptionPosition.Links_neben_dem_Feld;
 
-        Size = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Scrollen_mit_Textumbruch, Design.Caption, null, Translate, width);
+        Size = BlueControls.Controls.Caption.RequiredTextSize(_caption, Design.Caption, Translate, width);
     }
 
     #endregion
@@ -856,15 +856,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             ? " "
             : _caption;
 
-        if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
-            // Kann alles sein, Beschriftung und was weiß ich.
-            _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            _captionObject.Size = BlueControls.Controls.Caption.RequiredTextSize(_captionObject.Text, _captionObject.TextAnzeigeVerhalten, Design.Caption, null, false, Width);
-        } else {
-            _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
-            _captionObject.Size = _captionObject.RequiredTextSize();
-        }
+        //if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
+        //    // Kann alles sein, Beschriftung und was weiß ich.
+        //    _captionObject.Size = BlueControls.Controls.Caption.RequiredTextSize(_captionObject.Text, Design.Caption, false, Width);
+        //} else {
+        //    _captionObject.FitSize();
+        //}
 
+        _captionObject.FitSize();
         _captionObject.BringToFront();
     }
 
@@ -997,7 +996,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
             case CaptionPosition.Links_neben_dem_Feld:
-                var s1 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+                var s1 = BlueControls.Controls.Caption.RequiredTextSize(_caption, Design.Caption, Translate, -1);
 
                 control.Left = Math.Max(ControlX, s1.Width);
                 control.Top = 0;
@@ -1006,7 +1005,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             default:
-                var s2 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+                var s2 = BlueControls.Controls.Caption.RequiredTextSize(_caption, Design.Caption, Translate, -1);
                 control.Left = 0;
                 control.Top = Math.Max(ControlX, s2.Height);
                 control.Width = Width;

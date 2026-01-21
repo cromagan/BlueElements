@@ -831,7 +831,8 @@ public static class Skin {
 
     #region Fields
 
-    public const int Padding = 9;
+    public const int Padding = 9; 
+    public const int PaddingMedium = 6;
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(GetDpiScale(), 2, MidpointRounding.AwayFromZero);
     internal static Pen PenLinieDick = Pens.Red;

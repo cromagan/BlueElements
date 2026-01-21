@@ -64,33 +64,12 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Properties
 
-    public new int Height {
-        get => TextAnzeigeVerhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)
-            ? RequiredTextSize().Height
-            : base.Height;
-        set {
-            GetDesign();
-            if (TextAnzeigeVerhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
-            base.Height = value;
-        }
-    }
-
-    public new Size Size {
-        get => TextAnzeigeVerhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen) ? RequiredTextSize() : base.Size;
-        set {
-            GetDesign();
-            if (value.Width == base.Size.Width && value.Height == base.Size.Height) { return; }
-            base.Size = value;
-        }
-    }
-
     /// <summary>
     /// Benötigt, dass der Designer das nicht erstellt
     /// </summary>
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
-
         set => base.TabIndex = 0;
     }
 
@@ -100,7 +79,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
-
         set => base.TabStop = false;
     }
 
@@ -115,47 +93,19 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     } = string.Empty;
 
-    [DefaultValue(SteuerelementVerhalten.Text_Abschneiden)]
-    public SteuerelementVerhalten TextAnzeigeVerhalten {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            ResetETextAndInvalidate();
-        }
-    } = SteuerelementVerhalten.Text_Abschneiden;
-
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
-
-    public new int Width {
-        get => TextAnzeigeVerhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)
-            ? RequiredTextSize().Width
-            : base.Width;
-        set {
-            GetDesign();
-            if (TextAnzeigeVerhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
-            base.Width = value;
-        }
-    }
 
     #endregion
 
     #region Methods
 
-    public static Size RequiredTextSize(string text, SteuerelementVerhalten textAnzeigeverhalten, Design design, ExtText? eText, bool translate, int maxwidth) {
-        if (QuickModePossible(text, textAnzeigeverhalten)) {
+    public static Size RequiredTextSize(string text, Design design, bool translate, int maxwidth) {
+        if (QuickModePossible(text)) {
             var s = Skin.GetBlueFont(design, States.Standard).MeasureString(text);
             return new Size((int)(s.Width + 1), (int)(s.Height + 1));
         }
-
-        eText ??= new ExtText(design, States.Standard);
-
-        //eText.Design = design;
-        eText.HtmlText = LanguageTool.DoTranslate(text, translate);
-        eText.Multiline = true;
-        eText.TextDimensions = eText.TextDimensions with { Width = maxwidth };
-
+        var eText = GetEText(text, design, States.Standard, translate, maxwidth);
         return eText.LastSize();
     }
 
@@ -163,22 +113,17 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-    public Size RequiredTextSize() {
-        if (_design == Design.Undefiniert) { GetDesign(); }
-
-        //if (!QuickModePossible(Text, TextAnzeigeVerhalten) && _eText == null) {
-        //    if (DesignMode) { Refresh(); }// Damit das Skin initialisiert wird
-        //    DrawControl(null, States.Standard);
-        //}
-
-        return RequiredTextSize(Text, TextAnzeigeVerhalten, _design, _eText, Translate, -1);
-    }
-
     public void ResetETextAndInvalidate() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
         _eText = null;
-        //if (!QuickModePossible()) { SetDoubleBuffering(); }
         Invalidate();
+    }
+
+    internal void FitSize() {
+        if (_design == Design.Undefiniert) { GetDesign(); }
+        var s = RequiredTextSize(Text, _design, Translate, -1);
+        Width = s.Width;
+        Height = s.Height;
     }
 
     protected override void DrawControl(Graphics gr, States state) {
@@ -186,6 +131,8 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         base.DrawControl(gr, state);
 
         try {
+            Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+
             if (_design == Design.Undefiniert) {
                 GetDesign();
                 if (_design == Design.Undefiniert) { return; }
@@ -197,43 +144,15 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             }
 
             if (!string.IsNullOrEmpty(Text)) {
-                if (QuickModePossible(Text, TextAnzeigeVerhalten)) {
-                    if (gr == null) { return; }
-                    Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+                if (QuickModePossible(Text)) {
                     Skin.Draw_FormatedText(gr, Text, null, Alignment.Top_Left, new Rectangle(), _design, state, null, false, Translate);
-                    return;
+                } else {
+                    UseBackgroundBitmap = true;
+                    _eText ??= GetEText(Text, _design, state, Translate, Width);
+                    _eText.AreaControl = ClientRectangle;
+                    _eText?.Draw(gr, 1, 0, 0);
                 }
-
-                UseBackgroundBitmap = true;
-
-                _eText ??= new ExtText(_design, state) {
-                    HtmlText = LanguageTool.DoTranslate(Text, Translate),
-                    Multiline = true
-                };
-
-                switch (TextAnzeigeVerhalten) {
-                    case SteuerelementVerhalten.Steuerelement_Anpassen:
-                        _eText.TextDimensions = Size.Empty;
-                        Size = _eText.LastSize();
-                        break;
-
-                    case SteuerelementVerhalten.Text_Abschneiden:
-                        _eText.TextDimensions = Size.Empty;
-                        break;
-
-                    case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                        _eText.TextDimensions = new Size(base.Size.Width, -1);
-                        break;
-
-                    case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
-                        _eText.TextDimensions = Size.Empty;
-                        break;
-                }
-                _eText.AreaControl = ClientRectangle;
             }
-            if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
-            Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-            if (!string.IsNullOrEmpty(Text)) { _eText?.Draw(gr, 1, 0, 0); }
         } catch { }
     }
 
@@ -242,11 +161,13 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, this, e); }
     }
 
-    private static bool QuickModePossible(string text, SteuerelementVerhalten textAnzeigeverhalten) {
-        if (textAnzeigeverhalten != SteuerelementVerhalten.Text_Abschneiden) { return false; }
-        //if (Math.Abs(_Zeilenabstand - 1) > 0.01) { return false; }
-        return !text.Contains("<");
-    }
+    private static ExtText GetEText(string text, Design design, States state, bool translate, int maxwidth) => new ExtText(design, state) {
+        HtmlText = LanguageTool.DoTranslate(text, translate),
+        Multiline = true,
+        TextDimensions = new Size(maxwidth, -1),
+    };
+
+    private static bool QuickModePossible(string text) => !text.Contains("<");
 
     private void GetDesign() {
         _design = Design.Undefiniert;
@@ -266,16 +187,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             case ParentType.RibbonPage:
                 _design = Design.Ribbonbar_Caption;
                 break;
-
-            //case ParentType.GroupBox:
-            //case ParentType.TabPage:
-            //case ParentType.Form:
-            //case ParentType.FlexiControlForCell:
-            //case ParentType.Unbekannt: // UserForms und anderes
-            //case ParentType.Nothing: // UserForms und anderes
-            //case ParentType.ListBox:
-            //    _design = Design.Caption;
-            //    return;
 
             default:
                 _design = Design.Caption;

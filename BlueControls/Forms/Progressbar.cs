@@ -40,13 +40,7 @@ public partial class Progressbar : FloatingForm {
 
     private Progressbar() : base(Design.Form_BitteWarten) => InitializeComponent();
 
-    private Progressbar(string text) : this() {
-        // InitializeComponent();
-        capTXT.Text = text;
-        var he = Math.Min(capTXT.RequiredTextSize().Height, (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-        var wi = Math.Min(capTXT.RequiredTextSize().Width, (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-        Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
-    }
+    private Progressbar(string text) : this() => UpdateInternal(text);
 
     #endregion
 
@@ -151,15 +145,13 @@ public partial class Progressbar : FloatingForm {
     }
 
     private void UpdateInternal(string text) {
-        if (text != capTXT.Text) {
-            capTXT.Text = text;
-            var s = capTXT.RequiredTextSize();
-            var wi = Math.Max(Size.Width, s.Width + (Skin.Padding * 2));
-            var he = Math.Max(Size.Height, s.Height + (Skin.Padding * 2));
+        if (text != capText.Text) {
+            capText.Text = text;
+            capText.FitSize();
+            capText.Location = new Point(Skin.Padding, Skin.Padding);
+            var wi = Math.Max(Size.Width, capText.Right + Skin.Padding);
+            var he = Math.Max(Size.Height, capText.Bottom + Skin.Padding);
             Size = new Size(wi, he);
-            capTXT.Location = new Point(Skin.Padding, Skin.Padding);
-            capTXT.Width = s.Width + 1;
-            capTXT.Height = s.Height + 1;
             Refresh();
         }
     }

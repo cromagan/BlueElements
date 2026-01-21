@@ -128,7 +128,6 @@ namespace BlueControls.Forms {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(412, 24);
-            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 

@@ -117,6 +117,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public string AllowedChars { get; set; }
 
     /// <summary>
+    /// Bestimmt den Zeichenbereich. Zeichen außerhalb werden nicht dargsetellt.
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
     /// </summary>
     public Rectangle AreaControl { get; set; }

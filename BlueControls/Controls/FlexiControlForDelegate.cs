@@ -102,7 +102,7 @@ public class FlexiControlForDelegate : FlexiControl {
 
         EditType = EditTypeFormula.Button;
         CaptionPosition = CaptionPosition.ohne;
-        var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+        var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, Design.Caption, Translate, -1);
 
         Size = new Size(s0.Width + 50 + 22, 30);
         if (GetControl<Button>() is { IsDisposed: false } c0) {

@@ -26,12 +26,12 @@ namespace BlueControls.BlueTableDialogs {
             this.cpZeile = new BlueControls.Controls.Caption();
             this.btnTabelleKopf = new BlueControls.Controls.Button();
             this.grpScripte = new BlueControls.Controls.GroupBox();
-            this.caption1 = new BlueControls.Controls.Caption();
+            this.capInfo2 = new BlueControls.Controls.Caption();
             this.capScriptMenu = new BlueControls.Controls.Caption();
             this.btnScriptAfter = new BlueControls.Controls.Button();
             this.btnScriptMenu = new BlueControls.Controls.Button();
             this.btnScriptBefore = new BlueControls.Controls.Button();
-            this.caption2 = new BlueControls.Controls.Caption();
+            this.capInfo = new BlueControls.Controls.Caption();
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
@@ -94,8 +94,8 @@ namespace BlueControls.BlueTableDialogs {
             // grpScripte
             // 
             this.grpScripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpScripte.Controls.Add(this.caption2);
-            this.grpScripte.Controls.Add(this.caption1);
+            this.grpScripte.Controls.Add(this.capInfo);
+            this.grpScripte.Controls.Add(this.capInfo2);
             this.grpScripte.Controls.Add(this.capScriptMenu);
             this.grpScripte.Controls.Add(this.btnScriptAfter);
             this.grpScripte.Controls.Add(this.btnScriptMenu);
@@ -108,17 +108,16 @@ namespace BlueControls.BlueTableDialogs {
             this.grpScripte.TabStop = false;
             this.grpScripte.Text = "Scripte";
             // 
-            // caption1
+            // capInfo2
             // 
-            this.caption1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.capInfo2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.caption1.CausesValidation = false;
-            this.caption1.Location = new System.Drawing.Point(8, 48);
-            this.caption1.Name = "caption1";
-            this.caption1.Size = new System.Drawing.Size(274, 50);
-            this.caption1.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - BEVOR die Ze" +
+            this.capInfo2.CausesValidation = false;
+            this.capInfo2.Location = new System.Drawing.Point(8, 48);
+            this.capInfo2.Name = "capInfo2";
+            this.capInfo2.Size = new System.Drawing.Size(274, 50);
+            this.capInfo2.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - BEVOR die Ze" +
     "ile(n) angelegt werden.";
-            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capScriptMenu
             // 
@@ -129,7 +128,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capScriptMenu.Name = "capScriptMenu";
             this.capScriptMenu.Size = new System.Drawing.Size(274, 220);
             this.capScriptMenu.Text = "<b>Diese Skript wird ausgeführt, um die Menü-punkte zu generieren.</b><br>In die Variable MENU muss das Menu erstellt werden. Dieses muss folgendes Format haben:<br><i>Backen<br>Backen\\Zutaten<br>Backen\\Zutaten\\Mehl</i><br><br>Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.<br><br>Parallel dazu kann die Variable Infos erstellt werden - freie Wahl des Textes.";
-            this.capScriptMenu.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnScriptAfter
             // 
@@ -168,17 +166,16 @@ namespace BlueControls.BlueTableDialogs {
             this.btnScriptBefore.Text = "Before";
             this.btnScriptBefore.Click += new System.EventHandler(this.btnScriptBefore_Click);
             // 
-            // caption2
+            // capInfo
             // 
-            this.caption2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.capInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.caption2.CausesValidation = false;
-            this.caption2.Location = new System.Drawing.Point(8, 392);
-            this.caption2.Name = "caption2";
-            this.caption2.Size = new System.Drawing.Size(274, 50);
-            this.caption2.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - NACHDEM  die" +
+            this.capInfo.CausesValidation = false;
+            this.capInfo.Location = new System.Drawing.Point(8, 392);
+            this.capInfo.Name = "capInfo";
+            this.capInfo.Size = new System.Drawing.Size(274, 50);
+            this.capInfo.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - NACHDEM die" +
     " Zeile(n) angelegt wurden.";
-            this.caption2.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // RowAdderScriptEditor
             // 
@@ -208,7 +205,7 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnScriptAfter;
         private Button btnScriptMenu;
         private Caption capScriptMenu;
-        private Caption caption1;
-        private Caption caption2;
+        private Caption capInfo2;
+        private Caption capInfo;
     }
 }

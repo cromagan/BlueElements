@@ -105,25 +105,25 @@ namespace BlueControls.BlueTableDialogs {
             this.tabQuickInfo = new System.Windows.Forms.TabPage();
             this.txbAdminInfo = new BlueControls.Controls.TextBox();
             this.txbQuickinfo = new BlueControls.Controls.TextBox();
-            this.Caption18 = new BlueControls.Controls.Caption();
-            this.Caption17 = new BlueControls.Controls.Caption();
+            this.capAdminInfo = new BlueControls.Controls.Caption();
+            this.capQuickInfo = new BlueControls.Controls.Caption();
             this.btnQI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new System.Windows.Forms.TabPage();
             this.txbTags = new BlueControls.Controls.TextBox();
-            this.Caption8 = new BlueControls.Controls.Caption();
+            this.capTags = new BlueControls.Controls.Caption();
             this.cbxSort = new BlueControls.Controls.ComboBox();
             this.txbRegex = new BlueControls.Controls.TextBox();
             this.capSortiermaske = new BlueControls.Controls.Caption();
             this.capRegex = new BlueControls.Controls.Caption();
             this.txbAllowedChars = new BlueControls.Controls.TextBox();
-            this.Caption13 = new BlueControls.Controls.Caption();
+            this.capAllowedChars = new BlueControls.Controls.Caption();
             this.cbxLinkedTable = new BlueControls.Controls.ComboBox();
             this.capLinkedTable = new BlueControls.Controls.Caption();
             this.BlueFrame1 = new BlueControls.Controls.GroupBox();
             this.capInfo = new BlueControls.Controls.Caption();
-            this.Caption3 = new BlueControls.Controls.Caption();
+            this.capInternalName = new BlueControls.Controls.Caption();
             this.txbName = new BlueControls.Controls.TextBox();
-            this.Caption2 = new BlueControls.Controls.Caption();
+            this.capCaption = new BlueControls.Controls.Caption();
             this.txbCaption = new BlueControls.Controls.TextBox();
             this.btnSystemInfo = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
@@ -139,11 +139,11 @@ namespace BlueControls.BlueTableDialogs {
             this.capMaxTextLength = new BlueControls.Controls.Caption();
             this.tabSpaltenVerlinkung = new System.Windows.Forms.TabPage();
             this.cbxRelationType = new BlueControls.Controls.ComboBox();
-            this.caption1 = new BlueControls.Controls.Caption();
+            this.capOtherTable = new BlueControls.Controls.Caption();
             this.tblFilterliste = new BlueControls.Controls.TableView();
             this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
             this.capTargetColumn = new BlueControls.Controls.Caption();
-            this.caption5 = new BlueControls.Controls.Caption();
+            this.capCurrentView = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.capTabellenname = new BlueControls.Controls.Caption();
@@ -222,7 +222,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capHintergrund.Name = "capHintergrund";
             this.capHintergrund.Size = new System.Drawing.Size(88, 16);
             this.capHintergrund.Text = "Hintergrund:";
-            this.capHintergrund.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxRenderer
             // 
@@ -271,7 +270,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capSpaltenbild.Name = "capSpaltenbild";
             this.capSpaltenbild.Size = new System.Drawing.Size(72, 24);
             this.capSpaltenbild.Text = "Spaltenbild:";
-            this.capSpaltenbild.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbFixedColumnWidth
             // 
@@ -339,7 +337,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capUeberschrift3.Name = "capUeberschrift3";
             this.capUeberschrift3.Size = new System.Drawing.Size(88, 16);
             this.capUeberschrift3.Text = "Überschrift 3:";
-            this.capUeberschrift3.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capRenderer
             // 
@@ -365,7 +362,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capUeberschrift1.Name = "capUeberschrift1";
             this.capUeberschrift1.Size = new System.Drawing.Size(88, 16);
             this.capUeberschrift1.Text = "Überschrift 1:";
-            this.capUeberschrift1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxTranslate
             // 
@@ -392,7 +388,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capUeberschrift2.Name = "capUeberschrift2";
             this.capUeberschrift2.Size = new System.Drawing.Size(88, 16);
             this.capUeberschrift2.Text = "Überschrift 2:";
-            this.capUeberschrift2.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capLinkerRand
             // 
@@ -401,7 +396,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capLinkerRand.Name = "capLinkerRand";
             this.capLinkerRand.Size = new System.Drawing.Size(80, 16);
             this.capLinkerRand.Text = "Linker Rand:";
-            this.capLinkerRand.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxAlign
             // 
@@ -439,7 +433,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capRechterRand.Name = "capRechterRand";
             this.capRechterRand.Size = new System.Drawing.Size(88, 16);
             this.capRechterRand.Text = "Rechter Rand:";
-            this.capRechterRand.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxRandRechts
             // 
@@ -503,7 +496,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capcbxAdditionalCheck.Name = "capcbxAdditionalCheck";
             this.capcbxAdditionalCheck.Size = new System.Drawing.Size(216, 40);
             this.capcbxAdditionalCheck.Text = "Zusätzliche Prüfung, ob der eingegeben Wert konsitent ist zu:";
-            this.capcbxAdditionalCheck.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxChunk
             // 
@@ -522,7 +514,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capChunk.Name = "capChunk";
             this.capChunk.Size = new System.Drawing.Size(184, 16);
             this.capChunk.Text = "Werte zum Chunken benutzen:";
-            this.capChunk.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // chkMultiline
             // 
@@ -599,7 +590,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capImmerWerte.Name = "capImmerWerte";
             this.capImmerWerte.Size = new System.Drawing.Size(440, 24);
             this.capImmerWerte.Text = "<b><u>Immer auswählbare Werte:";
-            this.capImmerWerte.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnCanBeEmpty
             // 
@@ -647,7 +637,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capUserGroupEdit.Name = "capUserGroupEdit";
             this.capUserGroupEdit.Size = new System.Drawing.Size(328, 32);
             this.capUserGroupEdit.Text = "<b>Folgende Benutzergruppen dürfen den Inhalt der Zellen bearbeiten:";
-            this.capUserGroupEdit.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnEditableDropdown
             // 
@@ -760,7 +749,6 @@ namespace BlueControls.BlueTableDialogs {
     " Zeichen erlaubt.\r\nDa im UTF8-Format gespeichert wird, evtl. auch weniger.";
             this.capMaxCellLength.Size = new System.Drawing.Size(160, 24);
             this.capMaxCellLength.Text = "Maximale Zellen-Kapazität:";
-            this.capMaxCellLength.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnAutoEditKleineFehler
             // 
@@ -850,7 +838,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capJokerValue.Size = new System.Drawing.Size(312, 56);
             this.capJokerValue.Text = "Bei Autofilter-Aktionen, Zellen mit folgenden Inhalt <b>immer</b> anzeigen, wenn " +
     "ein Wert gewählt wurde:<br>(Joker)";
-            this.capJokerValue.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbJoker
             // 
@@ -902,8 +889,8 @@ namespace BlueControls.BlueTableDialogs {
             this.tabQuickInfo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabQuickInfo.Controls.Add(this.txbAdminInfo);
             this.tabQuickInfo.Controls.Add(this.txbQuickinfo);
-            this.tabQuickInfo.Controls.Add(this.Caption18);
-            this.tabQuickInfo.Controls.Add(this.Caption17);
+            this.tabQuickInfo.Controls.Add(this.capAdminInfo);
+            this.tabQuickInfo.Controls.Add(this.capQuickInfo);
             this.tabQuickInfo.Controls.Add(this.btnQI_Vorschau);
             this.tabQuickInfo.Location = new System.Drawing.Point(4, 25);
             this.tabQuickInfo.Name = "tabQuickInfo";
@@ -941,24 +928,22 @@ namespace BlueControls.BlueTableDialogs {
             this.txbQuickinfo.TabIndex = 0;
             this.txbQuickinfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // Caption18
+            // capAdminInfo
             // 
-            this.Caption18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Caption18.CausesValidation = false;
-            this.Caption18.Location = new System.Drawing.Point(617, 8);
-            this.Caption18.Name = "Caption18";
-            this.Caption18.Size = new System.Drawing.Size(188, 15);
-            this.Caption18.Text = "Administrator-Info:";
-            this.Caption18.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capAdminInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.capAdminInfo.CausesValidation = false;
+            this.capAdminInfo.Location = new System.Drawing.Point(617, 8);
+            this.capAdminInfo.Name = "capAdminInfo";
+            this.capAdminInfo.Size = new System.Drawing.Size(188, 15);
+            this.capAdminInfo.Text = "Administrator-Info:";
             // 
-            // Caption17
+            // capQuickInfo
             // 
-            this.Caption17.CausesValidation = false;
-            this.Caption17.Location = new System.Drawing.Point(8, 8);
-            this.Caption17.Name = "Caption17";
-            this.Caption17.Size = new System.Drawing.Size(168, 16);
-            this.Caption17.Text = "QuickInfo:";
-            this.Caption17.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capQuickInfo.CausesValidation = false;
+            this.capQuickInfo.Location = new System.Drawing.Point(8, 8);
+            this.capQuickInfo.Name = "capQuickInfo";
+            this.capQuickInfo.Size = new System.Drawing.Size(168, 16);
+            this.capQuickInfo.Text = "QuickInfo:";
             // 
             // btnQI_Vorschau
             // 
@@ -974,7 +959,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.tabSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSonstiges.Controls.Add(this.txbTags);
-            this.tabSonstiges.Controls.Add(this.Caption8);
+            this.tabSonstiges.Controls.Add(this.capTags);
             this.tabSonstiges.Location = new System.Drawing.Point(4, 25);
             this.tabSonstiges.Name = "tabSonstiges";
             this.tabSonstiges.Padding = new System.Windows.Forms.Padding(3);
@@ -996,14 +981,13 @@ namespace BlueControls.BlueTableDialogs {
             this.txbTags.TabIndex = 30;
             this.txbTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // Caption8
+            // capTags
             // 
-            this.Caption8.CausesValidation = false;
-            this.Caption8.Location = new System.Drawing.Point(4, 15);
-            this.Caption8.Name = "Caption8";
-            this.Caption8.Size = new System.Drawing.Size(144, 16);
-            this.Caption8.Text = "Sonstige Daten (Tags):";
-            this.Caption8.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capTags.CausesValidation = false;
+            this.capTags.Location = new System.Drawing.Point(4, 15);
+            this.capTags.Name = "capTags";
+            this.capTags.Size = new System.Drawing.Size(144, 16);
+            this.capTags.Text = "Sonstige Daten (Tags):";
             // 
             // cbxSort
             // 
@@ -1030,7 +1014,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capSortiermaske.Name = "capSortiermaske";
             this.capSortiermaske.Size = new System.Drawing.Size(216, 40);
             this.capSortiermaske.Text = "Bei der Tabellen-Zeilen-Sortierung fungiert diese Spalte als:";
-            this.capSortiermaske.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capRegex
             // 
@@ -1050,14 +1033,13 @@ namespace BlueControls.BlueTableDialogs {
             this.txbAllowedChars.TabIndex = 30;
             this.txbAllowedChars.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // Caption13
+            // capAllowedChars
             // 
-            this.Caption13.CausesValidation = false;
-            this.Caption13.Location = new System.Drawing.Point(8, 72);
-            this.Caption13.Name = "Caption13";
-            this.Caption13.Size = new System.Drawing.Size(352, 24);
-            this.Caption13.Text = "Folgende Zeichen können vom Benutzer eingegeben werden:";
-            this.Caption13.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capAllowedChars.CausesValidation = false;
+            this.capAllowedChars.Location = new System.Drawing.Point(8, 72);
+            this.capAllowedChars.Name = "capAllowedChars";
+            this.capAllowedChars.Size = new System.Drawing.Size(352, 24);
+            this.capAllowedChars.Text = "Folgende Zeichen können vom Benutzer eingegeben werden:";
             // 
             // cbxLinkedTable
             // 
@@ -1086,9 +1068,9 @@ namespace BlueControls.BlueTableDialogs {
             this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
             this.BlueFrame1.Controls.Add(this.capInfo);
-            this.BlueFrame1.Controls.Add(this.Caption3);
+            this.BlueFrame1.Controls.Add(this.capInternalName);
             this.BlueFrame1.Controls.Add(this.txbName);
-            this.BlueFrame1.Controls.Add(this.Caption2);
+            this.BlueFrame1.Controls.Add(this.capCaption);
             this.BlueFrame1.Controls.Add(this.txbCaption);
             this.BlueFrame1.Location = new System.Drawing.Point(8, 24);
             this.BlueFrame1.Name = "BlueFrame1";
@@ -1104,16 +1086,14 @@ namespace BlueControls.BlueTableDialogs {
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(280, 19);
             this.capInfo.Text = "NR";
-            this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // Caption3
+            // capInternalName
             // 
-            this.Caption3.CausesValidation = false;
-            this.Caption3.Location = new System.Drawing.Point(8, 40);
-            this.Caption3.Name = "Caption3";
-            this.Caption3.Size = new System.Drawing.Size(136, 16);
-            this.Caption3.Text = "Interner Spaltename:";
-            this.Caption3.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capInternalName.CausesValidation = false;
+            this.capInternalName.Location = new System.Drawing.Point(8, 40);
+            this.capInternalName.Name = "capInternalName";
+            this.capInternalName.Size = new System.Drawing.Size(136, 16);
+            this.capInternalName.Text = "Interner Spaltename:";
             // 
             // txbName
             // 
@@ -1125,14 +1105,13 @@ namespace BlueControls.BlueTableDialogs {
             this.txbName.Size = new System.Drawing.Size(296, 24);
             this.txbName.TabIndex = 0;
             // 
-            // Caption2
+            // capCaption
             // 
-            this.Caption2.CausesValidation = false;
-            this.Caption2.Location = new System.Drawing.Point(312, 16);
-            this.Caption2.Name = "Caption2";
-            this.Caption2.Size = new System.Drawing.Size(144, 16);
-            this.Caption2.Text = "Angezeigte Beschriftung:";
-            this.Caption2.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capCaption.CausesValidation = false;
+            this.capCaption.Location = new System.Drawing.Point(312, 16);
+            this.capCaption.Name = "capCaption";
+            this.capCaption.Size = new System.Drawing.Size(144, 16);
+            this.capCaption.Text = "Angezeigte Beschriftung:";
             // 
             // txbCaption
             // 
@@ -1209,7 +1188,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabDatenFormat.Controls.Add(this.capSortiermaske);
             this.tabDatenFormat.Controls.Add(this.txbRegex);
             this.tabDatenFormat.Controls.Add(this.capRegex);
-            this.tabDatenFormat.Controls.Add(this.Caption13);
+            this.tabDatenFormat.Controls.Add(this.capAllowedChars);
             this.tabDatenFormat.Controls.Add(this.chkFormatierungErlaubt);
             this.tabDatenFormat.Controls.Add(this.cbxAdditionalCheck);
             this.tabDatenFormat.Controls.Add(this.capcbxAdditionalCheck);
@@ -1310,13 +1289,12 @@ namespace BlueControls.BlueTableDialogs {
     "t dem Format entspricht.";
             this.capMaxTextLength.Size = new System.Drawing.Size(136, 24);
             this.capMaxTextLength.Text = "Maximale Text-Länge:";
-            this.capMaxTextLength.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // tabSpaltenVerlinkung
             // 
             this.tabSpaltenVerlinkung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabSpaltenVerlinkung.Controls.Add(this.cbxRelationType);
-            this.tabSpaltenVerlinkung.Controls.Add(this.caption1);
+            this.tabSpaltenVerlinkung.Controls.Add(this.capOtherTable);
             this.tabSpaltenVerlinkung.Controls.Add(this.tblFilterliste);
             this.tabSpaltenVerlinkung.Controls.Add(this.cbxTargetColumn);
             this.tabSpaltenVerlinkung.Controls.Add(this.capLinkedTable);
@@ -1338,14 +1316,13 @@ namespace BlueControls.BlueTableDialogs {
             this.cbxRelationType.Size = new System.Drawing.Size(232, 24);
             this.cbxRelationType.TabIndex = 41;
             // 
-            // caption1
+            // capOtherTable
             // 
-            this.caption1.CausesValidation = false;
-            this.caption1.Location = new System.Drawing.Point(8, 8);
-            this.caption1.Name = "caption1";
-            this.caption1.Size = new System.Drawing.Size(232, 16);
-            this.caption1.Text = "Werte aus anderer Tabelle benutzen:";
-            this.caption1.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capOtherTable.CausesValidation = false;
+            this.capOtherTable.Location = new System.Drawing.Point(8, 8);
+            this.capOtherTable.Name = "capOtherTable";
+            this.capOtherTable.Size = new System.Drawing.Size(232, 16);
+            this.capOtherTable.Text = "Werte aus anderer Tabelle benutzen:";
             // 
             // tblFilterliste
             // 
@@ -1379,16 +1356,15 @@ namespace BlueControls.BlueTableDialogs {
             this.capTargetColumn.Name = "capTargetColumn";
             this.capTargetColumn.Size = new System.Drawing.Size(200, 16);
             this.capTargetColumn.Text = "Aus dieser Spalte die Werte holen:";
-            this.capTargetColumn.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // caption5
+            // capCurrentView
             // 
-            this.caption5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.caption5.CausesValidation = false;
-            this.caption5.Location = new System.Drawing.Point(185, 765);
-            this.caption5.Name = "caption5";
-            this.caption5.Size = new System.Drawing.Size(104, 24);
-            this.caption5.Text = "Aktuelle Ansicht:";
+            this.capCurrentView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.capCurrentView.CausesValidation = false;
+            this.capCurrentView.Location = new System.Drawing.Point(185, 765);
+            this.capCurrentView.Name = "capCurrentView";
+            this.capCurrentView.Size = new System.Drawing.Size(104, 24);
+            this.capCurrentView.Text = "Aktuelle Ansicht:";
             // 
             // butAktuellVor
             // 
@@ -1417,7 +1393,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capTabellenname.Name = "capTabellenname";
             this.capTabellenname.Size = new System.Drawing.Size(940, 24);
             this.capTabellenname.Text = "Tabellenname:";
-            this.capTabellenname.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             this.capTabellenname.Translate = false;
             // 
             // btnSpaltenkopf
@@ -1450,7 +1425,7 @@ namespace BlueControls.BlueTableDialogs {
             this.ClientSize = new System.Drawing.Size(1112, 796);
             this.Controls.Add(this.btnSpaltenkopf);
             this.Controls.Add(this.capTabellenname);
-            this.Controls.Add(this.caption5);
+            this.Controls.Add(this.capCurrentView);
             this.Controls.Add(this.butAktuellVor);
             this.Controls.Add(this.butAktuellZurueck);
             this.Controls.Add(this.tabControl);
@@ -1476,7 +1451,7 @@ namespace BlueControls.BlueTableDialogs {
         }
         private Button btnOk;
         private TextBox txbName;
-        private Caption Caption3;
+        private Caption capInternalName;
         private ColorDialog ColorDia;
         private Button btnQI_Vorschau;
         private TextBox txbQuickinfo;
@@ -1490,7 +1465,7 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capLinkerRand;
         private Button btnTextColor;
         private Button btnBackColor;
-        private Caption Caption2;
+        private Caption capCaption;
         private TextBox txbCaption;
         private GroupBox BlueFrame1;
         private Button btnEditableDropdown;
@@ -1498,16 +1473,16 @@ namespace BlueControls.BlueTableDialogs {
         private TextBox txbAuswaehlbareWerte;
         private Button btnCanBeEmpty;
         private Caption capUserGroupEdit;
-        private Caption Caption8;
+        private Caption capTags;
         private ComboBox cbxRandRechts;
         private ComboBox cbxRandLinks;
-        private Caption Caption13;
+        private Caption capAllowedChars;
         private TextBox txbAllowedChars;
         private Caption capImmerWerte;
         private Caption capChunk;
-        private Caption Caption18;
+        private Caption capAdminInfo;
         private TextBox txbAdminInfo;
-        private Caption Caption17;
+        private Caption capQuickInfo;
         private Button btnOtherValuesToo;
         private ListBox lbxCellEditor;
         private ComboBox cbxChunk;
@@ -1549,7 +1524,7 @@ namespace BlueControls.BlueTableDialogs {
         private GroupBox grpAuswahlmenuOptionen;
         private TextBox txbAutoRemove;
         private Caption capAutoRemove;
-        private Caption caption5;
+        private Caption capCurrentView;
         private Button butAktuellVor;
         private Button butAktuellZurueck;
         private TextBox txbAutoReplace;
@@ -1586,7 +1561,7 @@ namespace BlueControls.BlueTableDialogs {
         private Button chkIsFirst;
         private Button chkRelation;
         private ComboBox cbxRelationType;
-        private Caption caption1;
+        private Caption capOtherTable;
         private Caption capHintergrund;
         private ComboBox cbxBackground;
         private Caption capInfos;

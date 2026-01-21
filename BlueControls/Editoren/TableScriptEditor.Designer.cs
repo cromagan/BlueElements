@@ -141,7 +141,6 @@ namespace BlueControls.BlueTableDialogs {
             this.capFehler.Location = new System.Drawing.Point(712, 80);
             this.capFehler.Name = "capFehler";
             this.capFehler.Size = new System.Drawing.Size(237, 192);
-            this.capFehler.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbQuickInfo
             // 

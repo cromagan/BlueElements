@@ -93,7 +93,7 @@ public partial class DialogWithOkAndCancel : Form {
             capText.Visible = true;
             capText.Translate = false;
             capText.Text = txt;
-            capText.Refresh();
+            capText.FitSize();
             wi += capText.Width;
             he += capText.Height;
         }

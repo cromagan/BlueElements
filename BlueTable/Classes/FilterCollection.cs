@@ -79,48 +79,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi != null) { Add(fi); }
     }
 
-    /// <summary>
-    /// Erstellt eine FilterCollection aus einer vollständigen SQL-SELECT-Anweisung
-    /// Beispiel: "SELECT * FROM Kunden WHERE Name = 'Mueller' AND Status = 'Aktiv'"
-    /// </summary>
-    /// <param name="sql">Die vollständige SQL-SELECT-Anweisung</param>
-    /// <param name="comment">Kommentar für den Filter</param>
-    public FilterCollection(string sql, string comment) {
-        Coment = comment;
-
-        if (string.IsNullOrWhiteSpace(sql)) {
-            Table = null;
-            return;
-        }
-
-        try {
-            // SQL normalisieren und in Großbuchstaben konvertieren
-            (var normalizedSql, var error) = sql.NormalizedText(true, true, true, false, ' ');
-
-            if (!string.IsNullOrEmpty(error)) {
-                Develop.DebugPrint(ErrorType.Error, "Fehler beim Normalisieren der SQL-Anweisung: " + error);
-                Table = null;
-                return;
-            }
-
-            // Tabelle anhand des Tabellennamens finden
-            Table = GetTableFromSql(normalizedSql);
-            if (Table == null) {
-                Develop.DebugPrint(ErrorType.Warning, "Tabelle nicht gefunden in SQL: " + sql);
-                return;
-            }
-
-            // WHERE-Klausel extrahieren und parsen
-            var whereClause = ExtractWhereClauseFromSql(normalizedSql);
-            if (!string.IsNullOrWhiteSpace(whereClause)) {
-                ParseSqlWhereClause(whereClause);
-            }
-        } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Error, "Fehler beim Parsen der SQL-Anweisung: " + ex.Message);
-            Table = null;
-        }
-    }
-
     #endregion
 
     #region Destructors
@@ -206,40 +164,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 RegisterTableEvents();
                 Invalidate_FilteredRows();
             }
-            OnPropertyChanged();
-        }
-    }
-
-    public string Where {
-        get {
-            if (IsDisposed || Count == 0) { return string.Empty; }
-
-            var conditions = new List<string>();
-
-            foreach (var filter in _internal) {
-                if (filter.IsOk()) {
-                    var condition = filter.Where;
-                    if (!string.IsNullOrEmpty(condition)) {
-                        conditions.Add(condition);
-                    }
-                }
-            }
-
-            return conditions.Count > 0 ? string.Join(" AND ", conditions) : string.Empty;
-        }
-        set {
-            if (IsDisposed) { return; }
-
-            Clear();
-
-            if (!string.IsNullOrWhiteSpace(value) && Table is { IsDisposed: false }) {
-                try {
-                    ParseSqlWhereClause(value);
-                } catch (Exception ex) {
-                    Develop.DebugPrint(ErrorType.Error, "Fehler beim Setzen der WHERE-Klausel: " + ex.Message);
-                }
-            }
-
             OnPropertyChanged();
         }
     }
@@ -756,60 +680,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public override string ToString() => ParseableItems().FinishParseable();
 
     /// <summary>
-    /// Extrahiert die WHERE-Klausel aus einer bereits normalisierten SQL-SELECT-Anweisung
-    /// </summary>
-    /// <param name="normalizedSql">Die bereits normalisierte SQL-Anweisung</param>
-    /// <returns>Die WHERE-Klausel ohne das Wort "WHERE" oder leerer String</returns>
-    private static string ExtractWhereClauseFromSql(string normalizedSql) {
-        if (string.IsNullOrWhiteSpace(normalizedSql)) { return string.Empty; }
-
-        // WHERE-Position finden (da bereits uppercase: nur "WHERE")
-        var whereIndex = normalizedSql.IndexOf(" WHERE ");
-
-        if (whereIndex == -1) { return string.Empty; }
-
-        // Alles nach WHERE extrahieren
-        var whereClause = normalizedSql.Substring(whereIndex + 7); // 7 = " WHERE ".Length
-
-        // Eventuelle ORDER BY, GROUP BY, HAVING entfernen
-        var endKeywords = new[] { " ORDER BY ", " GROUP BY ", " HAVING ", " LIMIT " };
-
-        foreach (var keyword in endKeywords) {
-            var keywordIndex = whereClause.IndexOf(keyword);
-            if (keywordIndex >= 0) {
-                whereClause = whereClause.Substring(0, keywordIndex);
-            }
-        }
-
-        return whereClause.Trim();
-    }
-
-    /// <summary>
-    /// Extrahiert den Tabellennamen aus einer bereits normalisierten SQL-SELECT-Anweisung und gibt die Tabelle zurück
-    /// </summary>
-    /// <param name="normalizedSql">Die bereits normalisierte SQL-Anweisung</param>
-    /// <returns>Die Tabelle oder null wenn nicht gefunden</returns>
-    private static Table? GetTableFromSql(string normalizedSql) {
-        if (string.IsNullOrWhiteSpace(normalizedSql)) { return null; }
-
-        // FROM-Klausel suchen
-        var fromMatch = System.Text.RegularExpressions.Regex.Match(normalizedSql,
-            @"\bFROM\s+([^\s]+)");
-
-        if (fromMatch.Success) {
-            var tableName = fromMatch.Groups[1].Value;
-
-            // Eventuelle Anführungszeichen oder eckige Klammern entfernen
-            tableName = tableName.Trim('[', ']', '"', '\'');
-
-            var validTableName = Table.MakeValidTableName(tableName);
-            return Table.Get(validTableName, null, false);
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Teilt die WHERE-Klausel in einzelne Bedingungen auf
     /// Vereinfachte Implementierung ohne Klammern-Unterstützung
     /// </summary>
@@ -904,30 +774,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    /// <summary>
-    /// Parst eine bereits normalisierte SQL-WHERE-Klausel und erstellt entsprechende FilterItems
-    /// </summary>
-    /// <param name="whereClause">Die bereits normalisierte WHERE-Klausel</param>
-    private void ParseSqlWhereClause(string whereClause) {
-        if (Table is not { IsDisposed: false } tb) { return; }
-
-        try {
-            // Aufteilen in einzelne Bedingungen (vereinfacht, ohne Klammern-Parsing)
-            var conditions = SplitConditions(whereClause);
-
-            foreach (var condition in conditions) {
-                var filterItem = new FilterItem(tb, condition.Trim());
-                if (filterItem.IsOk()) {
-                    AddInternal(filterItem);
-                }
-            }
-
-            Invalidate_FilteredRows();
-        } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Warning, $"Fehler beim Parsen der SQL-WHERE-Klausel: {ex.Message}");
-        }
     }
 
     private void RegisterTableEvents() {

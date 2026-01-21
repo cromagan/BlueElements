@@ -31,18 +31,17 @@ namespace BlueControls.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.capTXT = new BlueControls.Controls.Caption();
+            this.capText = new BlueControls.Controls.Caption();
             this.timQI = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
-            // capTXT
+            // capText
             // 
-            this.capTXT.CausesValidation = false;
-            this.capTXT.Location = new System.Drawing.Point(8, 8);
-            this.capTXT.Name = "capTXT";
-            this.capTXT.Size = new System.Drawing.Size(16, 16);
-            this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
-            this.capTXT.Translate = false;
+            this.capText.CausesValidation = false;
+            this.capText.Location = new System.Drawing.Point(8, 8);
+            this.capText.Name = "capText";
+            this.capText.Size = new System.Drawing.Size(16, 16);
+            this.capText.Translate = false;
             // 
             // timQI
             // 
@@ -52,14 +51,14 @@ namespace BlueControls.Forms
             // QuickInfo
             // 
             this.ClientSize = new System.Drawing.Size(86, 65);
-            this.Controls.Add(this.capTXT);
+            this.Controls.Add(this.capText);
             this.Name = "QuickInfo";
             this.Text = "QuickInfo";
             this.ResumeLayout(false);
         }
         #endregion
 
-        private Caption capTXT;
+        private Caption capText;
         private Timer timQI;
     }
 }

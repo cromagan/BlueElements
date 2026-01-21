@@ -57,7 +57,6 @@ namespace BlueControls.Forms {
             this.capSortierspalten.Name = "capSortierspalten";
             this.capSortierspalten.Size = new System.Drawing.Size(160, 24);
             this.capSortierspalten.Text = "Sortier-Spalten:";
-            this.capSortierspalten.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // btnSortRichtung
             // 

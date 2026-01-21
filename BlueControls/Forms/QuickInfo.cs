@@ -40,10 +40,12 @@ public partial class QuickInfo : FloatingForm {
 
     private QuickInfo(string text) : this() {
         //InitializeComponent();
-        capTXT.Text = text;
-        var he = Math.Min(capTXT.RequiredTextSize().Height, (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-        var wi = Math.Min(capTXT.RequiredTextSize().Width, (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-        Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
+        capText.Text = text;
+        capText.FitSize();
+        capText.Location = new Point(Skin.PaddingMedium, Skin.PaddingMedium);
+        var wi = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Right + Skin.PaddingMedium);
+        var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Bottom + Skin.PaddingMedium);
+        Size = new Size(wi, he);
         Visible = false;
         timQI.Enabled = true;
     }

@@ -691,6 +691,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (fi == null) {
             TableInternal.Filter.Remove(ffc.FilterSingleColumn);
         } else {
+            if(!string.IsNullOrEmpty(fi.Origin)) { return; }
+            // Besser wäre FilterInput[ffc.FilterSingleColumn].Equals(fi)
+            // Aber das Origin stimmt nicht
+
             TableInternal.Filter.RemoveOtherAndAdd(fi);
         }
 

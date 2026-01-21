@@ -53,7 +53,11 @@ public partial class MessageBox : Form {
         capText.Text = pic is { } im
             ? QuickImage.Get(im, 32).HTMLCode + " <zbx_store><top>" + LanguageTool.DoTranslate(txt, false)
             : LanguageTool.DoTranslate(txt, false);
-        Size = new Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
+
+        capText.FitSize();
+        capText.Location = new Point(Skin.Padding, Skin.Padding);
+
+        Size = new Size(capText.Right + BorderWidth + Skin.Padding, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
         if (buttons.Length == 0) { buttons = ["OK"]; }
         var b = Generate_Buttons(buttons);
         foreach (var thisButton in b) {

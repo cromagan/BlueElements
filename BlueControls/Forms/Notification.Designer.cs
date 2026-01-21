@@ -26,19 +26,17 @@ namespace BlueControls.Forms {
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            this.capTXT = new BlueControls.Controls.Caption();
+            this.capText = new BlueControls.Controls.Caption();
             this.timNote = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
-            // capTXT
+            // capText
             // 
-            this.capTXT.CausesValidation = false;
-            this.capTXT.Location = new System.Drawing.Point(8, 8);
-            this.capTXT.Name = "capTXT";
-            this.capTXT.Size = new System.Drawing.Size(10, 10);
-            this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Steuerelement_Anpassen;
-            this.capTXT.Translate = false;
-            this.capTXT.Click += new System.EventHandler(this.capTXT_Click);
+            this.capText.CausesValidation = false;
+            this.capText.Location = new System.Drawing.Point(8, 8);
+            this.capText.Name = "capText";
+            this.capText.Size = new System.Drawing.Size(10, 10);
+            this.capText.Translate = false;
             // 
             // timNote
             // 
@@ -48,13 +46,13 @@ namespace BlueControls.Forms {
             // Notification
             // 
             this.ClientSize = new System.Drawing.Size(86, 65);
-            this.Controls.Add(this.capTXT);
+            this.Controls.Add(this.capText);
             this.Name = "Notification";
             this.ResumeLayout(false);
         }
         #endregion
 
-        private Caption capTXT;
+        private Caption capText;
         private Timer timNote;
     }
 }

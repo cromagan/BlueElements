@@ -72,9 +72,9 @@ public partial class FontEditor : EditorEasy {
                 if (string.IsNullOrEmpty(f.Name)) { continue; }
 
                 if (f.IsStyleAvailable(FontStyle.Regular)) {
-                    Font fo = new(f.Name, 100);
+                    //var fo = new Font(f.Name, 100);
                     try {
-                        fo.MeasureString("T");
+                        //fo.MeasureString("T");
                         _fnList.Add(ItemOf(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true));
                     } catch { }
                 }

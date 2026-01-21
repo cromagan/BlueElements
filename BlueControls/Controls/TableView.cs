@@ -1586,6 +1586,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //var t = sortedRowData.CanvasItemData(Design.Item_Listbox);
         avi.Values.ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
 
+        if (!string.IsNullOrEmpty(Table.FreezedReason)) {
+            var i = QuickImage.Get(ImageCode.Schloss, 48);
+            gr.DrawImage(i, 10, 10);
+            var fa = BlueFont.DefaultFont.Scale(2.5f);
+            fa.DrawString(gr, Table.FreezedReason, 60, 15);
+        }
+
         // Rahmen um die gesamte Tabelle zeichnen
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
     }
@@ -1957,7 +1964,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (fehler.Count > 0) {
                 Forms.MessageBox.Show($"{info2}Alle {all} Zeilen abgearbeitet.\r\nEs sind in {fehler.Count} Zeile(n) Skript-Fehler aufgetreten", ImageCode.Warnung, "OK");
             } else {
-                Forms.MessageBox.Show($"{info2}Alle {all} Zeilen\r\nerfolgreich abgearbeitet.", ImageCode.HäkchenDoppelt, "OK");
+                Forms.MessageBox.Show($"{info2}Alle {all} Zeilen erfolgreich abgearbeitet.", ImageCode.HäkchenDoppelt, "OK");
             }
         }
     }

@@ -349,7 +349,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         gr.ResetTransform();
         if (!forPrinting) {
             if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
-                Font f = new("Arial", 8);
+                var f = new Font("Arial", 8);
                 BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, positionControl.Left, positionControl.Top);
             }
         }
