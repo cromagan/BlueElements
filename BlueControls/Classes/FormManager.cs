@@ -67,6 +67,8 @@ public class FormManager : ApplicationContext {
 
     #region Methods
 
+    public static Form? OpenLastMenu() => CreateForm(FormBeforeEnd, _current);
+
     public static void RegisterForm(Form frm) {
         if (_current == null) {
             Develop.DebugPrint(ErrorType.Error, "FormManager nicht gestartert!");
@@ -176,7 +178,7 @@ public class FormManager : ApplicationContext {
         if (Forms.Count > 0) { return; }
 
         if (sender != _lastStartForm) {
-            _lastStartForm = CreateForm(FormBeforeEnd, _current);
+            _lastStartForm = OpenLastMenu();
             if (_lastStartForm != null) { return; }
         }
 

@@ -26,7 +26,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.Forms;
 
-public partial class PictureView : Form, IDisposableExtended {
+public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
     #region Fields
 
@@ -82,7 +82,7 @@ public partial class PictureView : Form, IDisposableExtended {
 
     #region Properties
 
-    public sealed override string Text {
+    public override sealed string Text {
         get => base.Text;
         set => base.Text = value;
     }
@@ -95,6 +95,12 @@ public partial class PictureView : Form, IDisposableExtended {
         _fileList.Clear();
         if (fileList != null) { _fileList.AddRange(fileList); }
         LoadPic(imageno);
+    }
+
+    internal static void Contextmenu_OpenImage(object sender, ObjectEventArgs e) {
+        if (e.Data is not Bitmap bitmap) { return; }
+        var epv = new PictureView(bitmap);
+        epv.Show();
     }
 
     protected void LoadPic(int nr) {
@@ -146,12 +152,6 @@ public partial class PictureView : Form, IDisposableExtended {
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
-    }
-
-    internal static void Contextmenu_OpenImage(object sender, ObjectEventArgs e) {
-        if (e.Data is not Bitmap bitmap) { return; }
-        var epv = new PictureView(bitmap);
-        epv.Show();
     }
 
     #endregion

@@ -147,7 +147,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields, RowItem? row) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields, RowItem? row, bool produktiv) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -163,7 +163,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         vars.AddRange(fields);
 
-        var scp = new ScriptProperties("ScriptButton", Method.AllMethods, true, [], row, "ScriptButton", "ScriptButton in Formular");
+        var scp = new ScriptProperties("ScriptButton", Method.AllMethods, produktiv, [], row, "ScriptButton", "ScriptButton in Formular");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

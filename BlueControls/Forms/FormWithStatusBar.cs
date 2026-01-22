@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -62,9 +63,17 @@ public partial class FormWithStatusBar : Form {
 
     #region Properties
 
-    public bool DropMessages { get; set; } = true;
+    [DefaultValue(66)]
+    public int GlobalMenuHeight { get; set; } = 66;
 
+    [DefaultValue(true)]
+    public bool MessageBoxOnError { get; set; } = true;
+
+    [DefaultValue(10)]
     public int MessageSeconds { get; set; } = 10;
+
+    [DefaultValue(true)]
+    public bool ShowStatusBar { get; set; } = true;
 
     #endregion
 
@@ -96,6 +105,7 @@ public partial class FormWithStatusBar : Form {
     public bool UpdateStatus(ErrorType type, ImageCode symbol, string message, bool didAlreadyMessagebox) {
         try {
             if (IsDisposed || Disposing || !IsHandleCreated) { return false; }
+            if (!ShowStatusBar && !MessageBoxOnError) { return false; }
             if (DesignMode) { return false; }
 
             if (type == ErrorType.DevelopInfo) { return false; }
@@ -113,6 +123,7 @@ public partial class FormWithStatusBar : Form {
             //var imagecode = ImageCode.Information;
 
             if (string.IsNullOrEmpty(message)) {
+                if (!ShowStatusBar) { return false; }
                 capStatusBar.Text = string.Empty;
                 capStatusBar.Refresh();
                 return false;
@@ -128,13 +139,14 @@ public partial class FormWithStatusBar : Form {
             //if (type == ErrorType.Warning) { imagecode = ImageCode.Warnung; }
             //if (type == ErrorType.Error) { imagecode = ImageCode.Kritisch; }
 
-            if (type is ErrorType.Info || !DropMessages || didAlreadyMessagebox) {
+            if (type is ErrorType.Info || !MessageBoxOnError || didAlreadyMessagebox) {
+                if (!ShowStatusBar) { return false; }
                 capStatusBar.Text = QuickImage.Get(symbol, 16).HTMLCode + " " + message;
                 capStatusBar.Refresh();
                 return false;
             }
 
-            if (DropMessages) {
+            if (MessageBoxOnError) {
                 Develop.DebugPrint(ErrorType.Warning, message);
 
                 if (type == ErrorType.Error) {
@@ -164,6 +176,42 @@ public partial class FormWithStatusBar : Form {
         base.OnFormClosed(e);
     }
 
+    protected override void OnShown(System.EventArgs e) {
+        base.OnShown(e);
+
+        if (btnNeuerModus == null) {
+            // Null Abfrage wegen dem Designer
+            return;
+        }
+
+        capStatusBar.Visible = ShowStatusBar;
+
+        if (Height < 5) {
+            btnNeuerModus.Visible = false;
+            return;
+        }
+
+        if (GlobalMenuHeight > 40) {
+            btnNeuerModus.Top = 24;
+            btnNeuerModus.Height = GlobalMenuHeight;
+            btnNeuerModus.Width = 50;
+            btnNeuerModus.Visible = true;
+            btnNeuerModus.Left = Width - btnNeuerModus.Width - Skin.Padding * 2;
+            btnNeuerModus.ButtonStyle = Enums.ButtonStyle.Button_Big;
+        } else {
+            btnNeuerModus.Top = 0;
+            btnNeuerModus.Height = GlobalMenuHeight;
+            btnNeuerModus.Width = GlobalMenuHeight;
+            btnNeuerModus.Visible = true;
+            btnNeuerModus.Left = Width - btnNeuerModus.Width - Skin.Padding * 2;
+            btnNeuerModus.ButtonStyle = Enums.ButtonStyle.Button;
+            btnNeuerModus.QuickInfo = "Neuen Modus öffnen";
+            btnNeuerModus.Text = string.Empty;
+        }
+
+        btnNeuerModus.BringToFront();
+    }
+
     /// <summary>
     /// Registriert den statischen Handler nur einmal
     /// </summary>
@@ -174,6 +222,10 @@ public partial class FormWithStatusBar : Form {
                 _staticHandlerRegistered = true;
             }
         }
+    }
+
+    private void btnNeuerModus_Click(object sender, System.EventArgs e) {
+        FormManager.OpenLastMenu();
     }
 
     private void timMessageClearer_Tick(object sender, System.EventArgs e) {

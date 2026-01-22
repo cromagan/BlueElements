@@ -148,7 +148,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    [DefaultValue(CaptionPosition.ohne)]
+    [DefaultValue(CaptionPosition.Über_dem_Feld)]
     public CaptionPosition CaptionPosition {
         get => _captionPosition;
         set {

@@ -52,12 +52,16 @@
     <Compile Remove="AdditionalScriptMethods\Method_ShowForm.cs" />
     <Compile Remove="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
     <Compile Remove="AdditionalScriptMethods\VariablePadItem.cs" />
+    <Compile Remove="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
     <Compile Remove="Classes\ItemCollectionPad\FunktionsItems_Formular\CreativePadItem.cs" />
     <Compile Remove="Classes\ItemCollectionPad\ScaledViewPadItem.cs" />
     <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.cs" />
     <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.Designer.cs" />
     <Compile Remove="Editoren\CreativePadScriptEditor.cs" />
     <Compile Remove="Editoren\CreativePadScriptEditor.Designer.cs" />
+    <Compile Remove="Editoren\DynamicSymbolScriptEditor.cs" />
+    <Compile Remove="Editoren\DynamicSymbolScriptEditor.Designer.cs" />
+    <Compile Remove="Renderer\Renderer_DynamicSymbol.cs" />
   </ItemGroup>
   
   <ItemGroup>

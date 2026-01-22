@@ -38,7 +38,7 @@ namespace BlueControls.Controls;
 [Designer(typeof(BasicDesigner))]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class TableViewWithFilters : GenericControlReciverSender, ITranslateable, IHasTable, IOpenScriptEditor, IStyleable {
+public partial class TableViewWithFilters : GenericControlReciverSender, ITranslateable, IHasTable, IStyleable {
 
     #region Fields
 
@@ -256,8 +256,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public void ImportCsv(string csvtxt) => TableInternal.ImportCsv(csvtxt);
 
     public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) => TableInternal.IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, maychangeview);
-
-    public void OpenScriptEditor() => TableInternal.OpenScriptEditor();
 
     public void OpenSearchAndReplaceInCells() => TableInternal.OpenSearchAndReplaceInCells();
 
@@ -691,7 +689,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (fi == null) {
             TableInternal.Filter.Remove(ffc.FilterSingleColumn);
         } else {
-            if(!string.IsNullOrEmpty(fi.Origin)) { return; }
+            if (!string.IsNullOrEmpty(fi.Origin)) { return; }
             // Besser wäre FilterInput[ffc.FilterSingleColumn].Equals(fi)
             // Aber das Origin stimmt nicht
 

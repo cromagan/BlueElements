@@ -373,7 +373,7 @@ public class TableFile : Table {
         foreach (var thisTb in AllFiles) {
             if (thisTb is TableFile { IsDisposed: false } tbf) {
                 //if (!thisTb.LogUndo) { return true; } // Irgend ein heikler Prozess
-                if (!string.IsNullOrEmpty(tbf.Filename)) { return; } // Irgend eine Tabelle wird aktuell geladen
+                if (string.IsNullOrEmpty(tbf.Filename)) { return; } // Irgend eine Tabelle wird aktuell geladen
             }
 
             if (!thisTb.MainChunkLoadDone) { return; }

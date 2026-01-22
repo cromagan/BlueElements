@@ -56,7 +56,7 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(SelectedRowChanged))]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTable, IOpenScriptEditor, IStyleable {
+public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTable, IStyleable {
 
     #region Fields
 
@@ -1109,13 +1109,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OpenScriptEditor() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        var se = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
-        se.Row = CursorPosRow?.Row;
-    }
 
     public void OpenSearchAndReplaceInCells() {
         if (TableViewForm.EditabelErrorMessage(Table) || Table == null) { return; }

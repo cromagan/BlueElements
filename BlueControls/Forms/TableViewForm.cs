@@ -693,7 +693,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         var combi = isEditable && isAdmin;
 
         cbxColumnArr.ItemEditAllowed = combi;
-        DropMessages = combi;
+        MessageBoxOnError = combi;
         grpAdminAllgemein.Enabled = combi;
         grpImport.Enabled = combi;
         tabAdmin.Enabled = combi;

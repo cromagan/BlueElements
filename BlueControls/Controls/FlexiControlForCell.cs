@@ -44,7 +44,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEditor {
+public partial class FlexiControlForCell : GenericControlReciver {
 
     #region Fields
 
@@ -96,7 +96,8 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         }
     }
 
-    public CaptionPosition CaptionPosition { get => f.CaptionPosition; set => f.CaptionPosition = value; }
+    [DefaultValue(CaptionPosition.Über_dem_Feld)]
+    public CaptionPosition CaptionPosition { get => f?.CaptionPosition ?? CaptionPosition.Über_dem_Feld; set => f?.CaptionPosition = value; }
 
     public ColumnItem? Column {
         get {
@@ -121,6 +122,7 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
         }
     }
 
+    [DefaultValue(-1)]
     public int ControlX {
         get => f.ControlX;
         set => f.ControlX = value;
@@ -133,13 +135,6 @@ public partial class FlexiControlForCell : GenericControlReciver, IOpenScriptEdi
     #endregion
 
     #region Methods
-
-    public void OpenScriptEditor() {
-        if (IsDisposed || TableInput is not { IsDisposed: false } tb) { return; }
-
-        var se = IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
-        se.Row = _lastrow;
-    }
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.

@@ -76,12 +76,6 @@ public partial class PadEditorWithFileAccess : PadEditor {
         Pad.AddCentered(b);
     }
 
-    private void btnAddDynamicSymbol_Click(object sender, System.EventArgs e) {
-        DynamicSymbolPadItem b = new();
-        b.SetCoordinates(new RectangleF(100, 100, 300, 300));
-        Pad.AddCentered(b);
-    }
-
     private void btnAddImage_Click(object sender, System.EventArgs e) {
         BitmapPadItem b = new(string.Empty, QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
         Pad.AddCentered(b);

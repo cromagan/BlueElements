@@ -33,12 +33,12 @@ namespace BlueControls.Forms {
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(381, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(379, 24);
             // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 343);
-            this.pnlStatusBar.Size = new System.Drawing.Size(381, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(379, 24);
             // 
             // Forms
             // 
@@ -50,7 +50,7 @@ namespace BlueControls.Forms {
             this.Forms.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
             this.Forms.Location = new System.Drawing.Point(8, 32);
             this.Forms.Name = "Forms";
-            this.Forms.Size = new System.Drawing.Size(364, 304);
+            this.Forms.Size = new System.Drawing.Size(362, 304);
             this.Forms.TabIndex = 7;
             this.Forms.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.Forms_ItemClicked);
             // 
@@ -65,10 +65,11 @@ namespace BlueControls.Forms {
             // Start
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(381, 367);
+            this.ClientSize = new System.Drawing.Size(379, 367);
             this.Controls.Add(this.capApp);
             this.Controls.Add(this.Forms);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.GlobalMenuHeight = 0;
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "BeCreative! - (c) Christian Peter";

@@ -1272,7 +1272,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable, FilterCollection? filter) {
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool dbVariables, bool virtualcolumns, bool extendedVariable, IEnumerable<FilterItem>? filter) {
 
         #region Variablen für Skript erstellen
 
@@ -1287,7 +1287,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
         }
 
-        if (filter is { IsDisposed: false }) {
+        if (filter is { }) {
             var num = 0;
             foreach (var thisFilter in filter) {
                 vars.Add(new VariableFilterItem($"FilterInput{num}", thisFilter, true, "Ein Eingangsfilter"));

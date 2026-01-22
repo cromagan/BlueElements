@@ -30,7 +30,7 @@ using static BlueBasics.IO;
 
 namespace BluePaint;
 
-public partial class MainWindow : BlueControls.Forms.Form {
+public partial class MainWindow : FormWithStatusBar {
 
     #region Fields
 

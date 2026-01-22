@@ -40,7 +40,6 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.btnWeitereAllItem = new BlueControls.Controls.Button();
-            this.btnAddDynamicSymbol = new BlueControls.Controls.Button();
             this.btnAddSymbol = new BlueControls.Controls.Button();
             this.btnAddUnterStufe = new BlueControls.Controls.Button();
             this.btnAddText = new BlueControls.Controls.Button();
@@ -89,7 +88,6 @@ namespace BlueControls.Forms {
             // 
             this.grpKomponenteHinzufügen.Controls.Add(this.btnSymbolLaden);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnWeitereAllItem);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDynamicSymbol);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddText);
@@ -233,17 +231,6 @@ namespace BlueControls.Forms {
             this.btnWeitereAllItem.Text = "weitere...";
             this.btnWeitereAllItem.Click += new System.EventHandler(this.btnWeitereAllItem_Click);
             // 
-            // btnAddDynamicSymbol
-            // 
-            this.btnAddDynamicSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAddDynamicSymbol.ImageCode = "Variable|16";
-            this.btnAddDynamicSymbol.Location = new System.Drawing.Point(96, 46);
-            this.btnAddDynamicSymbol.Name = "btnAddDynamicSymbol";
-            this.btnAddDynamicSymbol.Size = new System.Drawing.Size(96, 22);
-            this.btnAddDynamicSymbol.TabIndex = 11;
-            this.btnAddDynamicSymbol.Text = "Dyn. Symbol";
-            this.btnAddDynamicSymbol.Click += new System.EventHandler(this.btnAddDynamicSymbol_Click);
-            // 
             // btnAddSymbol
             // 
             this.btnAddSymbol.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
@@ -362,7 +349,6 @@ namespace BlueControls.Forms {
         protected Button btnImport;
         protected Button btnSpeichern;
         private Button btnWeitereAllItem;
-        private Button btnAddDynamicSymbol;
         private Button btnAddSymbol;
         private Button btnAddUnterStufe;
         private Button btnAddText;

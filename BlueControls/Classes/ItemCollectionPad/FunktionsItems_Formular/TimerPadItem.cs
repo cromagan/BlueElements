@@ -34,7 +34,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable, IOpenScriptEditor {
+public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     #region Fields
 

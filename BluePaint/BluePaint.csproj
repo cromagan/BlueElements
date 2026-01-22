@@ -42,8 +42,11 @@
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
-	 <Reference Include="System.Windows.Forms" />
-	 <Reference Include="WindowsBase" />
+	<Reference Include="System.Windows.Forms" />
+	<Reference Include="WindowsBase" />
+	 
+	 <!-- Framework-Referenzen -->
+     <Reference Include="System.Design" />
 
 	<!-- Standard-Referenzen -->
     <Reference Include="System" />

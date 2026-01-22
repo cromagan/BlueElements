@@ -399,7 +399,13 @@ public abstract class Method : IReadableTextWithKey {
                 if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
             }
 
-            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{comand}' ist das Attribut '{n + 1}' nicht einer der erwarteten Typen '{exceptetType.JoinWith("' oder '")}', sondern {v.MyClassId}", true); }
+            if (!ok) {
+                if (v is VariableUnknown ukn) {
+                    return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{comand}' konnte das Attribut '{n + 1}' nicht aufgelöst werden: {ukn.Value}", true);
+                }
+
+                return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{comand}' ist das Attribut '{n + 1}' nicht einer der erwarteten Typen '{exceptetType.JoinWith("' oder '")}', sondern {v.MyClassId}", true);
+            }
 
             feedbackVariables.Add(v);
 

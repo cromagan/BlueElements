@@ -21,6 +21,8 @@ using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;
@@ -99,11 +101,23 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
             var row = sbpi.TableInput?.Row?.First();
 
+            List<FilterItem>? fi = null;
+
+            if (sbpi.Parents.Count > 0 && sbpi.TableInput is { IsDisposed: false } tbf && tbf.Column.First is { } c) {
+                fi = [];
+                for (var co = 0; co < sbpi.Parents.Count; co++) {
+                    fi.Add(new FilterItem(c, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, "DUMMY!"));
+                }
+            }
+
             if (row?.Table is { IsDisposed: false } tb) {
-                vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, null); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+                vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, fi); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+            } else if (sbpi.TableInput is { IsDisposed: false } tbf2) {
+                vars = tbf2.CreateVariableCollection(null, _allReadOnly, false, false, true, fi); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
             } else {
                 vars = [];
             }
+
             if (sbpi.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
                 foreach (var thisCon in icpi) {
                     if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
@@ -114,7 +128,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
             #endregion
 
-            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row);
+            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row, false);
         }
 
         return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein");

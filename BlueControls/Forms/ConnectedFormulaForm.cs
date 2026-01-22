@@ -18,15 +18,10 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
-using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueTable;
 using System.ComponentModel;
-using System.Windows.Forms;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
 
@@ -34,22 +29,11 @@ namespace BlueControls.Forms;
 
 public partial class ConnectedFormulaForm : FormWithStatusBar {
 
-    #region Fields
-
-    private AbstractPadItem? _lastItem;
-
-    private IOpenScriptEditor? _lastObject;
-
-    #endregion
-
     #region Constructors
 
     public ConnectedFormulaForm() => InitializeComponent();
 
     public ConnectedFormulaForm(string filename, string mode) : this() {
-        btnEingehendeTabelle.Enabled = false;
-        btnAusgehendeTabelle.Enabled = false;
-
         CFormula.Mode = mode;
 
         FormulaSet(filename);
@@ -78,41 +62,6 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
         CheckButtons();
-    }
-
-    private void btnAusgehendeTabelle_Click(object sender, System.EventArgs e) {
-        if (!Generic.IsAdministrator()) { return; }
-        if (_lastItem is ReciverSenderControlPadItem { TableOutput: { IsDisposed: false } tb }) {
-            var c = new TableViewForm(tb, false, true, true);
-            c.ShowDialog();
-        }
-    }
-
-    private void btnEingehendeTabelle_Click(object sender, System.EventArgs e) {
-        if (!Generic.IsAdministrator()) { return; }
-        if (_lastItem is ReciverControlPadItem { TableInput: { IsDisposed: false } tb }) {
-            var c = new TableViewForm(tb, false, true, true);
-            c.ShowDialog();
-        }
-    }
-
-    private void btnElementBearbeiten_Click(object sender, System.EventArgs e) {
-        DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (CFormula.Page?.GetConnectedFormula() is not { IsDisposed: false } cf) { return; }
-        if (!Generic.IsAdministrator()) { return; }
-
-        if (_lastItem is not { IsDisposed: false } api) { return; }
-
-        Table.SaveAll(false);
-        MultiUserFile.SaveAll(false);
-
-        if (!cf.LockEditing()) { return; }
-        InputBoxEditor.Show(api, true);
-
-        MultiUserFile.SaveAll(true);
-        cf.UnlockEditing();
-        Table.SaveAll(false);
-        CFormula.InvalidateView();
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
@@ -145,25 +94,14 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         LoadTab.ShowDialog();
     }
 
-    private void btnScript_Click(object sender, System.EventArgs e) {
-        DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (CFormula.Page == null) { return; }
-        if (!Generic.IsAdministrator()) { return; }
-
-        if (_lastObject is not { } api) { return; }
-        api.OpenScriptEditor();
-    }
-
     private void btnTopMost_CheckedChanged(object sender, System.EventArgs e) => TopMost = btnTopMost.Checked;
-
-    private void CFormula_ChildGotFocus(object sender, ControlEventArgs e) => SetItem(e.Control);
 
     private void CheckButtons() => btnFormular.Enabled = CFormula.Page != null;
 
     private void FormulaSet(ItemCollectionPadItem? page) {
         if (IsDisposed) { return; }
 
-        DropMessages = Generic.IsAdministrator();
+        MessageBoxOnError = Generic.IsAdministrator();
 
         CFormula.Page = page;
 
@@ -224,33 +162,6 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         FormulaSet(LoadTab.FileName);
-    }
-
-    private void SetItem(object? control) {
-        if (control is GenericControlReciver grc) {
-            _lastItem = grc.GeneratedFrom;
-            _lastObject = control as IOpenScriptEditor;
-        } else if (control is Control c) {
-            SetItem(c.Parent);
-            return;
-        } else {
-            _lastObject = null;
-            _lastItem = null;
-        }
-
-        btnEingehendeTabelle.Enabled = Generic.IsAdministrator() && _lastItem is ReciverControlPadItem;
-        btnAusgehendeTabelle.Enabled = Generic.IsAdministrator() && _lastItem is ReciverSenderControlPadItem;
-
-        if (_lastItem is ReciverControlPadItem fcpi) {
-            capClicked.Text = "<imagecode=Information|16> " + fcpi.MyClassId;
-            capClicked.QuickInfo = fcpi.Description;
-            btnElementBearbeiten.Enabled = Generic.IsAdministrator();
-        } else {
-            capClicked.Text = "-";
-            btnElementBearbeiten.Enabled = false;
-        }
-
-        btnScript.Enabled = _lastObject is { };
     }
 
     #endregion

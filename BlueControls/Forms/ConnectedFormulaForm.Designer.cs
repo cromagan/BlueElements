@@ -42,11 +42,6 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
             this.btnSaveLoad = new BlueControls.Controls.Button();
             this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
-            this.btnScript = new BlueControls.Controls.Button();
-            this.btnElementBearbeiten = new BlueControls.Controls.Button();
-            this.capClicked = new BlueControls.Controls.Caption();
-            this.btnAusgehendeTabelle = new BlueControls.Controls.Button();
-            this.btnEingehendeTabelle = new BlueControls.Controls.Button();
             this.btnFormular = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
@@ -204,7 +199,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminAllgemein.Enabled = false;
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminAllgemein.Location = new System.Drawing.Point(400, 0);
+            this.grpAdminAllgemein.Location = new System.Drawing.Point(72, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
             this.grpAdminAllgemein.Size = new System.Drawing.Size(72, 81);
             this.grpAdminAllgemein.TabIndex = 7;
@@ -226,76 +221,15 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminBearbeiten.CausesValidation = false;
-            this.grpAdminBearbeiten.Controls.Add(this.btnScript);
-            this.grpAdminBearbeiten.Controls.Add(this.btnElementBearbeiten);
-            this.grpAdminBearbeiten.Controls.Add(this.capClicked);
-            this.grpAdminBearbeiten.Controls.Add(this.btnAusgehendeTabelle);
-            this.grpAdminBearbeiten.Controls.Add(this.btnEingehendeTabelle);
             this.grpAdminBearbeiten.Controls.Add(this.btnFormular);
             this.grpAdminBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminBearbeiten.Location = new System.Drawing.Point(0, 0);
             this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(400, 81);
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(72, 81);
             this.grpAdminBearbeiten.TabIndex = 9;
             this.grpAdminBearbeiten.TabStop = false;
             this.grpAdminBearbeiten.Text = "Bearbeiten";
-            // 
-            // btnScript
-            // 
-            this.btnScript.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnScript.Enabled = false;
-            this.btnScript.ImageCode = "Skript|16";
-            this.btnScript.Location = new System.Drawing.Point(216, 46);
-            this.btnScript.Name = "btnScript";
-            this.btnScript.Size = new System.Drawing.Size(120, 22);
-            this.btnScript.TabIndex = 47;
-            this.btnScript.Text = "Skript";
-            this.btnScript.Click += new System.EventHandler(this.btnScript_Click);
-            // 
-            // btnElementBearbeiten
-            // 
-            this.btnElementBearbeiten.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnElementBearbeiten.Enabled = false;
-            this.btnElementBearbeiten.ImageCode = "Stift|16";
-            this.btnElementBearbeiten.Location = new System.Drawing.Point(216, 24);
-            this.btnElementBearbeiten.Name = "btnElementBearbeiten";
-            this.btnElementBearbeiten.Size = new System.Drawing.Size(120, 22);
-            this.btnElementBearbeiten.TabIndex = 47;
-            this.btnElementBearbeiten.Text = "Berarbeiten";
-            this.btnElementBearbeiten.Click += new System.EventHandler(this.btnElementBearbeiten_Click);
-            // 
-            // capClicked
-            // 
-            this.capClicked.CausesValidation = false;
-            this.capClicked.Location = new System.Drawing.Point(216, 2);
-            this.capClicked.Name = "capClicked";
-            this.capClicked.Size = new System.Drawing.Size(176, 22);
-            this.capClicked.Text = "-";
-            // 
-            // btnAusgehendeTabelle
-            // 
-            this.btnAusgehendeTabelle.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAusgehendeTabelle.Enabled = false;
-            this.btnAusgehendeTabelle.ImageCode = "Tabelle|16|||||||||Pfeil_Oben";
-            this.btnAusgehendeTabelle.Location = new System.Drawing.Point(144, 2);
-            this.btnAusgehendeTabelle.Name = "btnAusgehendeTabelle";
-            this.btnAusgehendeTabelle.Size = new System.Drawing.Size(64, 66);
-            this.btnAusgehendeTabelle.TabIndex = 46;
-            this.btnAusgehendeTabelle.Text = "Ausgeh. Tabelle";
-            this.btnAusgehendeTabelle.Click += new System.EventHandler(this.btnAusgehendeTabelle_Click);
-            // 
-            // btnEingehendeTabelle
-            // 
-            this.btnEingehendeTabelle.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnEingehendeTabelle.Enabled = false;
-            this.btnEingehendeTabelle.ImageCode = "Tabelle|16|||||||||Pfeil_Unten";
-            this.btnEingehendeTabelle.Location = new System.Drawing.Point(80, 2);
-            this.btnEingehendeTabelle.Name = "btnEingehendeTabelle";
-            this.btnEingehendeTabelle.Size = new System.Drawing.Size(64, 66);
-            this.btnEingehendeTabelle.TabIndex = 45;
-            this.btnEingehendeTabelle.Text = "Eingeh. Tabelle";
-            this.btnEingehendeTabelle.Click += new System.EventHandler(this.btnEingehendeTabelle_Click);
             // 
             // btnFormular
             // 
@@ -326,11 +260,9 @@ namespace BlueControls.Forms {
             this.CFormula.TabIndex = 98;
             this.CFormula.TabStop = false;
             this.CFormula.Text = "CFO";
-            this.CFormula.ChildGotFocus += new System.EventHandler<System.Windows.Forms.ControlEventArgs>(this.CFormula_ChildGotFocus);
             // 
             // ConnectedFormulaForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(606, 450);
             this.Controls.Add(this.CFormula);
@@ -369,11 +301,6 @@ namespace BlueControls.Forms {
         private Button btnFormular;
         private OpenFileDialog LoadTab;
         protected ConnectedFormulaView CFormula;
-        private Button btnAusgehendeTabelle;
-        private Button btnEingehendeTabelle;
-        private Caption capClicked;
-        private Button btnElementBearbeiten;
-        private Button btnScript;
         public Button btnTopMost;
         private GroupBox grpSpezial;
         private Button btnMonitoring;

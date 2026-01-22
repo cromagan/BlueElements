@@ -42,7 +42,7 @@ using static BlueScript.Script;
 
 namespace BlueControls.Controls;
 
-public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor // System.Windows.Forms.UserControl//,
+public partial class RowAdder : GenericControlReciverSender // System.Windows.Forms.UserControl//,
     {
     #region Fields
 
@@ -188,13 +188,6 @@ public partial class RowAdder : GenericControlReciverSender, IOpenScriptEditor /
         f.ItemAdd(ItemOf(txt, symbol));
         FilterOutput.ChangeTo(new FilterItem(null, "RowCreator"));
         _ignoreCheckedChanged = false;
-    }
-
-    public void OpenScriptEditor() {
-        if (IsDisposed || GeneratedFrom is not RowAdderPadItem { IsDisposed: false } it) { return; }
-
-        var se = IUniqueWindowExtension.ShowOrCreate<RowAdderScriptEditor>(it);
-        se.Row = _lastRow;
     }
 
     protected override void HandleChangesNow() {

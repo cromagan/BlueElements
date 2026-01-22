@@ -129,6 +129,9 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         if (row?.Table is { IsDisposed: false } row_tb) {
             tb = row_tb;
             vars = tb.CreateVariableCollection(row, false, false, true, true, FilterInput);
+        } else if (FilterInput?.Table is { IsDisposed: false } fi_tb) {
+            tb = fi_tb;
+            vars = tb.CreateVariableCollection(null, false, false, true, true, FilterInput);
         } else {
             vars = [];
         }
@@ -147,7 +150,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
         #endregion
 
-        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, vars, row);
+        var t = ScriptButtonPadItem.ExecuteScript(Script, Mode, vars, row, true);
 
         var errorreason = string.Empty;
 

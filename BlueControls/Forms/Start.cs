@@ -83,6 +83,11 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
 
     #region Methods
 
+    protected override void OnShown(System.EventArgs e) {
+        base.OnShown(e);
+        BringToFront();
+    }
+
     private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         if (e.Item.Tag is MethodInfo methodInfo) {
             var result = methodInfo.Invoke(null, null);
