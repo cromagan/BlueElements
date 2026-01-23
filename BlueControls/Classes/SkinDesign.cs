@@ -76,7 +76,7 @@ public static class SkinDesignExtensions {
 
         des.Image = pic;
         des.Status = status;
-        dictStats.Add(status, des);
+        dictStats[status] = des;
     }
 
     #endregion

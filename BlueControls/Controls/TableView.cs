@@ -227,6 +227,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         .Where(thisitem => thisitem.Visible)
         .ToList() ?? [];
 
+    [DefaultValue(Win11)]
     public string SheetStyle {
         get;
         set {
@@ -2321,7 +2322,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, sortused, visibleRowListItems);
 
-        CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
+        //CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
 
         CalculateAllViewItems_CalculateYPosition(sortedItems, arrangement);
 
@@ -2387,17 +2388,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
             }
         }
-    }
-
-    private void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
-        allItems.TryGetValue(TableEndListItem.Identifier, out var item0);
-        if (item0 is not TableEndListItem tableEnd) {
-            tableEnd = new TableEndListItem(arrangement);
-            allItems.Add(tableEnd.KeyName, tableEnd);
-        }
-        tableEnd.Visible = arrangement.ShowHead;
-        tableEnd.IgnoreYOffset = false;
-        sortedItems.Add(tableEnd);
     }
 
     private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {

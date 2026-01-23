@@ -73,6 +73,13 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                 }
                 break;
 
+            case GroupBoxStyle.RoundRect:
+                if (c.Height > 10) {
+                    Skin.Draw_Back(gr, Design.GroupBox_RoundRect, state, r, null, true);
+                    Skin.Draw_Border(gr, Design.GroupBox_RoundRect, state, r);
+                }
+                break;
+
             case GroupBoxStyle.NormalBold:
                 if (c.Height > 33) {
                     Skin.Draw_Border(gr, Design.GroupBoxBold, state, r);
@@ -89,19 +96,6 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                     }
                 }
                 break;
-            //if (Height > 33) {
-            //    r.Inflate(-2, -2);
-            //    for (var z = 0; z < 8; z++) {
-            //        Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
-            //        r.Inflate(1, 1);
-            //    }
-
-            //    if (!string.IsNullOrEmpty(Text)) {
-            //        Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
-            //        Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
-            //    }
-            //}
-            //break;
 
             default:
                 Skin.Draw_Back_Transparent(gr, c.DisplayRectangle, c);

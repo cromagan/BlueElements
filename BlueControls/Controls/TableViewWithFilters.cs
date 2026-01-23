@@ -169,6 +169,17 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public new bool Focused => base.Focused || TableInternal.Focused;
 
+    [DefaultValue(GroupBoxStyle.Nothing)]
+    public GroupBoxStyle GroupBoxStyle {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            grpBorder.GroupBoxStyle = value;
+            Invalidate();
+        }
+    } = GroupBoxStyle.Nothing;
+
     public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
 
     public bool PowerEdit {
@@ -177,6 +188,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public List<RowListItem> RowViewItems => TableInternal.RowViewItems;
 
+    [DefaultValue(Constants.Win11)]
     public string SheetStyle {
         get => TableInternal.SheetStyle;
         set => TableInternal.SheetStyle = value;
@@ -511,7 +523,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         #region Vorhandene Flexis ermitteln
 
-        foreach (var thisControl in Controls) {
+        foreach (var thisControl in grpBorder.Controls) {
             if (thisControl is FlexiControlForFilter flx) { flexsToDelete.Add(flx); }
         }
 
@@ -581,7 +593,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                             //flx.Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
                             ChildIsBorn(flx);
                             flx.FilterOutputPropertyChanged += FlexSingeFilter_FilterOutputPropertyChanged;
-                            Controls.Add(flx);
+                            grpBorder.Controls.Add(flx);
                         }
 
                         // Prüfen, ob wir in eine neue Zeile wechseln müssen
@@ -617,7 +629,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         foreach (var thisFlexi in flexsToDelete) {
             thisFlexi.FilterOutputPropertyChanged -= FlexSingeFilter_FilterOutputPropertyChanged;
             thisFlexi.Visible = false;
-            Controls.Remove(thisFlexi);
+            grpBorder.Controls.Remove(thisFlexi);
             thisFlexi.Dispose();
         }
 
@@ -747,9 +759,41 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             return;
         }
 
+        var left = 0;
+        var top = 0;
+        var right = 0;
+        var bottom = 0;
+
+        switch (GroupBoxStyle) {
+            case GroupBoxStyle.NormalBold:
+            case GroupBoxStyle.Normal:
+                left = Skin.Padding;
+                right = Skin.Padding;
+                bottom = Skin.Padding;
+                top = Skin.Padding + 16;
+                break;
+
+            case GroupBoxStyle.RibbonBar:
+                left = Skin.Padding;
+                right = Skin.Padding;
+                bottom = Skin.Padding + 16;
+                top = Skin.Padding;
+                break;
+
+            case GroupBoxStyle.Nothing:
+                break;
+
+            case GroupBoxStyle.RoundRect:
+                left = Skin.Padding;
+                right = Skin.Padding;
+                bottom = Skin.Padding;
+                top = Skin.Padding;
+                break;
+        }
+
         // Filterleistenelemente positionieren
         if (FilterleisteZeilen > 0) {
-            var firstRowY = 8; // Standard Y-CanvasPosition für erste Zeile
+            var firstRowY = 8 + top; // Standard Y-CanvasPosition für erste Zeile
 
             // Hauptelemente (erste Zeile)
             txbZeilenFilter.Top = firstRowY;
@@ -760,15 +804,17 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
             // Elemente der zweiten Zeile wenn nötig
             if (FilterleisteZeilen > 1) {
-                btnÄhnliche.Top = firstRowY + 32; // 32 = Höhe der ersten Reihe + Abstand
+                btnÄhnliche.Top = firstRowY + 32 + top; // 32 = Höhe der ersten Reihe + Abstand
             }
         }
 
-        var h = FilterleisteHeight;
+        var h = FilterleisteHeight + top;
         TableInternal.Top = h;
-        TableInternal.Height = Height - h;
-        TableInternal.Left = 0;
-        TableInternal.Width = Width;
+        TableInternal.Height = Height - h - bottom;
+        TableInternal.Left = left;
+        TableInternal.Width = Width - left - right;
+
+        grpBorder.Text = Table?.Caption ?? "Keine Tabelle geladen";
 
         // Bei kompletter Neupositionierung auch die FlexiFilterControls anpassen
         DoFilterAndPinButtons();

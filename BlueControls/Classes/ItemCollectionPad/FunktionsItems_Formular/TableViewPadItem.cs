@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using static BlueBasics.Converter;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
@@ -42,6 +43,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     #region Fields
 
+    private GroupBoxStyle _borderStyle = GroupBoxStyle.Nothing;
     private string _defaultArrangement = string.Empty;
 
     #endregion
@@ -52,19 +54,33 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public TableViewPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public TableViewPadItem(string keyName, Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public TableViewPadItem(string keyName, Table? tb, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, tb) { }
 
     #endregion
 
     #region Properties
 
     public static string ClassId => "FI-TableView";
+
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
+
     public bool AutoSizeableHeight => true;
 
     public override string Description => "Darstellung einer Tabelle als bearbeitbare und filterbare Tabelle.";
+
     public override bool InputMustBeOneRow => false;
+
     public override bool MustBeInDrawingArea => true;
+
+    [DefaultValue(GroupBoxStyle.Normal)]
+    public GroupBoxStyle RahmenStil {
+        get => _borderStyle;
+        set {
+            if (_borderStyle == value) { return; }
+            _borderStyle = value;
+            OnPropertyChanged();
+        }
+    }
 
     [DefaultValue("")]
     public string Standard_Ansicht {
@@ -100,6 +116,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         con.DoDefaultSettings(parent, this, mode);
         con.Arrangement = _defaultArrangement;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
+        con.GroupBoxStyle = _borderStyle;
         return con;
     }
 
@@ -107,7 +124,8 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         List<GenericControl> result =
         [
             .. base.GetProperties(widthOfControl),
-            new FlexiControl("Einstellungen:", widthOfControl, true)
+            new FlexiControl("Einstellungen:", widthOfControl, true),
+            new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil,ItemsOf(typeof(GroupBoxStyle)) )
         ];
 
         if (TableOutput is { IsDisposed: false } tb) {
@@ -126,6 +144,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("DefaultArrangement", _defaultArrangement);
+        result.ParseableAdd("BorderStyle", _borderStyle);
         return result;
     }
 
@@ -136,6 +155,10 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
             case "defaultarrangement":
                 _defaultArrangement = value.FromNonCritical();
+                return true;
+
+            case "borderstyle":
+                _borderStyle = (GroupBoxStyle)IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);

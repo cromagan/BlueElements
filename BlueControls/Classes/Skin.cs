@@ -831,7 +831,7 @@ public static class Skin {
 
     #region Fields
 
-    public const int Padding = 9; 
+    public const int Padding = 9;
     public const int PaddingMedium = 6;
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(GetDpiScale(), 2, MidpointRounding.AwayFromZero);
@@ -1578,6 +1578,8 @@ public static class Skin {
         Design.Add(Enums.Design.GroupBox, States.Standard_Disabled, "Windows 11 Disabled|0", Enums.Kontur.Rechteck, 0, -7, 0, 0, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, string.Empty);
         Design.Add(Enums.Design.GroupBoxBold, States.Standard, "Windows 11 Checked|7", Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "40568D", string.Empty, string.Empty);
         Design.Add(Enums.Design.GroupBoxBold, States.Standard_Disabled, "Windows 11 Disabled|7", Enums.Kontur.Rechteck, 9, -11, 9, 9, HintergrundArt.Ohne, string.Empty, string.Empty, RahmenArt.Solide_21px, "ACACAC", string.Empty, string.Empty);
+        Design.Add(Enums.Design.GroupBox_RoundRect, States.Standard, "Windows 11|0", Enums.Kontur.Rechteck_R4, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty);
+        Design.Add(Enums.Design.GroupBox_RoundRect, States.Standard_Disabled, "Windows 11 Disabled|0", Enums.Kontur.Rechteck_R4, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "D8D8D8", string.Empty, string.Empty);
         Design.Add(Enums.Design.TabStrip_Body, States.Standard, string.Empty, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, string.Empty);
         Design.Add(Enums.Design.TabStrip_Body, States.Standard_Disabled, string.Empty, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "FFFFFF", string.Empty, RahmenArt.Solide_1px, "ACACAC", string.Empty, string.Empty);
         Design.Add(Enums.Design.RibbonBar_Body, States.Standard, string.Empty, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, "F4F5F6", string.Empty, RahmenArt.Solide_1px, "E5E4E5", string.Empty, string.Empty);

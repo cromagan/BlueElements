@@ -24,6 +24,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
@@ -97,6 +98,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public string QuickInfo { get; set; } = string.Empty;
 
+    [DefaultValue(Win11)]
     public string SheetStyle {
         get;
         set {

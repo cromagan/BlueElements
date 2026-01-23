@@ -22,6 +22,7 @@ using BlueControls.Interfaces;
 using BlueTable;
 using BlueTable.Enums;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -85,6 +86,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
+    [DefaultValue(Constants.Win11)]
     public string SheetStyle {
         get;
         set {

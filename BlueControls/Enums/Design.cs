@@ -117,6 +117,7 @@ public enum Design {
     RibbonBar_Back = 2203,
     TabStrip_Back = 2204,
     GroupBoxBold = 2205,
+    GroupBox_RoundRect = 2206,
 
     Progressbar = 2210,
     Progressbar_Füller = 2211,
