@@ -985,22 +985,27 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         List<RowItem> allRows = [];
         if (row?.Table?.Column.First == null || row.Table.IsDisposed) { return allRows; }
 
-        var names = row.Table.Column.First?.GetUcaseNamesSortedByLength();
+        var searchData = row.Table.Column.First?.GetCellContentsSortedByLength();
+        if (searchData == null || searchData.Count == 0) { return allRows; }
+
         var relationTextLine = completeRelationText.ToUpperInvariant().SplitAndCutByCr();
+
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
             List<RowItem> rows = [];
-            if (names != null) {
-                for (var z = names.Count - 1; z > -1; z--) {
-                    if (tmp.IndexOfWord(names[z], 0, RegexOptions.IgnoreCase) > -1 && row.Table.Row[names[z]] is { } r) {
-                        rows.Add(r);
-                        tmp = tmp.Replace(names[z], string.Empty);
-                    }
+
+            foreach (var (name, foundRow) in searchData) {
+                if (tmp.IndexOfWord(name, 0, RegexOptions.IgnoreCase) > -1) {
+                    rows.Add(foundRow);
+                    tmp = tmp.Replace(name, string.Empty);
                 }
             }
 
-            if (rows.Count == 1 || rows.Contains(row)) { allRows.AddIfNotExists(rows); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
+            if (rows.Count == 1 || rows.Contains(row)) {
+                allRows.AddIfNotExists(rows);
+            }
         }
+
         return allRows;
     }
 
@@ -1048,21 +1053,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var c = tb.Column.First;
         if (c == null) { return completeRelationText; }
 
-        var names = c.GetUcaseNamesSortedByLength();
+        var searchData = c.GetCellContentsSortedByLength();
         var didOld = false;
         var didNew = false;
-        for (var z = names.Count - 1; z > -1; z--) {
-            if (!didOld && names[z].Length <= oldValue.Length) {
+
+        for (var z = searchData.Count - 1; z > -1; z--) {
+            if (!didOld && searchData[z].value.Length <= oldValue.Length) {
                 didOld = true;
                 DoReplace(oldValue, keyOfCHangedRow);
             }
-            if (!didNew && names[z].Length <= newValue.Length) {
+            if (!didNew && searchData[z].value.Length <= newValue.Length) {
                 didNew = true;
                 DoReplace(newValue, keyOfCHangedRow);
             }
-            if (completeRelationText.ContainsIgnoreCase(names[z])) {
-                var r = tb.Row[names[z]];
-                if (r is { IsDisposed: false }) { DoReplace(names[z], r.KeyName); }
+            if (completeRelationText.ContainsIgnoreCase(searchData[z].value)) {
+                var r = searchData[z].row;
+                if (r is { IsDisposed: false }) {
+                    DoReplace(searchData[z].value, r.KeyName);
+                }
             }
         }
         if (string.IsNullOrEmpty(newValue)) { return completeRelationText; }

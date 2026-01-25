@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueControls.Enums;
 using BlueTable;
+using BlueTable.AdditionalScriptMethods;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -141,7 +142,7 @@ public class ExtCharCellLink : ExtChar {
     }
 
     private void InitValues() {
-        _htmlText = $"<CELLLINK={TableName}|{ColumnKey}|{RowKey}>";
+        _htmlText = Method_Linkify.GenerateHtmlCellLink(TableName, ColumnKey, RowKey);
         _displayText = GetCellValue();
     }
 

@@ -17,13 +17,10 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.BlueTableDialogs;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;

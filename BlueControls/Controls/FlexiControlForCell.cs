@@ -18,13 +18,11 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueTable;
 using BlueTable.Enums;
@@ -403,7 +401,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         // Background-Thread für schwere Berechnungen
         await Task.Run(async () => {
-            var names = col.GetUcaseNamesSortedByLength().ToList();
+            var names = col.GetCellContentsSortedByLength();
             cancellationToken.ThrowIfCancellationRequested();
 
             var myname = row.CellFirstString().ToUpperInvariant();
@@ -425,7 +423,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                     cancellationToken.ThrowIfCancellationRequested();
 
                     // Verarbeitung der Wörter
-                    foreach (var thisWord in names) {
+                    foreach (var (thisWord, row) in names) {
                         var cap = 0;
                         do {
                             cancellationToken.ThrowIfCancellationRequested();

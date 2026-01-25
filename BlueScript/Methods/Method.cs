@@ -514,7 +514,7 @@ public abstract class Method : IReadableTextWithKey {
                 ? DoItFeedback.AttributFehler(infos.LogData, attvar)
                 : DoIt(varCol, attvar, scp, infos.LogData);
         } catch (Exception ex) {
-            return new DoItFeedback("Interner Programmfehler: " + ex.Message, true, infos.LogData);
+            return new DoItFeedback("Interner Programmfehler: " + ex.Message, false, infos.LogData);
         }
     }
 

@@ -1510,14 +1510,22 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
         return string.Empty;
     }
 
-    public List<string> GetUcaseNamesSortedByLength() {
+    public List<(string value, RowItem row)> GetCellContentsSortedByLength() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return []; }
 
-        if (UcaseNamesSortedByLength != null) { return UcaseNamesSortedByLength; }
-        var tmp = Contents([.. tb.Row], string.Empty);
-        tmp.Sort((s1, s2) => s2.Length.CompareTo(s1.Length));
-        UcaseNamesSortedByLength = tmp;
-        return UcaseNamesSortedByLength;
+        var dict = new Dictionary<string, RowItem>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var row in tb.Row) {
+            var cellValue = row.CellGetString(this);
+            if (string.IsNullOrWhiteSpace(cellValue)) { continue; }
+
+            dict[cellValue] = row;
+        }
+
+        var result = dict.Select(kvp => (kvp.Key, kvp.Value)).ToList();
+        result.Sort((a, b) => b.Key.Length.CompareTo(a.Key.Length));
+
+        return result;
     }
 
     public void Invalidate_ColumAndContent() {
