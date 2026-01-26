@@ -30,9 +30,9 @@ public class InvalidatedRowsManager {
     #region Fields
 
     /// <summary>
-    /// Eine Routine, die sich um das Update der Row kümmert. Kann evtl. umgeleitet werden. Ruft im Regelfall UpdateRow auf.
+    /// Eine Routine, die sich um das Update der Row kümmert. Kann evtl. umgeleitet werden. Ruft im Regelfall UpdateRowNow auf.
     /// </summary>
-    public static DGDoUpdateRow DoUpdateRow = UpdateRow;
+    public static DGDoUpdateRow DoUpdateRow = UpdateRowNow;
 
     // ConcurrentDictionary für threadsichere Sammlung der ungültigen Zeilen (Key = KeyName, Value = RowItem)
     private readonly ConcurrentDictionary<string, RowItem> _invalidatedRows = new();
@@ -88,7 +88,7 @@ public class InvalidatedRowsManager {
     /// <param name="masterRow"></param>
     /// <param name="row"></param>
     /// <param name="extendedAllowed"></param>
-    public static void UpdateRow(RowItem? masterRow, RowItem row, bool extendedAllowed) {
+    public static void UpdateRowNow(RowItem? masterRow, RowItem row, bool extendedAllowed) {
         if (masterRow?.Table != null) {
             row.UpdateRow(extendedAllowed, "Update von " + masterRow?.CellFirstString());
         } else {

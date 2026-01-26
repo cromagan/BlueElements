@@ -601,7 +601,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public bool NeedsRowInitialization() {
         if (Table is not { IsDisposed: false } tb) { return false; }
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
-        return string.IsNullOrEmpty(CellGetString(srs));
+        return string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
     }
 
     /// <summary>
@@ -766,7 +766,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return new ScriptEndedFeedback([], RepairAllLinks());
         }
 
-        var mustBeExtended = string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
+        var mustBeExtended = NeedsRowInitialization();
 
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
