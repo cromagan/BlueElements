@@ -1931,6 +1931,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 return;
             }
 
+            rows[0].InvalidateCheckData();
+            RowCollection.FailedRows.TryRemove(rows[0], out _);
+
             ScriptEndedFeedback fb;
             if (generic) {
                 rows[0].InvalidateRowState($"TableView, Kontextmenü, {info}");
@@ -1952,7 +1955,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (fehler.Count == 1) {
                 Forms.MessageBox.Show($"{info2}<b>Es ist ein Skript-Fehler aufgetreten.</b>\r\n\r\n{fehler[0].ProtocolText}", ImageCode.Warnung, "Ok");
             } else {
-                Forms.MessageBox.Show($"{info2}{firstRow.CheckRow().Message}", ImageCode.HäkchenDoppelt, "Ok");
+                if(generic) {
+                    Forms.MessageBox.Show($"{info2}{firstRow.CheckRow().Message}", ImageCode.HäkchenDoppelt, "Ok");
+                } else {
+                    Forms.MessageBox.Show($"{info2}Erfolgreich ausgeführt.", ImageCode.HäkchenDoppelt, "Ok");
+                }
+                 
             }
         } else {
             if (fehler.Count > 0) {

@@ -1236,9 +1236,9 @@ public static class Skin {
 
         var font = GetBlueFont(r);
 
-        if (tb.IsEditable(false)) {
-            r.CellSet(cf, font.ParseableItems().FinishParseable(), "Automatische Korrektur");
-        }
+        //if (tb.IsEditable(false)) {
+        //    r.CellSet(cf, font.ParseableItems().FinishParseable(), "Automatische Korrektur");
+        //}
 
         return font;
     }
