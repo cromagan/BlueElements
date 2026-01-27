@@ -151,13 +151,13 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     protected override void HandleChangesNow() {
-        base.HandleChangesNow();
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         if (!f.Allinitialized) { return; }
 
         DoInputFilter(null, false);
+        base.HandleChangesNow(); // Erst nach DoInputFilter - so kann die InputTabelle befüllt werden.
         RowsInputChangedHandled = true;
 
         _lastrow = RowSingleOrNull();
@@ -552,6 +552,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (oldVal == newValue) { return; }
 
         row.CellSet(_column, newValue, "Über Formular bearbeitet (FlexiControl)");
+        row.CheckRow();
     }
 
     #endregion

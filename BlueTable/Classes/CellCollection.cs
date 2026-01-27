@@ -131,11 +131,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
                 // und auch diese abgefragt werden
                 value = inputRow.ReplaceVariables(value, true, varcol);
+                if (value.Contains("~")) { return (null, "Eine Variable konnte nicht aufgelöst werden."); }
             }
 
             if (value != c.AutoCorrect(value, true)) { return (null, "Wert kann nicht gesetzt werden."); }
-
-            if (value.Contains("~")) { return (null, "Eine Variable konnte nicht aufgelöst werden."); }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }

@@ -1955,12 +1955,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (fehler.Count == 1) {
                 Forms.MessageBox.Show($"{info2}<b>Es ist ein Skript-Fehler aufgetreten.</b>\r\n\r\n{fehler[0].ProtocolText}", ImageCode.Warnung, "Ok");
             } else {
-                if(generic) {
+                if (generic) {
                     Forms.MessageBox.Show($"{info2}{firstRow.CheckRow().Message}", ImageCode.HäkchenDoppelt, "Ok");
                 } else {
                     Forms.MessageBox.Show($"{info2}Erfolgreich ausgeführt.", ImageCode.HäkchenDoppelt, "Ok");
                 }
-                 
             }
         } else {
             if (fehler.Count > 0) {
@@ -3189,14 +3188,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
     }
 
-    private void Row_RowRemoved(object sender, RowEventArgs e) => Invalidate_CurrentArrangement();
+    private void Row_RowRemoved(object sender, RowEventArgs e) => Invalidate_AllViewItems(false);
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (IsDisposed) { return; }
         if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }
         if (PinnedRows.Contains(e.Row)) {
             PinnedRows.Remove(e.Row);
-            Invalidate_AllViewItems(false);
         }
     }
 

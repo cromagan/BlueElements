@@ -185,13 +185,16 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static List<RowItem> CalculateFilteredRows(Table? tb, params FilterItem[] filter) {
         if (tb?.IsDisposed != false) { return []; }
 
-        if (filter.Length == 0) { return [.. tb.Row]; }
         if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
             if (InitValue(spc, true, true, filter) is { } i) {
                 var ok = tb.BeSureRowIsLoaded(i);
                 if (!ok) { return []; }
+            } else {
+                return [];
             }
         }
+
+        if (filter.Length == 0) { return [.. tb.Row]; }
 
         List<RowItem> tmpVisibleRows = [];
         var lockMe = new object();

@@ -342,6 +342,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         return _cachedFilterHash;
     }
 
+    /// <summary>
+    /// Befüllt TableInput. Der Wert wird aus FilterInput generiert.
+    /// </summary>
     protected virtual void HandleChangesNow() {
         if (IsDisposed) {
             TableInput = null;

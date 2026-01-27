@@ -32,12 +32,10 @@ public class Renderer_Number : Renderer_Abstract {
 
     #region Fields
 
-    private int _nachkomma = 2;
+    private int _nachkommastellen = 2;
     private string _präfix = string.Empty;
-
     private string _suffix = string.Empty;
-
-    private bool _trennzeichen = true;
+    private bool _tausender_Trennzeichen = true;
 
     #endregion
 
@@ -53,14 +51,14 @@ public class Renderer_Number : Renderer_Abstract {
 
     public override string Description => "Kann Zahlenwerte formatiert anzeigen.";
 
-    public int Nachkomma {
-        get => _nachkomma;
+    public int Nachkommastellen {
+        get => _nachkommastellen;
         set {
             if (value < 0) { value = 0; }
             if (value > 5) { value = 5; }
 
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _nachkomma = value;
+            _nachkommastellen = value;
             OnPropertyChanged();
         }
     }
@@ -85,12 +83,12 @@ public class Renderer_Number : Renderer_Abstract {
         }
     }
 
-    public bool Trennzeichen {
-        get => _trennzeichen;
+    public bool Tausender_Trennzeichen {
+        get => _tausender_Trennzeichen;
         set {
-            if (_trennzeichen == value) { return; }
+            if (_tausender_Trennzeichen == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _trennzeichen = value;
+            _tausender_Trennzeichen = value;
             OnPropertyChanged();
         }
     }
@@ -124,8 +122,8 @@ public class Renderer_Number : Renderer_Abstract {
         List<GenericControl> result =
         [   new FlexiControlForProperty<string>(() => Präfix),
             new FlexiControlForProperty<string>(() => Suffix,Renderer_TextOneLine.Suffixe(), true),
-            new FlexiControlForProperty<bool>(() => Trennzeichen),
-            new FlexiControlForProperty<int>(() => Nachkomma)
+            new FlexiControlForProperty<bool>(() => Tausender_Trennzeichen),
+            new FlexiControlForProperty<int>(() => Nachkommastellen)
         ];
         return result;
     }
@@ -137,8 +135,8 @@ public class Renderer_Number : Renderer_Abstract {
 
         result.ParseableAdd("Suffix", _suffix);
 
-        result.ParseableAdd("Separator", _trennzeichen);
-        result.ParseableAdd("DecimalPlaces", _nachkomma);
+        result.ParseableAdd("Separator", _tausender_Trennzeichen);
+        result.ParseableAdd("DecimalPlaces", _nachkommastellen);
         return result;
     }
 
@@ -153,11 +151,11 @@ public class Renderer_Number : Renderer_Abstract {
                 return true;
 
             case "separator":
-                _trennzeichen = value.FromPlusMinus();
+                _tausender_Trennzeichen = value.FromPlusMinus();
                 return true;
 
             case "decimalplaces":
-                _nachkomma = IntParse(value);
+                _nachkommastellen = IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);
@@ -207,10 +205,10 @@ public class Renderer_Number : Renderer_Abstract {
         var txt = content;
 
         if (DoubleTryParse(content, out var value)) {
-            if (_trennzeichen) {
-                txt = value.ToString($"N{_nachkomma}", System.Globalization.CultureInfo.InstalledUICulture);
+            if (_tausender_Trennzeichen) {
+                txt = value.ToString($"N{_nachkommastellen}", System.Globalization.CultureInfo.InstalledUICulture);
             } else {
-                txt = value.ToString($"F{_nachkomma}", System.Globalization.CultureInfo.InstalledUICulture);
+                txt = value.ToString($"F{_nachkommastellen}", System.Globalization.CultureInfo.InstalledUICulture);
             }
         }
 
