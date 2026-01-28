@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,7 +27,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class RectanglePadItem : AbstractPadItem, IMirrorable {
+public abstract class RectanglePadItem : AbstractPadItem {
 
     #region Fields
 

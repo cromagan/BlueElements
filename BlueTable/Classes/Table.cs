@@ -2493,7 +2493,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 Undo.Clear();
                 var uio = value.SplitAndCutByCr();
                 for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-                    UndoItem tmpWork = new(uio[z]);
+                    var tmpWork = new UndoItem(uio[z]);
                     Undo.Add(tmpWork);
                 }
                 break;

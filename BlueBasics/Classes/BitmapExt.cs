@@ -136,7 +136,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public static Padding GetAutoValuesForCrop(Bitmap? sourceBmp, double minBrightness) {
-        Padding pa = new(0, 0, 0, 0);
+        var pa = new Padding(0, 0, 0, 0);
         if (sourceBmp == null) { return pa; }
         var x = 0;
         var exitNow = false;
@@ -246,10 +246,10 @@ public class BitmapExt : IDisposableExtended {
     public static bool IntersectsWith(Bitmap? bmp1, Point pos1, Bitmap? bmp2, Point pos2, int accuracy) {
         //Used: Only BZL
         if (bmp1 == null || bmp2 == null) { return false; }
-        Rectangle koord1 = new(pos1, bmp1.Size);
-        Rectangle koord2 = new(pos2, bmp2.Size);
+        var koord1 = new Rectangle(pos1, bmp1.Size);
+        var koord2 = new Rectangle(pos2, bmp2.Size);
         if (!koord1.IntersectsWith(koord2)) { return false; }
-        Rectangle schnitt = new(koord1.Location, koord1.Size);
+        var schnitt = new Rectangle(koord1.Location, koord1.Size);
         schnitt.Intersect(koord2);
         for (var x = schnitt.Left; x < schnitt.Right; x += accuracy) {
             for (var y = schnitt.Top; y < schnitt.Bottom; y += accuracy) {
@@ -274,7 +274,7 @@ public class BitmapExt : IDisposableExtended {
         }
         var y = 150 - (int)(w1 / 2.0);
         if (point.Y < sourceBmp.Height / 2.0) { y = sourceBmp.Height - 150 - (int)(w1 / 2.0); }
-        Rectangle r = new(x, y, w1, w1);
+        var r = new Rectangle(x, y, w1, w1);
         for (var z = 5; z >= 0; z--) {
             r.Inflate(1, 1);
             // r.Expand(0, 0, 1, 1)

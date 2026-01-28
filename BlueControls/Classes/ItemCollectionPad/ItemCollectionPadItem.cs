@@ -703,21 +703,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return smallestHotItem;
     }
 
-    public void Items_Mirror(PointM? p, bool vertical, bool horizontal) {
-        foreach (var thisItem in _internal) {
-            if (thisItem is IMirrorable m) { m.Mirror(p, vertical, horizontal); }
-        }
-    }
-
-    public void Items_Move(float x, float y) {
-        if (x == 0 && y == 0) { return; }
-
-        foreach (var thisItem in _internal) {
-            thisItem.Move(x, y, false);
-        }
-    }
-
-    public void Items_SetTestScale(float scale) {
+    public void Items_SetTextScale(float scale) {
         foreach (var thisItem in _internal) {
             if (thisItem is ISupportsTextScale m) {
                 m.TextScale = scale;

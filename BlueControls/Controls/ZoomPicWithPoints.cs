@@ -115,7 +115,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, List<string> tags) {
         var filenamePng = tags.TagGet("ImageFile");
-        BitmapListItem i = new(bmp, filenamePng, filenamePng.FileNameWithoutSuffix(), string.Empty) {
+        var i = new BitmapListItem(bmp, filenamePng, filenamePng.FileNameWithoutSuffix(), string.Empty) {
             Padding = 10,
             Tag = tags
         };
@@ -347,7 +347,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             if (e.MouseDown != null && MouseDownData != null) {
                 var md1 = MouseDownData.ControlPoint;
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-                RectangleF r = new(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
+                var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                 e.Graphics.FillRectangle(BrushRotTransp, r);
             }
         }
@@ -357,7 +357,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             if (e.MouseDown != null && MouseDownData != null) {
                 var md1 = MouseDownData.ControlPoint;
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-                RectangleF r = new(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
+                var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                 e.Graphics.DrawRectangle(PenRotTransp, r.X, r.Y, r.Width, r.Height);
             }
         }

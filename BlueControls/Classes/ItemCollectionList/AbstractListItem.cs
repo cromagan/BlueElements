@@ -90,7 +90,7 @@ public static class AbstractListItemExtension {
 
     public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visControlArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
         try {
-            object locker = new();
+            var locker = new object();
 
             //var visCanvasArea = visControlArea.ControlToCanvas(zoom, offsetX, offsetY);
 
@@ -452,7 +452,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
-    public string QuickInfo { get; set; }
+    public string QuickInfo { get; set; } = string.Empty;
 
     /// <summary>
     /// Falls eine spezielle Information gespeichert und zurückgegeben werden soll

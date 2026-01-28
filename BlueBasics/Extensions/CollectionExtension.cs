@@ -53,7 +53,7 @@ public static partial class Extensions {
     /// <param name="maxlength"></param>
     /// <returns></returns>
     public static string JoinWithCr(this IEnumerable<string> collection, long maxlength) {
-        StringBuilder sb = new();
+        var sb = new StringBuilder();
 
         foreach (var thisitem in collection) {
             if (sb.Length + thisitem.Length <= maxlength) {

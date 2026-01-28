@@ -258,7 +258,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     public void ShowWorkingAreaSetup() {
         if (_items == null) { return; }
 
-        PrintDocument oriD = new();
+        var oriD = new PrintDocument();
         oriD.DefaultPageSettings.Landscape = false;
         oriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)MmToPixel(_items.Breite, 100), (int)MmToPixel(_items.Höhe, 100));
         oriD.DefaultPageSettings.Margins.Top = (int)MmToPixel(_items.RandinMm.Top, 100);
@@ -560,7 +560,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     //}
     private void ContextMenu_Export(object sender, ObjectEventArgs e) {
         if (e.Data is not IStringable ps) { return; }
-        using SaveFileDialog f = new();
+        using var f = new SaveFileDialog();
         f.CheckFileExists = false;
         f.CheckPathExists = true;
         if (!string.IsNullOrEmpty(IO.LastFilePath)) { f.InitialDirectory = IO.LastFilePath; }

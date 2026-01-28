@@ -31,7 +31,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -430,7 +429,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
                             // Thread-sicherer Text-Check
                             var currentText = await Develop.GetSafePropertyValueAsync(() => txb.Text);
-                            if (currentText != initT) { return; }
+                            if (initT == null || currentText != initT) { return; }
 
                             var fo = initT.IndexOfWord(thisWord, cap, RegexOptions.IgnoreCase);
                             if (fo < 0) { break; }

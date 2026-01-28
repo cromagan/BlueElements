@@ -31,7 +31,7 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls;
 
-public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyPropertyChanged, IMirrorable {
+public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyPropertyChanged {
 
     #region Fields
 

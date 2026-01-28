@@ -55,7 +55,7 @@ public static class Geometry {
     /// <returns></returns>
     public static float DistanzZuStrecke(this PointF p, float x1, float y1, float x2, float y2) {
         var sp = PointOnLine(new PointF(p.X, p.Y), x1, y1, x2, y2);
-        PointF p1 = new(p.X, p.Y);
+        var p1 = new PointF(p.X, p.Y);
         return sp.PointInRect(x1, y1, x2, y2, 5)
             ? GetLength(p1, sp)
             : Math.Min(GetLength(new PointF(x1, y1), p1), GetLength(new PointF(x2, x2), p1));

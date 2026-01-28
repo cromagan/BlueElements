@@ -26,7 +26,6 @@ using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_AddRows : Method_TableGeneric {
 
     #region Properties
@@ -71,7 +70,7 @@ public class Method_AddRows : Method_TableGeneric {
         var keys = attvar.ValueListStringGet(2);
         keys = keys.SortedDistinctList();
 
-        StackTrace stackTrace = new();
+        var stackTrace = new StackTrace();
         if (stackTrace.FrameCount > 400) {
             return new DoItFeedback("Stapelspeicherüberlauf", true, ld);
         }

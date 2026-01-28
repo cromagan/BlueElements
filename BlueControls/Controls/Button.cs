@@ -41,8 +41,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
     private readonly ExtText _etxt;
 
-    private ButtonStyle _buttonStyle = ButtonStyle.Button;
-
     private bool _checked;
 
     /// <summary>
@@ -77,10 +75,10 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
     [DefaultValue(ButtonStyle.Button)]
     public ButtonStyle ButtonStyle {
-        get => _buttonStyle;
+        get;
         set {
-            if (_buttonStyle == value) { return; }
-            _buttonStyle = value;
+            if (field == value) { return; }
+            field = value;
 
             if (_clickFirerer != null) {
                 _clickFirerer.Enabled = false;
@@ -105,7 +103,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
     [DefaultValue(false)]
     public bool Checked {
-        get => _checked && (_buttonStyle.HasFlag(ButtonStyle.Checkbox) || _buttonStyle.HasFlag(ButtonStyle.Optionbox));
+        get => _checked && (ButtonStyle.HasFlag(ButtonStyle.Checkbox) || ButtonStyle.HasFlag(ButtonStyle.Optionbox));
         set {
             if (_checked == value) { return; }
             _checked = value;
@@ -195,7 +193,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         base.DrawControl(gr, state);
         try {
             QuickImage? qi;
-            if ((ButtonStyle)((int)_buttonStyle % 1000) == ButtonStyle.Yes_or_No) {
+            if ((ButtonStyle)((int)ButtonStyle % 1000) == ButtonStyle.Yes_or_No) {
                 qi = _checked || MousePressing()
                     ? QuickImage.Get(BlueBasics.Enums.ImageCode.Häkchen)
                     : QuickImage.Get(BlueBasics.Enums.ImageCode.Kreuz);
@@ -207,13 +205,13 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
             if (_isFireing) { state = States.Standard_Disabled; } // Optische anzeige
 
-            if (_buttonStyle.HasFlag(ButtonStyle.Checkbox) || _buttonStyle.HasFlag(ButtonStyle.Optionbox)) {
+            if (ButtonStyle.HasFlag(ButtonStyle.Checkbox) || ButtonStyle.HasFlag(ButtonStyle.Optionbox)) {
                 if (_checked || MousePressing()) { state |= States.Checked; }
             }
 
             #endregion
 
-            switch (_buttonStyle) {
+            switch (ButtonStyle) {
                 case ButtonStyle.Text:
                 case ButtonStyle.Borderless:
                 case ButtonStyle.Button:
@@ -266,7 +264,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                     break;
 
                 default:
-                    Develop.DebugPrint_MissingCommand(_buttonStyle.ToString());
+                    Develop.DebugPrint_MissingCommand(ButtonStyle.ToString());
                     break;
             }
         } catch { }
@@ -286,10 +284,10 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         _isFireing = true;
         Refresh();
 
-        if (_buttonStyle.HasFlag(ButtonStyle.Checkbox)) {
+        if (ButtonStyle.HasFlag(ButtonStyle.Checkbox)) {
             Checked = !Checked;
         }
-        if (_buttonStyle.HasFlag(ButtonStyle.Optionbox)) {
+        if (ButtonStyle.HasFlag(ButtonStyle.Optionbox)) {
             if (!_checked) {
                 Checked = true;
                 DisableOtherOptionButtons();
@@ -322,7 +320,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         if (e.Button == MouseButtons.Right) {
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, null, e);
         } else {
-            if (_buttonStyle == ButtonStyle.SliderButton) {
+            if (ButtonStyle == ButtonStyle.SliderButton) {
                 _clickFirerer?.Interval = 500;
                 ClickFirerer_Tick(null, e);
             }
@@ -360,7 +358,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     private void ClickFirerer_Tick(object? sender, System.EventArgs e) {
-        if (_buttonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing() && ContainsMouse()) {
+        if (ButtonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing() && ContainsMouse()) {
             // Focus egal, DauerFeuerbutton - Slider - Design kann keinen Focus erhalten!
             _clickFired = false;
             OnClick(e);
@@ -374,7 +372,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     private void DisableOtherOptionButtons() {
-        if (!_checked || !_buttonStyle.HasFlag(ButtonStyle.Optionbox) || Parent == null) { return; }
+        if (!_checked || !ButtonStyle.HasFlag(ButtonStyle.Optionbox) || Parent == null) { return; }
 
         if (string.IsNullOrEmpty(Name)) { return; }
 
@@ -392,20 +390,20 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
         if (par == ParentType.Slider) {
             SetNotFocusable();
-            _buttonStyle = ButtonStyle.SliderButton;
+            ButtonStyle = ButtonStyle.SliderButton;
         } else {
             SetStyle(ControlStyles.Selectable, true);
         }
 
-        if (_buttonStyle.HasFlag(ButtonStyle.Text)) { return; }
+        if (ButtonStyle.HasFlag(ButtonStyle.Text)) { return; }
 
         if (par is ParentType.RibbonGroupBox or ParentType.RibbonPage) {
-            if (!_buttonStyle.HasFlag(ButtonStyle.Button_Big)) { _buttonStyle |= ButtonStyle.Button_Big; }
-            if (!_buttonStyle.HasFlag(ButtonStyle.Borderless)) { _buttonStyle |= ButtonStyle.Borderless; }
+            if (!ButtonStyle.HasFlag(ButtonStyle.Button_Big)) { ButtonStyle |= ButtonStyle.Button_Big; }
+            if (!ButtonStyle.HasFlag(ButtonStyle.Borderless)) { ButtonStyle |= ButtonStyle.Borderless; }
         }
 
-        if (par == ParentType.ComboBox) { _buttonStyle = ButtonStyle.ComboBoxButton; }
-        if (par == ParentType.RibbonBarCombobox) { _buttonStyle = ButtonStyle.ComboBoxButton_Borderless; }
+        if (par == ParentType.ComboBox) { ButtonStyle = ButtonStyle.ComboBoxButton; }
+        if (par == ParentType.RibbonBarCombobox) { ButtonStyle = ButtonStyle.ComboBoxButton_Borderless; }
     }
 
     private void OnCheckedChanged() => CheckedChanged?.Invoke(this, System.EventArgs.Empty);

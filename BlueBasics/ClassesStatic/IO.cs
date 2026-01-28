@@ -648,7 +648,7 @@ public static class IO {
             if (TryFileExists(affectingFiles).ReturnValue is true) {
                 try {
                     // Versuch, Datei EXKLUSIV zu öffnen
-                    using (FileStream obFi = new(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) {
+                    using (var obFi = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) {
                         obFi.Close();
                     }
                     result = true;
@@ -857,7 +857,7 @@ public static class IO {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
 
         try {
-            FileInfo f = new(filename);
+            var f = new FileInfo(filename);
             return new(f.LastWriteTimeUtc.ToString1() + "-" + f.Length);
         } catch (UnauthorizedAccessException) {
             return FileOperationResult.ValueFailed;
@@ -1036,7 +1036,7 @@ public static class IO {
             // Prüfen ob wir schreiben können
             if (TryCanWrite([filename]).ReturnValue is not true) { return FileOperationResult.ValueFalse; }
 
-            using FileStream fs = new(filename, FileMode.Create, FileAccess.Write, FileShare.None);
+            using var fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
             fs.Write(bytes, 0, bytes.Length);
             fs.Flush();
             fs.Close();

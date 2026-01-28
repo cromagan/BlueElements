@@ -27,19 +27,13 @@ public static partial class Extensions {
     public static PointF ControlToCanvas(this Point p, float zoom, float offsetX, float offsetY) => new(p.X.ControlToCanvas(zoom, offsetX), p.Y.ControlToCanvas(zoom, offsetY));
 
     public static Point PointParse(this string? toParse) {
-        if (toParse == null) { return Point.Empty; }
+        if (toParse == null || string.IsNullOrEmpty(toParse)) { return Point.Empty; }
 
         toParse = toParse.RemoveChars("{}XYxy= ");
-        Point p = new();
-        if (string.IsNullOrEmpty(toParse)) {
-            p.X = 0;
-            p.Y = 0;
-            return p;
-        }
         var w = toParse.Split(',');
-        p.X = IntParse(w[0]);
-        p.Y = IntParse(w[1]);
-        return p;
+        if (w.Length != 2) { return Point.Empty; }
+
+        return new Point(IntParse(w[0]), IntParse(w[1]));
     }
 
     #endregion

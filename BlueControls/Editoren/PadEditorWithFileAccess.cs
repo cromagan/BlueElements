@@ -72,30 +72,30 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnAddDimension_Click(object sender, System.EventArgs e) {
-        DimensionPadItem b = new(new PointF(300, 300), new PointF(400, 300), 30);
+        var b = new DimensionPadItem(new PointF(300, 300), new PointF(400, 300), 30);
         Pad.AddCentered(b);
     }
 
     private void btnAddImage_Click(object sender, System.EventArgs e) {
-        BitmapPadItem b = new(string.Empty, QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
+        var b = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Fragezeichen), new Size(1000, 1000));
         Pad.AddCentered(b);
     }
 
     private void btnAddLine_Click(object sender, System.EventArgs e) {
         var p = Pad.MiddleOfVisiblesScreen();
         var w = (int)(300 / Pad.Zoom);
-        LinePadItem b = new(PadStyles.Standard, p with { X = p.X - w }, p with { X = p.X + w });
+        var b = new LinePadItem(PadStyles.Standard, p with { X = p.X - w }, p with { X = p.X + w });
         Pad.AddCentered(b);
     }
 
     private void btnAddSymbol_Click(object sender, System.EventArgs e) {
-        SymbolPadItem b = new();
+        var b = new SymbolPadItem();
         b.SetCoordinates(new RectangleF(100, 100, 300, 300));
         Pad.AddCentered(b);
     }
 
     private void btnAddText_Click(object sender, System.EventArgs e) {
-        TextPadItem b = new() {
+        var b = new TextPadItem() {
             Text = string.Empty,
             Style = PadStyles.Standard
         };

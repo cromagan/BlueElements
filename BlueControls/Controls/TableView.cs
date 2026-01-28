@@ -490,7 +490,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var columnListtmp = columnList?.ToList();
         columnListtmp ??= [.. tbl.Column.Where(thisColumnItem => thisColumnItem != null)];
 
-        StringBuilder sb = new();
+        var sb = new StringBuilder();
         switch (firstRow) {
             case FirstRow.Without:
                 break;
@@ -683,7 +683,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             //}
 
             if (column?.Column is { IsDisposed: false, TextFormatingAllowed: true }) {
-                ExtText l = new(Design.TextBox, States.Standard) {
+                var l = new ExtText(Design.TextBox, States.Standard) {
                     HtmlText = ist1
                 };
                 ist1 = l.PlainText;
@@ -1770,7 +1770,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.OnMouseMove(e);
 
         lock (_lockUserAction) {
-            if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+            if (IsDisposed || Table is not { IsDisposed: false }) { return; }
             if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
 
             if (_isinMouseMove) { return; }
@@ -2319,7 +2319,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, tb, filteredRows, pinnedRows);
 
-        var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, tb, allrows, pinnedRows, allVisibleCaps, sortused);
+        var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, allrows, pinnedRows, allVisibleCaps, sortused);
 
         CalculateAllViewItems_Collapsed(allItems);
 
@@ -2329,7 +2329,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, sortused, visibleRowListItems);
 
-        //CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
+        CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
 
         CalculateAllViewItems_CalculateYPosition(sortedItems, arrangement);
 
@@ -2395,6 +2395,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
             }
         }
+    }
+
+    private void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
+        allItems.TryGetValue(TableEndListItem.Identifier, out var item0);
+        if (item0 is not TableEndListItem tableEnd) {
+            tableEnd = new TableEndListItem(arrangement);
+            allItems.Add(tableEnd.KeyName, tableEnd);
+        }
+        tableEnd.Visible = arrangement.ShowHead;
+        tableEnd.IgnoreYOffset = false;
+        sortedItems.Add(tableEnd);
     }
 
     private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
@@ -2555,7 +2566,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, Table tb, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused) {
+    private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused) {
         var nullcap = allVisibleCaps.Count > 0;
 
         var visibleRowListItems = new List<RowListItem>();

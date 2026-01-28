@@ -72,21 +72,21 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
     /// <param name="originalPic"></param>
-    public new virtual void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) { }
+    public virtual new void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) { }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
     /// <param name="originalPic"></param>
-    public new virtual void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) { }
+    public virtual new void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) { }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
     /// <param name="originalPic"></param>
-    public new virtual void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) { }
+    public virtual new void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) { }
 
     /// <summary>
     ///
@@ -108,7 +108,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     protected void OnHideMainWindow() => HideMainWindow?.Invoke(this, System.EventArgs.Empty);
 
     protected Bitmap? OnNeedCurrentPic() {
-        BitmapEventArgs e = new(null);
+        var e = new BitmapEventArgs(null);
         NeedCurrentPic?.Invoke(this, e);
         return e.Bmp;
     }

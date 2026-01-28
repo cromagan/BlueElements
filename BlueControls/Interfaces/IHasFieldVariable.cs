@@ -19,6 +19,9 @@ using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
 
+/// <summary>
+/// Für Steuerelemente in Connected Formula, die Variabelen für Skripte bereitstellen.
+/// </summary>
 public interface IHasFieldVariable {
 
     #region Properties

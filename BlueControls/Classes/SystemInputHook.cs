@@ -248,8 +248,8 @@ public sealed class SystemInputHook {
         {
             k |= Keys.Oem5;
         }
-        KeyEventArgs kev = new(k);
-        KeyEventArgs kevold = new(_keyLastKey);
+        var kev = new KeyEventArgs(k);
+        var kevold = new KeyEventArgs(_keyLastKey);
         if (_keyIsPressing) {
             if (k == Keys.None) {
                 OnKeyUp(kevold);
@@ -274,10 +274,8 @@ public sealed class SystemInputHook {
         if (GetAsyncKeyState(Keys.RButton) != 0) {
             b |= MouseButtons.Right;
         }
-        MouseEventArgs mev = new(b, 0, Cursor.Position.X,
-            Cursor.Position.Y, 0);
-        MouseEventArgs mevold = new(_mouseLastButton, 0,
-            Cursor.Position.X, Cursor.Position.Y, 0);
+        var mev = new MouseEventArgs(b, 0, Cursor.Position.X, Cursor.Position.Y, 0);
+        var mevold = new MouseEventArgs(_mouseLastButton, 0, Cursor.Position.X, Cursor.Position.Y, 0);
         if (_mouseLastX != mev.X || _mouseLastY != mev.Y) {
             OnMouseMove(mev);
         }

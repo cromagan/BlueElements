@@ -31,7 +31,7 @@ using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class DimensionPadItem : AbstractPadItem, IMirrorable, IStyleableOne, ISupportsTextScale {
+public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupportsTextScale {
 
     #region Fields
 

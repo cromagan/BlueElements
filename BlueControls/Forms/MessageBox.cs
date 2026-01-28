@@ -92,7 +92,7 @@ public partial class MessageBox : Form {
     public static int Show(string txt, ImageCode? pic, params string[] buttons) => Show(txt, pic, true, buttons);
 
     public static int Show(string txt, ImageCode? pic, bool dialog, params string[] buttons) {
-        MessageBox mb = new(txt, pic, buttons);
+        var mb = new MessageBox(txt, pic, buttons);
         if (dialog) {
             mb.ShowDialog();
         } else {
@@ -107,7 +107,7 @@ public partial class MessageBox : Form {
 
     public List<Button> Generate_Buttons(string[] names) {
         var myX = Width - Skin.Padding - BorderWidth;
-        ExtText erT = new(Design.Button, States.Standard);
+        var erT = new ExtText(Design.Button, States.Standard);
         List<Button> buts = [];
         for (var z = names.GetUpperBound(0); z > -1; z--) {
             if (!string.IsNullOrEmpty(names[z])) {

@@ -59,7 +59,7 @@ public partial class InputBox : DialogWithOkAndCancel {
     public static string Show(string txt, string vorschlagsText, IInputFormat textformat) => Show(txt, vorschlagsText, textformat, false);
 
     public static string Show(string txt, string vorschlagsText, IInputFormat textformat, bool bigMultiLineBox) {
-        InputBox mb = new(txt, vorschlagsText, textformat, bigMultiLineBox);
+        var mb = new InputBox(txt, vorschlagsText, textformat, bigMultiLineBox);
         mb.ShowDialog();
         return mb._giveBack;
     }

@@ -6,11 +6,6 @@ using System.Windows.Forms;
 
 namespace BlueControls.Controls {
     partial class ConnectedFormulaScriptButton {
-        /// <summary> 
-        /// Erforderliche Designervariable.
-        /// </summary>
-        private IContainer components = null;
-
 
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 

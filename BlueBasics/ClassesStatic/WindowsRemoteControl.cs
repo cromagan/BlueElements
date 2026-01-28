@@ -73,7 +73,7 @@ public static class WindowsRemoteControl {
     public static void FensterMinimieren(IntPtr handle) => ShowWindow(handle, (int)Sw.ShowMinimized);
 
     public static void FensterPosSetzen(IntPtr handle, int left, int top) {
-        Rectangle r = new();
+        var r = new Rectangle();
         GetWindowRect(handle, ref r);
         if (r.Width == 0) { return; }
         if (r.Height == 0) { return; }
@@ -161,7 +161,7 @@ public static class WindowsRemoteControl {
         while (true) {
             hh = GetWindow(hh, 2);
             if (hh.ToInt32() != 0) {
-                StrProcess l = new() {
+                var l = new StrProcess() {
                     MainWindowHandle = hh
                 };
                 GetWindowInfo(ref l);

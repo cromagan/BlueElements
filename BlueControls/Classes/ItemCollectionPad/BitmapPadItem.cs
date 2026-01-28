@@ -127,7 +127,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         if (Bitmap != null) {
             if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
-        OpenFileDialog e = new() {
+        var e = new OpenFileDialog() {
             CheckFileExists = true,
             Multiselect = false,
             Title = "Bild wählen:",
@@ -293,8 +293,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         //positionControl.Inflate(-_padding, -_padding);
         //RectangleF r1 = new(positionControl.Left , positionControl.Top , positionControl.Width , positionControl.Height );
-        RectangleF r2 = new();
-        RectangleF r3 = new();
+        var r2 = new RectangleF();
+        var r3 = new RectangleF();
         if (Bitmap != null) {
             r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
             switch (Bild_Modus) {

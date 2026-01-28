@@ -24,16 +24,15 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static Padding PaddingParse(this string toParse) {
+    public static Padding PaddingParse(this string? toParse) {
+        if (toParse == null || string.IsNullOrEmpty(toParse)) { return Padding.Empty; }
+
         toParse = toParse.FromNonCritical().RemoveChars("{}LeftTopRightBm= ");
         var w = toParse.Split(',');
-        Padding p = new() {
-            Left = IntParse(w[0]),
-            Top = IntParse(w[1]),
-            Right = IntParse(w[2]),
-            Bottom = IntParse(w[3])
-        };
-        return p;
+
+        if (w.Length != 4) { return Padding.Empty; }
+
+        return new Padding(IntParse(w[0]), IntParse(w[1]), IntParse(w[2]), IntParse(w[3]));
     }
 
     #endregion

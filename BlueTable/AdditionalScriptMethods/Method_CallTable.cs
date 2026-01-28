@@ -55,7 +55,7 @@ public class Method_CallTable : Method_TableGeneric {
 
         if (!tb.IsEditable(false)) { return new DoItFeedback($"Tabellesperre: {tb.IsNotEditableReason(false)}", false, ld); }
 
-        StackTrace stackTrace = new();
+        var stackTrace = new StackTrace();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback("Stapelspeicherüberlauf", true, ld); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }

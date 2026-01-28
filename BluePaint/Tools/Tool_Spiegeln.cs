@@ -80,7 +80,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
         var wink = GetAngle(e.MouseDown.CanvasPoint, e.MouseCurrent.CanvasPoint);
         // Make a Matrix to represent rotation by this angle.
-        Matrix rotateAtOrigin = new();
+        var rotateAtOrigin = new Matrix();
         rotateAtOrigin.Rotate(wink);
         // Rotate the image's corners to see how big it will be after rotation.
         PointF[] p = [
@@ -96,7 +96,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         var h = (int)Math.Round(maxY - minY, MidpointRounding.AwayFromZero);
         var bmp = new Bitmap(b, h);
         // Create the real rotation transformation.
-        Matrix rotateAtCenter = new();
+        var rotateAtCenter = new Matrix();
         rotateAtCenter.RotateAt(wink, new PointF(b / 2f, h / 2f));
         // Draw the image onto the new bitmap rotated.
         using (var gr = Graphics.FromImage(bmp)) {

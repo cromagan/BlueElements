@@ -6,10 +6,6 @@ using BlueTable.Enums;
 
 namespace BlueControls.Controls{
     partial class FlexiControlForFilter {
-        /// <summary> 
-        /// Erforderliche Designervariable.
-        /// </summary>
-        private IContainer components = null;
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 

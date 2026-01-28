@@ -164,9 +164,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public int FilterleisteZeilen => CurrentArrangement?.FilterRows ?? 1;
 
-    [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
-    public FilterTypesToShow FilterTypesToShow { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
-
     public new bool Focused => base.Focused || TableInternal.Focused;
 
     [DefaultValue(GroupBoxStyle.Nothing)]
@@ -572,8 +569,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                     #region Sichtbarkeit des Filterelements bestimmen
 
                     if (thisColumn.AutoFilterSymbolPossible()) {
-                        if (viewItemOrder != null && FilterTypesToShow.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
-                        if (viewItemCurrent != null && FilterTypesToShow.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter) && filterItem != null) { showMe = true; }
+                        if (viewItemOrder != null) { showMe = true; }
+                        if (viewItemCurrent != null && filterItem != null) { showMe = true; }
 
                         if (FilterInput?[thisColumn] is { }) { showMe = true; }
                     }

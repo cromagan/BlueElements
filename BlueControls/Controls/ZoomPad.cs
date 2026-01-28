@@ -354,7 +354,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         ControlPressing = false;
     }
 
-    protected override sealed void OnMouseDown(MouseEventArgs e) {
+    protected sealed override void OnMouseDown(MouseEventArgs e) {
         var cme = new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY);
         MouseDownData = cme;
         base.OnMouseDown(e);
@@ -368,14 +368,14 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         ControlPressing = false;
     }
 
-    protected override sealed void OnMouseMove(MouseEventArgs e) {
+    protected sealed override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         OnMouseMove(new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY));
     }
 
     protected virtual void OnMouseMove(CanvasMouseEventArgs e) { }
 
-    protected override sealed void OnMouseUp(MouseEventArgs e) {
+    protected sealed override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         MouseDownData = null;
         OnMouseUp(new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY));
@@ -383,7 +383,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected virtual void OnMouseUp(CanvasMouseEventArgs e) { }
 
-    protected override sealed void OnMouseWheel(MouseEventArgs e) {
+    protected sealed override void OnMouseWheel(MouseEventArgs e) {
         // e enstricht den Control-Koordinaten
         base.OnMouseWheel(e);
 

@@ -33,14 +33,14 @@ public static class Polygons {
     }
 
     public static GraphicsPath Poly_Arrow(Rectangle rect) {
-        GraphicsPath p = new();
+        var p = new GraphicsPath();
         // --------+  >
         //         | /
         //         |/
         //
-        PointF plusOben = new((float)(rect.Left + (rect.Width * 0.5)),
+        var plusOben = new PointF((float)(rect.Left + (rect.Width * 0.5)),
             (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
-        PointF plusUnten = new((float)(rect.Left + (rect.Width * 0.5)),
+        var plusUnten = new PointF((float)(rect.Left + (rect.Width * 0.5)),
             (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
         p.AddLine(rect.PointOf(Alignment.VerticalCenter_Right), plusUnten with { Y = rect.Bottom });
         p.AddLine(p.GetLastPoint(), plusUnten);
@@ -54,7 +54,7 @@ public static class Polygons {
     }
 
     public static GraphicsPath Poly_Bruchlinie(Rectangle rect) {
-        GraphicsPath p = new();
+        var p = new GraphicsPath();
         p.AddLine(rect.PointOf(Alignment.Top_Left), rect.PointOf(Alignment.Top_Right));
         p.AddLine(p.GetLastPoint(), rect.PointOf(Alignment.Bottom_Right));
         p.AddLine(p.GetLastPoint(), rect.PointOf(Alignment.Bottom_Left));
@@ -72,7 +72,7 @@ public static class Polygons {
     }
 
     public static GraphicsPath Poly_Rechteck(Rectangle rect) {
-        GraphicsPath tempPolyRechteck = new();
+        var tempPolyRechteck = new GraphicsPath();
         tempPolyRechteck.AddRectangle(rect);
         tempPolyRechteck.CloseFigure();
         return tempPolyRechteck;
@@ -82,7 +82,7 @@ public static class Polygons {
 
     public static GraphicsPath? Poly_RoundRec(int x, int y, int width, int height, int radius) {
         if (width < 1 || height < 1) { return null; }
-        GraphicsPath tempPolyRoundRec = new();
+        var tempPolyRoundRec = new GraphicsPath();
         if (radius > (height / 2.0) + 2) { radius = (int)(height / 2.0) + 2; }
         if (radius > (width / 2.0) + 2) { radius = (int)(width / 2.0) + 2; }
 
@@ -101,7 +101,7 @@ public static class Polygons {
     }
 
     public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3) {
-        GraphicsPath p = new();
+        var p = new GraphicsPath();
         p.AddLine(p1, p2);
         p.AddLine(p2, p3);
         p.CloseFigure();

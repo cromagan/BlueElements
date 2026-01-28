@@ -74,12 +74,12 @@ public sealed partial class ScreenShot : Form {
     /// <returns></returns>
     /// <remarks></remarks>
     public static ScreenData GrabArea(Form? frm) {
-        using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, Helpers.DrawRectangle | Helpers.Magnifier);
+        using var x = new ScreenShot("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.", false, Helpers.DrawRectangle | Helpers.Magnifier);
         return x.Start(frm);
     }
 
     internal static ScreenData GrabAndClick(string txt, Form? frm, Helpers helper) {
-        using ScreenShot x = new(txt, true, helper);
+        using var x = new ScreenShot(txt, true, helper);
         return x.Start(frm);
     }
 

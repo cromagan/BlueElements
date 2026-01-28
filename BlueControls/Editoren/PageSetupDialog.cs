@@ -80,7 +80,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
     #region Methods
 
     public static PrintDocument? Show(PrintDocument printDocument1, bool nurHochformat) {
-        PageSetupDialog mb = new(printDocument1, nurHochformat);
+        var mb = new PageSetupDialog(printDocument1, nurHochformat);
         mb.ShowDialog();
         return mb._giveBack;
     }

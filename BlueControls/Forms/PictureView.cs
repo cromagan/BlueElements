@@ -82,7 +82,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
     #region Properties
 
-    public override sealed string Text {
+    public sealed override string Text {
         get => base.Text;
         set => base.Text = value;
     }

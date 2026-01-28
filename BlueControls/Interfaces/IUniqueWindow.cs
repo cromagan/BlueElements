@@ -24,7 +24,7 @@ namespace BlueControls.Interfaces;
 /// Typischerweiße bei einem Editor.
 /// Wichtig! Die Form muss einen Parameterlosen Konstruktor haben.
 /// Wenn Object Null ist, ist Systemweit nur ein Fenster möglich.
-/// Aufrufbeispiel: IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
+/// Aufrufbeispiel: IUniqueWindowExtension.ShowOrCreate&lt;TableScriptEditor&gt;(tb);
 /// </summary>
 public interface IUniqueWindow : IDisposableExtended {
 

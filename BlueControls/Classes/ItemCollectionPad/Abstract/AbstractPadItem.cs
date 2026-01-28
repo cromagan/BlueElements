@@ -41,6 +41,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     #region Fields
 
+    public static readonly HatchBrush RedStripesBrush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
+
     /// <summary>
     /// Soll es gedruckt werden?
     /// </summary>
@@ -268,10 +270,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-
-    private HatchBrush RedStripesBrush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
-
-
     public void Draw(Graphics gr, Rectangle visibleAreaControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (forPrinting && !_beiExportSichtbar && !ShowAlways) { return; }
 
@@ -301,7 +299,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     var r = iec.ErrorReason();
 
                     if (!string.IsNullOrEmpty(r)) {
-
                         gr.FillRectangle(RedStripesBrush, positionControl);
                         var q = QuickImage.Get("Kritisch|32||1");
                         gr.DrawImage(q, positionControl.X, positionControl.Y);
@@ -368,11 +365,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
             //new FlexiControl("Verbindungspunkte:", widthOfControl, true),
             //d
-        }
-
-        if (this is IMirrorable) {
-            result.Add(new FlexiControlForDelegate(Spiegeln_Vertikal, "Vertikal", ImageCode.SpiegelnVertikal));
-            result.Add(new FlexiControlForDelegate(Spiegeln_Horizontal, "Horizontal", ImageCode.SpiegelnHorizontal));
         }
 
         return result;
@@ -668,18 +660,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
 
         OnPropertyChanged("JointPoint");
-    }
-
-    private void Spiegeln_Horizontal() {
-        if (this is IMirrorable m) {
-            m.Mirror(null, false, true);
-        }
-    }
-
-    private void Spiegeln_Vertikal() {
-        if (this is IMirrorable m) {
-            m.Mirror(null, true, false);
-        }
     }
 
     #endregion

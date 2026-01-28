@@ -122,7 +122,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}"
     };
 
-    public new static readonly ColumnFormatHolder FilePath = new(FormatHolder.Filepath) {
+    public new static readonly ColumnFormatHolder Filepath = new(FormatHolder.Filepath) {
         Align = AlignmentHorizontal.Links,
         SortType = SortierTyp.Original_String,
         DoOpticalTranslation = TranslationType.Original_Anzeigen,

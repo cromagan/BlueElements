@@ -91,7 +91,7 @@ public partial class ZoomPic : ZoomPad {
         var drawArea = AvailableControlPaintArea;
 
         // Create and draw gradient background
-        using LinearGradientBrush lgb = new(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+        using var lgb = new LinearGradientBrush(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, drawArea);
 
         if (Bmp?.IsValid() == true) {

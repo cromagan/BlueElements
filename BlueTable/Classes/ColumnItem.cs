@@ -37,7 +37,7 @@ using static BlueTable.Table;
 
 namespace BlueTable;
 
-public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColumnInputFormat, IErrorCheckable, IHasTable, IDisposableExtendedWithEvent, IEditable {
+public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErrorCheckable, IHasTable, IDisposableExtendedWithEvent, IEditable {
 
     #region Fields
 
@@ -1085,7 +1085,7 @@ public sealed class ColumnItem : IReadableTextWithPropertyChangingAndKey, IColum
     public void AddSystemInfo(string type, Table sourcetable, string user) => AddSystemInfo(type, sourcetable.Caption + " -> " + user);
 
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return value; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return value; }
 
         if (IsSystemColumn()) { return value; }
         //if (Function == ColumnFunction.Virtelle_Spalte) { return value; }

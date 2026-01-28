@@ -106,7 +106,7 @@ public static class Generic {
         var title = "unbekannt";
         // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         try {
-            using WebClient x = new();
+            using var x = new WebClient();
             var source = x.DownloadString(linkUrl);
             title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
             title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
@@ -158,7 +158,7 @@ public static class Generic {
     /// <returns></returns>
     public static string Download(string url) {
         // My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
-        using WebClient wc = new();
+        using var wc = new WebClient();
         wc.Encoding = Encoding.UTF8;
         return wc.DownloadString(url);
     }
@@ -388,8 +388,8 @@ public static class Generic {
             x2 = Math.Max(x2, Screen.AllScreens[zSc].Bounds.Right);
             y2 = Math.Max(y2, Screen.AllScreens[zSc].Bounds.Bottom);
         }
-        Point gp = new(x1, y1);
-        Size sz = new(-x1 + x2, -y1 + y2);
+        var gp = new Point(x1, y1);
+        var sz = new Size(-x1 + x2, -y1 + y2);
         return new Rectangle(gp, sz);
     }
 

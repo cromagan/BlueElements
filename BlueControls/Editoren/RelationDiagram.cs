@@ -92,7 +92,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
             return null;
         }
         if (ItemOfRow(r) != null) { return null; }
-        RowFormulaPadItem i2 = new(tb, r.KeyName, layoutId);
+        var i2 = new RowFormulaPadItem(tb, r.KeyName, layoutId);
         Pad?.AddCentered(i2);
         //  Pad.Invalidate()
         i2.SetLeftTopPoint(xPos, ypos);
@@ -310,7 +310,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         if (Pad.Items is not { IsDisposed: false }) { return; }
         if (_column == null) { return; }
 
-        FolderBrowserDialog fl = new();
+        var fl = new FolderBrowserDialog();
         fl.ShowDialog();
 
         List<string> l = [];

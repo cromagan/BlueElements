@@ -887,7 +887,7 @@ public static class Skin {
         try {
             return Design[design][state];
         } catch {
-            SkinDesign d = new() {
+            var d = new SkinDesign() {
                 BackColor1 = Color.White,
                 BorderColor1 = Color.Red,
                 Font = BlueFont.DefaultFont,
@@ -1218,7 +1218,7 @@ public static class Skin {
         if (StyleTb is not { IsDisposed: false } tb ||
             _styleTb_Style is not { IsDisposed: false } cs ||
             _styleTb_Name is not { IsDisposed: false } cn ||
-            _styleTb_Font is not { IsDisposed: false } cf) { return BlueFont.DefaultFont; }
+            _styleTb_Font is not { IsDisposed: false }) { return BlueFont.DefaultFont; }
 
         var f1 = new FilterItem(cn, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, style);
         var f2 = new FilterItem(cs, BlueTable.Enums.FilterType.Istgleich, ((int)format).ToString());
@@ -1234,13 +1234,11 @@ public static class Skin {
             return BlueFont.DefaultFont;
         }
 
-        var font = GetBlueFont(r);
-
         //if (tb.IsEditable(false)) {
         //    r.CellSet(cf, font.ParseableItems().FinishParseable(), "Automatische Korrektur");
         //}
 
-        return font;
+        return GetBlueFont(r);
     }
 
     public static BlueFont GetBlueFont(RowItem? r) {

@@ -40,7 +40,7 @@ public partial class Tool_DummyGenerator {
         gr.Clear(Color.White);
         gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, bmp.Width - 2, bmp.Height - 2);
         if (!string.IsNullOrEmpty(text)) {
-            Font f = new("Arial", 50, FontStyle.Bold);
+            var f = new Font("Arial", 50, FontStyle.Bold);
             var fs = f.MeasureString(text);
             gr.TranslateTransform((float)(bmp.Width / 2.0), (float)(bmp.Height / 2.0));
             gr.RotateTransform(-90);

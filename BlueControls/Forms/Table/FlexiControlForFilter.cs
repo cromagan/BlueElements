@@ -247,7 +247,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (FilterSingleColumn is not { IsDisposed: false } c) { return; }
 
-        AutoFilter autofilter = new(c, FilterInput, null, Width, _renderer);
+        var autofilter = new AutoFilter(c, FilterInput, null, Width, _renderer);
         var p = PointToScreen(Point.Empty);
         autofilter.Position_LocateToPosition(p with { Y = p.Y + Height });
         autofilter.Show();

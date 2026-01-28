@@ -796,7 +796,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
     private Button Control_Create_ButtonColor() {
-        Button control = new() {
+        var control = new Button() {
             Enabled = Enabled,
             Name = "ColorButton",
             Checked = false,
@@ -811,7 +811,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
     private Button Control_Create_ButtonCommand() {
-        Button control = new() {
+        var control = new Button() {
             Enabled = Enabled,
             Name = "CommandButton",
             Checked = false,
@@ -823,7 +823,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private Button Control_Create_ButtonYesNo() {
-        Button control = new() {
+        var control = new Button() {
             Enabled = Enabled,
             Name = "YesNoButton",
             ButtonStyle = ButtonStyle.Yes_or_No,
@@ -868,14 +868,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private ComboBox Control_Create_ComboBox() {
-        ComboBox control = new();
+        var control = new ComboBox();
         StyleComboBox(control, null, ComboBoxStyle.DropDownList, false, 1);
         control.TextChanged += ValueChanged_ComboBox;
         return control;
     }
 
     private GroupBox Control_Create_GroupBox() {
-        GroupBox control = new() {
+        var control = new GroupBox() {
             Enabled = Enabled,
             GroupBoxStyle = GroupBoxStyle.NormalBold,
             Text = _caption
@@ -884,7 +884,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private Line Control_Create_Line() {
-        Line control = new() {
+        var control = new Line() {
             Enabled = Enabled,
             Orientation = Orientation.Waagerecht
         };
@@ -892,7 +892,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private ListBox Control_Create_ListBox() {
-        ListBox control = new() {
+        var control = new ListBox() {
             Enabled = Enabled,
             CheckBehavior = CheckBehavior.MultiSelection
         };
@@ -903,7 +903,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private SwapListBox Control_Create_SwapListBox() {
-        SwapListBox control = new() {
+        var control = new SwapListBox() {
             Enabled = Enabled
         };
         control.UnCheck();
@@ -912,7 +912,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private TextBox Control_Create_TextBox() {
-        TextBox control = new();
+        var control = new TextBox();
         StyleTextBox(control, 1);
         control.TextChanged += ValueChanged_TextBox;
         return control;

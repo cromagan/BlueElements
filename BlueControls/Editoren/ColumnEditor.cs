@@ -205,7 +205,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private static string GenQIText(string name, ImageCode img, List<string> werte) {
-        var t2 = string.Empty;
+        string t2;
 
         if (werte.Count == 0) {
             t2 = "-";

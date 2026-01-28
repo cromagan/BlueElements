@@ -46,7 +46,7 @@ public partial class Progressbar : FloatingForm {
     #region Methods
 
     public static Progressbar Show(string text) {
-        Progressbar p = new(text) {
+        var p = new Progressbar(text) {
             _baseText = text
         };
         p.Show();
@@ -54,7 +54,7 @@ public partial class Progressbar : FloatingForm {
     }
 
     public static Progressbar Show(string text, int count) {
-        Progressbar p = new(text) {
+        var p = new Progressbar(text) {
             _baseText = text,
             _count = count
         };

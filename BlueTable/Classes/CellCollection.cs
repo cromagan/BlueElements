@@ -119,7 +119,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
 
             var x = thisFi.SplitBy("|");
-            var c = linkedTable?.Column[x[0]];
+            var c = linkedTable.Column[x[0]];
             if (c == null) { return (null, $"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
 
             if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
@@ -132,9 +132,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 // und auch diese abgefragt werden
                 value = inputRow.ReplaceVariables(value, true, varcol);
                 if (value.Contains("~")) { return (null, "Eine Variable konnte nicht aufgelöst werden."); }
+                if (value != c.AutoCorrect(value, true)) { return (null, "Wert kann nicht gesetzt werden."); }
             }
-
-            if (value != c.AutoCorrect(value, true)) { return (null, "Wert kann nicht gesetzt werden."); }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }
@@ -246,6 +245,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!tb.IsEditable(false)) { return $"Tabellesperre: {tb.IsNotEditableReason(false)}"; }
 
         if (column.RelationType == RelationType.CellValues) {
+            if (row == null) { return "Verlinkungs-Fehler"; }
+
             var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
 
             if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }

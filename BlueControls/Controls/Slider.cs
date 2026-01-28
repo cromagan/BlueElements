@@ -42,8 +42,6 @@ public partial class Slider : IBackgroundNone {
 
     private Rectangle _clickArea;
 
-    private bool _clickAreaContainsMouse;
-
     private float? _lastFiredValue;
     private float _maximum = 100;
 
@@ -52,8 +50,6 @@ public partial class Slider : IBackgroundNone {
     private Orientation _orientation = Orientation.Waagerecht;
 
     private Rectangle _slider;
-
-    private bool _sliderContainsMouse;
 
     private Design _sliderStyle;
 
@@ -208,11 +204,10 @@ public partial class Slider : IBackgroundNone {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
 
-        var vStateBack = state;
-        var vStateSlider = state;
+        var stateBack = state;
+        var stateSlider = state;
 
         Rectangle clickArea;
-        Rectangle slider;
         bool sliderContainsMouse;
         float value, minimum, maximum;
         Orientation orientation;
@@ -225,51 +220,42 @@ public partial class Slider : IBackgroundNone {
             orientation = _orientation;
         }
 
-        var mousePos = MousePos();
-        var clickAreaContainsMouse = clickArea.Contains(mousePos.X, mousePos.Y);
-
         var proz = maximum - minimum > 0 ? (value - minimum) / (maximum - minimum) : 0;
-
-        if (maximum - minimum > 0) {
-            slider = orientation == Orientation.Waagerecht
+        lock (_lock) {
+            if (maximum - minimum > 0) {
+                _slider = orientation == Orientation.Waagerecht
                 ? new Rectangle((int)(clickArea.Left + (proz * (clickArea.Width - But1.Width))), 0, But1.Width, But1.Height)
                 : new Rectangle(0, (int)(clickArea.Top + (proz * (clickArea.Height - But1.Height))), But1.Width, But1.Height);
-            sliderContainsMouse = slider.Contains(mousePos);
-        } else {
-            slider = new Rectangle();
-            sliderContainsMouse = false;
-        }
-
-        // Cache-Update für nachfolgende Aufrufe
-        lock (_lock) {
-            _clickAreaContainsMouse = clickAreaContainsMouse;
-            _sliderContainsMouse = sliderContainsMouse;
-            _slider = slider;
+                sliderContainsMouse = _slider.Contains(MousePos());
+            } else {
+                _slider = new Rectangle();
+                sliderContainsMouse = false;
+            }
         }
 
         if (state.HasFlag(States.Standard_MouseOver)) {
             if (sliderContainsMouse) {
-                vStateBack ^= States.Standard_MouseOver;
+                stateBack ^= States.Standard_MouseOver;
             } else {
-                vStateSlider ^= States.Standard_MouseOver;
+                stateSlider ^= States.Standard_MouseOver;
             }
         }
 
         if (state.HasFlag(States.Standard_MousePressed)) {
             if (sliderContainsMouse) {
-                vStateBack ^= States.Standard_MousePressed;
+                stateBack ^= States.Standard_MousePressed;
             } else {
-                vStateSlider ^= States.Standard_MousePressed;
+                stateSlider ^= States.Standard_MousePressed;
             }
         }
 
-        Skin.Draw_Back(gr, _backStyle, vStateBack, clickArea, this, true);
-        Skin.Draw_Border(gr, _backStyle, vStateBack, clickArea);
+        Skin.Draw_Back(gr, _backStyle, stateBack, clickArea, this, true);
+        Skin.Draw_Border(gr, _backStyle, stateBack, clickArea);
 
         if (maximum - minimum <= 0) { return; }
 
-        Skin.Draw_Back(gr, _sliderStyle, vStateSlider, slider, this, false);
-        Skin.Draw_Border(gr, _sliderStyle, vStateSlider, slider);
+        Skin.Draw_Back(gr, _sliderStyle, stateSlider, _slider, this, false);
+        Skin.Draw_Border(gr, _sliderStyle, stateSlider, _slider);
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {
@@ -282,11 +268,6 @@ public partial class Slider : IBackgroundNone {
 
         if (!Enabled) { return; }
 
-        lock (_lock) {
-            _sliderContainsMouse = _slider.Contains(e.X, e.Y);
-            _clickAreaContainsMouse = _clickArea.Contains(e.X, e.Y);
-        }
-
         Invalidate();
     }
 
@@ -294,13 +275,6 @@ public partial class Slider : IBackgroundNone {
         base.OnMouseEnter(e);
 
         if (!Enabled) { return; }
-
-        var mousePos = MousePos();
-        lock (_lock) {
-            _sliderContainsMouse = _slider.Contains(mousePos.X, mousePos.Y);
-            _clickAreaContainsMouse = _clickArea.Contains(mousePos.X, mousePos.Y);
-        }
-
         Invalidate();
     }
 
@@ -309,11 +283,6 @@ public partial class Slider : IBackgroundNone {
 
         if (!Enabled) { return; }
 
-        lock (_lock) {
-            _sliderContainsMouse = false;
-            _clickAreaContainsMouse = false;
-        }
-
         Invalidate();
     }
 
@@ -321,11 +290,6 @@ public partial class Slider : IBackgroundNone {
         base.OnMouseMove(e);
 
         if (!Enabled) { return; }
-
-        lock (_lock) {
-            _sliderContainsMouse = _slider.Contains(e.X, e.Y);
-            _clickAreaContainsMouse = _clickArea.Contains(e.X, e.Y);
-        }
 
         if (e.Button != MouseButtons.Left) { return; }
 
@@ -336,11 +300,6 @@ public partial class Slider : IBackgroundNone {
         base.OnMouseUp(e);
 
         if (!Enabled) { return; }
-
-        lock (_lock) {
-            _sliderContainsMouse = _slider.Contains(e.X, e.Y);
-            _clickAreaContainsMouse = _clickArea.Contains(e.X, e.Y);
-        }
 
         if (e.Button == MouseButtons.Left) {
             DoMouseAction(e, false);
@@ -364,21 +323,11 @@ public partial class Slider : IBackgroundNone {
     private void But1_Click(object sender, System.EventArgs e) {
         if (!Enabled) { return; }
 
-        lock (_lock) {
-            _sliderContainsMouse = false;
-            _clickAreaContainsMouse = false;
-        }
-
         Value -= SmallChange;
     }
 
     private void But2_Click(object sender, System.EventArgs e) {
         if (!Enabled) { return; }
-
-        lock (_lock) {
-            _sliderContainsMouse = false;
-            _clickAreaContainsMouse = false;
-        }
 
         Value += SmallChange;
     }
@@ -453,15 +402,7 @@ public partial class Slider : IBackgroundNone {
     }
 
     private void GenerateButtons() {
-        Orientation orientation;
-
-        lock (_lock) {
-            _sliderContainsMouse = false;
-            _clickAreaContainsMouse = false;
-            orientation = _orientation;
-        }
-
-        if (orientation == Orientation.Waagerecht) {
+        if (_orientation == Orientation.Waagerecht) {
             _backStyle = Design.Slider_Hintergrund_Waagerecht;
             _sliderStyle = Design.Button_Slider_Waagerecht;
             But1.SetBounds(0, 0, ButtonSize, Height);

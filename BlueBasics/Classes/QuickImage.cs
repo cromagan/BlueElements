@@ -342,7 +342,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         }
 
         if (bmpOri == null) {
-            NeedImageEventArgs e = new(Name);
+            var e = new NeedImageEventArgs(Name);
             OnNeedImage(e);
             if (e is { Done: true, Bmp: not null }) { bmpOri = e.Bmp; }
         }

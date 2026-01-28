@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -36,7 +35,7 @@ using Form = System.Windows.Forms.Form;
 
 namespace BlueControls.Controls;
 
-public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocusedChild {
+public class GenericControl : Control, IDisposableExtendedWithEvent {
 
     #region Fields
 
@@ -341,7 +340,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
 
-        if (e.Control is ISendsFocusedChild sfc) {
+        if (e.Control is TabControl sfc) {
             sfc.ChildGotFocus += Sfc_ChildGotFocus;
         }
         e.Control.GotFocus += Control_GotFocus;
@@ -350,7 +349,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent, ISendsFocus
     protected override void OnControlRemoved(ControlEventArgs e) {
         base.OnControlRemoved(e);
 
-        if (e.Control is ISendsFocusedChild sfc) {
+        if (e.Control is TabControl sfc) {
             sfc.ChildGotFocus -= Sfc_ChildGotFocus;
         }
         e.Control.GotFocus -= Control_GotFocus;

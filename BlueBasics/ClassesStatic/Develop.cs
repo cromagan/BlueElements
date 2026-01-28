@@ -29,7 +29,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.IO;
-using Timer = System.Windows.Forms.Timer;
 
 namespace BlueBasics;
 
@@ -75,7 +74,7 @@ public static class Develop {
     #region Methods
 
     public static void AbortAppIfStackOverflow() {
-        StackTrace stackTrace = new();
+        var stackTrace = new StackTrace();
         if (stackTrace.FrameCount > 200) {
             DebugPrint(ErrorType.Error, "Stack-Overflow abgefangen!");
         }
@@ -142,7 +141,7 @@ public static class Develop {
                 _lastDebugTime = DateTime.UtcNow;
                 var first = true;
                 var tmp = _currentTraceLogFile;
-                StackTrace strace = new(true);
+                var strace = new StackTrace(true);
                 var nr = 100;
                 List<string>? l = null;
                 Trace.WriteLine("<tr>");
@@ -347,7 +346,7 @@ public static class Develop {
 
         OrigingNumberDecimalSeparator = info.NumberDecimalSeparator;
 
-        CultureInfo ci = new("de-DE") {
+        var ci = new CultureInfo("de-DE") {
             NumberFormat = {
                 CurrencyGroupSeparator = string.Empty,
                 NumberGroupSeparator = string.Empty,
@@ -369,7 +368,7 @@ public static class Develop {
 
         Generic.LoadAllAssemblies(Application.StartupPath);
 
-        Timer check = new();
+        var check = new System.Windows.Forms.Timer();
         check.Tick += CloseAfter12Hours;
         check.Interval = 60000;
         check.Enabled = true;

@@ -37,6 +37,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Methods\Method_BackupControl.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
 

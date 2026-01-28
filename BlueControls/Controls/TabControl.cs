@@ -16,14 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
-public class TabControl : AbstractTabControl, ISendsFocusedChild {
+public class TabControl : AbstractTabControl {
 
     #region Constructors
 
@@ -39,7 +38,7 @@ public class TabControl : AbstractTabControl, ISendsFocusedChild {
 
     #region Properties
 
-    public sealed override Color BackColor {
+    public override sealed Color BackColor {
         get => base.BackColor;
         set => base.BackColor = value;
     }
@@ -71,7 +70,7 @@ public class TabControl : AbstractTabControl, ISendsFocusedChild {
     private void AddedControlInTabPage(object sender, ControlEventArgs e) {
         if (e.Control is TabPage) { return; }
 
-        if (e.Control is ISendsFocusedChild sfc) {
+        if (e.Control is TabControl sfc) {
             sfc.ChildGotFocus += Sfc_ChildGotFocus;
         }
         e.Control.GotFocus += ControlInTabPage_GotFocus;
@@ -87,7 +86,7 @@ public class TabControl : AbstractTabControl, ISendsFocusedChild {
     private void RemovedControlInTabPage(object sender, ControlEventArgs e) {
         if (e.Control is TabPage) { return; }
 
-        if (e.Control is ISendsFocusedChild sfc) {
+        if (e.Control is TabControl sfc) {
             sfc.ChildGotFocus -= Sfc_ChildGotFocus;
         }
         e.Control.GotFocus -= ControlInTabPage_GotFocus;

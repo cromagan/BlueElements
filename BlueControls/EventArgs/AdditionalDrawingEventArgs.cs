@@ -67,7 +67,7 @@ public class AdditionalDrawingEventArgs : System.EventArgs {
     }
 
     public void FillCircle(Color c, int canvasX, int canvasY, int canvasR) {
-        SolidBrush b = new(c);
+        var b = new SolidBrush(c);
         for (var adx = -canvasR; adx <= canvasR; adx++) {
             for (var ady = -canvasR; ady <= canvasR; ady++) {
                 var d = Math.Sqrt((adx * adx) + (ady * ady)) - 0.5;

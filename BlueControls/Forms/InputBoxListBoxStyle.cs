@@ -66,7 +66,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
     }
 
     public static List<string>? Show(string txt, List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
-        InputBoxListBoxStyle mb = new(txt, items, checkBehavior, check, addNewAllowed, true);
+        var mb = new InputBoxListBoxStyle(txt, items, checkBehavior, check, addNewAllowed, true);
         mb.ShowDialog();
         return mb._giveBack;
     }

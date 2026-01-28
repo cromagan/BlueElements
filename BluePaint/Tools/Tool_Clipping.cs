@@ -44,7 +44,7 @@ public partial class Tool_Clipping {
 
     public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
         if (originalPic == null || e.MouseCurrent == null) { return; }
-        Pen penBlau = new(Color.FromArgb(150, 0, 0, 255));
+        var penBlau = new Pen(Color.FromArgb(150, 0, 0, 255));
         DrawZusatz(e, originalPic);
         e.DrawLine(penBlau, e.MouseCurrent.TrimmedCanvasX, -1, e.MouseCurrent.TrimmedCanvasX, originalPic.Height);
         e.DrawLine(penBlau, -1, e.MouseCurrent.TrimmedCanvasY, originalPic.Width, e.MouseCurrent.TrimmedCanvasY);
@@ -97,7 +97,7 @@ public partial class Tool_Clipping {
     }
 
     private void DrawZusatz(AdditionalDrawingEventArgs e, Image? originalPic) {
-        SolidBrush brushBlau = new(Color.FromArgb(120, 0, 0, 255));
+        var brushBlau = new SolidBrush(Color.FromArgb(120, 0, 0, 255));
         if (originalPic == null) { return; }
 
         if (Links.Value != 0) {

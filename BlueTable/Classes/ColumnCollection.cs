@@ -197,7 +197,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateOverView() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        Html da = new(tb.KeyName);
+        var da = new Html(tb.KeyName);
         da.AddCaption("Spaltenliste von: " + tb.Caption);
         da.Add("  <Font face=\"Arial\" Size=\"4\">" + tb.KeyName + "</h1><br>");
         da.TableBeginn();

@@ -51,14 +51,14 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
     #region Methods
 
     public static void DrawGroupBox(Control c, Graphics gr, States state, GroupBoxStyle _groupBoxStyle, string caption) {
-        Rectangle r = new(0, 0, c.Width, c.Height);
+        var r = new Rectangle(0, 0, c.Width, c.Height);
         gr.Clear(c.BackColor);
 
         switch (_groupBoxStyle) {
             case GroupBoxStyle.RibbonBar:
                 Skin.Draw_Border(gr, Design.RibbonBar_Frame, state, r);
                 if (!string.IsNullOrEmpty(caption)) {
-                    Rectangle bottomTxt = new(0, 0, c.Width, c.Height + 2);
+                    var bottomTxt = new Rectangle(0, 0, c.Width, c.Height + 2);
                     Skin.Draw_FormatedText(gr, caption, null, Alignment.Bottom_HorizontalCenter, bottomTxt, Design.RibbonBar_Frame, state, c, false, true);
                 }
                 break;
@@ -67,7 +67,7 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                 if (c.Height > 33) {
                     Skin.Draw_Border(gr, Design.GroupBox, state, r);
                     if (!string.IsNullOrEmpty(caption)) {
-                        Rectangle topTxt = new(Skin.Padding, 0, c.Width, c.Height);
+                        var topTxt = new Rectangle(Skin.Padding, 0, c.Width, c.Height);
                         Skin.Draw_FormatedText(gr, caption, null, Alignment.Top_Left, topTxt, Design.GroupBox, state, c, true, true);
                     }
                 }
@@ -84,14 +84,14 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                 if (c.Height > 33) {
                     Skin.Draw_Border(gr, Design.GroupBoxBold, state, r);
                     if (!string.IsNullOrEmpty(caption)) {
-                        Rectangle topTxt = new(Skin.Padding, Skin.PaddingSmal, c.Width, c.Height);
+                        var topTxt = new Rectangle(Skin.Padding, Skin.PaddingSmal, c.Width, c.Height);
                         Skin.Draw_FormatedText(gr, caption, null, Alignment.Top_Left, topTxt, Design.GroupBoxBold, state, c, false, true);
                     }
                 } else {
                     var d = Skin.DesignOf(Design.GroupBoxBold, state);
                     gr.Clear(d.BorderColor1);
                     if (!string.IsNullOrEmpty(caption)) {
-                        Rectangle topTxt = new(Skin.Padding, 0, c.Width, c.Height);
+                        var topTxt = new Rectangle(Skin.Padding, 0, c.Width, c.Height);
                         Skin.Draw_FormatedText(gr, caption, null, Alignment.VerticalCenter_Left, topTxt, Design.GroupBoxBold, state, c, false, true);
                     }
                 }

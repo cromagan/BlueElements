@@ -44,7 +44,7 @@ public static partial class Extensions {
     }
 
     public static bool PointInRect(this PointF p, float x1, float y1, float x2, float y2, float toleranz) {
-        RectangleF r = new(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2));
+        var r = new RectangleF(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2));
         r.Inflate(toleranz, toleranz);
         return r.Contains(p);
     }

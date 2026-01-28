@@ -125,7 +125,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         if (Row?.Table is { IsDisposed: false } tb) {
             var layouts = new List<AbstractListItem>();
             foreach (var thisLayouts in tb.GetAllLayoutsFileNames()) {
-                ItemCollectionPadItem p = new(thisLayouts);
+                var p = new ItemCollectionPadItem(thisLayouts);
                 layouts.Add(ItemOf(p.Caption, p.KeyName, ImageCode.Stern));
             }
             result.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts));

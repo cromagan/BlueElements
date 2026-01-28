@@ -68,7 +68,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         CalculateJointMiddle(_point1, _point2);
         _style = format;
         _tempPoints = [];
-        Linien_Verhalten = ConectorStyle.Direct;
+        Linien_Verhalten = ConnectorStyle.Direct;
     }
 
     #endregion
@@ -81,7 +81,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     public BlueFont? Font { get; set; }
 
-    public ConectorStyle Linien_Verhalten { get; set; }
+    public ConnectorStyle Linien_Verhalten { get; set; }
 
     public string SheetStyle => Parent is IStyleable ist ? ist.SheetStyle : string.Empty;
 
@@ -122,17 +122,17 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<AbstractListItem> verhalt =
         [
-            ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString1(),
+            ItemOf("Linie direkt zwischen zwei Punkten", ((int)ConnectorStyle.Direct).ToString1(),
                 QuickImage.Get(ImageCode.Linie)),
-            ItemOf("Linie soll Objekten ausweichen", ((int)ConectorStyle.Ausweichenx).ToString1(),
+            ItemOf("Linie soll Objekten ausweichen", ((int)ConnectorStyle.Ausweichen).ToString1(),
                 QuickImage.Get(ImageCode.Linie)),
             ItemOf("Linie soll Objekten ausweichen und rechtwinklig sein",
-                ((int)ConectorStyle.AusweichenUndGerade).ToString1(), QuickImage.Get(ImageCode.Linie))
+                ((int)ConnectorStyle.AusweichenUndGerade).ToString1(), QuickImage.Get(ImageCode.Linie))
         ];
 
         List<GenericControl> result =
         [
-            new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt),
+            new FlexiControlForProperty<ConnectorStyle>(() => Linien_Verhalten, verhalt),
             new FlexiControlForProperty<PadStyles>(() => Style, Skin.GetRahmenArt(SheetStyle, true))
         ];
 
@@ -168,7 +168,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "connection":
-                Linien_Verhalten = (ConectorStyle)IntParse(value);
+                Linien_Verhalten = (ConnectorStyle)IntParse(value);
                 return true;
 
             case "style":
@@ -243,23 +243,21 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         UnRegisterEvents();
     }
 
-    private static bool SchneidetDas(AbstractPadItem? thisBasicItem, PointM p1, PointM p2) {
+    private static bool SchneidetDas(AbstractPadItem? thisBasicItem, PointF p1, PointF p2) {
         if (thisBasicItem == null) { return false; }
         if (thisBasicItem is not LinePadItem) {
             var a = thisBasicItem.CanvasUsedArea;
             if (a is { Width: > 0, Height: > 0 }) {
                 a.Inflate(2, 2);
 
-                PointF tP1 = p1;
-                PointF tP2 = p2;
                 var lo = a.PointOf(Alignment.Top_Left);
                 var ro = a.PointOf(Alignment.Top_Right);
                 var lu = a.PointOf(Alignment.Bottom_Left);
                 var ru = a.PointOf(Alignment.Bottom_Right);
-                if (!LinesIntersect(tP1, tP2, lo, ro, true).IsEmpty ||
-                    !LinesIntersect(tP1, tP2, lu, ru, true).IsEmpty ||
-                    !LinesIntersect(tP1, tP2, lo, lu, true).IsEmpty ||
-                    !LinesIntersect(tP1, tP2, ro, ru, true).IsEmpty) { return true; }
+                if (!LinesIntersect(p1, p2, lo, ro, true).IsEmpty ||
+                    !LinesIntersect(p1, p2, lu, ru, true).IsEmpty ||
+                    !LinesIntersect(p1, p2, lo, lu, true).IsEmpty ||
+                    !LinesIntersect(p1, p2, ro, ru, true).IsEmpty) { return true; }
             }
         }
         return false;
@@ -290,7 +288,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
             _calcTempPointsCode = newCode;
             _tempPoints = null;
         }
-        if (Linien_Verhalten != ConectorStyle.Direct && _tempPoints != null) {
+        if (Linien_Verhalten != ConnectorStyle.Direct && _tempPoints != null) {
             if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5) {
                 if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5 + Constants.GlobalRnd.Next(10)) {
                     _tempPoints = null;
@@ -306,7 +304,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
             _point1,
             _point2
         ];
-        if (Linien_Verhalten == ConectorStyle.Direct) { return; }
+        if (Linien_Verhalten == ConnectorStyle.Direct) { return; }
         var count = 0;
         do {
             count++;
@@ -319,11 +317,11 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
                     again = true;
                     break;
                 }
-                if (Linien_Verhalten == ConectorStyle.AusweichenUndGerade && Begradige(z)) {
+                if (Linien_Verhalten == ConnectorStyle.AusweichenUndGerade && Begradige(z)) {
                     again = true;
                     break;
                 }
-                if (Linien_Verhalten is ConectorStyle.AusweichenUndGerade or ConectorStyle.Ausweichenx) {
+                if (Linien_Verhalten is ConnectorStyle.AusweichenUndGerade or ConnectorStyle.Ausweichen) {
                     if (WeicheAus(z)) {
                         again = true;
                         break;
@@ -371,8 +369,8 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
 
     private bool SchneidetWas(float x1, float y1, float x2, float y2) {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return false; }
-        PointM p1 = new(x1, y1);
-        PointM p2 = new(x2, y2);
+        var p1 = new PointF(x1, y1);
+        var p2 = new PointF(x2, y2);
         return icpi.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
     }
 
@@ -385,7 +383,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     private bool Vereinfache(int p1) {
         if (_tempPoints == null) { return false; }
 
-        if (Linien_Verhalten != ConectorStyle.AusweichenUndGerade) {
+        if (Linien_Verhalten != ConnectorStyle.AusweichenUndGerade) {
             if (p1 > 0 && p1 < _tempPoints.Count - 1) {
                 if (!SchneidetWas(_tempPoints[p1 - 1].X, _tempPoints[p1 - 1].Y, _tempPoints[p1 + 1].X, _tempPoints[p1 + 1].Y)) {
                     _tempPoints.RemoveAt(p1);

@@ -21,7 +21,6 @@ using BlueBasics.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -33,7 +32,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
-public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, IEditable, IParseable {
+public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable {
 
     #region Fields
 
@@ -64,12 +63,6 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     private QuickImage? _symbolOfLineSym;
     private float _widthOf2Points;
     private int _zeilenabstand = -1;
-
-    #endregion
-
-    #region Events
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -740,5 +733,4 @@ public sealed class BlueFont : IReadableTextWithPropertyChanging, IHasKeyName, I
     }
 
     #endregion
-
 }

@@ -15,16 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
-
 namespace BlueControls.Enums;
 
-[Flags]
-public enum FilterTypesToShow {
-    None = 0,
-    NachDefinierterAnsicht = 1,
-    AktuelleAnsicht_AktiveFilter = 2,
-
-    //NachDefinierterAnsichtStepByStep = 4,
-    DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter = NachDefinierterAnsicht | AktuelleAnsicht_AktiveFilter
+public enum ConnectorStyle {
+    Direct = 0,
+    Ausweichen = 1,
+    AusweichenUndGerade = 2
 }

@@ -182,9 +182,8 @@ public sealed class RowListItem : RowBackgroundListItem {
             gr.FillRectangle(_rowCheckedEventArgs.RowColor, positionControl);
         }
 
-   //       var RedStripesBrush1 = new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(30, 255, 0, 0), Color.FromArgb(5, 255, 0, 0));
-   //var  RedStripesBrush2 = new HatchBrush(HatchStyle.DarkVertical, Color.FromArgb(80, 255, 100, 0), Color.FromArgb(80, 255, 0, 0));
-
+        //       var RedStripesBrush1 = new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(30, 255, 0, 0), Color.FromArgb(5, 255, 0, 0));
+        //var  RedStripesBrush2 = new HatchBrush(HatchStyle.DarkVertical, Color.FromArgb(80, 255, 100, 0), Color.FromArgb(80, 255, 0, 0));
 
         if (Generic.IsAdministrator()) {
             if (_rowCheckedEventArgs == null || RowCollection.FailedRows.ContainsKey(_rowCheckedEventArgs.Row)) {
@@ -284,7 +283,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         //var stat = States.Standard;
         //if (Focused()) { stat = States.Standard_HasFocus; }
         var _tmpCursorRect = positionControl.ToRect();
-        Pen pen = new(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180));
+        var pen = new Pen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180));
         gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1));
     }
 

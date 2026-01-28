@@ -180,7 +180,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         var w = States.Standard;
         if (!TabPages[id].Enabled) { w = States.Standard_Disabled; }
         var tabRect = GetTabRect(id);
-        Rectangle r = new(0, tabRect.Bottom, Width, Height - tabRect.Bottom);
+        var r = new Rectangle(0, tabRect.Bottom, Width, Height - tabRect.Bottom);
         if (r.Width < 2 || r.Height < 2) { return; }
         if (this is RibbonBar) {
             Skin.Draw_Back(graphics, Design.RibbonBar_Body, w, r, this, true);

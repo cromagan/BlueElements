@@ -1565,7 +1565,7 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capHintergrund;
         private ComboBox cbxBackground;
         private Caption capInfos;
-        protected ListBox lstStyles;
+        private ListBox lstStyles;
         private GroupBox grpStyles;
     }
 }

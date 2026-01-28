@@ -145,7 +145,7 @@ public class RowFormulaListItem : AbstractListItem {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
-        ItemCollectionPadItem pad = new(_layoutFileName);
+        var pad = new ItemCollectionPadItem(_layoutFileName);
         pad.ResetVariables();
         var l = pad.ReplaceVariables(Row);
         if (l.Failed) {

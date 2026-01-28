@@ -27,7 +27,7 @@ using static BlueBasics.Constants;
 
 namespace BlueScript;
 
-public abstract class ScriptDescription : IParseable, IReadableTextWithPropertyChangingAndKey, IDisposableExtended, IErrorCheckable, IComparable {
+public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable {
 
     #region Constructors
 
