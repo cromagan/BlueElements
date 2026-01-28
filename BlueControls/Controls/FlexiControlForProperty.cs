@@ -94,7 +94,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? list, CheckBehavior checkBehavior, AddType addallowed, ComboBoxStyle comboBoxStyle) : base() {
+    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, ComboBoxStyle comboBoxStyle) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -131,22 +131,22 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
 
-                    StyleListBox(GetControl<ListBox>(), list, checkBehavior, addallowed);
+                    StyleListBox(GetControl<ListBox>(), allPossibleItems, checkBehavior, addallowed);
 
                     break;
                 }
 
             default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
             {
-                    if (list != null) {
+                    if (allPossibleItems != null) {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                         var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
 
-                        var (biggestItemX, biggestItemY, _, _) = list.CanvasItemData(Design.ComboBox_Textbox);
+                        var (biggestItemX, biggestItemY, _, _) = allPossibleItems.CanvasItemData(Design.ComboBox_Textbox);
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
-                        StyleComboBox(GetControl<ComboBox>(), list, comboBoxStyle, true, 1);
+                        StyleComboBox(GetControl<ComboBox>(), allPossibleItems, comboBoxStyle, true, 1);
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
                         var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
@@ -268,73 +268,26 @@ public class FlexiControlForProperty<T> : FlexiControl {
         base.OnValueChanged();
     }
 
-    protected void StyleListBox(ListBox? control, List<AbstractListItem>? list, CheckBehavior checkBehavior, AddType addallowed) {
+    protected void StyleListBox(ListBox? control, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed) {
         if (control == null) { return; }
-
-        //control.Enabled = Enabled;
-
-        //EditType = EditTypeFormula.Listbox;
-        //var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
         control.CheckBehavior = checkBehavior;
         control.Appearance = ListBoxAppearance.Listbox_Boxes;
-        control.ItemAddRange(list);
         control.AddAllowed = addallowed;
-        control.RemoveAllowed = false;
+
+        if (checkBehavior == CheckBehavior.AllSelected) {
+            control.Suggestions.AddRange(allPossibleItems);
+            control.RemoveAllowed = true;
+        } else {
+            control.ItemAddRange(allPossibleItems);
+            control.RemoveAllowed = false;
+        }
+
+  
+  
         control.ItemEditAllowed = string.Equals(Generic.UserGroup, Administrator, StringComparison.OrdinalIgnoreCase);
 
         ValueSet(string.Empty, true);
-        //control.Check(Value.SplitByCr());
-
-        //control.Item.Clear();
-        //control.CheckBehavior = CheckBehavior.MultiSelection;
-        //if (column == null || column.IsDisposed) { return; }
-
-        //var item =  new List<AbstractListItem>();;
-        //if (column.DropdownBearbeitungErlaubt) {
-        //    item.AddRange(GetItemCollection(column, null, ShortenStyle.Replaced, 10000));
-        //    if (!column.DropdownWerteAndererZellenAnzeigen) {
-        //        bool again;
-        //        do {
-        //            again = false;
-        //            foreach (var thisItem in item) {
-        //                if (!column.DropDownItems.Contains(thisItem.KeyName)) {
-        //                    again = true;
-        //                    item.Remove(thisItem);
-        //                    break;
-        //                }
-        //            }
-        //        } while (again);
-        //    }
-        //}
-
-        //switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-        //    case EditTypeTable.Textfeld:
-        //        control.AddAllowed = AddType.Text;
-        //        break;
-
-        //    case EditTypeTable.Listbox:
-        //        control.AddAllowed = AddType.OnlySuggests;
-        //        break;
-
-        //    default:
-        //        control.AddAllowed = AddType.None;
-        //        break;
-        //}
-
-        //control.FilterAllowed = false;
-        //control.MoveAllowed = false;
-        //switch (EditType) {
-        //    //case EditTypeFormula.Gallery:
-        //    //    control.Appearance = BlueListBoxAppearance.Gallery;
-        //    //    control.RemoveAllowed = true;
-        //    //    break;
-
-        //    case EditTypeFormula.Listbox:
-        //        control.RemoveAllowed = true;
-        //        control.Appearance = ListBoxAppearance.Listbox;
-        //        break;
-        //}
     }
 
     private bool CheckEnabledState() {

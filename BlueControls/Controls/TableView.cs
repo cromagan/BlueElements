@@ -962,6 +962,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var _mouseOverColumn = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
             var _mouseOverRow = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
 
+            if (CurrentArrangement is not { } ca) { return; }
+
+            if (ca.Kontextmenu_Skripte.Count > 0 && _mouseOverRow is { } row5) {
+                foreach (var thisString in ca.Kontextmenu_Skripte) {
+                    if (tb.EventScript.GetByKey(thisString) is { } thiss) {
+                        var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk();
+                        e.ContextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, new { Script = thiss, Row = row5 }, enabled, thiss.QuickInfo));
+                    }
+                }
+                return;
+            }
+
             #region Pinnen
 
             if (_mouseOverRow is { IsDisposed: false } row) {

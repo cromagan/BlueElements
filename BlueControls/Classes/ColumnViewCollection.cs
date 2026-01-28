@@ -62,6 +62,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Properties
 
+    public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
     public string CaptionForEditor => "Spaltenanordnung";
 
     public ColumnItem? ColumnForChapter { get; internal set; }
@@ -79,10 +80,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public int ControlColumnsWidth { get; private set; }
 
     public int Count => _internal.Count;
+    public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new List<string>().AsReadOnly();
     public int FilterRows { get; internal set; } = 1;
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
+
+    public ReadOnlyCollection<string> Kontextmenu_Skripte { get; set; } = new List<string>().AsReadOnly();
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
         get => new(_permissionGroups_show);
@@ -264,6 +268,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);
         result.ParseableAdd("Column", _internal);
+        result.ParseableAdd("ContextmenuScripts", Kontextmenu_Skripte, true);
+        result.ParseableAdd("ExecuteableScripts", Ausführbare_Skripte, true);
+        result.ParseableAdd("ColumnsShowAlwaysFilter", Filter_immer_Anzeigen, true);
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
         tmp.RemoveString(Administrator, false);
@@ -297,10 +304,22 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true;
 
             case "rowsortdefinition":
-                return true; // TODO Entfernen: 18.0.2026
+                return true; // TODO Entfernen: 18.01.2026
 
             case "filter":
-                return true; // TODO Entfernen: 18.0.2026
+                return true; // TODO Entfernen: 18.01.2026
+
+            case "contextmenuscripts":
+                Kontextmenu_Skripte = value.FromNonCritical().SplitAndCutByCr().ToList().AsReadOnly();
+                return true;
+
+            case "executeablescripts":
+                Ausführbare_Skripte = value.FromNonCritical().SplitAndCutByCr().ToList().AsReadOnly();
+                return true;
+
+            case "columnsshowalwaysfilter":
+                Filter_immer_Anzeigen = value.FromNonCritical().SplitAndCutByCr().ToList().AsReadOnly();
+                return true;
 
             case "quickinfo":
                 QuickInfo = value.FromNonCritical();

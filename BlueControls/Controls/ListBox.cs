@@ -611,11 +611,16 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         // und die Mains auffüllen
         foreach (var thisString in zuwenig) {
-            var it = IO.FileExists(thisString)
-                ? thisString.FileType() == FileFormat.Image
-                    ? ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix(), string.Empty)
-                    : ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48))
-                : (AbstractListItem)ItemOf(thisString);
+            var it = Suggestions.GetByKey(thisString);
+            if (it == null && IO.FileExists(thisString)) {
+                if (thisString.FileType() == FileFormat.Image) {
+                    it = ItemOf(thisString, thisString, thisString.FileNameWithoutSuffix(), string.Empty);
+                } else {
+                    it = ItemOf(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
+                }
+            }
+            it ??= ItemOf(thisString);
+
             AddAndRegister(it);
         }
 
@@ -793,10 +798,12 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         OnAddClicked();
 
         AbstractListItem? toAdd = null;
+        var mayBeNew = false;
 
         switch (AddAllowed) {
             case AddType.UserDef:
                 toAdd = AddMethod?.Invoke();
+                mayBeNew = true;
                 break;
 
             case AddType.Text:
@@ -818,7 +825,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         if (toAdd is { } ali) {
             AddAndCheck(ali);
 
-            if (ItemEditAllowed && ali is ReadableListItem { Item: IEditable ie }) {
+            if (mayBeNew && ItemEditAllowed && ali is ReadableListItem { Item: IEditable ie }) {
                 ie.Edit();
             }
 
@@ -1081,7 +1088,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         List<string> newList = [];
 
         foreach (var thisit in newCheckedItems) {
-            var it = _item.GetByKey(thisit) ?? ItemOf(thisit);
+            var it = _item.GetByKey(thisit) ?? Suggestions.GetByKey(thisit) ?? ItemOf(thisit);
 
             if (it.IsClickable()) {
                 newList.Add(thisit);

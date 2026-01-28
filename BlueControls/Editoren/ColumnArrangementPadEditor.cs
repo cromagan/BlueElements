@@ -369,6 +369,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                     ca.FilterRows = d.FilterRows;
                     ca.ColumnForChapter = tb.Column[d.Chapter_Column];
                     ca.QuickInfo = d.QuickInfo;
+                    ca.Ausführbare_Skripte = d.Ausführbare_Skripte;
+                    ca.Kontextmenu_Skripte = d.Kontextmenu_Skripte;
+                    ca.Filter_immer_Anzeigen = d.Filter_immer_Anzeigen;
                     break;
                 }
             }
@@ -455,12 +458,17 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         SortColumns();
 
-        var t = new DummyHeadPadItem(tb);
-        t.Page = "xxx";
-        t.ShowHead = ca.ShowHead;
-        t.FilterRows = ca.FilterRows;
-        t.Chapter_Column = ca.ColumnForChapter?.KeyName ?? "#ohne";
-        t.QuickInfo = ca.QuickInfo;
+        var t = new DummyHeadPadItem(tb) {
+            Page = "xxx",
+            ShowHead = ca.ShowHead,
+            FilterRows = ca.FilterRows,
+            Chapter_Column = ca.ColumnForChapter?.KeyName ?? "#ohne",
+            QuickInfo = ca.QuickInfo,
+            Ausführbare_Skripte = ca.Ausführbare_Skripte,
+            Kontextmenu_Skripte = ca.Kontextmenu_Skripte,
+            Filter_immer_Anzeigen = ca.Filter_immer_Anzeigen
+        };
+
         Pad.Items.Add(t);
 
         Pad.LastClickedItem = t;

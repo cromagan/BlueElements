@@ -25,6 +25,7 @@ using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Linq;
 using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
@@ -49,7 +50,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
     public override string Description => string.Empty;
     public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new([]);
     public int FilterRows { get; set; }
-
+    public ReadOnlyCollection<string> Kontextmenu_Skripte { get; set; } = new([]);
     public bool ShowHead { get; set; }
 
     public Table? Table { get; private set; }
@@ -72,10 +73,15 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
         var filterColumns = ItemsOf(tb.Column, true);
 
-        var script = new List<AbstractListItem>();
+        var scriptAll = new List<AbstractListItem>();
+        var scriptRow = new List<AbstractListItem>();
 
-        foreach (var thisScript in tb.EventScript) {
-            script.Add(ItemOf(thisScript));// ItemOf(thisScript.ReadableText(), thisScript.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
+        foreach (var thisScript in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
+            scriptAll.Add(ItemOf(thisScript));
+
+            if (thisScript.NeedRow) {
+                scriptRow.Add(ItemOf(thisScript));
+            }
         }
 
         List<GenericControl> result =
@@ -87,8 +93,9 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForProperty<string>(() => Chapter_Column, chapterColumns ),
             new FlexiControlForProperty<string>(() => QuickInfo, 3 ),
             new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Filter_immer_Anzeigen, "Filter immer anzeigen von", 6, filterColumns, Enums.CheckBehavior.AllSelected, Enums.AddType.OnlySuggests, System.Windows.Forms.ComboBoxStyle.DropDownList ),
-            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Ausführbare_Skripte, "Ausführbare Skripte",6, script, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, System.Windows.Forms.ComboBoxStyle.DropDownList )
-        ];
+            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Ausführbare_Skripte, "Ausführbare Skripte",6, scriptAll, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, System.Windows.Forms.ComboBoxStyle.DropDownList ),
+            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Kontextmenu_Skripte, "Kontextmenu ersetzen mit",6, scriptRow, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, System.Windows.Forms.ComboBoxStyle.DropDownList )
+            ];
 
         return result;
     }

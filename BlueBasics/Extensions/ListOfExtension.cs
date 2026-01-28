@@ -173,7 +173,10 @@ public static partial class Extensions {
     /// <param name="value"></param>
     /// <param name="ignoreEmpty"></param>
     public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value, bool ignoreEmpty) {
-        if (value?.Any() != true) { return; }
+        if (value?.Any() != true) {
+            ParseableAdd(col, tagname, new List<string>(), ignoreEmpty);
+            return;
+        }
         ParseableAdd(col, tagname, value.ToListOfString(), ignoreEmpty);
     }
 
