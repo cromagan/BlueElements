@@ -15,22 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-
 namespace BlueControls.EventArgs;
 
 public class ObjectEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public ObjectEventArgs(object? data) =>        Data = data;
-
+    public ObjectEventArgs(object? data) => Data = data;
 
     #endregion
 
     #region Properties
 
     public object? Data { get; }
-
 
     #endregion
 }

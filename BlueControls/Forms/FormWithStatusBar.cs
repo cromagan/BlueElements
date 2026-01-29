@@ -196,14 +196,14 @@ public partial class FormWithStatusBar : Form {
             btnNeuerModus.Height = GlobalMenuHeight;
             btnNeuerModus.Width = 50;
             btnNeuerModus.Visible = true;
-            btnNeuerModus.Left = Width - btnNeuerModus.Width - Skin.Padding * 2;
+            btnNeuerModus.Left = Width - btnNeuerModus.Width - (Skin.Padding * 2);
             btnNeuerModus.ButtonStyle = Enums.ButtonStyle.Button_Big;
         } else {
             btnNeuerModus.Top = 0;
             btnNeuerModus.Height = GlobalMenuHeight;
             btnNeuerModus.Width = GlobalMenuHeight;
             btnNeuerModus.Visible = true;
-            btnNeuerModus.Left = Width - btnNeuerModus.Width - Skin.Padding * 2;
+            btnNeuerModus.Left = Width - btnNeuerModus.Width - (Skin.Padding * 2);
             btnNeuerModus.ButtonStyle = Enums.ButtonStyle.Button;
             btnNeuerModus.QuickInfo = "Neuen Modus öffnen";
             btnNeuerModus.Text = string.Empty;

@@ -63,7 +63,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <param name="expr"></param>
     /// <param name="list"></param>
     /// <param name="texteditAllowed"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, texteditAllowed ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, List<AbstractListItem>? list, bool texteditAllowed) : this(expr, string.Empty, 1, list, CheckBehavior.MultiSelection, AddType.None, texteditAllowed ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList, true) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige, mit der angegeben Anzahl an Zeilen.
@@ -72,29 +72,29 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
     ///
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, string.Empty, rowCount, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
     ///
-    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="captionText"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true) { }
 
-    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList) {
+    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true) {
     }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
-    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, ComboBoxStyle comboBoxStyle) : base() {
+    public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, ComboBoxStyle comboBoxStyle, bool autoSort) : base() {
         _accessor = new(expr);
 
         GenFehlerText();
@@ -131,7 +131,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
 
-                    StyleListBox(GetControl<ListBox>(), allPossibleItems, checkBehavior, addallowed);
+                    StyleListBox(GetControl<ListBox>(), allPossibleItems, checkBehavior, addallowed, autoSort);
 
                     break;
                 }
@@ -268,9 +268,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
         base.OnValueChanged();
     }
 
-    protected void StyleListBox(ListBox? control, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed) {
+    protected void StyleListBox(ListBox? control, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autosort) {
         if (control == null) { return; }
 
+        control.AutoSort = autosort;
+        control.MoveAllowed = !autosort;
         control.CheckBehavior = checkBehavior;
         control.Appearance = ListBoxAppearance.Listbox_Boxes;
         control.AddAllowed = addallowed;
@@ -283,8 +285,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
             control.RemoveAllowed = false;
         }
 
-  
-  
         control.ItemEditAllowed = string.Equals(Generic.UserGroup, Administrator, StringComparison.OrdinalIgnoreCase);
 
         ValueSet(string.Empty, true);

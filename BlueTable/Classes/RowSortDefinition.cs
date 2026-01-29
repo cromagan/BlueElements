@@ -80,10 +80,12 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
 
     public override int GetHashCode() {
         unchecked {
-            int hash = 17;
-            hash = hash * 23 + Reverse.GetHashCode();
-            foreach (var item in _internal)
-                hash = hash * 23 + (item.KeyName?.GetHashCode() ?? 0);
+            var hash = 17;
+            hash = (hash * 23) + Reverse.GetHashCode();
+            foreach (var item in _internal) {
+                hash = (hash * 23) + (item.KeyName?.GetHashCode() ?? 0);
+            }
+
             return hash;
         }
     }

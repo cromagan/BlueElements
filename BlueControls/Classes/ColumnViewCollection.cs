@@ -310,15 +310,15 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true; // TODO Entfernen: 18.01.2026
 
             case "contextmenuscripts":
-                Kontextmenu_Skripte = value.FromNonCritical().SplitAndCutByCr().ToList().AsReadOnly();
+                Kontextmenu_Skripte = value.FromNonCritical().SplitAndCutBy("|").ToList().AsReadOnly();
                 return true;
 
             case "executeablescripts":
-                Ausführbare_Skripte = value.FromNonCritical().SplitAndCutByCr().ToList().AsReadOnly();
+                Ausführbare_Skripte = value.FromNonCritical().SplitAndCutBy("|").ToList().AsReadOnly();
                 return true;
 
             case "columnsshowalwaysfilter":
-                Filter_immer_Anzeigen = value.FromNonCritical().SplitAndCutByCr().ToList().AsReadOnly();
+                Filter_immer_Anzeigen = value.FromNonCritical().SplitAndCutBy("|").ToList().AsReadOnly();
                 return true;
 
             case "quickinfo":

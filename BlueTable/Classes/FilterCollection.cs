@@ -682,25 +682,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    /// <summary>
-    /// Teilt die WHERE-Klausel in einzelne Bedingungen auf
-    /// Vereinfachte Implementierung ohne Klammern-Unterstützung
-    /// </summary>
-    private static List<string> SplitConditions(string whereClause) {
-        var conditions = new List<string>();
-
-        // Einfache Aufteilung bei AND (da bereits uppercase: nur " AND ")
-        var parts = whereClause.Split([" AND "], StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var part in parts) {
-            if (!string.IsNullOrWhiteSpace(part)) {
-                conditions.Add(part.Trim());
-            }
-        }
-
-        return conditions;
-    }
-
     private void _Table_CellValueChanged(object sender, CellEventArgs e) {
         if (_rows == null) { return; }
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }

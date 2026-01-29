@@ -19,10 +19,12 @@ namespace BlueControls.Controls {
             this.btnAlleFilterAus = new BlueControls.Controls.Button();
             this.btnPin = new BlueControls.Controls.Button();
             this.btnPinZurück = new BlueControls.Controls.Button();
-            this.btnÄhnliche = new BlueControls.Controls.Button();
             this.TableInternal = new BlueControls.Controls.TableView();
             this.grpBorder = new BlueControls.Controls.GroupBox();
+            this.grpFilter = new BlueControls.Controls.GroupBox();
+            this.grpButtons = new BlueControls.Controls.GroupBox();
             this.grpBorder.SuspendLayout();
+            this.grpFilter.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnTextLöschen
@@ -77,34 +79,18 @@ namespace BlueControls.Controls {
             this.btnPinZurück.TabIndex = 54;
             this.btnPinZurück.Click += new System.EventHandler(this.btnPinZurück_Click);
             // 
-            // btnÄhnliche
-            // 
-            this.btnÄhnliche.ImageCode = "Fernglas|16|||||||||HäkchenDoppelt";
-            this.btnÄhnliche.Location = new System.Drawing.Point(8, 40);
-            this.btnÄhnliche.Margin = new System.Windows.Forms.Padding(4);
-            this.btnÄhnliche.Name = "btnÄhnliche";
-            this.btnÄhnliche.Size = new System.Drawing.Size(136, 24);
-            this.btnÄhnliche.TabIndex = 55;
-            this.btnÄhnliche.Text = "ähnlich";
-            this.btnÄhnliche.Visible = false;
-            this.btnÄhnliche.Click += new System.EventHandler(this.btnÄhnliche_Click);
-            // 
             // TableInternal
             // 
-            this.TableInternal.Location = new System.Drawing.Point(8, 80);
+            this.TableInternal.Location = new System.Drawing.Point(8, 176);
             this.TableInternal.Name = "TableInternal";
-            this.TableInternal.Size = new System.Drawing.Size(656, 344);
+            this.TableInternal.Size = new System.Drawing.Size(656, 248);
             this.TableInternal.TabIndex = 0;
             // 
             // grpBorder
             // 
+            this.grpBorder.Controls.Add(this.grpButtons);
+            this.grpBorder.Controls.Add(this.grpFilter);
             this.grpBorder.Controls.Add(this.TableInternal);
-            this.grpBorder.Controls.Add(this.btnÄhnliche);
-            this.grpBorder.Controls.Add(this.txbZeilenFilter);
-            this.grpBorder.Controls.Add(this.btnPinZurück);
-            this.grpBorder.Controls.Add(this.btnAlleFilterAus);
-            this.grpBorder.Controls.Add(this.btnPin);
-            this.grpBorder.Controls.Add(this.btnTextLöschen);
             this.grpBorder.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpBorder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.grpBorder.Location = new System.Drawing.Point(0, 0);
@@ -114,12 +100,36 @@ namespace BlueControls.Controls {
             this.grpBorder.TabStop = false;
             this.grpBorder.Text = "groupBox1";
             // 
+            // grpFilter
+            // 
+            this.grpFilter.Controls.Add(this.txbZeilenFilter);
+            this.grpFilter.Controls.Add(this.btnTextLöschen);
+            this.grpFilter.Controls.Add(this.btnPin);
+            this.grpFilter.Controls.Add(this.btnAlleFilterAus);
+            this.grpFilter.Controls.Add(this.btnPinZurück);
+            this.grpFilter.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RoundRect;
+            this.grpFilter.Location = new System.Drawing.Point(8, 8);
+            this.grpFilter.Name = "grpFilter";
+            this.grpFilter.Size = new System.Drawing.Size(440, 72);
+            this.grpFilter.TabIndex = 56;
+            this.grpFilter.TabStop = false;
+            // 
+            // grpButtons
+            // 
+            this.grpButtons.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RoundRect;
+            this.grpButtons.Location = new System.Drawing.Point(8, 88);
+            this.grpButtons.Name = "grpButtons";
+            this.grpButtons.Size = new System.Drawing.Size(440, 48);
+            this.grpButtons.TabIndex = 57;
+            this.grpButtons.TabStop = false;
+            // 
             // TableViewWithFilters
             // 
             this.Controls.Add(this.grpBorder);
             this.Name = "TableViewWithFilters";
             this.Size = new System.Drawing.Size(684, 455);
             this.grpBorder.ResumeLayout(false);
+            this.grpFilter.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -128,8 +138,9 @@ namespace BlueControls.Controls {
         private Button btnAlleFilterAus;
         private Button btnPin;
         private Button btnPinZurück;
-        private Button btnÄhnliche;
         private TableView TableInternal;
         private GroupBox grpBorder;
+        private GroupBox grpButtons;
+        private GroupBox grpFilter;
     }
 }

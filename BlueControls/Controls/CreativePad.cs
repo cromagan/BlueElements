@@ -312,7 +312,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
         var add = 100;// (float)Math.Max(a.Width * 0.1, a.Height * 0.1);
 
-        return new RectangleF(a.Left - add, a.Top - add, a.Width + add * 2, a.Height + add * 2);
+        return new RectangleF(a.Left - add, a.Top - add, a.Width + (add * 2), a.Height + (add * 2));
     }
 
     protected override void Dispose(bool disposing) {

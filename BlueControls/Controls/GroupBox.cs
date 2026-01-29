@@ -170,6 +170,12 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
     private void SetStandardValues() {
         var l = GenericControl.Typ(Parent);
         if (GroupBoxStyle == GroupBoxStyle.RibbonBar) { l = ParentType.RibbonPage; }
+
+        if (GroupBoxStyle == GroupBoxStyle.RoundRect) {
+            base.BackColor = Skin.Color_Back(Design.GroupBox_RoundRect, States.Standard);
+            return;
+        }
+
         switch (l) {
             case ParentType.RibbonPage:
                 GroupBoxStyle = GroupBoxStyle.RibbonBar;
