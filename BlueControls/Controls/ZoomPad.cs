@@ -16,19 +16,21 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Controls;
 
@@ -354,7 +356,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         ControlPressing = false;
     }
 
-    protected sealed override void OnMouseDown(MouseEventArgs e) {
+    protected override sealed void OnMouseDown(MouseEventArgs e) {
         var cme = new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY);
         MouseDownData = cme;
         base.OnMouseDown(e);
@@ -368,14 +370,14 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         ControlPressing = false;
     }
 
-    protected sealed override void OnMouseMove(MouseEventArgs e) {
+    protected override sealed void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         OnMouseMove(new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY));
     }
 
     protected virtual void OnMouseMove(CanvasMouseEventArgs e) { }
 
-    protected sealed override void OnMouseUp(MouseEventArgs e) {
+    protected override sealed void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         MouseDownData = null;
         OnMouseUp(new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY));
@@ -383,7 +385,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected virtual void OnMouseUp(CanvasMouseEventArgs e) { }
 
-    protected sealed override void OnMouseWheel(MouseEventArgs e) {
+    protected override sealed void OnMouseWheel(MouseEventArgs e) {
         // e enstricht den Control-Koordinaten
         base.OnMouseWheel(e);
 

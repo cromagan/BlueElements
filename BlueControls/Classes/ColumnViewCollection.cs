@@ -16,8 +16,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Interfaces;
 using BlueControls.Interfaces;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;
@@ -26,10 +28,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueTable;
+namespace BlueControls.Classes;
 
 public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable, IStyleable {
 
@@ -464,7 +466,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     //    (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    private void ColumnViewItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) => Invalidate();
+    private void ColumnViewItem_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
 
     private void OnStyleChanged() {
         StyleChanged?.Invoke(this, System.EventArgs.Empty);

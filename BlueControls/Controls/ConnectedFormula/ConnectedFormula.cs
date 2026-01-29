@@ -16,17 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,11 +34,13 @@ using System.ComponentModel;
 using System.Drawing;
 
 using System.Linq;
-using static BlueBasics.Converter;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics.ClassesStatic;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
-namespace BlueControls.ConnectedFormula;
+namespace BlueControls.Controls.ConnectedFormula;
 
 public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWithKey {
 
@@ -332,7 +334,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                         icpi.Add(found);
                     }
 
-                    found.SetCoordinates(new RectangleF((icpi.CanvasUsedArea.Width / 2) - 150, -30, 300, 30));
+                    found.SetCoordinates(new RectangleF(icpi.CanvasUsedArea.Width / 2 - 150, -30, 300, 30));
                     found.Bei_Export_sichtbar = false;
                 }
             }

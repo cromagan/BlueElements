@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -23,8 +23,8 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using static BlueBasics.Generic;
-using static BlueBasics.Geometry;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BluePaint;
 

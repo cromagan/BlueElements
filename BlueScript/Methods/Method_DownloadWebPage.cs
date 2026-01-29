@@ -16,8 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
@@ -52,7 +53,7 @@ internal class Method_DownloadWebPage : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var url = attvar.ValueStringGet(0);
-        var varn = "X" + url.ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
+        var varn = "X" + url.ReduceToChars(BlueBasics.ClassesStatic.Constants.AllowedCharsVariableName);
 
         if (Last.GetByKey(varn) is VariableString vb) {
             return new DoItFeedback(vb.ValueString);

@@ -16,12 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueControls.Enums;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 public sealed class FilterBarListItem : RowBackgroundListItem {
 
@@ -132,8 +133,8 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
             var s = Font_TextInFilter_Scaled.MeasureString(trichterText);
 
             Font_TextInFilter_Scaled.DrawString(gr, trichterText,
-                origAutoFilterLocation.Left + ((paf - s.Width) / 2),
-                origAutoFilterLocation.Top + ((paf - s.Height) / 2));
+                origAutoFilterLocation.Left + (paf - s.Width) / 2,
+                origAutoFilterLocation.Top + (paf - s.Height) / 2);
         }
 
         #endregion

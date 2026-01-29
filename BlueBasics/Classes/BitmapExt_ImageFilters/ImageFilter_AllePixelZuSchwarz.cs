@@ -17,7 +17,7 @@
 
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_AllePixelZuSchwarz : ImageFilter {
 
@@ -42,7 +42,7 @@ internal class ImageFilter_AllePixelZuSchwarz : ImageFilter {
             var b = bits[i];     // Blau-Komponente
 
             // Berechnen der Helligkeit des Pixels
-            var brightness = (0.3f * r) + (0.59f * g) + (0.11f * b);
+            var brightness = 0.3f * r + 0.59f * g + 0.11f * b;
 
             // Überprüfen, ob die Helligkeit nahe dem Weißwert liegt
             if (brightness < threshold) {

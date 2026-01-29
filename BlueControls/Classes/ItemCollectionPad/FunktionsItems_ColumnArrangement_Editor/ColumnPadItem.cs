@@ -15,20 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueControls.CellRenderer;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueTable;
+using BlueControls.Renderer;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 
 /// <summary>
 /// Zum Darstellen einer Spalte. Im ViewEditpt benutzt

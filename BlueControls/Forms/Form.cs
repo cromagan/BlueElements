@@ -15,10 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueBasics.MultiUserFile;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
+using BlueControls.Classes;
 using BlueControls.Enums;
-using BlueTable;
+using BlueTable.Classes;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;

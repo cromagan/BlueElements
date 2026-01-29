@@ -16,11 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,10 +30,11 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Text;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
+using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.Extensions;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 using Orientation = BlueBasics.Enums.Orientation;
+using BlueBasics.Classes;
 
 namespace BlueControls.Controls;
 

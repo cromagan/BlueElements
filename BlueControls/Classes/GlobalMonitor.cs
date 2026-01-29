@@ -1,8 +1,10 @@
 ﻿using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueControls.CellRenderer;
+using BlueControls.Classes;
 using BlueControls.Forms;
-using BlueTable;
+using BlueControls.Renderer;
+using BlueTable.Classes;
 using System;
 using System.Threading;
 

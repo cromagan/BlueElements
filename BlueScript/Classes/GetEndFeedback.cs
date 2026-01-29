@@ -15,10 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueScript.Variables;
 
-namespace BlueScript.Structures;
+namespace BlueScript.Classes;
 
 public readonly struct GetEndFeedback {
 

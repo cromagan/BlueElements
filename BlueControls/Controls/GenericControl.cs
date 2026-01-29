@@ -16,7 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using System;

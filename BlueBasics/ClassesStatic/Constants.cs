@@ -24,7 +24,7 @@ using System.Text;
 // http://www.carlosag.net/tools/codetranslator/
 // http://converter.telerik.com/
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class Constants {
 

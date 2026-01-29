@@ -16,10 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueScript.Variables;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -124,7 +127,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         VariableCollection vars;
 
         var row = RowSingleOrNull();
-        BlueTable.Table? tb = null;
+        Table? tb = null;
 
         if (row?.Table is { IsDisposed: false } row_tb) {
             tb = row_tb;

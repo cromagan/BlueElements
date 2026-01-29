@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueScript;
+namespace BlueScript.ClassesStatic;
 
 public static class Extensions {
     //public static readonly string ImageKennung = ((char)9001).ToString(false);

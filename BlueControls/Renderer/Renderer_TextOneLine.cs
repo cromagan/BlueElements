@@ -16,17 +16,20 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.CellRenderer;
+namespace BlueControls.Renderer;
 
 public class Renderer_TextOneLine : Renderer_Abstract {
 

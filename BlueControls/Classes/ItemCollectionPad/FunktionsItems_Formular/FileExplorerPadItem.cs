@@ -16,18 +16,19 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutosizable {
 
@@ -45,7 +46,7 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     public FileExplorerPadItem() : this(string.Empty, null) { }
 
-    public FileExplorerPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => SetCoordinates(new RectangleF(0, 0, 50, 30));
+    public FileExplorerPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) => SetCoordinates(new RectangleF(0, 0, 50, 30));
 
     #endregion
 

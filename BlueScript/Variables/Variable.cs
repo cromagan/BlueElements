@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueScript.Methods;
@@ -23,7 +25,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static BlueBasics.Constants;
+using static BlueBasics.ClassesStatic.Constants;
 
 namespace BlueScript.Variables;
 

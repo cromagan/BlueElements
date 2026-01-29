@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -23,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList;
 
 public class DropDownListItem : AbstractListItem {
 

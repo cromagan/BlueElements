@@ -15,13 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes;
 // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
 // https://stackoverflow.com/questions/1402803/passing-properties-by-reference-in-c-sharp
 

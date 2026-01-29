@@ -15,20 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 
 public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 

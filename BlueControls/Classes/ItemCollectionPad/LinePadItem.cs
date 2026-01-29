@@ -16,22 +16,24 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using static BlueBasics.Converter;
-using static BlueBasics.Geometry;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Geometry;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.ItemCollectionPad;
+namespace BlueControls.Classes.ItemCollectionPad;
 
 public class LinePadItem : AbstractPadItem, IStyleableOne {
 
@@ -153,8 +155,8 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     //    }
     //}
     public override void InitialPosition(int x, int y, int width, int height) {
-        _point1.SetTo(x, y + (height / 2), false);
-        _point2.SetTo(x + width, y + (height / 2), false);
+        _point1.SetTo(x, y + height / 2, false);
+        _point2.SetTo(x + width, y + height / 2, false);
     }
 
     public override List<string> ParseableItems() {

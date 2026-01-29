@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
@@ -27,9 +28,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using static BlueBasics.Generic;
+using static BlueBasics.ClassesStatic.Generic;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class IO {
 
@@ -347,7 +348,7 @@ public static class IO {
         } catch { }
 
         Develop.AbortAppIfStackOverflow();
-        return NormalizePath(pfad);
+        return pfad.NormalizePath();
     }
 
     /// <summary>

@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
 
 namespace BlueControls.Interfaces;
 

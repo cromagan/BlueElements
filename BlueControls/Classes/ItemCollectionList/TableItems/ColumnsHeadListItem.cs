@@ -16,13 +16,14 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueControls.Enums;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 /// <summary>
 /// Kümmert sich um die Anzeige des Spaltenkopfes

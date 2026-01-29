@@ -16,12 +16,14 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueScript;
+using BlueScript.Classes;
+using BlueScript.EventArgs;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Enums;
@@ -38,15 +40,16 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.Extensions;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
-using static BlueScript.Script;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueScript.Classes.Script;
 using Timer = System.Threading.Timer;
+using BlueTable.AdditionalScriptVariables;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
@@ -1068,20 +1071,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         List<TableScriptDescription> updatedScripts = [];
 
         foreach (var existingScript in tb.EventScript) {
-            if (ReferenceEquals(existingScript, script) || (existingScript.KeyName == script.KeyName && existingScript.Script == script.Script)) {
+            if (ReferenceEquals(existingScript, script) || existingScript.KeyName == script.KeyName && existingScript.Script == script.Script) {
                 found = true;
 
                 if (!isDisposed) {
                     // Prüfe ob sich wirklich etwas geändert hat
-                    var hasChanges = (keyname != null && keyname != existingScript.KeyName) ||
-                                    (scriptContent != null && scriptContent != existingScript.Script) ||
-                                    (image != null && image != existingScript.Image) ||
-                                    (quickInfo != null && quickInfo != existingScript.QuickInfo) ||
-                                    (adminInfo != null && adminInfo != existingScript.AdminInfo) ||
-                                    (eventTypes != null && !eventTypes.Equals(existingScript.EventTypes)) ||
-                                    (needRow != null && needRow != existingScript.NeedRow) ||
+                    var hasChanges = keyname != null && keyname != existingScript.KeyName ||
+                                    scriptContent != null && scriptContent != existingScript.Script ||
+                                    image != null && image != existingScript.Image ||
+                                    quickInfo != null && quickInfo != existingScript.QuickInfo ||
+                                    adminInfo != null && adminInfo != existingScript.AdminInfo ||
+                                    eventTypes != null && !eventTypes.Equals(existingScript.EventTypes) ||
+                                    needRow != null && needRow != existingScript.NeedRow ||
                                     userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
-                                    (failedReason != null && failedReason != existingScript.FailedReason);
+                                    failedReason != null && failedReason != existingScript.FailedReason;
 
                     if (hasChanges) {
                         // Erstelle neues Script mit aktualisierten Werten
@@ -2565,9 +2568,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private static int NummerCode1(byte[] b, int pointer) => b[pointer];
 
-    private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
+    private static int NummerCode2(byte[] b, int pointer) => b[pointer] * 255 + b[pointer + 1];
 
-    private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
+    private static int NummerCode3(byte[] b, int pointer) => b[pointer] * 65025 + b[pointer + 1] * 255 + b[pointer + 2];
 
     private static long NummerCode7(byte[] b, int pointer) {
         long nu = 0;

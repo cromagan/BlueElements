@@ -15,13 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
+using BlueScript.Methods;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.AdditionalScriptVariables;
+using BlueTable.Classes;
 using System.Collections.Generic;
 
-namespace BlueScript.Methods;
+namespace BlueTable.AdditionalScriptMethods;
 
 
 internal class Method_Table : Method {

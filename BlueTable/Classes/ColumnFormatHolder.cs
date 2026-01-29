@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 

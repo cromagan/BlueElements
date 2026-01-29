@@ -16,24 +16,27 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 

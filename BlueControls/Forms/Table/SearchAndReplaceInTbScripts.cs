@@ -16,15 +16,16 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static BlueBasics.Constants;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.BlueTableDialogs;
 

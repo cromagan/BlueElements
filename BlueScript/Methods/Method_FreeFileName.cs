@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 
@@ -57,13 +57,13 @@ internal class Method_FreeFileName : Method {
             return new DoItFeedback(TempFile(pf, nam, suf));
         }
 
-        var zeichen = BlueBasics.Constants.Char_AZ.ToLowerInvariant() + BlueBasics.Constants.Char_Numerals + BlueBasics.Constants.Char_AZ.ToUpperInvariant();
+        var zeichen = BlueBasics.ClassesStatic.Constants.Char_AZ.ToLowerInvariant() + BlueBasics.ClassesStatic.Constants.Char_Numerals + BlueBasics.ClassesStatic.Constants.Char_AZ.ToUpperInvariant();
         // Ja, lower und upper macht keinen sinn, sieht aber verrückter aus
 
         do {
             var p = string.Empty;
             while (p.Length < 20) {
-                var pos = BlueBasics.Constants.GlobalRnd.Next(zeichen.Length);
+                var pos = BlueBasics.ClassesStatic.Constants.GlobalRnd.Next(zeichen.Length);
                 p += zeichen.Substring(pos, 1);
             }
 

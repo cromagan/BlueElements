@@ -20,7 +20,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class Polygons {
 
@@ -38,10 +38,10 @@ public static class Polygons {
         //         | /
         //         |/
         //
-        var plusOben = new PointF((float)(rect.Left + (rect.Width * 0.5)),
-            (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
-        var plusUnten = new PointF((float)(rect.Left + (rect.Width * 0.5)),
-            (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
+        var plusOben = new PointF((float)(rect.Left + rect.Width * 0.5),
+            (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y - rect.Height * 0.18));
+        var plusUnten = new PointF((float)(rect.Left + rect.Width * 0.5),
+            (float)(rect.PointOf(Alignment.VerticalCenter_Right).Y + rect.Height * 0.18));
         p.AddLine(rect.PointOf(Alignment.VerticalCenter_Right), plusUnten with { Y = rect.Bottom });
         p.AddLine(p.GetLastPoint(), plusUnten);
         p.AddLine(p.GetLastPoint(), plusUnten with { X = rect.Left });
@@ -83,8 +83,8 @@ public static class Polygons {
     public static GraphicsPath? Poly_RoundRec(int x, int y, int width, int height, int radius) {
         if (width < 1 || height < 1) { return null; }
         var tempPolyRoundRec = new GraphicsPath();
-        if (radius > (height / 2.0) + 2) { radius = (int)(height / 2.0) + 2; }
-        if (radius > (width / 2.0) + 2) { radius = (int)(width / 2.0) + 2; }
+        if (radius > height / 2.0 + 2) { radius = (int)(height / 2.0) + 2; }
+        if (radius > width / 2.0 + 2) { radius = (int)(width / 2.0) + 2; }
 
         tempPolyRoundRec.AddLine(x + radius, y, x + width - radius, y);
         if (radius > 0) { AddRad90(x + width - radius, y, 270); }

@@ -19,7 +19,7 @@ using BlueBasics;
 using BlueTable.Enums;
 using System.Collections.ObjectModel;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public static class LanguageTool {
 

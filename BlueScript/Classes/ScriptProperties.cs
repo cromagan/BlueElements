@@ -18,7 +18,7 @@
 using BlueScript.Methods;
 using System.Collections.Generic;
 
-namespace BlueScript.Structures;
+namespace BlueScript.Classes;
 
 public class ScriptProperties {
 

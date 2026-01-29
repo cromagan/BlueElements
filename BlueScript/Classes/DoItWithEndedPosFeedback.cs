@@ -17,7 +17,7 @@
 
 using BlueScript.Variables;
 
-namespace BlueScript.Structures;
+namespace BlueScript.Classes;
 
 /// <summary>
 /// Extended feedback structure that includes position information

@@ -17,7 +17,7 @@
 
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_Grayscale : ImageFilter {
 
@@ -38,7 +38,7 @@ internal class ImageFilter_Grayscale : ImageFilter {
             var b = bits[i];
 
             // Berechnung des Grauwerts mit der Luma-Formel
-            var gray = (byte)((0.3 * r) + (0.59 * g) + (0.11 * b));
+            var gray = (byte)(0.3 * r + 0.59 * g + 0.11 * b);
 
             // Setzen der Graustufenwerte für alle Farbkanäle
             bits[i] = gray;       // Blau

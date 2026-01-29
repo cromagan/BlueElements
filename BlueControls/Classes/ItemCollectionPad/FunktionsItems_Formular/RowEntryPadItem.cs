@@ -15,19 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueScript;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.AdditionalScriptVariables;
+using BlueTable.Classes;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>
 /// Dieses Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.
@@ -40,7 +40,7 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText, IHasF
 
     public RowEntryPadItem() : this(string.Empty, null, null) { }
 
-    public RowEntryPadItem(string keyName, Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public RowEntryPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 

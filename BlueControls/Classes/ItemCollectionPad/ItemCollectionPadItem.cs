@@ -16,19 +16,20 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueBasics.FileSystemCaching;
 using BlueBasics.Interfaces;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueScript.Structures;
+using BlueScript.Classes;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,11 +42,11 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
-using static BlueBasics.Generic;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Generic;
 
-namespace BlueControls.ItemCollectionPad;
+namespace BlueControls.Classes.ItemCollectionPad;
 
 public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<AbstractPadItem>, IReadableTextWithKey, IParseable, ICanHaveVariables, IStyleable {
 
@@ -281,17 +282,17 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             newS = ZoomFitValue(usedArea, positionControl.ToRect().Size);
 
             // Berechne den Mittelpunkt der 'usedArea' im unskalierten Koordinatensystem
-            var usedAreaCenterX = usedArea.X + (usedArea.Width / 2f);
-            var usedAreaCenterY = usedArea.Y + (usedArea.Height / 2f);
+            var usedAreaCenterX = usedArea.X + usedArea.Width / 2f;
+            var usedAreaCenterY = usedArea.Y + usedArea.Height / 2f;
 
             // Berechne den Mittelpunkt der 'positionControl' (der Anzeigebereich)
-            var positionControlCenterX = positionControl.X + (positionControl.Width / 2f);
-            var positionControlCenterY = positionControl.Y + (positionControl.Height / 2f);
+            var positionControlCenterX = positionControl.X + positionControl.Width / 2f;
+            var positionControlCenterY = positionControl.Y + positionControl.Height / 2f;
 
             // Der neue Offset sollte den Mittelpunkt der usedArea auf den Mittelpunkt von positionControl verschieben,
             // unter Berücksichtigung des neuen Skalierungsfaktors.
-            newX = (-usedAreaCenterX * newS) + positionControlCenterX;
-            newY = (-usedAreaCenterY * newS) + positionControlCenterY;
+            newX = -usedAreaCenterX * newS + positionControlCenterX;
+            newY = -usedAreaCenterY * newS + positionControlCenterY;
         }
 
         return (newS, newX, newY);
@@ -952,8 +953,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return _caption;
     }
 
-    internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() {
-        if (Parent is ConnectedFormula.ConnectedFormula cf) { return cf; }
+    internal Controls.ConnectedFormula.ConnectedFormula? GetConnectedFormula() {
+        if (Parent is Controls.ConnectedFormula.ConnectedFormula cf) { return cf; }
 
         if (Parent is ItemCollectionPadItem icpi) { return icpi.GetConnectedFormula(); }
         return null;

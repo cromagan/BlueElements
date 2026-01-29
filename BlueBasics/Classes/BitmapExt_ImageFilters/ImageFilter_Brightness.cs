@@ -18,7 +18,7 @@
 using System;
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_Brightness : ImageFilter {
 
@@ -37,7 +37,7 @@ internal class ImageFilter_Brightness : ImageFilter {
         for (var y = 0; y < bitmapData.Height; y++) {
             for (var x = 0; x < bitmapData.Width; x++) {
                 // Berechnung des Index für den aktuellen Pixel im Byte-Array
-                var index = (y * bitmapData.Stride) + (x * 4); // 4 Bytes pro Pixel (RGBA)
+                var index = y * bitmapData.Stride + x * 4; // 4 Bytes pro Pixel (RGBA)
 
                 // Anpassen der Helligkeit für jede Farbkomponente (RGB)
                 bits[index] = (byte)Math.Max(0, Math.Min(255, bits[index] * factor)); // Blau

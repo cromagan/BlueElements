@@ -16,16 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 /// <summary>
 /// Enthält Daten, wie eine Zeile angezeigt werden soll.

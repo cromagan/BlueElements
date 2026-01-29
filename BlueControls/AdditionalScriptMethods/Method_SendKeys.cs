@@ -1,9 +1,8 @@
-
-using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 

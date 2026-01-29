@@ -16,15 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Enums;
-using BlueControls.ItemCollectionPad;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList;
 
 public class RowFormulaListItem : AbstractListItem {
 
@@ -118,8 +120,8 @@ public class RowFormulaListItem : AbstractListItem {
         if (_tmpBmp != null) {
             zoom = (float)Math.Min(positionControl.Width / (double)_tmpBmp.Width, positionControl.Height / (double)_tmpBmp.Height);
             var r2 = new RectangleF(
-                ((positionControl.Width - _tmpBmp.Width.CanvasToControl(zoom)) / 2) + positionControl.Left,
-                ((positionControl.Height - _tmpBmp.Height.CanvasToControl(zoom)) / 2) + positionControl.Top,
+                (positionControl.Width - _tmpBmp.Width.CanvasToControl(zoom)) / 2 + positionControl.Left,
+                (positionControl.Height - _tmpBmp.Height.CanvasToControl(zoom)) / 2 + positionControl.Top,
                 _tmpBmp.Width.CanvasToControl(zoom), _tmpBmp.Height.CanvasToControl(zoom));
             gr.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
         }
@@ -166,8 +168,8 @@ public class RowFormulaListItem : AbstractListItem {
         _tmpBmp ??= new Bitmap(canvasUsedArea.Width * internalZoom, canvasUsedArea.Height * internalZoom);
         var zoomv = ItemCollectionPadItem.ZoomFitValue(canvasUsedArea, _tmpBmp.Size);
         var freiraumControl = ItemCollectionPadItem.FreiraumControl(canvasUsedArea, _tmpBmp.Size, zoomv);
-        var sliderX = canvasUsedArea.Left.CanvasToControl(zoomv) + (freiraumControl.X / 2f);
-        var sliderY = canvasUsedArea.Top.CanvasToControl(zoomv) + (freiraumControl.Y / 2f);
+        var sliderX = canvasUsedArea.Left.CanvasToControl(zoomv) + freiraumControl.X / 2f;
+        var sliderY = canvasUsedArea.Top.CanvasToControl(zoomv) + freiraumControl.Y / 2f;
         pad.DrawToBitmap(_tmpBmp, zoomv, sliderX, sliderY);
     }
 

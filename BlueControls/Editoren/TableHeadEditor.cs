@@ -16,14 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.CellRenderer;
+using BlueControls.Classes;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.Renderer;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;

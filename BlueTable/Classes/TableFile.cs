@@ -15,16 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableFile : Table {
@@ -278,9 +279,9 @@ public class TableFile : Table {
         var timeSinceLastAction = DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds;
 
         // Bestimme ob gespeichert werden muss
-        var mustSave = (_checkerTickCount > 20 && timeSinceLastAction > 20) ||
+        var mustSave = _checkerTickCount > 20 && timeSinceLastAction > 20 ||
                          _checkerTickCount > 110 ||
-                         (Column.ChunkValueColumn != null && _checkerTickCount > 50);
+                         Column.ChunkValueColumn != null && _checkerTickCount > 50;
 
         if (_checkerTickCount < 200) {
             // 200 * 2 Sekunden = 6,7 Minuten

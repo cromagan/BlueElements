@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueScript.Structures;
+namespace BlueScript.Classes;
 
 public readonly struct CanDoFeedback {
 

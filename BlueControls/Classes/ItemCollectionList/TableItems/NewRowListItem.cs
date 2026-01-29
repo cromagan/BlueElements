@@ -18,11 +18,11 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 /// <summary>
 /// Enthält Daten, wie eine Zeile angezeigt werden soll.

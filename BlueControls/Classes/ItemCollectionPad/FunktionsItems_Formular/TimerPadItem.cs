@@ -16,23 +16,24 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueScript;
+using BlueScript.Classes;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
@@ -48,7 +49,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     public TimerPadItem() : this(string.Empty, null) { }
 
-    public TimerPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName) { }
+    public TimerPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName) { }
 
     #endregion
 

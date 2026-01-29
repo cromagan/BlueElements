@@ -16,11 +16,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Interfaces;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls;
 using BlueControls.Forms;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueScript.Structures;
-using BlueTable;
+using BlueScript.Classes;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
 

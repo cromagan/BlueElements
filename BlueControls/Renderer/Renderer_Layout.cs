@@ -16,18 +16,21 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace BlueControls.CellRenderer;
+namespace BlueControls.Renderer;
 
 public class Renderer_Layout : Renderer_Abstract {
 
@@ -110,7 +113,7 @@ public class Renderer_Layout : Renderer_Abstract {
             }
 
             var scale2 = Math.Min((float)drawingAreaControl.Width / cachedBmp.Width, (float)drawingAreaControl.Height / cachedBmp.Height);
-            gr.DrawImage(cachedBmp, new Rectangle(drawingAreaControl.X + ((drawingAreaControl.Width - cachedBmp.Width.CanvasToControl(scale2)) / 2), drawingAreaControl.Y + ((drawingAreaControl.Height - cachedBmp.Height.CanvasToControl(scale2)) / 2), cachedBmp.Width.CanvasToControl(scale2), cachedBmp.Height.CanvasToControl(scale2)));
+            gr.DrawImage(cachedBmp, new Rectangle(drawingAreaControl.X + (drawingAreaControl.Width - cachedBmp.Width.CanvasToControl(scale2)) / 2, drawingAreaControl.Y + (drawingAreaControl.Height - cachedBmp.Height.CanvasToControl(scale2)) / 2, cachedBmp.Width.CanvasToControl(scale2), cachedBmp.Height.CanvasToControl(scale2)));
         } catch {
             var replacedText = ValueReadable("Anzeige fehlgeschlagen.", ShortenStyle.Replaced, translate);
             Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);

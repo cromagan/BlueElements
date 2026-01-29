@@ -17,12 +17,12 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.CellRenderer;
 using BlueControls.Enums;
+using BlueControls.Renderer;
 using BlueTable.Enums;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList;
 
 public class CellLikeListItem : AbstractListItem {
 

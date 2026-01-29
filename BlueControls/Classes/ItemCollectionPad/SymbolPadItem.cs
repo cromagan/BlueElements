@@ -16,19 +16,21 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using static BlueBasics.Converter;
-using static BlueBasics.Polygons;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Polygons;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.ItemCollectionPad;
+namespace BlueControls.Classes.ItemCollectionPad;
 
 public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 

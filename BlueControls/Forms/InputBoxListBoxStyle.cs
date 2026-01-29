@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Enums;
-using BlueControls.ItemCollectionList;
 using System.Collections.Generic;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 

@@ -17,10 +17,10 @@
 
 using System;
 using System.Collections.Generic;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class MathFormulaParser {
 

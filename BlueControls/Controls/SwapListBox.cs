@@ -16,10 +16,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

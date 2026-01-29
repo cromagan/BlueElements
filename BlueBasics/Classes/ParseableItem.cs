@@ -15,12 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes;
 
 public abstract class ParseableItem : IParseable, ICloneable {
     //public abstract string MyClassId { get; }

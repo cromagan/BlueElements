@@ -17,9 +17,9 @@
 
 using BlueBasics.Interfaces;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.Classes;
 
-namespace BlueScript;
+namespace BlueTable.AdditionalScriptVariables;
 
 public class VariableFilterItem : Variable {
 

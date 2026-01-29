@@ -15,7 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.EventArgs;
+using BlueBasics.EventArgs;
+
+namespace BlueScript.EventArgs;
 
 public class CanDoScriptEventArgs : CancelReasonEventArgs {
 

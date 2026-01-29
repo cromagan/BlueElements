@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
@@ -26,11 +28,11 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.Extensions;
 
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable {
 
@@ -250,7 +252,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             var max = txt.Length;
             int middle;
             do {
-                middle = (int)(min + ((max - min) / 2.0));
+                middle = (int)(min + (max - min) / 2.0);
                 tSize = font.MeasureString(txt.Substring(0, middle) + "...");
                 if (tSize.Width + 3 > maxWidth) {
                     max = middle;
@@ -335,7 +337,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
                 gr.DrawLine(scaledPen, offsetX, (int)underlineY, offsetX + (1 + size.Width).CanvasToControl(zoom), (int)underlineY);
             }
             if (StrikeOut) {
-                var strikeY = offsetY + (size.Height * 0.55f);
+                var strikeY = offsetY + size.Height * 0.55f;
                 gr.DrawLine(scaledPen, offsetX - 1, (int)strikeY, (int)(offsetX + 1 + size.Width), (int)strikeY);
             }
         }
@@ -480,7 +482,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
                 for (var x = 1; x < f.Width - 1; x++) {
                     for (var y = (int)(f.Height - 1); y >= miny; y--) {
                         // Bei 32bpp ist jedes Pixel 4 Bytes
-                        var pixel = rgbValues[(y * stride) + (x * 4)];
+                        var pixel = rgbValues[y * stride + x * 4];
                         if (y > miny && pixel == 0) {
                             miny = y;
                             break;

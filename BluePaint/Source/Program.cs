@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using System;
 using System.Windows.Forms;
 
-namespace BluePaint;
+namespace BluePaint.Source;
 
 internal static class Program {
 

@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Text;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public class Html {
 

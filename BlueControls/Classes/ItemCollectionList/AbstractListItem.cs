@@ -16,13 +16,15 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.CellRenderer;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueTable;
+using BlueControls.Renderer;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
@@ -32,7 +34,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList;
 
 public static class AbstractListItemExtension {
 
@@ -58,7 +60,7 @@ public static class AbstractListItemExtension {
             var hall = 0;
             var sameh = -1;
             var or = Orientation.Senkrecht;
-            PreComputeSize(item, itemDesign);
+            item.PreComputeSize(itemDesign);
 
             foreach (var thisItem in item) {
                 if (thisItem != null && thisItem.Visible) {
@@ -79,7 +81,7 @@ public static class AbstractListItemExtension {
             return (w, h, hall, or);
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return CanvasItemData(item, itemDesign);
+            return item.CanvasItemData(itemDesign);
         }
     }
 
@@ -353,7 +355,7 @@ public static class AbstractListItemExtension {
             Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
         } catch {
             Develop.AbortAppIfStackOverflow();
-            PreComputeSize(item, itemDesign);
+            item.PreComputeSize(itemDesign);
         }
     }
 

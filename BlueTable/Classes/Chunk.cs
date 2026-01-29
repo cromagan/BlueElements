@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
@@ -25,11 +26,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using static BlueBasics.Converter;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
+using BlueBasics.Classes;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class Chunk : IHasKeyName {
@@ -423,7 +425,7 @@ public class Chunk : IHasKeyName {
         }
 
         // --- TmpFile wird zum Haupt ---
-        const int maxRetries = 5;
+        const int maxRetries = 8;
         const int retryDelayMs = 1000;
 
         for (var attempt = 1; attempt <= maxRetries; attempt++) {
@@ -437,19 +439,25 @@ public class Chunk : IHasKeyName {
                 return FileOperationResult.ValueStringEmpty;
             }
 
-            // Paralleler Prozess hat gespeichert?
+            Thread.Sleep(retryDelayMs * attempt);
+
+            // Haupt-Datei ist von irgendwo anders her wieder erstellt worden.
             if (FileExists(filename)) {
                 DeleteFile(tempfile, false);
                 LoadBytesFromDisk(true);
                 return new("Dateien wurden zwischenzeitlich verändert", true, true);
             }
 
-            Thread.Sleep(retryDelayMs * attempt);
-
-            if (!FileExists(tempfile)) { return new("Temp-Datei Zugriffsfehler", false, true); }
+            if (!FileExists(tempfile)) {
+                break; // Raus aus der Schleife -> Rollback
+            }
         }
 
-        // Aufräumen falls alles fehlschlägt
+        // ROLLBACK: Backup wiederherstellen bei jedem Fehlerfall
+        if (FileExists(backup) && !FileExists(filename)) {
+            MoveFile(backup, filename, false);
+        }
+
         DeleteFile(tempfile, false);
         return new("Speichervorgang unerwartet abgebrochen", false, true);
     }

@@ -16,16 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueScript.Structures;
-using BlueTable;
+using BlueScript.Classes;
+using BlueScript.EventArgs;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;
@@ -33,9 +34,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -448,7 +449,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
         if (_item == null) { return; }
 
-        if (!BlueScript.ScriptDescription.IsValidName(txbName.Text)) { return; }
+        if (!ScriptDescription.IsValidName(txbName.Text)) { return; }
 
         if (!string.Equals(txbName.Text, _item.KeyName, StringComparison.OrdinalIgnoreCase)) {
             if (tb.EventScript.GetByKey(txbName.Text) != null) { return; }

@@ -15,17 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueBasics.FileSystemCaching;
-using BlueBasics.MultiUserFile;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
 //https://stackoverflow.com/questions/9462592/best-practices-for-multi-form-applications-to-show-and-hide-forms
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public class FormManager : ApplicationContext {
 

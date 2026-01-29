@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueControls.Controls;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.Collections.Specialized;
 
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public static class Allgemein {
 
@@ -54,7 +54,7 @@ public static class Allgemein {
         if (_serviceStarted) { return; }
         _serviceStarted = true;
         Table.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
-        ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
+        Controls.ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
     }
 
     private static void AllFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {

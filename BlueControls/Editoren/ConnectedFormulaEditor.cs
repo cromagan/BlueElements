@@ -19,24 +19,27 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using Button = BlueControls.Controls.Button;
+using BlueBasics.ClassesStatic;
+using BlueBasics.Classes;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.Forms;
 
@@ -81,7 +84,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     public virtual Type? EditorFor => null;
 
-    public ConnectedFormula.ConnectedFormula? Formula {
+    public Controls.ConnectedFormula.ConnectedFormula? Formula {
         get;
         private set {
             if (!Generic.IsAdministrator()) { value = null; }
@@ -116,10 +119,10 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     public IEditable? ToEdit {
         set {
-            if (value is ConnectedFormula.ConnectedFormula cf) {
+            if (value is Controls.ConnectedFormula.ConnectedFormula cf) {
                 FormulaSet(cf, null);
             } else {
-                FormulaSet(null as ConnectedFormula.ConnectedFormula, null);
+                FormulaSet(null as Controls.ConnectedFormula.ConnectedFormula, null);
             }
         }
     }
@@ -137,14 +140,14 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            FormulaSet(null as ConnectedFormula.ConnectedFormula, null);
+            FormulaSet(null as Controls.ConnectedFormula.ConnectedFormula, null);
             components?.Dispose();
         }
         base.Dispose(disposing);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        FormulaSet(null as ConnectedFormula.ConnectedFormula, null);
+        FormulaSet(null as Controls.ConnectedFormula.ConnectedFormula, null);
         base.OnFormClosing(e);
     }
 
@@ -243,16 +246,16 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-        BlueTable.Table.SaveAll(false);
+        Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.SaveAll(true);
+        Table.SaveAll(true);
         MultiUserFile.SaveAll(false);
 
-        ConnectedFormula.ConnectedFormula? tmpf = null;
+        Controls.ConnectedFormula.ConnectedFormula? tmpf = null;
 
         if (sender == btnSaveAs) { tmpf = Formula; }
 
-        if (sender == btnNeuDB) { tmpf = new ConnectedFormula.ConnectedFormula(); }
+        if (sender == btnNeuDB) { tmpf = new Controls.ConnectedFormula.ConnectedFormula(); }
 
         if (tmpf == null) {
             MessageBox.Show("Kein Formular zum Speichern vorhanden");
@@ -402,7 +405,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private bool FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
-        FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
+        FormulaSet(null as Controls.ConnectedFormula.ConnectedFormula, notAllowedchilds);
 
         if (!Generic.IsAdministrator()) { return false; }
 
@@ -413,7 +416,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        var tmpFormula = BlueControls.Controls.ConnectedFormula.ConnectedFormula.GetByFilename(filename);
         if (tmpFormula == null) { return false; }
 
         FormulaSet(tmpFormula, notAllowedchilds);
@@ -421,7 +424,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         return true;
     }
 
-    private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
+    private void FormulaSet(Controls.ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
         Formula = formular;
 
         //if (notAllowedchilds != null && Formula != null && editable) {

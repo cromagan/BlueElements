@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.BitmapExt_ImageFilters;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
@@ -28,7 +30,7 @@ using System.Threading;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes;
 
 // https://stackoverflow.com/questions/24701703/c-sharp-faster-alternatives-to-setpixel-and-getpixel-for-bitmaps-for-windows-f
 // Todo: Obselete Routinen:
@@ -107,7 +109,7 @@ public class BitmapExt : IDisposableExtended {
     /// <param name="bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
     /// <returns></returns>
     public static Bitmap? Crop(Bitmap? sourceBmp, int left, int right, int top, int bottom) {
-        if (sourceBmp == null || (left == 0 && right == 0 && top == 0 && bottom == 0)) { return sourceBmp; }
+        if (sourceBmp == null || left == 0 && right == 0 && top == 0 && bottom == 0) { return sourceBmp; }
 
         Generic.CollectGarbage();
         var w = Math.Max(sourceBmp.Width - left + right, 1);
@@ -125,7 +127,7 @@ public class BitmapExt : IDisposableExtended {
 
         for (var adx = -r; adx <= r; adx++) {
             for (var ady = -r; ady <= r; ady++) {
-                var d = Math.Sqrt(Convert.ToDouble((adx * adx) + (ady * ady))) - 0.5;
+                var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
                 var px = x + adx;
                 var py = y + ady;
                 if (px >= 0 && py >= 0 && px < sourceBmp.Width && py < sourceBmp.Height && d <= r) {
@@ -211,7 +213,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public static Color GetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y) {
-        var index = (y * sourceBmpData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
+        var index = y * sourceBmpData.Stride + x * 4; // 4 bytes per pixel for BGRA format
         var b = bits[index];
         var g = bits[index + 1];
         var r = bits[index + 2];
@@ -284,7 +286,7 @@ public class BitmapExt : IDisposableExtended {
         r.Inflate(-5, -5);
         gr.InterpolationMode = InterpolationMode.NearestNeighbor;
         gr.PixelOffsetMode = PixelOffsetMode.Half;
-        gr.DrawImage(sourceBmp, r, new Rectangle((int)point.X - w5, (int)point.Y - w5, (w5 * 2) + 1, (w5 * 2) + 1), GraphicsUnit.Pixel);
+        gr.DrawImage(sourceBmp, r, new Rectangle((int)point.X - w5, (int)point.Y - w5, w5 * 2 + 1, w5 * 2 + 1), GraphicsUnit.Pixel);
         gr.DrawRectangle(Pens.Black, r);
         var mitte = r.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);
@@ -315,7 +317,7 @@ public class BitmapExt : IDisposableExtended {
             for (var y = 0; y < sourceBmp.Height; ++y) {
                 var rowOffset = y * sourceData.Stride;
                 for (var x = 0; x < sourceBmp.Width; ++x) {
-                    var pixelOffset = rowOffset + (x * pixelSize);
+                    var pixelOffset = rowOffset + x * pixelSize;
                     var b = sourceBuffer[pixelOffset + 0];
                     var g = sourceBuffer[pixelOffset + 1];
                     var r = sourceBuffer[pixelOffset + 2];
@@ -344,7 +346,7 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public static void SetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y, Color color) {
-        var index = (y * sourceBmpData.Stride) + (x * 4); // 4 bytes per pixel for BGRA format
+        var index = y * sourceBmpData.Stride + x * 4; // 4 bytes per pixel for BGRA format
         bits[index] = color.B;
         bits[index + 1] = color.G;
         bits[index + 2] = color.R;
@@ -539,7 +541,7 @@ public class BitmapExt : IDisposableExtended {
 
         if (_bitmapData == null || x < 0 || y < 0 || x >= Width || y >= Height) { return Color.Transparent; }
 
-        var index = (y * _bitmapData.Stride) + (x * 4); // 4 bytes per pixel in ARGB
+        var index = y * _bitmapData.Stride + x * 4; // 4 bytes per pixel in ARGB
         var blue = _bits[index];
         var green = _bits[index + 1];
         var red = _bits[index + 2];
@@ -585,7 +587,7 @@ public class BitmapExt : IDisposableExtended {
 
         if (_bitmapData == null) { return; }
 
-        var index = (y * _bitmapData.Stride) + (x * 4); // 4 bytes per pixel in ARGB
+        var index = y * _bitmapData.Stride + x * 4; // 4 bytes per pixel in ARGB
         _bits[index] = color.B;
         _bits[index + 1] = color.G;
         _bits[index + 2] = color.R;

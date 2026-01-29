@@ -17,11 +17,12 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
 using Form = BlueControls.Forms.Form;

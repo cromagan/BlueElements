@@ -18,7 +18,7 @@
 using BlueBasics.Interfaces;
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 public abstract class ImageFilter : IHasKeyName {
 

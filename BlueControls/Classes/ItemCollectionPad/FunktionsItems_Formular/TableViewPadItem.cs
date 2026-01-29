@@ -16,23 +16,25 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>
 /// Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen EINE zu wählen.
@@ -52,9 +54,9 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public TableViewPadItem() : this(string.Empty, null, null) { }
 
-    public TableViewPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
+    public TableViewPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public TableViewPadItem(string keyName, Table? tb, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, tb) { }
+    public TableViewPadItem(string keyName, Table? tb, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, tb) { }
 
     #endregion
 

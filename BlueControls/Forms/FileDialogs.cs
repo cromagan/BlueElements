@@ -16,9 +16,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using System.Collections.Generic;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Forms;
 

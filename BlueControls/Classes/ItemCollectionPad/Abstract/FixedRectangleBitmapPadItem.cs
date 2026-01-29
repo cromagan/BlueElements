@@ -18,7 +18,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace BlueControls.ItemCollectionPad.Abstract;
+namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
 public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 

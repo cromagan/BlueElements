@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
@@ -22,7 +23,7 @@ using System.Drawing.Imaging;
 
 using System.Runtime.InteropServices;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes;
 
 public class WindowsThumbnailProvider {
 
@@ -113,9 +114,9 @@ public class WindowsThumbnailProvider {
             for (var y = 0; y <= srcData.Height - 1; y++) {
                 for (var x = 0; x <= srcData.Width - 1; x++) {
                     var pixelColor = Color.FromArgb(
-                        Marshal.ReadInt32(srcData.Scan0, (srcData.Stride * y) + (4 * x)));
+                        Marshal.ReadInt32(srcData.Scan0, srcData.Stride * y + 4 * x));
 
-                    if ((pixelColor.A > 0) & (pixelColor.A < 255)) {
+                    if (pixelColor.A > 0 & pixelColor.A < 255) {
                         isAlplaBitmap = true;
                     }
 
@@ -136,7 +137,7 @@ public class WindowsThumbnailProvider {
     }
 
     public static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options) {
-        var hBitmap = GetHBitmap(IO.NormalizeFile(fileName), width, height, options);
+        var hBitmap = GetHBitmap(fileName.NormalizeFile(), width, height, options);
 
         if (hBitmap == null) { return null; }
 

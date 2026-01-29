@@ -18,9 +18,9 @@
 using System;
 using System.Text;
 using System.Threading;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
-namespace BlueBasics.FileSystemCaching;
+namespace BlueBasics.Classes.FileSystemCaching;
 
 /// <summary>
 /// Repräsentiert eine gecachte Datei mit Lazy-Loading-Unterstützung und Versionierung.

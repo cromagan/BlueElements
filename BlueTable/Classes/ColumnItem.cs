@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
@@ -30,12 +32,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
-using static BlueBasics.IO;
-using static BlueTable.Table;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueTable.Classes.Table;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErrorCheckable, IHasTable, IDisposableExtendedWithEvent, IEditable {
 

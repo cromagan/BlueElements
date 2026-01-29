@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueTable.EventArgs;
 using System;
@@ -23,7 +23,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public class InvalidatedRowsManager {
 

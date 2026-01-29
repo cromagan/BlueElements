@@ -18,13 +18,13 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
@@ -34,12 +34,13 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
-using static BlueBasics.Generic;
-using static BlueBasics.Polygons;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.Polygons;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics.ClassesStatic;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 /// <summary>
 /// Standard für Objekte, die einen Tabellen/Zeilenbezug haben.
@@ -63,7 +64,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     #region Constructors
 
-    protected ReciverControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula) : base(keyName) {
+    protected ReciverControlPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? parentFormula) : base(keyName) {
         ParentFormula = parentFormula;
         SetCoordinates(new RectangleF(0, 0, 50, 30));
     }
@@ -94,7 +95,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ConnectedFormula.ConnectedFormula? ParentFormula { get; set; }
+    public Controls.ConnectedFormula.ConnectedFormula? ParentFormula { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -152,7 +153,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             var tmp = Table.RepairUserGroups(value);
             if (!field.IsDifferentTo(tmp)) { return; }
 
-            ConnectedFormula.ConnectedFormula.Invalidate_VisibleFor_AllUsed();
+            Controls.ConnectedFormula.ConnectedFormula.Invalidate_VisibleFor_AllUsed();
 
             field = tmp.AsReadOnly();
             OnPropertyChanged();
@@ -318,7 +319,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             if (MustBeInDrawingArea) {
                 var vf = new List<AbstractListItem>();
-                vf.AddRange(ItemsOf(ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
+                vf.AddRange(ItemsOf(Controls.ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
                 result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text, ComboBoxStyle.DropDownList, true));
             }
         }
@@ -417,10 +418,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         }
 
         var anzahlSpaltenImFormular = (int)_xPosition / 100;
-        var aufXPosition = (int)(_xPosition - (anzahlSpaltenImFormular * 100));
+        var aufXPosition = (int)(_xPosition - anzahlSpaltenImFormular * 100);
 
-        var wi = (icpi.CanvasUsedArea.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
-        var xpos = (wi * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));
+        var wi = (icpi.CanvasUsedArea.Width - AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1)) / anzahlSpaltenImFormular;
+        var xpos = wi * (aufXPosition - 1) + AutosizableExtension.GridSize * (aufXPosition - 1);
 
         _pLo.X = xpos;
         _pl.X = xpos;
@@ -583,10 +584,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     protected ItemCollectionPadItem? GetChild(string nameidorfile) {
         if (nameidorfile.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-            var cf = ConnectedFormula.ConnectedFormula.GetByFilename(nameidorfile);
+            var cf = Controls.ConnectedFormula.ConnectedFormula.GetByFilename(nameidorfile);
             return cf?.GetPage("Head");
         } else {
-            if (Parent is ConnectedFormula.ConnectedFormula cf) {
+            if (Parent is Controls.ConnectedFormula.ConnectedFormula cf) {
                 // TODO: Überflüssig???? 29.11.2024
                 return cf.GetPage("Head");
             }

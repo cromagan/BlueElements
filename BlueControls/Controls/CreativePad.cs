@@ -16,16 +16,19 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,9 +39,9 @@ using System.Drawing.Printing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
-using static BlueBasics.Geometry;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Geometry;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 
 namespace BlueControls.Controls;

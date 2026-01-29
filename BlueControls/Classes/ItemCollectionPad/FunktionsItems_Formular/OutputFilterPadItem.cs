@@ -16,21 +16,22 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
@@ -52,9 +53,9 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public OutputFilterPadItem() : this(string.Empty, null, null) { }
 
-    public OutputFilterPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
+    public OutputFilterPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public OutputFilterPadItem(string keyName, Table? db, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public OutputFilterPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 

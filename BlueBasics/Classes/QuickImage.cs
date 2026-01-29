@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
@@ -26,11 +27,11 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.Extensions;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes;
 
 public sealed class QuickImage : IReadableText, IEditable {
 
@@ -434,7 +435,7 @@ public sealed class QuickImage : IReadableText, IEditable {
                     if (Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled)) {
                         var w = (int)(c.GetBrightness() * 100);
                         w = (int)(w / 2.8);
-                        c = Extensions.FromHsb(0, 0, (float)((w / 100.0) + 0.5), c.A);
+                        c = Extensions.FromHsb(0, 0, (float)(w / 100.0 + 0.5), c.A);
                     }
                     if (Effekt.HasFlag(ImageCodeEffect.Graustufen)) { c = c.ToGrey(); }
                 }
@@ -456,10 +457,10 @@ public sealed class QuickImage : IReadableText, IEditable {
                 if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
                     var c1 = Color.FromArgb(0, 0, 0, 0);
                     if (!c.IsMagentaOrTransparent()) {
-                        var randPixel = (x > 0 && bmpOriE.GetPixel(x - 1, y).IsMagentaOrTransparent()) ||
-                                             (y > 0 && bmpOriE.GetPixel(x, y - 1).IsMagentaOrTransparent()) ||
-                                             (x < bmpOriE.Width - 1 && bmpOriE.GetPixel(x + 1, y).IsMagentaOrTransparent()) ||
-                                             (y < bmpOriE.Height - 1 && bmpOriE.GetPixel(x, y + 1).IsMagentaOrTransparent());
+                        var randPixel = x > 0 && bmpOriE.GetPixel(x - 1, y).IsMagentaOrTransparent() ||
+                                             y > 0 && bmpOriE.GetPixel(x, y - 1).IsMagentaOrTransparent() ||
+                                             x < bmpOriE.Width - 1 && bmpOriE.GetPixel(x + 1, y).IsMagentaOrTransparent() ||
+                                             y < bmpOriE.Height - 1 && bmpOriE.GetPixel(x, y + 1).IsMagentaOrTransparent();
 
                         if (c.B < 128 || randPixel) {
                             c1 = SystemColors.ControlDark;

@@ -17,11 +17,11 @@
 
 using BlueBasics.Enums;
 using BlueControls.Forms;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 

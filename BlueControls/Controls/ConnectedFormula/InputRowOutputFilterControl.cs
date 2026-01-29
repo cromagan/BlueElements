@@ -16,15 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
 using BlueControls.Enums;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace BlueControls.Controls;
+namespace BlueControls.Controls.ConnectedFormula;
 
 internal class InputRowOutputFilterControl : GenericControlReciverSender {
 

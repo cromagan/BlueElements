@@ -16,12 +16,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.Enums;
-using BlueTable;
 using BlueTable.Enums;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 public sealed class TableEndListItem : RowBackgroundListItem {
 

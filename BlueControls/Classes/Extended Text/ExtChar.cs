@@ -16,13 +16,15 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Extended_Text;
 

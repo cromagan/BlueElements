@@ -16,14 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.Extended_Text;
+using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
-
 
 internal class Method_StringHTMLToAscii : Method {
 

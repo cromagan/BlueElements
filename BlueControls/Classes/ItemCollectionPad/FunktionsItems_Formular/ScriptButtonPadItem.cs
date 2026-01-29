@@ -16,30 +16,31 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueScript;
+using BlueScript.Classes;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using Button = BlueControls.Controls.Button;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutosizable, IErrorCheckable {
 
@@ -65,7 +66,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     public ScriptButtonPadItem() : this(string.Empty, null) { }
 
-    public ScriptButtonPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
+    public ScriptButtonPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 

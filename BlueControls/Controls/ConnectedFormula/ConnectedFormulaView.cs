@@ -15,19 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueScript;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.AdditionalScriptVariables;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
@@ -35,7 +37,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.ConnectedFormula.ConnectedFormula;
+using static BlueControls.Controls.ConnectedFormula.ConnectedFormula;
 
 namespace BlueControls.Controls;
 

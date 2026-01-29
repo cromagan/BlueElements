@@ -16,11 +16,12 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.Classes;
 
-namespace BlueScript;
+namespace BlueTable.AdditionalScriptVariables;
 
 public class VariableRowItem : Variable {
 

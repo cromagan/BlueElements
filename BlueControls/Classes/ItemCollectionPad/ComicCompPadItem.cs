@@ -16,16 +16,18 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Geometry;
+using static BlueBasics.ClassesStatic.Geometry;
 
-namespace BlueControls.ItemCollectionPad;
+namespace BlueControls.Classes.ItemCollectionPad;
 
 public class ComicCompPadItem : AbstractPadItem {
 
@@ -151,8 +153,8 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override void InitialPosition(int x, int y, int width, int height) {
-        P1.SetTo(x + (width / 2), y, false);
-        P2.SetTo(x + (width / 2), y + height, false);
+        P1.SetTo(x + width / 2, y, false);
+        P2.SetTo(x + width / 2, y + height, false);
     }
 
     public override List<string> ParseableItems() => [];

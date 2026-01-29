@@ -18,12 +18,12 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
 using BlueControls.BlueTableDialogs;
+using BlueControls.Classes;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
@@ -33,11 +33,13 @@ using System.ComponentModel;
 
 using System.Linq;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
-using static BlueBasics.Develop;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Develop;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics.ClassesStatic;
+using BlueBasics.Classes;
 
 namespace BlueControls.Forms;
 
@@ -208,7 +210,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.SaveAll(false);
+        BlueTable.Classes.Table.SaveAll(false);
         if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
 
         switch (e.Item.KeyName) {
@@ -276,7 +278,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         TableSet(null, string.Empty);
         MultiUserFile.SaveAll(true);
-        BlueTable.Table.SaveAll(true);
+        BlueTable.Classes.Table.SaveAll(true);
     }
 
     protected override void OnShown(System.EventArgs e) {
@@ -295,7 +297,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         Table.Enabled = false;
         Table.Refresh();
 
-        BlueTable.Table.SaveAll(false);
+        BlueTable.Classes.Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
 
         var s = (List<object>)tabPage.Tag;
@@ -309,7 +311,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         #region Status-Meldung updaten?
 
         var maybeok = false;
-        foreach (var thisTb in BlueTable.Table.AllFiles) {
+        foreach (var thisTb in BlueTable.Classes.Table.AllFiles) {
             if (thisTb.KeyName.Equals(tablename, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
         }
 
@@ -319,7 +321,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         #endregion
 
-        if (BlueTable.Table.Get(tablename, TableView.Table_NeedPassword, false) is { IsDisposed: false } tb) {
+        if (BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword, false) is { IsDisposed: false } tb) {
             if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
                 if (!string.IsNullOrEmpty(tbf.Filename)) {
                     btnLetzteDateien.AddFileName(tbf.Filename, tb.KeyName);
@@ -343,10 +345,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// <returns></returns>
     protected bool SwitchTabToTable(string tablename) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.SaveAll(false);
+        BlueTable.Classes.Table.SaveAll(false);
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            BlueTable.Table.Get(tablename, TableView.Table_NeedPassword, false);
+            BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword, false);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -540,7 +542,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.SaveAll(false);
+        BlueTable.Classes.Table.SaveAll(false);
 
         SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) {
@@ -564,7 +566,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.SaveAll(false);
+        BlueTable.Classes.Table.SaveAll(false);
         LoadTab.ShowDialog();
     }
 
@@ -575,7 +577,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.SaveAll(false);
+        BlueTable.Classes.Table.SaveAll(false);
 
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
             if (!tbf.IsEditable(false)) { return; }
@@ -596,8 +598,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
-        BlueTable.Table.SaveAll(true);
-        BlueTable.Table.BeSureToBeUpToDate(BlueTable.Table.AllFiles, false);
+        BlueTable.Classes.Table.SaveAll(true);
+        BlueTable.Classes.Table.BeSureToBeUpToDate(BlueTable.Classes.Table.AllFiles, false);
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
@@ -622,7 +624,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
-        BlueTable.Table.SaveAll(false);
+        BlueTable.Classes.Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
 
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
@@ -631,7 +633,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
-        BlueTable.Table.SaveAll(false);
+        BlueTable.Classes.Table.SaveAll(false);
         MultiUserFile.SaveAll(false);
         ExecuteFile(System.IO.Path.GetTempPath());
     }

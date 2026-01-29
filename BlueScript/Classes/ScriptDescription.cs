@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
@@ -23,9 +25,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static BlueBasics.Constants;
+using static BlueBasics.ClassesStatic.Constants;
 
-namespace BlueScript;
+namespace BlueScript.Classes;
 
 public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable {
 

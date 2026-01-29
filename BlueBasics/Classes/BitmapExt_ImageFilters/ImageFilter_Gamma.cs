@@ -18,7 +18,7 @@
 using System;
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_Gamma : ImageFilter {
 
@@ -37,7 +37,7 @@ internal class ImageFilter_Gamma : ImageFilter {
         // Erstellen Sie eine Lookup-Tabelle für die Gamma-Korrektur
         var gammaArray = new byte[256];
         for (var i = 0; i < 256; ++i) {
-            gammaArray[i] = (byte)Math.Min(255, (int)((255.0 * Math.Pow(i / 255.0, 1.0 / factor)) + 0.5));
+            gammaArray[i] = (byte)Math.Min(255, (int)(255.0 * Math.Pow(i / 255.0, 1.0 / factor) + 0.5));
         }
 
         // Schleife über alle Pixel im Bild

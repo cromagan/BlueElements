@@ -17,7 +17,7 @@
 
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_Invert : ImageFilter {
 

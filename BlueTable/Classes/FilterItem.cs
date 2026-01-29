@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
@@ -23,10 +25,10 @@ using BlueTable.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorCheckable, IHasTable {
 

@@ -15,11 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System.Collections.Generic;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes;
 
 public class FormatHolder : IInputFormat, IReadableTextWithKey {
 

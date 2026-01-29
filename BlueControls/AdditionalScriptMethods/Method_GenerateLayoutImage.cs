@@ -15,9 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
 using System.Collections.Generic;

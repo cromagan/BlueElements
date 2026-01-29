@@ -16,14 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
-using BlueTable;
+using BlueTable.Classes;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;

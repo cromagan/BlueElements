@@ -16,7 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Interfaces;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System;
 

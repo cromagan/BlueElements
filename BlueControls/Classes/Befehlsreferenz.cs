@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollectionList;
 using BlueScript.Methods;
-using BlueTable;
+using BlueTable.Classes;
 using static BlueBasics.Extensions;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls;
 

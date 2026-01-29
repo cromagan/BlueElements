@@ -19,7 +19,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public sealed class SystemInputHook {
 

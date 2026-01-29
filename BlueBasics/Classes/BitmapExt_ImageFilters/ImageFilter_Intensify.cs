@@ -17,7 +17,7 @@
 
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_Intensify : ImageFilter {
 
@@ -34,7 +34,7 @@ internal class ImageFilter_Intensify : ImageFilter {
         for (var y = 0; y < bitmapData.Height; y++) {
             for (var x = 0; x < bitmapData.Width; x++) {
                 // Berechnen des Index für den aktuellen Pixel im Byte-Array
-                var index = (y * bitmapData.Stride) + (x * 4);
+                var index = y * bitmapData.Stride + x * 4;
 
                 // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
                 var a = bits[index + 3];
@@ -54,7 +54,7 @@ internal class ImageFilter_Intensify : ImageFilter {
     }
 
     // Hilfsmethode zur Berechnung der Helligkeit eines Pixels
-    private float GetBrightness(int r, int g, int b) => ((0.3f * r) + (0.59f * g) + (0.11f * b)) / 255.0f;
+    private float GetBrightness(int r, int g, int b) => (0.3f * r + 0.59f * g + 0.11f * b) / 255.0f;
 
     #endregion
 }

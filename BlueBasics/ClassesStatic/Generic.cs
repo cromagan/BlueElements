@@ -29,10 +29,10 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 using Point = System.Drawing.Point;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class Generic {
 
@@ -181,7 +181,7 @@ public static class Generic {
     }
 
     public static void EnsureMemoryAvailable(long requiredBytes) {
-        using var process = System.Diagnostics.Process.GetCurrentProcess();
+        using var process = Process.GetCurrentProcess();
         var usedMemory = process.PrivateMemorySize64;
         var maxMemory32Bit = 1_500_000_000L; // ~1.5 GB für 32-bit
         var availableMemory = maxMemory32Bit - usedMemory;
@@ -217,7 +217,7 @@ public static class Generic {
     public static string GetHashString(this string? inputString) {
         if (inputString is { }) {
             var sb = new StringBuilder();
-            foreach (var b in GetHash(inputString)) {
+            foreach (var b in inputString.GetHash()) {
                 sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
             }
 
@@ -282,7 +282,7 @@ public static class Generic {
     public static string GetUniqueKey(int tmp, string type) {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
         var s = type + "\r\n" + UserName + "\r\n" + Environment.CurrentManagedThreadId + "\r\n" + Environment.MachineName;
-        var key = x + (s.GetHashCode() * 100000000) + tmp;
+        var key = x + s.GetHashCode() * 100000000 + tmp;
         return key < 0 ? (key * -1).ToString1() : key.ToString1();
     }
 

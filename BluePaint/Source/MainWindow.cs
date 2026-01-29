@@ -26,7 +26,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
+using BlueBasics.ClassesStatic;
+using BlueControls.Classes;
 
 namespace BluePaint;
 
@@ -61,7 +63,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     #region Methods
 
-    [BlueControls.StandaloneInfo("Bild-bearbeitung", ImageCode.Bild, "Allgemein", "Einfache Bildbearbeitung", 802)]
+    [StandaloneInfo("Bild-bearbeitung", ImageCode.Bild, "Allgemein", "Einfache Bildbearbeitung", 802)]
     public static System.Windows.Forms.Form Start() => new MainWindow();
 
     /// <summary>

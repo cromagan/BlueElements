@@ -16,12 +16,15 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.ItemCollectionList;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
@@ -30,8 +33,8 @@ using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Controls;
 

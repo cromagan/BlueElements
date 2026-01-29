@@ -16,11 +16,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueScript;
+using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.Classes;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;

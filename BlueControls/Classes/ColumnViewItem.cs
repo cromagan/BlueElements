@@ -16,12 +16,15 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.CellRenderer;
+using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
+using BlueControls.Renderer;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
@@ -30,9 +33,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueTable;
+namespace BlueControls.Classes;
 
 public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable, INotifyPropertyChanged, IHasTable {
 
@@ -410,7 +413,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             return _controlColumnWidth;
         }
 
-        var minw = (p16 * (_column.Caption.CountString("\r") + 1)) + pa;
+        var minw = p16 * (_column.Caption.CountString("\r") + 1) + pa;
 
         if (!IsExpanded) {
             _controlColumnWidth = minw;

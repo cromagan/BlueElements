@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Interfaces;
@@ -24,7 +25,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquatable<RowSortDefinition> {
 
@@ -81,9 +82,9 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     public override int GetHashCode() {
         unchecked {
             var hash = 17;
-            hash = (hash * 23) + Reverse.GetHashCode();
+            hash = hash * 23 + Reverse.GetHashCode();
             foreach (var item in _internal) {
-                hash = (hash * 23) + (item.KeyName?.GetHashCode() ?? 0);
+                hash = hash * 23 + (item.KeyName?.GetHashCode() ?? 0);
             }
 
             return hash;

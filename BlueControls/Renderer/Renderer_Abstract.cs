@@ -16,12 +16,15 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.Collections.Concurrent;
@@ -30,7 +33,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 
-namespace BlueControls.CellRenderer;
+namespace BlueControls.Renderer;
 
 public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleEditor, IStyleableOne {
 

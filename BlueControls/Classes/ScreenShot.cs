@@ -15,7 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
+using BlueControls.Classes;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using System.Drawing;

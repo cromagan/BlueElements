@@ -20,8 +20,8 @@ using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.BitmapExt;
-using static BlueBasics.Generic;
+using static BlueBasics.Classes.BitmapExt;
+using static BlueBasics.ClassesStatic.Generic;
 
 namespace BluePaint;
 

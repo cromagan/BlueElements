@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueScript.Methods;
 
@@ -30,7 +30,7 @@ internal class Method_IsDateTime : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "isdatetime";
-    public override List<string> Constants => [.. BlueBasics.Constants.DateTimeFormats];
+    public override List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
     public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

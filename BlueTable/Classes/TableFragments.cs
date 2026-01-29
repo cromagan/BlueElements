@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueBasics.FileSystemCaching;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
@@ -26,11 +26,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static BlueBasics.Converter;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
+using BlueBasics.Classes.FileSystemCaching;
+using BlueBasics.Classes;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -46,7 +48,7 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Wert in Minuten. Nach dieser Zeit dürfen Fragmente gelöscht werden.
     /// </summary>
-    public static readonly int DeleteFragmentsAfter = (DoComplete * 2) + (UpdateTable * 2);
+    public static readonly int DeleteFragmentsAfter = DoComplete * 2 + UpdateTable * 2;
 
     /// <summary>
     /// Wert in Minuten. Nach dieser Zeit sollte eine Komplettierung erfolgen

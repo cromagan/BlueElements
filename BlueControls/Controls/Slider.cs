@@ -15,7 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
+using BlueControls.Classes;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -23,7 +24,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
+using static BlueBasics.ClassesStatic.Constants;
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;

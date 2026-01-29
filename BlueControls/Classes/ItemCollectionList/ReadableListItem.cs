@@ -18,7 +18,7 @@
 using BlueBasics.Interfaces;
 using System.ComponentModel;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList;
 
 public class ReadableListItem : TextListItem {
 

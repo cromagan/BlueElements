@@ -18,11 +18,11 @@
 using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueTable;
+using BlueTable.Classes;
 using System.Collections.Generic;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 /// <summary>
 /// Standard für Objekte, die einen Tabellen/Zeilenbezug haben.
@@ -42,7 +42,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
 
     #region Constructors
 
-    protected ReciverSenderControlPadItem(string keyName, ConnectedFormula.ConnectedFormula? parentFormula, Table? tableOutput) : base(keyName, parentFormula) => TableOutput = tableOutput;
+    protected ReciverSenderControlPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? parentFormula, Table? tableOutput) : base(keyName, parentFormula) => TableOutput = tableOutput;
 
     #endregion
 

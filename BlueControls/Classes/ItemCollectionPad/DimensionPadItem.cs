@@ -16,20 +16,22 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Converter;
-using static BlueBasics.Geometry;
-using static BlueBasics.Polygons;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Geometry;
+using static BlueBasics.ClassesStatic.Polygons;
+using BlueBasics.ClassesStatic;
 
-namespace BlueControls.ItemCollectionPad;
+namespace BlueControls.Classes.ItemCollectionPad;
 
 public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupportsTextScale {
 
@@ -222,7 +224,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     public override void InitialPosition(int x, int y, int width, int height) {
         _point1.SetTo(x, y + height, false);
         _point2.SetTo(x + width, y + height, false);
-        _textPoint.SetTo(x + (width / 2), y, false);
+        _textPoint.SetTo(x + width / 2, y, false);
     }
 
     public void Mirror(PointM? p, bool vertical, bool horizontal) {
@@ -354,7 +356,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
             var sz2 = f.MeasureString(Text_Unten);
             var p1 = _schnittPunkt1.CanvasToControl(zoom, offsetX, offsetY);
             var p2 = _schnittPunkt2.CanvasToControl(zoom, offsetX, offsetY);
-            if (sz1.Width + (pfeilG * 2f) < GetLength(p1, p2)) {
+            if (sz1.Width + pfeilG * 2f < GetLength(p1, p2)) {
                 DrawArrow(gr, p1, _winkel, f.ColorMain, pfeilG);
                 DrawArrow(gr, p2, _winkel + 180, f.ColorMain, pfeilG);
             } else {

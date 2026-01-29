@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
@@ -23,9 +24,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueControls.ItemCollectionPad.Abstract;
+namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
 public abstract class RectanglePadItem : AbstractPadItem {
 
@@ -229,10 +230,10 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     private void CalculateSlavePoints() {
         // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-        _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);
-        _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2), false);
-        _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y, false);
-        _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y, false);
+        _pl.SetTo(_pLo.X, _pLo.Y + (_pLu.Y - _pLo.Y) / 2, false);
+        _pr.SetTo(_pRo.X, _pLo.Y + (_pLu.Y - _pLo.Y) / 2, false);
+        _pu.SetTo(_pLo.X + (_pRo.X - _pLo.X) / 2, _pRu.Y, false);
+        _po.SetTo(_pLo.X + (_pRo.X - _pLo.X) / 2, _pRo.Y, false);
         CalculateJointMiddle(_pl, _pr);
     }
 

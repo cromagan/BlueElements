@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad;
-using BlueControls.ItemCollectionPad.Abstract;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueScript.Structures;
+using BlueScript.Classes;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.Classes;
 using System.Collections.Generic;
 using System.Windows.Forms;
 

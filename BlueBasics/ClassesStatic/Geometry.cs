@@ -17,9 +17,9 @@
 
 using System;
 using System.Drawing;
-using static BlueBasics.Constants;
+using static BlueBasics.ClassesStatic.Constants;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class Geometry {
 
@@ -75,7 +75,7 @@ public static class Geometry {
         float l1 = sP.X - ep.X;
         float l2 = sP.Y - ep.Y;
         // ^2 ist langsamer, laut Project Analyzer
-        return (float)Math.Sqrt((l1 * l1) + (l2 * l2));
+        return (float)Math.Sqrt(l1 * l1 + l2 * l2);
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public static class Geometry {
     public static float GetLength(PointF sp, PointF ep) {
         var l1 = sp.X - ep.X;
         var l2 = sp.Y - ep.Y;
-        return (float)Math.Sqrt((l1 * l1) + (l2 * l2)); // ^ 2 ist langsamer, laut Project Analyzer
+        return (float)Math.Sqrt(l1 * l1 + l2 * l2); // ^ 2 ist langsamer, laut Project Analyzer
     }
 
     /// <summary>
@@ -101,16 +101,16 @@ public static class Geometry {
     public static PointF LinesIntersect(PointF line1Start, PointF line1End, PointF line2Start, PointF line2End) {
         var a1 = line1End.Y - line1Start.Y;
         var b1 = line1Start.X - line1End.X;
-        var c1 = (line1End.X * line1Start.Y) - (line1Start.X * line1End.Y);
+        var c1 = line1End.X * line1Start.Y - line1Start.X * line1End.Y;
         var a2 = line2End.Y - line2Start.Y;
         var b2 = line2Start.X - line2End.X;
-        var c2 = (line2End.X * line2Start.Y) - (line2Start.X * line2End.Y);
-        var denom = (a1 * b2) - (a2 * b1);
+        var c2 = line2End.X * line2Start.Y - line2Start.X * line2End.Y;
+        var denom = a1 * b2 - a2 * b1;
         if (denom is < 0.0000001f and > -0.0000001f) {
             // Ergibt ansonsten zu große ergebnisse
             return PointF.Empty;
         }
-        return new PointF(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
+        return new PointF((b1 * c2 - b2 * c1) / denom, (a2 * c1 - a1 * c2) / denom);
     }
 
     public static PointF LinesIntersect(PointF line1Start, PointF line1End, PointF line2Start, PointF line2End, bool considerEndpoints) {
@@ -161,10 +161,10 @@ public static class Geometry {
         }
         var m1 = (pY - qY) / (pX - qX);
         var m2 = -1 / m1;
-        var t2 = maus.Y + (maus.X / m1);
-        var t1 = pY - (m1 * pX);
+        var t2 = maus.Y + maus.X / m1;
+        var t1 = pY - m1 * pX;
         var schnittX = (t2 - t1) / (m1 - m2);
-        var schnitty = (m1 * schnittX) + t1;
+        var schnitty = m1 * schnittX + t1;
         return new PointF(schnittX, schnitty);
     }
 

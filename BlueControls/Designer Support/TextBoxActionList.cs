@@ -1,4 +1,4 @@
-﻿using BlueBasics;
+﻿using BlueBasics.Classes;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using System.ComponentModel;

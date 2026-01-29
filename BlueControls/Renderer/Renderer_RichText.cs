@@ -15,16 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Extended_Text;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.CellRenderer;
+namespace BlueControls.Renderer;
 
 public class Renderer_RichText : Renderer_Abstract {
 

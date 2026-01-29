@@ -16,18 +16,20 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.MultiUserFile;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
+using BlueScript.Classes;
 using BlueScript.Methods;
-using BlueScript.Structures;
+using BlueTable.Classes;
 using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -176,7 +178,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         WriteInfosBack();
         MultiUserFile.SaveAll(false);
-        BlueTable.Table.SaveAll(false);
+        Table.SaveAll(false);
         //BlueTable.Table.BeSureToBeUpToDate(BlueTable.Table.AllFiles);
 
         btnSaveLoad.Enabled = true;

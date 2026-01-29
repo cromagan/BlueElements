@@ -15,13 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -31,10 +32,11 @@ using System.Drawing.Printing;
 
 using System.Linq;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using ComboBox = BlueControls.Controls.ComboBox;
+using BlueBasics.ClassesStatic;
 
 namespace BlueControls.Forms;
 

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class WindowsRemoteControl {
 
@@ -173,7 +174,7 @@ public static class WindowsRemoteControl {
     }
 
     public static void RebootComputer() {
-        MultiUserFile.MultiUserFile.SaveAll(true);
+        MultiUserFile.SaveAll(true);
         Develop.TraceLogging_End();
 
         var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0") {
@@ -191,7 +192,7 @@ public static class WindowsRemoteControl {
     public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
     public static void ShutdownComputer() {
-        MultiUserFile.MultiUserFile.SaveAll(true);
+        MultiUserFile.SaveAll(true);
         Develop.TraceLogging_End();
 
         var psi = new ProcessStartInfo("shutdown", "/s /t 0") {

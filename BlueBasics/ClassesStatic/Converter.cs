@@ -22,7 +22,7 @@ using System.Globalization;
 
 using System.Text;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class Converter {
 

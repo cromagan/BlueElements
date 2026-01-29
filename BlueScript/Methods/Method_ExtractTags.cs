@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
@@ -60,7 +60,7 @@ internal class Method_ExtractTags : Method {
             var x = thisw.SplitBy(attvar.ValueStringGet(1));
 
             if (x.Length == 2) {
-                var vn = x[0].ToLowerInvariant().ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
+                var vn = x[0].ToLowerInvariant().ReduceToChars(BlueBasics.ClassesStatic.Constants.AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
                     varCol.Add(new VariableString("extracted_" + vn, thisv, true, comment));

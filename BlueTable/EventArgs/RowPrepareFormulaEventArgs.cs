@@ -15,7 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueScript.Structures;
+using BlueScript.Classes;
+using BlueTable.Classes;
 using System.Collections.Generic;
 using System.Drawing;
 

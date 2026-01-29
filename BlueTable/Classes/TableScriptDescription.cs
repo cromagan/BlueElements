@@ -16,9 +16,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueScript;
+using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueTable.Interfaces;
 using System;
@@ -26,9 +28,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public static class TableScriptDescriptionExtension {
 

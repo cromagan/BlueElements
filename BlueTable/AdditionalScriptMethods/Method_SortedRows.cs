@@ -15,15 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueScript;
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
-using BlueTable;
-using BlueTable.AdditionalScriptMethods;
+using BlueTable.AdditionalScriptVariables;
+using BlueTable.Classes;
 using System.Collections.Generic;
 
-namespace BlueControls.AdditionalScriptMethods;
+namespace BlueTable.AdditionalScriptMethods;
 
 public class Method_SortedRows : Method_TableGeneric {
 

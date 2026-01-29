@@ -20,8 +20,6 @@ using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueTable;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
@@ -32,50 +30,12 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-
-using BlueBasics;
-
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
-using BlueControls.BlueTableDialogs;
-using BlueControls.CellRenderer;
-
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-
-using BlueControls.Extended_Text;
-using BlueControls.Forms;
-
-using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-
-using BlueScript.Structures;
-
-using BlueTable;
-using BlueTable.Enums;
-using BlueTable.EventArgs;
-using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Windows.Forms;
-
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static BlueTable.Table;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList.TableItems;
+using BlueControls.Controls.ConnectedFormula;
+using BlueTable.Classes;
+using BlueBasics.ClassesStatic;
 
 namespace BlueControls.Controls;
 

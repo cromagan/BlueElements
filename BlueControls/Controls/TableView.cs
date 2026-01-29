@@ -16,21 +16,24 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
 using BlueControls.BlueTableDialogs;
-using BlueControls.CellRenderer;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueScript.Structures;
-using BlueTable;
+using BlueControls.Renderer;
+using BlueScript.Classes;
+using BlueScript.EventArgs;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
@@ -43,12 +46,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
-using static BlueTable.Table;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using static BlueTable.Classes.Table;
 
 namespace BlueControls.Controls;
 
@@ -1024,10 +1027,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 e.ContextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, column3, tb.IsAdministrator(), string.Empty));
                 e.ContextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, column3, tb.IsAdministrator()));
 
-                if (_mouseOverRow is { IsDisposed: false } row3) {
-                    var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column3, row3, row3.ChunkValue));
-                    e.ContextMenu.Add(ItemOf("Voting", ImageCode.Herz, ContextMenu_Voting, column3, tb.IsAdministrator() && editable && column3.CanBeChangedByRules()));
-                }
+                //if (_mouseOverRow is { IsDisposed: false } row3) {
+                //    var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column3, row3, row3.ChunkValue));
+                //    e.ContextMenu.Add(ItemOf("Voting", ImageCode.Herz, ContextMenu_Voting, column3, tb.IsAdministrator() && editable && column3.CanBeChangedByRules()));
+                //}
             }
 
             #endregion
@@ -2972,12 +2975,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void ContextMenu_Unpin(object sender, ObjectEventArgs e) {
         if (e.Data is not RowItem row) { return; }
         PinRemove(row);
-    }
-
-    private void ContextMenu_Voting(object sender, ObjectEventArgs e) {
-        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
-        var v = new Voting(column, [.. FilterCombined.Rows]);
-        v.ShowDialog();
     }
 
     private void Cursor_Move(Direction direction) {

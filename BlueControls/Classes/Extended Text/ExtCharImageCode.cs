@@ -16,11 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueControls.Classes;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Constants;
+using static BlueBasics.ClassesStatic.Constants;
 
 namespace BlueControls.Extended_Text;
 

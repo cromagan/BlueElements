@@ -16,10 +16,12 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
 using BlueControls.Editoren;
 using BlueScript.Variables;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.EventArgs;
 using System;
 using System.Collections.Generic;

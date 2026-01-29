@@ -20,9 +20,9 @@ using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public class UndoItem : IParseable {
 

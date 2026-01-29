@@ -25,11 +25,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using static BlueBasics.Constants;
-using static BlueBasics.Converter;
-using static BlueBasics.Geometry;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Geometry;
 
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyPropertyChanged {
 
@@ -128,7 +128,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
-    public float Magnitude => (float)Math.Sqrt((_x * _x) + (_y * _y));
+    public float Magnitude => (float)Math.Sqrt(_x * _x + _y * _y);
     public bool MoveXByMouse { get; set; } = true;
     public bool MoveYByMouse { get; set; } = true;
 
@@ -181,7 +181,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public float DistanzZuLinie(float x1, float y1, float x2, float y2) => GetLength(this, PointOnLine(this, x1, y1, x2, y2));
 
-    public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
+    public float DotProduct(PointM vector) => _x * vector._x + _y * vector._y;
 
     public void Draw(Graphics gr, float zoom, float offsetX, float offsetY, Design type, States state) {
         var contX = _x.CanvasToControl(zoom, offsetX);

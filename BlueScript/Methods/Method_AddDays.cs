@@ -15,8 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Globalization;
@@ -30,7 +30,7 @@ internal class Method_AddDays : Method {
 
     public override List<List<string>> Args => [StringVal, FloatVal, StringVal];
     public override string Command => "adddays";
-    public override List<string> Constants => [.. BlueBasics.Constants.DateTimeFormats];
+    public override List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
     public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu.\r\nDabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt.\r\nDer Rückgabwert als String und wird mit 'Format' festgelegt.\r\nBeispiel: dd.MM.yyyy HH:mm:ss.fff";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

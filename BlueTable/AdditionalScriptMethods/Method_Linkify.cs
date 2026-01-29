@@ -15,10 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueScript;
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
+using BlueTable.AdditionalScriptVariables;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;

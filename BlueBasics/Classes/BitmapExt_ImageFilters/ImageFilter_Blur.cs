@@ -19,7 +19,7 @@ using System;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_Blur : ImageFilter {
 
@@ -56,7 +56,7 @@ internal class ImageFilter_Blur : ImageFilter {
                         // Überprüfen, ob der Pixel im Bereich des Bildes liegt
                         if (newX >= 0 && newX < bitmapData.Width && newY >= 0 && newY < bitmapData.Height) {
                             // Berechnung des Index im Byte-Array
-                            var pixelIndex = (newY * bitmapData.Stride) + (newX * 4);
+                            var pixelIndex = newY * bitmapData.Stride + newX * 4;
 
                             // Addieren der Farbwerte zum Summenkanal
                             sumR += bits[pixelIndex + 2];
@@ -73,7 +73,7 @@ internal class ImageFilter_Blur : ImageFilter {
                 var avgB = sumB / count;
 
                 // Berechnung des Index für den aktuellen Pixel
-                var currentPixelIndex = (y * bitmapData.Stride) + (x * 4);
+                var currentPixelIndex = y * bitmapData.Stride + x * 4;
 
                 // Setzen des neuen Farbwerts im temporären Buffer
                 tempBits[currentPixelIndex + 2] = (byte)avgR;

@@ -15,13 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
-
 
 internal class Method_RandomInt : Method {
 
@@ -43,7 +42,7 @@ internal class Method_RandomInt : Method {
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(BlueBasics.Constants.GlobalRnd.Next(0, attvar.ValueIntGet(0)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(BlueBasics.ClassesStatic.Constants.GlobalRnd.Next(0, attvar.ValueIntGet(0)));
 
     #endregion
 }

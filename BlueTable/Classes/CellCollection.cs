@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueScript.Variables;
@@ -26,7 +27,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDisposableExtended, IHasTable {
 

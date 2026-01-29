@@ -17,15 +17,15 @@
 
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Enums;
-using BlueControls.ItemCollectionPad.Abstract;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using static BlueBasics.Extensions;
 
-namespace BlueControls.ItemCollection;
+namespace BlueControls.Classes;
 
 public class ItemConnection : IStringable, INotifyPropertyChanged {
 

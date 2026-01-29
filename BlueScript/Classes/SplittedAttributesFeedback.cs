@@ -20,9 +20,9 @@ using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueScript.Structures;
+namespace BlueScript.Classes;
 
 public readonly struct SplittedAttributesFeedback {
 

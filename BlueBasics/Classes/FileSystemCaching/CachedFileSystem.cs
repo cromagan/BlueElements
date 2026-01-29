@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -26,7 +27,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlueBasics.FileSystemCaching;
+namespace BlueBasics.Classes.FileSystemCaching;
 
 /// <summary>
 /// Hauptklasse für das Caching-System mit automatischer Synchronisation
@@ -73,7 +74,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         set {
             if (IsDisposed) { return; }
 
-            value = IO.NormalizePath(value).ToUpperInvariant();
+            value = value.NormalizePath().ToUpperInvariant();
 
             if (!IO.DirectoryExists(value)) {
                 Develop.DebugPrint(Enums.ErrorType.Error, $"Verzeichnis nicht gefunden: {value}");
@@ -122,7 +123,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Holt oder erstellt eine CachedFileSystem-Instanz für das angegebene Verzeichnis
     /// </summary>
     public static CachedFileSystem Get(string path) {
-        var normalizedPath = IO.NormalizePath(path).ToUpperInvariant();
+        var normalizedPath = path.NormalizePath().ToUpperInvariant();
 
         // Fast-Path: Instanz existiert bereits exakt
         if (_instances.TryGetValue(normalizedPath, out var existingInstance)) {
@@ -192,7 +193,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public bool FileExists(string filename) {
         if (IsDisposed) { return false; }
 
-        var normalizedFileName = IO.NormalizeFile(filename);
+        var normalizedFileName = filename.NormalizeFile();
 
         if (!ShouldCacheFile(normalizedFileName)) {
             Develop.DebugPrint(Enums.ErrorType.Error, $"Der angegebene Pfad '{filename}' liegt nicht im überwachten Bereich '{WatchedDirectory}'.");
@@ -208,7 +209,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public CachedFile? GetFile(string filename) {
         if (IsDisposed) { return null; }
 
-        var normalizedFileName = IO.NormalizeFile(filename);
+        var normalizedFileName = filename.NormalizeFile();
 
         if (!ShouldCacheFile(normalizedFileName)) {
             Develop.DebugPrint(Enums.ErrorType.Error, $"Der angegebene Pfad '{filename}' liegt nicht im überwachten Bereich '{WatchedDirectory}'.");
@@ -227,7 +228,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public List<string> GetFiles(string path, List<string>? includePatterns = null) {
         if (IsDisposed) { return []; }
 
-        var normalizedPath = IO.NormalizePath(path);
+        var normalizedPath = path.NormalizePath();
 
         // Prüfen, ob Pfad im Watcher-Bereich liegt
         if (!ShouldCacheFile(normalizedPath)) {
@@ -296,8 +297,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Prüft, ob childPath ein Unterpfad von parentPath ist
     /// </summary>
     private static bool IsSubPath(string parentPath, string childPath) {
-        var normalizedParentPath = IO.NormalizePath(parentPath);
-        var normalizedChildPath = IO.NormalizePath(childPath);
+        var normalizedParentPath = parentPath.NormalizePath();
+        var normalizedChildPath = childPath.NormalizePath();
 
         if (normalizedParentPath.Equals(normalizedChildPath, StringComparison.OrdinalIgnoreCase)) {
             return false; // Gleicher Pfad, kein Unterpfad
@@ -312,7 +313,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private CachedFile AddToCache(string fileName) {
-        var normalizedFileName = IO.NormalizeFile(fileName);
+        var normalizedFileName = fileName.NormalizeFile();
 
         return _cachedFiles.GetOrAdd(normalizedFileName.ToUpperInvariant(),
             key => new CachedFile(key));
@@ -449,7 +450,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void RemoveFromCache(string filename) {
         if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return; }
-        if (_cachedFiles.TryRemove(IO.NormalizeFile(filename).ToUpperInvariant(), out var file)) {
+        if (_cachedFiles.TryRemove(filename.NormalizeFile().ToUpperInvariant(), out var file)) {
             file.Dispose();
         }
     }
@@ -457,7 +458,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private bool ShouldCacheFile(string filename) {
         if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return false; }
 
-        return IO.NormalizeFile(filename).StartsWith(WatchedDirectory, StringComparison.OrdinalIgnoreCase);
+        return filename.NormalizeFile().StartsWith(WatchedDirectory, StringComparison.OrdinalIgnoreCase);
     }
 
     private void WarmCache() {

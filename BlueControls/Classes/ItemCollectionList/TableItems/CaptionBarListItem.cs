@@ -18,11 +18,10 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueTable;
 using BlueTable.Enums;
 using System.Drawing;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 public sealed class CaptionBarListItem : RowBackgroundListItem {
 

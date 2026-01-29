@@ -16,8 +16,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System;
@@ -26,7 +29,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Text;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 using Color = System.Drawing.Color;
 using Pen = System.Drawing.Pen;
 

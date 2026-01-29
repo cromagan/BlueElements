@@ -16,15 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Extensions;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList;
 
 public class BitmapListItem : AbstractListItem {
 
@@ -110,7 +112,7 @@ public class BitmapListItem : AbstractListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (style == ListBoxAppearance.FileSystem) {
-            return 110 + (_captionlines * ConstMy);
+            return 110 + _captionlines * ConstMy;
         }
 
         if (_bitmap == null) { return (int)(columnWidth * 0.8); }
@@ -160,10 +162,10 @@ public class BitmapListItem : AbstractListItem {
                 try {
                     lock (_bitmap) {
                         areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
-                        zoom = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
-                            (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
-                        scaledImagePosition = new RectangleF(((drawingCoordinates.Width - _bitmap.Width.CanvasToControl(zoom)) / 2) + drawingCoordinates.Left,
-                            ((drawingCoordinates.Height - _bitmap.Height.CanvasToControl(zoom)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2f),
+                        zoom = (float)Math.Min((drawingCoordinates.Width - Padding * 2) / (double)_bitmap.Width,
+                            (drawingCoordinates.Height - Padding * 2 - _captionlines * ConstMy) / (double)_bitmap.Height);
+                        scaledImagePosition = new RectangleF((drawingCoordinates.Width - _bitmap.Width.CanvasToControl(zoom)) / 2 + drawingCoordinates.Left,
+                            (drawingCoordinates.Height - _bitmap.Height.CanvasToControl(zoom)) / 2 + drawingCoordinates.Top - _captionlines * ConstMy / 2f,
                             _bitmap.Width.CanvasToControl(zoom),
                             _bitmap.Height.CanvasToControl(zoom));
                     }
@@ -199,11 +201,11 @@ public class BitmapListItem : AbstractListItem {
             foreach (var thisCap in _captiontmp) {
                 c--;
                 var s = bFont.FormatedText_NeededSize(thisCap, null, 16);
-                var r = new Rectangle((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)),
+                var r = new Rectangle((int)(drawingCoordinates.Left + (drawingCoordinates.Width - s.Width) / 2.0),
                        (int)drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
                 r.X -= (int)trp.X;
                 r.Y -= (int)trp.Y;
-                r.Y = r.Y - (ConstMy * c) + ausgl;
+                r.Y = r.Y - ConstMy * c + ausgl;
                 //r = new Rectangle(r.Left - trp.ControlX, r.Top - trp.Y, r.Width, r.Height);
                 //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                 //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);

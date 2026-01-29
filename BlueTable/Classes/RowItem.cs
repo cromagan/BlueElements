@@ -16,9 +16,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueScript.Structures;
+using BlueScript.Classes;
 using BlueScript.Variables;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
@@ -32,10 +33,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using static BlueBasics.Converter;
-using static BlueTable.Table;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueTable.Classes.Table;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable {
 
@@ -184,7 +185,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         int colorBlue = c.B;
         int colorGreen = c.G;
         int colorRed = c.R;
-        return (colorBlue << 16) | (colorGreen << 8) | colorRed;
+        return colorBlue << 16 | colorGreen << 8 | colorRed;
     }
 
     /// <summary>

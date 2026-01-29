@@ -18,7 +18,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using System.Drawing.Drawing2D;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
 namespace BluePaint;
 

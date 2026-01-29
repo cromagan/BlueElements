@@ -15,9 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueControls.ItemCollectionPad;
-using BlueTable;
+using BlueBasics.ClassesStatic;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 

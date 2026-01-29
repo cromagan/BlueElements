@@ -16,13 +16,15 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 

@@ -17,7 +17,7 @@
 
 using BlueBasics.Enums;
 using BlueControls.Forms;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System.ComponentModel;
 using System.Linq;

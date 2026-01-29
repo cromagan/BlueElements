@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
@@ -31,7 +32,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasTable {
 

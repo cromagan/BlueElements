@@ -16,13 +16,14 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,10 +33,10 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static BlueBasics.Generic;
-using static BlueBasics.Geometry;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.Geometry;
 
-namespace BlueControls.ItemCollectionPad.Abstract;
+namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
 public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
 

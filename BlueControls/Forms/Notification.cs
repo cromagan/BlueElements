@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Enums;
+using BlueControls.Classes;
 using BlueControls.Enums;
 using System;
 using System.Drawing;

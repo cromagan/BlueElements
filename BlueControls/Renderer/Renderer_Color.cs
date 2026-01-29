@@ -16,16 +16,19 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueControls.CellRenderer;
+namespace BlueControls.Renderer;
 
 public class Renderer_Color : Renderer_Abstract {
 

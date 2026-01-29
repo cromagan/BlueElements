@@ -16,17 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueTable;
 using BlueTable.Enums;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace BlueControls.ItemCollectionList;
+namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 /// <summary>
 /// Enthält Daten, wie eine Zeile angezeigt werden soll.
@@ -189,7 +189,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
         for (var du = 0; du < 2; du++) {
             foreach (var viewItem in Arrangement) {
-                if (DoSpezialOrder && ((viewItem.Permanent && du == 0) || (!viewItem.Permanent && du == 1))) { continue; }
+                if (DoSpezialOrder && (viewItem.Permanent && du == 0 || !viewItem.Permanent && du == 1)) { continue; }
                 if (viewItem.Column == null) { continue; }
 
                 var left = viewItem.ControlColumnLeft((int)offsetX);

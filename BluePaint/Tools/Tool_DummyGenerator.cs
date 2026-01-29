@@ -16,11 +16,12 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueControls;
+using BlueControls.Classes;
 using BlueControls.Forms;
 using System.Drawing;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
 namespace BluePaint;
 

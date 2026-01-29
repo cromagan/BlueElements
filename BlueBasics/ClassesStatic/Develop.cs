@@ -28,9 +28,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
-namespace BlueBasics;
+namespace BlueBasics.ClassesStatic;
 
 public static class Develop {
 

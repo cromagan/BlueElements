@@ -16,7 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Windows.Forms;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueBasics;
 

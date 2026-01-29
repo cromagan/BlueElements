@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
@@ -47,7 +47,7 @@ internal class Method_TrimSuffix : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var val = attvar.ValueStringGet(0);
 
-        const string tmp = BlueBasics.Constants.Char_Numerals + " ";
+        const string tmp = BlueBasics.ClassesStatic.Constants.Char_Numerals + " ";
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var suf = attvar.ValueStringGet(z).ToLowerInvariant();

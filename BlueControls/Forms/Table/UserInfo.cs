@@ -16,7 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.Forms;
-using BlueTable;
+using BlueTable.Classes;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
@@ -23,11 +24,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
 using Timer = System.Threading.Timer;
 
-namespace BlueBasics.MultiUserFile;
+namespace BlueBasics.Classes;
 
 public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseable, INotifyPropertyChanged {
 
@@ -87,7 +88,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             if (string.IsNullOrEmpty(value)) {
                 _filename = string.Empty;
             } else {
-                _filename = IO.NormalizeFile(value);
+                _filename = value.NormalizeFile();
             }
         }
     }

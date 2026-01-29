@@ -16,15 +16,16 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueScript.ClassesStatic;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace BlueScript;
+namespace BlueScript.Classes;
 
 public class Script {
 

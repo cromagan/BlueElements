@@ -18,7 +18,7 @@
 using System;
 using System.Drawing;
 
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public class ScreenData {
 

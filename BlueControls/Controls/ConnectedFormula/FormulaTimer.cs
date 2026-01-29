@@ -16,9 +16,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using System;
 using System.ComponentModel;
 using System.Drawing;

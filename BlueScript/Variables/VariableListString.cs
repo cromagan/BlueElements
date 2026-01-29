@@ -16,7 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueScript.ClassesStatic;
 using System.Collections.Generic;
 
 namespace BlueScript.Variables;

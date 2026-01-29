@@ -16,10 +16,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using System.Collections.Generic;
 
 using System.Text;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Interfaces;
 

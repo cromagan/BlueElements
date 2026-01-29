@@ -16,20 +16,22 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueTable;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Windows.Forms;
-using static BlueBasics.Polygons;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.Polygons;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 //  = A3 & ".Design.GenerateAndAdd(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 
@@ -825,7 +827,7 @@ using static BlueControls.ItemCollectionList.AbstractListItemExtension;
 //	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, CanvasSize=9,4, Bold=True, Color=0046d5}
 //	Table_Cell_Chapter	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, CanvasSize=13, Bold=True, Underline=True, Color=0046d5}
 
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public static class Skin {
 

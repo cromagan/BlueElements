@@ -15,13 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
+using BlueScript.Methods;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace BlueScript.Methods;
+namespace BlueControls.AdditionalScriptMethods;
 
 internal class Method_ClipboardText : Method {
 

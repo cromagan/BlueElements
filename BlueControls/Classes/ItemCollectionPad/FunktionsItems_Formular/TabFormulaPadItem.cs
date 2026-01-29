@@ -16,22 +16,23 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 
-namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
@@ -48,7 +49,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     public TabFormulaPadItem() : this(string.Empty, null) { }
 
-    public TabFormulaPadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
+    public TabFormulaPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
         if (ParentFormula != null) {
             ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
         }
@@ -206,7 +207,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
+                ParentFormula = Controls.ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
                 if (ParentFormula != null) {
                     ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
                 }
@@ -258,7 +259,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
         foreach (var thisC in lc) {
             c++;
-            var it = new RectangleF(positionControl.X + (c * headb), positionControl.Y, headb, headh);
+            var it = new RectangleF(positionControl.X + c * headb, positionControl.Y, headb, headh);
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 

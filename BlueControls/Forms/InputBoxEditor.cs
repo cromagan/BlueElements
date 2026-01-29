@@ -15,8 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
 using BlueControls.Editoren;
 using BlueControls.Interfaces;
 using System;
@@ -84,7 +86,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         var toEditType = toEdit.GetType();
         Type? editorType = null;
 
-        var editorTypes = BlueBasics.Generic.GetEnumerableOfType<IIsEditor>();
+        var editorTypes = Generic.GetEnumerableOfType<IIsEditor>();
 
         foreach (var type in editorTypes) {
             try {

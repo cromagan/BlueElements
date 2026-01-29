@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_Median : ImageFilter {
 
@@ -51,7 +51,7 @@ internal class ImageFilter_Median : ImageFilter {
                         // Überprüfen, ob der Pixel im Bereich des Bildes liegt
                         if (newX >= 0 && newX < bitmapData.Width && newY >= 0 && newY < bitmapData.Height) {
                             // Berechnung des Index im Byte-Array
-                            var index = (newY * bitmapData.Stride) + (newX * 4);
+                            var index = newY * bitmapData.Stride + newX * 4;
 
                             // Extrahieren des Farbwerts des Pixels und Hinzufügen zur Liste
                             var argb = BitConverter.ToInt32(bits, index);
@@ -68,7 +68,7 @@ internal class ImageFilter_Median : ImageFilter {
                 var medianValue = pixelValues[medianIndex];
 
                 // Setzen des Medianwerts für den aktuellen Pixel
-                var currentIndex = (y * bitmapData.Stride) + (x * 4);
+                var currentIndex = y * bitmapData.Stride + x * 4;
                 BitConverter.GetBytes(medianValue).CopyTo(bits, currentIndex);
             }
         }

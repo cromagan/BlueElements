@@ -15,15 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueBasics.MultiUserFile;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollectionPad;
-using BlueTable;
+using BlueTable.Classes;
 using System.ComponentModel;
-using static BlueBasics.Develop;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.Develop;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Forms;
 
@@ -54,7 +55,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         btnLastFormulas.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        var tmpFormula = BlueControls.Controls.ConnectedFormula.ConnectedFormula.GetByFilename(filename);
         if (tmpFormula == null) { return; }
         FormulaSet(tmpFormula.GetPage("Head"));
     }

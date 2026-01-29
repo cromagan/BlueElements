@@ -16,15 +16,17 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.FileSystemCaching;
+using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 using System.Text;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 

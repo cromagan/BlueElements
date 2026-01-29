@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
@@ -31,7 +33,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasTable, IDisposableExtended, INotifyPropertyChanged, IReadableText, IEditable, IErrorCheckable {
 

@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueTable.Enums;
 using System;
@@ -26,10 +27,11 @@ using System.Diagnostics;
 
 using System.Linq;
 using System.Threading;
-using static BlueBasics.Generic;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
+using BlueBasics.Classes;
 
-namespace BlueTable;
+namespace BlueTable.Classes;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -177,7 +179,7 @@ public class TableChunk : TableFile {
 
             foreach (var thisWorkItem in sortedUndoItems) {
                 if (thisWorkItem?.LogsUndo(tb) == true) {
-                    if (undoCount < 1000 || (thisWorkItem.Command == TableDataType.EventScript && important < 10)) {
+                    if (undoCount < 1000 || thisWorkItem.Command == TableDataType.EventScript && important < 10) {
                         undoCount++;
                         if (thisWorkItem.Command == TableDataType.EventScript) { important++; }
 

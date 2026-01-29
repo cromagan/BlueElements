@@ -15,10 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueTable;
+using BlueScript.Variables;
+using BlueTable.Classes;
 using System.Collections.Generic;
 
-namespace BlueScript.Variables;
+namespace BlueTable.AdditionalScriptVariables;
 
 public class VariableListRow : Variable {
 

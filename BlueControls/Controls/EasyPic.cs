@@ -17,6 +17,8 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Classes;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -28,8 +30,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics.ClassesStatic;
 
 namespace BlueControls.Controls;
 

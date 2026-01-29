@@ -16,13 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Interfaces;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
-using BlueControls.ItemCollectionList;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System;
 using System.Linq;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 

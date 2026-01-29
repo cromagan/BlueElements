@@ -19,7 +19,7 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueScript.Structures;
+namespace BlueScript.Classes;
 
 /// <summary>
 /// Base feedback structure that represents the result of a script operation

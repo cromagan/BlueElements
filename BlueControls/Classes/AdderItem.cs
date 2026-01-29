@@ -16,13 +16,15 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
-using BlueTable;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace BlueControls.Controls;
+namespace BlueControls.Classes;
 
 /// <summary>
 /// Diese Element kennt den Schlüssel und alle Zeilen, die erzeugt werden müssen.

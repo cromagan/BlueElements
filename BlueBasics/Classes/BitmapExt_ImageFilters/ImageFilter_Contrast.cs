@@ -18,7 +18,7 @@
 using System;
 using System.Drawing.Imaging;
 
-namespace BlueBasics;
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 internal class ImageFilter_Contrast : ImageFilter {
 
@@ -42,9 +42,9 @@ internal class ImageFilter_Contrast : ImageFilter {
             var b = bits[i];
 
             // Anpassen des Kontrasts für jede Farbkomponente und Begrenzen der Farbwerte
-            r = (byte)Math.Max(0, Math.Min(255, ((((r / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
-            g = (byte)Math.Max(0, Math.Min(255, ((((g / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
-            b = (byte)Math.Max(0, Math.Min(255, ((((b / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
+            r = (byte)Math.Max(0, Math.Min(255, ((r / 255f - 0.5f) * factor + 0.5f) * 255.0f));
+            g = (byte)Math.Max(0, Math.Min(255, ((g / 255f - 0.5f) * factor + 0.5f) * 255.0f));
+            b = (byte)Math.Max(0, Math.Min(255, ((b / 255f - 0.5f) * factor + 0.5f) * 255.0f));
 
             // Aktualisieren der Farbkomponenten im Array
             bits[i + 2] = r;

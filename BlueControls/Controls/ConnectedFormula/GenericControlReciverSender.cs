@@ -16,14 +16,15 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueTable;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace BlueControls.Controls;
+namespace BlueControls.Controls.ConnectedFormula;
 
 public class GenericControlReciverSender : GenericControlReciver {
 

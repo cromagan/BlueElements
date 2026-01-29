@@ -16,12 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
-using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -29,12 +30,13 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using static BlueBasics.Converter;
+using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.Extensions;
-using static BlueBasics.IO;
-using static BlueControls.ItemCollectionList.AbstractListItemExtension;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics.ClassesStatic;
 
-namespace BlueControls.ItemCollectionPad;
+namespace BlueControls.Classes.ItemCollectionPad;
 
 public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne {
 
@@ -314,7 +316,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                 default: // Is = enSizeModes.WeißerRand
                 {
                         var scale2 = Math.Min(positionControl.Width / Bitmap.Width, positionControl.Height / Bitmap.Height);
-                        r2 = new RectangleF(((positionControl.Width - Bitmap.Width.CanvasToControl(scale2)) / 2) + positionControl.Left, ((positionControl.Height - Bitmap.Height.CanvasToControl(scale2)) / 2) + positionControl.Top, Bitmap.Width.CanvasToControl(scale2), Bitmap.Height.CanvasToControl(scale2));
+                        r2 = new RectangleF((positionControl.Width - Bitmap.Width.CanvasToControl(scale2)) / 2 + positionControl.Left, (positionControl.Height - Bitmap.Height.CanvasToControl(scale2)) / 2 + positionControl.Top, Bitmap.Width.CanvasToControl(scale2), Bitmap.Height.CanvasToControl(scale2));
                         break;
                     }
             }

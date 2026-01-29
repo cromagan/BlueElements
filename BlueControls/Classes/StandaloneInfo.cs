@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.Enums;
 using System;
 
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public class StandaloneInfo : Attribute {
 

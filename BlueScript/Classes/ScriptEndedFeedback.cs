@@ -20,7 +20,7 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace BlueScript.Structures;
+namespace BlueScript.Classes;
 
 public class ScriptEndedFeedback : DoItFeedback {
 

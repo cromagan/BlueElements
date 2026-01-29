@@ -15,16 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueControls.ItemCollectionPad;
-using BlueTable;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static BlueBasics.IO;
+using static BlueBasics.ClassesStatic.IO;
 
-namespace BlueControls;
+namespace BlueControls.Classes;
 
 public static class Export {
     //public static string CreateLayout(RowItem Row, string LoadedFile, bool ToNonCriticalText) {

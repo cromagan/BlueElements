@@ -15,8 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ internal class Method_DateTimeNowUTC : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "datetimeutcnow";
-    public override List<string> Constants => [.. BlueBasics.Constants.DateTimeFormats];
+    public override List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
     public override string Description => "Gibt die akutelle UTC-Uhrzeit im angegebenen Format (z.B. dd.MM.yyyy HH:mm:ss.fff) zurück. ";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;

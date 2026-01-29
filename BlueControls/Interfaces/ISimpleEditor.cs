@@ -15,13 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls;
+using BlueBasics.Interfaces;
+using BlueControls.Classes;
 using BlueControls.Controls;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace BlueBasics.Interfaces;
+namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Wird verwendet, wenn eine Klasse bearbeitbar ist, es sie selbst die Properties ausgeben kann.
@@ -93,7 +94,7 @@ public static class SimpleEditorExtension {
                 thisFlexi.Top = top;
                 thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = control.Width - (Skin.Padding * 2);
+                thisFlexi.Width = control.Width - Skin.Padding * 2;
             }
         }
 
