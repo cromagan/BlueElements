@@ -686,7 +686,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="onlyTopLevel"></param>
     /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
     public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
-        ProcessFile(TryGrantWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel) as string ?? "Unbekannter Fehler";
+        ProcessFile(TryGrantWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel).FailedReason;
 
     public static bool IsValidTableName(string tablename) {
         if (string.IsNullOrEmpty(tablename)) { return false; }
@@ -1598,10 +1598,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return r;
     }
 
-    public virtual FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
-        if (!IsEditable(false)) { return new(IsNotEditableReason(false), false, true); }
+    public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) {
+        if (!IsEditable(false)) { return IsNotEditableReason(false); }
 
-        return FileOperationResult.ValueStringEmpty;
+        return string.Empty;
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
@@ -1808,7 +1808,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Prüft und holt sich sicher die Rechte zum Bearbeiten.
     /// </summary>
     /// <returns></returns>
-    public string IsNowEditable() => GrantWriteAccess(TableDataType.Caption, TableChunk.Chunk_Master).StringValue;
+    public string IsNowEditable() => GrantWriteAccess(TableDataType.Caption, TableChunk.Chunk_Master);
 
     public string IsNowNewRowPossible(string? chunkValue, bool checkUserRights) {
         if (IsDisposed) { return "Tabelle verworfen"; }
@@ -2580,58 +2580,58 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return nu;
     }
 
-    private static FileOperationResult TryGrantWriteAccess(List<string> affectingFiles, params object?[] args) {
+    private static OperationResult TryGrantWriteAccess(List<string> affectingFiles, params object?[] args) {
         if (args.Length < 5 ||
             args[0] is not string newChunkValue ||
             args[1] is not ColumnItem column ||
             args[3] is not int waitforseconds ||
              args[4] is not bool onlyTopLevel) {
-            return new("Ungültige Parameter.", false, true);
+            return OperationResult.FailedInternalError;
         }
 
         var row = args[2] as RowItem;
 
         try {
-            if (column.Table is not { IsDisposed: false } tb) { return new("Es ist keine Spalte ausgewählt.", false, true); }
+            if (column.Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Es ist keine Spalte ausgewählt."); }
 
-            if (!tb.IsEditable(false)) { return new(tb.IsNotEditableReason(false), false, true); }
+            if (!tb.IsEditable(false)) { return OperationResult.Failed(tb.IsNotEditableReason(false)); }
 
-            var fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
-            if (fo.Failed) { return fo; }
+            var f = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
+            if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
             if (row != null) {
-                fo = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-                if (fo.Failed) { return fo; }
+                f = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+                if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
             } else {
                 if (column.RelationType == RelationType.CellValues) {
-                    return new("Verknüpfte Tabelle kann keine Initialzeile erstellt werden.", false, true);
+                    return OperationResult.Failed("Verknüpfte Tabelle kann keine Initialzeile erstellt werden.");
                 }
             }
 
-            if (onlyTopLevel) { return FileOperationResult.ValueStringEmpty; }
+            if (onlyTopLevel) { return OperationResult.Success; }
 
             if (column.RelationType == RelationType.CellValues && row != null) {
                 var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
-                if (!string.IsNullOrEmpty(info) && !canrepair) { return new(info, false, true); }
+                if (!string.IsNullOrEmpty(info) && !canrepair) { return OperationResult.Failed(info); }
 
-                if (lcolumn?.Table is not { IsDisposed: false } tb2) { return new("Verknüpfte Tabelle verworfen.", false, true); }
+                if (lcolumn?.Table is not { IsDisposed: false } tb2) { return OperationResult.Failed("Verknüpfte Tabelle verworfen."); }
 
                 tb2.PowerEdit = tb.PowerEdit;
 
                 if (lrow != null) {
                     waitforseconds = Math.Max(1, waitforseconds / 2);
 
-                    var tmp = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
-                    if (!string.IsNullOrEmpty(tmp)) { return new("Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp, waitforseconds > 10, false); }
-                    return FileOperationResult.ValueStringEmpty;
+                    f = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
+                    if (!string.IsNullOrEmpty(f)) { return new OperationResult(waitforseconds > 10, $"Die verlinkte Zelle kann nicht bearbeitet werden: {f}"); }
+                    return OperationResult.Success;
                 }
 
-                return new("Allgemeiner Fehler.", true, true);
+                return OperationResult.FailedInternalError;
             }
 
-            return FileOperationResult.ValueStringEmpty;
+            return OperationResult.Success;
         } catch (Exception ex) {
-            return new FileOperationResult(ex.ToString(), true, false); // Retry bei Exceptions
+            return OperationResult.FailedRetryable(ex); // Retry bei Exceptions
         }
     }
 

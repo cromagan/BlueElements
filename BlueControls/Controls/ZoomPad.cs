@@ -97,7 +97,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public new bool Focused => base.Focused || SliderX.Focused || SliderY.Focused;
 
-    public bool IsMaxYOffset => Math.Abs(OffsetY - SliderY.Maximum) < IntTolerance;
+    public bool IsMaxYOffset => SliderY.Maximum < 6 || Math.Abs(OffsetY + SliderY.Maximum) < IntTolerance;
 
     /// <summary>
     /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde.

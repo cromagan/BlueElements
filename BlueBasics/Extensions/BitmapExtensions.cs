@@ -65,7 +65,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(filename)) { return null; }
         if (!FileExists(filename)) { return null; }
         try {
-            var bytes = ReadAllBytes(filename, 3);
+            var bytes = ReadAllBytes(filename, 3).Value as byte[] ?? [];
             using var ms = new System.IO.MemoryStream(bytes);
             var im = Image.FromStream(ms);
             return im;

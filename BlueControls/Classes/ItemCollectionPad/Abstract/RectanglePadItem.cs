@@ -69,8 +69,8 @@ public abstract class RectanglePadItem : AbstractPadItem {
         MovablePoint.Add(_pr);
         MovablePoint.Add(_pu);
         MovablePoint.Add(_po);
-        PointsForSuccesfullyMove.Add(_pLo);
-        PointsForSuccesfullyMove.Add(_pRu);
+        PointsForSuccessfullyMove.Add(_pLo);
+        PointsForSuccessfullyMove.Add(_pRu);
         CalculateJointMiddle(_pl, _pr);
         Drehwinkel = 0;
     }

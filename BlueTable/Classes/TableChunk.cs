@@ -24,12 +24,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-
 using System.Linq;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
-using BlueBasics.Classes;
 
 namespace BlueTable.Classes;
 
@@ -348,20 +346,20 @@ public class TableChunk : TableFile {
         }
     }
 
-    public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
+    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
-        if (f.Failed) { return f; }
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (chunkValue is not { }) { return new("Fehlerhafter Chunk-Wert", false, true); }
+        if (chunkValue is not { }) { return "Fehlerhafter Chunk-Wert"; }
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
         var ok = LoadChunkWithChunkId(chunkId, false);
 
-        if (!ok) { return new("Chunk Lade-Fehler", false, true); }
+        if (!ok) { return "Chunk Lade-Fehler"; }
 
         if (!_chunks.TryGetValue(chunkId, out var chunk)) {
-            return new($"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}", false, true);
+            return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
         } else {
             return chunk.GrantWriteAccess();
         }
@@ -443,7 +441,7 @@ public class TableChunk : TableFile {
     }
 
     public override void MasterMe() {
-        if (GrantWriteAccess(TableDataType.TemporaryTableMasterUser, string.Empty).Failed) { return; }
+        if (!string.IsNullOrEmpty(GrantWriteAccess(TableDataType.TemporaryTableMasterUser, string.Empty))) { return; }
 
         base.MasterMe();
     }
@@ -528,7 +526,7 @@ public class TableChunk : TableFile {
         if (!_chunks.TryGetValue(chunkId, out var chunk)) {
             return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
         } else {
-            return chunk.IsEditable().StringValue;
+            return chunk.IsEditable();
         }
     }
 
@@ -540,11 +538,11 @@ public class TableChunk : TableFile {
 
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true);
 
-    protected override FileOperationResult SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (!SaveRequired) { return FileOperationResult.ValueStringEmpty; }
+    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (!SaveRequired) { return string.Empty; }
 
         var f = CanSaveMainChunk();
-        if (f.Failed) { return f; }
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         Develop.SetUserDidSomething();
 
@@ -553,7 +551,7 @@ public class TableChunk : TableFile {
         DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Tabelle '{Caption}'");
 
         var chunksnew = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
-        if (chunksnew == null || chunksnew.Count == 0) { return new("Fehler bei der Chunk Erzeugung", false, true); }
+        if (chunksnew == null || chunksnew.Count == 0) { return "Fehler bei der Chunk Erzeugung"; }
 
         #endregion
 
@@ -572,13 +570,13 @@ public class TableChunk : TableFile {
 
         #region Chunks speichern, Fehler ermitteln (allok)
 
-        FileOperationResult? allok = null;
+        var allok = string.Empty;
         try {
             foreach (var thisChunk in chunksToSave) {
                 DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
 
                 f = thisChunk.DoExtendedSave();
-                if (!f.Failed) {
+                if (string.IsNullOrEmpty(f)) {
                     _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
                 } else {
                     allok = f;
@@ -594,7 +592,7 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        if (allok is { } fr) { return fr; }
+        if (!string.IsNullOrEmpty(allok)) { return allok; }
 
         #region Nun gibt es noch Chunk-Leichen
 
@@ -617,7 +615,7 @@ public class TableChunk : TableFile {
         #endregion
 
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
-        return FileOperationResult.ValueStringEmpty;
+        return string.Empty;
     }
 
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {

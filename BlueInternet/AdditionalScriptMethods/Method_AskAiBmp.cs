@@ -17,9 +17,9 @@
 
 using Anthropic.SDK.Constants;
 using Anthropic.SDK.Messaging;
-using BlueBasics;
 using BlueScript.Enums;
-using BlueScript.Structures;
+using BlueScript.Classes;
+using BlueBasics.ClassesStatic;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -29,7 +29,6 @@ using static BlueScript.Variables.VariableBitmap;
 //using CefSharp.WinForms;
 
 namespace BlueScript.Methods;
-
 
 internal class Method_AskAiBmp : Method {
 

@@ -659,8 +659,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
         if (pointToMove == null) {
             foreach (var thisIt in _itemsToMove) {
-                if (thisIt is AbstractPadItem { PointsForSuccesfullyMove.Count: > 0 } bpi) {
-                    pointToMove = bpi.PointsForSuccesfullyMove[0];
+                if (thisIt is AbstractPadItem { PointsForSuccessfullyMove.Count: > 0 } bpi) {
+                    pointToMove = bpi.PointsForSuccessfullyMove[0];
                     break;
                 }
             }

@@ -66,7 +66,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         _point2.SetTo(point2, false);
         MovablePoint.Add(_point1);
         MovablePoint.Add(_point2);
-        PointsForSuccesfullyMove.AddRange(MovablePoint);
+        PointsForSuccessfullyMove.AddRange(MovablePoint);
         CalculateJointMiddle(_point1, _point2);
         _style = format;
         _tempPoints = [];

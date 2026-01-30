@@ -16,14 +16,13 @@
 // DEALINGS IN THE SOFTWARE.
 
 using Anthropic.SDK;
-using BlueBasics;
 using BlueScript.Enums;
-using BlueScript.Structures;
+using BlueScript.Classes;
+using BlueBasics.ClassesStatic;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
-
 
 internal class Method_Ai : Method {
 

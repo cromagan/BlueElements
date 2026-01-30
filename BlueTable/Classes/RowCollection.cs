@@ -781,7 +781,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// </summary>
     /// <param name="row"></param>
     /// <param name="reason"></param>
-    /// <returns></returns>
+    /// <returns>Einen Text, warum das Hinzufügen fehlgeschlagen ist</returns>
     private string Add(RowItem row, Reason reason) {
         if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
 

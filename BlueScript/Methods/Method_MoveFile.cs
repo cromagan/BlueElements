@@ -24,7 +24,6 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_MoveFile : Method {
 
     #region Properties

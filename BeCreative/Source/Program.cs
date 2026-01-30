@@ -1,5 +1,5 @@
-﻿using BlueBasics;
-using BlueControls;
+﻿using BlueBasics.ClassesStatic;
+using BlueControls.Classes;
 using System;
 using System.Windows.Forms;
 

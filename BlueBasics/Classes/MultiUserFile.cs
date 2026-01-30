@@ -376,7 +376,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (!LockEditing()) { return false; }
 
-        var t = ProcessFile(TrySave, [_filename], false, mustSave ? 120 : 10) is true;
+        var t = ProcessFile(TrySave, [_filename], false, mustSave ? 120 : 10).IsSuccessful;
 
         if (t) {
             _isSaved = true;
@@ -387,7 +387,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return t;
     }
 
-    public bool SaveAs(string filename) => ProcessFile(TrySave, [filename], false, 120) is true;
+    public bool SaveAs(string filename) => ProcessFile(TrySave, [filename], false, 120).IsSuccessful;
 
     public void UnlockEditing() {
         if (!AmIBlocker()) { return; }
@@ -519,50 +519,51 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         } catch { }
     }
 
-    private FileOperationResult TrySave(List<string> affectingFiles, params object?[] args) {
-        if (IsDisposed) { return FileOperationResult.ValueFailed; }
-        if (Develop.AllReadOnly) { return FileOperationResult.ValueFailed; }
+    private OperationResult TrySave(List<string> affectingFiles, params object?[] args) {
+        if (IsDisposed) { return OperationResult.Failed("Verworfen!"); }
 
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFalse; }
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
-        if (string.IsNullOrEmpty(filename)) { return FileOperationResult.ValueFalse; }
+        if (string.IsNullOrEmpty(filename)) { return OperationResult.Failed("Kein Dateinname angekommen"); }
 
-        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return FileOperationResult.DoRetry; }
+        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return OperationResult.FailedRetryable("Benutzer-Aktion abwarten"); }
 
         // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
-        if (!_saveSemaphore.Wait(0)) { return FileOperationResult.DoRetry; }
+        if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
 
         try {
             //string fileInfoBeforeSaving = GetFileState(filename, true);
 
             var dataUncompressed = ParseableItems().FinishParseable();
 
-            if (dataUncompressed.Length < 10) { return FileOperationResult.DoRetry; }
+            if (dataUncompressed.Length < 10) { return OperationResult.FailedRetryable("Zu wenig Daten angekommen"); }
 
             var tmpFileName = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
+            if (Develop.AllReadOnly) { return OperationResult.Success; }
+
             if (!WriteAllText(tmpFileName, dataUncompressed, Constants.Win1252, false)) {
                 // DeleteFile(TMPFileName, false); Darf nicht gelöscht werden. Datei konnte ja nicht erstell werden. also auch nix zu löschen
-                return FileOperationResult.DoRetry;
+                return OperationResult.FailedRetryable("Speicherfehler");
             }
 
             // OK, nun gehts rund: Zuerst das Backup löschen
             if (FileExists(Backupdateiname(filename))) {
-                if (!DeleteFile(Backupdateiname(filename), false)) { return FileOperationResult.DoRetry; }
+                if (!DeleteFile(Backupdateiname(filename), false)) { return OperationResult.FailedRetryable("Backup konnte nicht gelöscht werden"); }
             }
 
             if (FileExists(filename)) {
                 // Haupt-Datei wird zum Backup umbenannt
-                if (!MoveFile(filename, Backupdateiname(filename), false)) { return FileOperationResult.DoRetry; }
+                if (!MoveFile(filename, Backupdateiname(filename), false)) { return OperationResult.FailedRetryable("Haupt-Datei konnte nicht zum Backup gemacht werden"); }
             }
 
             // --- TmpFile wird zum Haupt ---
             MoveFile(tmpFileName, filename, true);
 
             // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
-            if (ParseableItems().FinishParseable() != ReadAllText(filename, Constants.Win1252)) { return FileOperationResult.DoRetry; }
+            if (ParseableItems().FinishParseable() != ReadAllText(filename, Constants.Win1252)) { return OperationResult.FailedRetryable("Datenschiefstand"); }
 
-            return FileOperationResult.ValueTrue;
+            return OperationResult.Success;
         } finally {
             _saveSemaphore.Release();
         }

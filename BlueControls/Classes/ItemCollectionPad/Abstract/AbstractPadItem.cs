@@ -180,7 +180,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// Diese Punkte müssen gleichzeitig bewegt werden,
     /// wenn das ganze Objekt verschoben werden muss.
     /// </summary>
-    public List<PointM> PointsForSuccesfullyMove { get; } = [];
+    public List<PointM> PointsForSuccessfullyMove { get; } = [];
 
     public virtual string QuickInfo { get; set; } = string.Empty;
 
@@ -382,7 +382,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     public void Move(float x, float y, bool isMouse) {
         if (x == 0 && y == 0) { return; }
-        foreach (var t in PointsForSuccesfullyMove) {
+        foreach (var t in PointsForSuccessfullyMove) {
             t.Move(x, y, isMouse);
         }
         // JointPoint werden bewegt, wenn der JointParentPoint angesprochen wird
@@ -574,7 +574,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     internal void GetNewIdsForEverything() => KeyName = GetUniqueKey();
 
-    //foreach (var thispoint in JointPoints) {//    thispoint.KeyName = Generic.GetUniqueKey();//}//foreach (var thispoint in MovablePoint) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//foreach (var thispoint in PointsForSuccesfullyMove) {//    thispoint.KeyName = Generic.GetUniqueKey();//}////Doppelt gemoppelt//_jointMiddle.KeyName = Generic.GetUniqueKey();//_jointReferenceFirst.KeyName =  Generic.GetUniqueKey();//_jointReferenceSecond.KeyName = Generic.GetUniqueKey();
     protected abstract RectangleF CalculateCanvasUsedArea();
 
     protected void CalculateJointMiddle(PointM firstPoint, PointM secondPoint) {

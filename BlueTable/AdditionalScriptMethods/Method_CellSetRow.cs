@@ -24,7 +24,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_CellSetRow : Method_TableGeneric {
 
     #region Properties
@@ -75,8 +74,8 @@ public class Method_CellSetRow : Method_TableGeneric {
 
         if (columnToSet == tb.Column.ChunkValueColumn) { newchunkval = value; }
 
-        var m = Table.GrantWriteAccess(columnToSet, row, newchunkval, 120, false);
-        if (!string.IsNullOrEmpty(m)) { return DoItFeedback.Falsch(); }
+        var f = Table.GrantWriteAccess(columnToSet, row, newchunkval, 120, false);
+        if (!string.IsNullOrEmpty(f)) { return DoItFeedback.Falsch(); }
 
         if (!scp.ProduktivPhase) {
             if (row.CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }

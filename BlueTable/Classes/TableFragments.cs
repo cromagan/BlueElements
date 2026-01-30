@@ -30,7 +30,6 @@ using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.Classes;
 
 namespace BlueTable.Classes;
 
@@ -155,15 +154,15 @@ public class TableFragments : TableFile {
         base.Freeze(reason);
     }
 
-    public override FileOperationResult GrantWriteAccess(TableDataType type, string? chunkValue) {
+    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
-        if (f.Failed) { return f; }
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (_writer == null) { StartWriter(); }
 
-        if (_writer == null) { return new("Schreib-Objekt nicht erstellt.", false, true); }
+        if (_writer == null) { return "Schreib-Objekt nicht erstellt."; }
 
-        return FileOperationResult.ValueStringEmpty;
+        return string.Empty;
     }
 
     public override string IsNotEditableReason(bool isloading) {
@@ -204,15 +203,17 @@ public class TableFragments : TableFile {
         return base.LoadMainData();
     }
 
-    protected override FileOperationResult SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (_writer == null) { return new("Writer Fehler", false, true); }
+    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (_writer == null) { return "Writer Fehler"; }
 
         try {
             lock (_writer) {
                 _writer.Flush();
             }
-            return FileOperationResult.ValueStringEmpty;
-        } catch { return new("Allgemeiner Fehler", false, true); }
+            return string.Empty;
+        } catch (Exception ex) {
+            return ex.Message;
+        }
     }
 
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
@@ -288,8 +289,8 @@ public class TableFragments : TableFile {
 
             var f = SaveMainFile(this, _isInCache);
 
-            if (f.Failed) {
-                DropMessage(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f.StringValue}");
+            if (!string.IsNullOrEmpty(f)) {
+                DropMessage(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
                 //Develop.DebugPrint(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
                 return;
             }

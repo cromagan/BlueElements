@@ -66,8 +66,8 @@ public class ComicCompPadItem : AbstractPadItem {
         _width = 100;
         P1 = new PointM(this, "Punkt1", 0, 0);
         P2 = new PointM(this, "Punkt2", 0, 0);
-        PointsForSuccesfullyMove.Add(P1);
-        PointsForSuccesfullyMove.Add(P2);
+        PointsForSuccessfullyMove.Add(P1);
+        PointsForSuccessfullyMove.Add(P2);
         MovablePoint.Add(P1);
         MovablePoint.Add(P2);
         _bitmap = null;
@@ -110,7 +110,7 @@ public class ComicCompPadItem : AbstractPadItem {
         var ne = 6.ControlToCanvas(zoom) + 1;
 
         if (value.DistanzZuStrecke(P1, P2) < ne) { return true; }
-        foreach (var thispoint in PointsForSuccesfullyMove) {
+        foreach (var thispoint in PointsForSuccessfullyMove) {
             if (GetLength(value, (PointF)thispoint) < ne) { return true; }
         }
         return false;

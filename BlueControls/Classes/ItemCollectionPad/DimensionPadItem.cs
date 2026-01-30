@@ -100,7 +100,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         MovablePoint.Add(_point1);
         MovablePoint.Add(_point2);
         MovablePoint.Add(_textPoint);
-        PointsForSuccesfullyMove.AddRange(MovablePoint);
+        PointsForSuccessfullyMove.AddRange(MovablePoint);
 
         CalculateOtherPoints();
     }

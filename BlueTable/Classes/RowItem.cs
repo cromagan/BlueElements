@@ -479,7 +479,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-        return tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue).StringValue;
+        return tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue);
     }
 
     public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } tb ||
@@ -531,9 +531,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
                     if (oldvalue != newvalue) {
                         var chunkValue = ChunkValue;
-                        var editableError = GrantWriteAccess(inputColumn, this, chunkValue, 2, true);
+                        var f = GrantWriteAccess(inputColumn, this, chunkValue, 2, true);
+                        if (!string.IsNullOrEmpty(f)) { return (targetColumn, targetRow, f, false); }
 
-                        if (!string.IsNullOrEmpty(editableError)) { return (targetColumn, targetRow, editableError, false); }
                         //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
                         //row.CellSet(column, targetRow.KeyName);
                         //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);

@@ -234,7 +234,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        return tb.GrantWriteAccess(TableDataType.ColumnArrangement, TableChunk.Chunk_Master).StringValue;
+        return tb.GrantWriteAccess(TableDataType.ColumnArrangement, TableChunk.Chunk_Master);
     }
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);

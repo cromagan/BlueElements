@@ -135,7 +135,7 @@ public sealed class CachedFile : IDisposable {
     private (byte[] Content, string Timestamp) ReadContentFromFileSystem() {
         do {
             var fileInfo1 = GetFileState(Filename, false, 0.1f);
-            var content = ReadAllBytes(Filename, 20);
+            var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
             var fileInfo2 = GetFileState(Filename, false, 2f);
             if (fileInfo1 == fileInfo2) { return (content, fileInfo2); }
         } while (true);

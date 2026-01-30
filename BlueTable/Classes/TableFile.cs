@@ -102,14 +102,14 @@ public class TableFile : Table {
     /// Konkrete Prüfung, ob jetzt gespeichert werden kann
     /// </summary>
     /// <returns></returns>
-    public FileOperationResult CanSaveMainChunk() {
-        if (!IsEditable(false)) { return new(IsNotEditableReason(false), false, true); }
+    public string CanSaveMainChunk() {
+        if (!IsEditable(false)) { return IsNotEditableReason(false); }
 
-        if (RowCollection.HasPendingWorker()) { return new("Es müssen noch Daten überprüft werden.", true, true); }
+        if (RowCollection.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
 
         //if (ExecutingScriptThreadsAnyTable.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
 
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return new("Kürzlich vorgenommene Änderung muss verarbeitet werden.", true, true); }
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
 
         return CanSaveFile(Filename, 5);
     }
@@ -151,7 +151,7 @@ public class TableFile : Table {
 
             if (deleteImportet) {
                 var ok = Save(true);
-                if (!ok) { return "Speicher-Fehler!"; }
+                if (ok.IsFailed) { return $"Speicher-Fehler: {ok.FailedReason}"; }
                 tb.Dispose();
                 var d = DeleteFile(thisFile, false);
                 if (!d) { return "Lösch-Fehler!"; }
@@ -206,7 +206,7 @@ public class TableFile : Table {
 
         RepairAfterParse();
 
-        if (!CanWriteInDirectory(fileNameToLoad.FilePath())) { Freeze("Keine Schreibrechte im Verzeichniss."); }
+        if (!CanWriteInDirectory(fileNameToLoad.FilePath())) { Freeze("Keine Schreibrechte im Verzeichnis."); }
 
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded(true);
@@ -228,7 +228,7 @@ public class TableFile : Table {
         base.RepairAfterParse();
     }
 
-    public bool Save(bool mustSave) => ProcessFile(TrySave, [Filename], false, mustSave ? 120 : 10) is true;
+    public OperationResult Save(bool mustSave) => ProcessFile(TrySave, [Filename], false, mustSave ? 120 : 10);
 
     public void SaveAsAndChangeTo(string newFileName) {
         if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!"); }
@@ -247,20 +247,20 @@ public class TableFile : Table {
         MainChunkLoadDone = true;
     }
 
-    protected static FileOperationResult SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
+    protected static string SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.CanSaveMainChunk();
-        if (f.Failed) { return f; }
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         Develop.SetUserDidSomething();
 
         var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false);
-        if (chunksnew?.Count != 1) { return new("Fehler bei der Chunk Erzeugung", false, true); }
+        if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
         f = chunksnew[0].DoExtendedSave();
-        if (f.Failed) { return f; }
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;
-        return FileOperationResult.ValueStringEmpty;
+        return string.Empty;
     }
 
     protected override void Checker_Tick(object state) {
@@ -320,10 +320,10 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var byteData = ReadAndUnzipAllBytes(Filename);
+        var c = ReadAndUnzipAllBytes(Filename);
 
-        if (byteData is null) {
-            Freeze("Laden fehlgeschlagen!");
+        if (c.Value is not ByteData byteData || c.IsFailed) {
+            Freeze($"Laden fehlgeschlagen: {c.FailedReason}");
             return false;
         }
 
@@ -337,17 +337,17 @@ public class TableFile : Table {
         return true;
     }
 
-    protected virtual FileOperationResult SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
         try {
             var result = SaveMainFile(this, DateTime.UtcNow);
 
-            _saveRequired_File = result.Failed;
+            _saveRequired_File = !string.IsNullOrEmpty(result);
 
             OnInvalidateView();
 
             return result;
-        } catch {
-            return new("Allgemeiner Fehler.", false, true);
+        } catch (Exception ex) {
+            return ex.Message;
         }
     }
 
@@ -383,23 +383,25 @@ public class TableFile : Table {
         BeSureToBeUpToDate(AllFiles, false);
     }
 
-    private FileOperationResult TrySave(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return FileOperationResult.ValueFailed; }
+    private OperationResult TrySave(List<string> affectingFiles, params object?[] args) {
+        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
-        if (!string.Equals(filename, Filename, StringComparison.OrdinalIgnoreCase)) { return FileOperationResult.ValueFailed; }
+        if (!string.Equals(filename, Filename, StringComparison.OrdinalIgnoreCase)) { return OperationResult.Failed("Dateiname ungültig"); }
 
-        if (Develop.AllReadOnly) { return FileOperationResult.ValueTrue; }
+        if (Develop.AllReadOnly) { return OperationResult.Success; }
 
-        if (!SaveRequired) { return FileOperationResult.ValueTrue; }
+        if (!SaveRequired) { return OperationResult.Success; }
 
         // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
-        if (!_saveSemaphore.Wait(0)) { return FileOperationResult.DoRetry; }
+        if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
 
         try {
             var result = SaveInternal(DateTime.UtcNow);
             OnInvalidateView();
 
-            return result;
+            if (string.IsNullOrEmpty(result)) { return OperationResult.Success; }
+
+            return OperationResult.Failed(result);
         } finally {
             _saveSemaphore.Release();
         }

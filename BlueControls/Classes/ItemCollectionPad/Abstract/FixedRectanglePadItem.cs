@@ -82,7 +82,7 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         MovablePoint.Add(_pr);
         MovablePoint.Add(_pu);
         MovablePoint.Add(_po);
-        PointsForSuccesfullyMove.Add(_pLo);
+        PointsForSuccessfullyMove.Add(_pLo);
     }
 
     #endregion
