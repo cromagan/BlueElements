@@ -283,19 +283,26 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         if (IsDisposed) { return; }
 
         var tmpCanvasMaxBounds = CanvasMaxBounds;
-        var controlArea = AvailableControlPaintArea;
 
+        var freiraumNoSliders = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, Size, Zoom);
+        var freiraumYOnly = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderY.Width, Size.Height), Zoom);
+        var freiraumBoth = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderY.Width, Size.Height - SliderX.Height), Zoom);
+
+        // Jetzt mit finaler Größe arbeiten
+        var controlArea = AvailableControlPaintArea;
         var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
 
-        SliderX.Visible = ShowSliderX && SlideAndZoomAllowed;
-        if (freiraumControl.X < 0 && SliderX.Visible) {
-            SliderX.Enabled = true;
+        SliderY.Visible = SlideAndZoomAllowed && freiraumNoSliders.Y < -SliderY.Width && freiraumControl.Y < 0;
+        SliderX.Visible = ShowSliderX && SlideAndZoomAllowed &&
+                           (SliderY.Visible ? freiraumBoth.X < -SliderX.Height : freiraumYOnly.X < -SliderX.Height) &&
+                           freiraumControl.X < 0;
+
+        if (SliderX.Visible) {
             SliderX.Minimum = tmpCanvasMaxBounds.Right.CanvasToControl(Zoom) - controlArea.Right - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom);
             SliderX.Maximum = tmpCanvasMaxBounds.Left.CanvasToControl(Zoom) - controlArea.Left;
             SliderX.LargeChange = controlArea.Width;
             SliderX.Value = -OffsetX;
         } else {
-            SliderX.Enabled = false;
             if (!MousePressing()) {
                 var val = 0;
                 if (AutoCenter) { val = (freiraumControl.X - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom)) / 2; }
@@ -306,15 +313,12 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             }
         }
 
-        SliderY.Visible = SlideAndZoomAllowed;
-        if (freiraumControl.Y < 0 && SliderY.Visible) {
-            SliderY.Enabled = true;
+        if (SliderY.Visible) {
             SliderY.Maximum = tmpCanvasMaxBounds.Bottom.CanvasToControl(Zoom) - controlArea.Bottom - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom);
             SliderY.Minimum = tmpCanvasMaxBounds.Top.CanvasToControl(Zoom) - controlArea.Top;
             SliderY.LargeChange = controlArea.Height;
             SliderY.Value = -OffsetY;
         } else {
-            SliderY.Enabled = false;
             if (!MousePressing()) {
                 var val = 0;
                 if (AutoCenter) { val = (freiraumControl.Y - tmpCanvasMaxBounds.Top.CanvasToControl(Zoom)) / 2; }
@@ -424,7 +428,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     protected virtual void OnMouseUp(CanvasMouseEventArgs e) { }
 
     protected override sealed void OnMouseWheel(MouseEventArgs e) {
-        // e enstricht den Control-Koordinaten
         base.OnMouseWheel(e);
 
         if (ControlMustPressedForZoomWithWheel && !ControlPressing) {
@@ -441,19 +444,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         } else {
             Zoom *= 1f / 1.5f;
         }
-
-        //var canvasBounds = CanvasMaxBounds();
-        //ComputeSliders(canvasBounds);
-        // m.Canvas Beeinhaltet den Punkt, wo die Maus hinzeigt Maßstabunabhängig.
-        // Der Slider ist abhängig vom Maßsstab - sowie die echten Mauskoordinaten ebenfalls.
-        // Deswegen die m.Canvas mit dem neuen Zoom-Faktor berechnen umrechen, um auch Masstababhängig zu sein
-        // Die Verschiebung der echten Mauskoordinaten berechnen und den Slider auf den Wert setzen.
         OffsetX = m.CanvasX.CanvasToControl(Zoom) - e.X;
         OffsetY = m.CanvasY.CanvasToControl(Zoom) - e.Y;
-
-        // Alte Berechnung für Mittig Setzen
-        //SliderX.Value = (m.ControlX * _zoom) - (Width / 2) - SliderY.Width
-        //SliderY.Value = (m.Y * _zoom) - (Height / 2) - SliderX.Height
     }
 
     protected virtual void OnOffsetXChanged() => Invalidate();
