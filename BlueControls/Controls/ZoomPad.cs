@@ -285,17 +285,17 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         var tmpCanvasMaxBounds = CanvasMaxBounds;
 
         var freiraumNoSliders = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, Size, Zoom);
-        var freiraumYOnly = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderY.Width, Size.Height), Zoom);
         var freiraumBoth = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderY.Width, Size.Height - SliderX.Height), Zoom);
 
-        // Jetzt mit finaler Größe arbeiten
+        // Erst die Slider-Sichtbarkeit bestimmen
+        SliderY.Visible = SlideAndZoomAllowed && freiraumNoSliders.Y < -SliderY.Width && freiraumBoth.Y < 0;
+        SliderX.Visible = ShowSliderX && SlideAndZoomAllowed &&
+                           (SliderY.Visible ? freiraumBoth.X < -SliderX.Height : freiraumNoSliders.X < -SliderX.Height) &&
+                           (SliderY.Visible ? freiraumBoth.X < 0 : freiraumNoSliders.X < 0);
+
+        // Jetzt mit finaler Größe arbeiten - NACH der Slider-Schaltung
         var controlArea = AvailableControlPaintArea;
         var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
-
-        SliderY.Visible = SlideAndZoomAllowed && freiraumNoSliders.Y < -SliderY.Width && freiraumControl.Y < 0;
-        SliderX.Visible = ShowSliderX && SlideAndZoomAllowed &&
-                           (SliderY.Visible ? freiraumBoth.X < -SliderX.Height : freiraumYOnly.X < -SliderX.Height) &&
-                           freiraumControl.X < 0;
 
         if (SliderX.Visible) {
             SliderX.Minimum = tmpCanvasMaxBounds.Right.CanvasToControl(Zoom) - controlArea.Right - tmpCanvasMaxBounds.Left.CanvasToControl(Zoom);
