@@ -299,3 +299,57 @@ dotnet_diagnostic.IDE0055.severity = none
 
 # CS1591: Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
 dotnet_diagnostic.CS1591.severity = none
+
+
+# CS0649: Dem Feld wird nie etwas zugewiesen, und es hat immer seinen Standardwert von "null".
+dotnet_diagnostic.CS0649.severity = error
+
+# IDE0290: Primären Konstruktor verwenden
+dotnet_diagnostic.IDE0290.severity = none
+
+# S1135: Track uses of "TODO" tags
+dotnet_diagnostic.S1135.severity = none
+
+# S3060: "is" should not be used with "this"
+dotnet_diagnostic.S3060.severity = suggestion
+
+# S125: Sections of code should not be commented out
+dotnet_diagnostic.S125.severity = suggestion
+
+# S101: Types should be named in PascalCase
+dotnet_diagnostic.S101.severity = silent
+
+# S1066: Mergeable "if" statements should be combined
+dotnet_diagnostic.S1066.severity = suggestion
+
+# S1075: URIs should not be hardcoded
+dotnet_diagnostic.S1075.severity = none
+
+# S1121: Assignments should not be made from within sub-expressions
+dotnet_diagnostic.S1121.severity = none
+
+# S1125: Boolean literals should not be redundant
+dotnet_diagnostic.S1125.severity = none
+
+# S1210: "Equals" and the comparison operators should be overridden when implementing "IComparable"
+dotnet_diagnostic.S1210.severity = suggestion
+
+# S2053: Hashes should include an unpredictable salt
+dotnet_diagnostic.S2053.severity = silent
+
+# S2346: Flags enumerations zero-value members should be named "None"
+dotnet_diagnostic.S2346.severity = suggestion
+
+# S2486: Generic exceptions should not be ignored
+dotnet_diagnostic.S2486.severity = suggestion
+
+# S4220: Events should have proper arguments
+dotnet_diagnostic.S4220.severity = error
+
+# S4275: Getters and setters should access the expected fields
+dotnet_diagnostic.S4275.severity = suggestion
+
+# S3604: Member initializer values should not be redundant
+dotnet_diagnostic.S3604.severity = none
+
+

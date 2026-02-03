@@ -21,9 +21,8 @@ namespace BlueBasics.Enums;
 
 [Flags]
 public enum ImageCodeEffect {
-
     //Undefiniert = -1,
-    Ohne = 0,
+    None = 0,
 
     Durchgestrichen = 1,
 

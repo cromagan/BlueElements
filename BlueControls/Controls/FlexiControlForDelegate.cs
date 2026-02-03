@@ -78,19 +78,19 @@ public class FlexiControlForDelegate : FlexiControl {
         base.OnControlAdded(e);
     }
 
-    private bool CheckEnabledState() {
+    private void CheckEnabledState() {
         if (DesignMode) {
             DisabledReason = string.Empty;
-            return true;
+            return ;
         }
 
         if (_doThis == null) {
             DisabledReason = "Kein zugehöriges Objekt definiert.";
-            return false;
+            return ;
         }
 
         DisabledReason = string.Empty;
-        return true;
+
     }
 
     private void GenFehlerText() => InfoText = string.Empty;
@@ -108,7 +108,7 @@ public class FlexiControlForDelegate : FlexiControl {
         if (GetControl<Button>() is { IsDisposed: false } c0) {
             c0.Text = text;
             if (image is { } im) {
-                c0.ImageCode = image.KeyName;
+                c0.ImageCode = im.KeyName;
             }
         }
 

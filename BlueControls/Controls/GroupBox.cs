@@ -145,21 +145,10 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
         foreach (Control thisControl in Controls) {
             switch (thisControl) {
                 case Caption:
-                    thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
-                    thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
-                    break;
-
                 case Line:
-                    thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
-                    thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
-                    break;
-
                 case Button:
-
                 case ComboBox:
-
                 case ListBox:
-
                 case TextBox:
                     thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                     thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);

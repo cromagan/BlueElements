@@ -117,7 +117,7 @@ public sealed class QuickImage : IReadableText, IEditable {
     public string CaptionForEditor => "Bild";
     public Color? ChangeGreenTo { get; }
     public int DrehWinkel { get; }
-    public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
+    public ImageCodeEffect Effekt { get; } = ImageCodeEffect.None;
     public Color? Färbung { get; }
     public int Height { get; private set; }
     public int Helligkeit { get; }
@@ -223,7 +223,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         c.Append('|');
         if (height > 0 && width != height) { c.Append(height); }
         c.Append('|');
-        if (effekt != ImageCodeEffect.Ohne) { c.Append((int)effekt); }
+        if (effekt != ImageCodeEffect.None) { c.Append((int)effekt); }
         c.Append('|');
         if (färbung.HasValue && färbung.Value != Color.Transparent) { c.Append(färbung.Value.ToHtmlCode()); }
 
@@ -242,7 +242,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         return c.ToString().TrimEnd('|');
     }
 
-    public static QuickImage Get(QuickImage qi, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? qi
+    public static QuickImage Get(QuickImage qi, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.None ? qi
             : Get(GenerateCode(qi.Name, qi.Width, qi.Height, qi.Effekt | additionalState, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
 
     public static QuickImage Get(string code) => Pics.TryGetValue(code, out var p) ? p : new QuickImage(code);
@@ -255,16 +255,16 @@ public sealed class QuickImage : IReadableText, IEditable {
             w[2] = string.Empty;
             return Get(w.JoinWith("|"));
         }
-        return Get(GenerateCode(image, squareWidth, 0, ImageCodeEffect.Ohne, null, null, 100, 100, 0, 0, string.Empty));
+        return Get(GenerateCode(image, squareWidth, 0, ImageCodeEffect.None, null, null, 100, 100, 0, 0, string.Empty));
     }
 
     public static QuickImage Get(ImageCode image) => Get(image, 16);
 
-    public static QuickImage Get(ImageCode image, int squareWidth) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, null, null, 100, 100, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.None, null, null, 100, 100, 0, 0, string.Empty));
 
-    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo, int helligkeit) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung, changeGreenTo, 100, helligkeit, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo, int helligkeit) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.None, färbung, changeGreenTo, 100, helligkeit, 0, 0, string.Empty));
 
-    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.None, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
 
     public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
@@ -285,8 +285,6 @@ public sealed class QuickImage : IReadableText, IEditable {
     public static implicit operator Bitmap(QuickImage qi) => qi._bitmap;
 
     public string IsNowEditable() => string.Empty;
-
-    public void OnNeedImage(NeedImageEventArgs e) => NeedImage?.Invoke(this, e);
 
     public string ReadableText() => string.Empty;
 
@@ -356,7 +354,7 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         #region Bild ohne besonderen Effekte, schnell abhandeln
 
-        if (Effekt == ImageCodeEffect.Ohne &&
+        if (Effekt == ImageCodeEffect.None &&
             !ChangeGreenTo.HasValue &&
             !Färbung.HasValue &&
             Sättigung == 100 &&
@@ -379,7 +377,7 @@ public sealed class QuickImage : IReadableText, IEditable {
             var n = "Kreuz|" + bmpOriE.Width + "|";
             if (bmpOriE.Width != bmpOriE.Height) { n += bmpOriE.Height; }
             n += "|";
-            if (tmpEx != ImageCodeEffect.Ohne) { n += (int)tmpEx; }
+            if (tmpEx != ImageCodeEffect.None) { n += (int)tmpEx; }
             bmpKreuz = new BitmapExt(Get(n.Trim("|")));
         }
         if (!string.IsNullOrEmpty(Zweitsymbol)) {
@@ -481,6 +479,8 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         return bmp == null ? (new Bitmap(Width, Height), true) : (bmp, false);
     }
+
+    private void OnNeedImage(NeedImageEventArgs e) => NeedImage?.Invoke(null, e);
 
     #endregion
 }

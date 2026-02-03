@@ -418,7 +418,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
 
         var n = "FontName-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol(FontName, true)); }
+        if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(FontName, true)); }
 
         _nameInStyleSym = QuickImage.Get(n);
         return _nameInStyleSym;
@@ -609,7 +609,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
 
         var n = "Font-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { new QuickImage(n, Symbol("Abc", false)); }
+        if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false)); }
 
         _symbolForReadableTextSym = QuickImage.Get(n);
         return _symbolForReadableTextSym;
@@ -626,7 +626,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         }
 
         var n = "Line-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { new QuickImage(n, bmp); }
+        if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp); }
 
         _symbolOfLineSym = QuickImage.Get(n);
         return _symbolOfLineSym;

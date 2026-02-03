@@ -61,21 +61,12 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dick, left, right, bottom);
 
-    //    gr.FillRectangle(lgb, r2);
-    //}
     public override void Draw_UpperLine(Graphics gr, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_UpperLine(gr, ColumnLineStyle.Dick, left, right, bottom);
 
-    //    var lgb = new LinearGradientBrush(r2, viewItem.BackColor_ColumnCell, co, LinearGradientMode.Vertical);
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
 
-    //public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
-    //    base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
-
-    //    var r2 = new RectangleF(positionControl.Left, positionControl.Top + positionControl.Height *0.1f, positionControl.Width, positionControl.Height *0.9f);
-
-    //    var co = viewItem.BackColor_ColumnCell.Darken(0.1);
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
@@ -105,7 +96,6 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
             gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, buttonPos.Top + p5);
         }
         Font_RowChapter_Scaled.DrawString(gr, tmp, p23, buttonPos.Top);
-        //gr.DrawLine(Skin.PenLinieDick, 0, positionControl.Y, positionControl.Width, positionControl.Y);
     }
 
     protected override string GetCompareKey() => ChapterText;

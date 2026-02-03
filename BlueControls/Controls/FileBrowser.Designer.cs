@@ -39,7 +39,6 @@ namespace BlueControls.Controls {
             this.ThumbGenerator.WorkerSupportsCancellation = true;
             this.ThumbGenerator.DoWork += new DoWorkEventHandler(this.ThumbGenerator_DoWork);
             this.ThumbGenerator.ProgressChanged += new ProgressChangedEventHandler(this.ThumbGenerator_ProgressChanged);
-            this.ThumbGenerator.RunWorkerCompleted += new RunWorkerCompletedEventHandler(this.ThumbGenerator_RunWorkerCompleted);
             // 
             // lsbFiles
             // 

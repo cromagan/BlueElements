@@ -323,15 +323,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 break;
 
             case ListBoxAppearance.Gallery:
-                _itemDesign = Design.Item_Listbox;
-                _controlDesign = Design.ListBox;
-                break;
-
-            case ListBoxAppearance.FileSystem:
-                _itemDesign = Design.Item_Listbox;
-                _controlDesign = Design.ListBox;
-                break;
-
+             case ListBoxAppearance.FileSystem:
             case ListBoxAppearance.Listbox_Boxes:
             case ListBoxAppearance.Listbox:
                 _itemDesign = Design.Item_Listbox;

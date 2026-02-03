@@ -149,8 +149,7 @@ public static class Generic {
     /// <summary>
     /// Erstellt eine URL-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
     /// </summary>
-    /// <param name="saveTo"></param>
-    /// <param name="linkUrl"></param>
+    /// <param name="url"></param>
     /// <returns></returns>
     /// <summary>
     /// Erstellt eine Datei-Verknüpfung, die im Explorer mittels Click geöffnet werden lann

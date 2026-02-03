@@ -234,7 +234,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
             if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
                 if (string.IsNullOrEmpty(QuickInfo)) { t += "\r\n"; }
-                t = "Verlinkungs-Status: " + info;
+                t = t + "Verlinkungs-Status: " + info;
             }
 
             return t;

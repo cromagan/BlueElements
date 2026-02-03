@@ -44,8 +44,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Constructors
 
-    private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
-
     private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) : base(connectedControl, (Design)controlDesign) {
         InitializeComponent();
         xpos -= Skin.PaddingSmal;

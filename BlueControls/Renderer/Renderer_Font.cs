@@ -53,7 +53,6 @@ public class Renderer_Font : Renderer_Abstract {
 
     public override List<string> ParseableItems() => [];
 
-    public override bool ParseThis(string key, string value) => base.ParseThis(key, value);
 
     public override string ReadableText() => "Schriftart darstellen";
 

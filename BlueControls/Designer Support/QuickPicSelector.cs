@@ -28,7 +28,6 @@ public sealed class QuickPicSelector : UITypeEditor {
     #region Fields
 
     private readonly QuickPicDesigner _fqp = new();
-    private string _c = string.Empty;
     private IWindowsFormsEditorService? _edSvc;
 
     #endregion
@@ -37,7 +36,7 @@ public sealed class QuickPicSelector : UITypeEditor {
 
     public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value) {
         _edSvc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
-        _c = Convert.ToString(value);
+        var _c = Convert.ToString(value);
         _fqp.StartAll(_c);
         //we add handler to the about form button1 in order to close the form when the button is clicked
         _fqp.btnOk.Click += Click;
@@ -53,7 +52,7 @@ public sealed class QuickPicSelector : UITypeEditor {
             return;
         }
 
-        _c = _fqp.ImgCode();
+  
         _edSvc.CloseDropDown();
     }
 

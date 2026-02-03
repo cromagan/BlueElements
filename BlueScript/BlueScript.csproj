@@ -24,17 +24,30 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
 
-    <!-- Moderne Optimierungen -->
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisLevel>preview</AnalysisLevel>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-
     <!-- Plattformen -->
 	  <Platforms>AnyCPU</Platforms>
     <Prefer32Bit>false</Prefer32Bit>
     <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+<ItemGroup>
+  <!-- Maximale Code-Analyzer für .NET Framework 4.8 -->
+  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+  
+  <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+  
+  <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+ </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Methods\Method_BackupControl.cs" />

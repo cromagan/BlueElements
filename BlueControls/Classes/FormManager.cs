@@ -173,7 +173,7 @@ public class FormManager : ApplicationContext {
 
         Forms.Remove(thisForm);
 
-        FormRemoved?.Invoke(this, new EventArgs.FormEventArgs(thisForm));
+        FormRemoved?.Invoke(null, new EventArgs.FormEventArgs(thisForm));
 
         if (Forms.Count > 0) { return; }
 
@@ -195,7 +195,7 @@ public class FormManager : ApplicationContext {
         frm.FormClosed += OnFormClosed;
         Forms.Add(frm);
 
-        FormAdded?.Invoke(this, new EventArgs.FormEventArgs(frm));
+        FormAdded?.Invoke(null, new EventArgs.FormEventArgs(frm));
     }
 
     #endregion

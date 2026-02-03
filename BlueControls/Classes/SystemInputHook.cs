@@ -312,9 +312,9 @@ public sealed class SystemInputHook {
 
     private void OnKeyDown(KeyEventArgs e) => KeyDown?.Invoke(this, e);
 
-    private void OnKeyUp(KeyEventArgs e) => KeyUp?.Invoke(null, e);
+    private void OnKeyUp(KeyEventArgs e) => KeyUp?.Invoke(this, e);
 
-    private void OnMouseDown(MouseEventArgs e) => MouseDown?.Invoke(null, e);
+    private void OnMouseDown(MouseEventArgs e) => MouseDown?.Invoke(this, e);
 
     private void OnMouseMove(MouseEventArgs e) => MouseMove?.Invoke(this, e);
 

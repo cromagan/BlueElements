@@ -830,7 +830,6 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Classes;
 
 public static class Skin {
-
     #region Fields
 
     public const int Padding = 9;
@@ -871,7 +870,7 @@ public static class Skin {
 
     #region Methods
 
-    public static ImageCodeEffect AdditionalState(States state) => state.HasFlag(States.Standard_Disabled) ? St[0] : ImageCodeEffect.Ohne;
+    public static ImageCodeEffect AdditionalState(States state) => state.HasFlag(States.Standard_Disabled) ? St[0] : ImageCodeEffect.None;
 
     public static List<string>? AllStyles() {
         InitStyles();

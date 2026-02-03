@@ -68,8 +68,6 @@ public class Renderer_RichText : Renderer_Abstract {
         return result;
     }
 
-    public override bool ParseThis(string key, string value) => base.ParseThis(key, value);
-
     public override string ReadableText() => "Formatierter Text";
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Sonne);

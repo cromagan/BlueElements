@@ -419,9 +419,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             capZeilen1.Text = "<imagecode=Information|16> " + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " +
                               Table.RowsVisibleUnique().Count + " " + LanguageTool.DoTranslate("St.");
         } else {
-            {
-                capZeilen1.Text = string.Empty;
-            }
+            capZeilen1.Text = string.Empty;
         }
 
         capZeilen1.Refresh(); // Backgroundworker lassen wenig luft

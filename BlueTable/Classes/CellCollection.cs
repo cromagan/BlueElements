@@ -296,7 +296,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (column != null && row != null) { return KeyOfCell(column.KeyName, row.KeyName); }
         if (column == null && row != null) { return KeyOfCell(string.Empty, row.KeyName); }
-        if (column != null && row == null) { return KeyOfCell(column.KeyName, string.Empty); }
+        if (column != null) { return KeyOfCell(column.KeyName, string.Empty); }
 
         return string.Empty;
     }

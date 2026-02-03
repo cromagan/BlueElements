@@ -310,10 +310,10 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         var count = 0;
         do {
             count++;
+            if (count > 50) { break; }
             var again = false;
-            if (_tempPoints.Count > 100) {
-                break;
-            }
+            if (_tempPoints.Count > 100) { break; }
+
             for (var z = 0; z < _tempPoints.Count; z++) {
                 if (LöscheVerdeckte(z)) {
                     again = true;
@@ -335,7 +335,6 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
                 }
             }
             if (!again) { break; }
-            if (count > 50) { break; }
         } while (true);
     }
 

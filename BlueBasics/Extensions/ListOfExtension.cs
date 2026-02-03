@@ -213,9 +213,7 @@ public static partial class Extensions {
         col.Add(tagname + "=" + l);
     }
 
-    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : Enum {
-        if (value == null) { return; }
-
+    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T value) where T : Enum {
         var underlyingType = Enum.GetUnderlyingType(typeof(T));
 
         if (underlyingType == typeof(int)) {

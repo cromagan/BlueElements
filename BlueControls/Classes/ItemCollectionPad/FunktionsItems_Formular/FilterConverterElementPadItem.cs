@@ -178,7 +178,6 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
         //var inr = GetFilterFromGet();
         if (TableOutput is { IsDisposed: false } tb) {
-            var ic = new List<AbstractListItem>();
             result.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ItemsOf(tb.Column, true)));
             result.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ItemsOf(typeof(FilterTypeRowInputItem))));
             result.Add(new FlexiControlForProperty<string>(() => Filter_Wert, 5));

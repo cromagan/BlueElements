@@ -930,11 +930,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var tries = 0;
         var startTime = DateTime.UtcNow;
 
-        //if (reason == Reason.SetCommand) {
-        //    var r = Table?.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, ChunkValue) ?? string.Empty;
-        //    if (!string.IsNullOrEmpty(r)) { return r; }
-        //}
-
         while (true) {
             tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures
 
@@ -973,7 +968,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     }
                 }
 
-                //column.Invalidate_ContentWidth();
                 InvalidateCheckData();
                 tb.Cell.OnCellValueChanged(new CellEventArgs(column, this));
             }
@@ -1261,13 +1255,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         searchText = searchText.ToUpperInvariant();
         foreach (var thisColumnItem in tb.Column) {
-            {
+            
                 if (!thisColumnItem.IgnoreAtRowFilter) {
                     var txt = CellGetString(thisColumnItem);
                     txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, thisColumnItem.DoOpticalTranslation, null);
                     if (!string.IsNullOrEmpty(txt) && txt.ContainsIgnoreCase(searchText)) { return true; }
                 }
-            }
+            
         }
         return false;
     }

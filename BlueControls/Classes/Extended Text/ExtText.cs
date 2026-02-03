@@ -693,6 +693,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 break;
 
             case "H7":
+            case "STRONG":
                 style = PadStyles.Hervorgehoben;
                 font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
@@ -704,11 +705,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             case "H5":
                 style = PadStyles.Kleiner_Zusatz;
-                font = Skin.GetBlueFont(_sheetStyle, style);
-                break;
-
-            case "STRONG":
-                style = PadStyles.Hervorgehoben;
                 font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 

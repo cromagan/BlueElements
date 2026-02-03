@@ -63,7 +63,7 @@ public partial class QuickInfo : FloatingForm {
         if (text == _autoClosedTxt) { return; }
         _shownTxt = text;
         if (string.IsNullOrEmpty(text)) { return; }
-        new QuickInfo(text);
+        _ = new QuickInfo(text);
     }
 
     private static void Close(bool autoClose) {

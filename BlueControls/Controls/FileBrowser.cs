@@ -286,9 +286,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     private void CheckButtons(bool pfadexists) {
         txbPfad.Enabled = string.IsNullOrEmpty(DirectoryMin) && Enabled && string.IsNullOrEmpty(Var_Directory);
         lsbFiles.Enabled = Enabled && pfadexists;
-        btnAddScreenShot.Enabled = AllowScreenshots & Enabled && pfadexists;
+        btnAddScreenShot.Enabled = AllowScreenshots && Enabled && pfadexists;
 
-        btnExplorerÖffnen.Enabled = pfadexists && Enabled; //&& (IsAdministrator() || AllowEdit);
+        btnExplorerÖffnen.Enabled = pfadexists && Enabled;
 
         if (string.IsNullOrEmpty(DirectoryMin)) {
             btnZurück.Enabled = Enabled && pfadexists;
@@ -743,9 +743,6 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 bItem.Bitmap = null;
                 break;
         }
-    }
-
-    private void ThumbGenerator_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
     }
 
     private void txbPfad_Enter(object? sender, System.EventArgs? e) {

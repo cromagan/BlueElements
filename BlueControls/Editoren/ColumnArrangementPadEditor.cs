@@ -449,7 +449,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         var x = 0f;
         foreach (var thisColumnViewItem in ca) {
-            if (thisColumnViewItem?.Column is { IsDisposed: false } c) {
+            if (thisColumnViewItem is { IsDisposed: false } ) {
                 var it = new ColumnPadItem(thisColumnViewItem, thisColumnViewItem.GetRenderer(Constants.Win11));
                 Pad.Items.Add(it);
                 it.SetLeftTopPoint(x, 0);

@@ -75,7 +75,7 @@ internal class Method_Export : Method_TableGeneric {
 
         #region  Tabelle prüfen
 
-        if (myTb == null || allFi.Table != myTb) {
+        if (allFi.Table != myTb) {
             allFi.Dispose();
             return new DoItFeedback("Tabellenfehler!", true, ld);
         }

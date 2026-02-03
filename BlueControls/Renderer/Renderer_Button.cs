@@ -171,10 +171,10 @@ public class Renderer_Button : Renderer_Abstract {
 
         if (_bild_anzeigen && _checkstatus_anzeigen) {
             r = t[2];
-        } else if (_bild_anzeigen && _checkstatus_anzeigen) {
-            r = t[1];
-        } else {
+        } else if (!_bild_anzeigen && !_checkstatus_anzeigen) {
             r = t[0];
+        } else {
+            r = t[1];
         }
 
         return LanguageTool.PrepaireText(r, style, string.Empty, string.Empty, doOpticalTranslation, null);

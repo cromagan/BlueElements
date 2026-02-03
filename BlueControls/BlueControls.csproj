@@ -1,104 +1,118 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+<PropertyGroup>
+  <OutputType>Library</OutputType>
+  <TargetFramework>net48</TargetFramework>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  <LangVersion>preview</LangVersion>
+  <Nullable>enable</Nullable>
+  <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  <AnalysisMode>Recommended</AnalysisMode>
+  <EnableHotReload>true</EnableHotReload>
+  <Deterministic>false</Deterministic>
+
+  <!-- Assembly-Metadaten -->
+  <RootNamespace>BlueControls</RootNamespace>
+  <AssemblyName>BlueControls</AssemblyName>
+  <Company>Christian Peter</Company>
+  <Authors>Christian Peter</Authors>
+  <Copyright>Copyright © 2026 Christian Peter</Copyright>
+
+  <!-- Assembly-Informationen -->
+  <Version>1.0.0</Version>
+  <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  <FileVersion>1.0.0.0</FileVersion>
+
   
-  <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>net48</TargetFramework>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    <AnalysisMode>Recommended</AnalysisMode>
-	<EnableHotReload>true</EnableHotReload>
-	<Deterministic>false</Deterministic>
-
-    <!-- Assembly-Metadaten -->
-    <RootNamespace>BlueControls</RootNamespace>
-    <AssemblyName>BlueControls</AssemblyName>
-    <Company>Christian Peter</Company>
-    <Authors>Christian Peter</Authors>
-    <Copyright>Copyright © 2026 Christian Peter</Copyright>
-
-    <!-- Assembly-Informationen -->
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-
-    <!-- Moderne Optimierungen -->
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisLevel>preview</AnalysisLevel>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-
-    <!-- Plattformen -->
-	  <Platforms>AnyCPU;x86;x64</Platforms>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseWindowsForms>true</UseWindowsForms>
-    <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
-   
-  <ItemGroup>
-    <Compile Remove="AdditionalScriptMethods\Method_AddPadItem.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_ConnectPoints.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_ConnectPointsWithSameName.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_DeletePoints.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_Dimension.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_LoadPadItem.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_MirrorPadItem.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_mm.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_MovePadItem.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_ScaledView.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_SendToBack.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_ShowForm.cs" />
-    <Compile Remove="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
-    <Compile Remove="AdditionalScriptMethods\VariablePadItem.cs" />
-    <Compile Remove="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
-    <Compile Remove="Classes\ItemCollectionPad\FunktionsItems_Formular\CreativePadItem.cs" />
-    <Compile Remove="Classes\ItemCollectionPad\ScaledViewPadItem.cs" />
-    <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.cs" />
-    <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.Designer.cs" />
-    <Compile Remove="Editoren\CreativePadScriptEditor.cs" />
-    <Compile Remove="Editoren\CreativePadScriptEditor.Designer.cs" />
-    <Compile Remove="Editoren\DynamicSymbolScriptEditor.cs" />
-    <Compile Remove="Editoren\DynamicSymbolScriptEditor.Designer.cs" />
-    <Compile Remove="Forms\Voting.cs" />
-    <Compile Remove="Forms\Voting.Designer.cs" />
-    <Compile Remove="Renderer\Renderer_DynamicSymbol.cs" />
-  </ItemGroup>
+  <!-- Plattformen -->
+  <Platforms>AnyCPU;x86;x64</Platforms>
+  <Prefer32Bit>false</Prefer32Bit>
+  <UseWindowsForms>true</UseWindowsForms>
+  <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
+  <RepositoryType>git</RepositoryType>
+</PropertyGroup>
+ 
+<ItemGroup>
+  <!-- Maximale Code-Analyzer für .NET Framework 4.8 -->
+  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
   
-  <ItemGroup>
-    <None Remove="Ressources\Dictionary\Deutsch.BDB" />
-    <None Remove="Ressources\Styles\Styles.BDB" />
+  <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+  
+  <PackageReference Include="SonarAnalyzer.CSharp" Version="9.16.0.82469">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
+ </ItemGroup>
+  
+ <ItemGroup>
+  
+  <Compile Remove="AdditionalScriptMethods\Method_AddPadItem.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_ConnectPoints.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_ConnectPointsWithSameName.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_DeletePoints.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_Dimension.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_LoadPadItem.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_MirrorPadItem.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_mm.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_MovePadItem.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_ScaledView.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_SendToBack.cs" />
+  <Compile Remove="AdditionalScriptMethods\Method_ShowForm.cs" />
+  <Compile Remove="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
+  <Compile Remove="AdditionalScriptMethods\VariablePadItem.cs" />
+  <Compile Remove="Classes\ItemCollectionList\TableItems\RowInfoListItem.cs" />
+  <Compile Remove="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
+  <Compile Remove="Classes\ItemCollectionPad\FunktionsItems_Formular\CreativePadItem.cs" />
+  <Compile Remove="Classes\ItemCollectionPad\ScaledViewPadItem.cs" />
+  <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.cs" />
+  <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.Designer.cs" />
+  <Compile Remove="Editoren\CreativePadScriptEditor.cs" />
+  <Compile Remove="Editoren\CreativePadScriptEditor.Designer.cs" />
+  <Compile Remove="Editoren\DynamicSymbolScriptEditor.cs" />
+  <Compile Remove="Editoren\DynamicSymbolScriptEditor.Designer.cs" />
+  <Compile Remove="Forms\Voting.cs" />
+  <Compile Remove="Forms\Voting.Designer.cs" />
+  <Compile Remove="Renderer\Renderer_DynamicSymbol.cs" />
+</ItemGroup>
 
-    <EmbeddedResource Include="Ressources\Dictionary\Deutsch.BDB" />
-    <EmbeddedResource Include="Ressources\Styles\Styles.BDB" />
+<ItemGroup>
+  <None Remove="Ressources\Dictionary\Deutsch.BDB" />
+  <None Remove="Ressources\Styles\Styles.BDB" />
 
-    <!-- NuGet-Pakete -->
-    <PackageReference Include="FCTB" Version="2.16.24" />
-    
-    <!-- .NET Framework Referenzen -->
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Design" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" />
+  <EmbeddedResource Include="Ressources\Dictionary\Deutsch.BDB" />
+  <EmbeddedResource Include="Ressources\Styles\Styles.BDB" />
+
+  <!-- NuGet-Pakete -->
+  <PackageReference Include="FCTB" Version="2.16.24" />
+  
+  <!-- .NET Framework Referenzen -->
+  <Reference Include="System" />
+  <Reference Include="System.Core" />
+  <Reference Include="System.Design" />
+  <Reference Include="System.Drawing" />
+  <Reference Include="System.Windows" />
+  <Reference Include="System.Windows.Forms" />
+  <Reference Include="WindowsBase" />
 
   <!-- App Manifest -->
+  <None Include="app.manifest" />
 
-    <None Include="app.manifest" />
+  <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
+  <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
+  <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
+</ItemGroup>
 
-    <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
-    <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
-    <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Update="Editoren\RowSortDefinitionEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-  </ItemGroup>
-
+<ItemGroup>
+  <Compile Update="Editoren\RowSortDefinitionEditor.cs">
+    <SubType>UserControl</SubType>
+  </Compile>
+</ItemGroup>
 
 </Project>

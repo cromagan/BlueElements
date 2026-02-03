@@ -26,7 +26,6 @@ using System.Runtime.InteropServices;
 namespace BlueBasics.Classes;
 
 public class WindowsThumbnailProvider {
-
     #region Fields
 
     private const string ShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
@@ -70,7 +69,6 @@ public class WindowsThumbnailProvider {
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
     internal interface IShellItem {
-
         void BindToHandler(IntPtr pbc,
             [MarshalAs(UnmanagedType.LPStruct)] Guid bhid,
             [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
@@ -89,7 +87,6 @@ public class WindowsThumbnailProvider {
     [Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     internal interface IShellItemImageFactory {
-
         [PreserveSig]
         HResult GetImage(
             [In][MarshalAs(UnmanagedType.Struct)] NativeSize size,
@@ -116,7 +113,7 @@ public class WindowsThumbnailProvider {
                     var pixelColor = Color.FromArgb(
                         Marshal.ReadInt32(srcData.Scan0, srcData.Stride * y + 4 * x));
 
-                    if (pixelColor.A > 0 & pixelColor.A < 255) {
+                    if (pixelColor.A > 0 && pixelColor.A < 255) {
                         isAlplaBitmap = true;
                     }
 

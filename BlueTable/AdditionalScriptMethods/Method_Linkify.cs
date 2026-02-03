@@ -78,7 +78,6 @@ public class Method_Linkify : Method_TableGeneric {
         foreach (var (term, row) in searchData) {
             if (!resultText.Contains(term)) { continue; }
 
-            var linkText = row.CellGetString(linkColumn);
             var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName);
             resultText = resultText.Replace(term, link);
         }

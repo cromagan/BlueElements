@@ -359,11 +359,11 @@ public class Renderer_ImageAndText : Renderer_Abstract {
             }
         }
 
-        var i = QuickImage.Get(QuickImage.GenerateCode(_imgpräfix + name, constw, consth, ImageCodeEffect.Ohne, null, null, 100, 100, 0, 0, string.Empty));
+        var i = QuickImage.Get(QuickImage.GenerateCode(_imgpräfix + name, constw, consth, ImageCodeEffect.None, null, null, 100, 100, 0, 0, string.Empty));
 
         if (i.IsError) {
             if (!string.IsNullOrEmpty(_defaultImage)) {
-                i = QuickImage.Get(QuickImage.GenerateCode(_defaultImage, constw, consth, ImageCodeEffect.Ohne, null, null, 100, 100, 0, 0, string.Empty));
+                i = QuickImage.Get(QuickImage.GenerateCode(_defaultImage, constw, consth, ImageCodeEffect.None, null, null, 100, 100, 0, 0, string.Empty));
                 if (!i.IsError) { return i; }
             }
             return null;

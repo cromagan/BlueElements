@@ -21,7 +21,7 @@ namespace BlueBasics.Enums;
 
 [Flags]
 public enum Direction : byte {
-    Nichts = 0,
+    None = 0,
     Oben = 1,
     Unten = 2,
     Links = 4,

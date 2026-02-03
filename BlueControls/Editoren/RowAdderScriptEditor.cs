@@ -68,16 +68,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         }
     }
 
-    /// <summary>
-    /// Nur zum setzen der Zeile zum Testen.
-    /// </summary>
-    public RowItem? Row {
-        set {
-            txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
-            Table = value?.Table;
-        }
-    }
-
     public Table? Table {
         get;
         set {

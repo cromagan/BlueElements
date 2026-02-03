@@ -61,7 +61,7 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
         var pxx = 9.CanvasToControl(scale);
         var p1 = 1.CanvasToControl(scale);
         var p1pic = p1 + pxx;
-        var p2pic = p1 + pxx + p1 + pxx;
+
 
         var editable = CellCollection.IsCellEditable(c, tb.Row.First(), "dummy");
         var bearbInfo = QuickImage.Get(ImageCode.Stift, pxx);

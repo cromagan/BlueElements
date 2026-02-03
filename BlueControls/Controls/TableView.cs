@@ -60,7 +60,6 @@ namespace BlueControls.Controls;
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTable, IStyleable {
-
     #region Fields
 
     public const string Angepinnt = "Angepinnt";
@@ -84,7 +83,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private bool _isinMouseMove;
     private bool _isinSizeChanged;
     private string _newRowsAllowed = string.Empty;
-    private Progressbar? _pg;
     private List<RowItem> _rowsVisibleUnique = new([]);
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
@@ -1521,7 +1519,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
                 FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
                 TableSet(null, string.Empty); // Wichtig (nicht _Table) um Events zu lösen
-                _pg?.Dispose();
             }
         } finally {
             base.Dispose(disposing);
@@ -2985,7 +2982,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        if (direction == Direction.Nichts) { return; }
+        if (direction == Direction.None) { return; }
 
         var newColumn = CursorPosColumn;
         var newRow = CursorPosRow;
